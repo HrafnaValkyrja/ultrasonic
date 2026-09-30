@@ -1,0 +1,10 @@
+# Python packages for the harness venv (Python 3.12, --system-site-packages so KiCad's
+# pcbnew module is importable). Full transitive pins live in constraints.txt.
+# Install: tools/setup.sh   (never pip-install these into the system Python)
+numpy==2.5.3
+scipy==1.18.1
+matplotlib==3.11.2
+build123d==0.13.0        # parametric CAD on OpenCascade (cadquery-ocp-novtk wheel)
+scikit-fem==12.0.2       # finite elements
+skidl==2.3.0             # schematic-as-code -> KiCad netlist
+easyeda2kicad==1.0.1     # LCSC/EasyEDA symbols, footprints, 3D models -> KiCad
