@@ -6,6 +6,18 @@ Branch: `claude/clever-mayer-s5rxuw` (everything below is committed and pushed).
 ## Why the move
 The adversarial audit workflow runs at most (CPU cores − 2) agents at once, capped at 16. The cloud container has 4 cores, so 2 agents ran at a time: about 6–10 h for the whole audit. With the i9-14900HX's 32 threads, 16 run at once.
 
+## First job for the local session
+**The owner has downloaded the 20 bundle parts and asked Claude to do the reassembly.** Ask her which folder they're in, then:
+```bash
+cd <that folder>
+cat ultrasonic-scratch.zip.part{00..19} > ultrasonic-scratch.zip
+sha256sum ultrasonic-scratch.zip   # must be e47d1e93519f00fdd40d1e1364c22b11b18529978cbd8a378028d7e3102f8b4c
+unzip -q ultrasonic-scratch.zip -d <parent of the repo>   # gives <parent>/ultrasonic-scratch
+```
+If the hash doesn't match, find the bad part by size (every part except part19 is exactly 29,360,128 bytes) and ask her to re-download it.
+
+**How this session got here:** `claude --teleport session_016uLR3rVesNK6FmgR7vwByF`, run from a clean checkout of the repo. That carries the whole cloud conversation over. Paths in that history (`/home/user/ultrasonic`, `/tmp/claude-0/...scratchpad`) are the cloud's; locally they are the repo and `../ultrasonic-scratch`.
+
 ## One-time setup on Valhalla
 1. **Linux shell:** on Windows, use **WSL2 with Ubuntu 24.04**. `tools/setup.sh` is apt-based and installs KiCad 10, ngspice, FreeRouting, the Python venv and mermaid-cli.
 2. **Clone and set up:**
