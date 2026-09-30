@@ -43,7 +43,8 @@ PCB_PARTS = 1.2                   # tallest part each side (MCU 0.55, crystal 0.
 SWEEP_DEG = 30.0                  # owner's swept-back arm, 25-35 deg (§8), variant A
 # the pad location is anatomy, so it is fixed from rev 1 (35 x 14 pod, anchor 4 mm from its rear)
 PIVOT = (VISION_X + 35.0 - 4.0, 0.5, -2.0 - 14.0 / 2 + 1.5)
-WIRE_D, SLEEVE_D = 0.85, 2.0      # NiTi wire and its silicone sleeve
+WIRE_D, SLEEVE_D = 0.75, 1.8      # NiTi wire (owner 2026-09-30: keep 20 mm / 30 deg; 0.75 caps force ~1.6 N)
+                                  # sleeve also carries the two transducer wires (docs/diagrams/arm-wiring.svg)
 ARM_L = {"A": None, "B": 30.0}    # free length; None = straight from PIVOT at SWEEP_DEG (~20 mm)
 PAD_DROP = 25.0                   # temple arm to pad centre (ear-open-fit.md, owner's photos)
 SKIN_Y = -3.0                     # pre-tragal skin relative to the temple's inner face (E9 rear-oblique photo)
