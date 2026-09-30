@@ -79,3 +79,4 @@ urllib3==2.8.0
 wcwidth==0.9.1
 webcolors==24.8.0
 wrapt==2.5.0
+pymupdf==1.28.2
