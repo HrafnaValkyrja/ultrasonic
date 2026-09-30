@@ -27,6 +27,7 @@ On the owner's machine (Valhalla: i9-14900HX, 32 threads, 30 GB RAM, native Ubun
   - Start sessions with `tools/claude-session.sh` (tmux + an 18 GB fence).
   - Run any simulation, routing or bulk data job inside a fence: `systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 <cmd>`.
   - Workflows: cap live agents (the audit script uses 5). Never let parallel agents run FreeRouting.
+  - **If you are one of several parallel agents (a workflow or audit):** fence every simulation at 3G (`systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 <cmd>`). If it's killed (exit 137), shrink the problem rather than raising the limit past 4G. Never run FreeRouting, `hw/pod/place.py` or any autorouter.
   - Before resuming heavy background work, check `journalctl -k` for recent OOM kills.
 
 ## Tools
