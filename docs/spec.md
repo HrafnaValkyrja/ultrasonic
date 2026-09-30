@@ -1,4 +1,4 @@
-# Stereo Ultrasound — Project Spec v0.8
+# Stereo Ultrasound — Project Spec v0.9
 
 **Owner:** Valkyrie
 **Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. v0.5 applies the full-plan sanity check (`docs/research/review-2026-09-30.md`). Next: shopping-list approval (O3) → Phase 1 simulation and first bench orders. No hardware purchased.
@@ -378,6 +378,21 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 >   That's the price of keeping everything in front of the ear hook. The owner's call (O5).
 >
 > The v0.6 text below remains the fallback.
+>
+> **v0.9 (owner): peripheral vision is a hard no-go zone. No part of the device may be visible
+> with the eyes looking straight ahead.**
+> - **Estimate:** the temporal visual field reaches ~100–110° from straight ahead. For an object
+>   ~35 mm out to the side of the pupil, that's visible up to ~6–13 mm *behind* the pupil plane.
+>   The design limit is a 110° field plus a 5 mm margin: **nothing forward of ~18 mm behind the
+>   pupil plane.** On the owner's photo that leaves **~35 mm** of temple arm for the pod, not 60 mm.
+> - **Consequences:**
+>   - The in-line PCB + cell layout no longer fits. The pod becomes ~35 mm long, with the PCB
+>     stacked beside or under a ~30 mm (~105 mAh) cell, so it's thicker (~8–10 mm).
+>   - Balance improves: the pod is centred ~47 mm behind the hinge, putting 3.2 g per side on
+>     the nose pads (105 mAh) or 4.0 g (150 mAh).
+>   - The swept-back arm (25–35°) is unchanged.
+> - **Hard rule:** the owner's measured field (E10) overrides this estimate. The mic stays in
+>   front of the hair (E9) *and* behind the vision line, so it goes at the pod's front end.
 
 - **Front module, at the hinge:** PCB, mic, button, crystal.
   - **PCB size** `[Med]` (parts-area estimate): ~10×20 mm with parts on both sides (4-layer), or ~10×28 mm single-sided. The 7×7 mm MCU sets the ~10 mm width.
@@ -509,7 +524,7 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | ~~O1~~ | ~~Battery and runtime target~~ | **Resolved 2026-09-30:** ≥8 h, target ~12 h, design for balance (D18) |
 | ~~O2~~ | ~~Test a spot nearer the tragus?~~ | **Resolved 2026-09-30:** the tragus is the primary site, and the owner says it fits more easily (D1) |
 | **O3** | Approve the v0.5 shopping list once priced | — |
-| **O5** | One pod between eye and ear (v0.8) vs cell further back (v0.6): 60 mm limit and ~1 g more on the nose, against a split pod | One pod if the 105–120 mAh class meets the runtime after E4 |
+| **O5** | Pod layout inside the ~35 mm between the vision line and the ear keep-out (v0.9): stacked, thicker pod with a ~105 mAh cell vs a slimmer pod with a smaller cell (runtime cost) | One pod if the 105–120 mAh class meets the runtime after E4 |
 | **O4** | Confirm the D18 reading of §1.2.4: cell along the arm, in front of the ear, nothing behind it | Yes; it's what makes the 12 h battery comfortable |
 
 Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 or the schematic · **P2** before board order · **P3** before final assembly.
@@ -567,6 +582,7 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 | E6 | **New.** Mic-clock duty cycle (scope) | R13 |
 | E7 | **New.** Low-level distortion and idle silence on the bridge test board | R9, R12 |
 | E8 | **New.** Stereo A/B: free-running vs shared clock (S4) | R5, D2 |
+| E10 | **New v0.9.** Peripheral-vision boundary: glasses on, eyes fixed on a point straight ahead, a helper slides a pen tip forward along the temple arm from the ear until the owner first detects it. Mark the spot and measure from the hinge; repeat 3×, both eyes; also check just above and below the arm. The pod's front end goes ≥5 mm behind the mark | Vision no-go line (§8) |
 | E9 | **Partly done 2026-09-30** (no ruler; scale from the speaker ring, see `ear-open-fit.md`; still wanted: ruler shot and mouth-open shot). Photo measurement: glasses + Ear (open) worn, mm ruler at the ear; lateral view of both ears, rear-oblique view, and mouth-open view (procedure in `ear-open-fit.md`) | D1 pad location, D4 arm geometry, keep-out at true scale |
 
 **Suggested order:** O1 and O3 → order transducers and Nucleos → JLC board designs → C1 → Phase 1 algorithms → S1/S2 as parts arrive → B-series → D-series.
@@ -603,6 +619,9 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ---
 
 ## 15. Changelog
+
+### v0.9 (2026-09-30) — peripheral vision is a no-go zone
+- Owner: no part of the device may enter her peripheral vision. Estimated limit ~18 mm behind the pupil plane (110° field + 5 mm), which shrinks the pod space to ~35 mm; the pod becomes stacked and thicker; balance improves. New E10 (measure her actual field); O5 reframed.
 
 ### v0.8 (2026-09-30) — pod between eye and ear, swept-back arm
 - Owner request: one pod on the temple arm between her deep-set eyes and the Ear (open) keep-out, with the transducer arm swept back. Measured on her photos: ~60 mm usable; 25–35° sweep clears the Ear (open) by 8–9 mm. New O5 (layout versus battery size and nose load).
