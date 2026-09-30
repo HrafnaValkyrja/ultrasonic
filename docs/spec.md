@@ -1,324 +1,385 @@
-# Stereo Ultrasound — Project Spec v0.2
+# Stereo Ultrasound — Project Spec v0.3
 
 **Owner:** Valkyrie
-**Status:** Architecture decided. Next phase: DSP simulation plus parts research (no hardware purchased yet).
-**Purpose of this document:** Handoff from design chat to a Claude Code implementation session. Records requirements, decisions *with reasoning*, rejected alternatives, and open questions with confidence levels. Treat decisions as settled unless new evidence contradicts the stated reasoning.
+**Status:** Concept phase. Architecture mostly settled; MCU choice changed in this version (see D5). Next: Phase 1 DSP simulation plus remaining P1 research. No hardware purchased.
+**Last updated:** 2026-09-30 (Claude Code session). See §15 for what changed from v0.2.
 
-**Confidence tags:** `[High]` well-established / verified · `[Med]` reasoned estimate, likely right · `[Low]` guess, verify before relying on it.
+**Confidence tags:** `[High]` verified from a primary source or well established · `[Med]` reasoned estimate, likely right · `[Low]` guess, verify before relying on it.
 
----
-
-## 0. Instructions for Claude Code (read first)
-
-**Your job:** own the research and implementation. The owner has microcontroller experience but does **not** want to decode part numbers or trawl distributor catalogs. That's your work. §15 lists every open research task; work through them in priority order.
-
-**Standing rules:**
-1. **Always gloss part numbers.** Every time you name a part, say what it is and why it's there in plain language (e.g. "TLV75533 — a 3.3 V linear regulator, 500 mA, very low noise"). Never present a bare part number.
-2. **Verify from primary sources.** Datasheets and manufacturer pages for specs; distributor pages (DigiKey, Mouser, LCSC/JLCPCB) for stock and price. Record the source and date for every stock or price claim; stock changes daily.
-3. **Prefer JLCPCB-assemblable parts.** Check whether each part is a JLC "Basic" part (no setup fee), "Extended" (small fee), or needs global sourcing or consignment. Report which.
-4. **Present decisions as 2–3 clear options with tradeoffs**, then give your recommendation. The owner picks. Don't finalize a part without approval.
-5. **Update this spec** as decisions land: change the decision log, parts table, and task status, and bump the version.
-6. **Teach as you go.** The owner is self-taught and wants to learn the why (DSP, PDM, noise shaping, power design). Brief explanations, no condescension.
-7. **Be blunt about problems.** If a decision in this spec turns out wrong, say so and propose the fix.
-8. **Constraint checklist for every part choice:** smallest practical package that JLC can assemble · lowest power · no switching regulators (owner hears coil whine) · stocked or sourceable.
+**Everything below §1 may be revised as evidence comes in. §1 is locked.**
 
 ---
 
-## 1. Goal
+## 0. Working rules (for Claude)
 
+1. **§1 (MVP) is owner-locked.** Never change it; if evidence says part of it can't be met, say so bluntly and propose options, but leave the text alone.
+2. **Gloss every part number** in plain language on first mention in any document or message (what it is, why it's there).
+3. **Primary sources.** Datasheets for specs; distributor or JLC listings for stock and price, always with the query date. Findings go in `docs/research/`, one file per task, and get summarized here.
+4. **Decisions as 2–3 options with tradeoffs plus a recommendation.** The owner picks. Nothing is final without her approval.
+5. **Part-choice checklist:** smallest package JLC can assemble · lowest power · **no switch-mode regulators anywhere** · in stock or sourceable. JLC "Basic" parts carry no setup fee, "Extended" parts carry a small one; say which.
+6. **Teach the why** (DSP, PDM, noise shaping, power design), briefly and without condescension.
+7. **Be blunt.** If something in this spec is wrong, flag it and fix it here, bump the version, and log it in §15.
+
+---
+
+## 1. MVP — LOCKED (owner-defined; do not modify)
+
+### 1.1 Goal
 A wearable that lets the owner hear ultrasound (roughly 20–96 kHz) in real time, in stereo, by shifting it down into a comfortable audible band and delivering it by bone conduction. It mounts on her everyday prescription glasses and must feel like an extension of her body, not a gadget.
 
-Part of a larger sensory-augmentation program (see §13). This is project 1 of 3.
-
-## 2. Owner constraints (non-negotiable)
-
+### 1.2 Owner constraints
 1. **Full-time glasses wearer.** The device clips onto her main glasses via removable 3D-printed clasps.
-2. **Nothing Ear (open) headphones are worn constantly and are reserved exclusively for phone audio.** The device must not use them as output, must not physically interfere with their fit, and must not bump the driver pod, which sits over the ear opening between the helix root and tragus and shifts slightly during wear. The counterweight bulb sits behind the ear.
-3. **Unusually good high-frequency hearing.** She already hears some charger and LED-driver whine. Consequences: no audible self-noise, no switching regulators, and PWM noise kept well above her hearing (§7.4).
-4. **Comfort and size are the top priority.** If it's bulky or uncomfortable it won't get worn, and the project fails. Bulk goes at the front of the frame near the hinges, never near the neck or behind the ears.
+2. **Nothing Ear (open) headphones are worn constantly and reserved for phone audio.** The device must not use them as output, must not interfere with their fit, and must not bump the driver pod (over the ear opening, between helix root and tragus; shifts slightly during wear). The counterweight bulb sits behind the ear.
+3. **Unusually good high-frequency hearing** (hears some charger and LED-driver whine). So: no audible self-noise, no switching regulators, PWM noise kept well above her hearing.
+4. **Comfort and size are the top priority.** Bulky or uncomfortable means unworn means failed. Bulk goes at the front of the frame near the hinges, never near the neck or behind the ears.
 
-## 3. Priorities (ranked)
-
-1. Comfort, size, and weight
-2. Power draw (as low as practical)
-3. Circuit simplicity and part count
-4. Cost
-5. Sound pleasantness (a close 5th; drives the choice of digital DSP over analog)
-
-## 4. Success criteria (behavior tests)
-
-- **T1 House walk:** walking around the house, she hears ultrasonic sources (electronics, etc.). In Transient-only mode, the house is tolerable rather than overwhelming.
-- **T2 Nature sit:** sitting outside at dusk, she hears bats and other ultrasonic wildlife as comfortable, non-shrill sound. Reference point: pitched-down bat recordings in online demos (noting those are usually *time-expanded*, which can't be done in real time; see D4).
-- **T3 Localization:** eyes closed, she can point left or right toward an ultrasonic source (for example a 40 kHz rangefinder emitter) better than chance.
-- **T4 Coexistence:** Ear Opens are worn and playing phone audio the whole time, with no fit interference and both audio streams distinguishable.
-- **T5 Wearability:** worn for 2+ hours with no pressure pain at the transducer site or temples, including while talking and eating.
+### 1.3 Success tests
+- **T1 House walk:** she hears ultrasonic sources (electronics, etc.) around the house. In Transient-only mode the house is tolerable, not overwhelming.
+- **T2 Nature sit:** outside at dusk, bats and other ultrasonic wildlife come through as comfortable, non-shrill sound.
+- **T3 Localization:** eyes closed, she can point left/right toward an ultrasonic source (e.g. a 40 kHz rangefinder emitter) better than chance.
+- **T4 Coexistence:** Ear Opens worn and playing phone audio the whole time; no fit interference; both streams distinguishable.
+- **T5 Wearability:** 2+ hours with no pressure pain at the transducer site or temples, including while talking and eating.
 - **T6 Silence:** with no ultrasound present, the device is inaudible to her. No hiss, no whine.
 
 ---
 
-## 5. Decision log
+## 2. Priorities (ranked)
 
-### D1. Output = bone conduction on the root of the cheekbone arch, in front of the ear `[High]`
-- **Site:** the root of the zygomatic arch, about 1 finger-width *above* the mandibular condyle (jaw joint), about 1–1.5 cm forward of the tragus.
-- **Why this site:** bone is close to the surface with little soft tissue, near the cochlea, and it's the site commercial bone-conduction headsets use. Placing it above the condyle avoids contact shifting when the jaw opens.
-- **Rejected:**
-  - *Stream to Ear Opens over Bluetooth:* violates constraint 2.
-  - *Temple (squamous temporal bone):* the temporalis muscle damps vibration, I estimate 5–10 dB worse `[Low]` on the exact figure. It's also a common spot for glasses-pressure headaches.
-  - *Air-conduction microspeaker aimed at the ear canal:* the Ear Open pod occupies the path over the ear opening.
-  - *Mastoid:* crowded by the Ear Open hook and counterweight.
-
-### D2. Two independent mono units, no link between them `[High]`
-- Each side has its own mic, MCU, driver, battery, and transducer.
-- **Why:** stereo localization at these frequencies relies on the loudness difference between ears, and the head strongly shadows ultrasound (wavelength under 1 cm). Each side processing its own mic preserves that difference naturally. This eliminates wiring across the hinges, the biggest mechanical failure risk, and halves the size of each clasp.
-- **Accepted cost:** two MCUs and two batteries, and no shared settings between sides.
-
-### D3. Fixed gain plus manual volume; no automatic gain control `[High]`
-- **Why:** independent automatic gain would normalize each side separately and erase the loudness difference between them, which destroys localization.
-- **Requirement:** volume uses discrete, indexed steps and **resets to a known default at power-on**, so both sides start matched. Same for mode.
-
-### D4. Digital DSP, not analog frequency division `[High]`
-- Analog frequency division (comparator plus counter) sounds harsh and buzzy and loses loudness information. It fails the pleasantness requirement, and it would save only about 3 mA, since the preamp and transducer draw the same either way.
-- Time expansion (what most demo videos use) is impossible in real time. The real-time options are heterodyne and spectral pitch or frequency compression (§7).
-
-### D5. MCU = STM32L432KC (QFN-32, 5×5 mm) `[Med]`
-- Cortex-M4F at 80 MHz with DSP instructions, a low-power family, and a fast on-chip 12-bit ADC (samples the ultrasonic signal directly, so no external ADC). Hand-solderable in principle, but will be factory-assembled (D8).
-- **Rejected:** ESP32 variants (the radio isn't needed and they draw more power); RP2040 (higher active current and no fast ADC with good analog performance for this use `[Med]`); Ambiq Apollo (excellent efficiency but hard-to-assemble packages, reconsider only for a future revision).
-- **Verify:** ADC performance at ≥192 kS/s single-channel with DMA; JLCPCB stock.
-
-### D6. Output stage = filterless firmware PWM driving an H-bridge; no amplifier IC `[Med]`
-- MCU timer PWM at roughly 312.5 kHz (80 MHz / 256, so 8-bit resolution) drives a small H-bridge made from complementary MOSFETs, which drives the transducer directly.
-- **Why it works:** the transducer coil's inductance plus its resistance forms a low-pass filter. The output band is narrow and low (under 5 kHz), so the effective oversampling ratio is about 60× and noise shaping recovers good in-band resolution from 8-bit PWM.
-- **Removes:** the amplifier IC, its quiescent current, and the DAC.
-- **Risk:** the RC-BC02's inductance is not on its datasheet. If it's too low, add a small series inductor (one 0805-size part). Measure it with an LCR meter.
-- **Squelch implementation:** stop the PWM and hold both bridge legs at the same level, so zero current flows.
-
-### D7. Transducer = RC-BC02 / "GD02"-class module `[Med]`
-- 12.6 × 6 × 4 mm, 8 Ω, 0.3 W nominal, 300–19,000 Hz, rated 88 dB at 1 kHz.
-- The smallest off-the-shelf part with a datasheet found so far. Smaller parts appear to be OEM-only in the hearing-aid supply chain `[Med]`.
-- 8 Ω draws about half the current of 4 Ω parts at the same drive voltage.
-- **Known weakness:** a DIY glasses build using this module reported it was quiet. That's acceptable, even preferred, and mitigated by D1's site choice and D9's output band.
-- **Bench comparison part:** Dayton BCE-1 (21 × 14 × 7.8 mm, 4 Ω, resonance 2.1 kHz).
-
-### D8. Factory PCB assembly (JLCPCB) `[High]`
-- All SMD parts are machine-placed. The owner hand-solders only the transducer leads, battery, and optionally the button.
-- **Hard constraint:** MEMS microphones are land-grid parts that must be reflowed and can't be hand-soldered, so **the mic must be available through JLCPCB's parts service.** Check this before designing the schematic.
-
-### D9. Output band ≈ 1.5–4 kHz `[Med]`
-- **Why:** it matches the ear's peak sensitivity region (about 2–4 kHz) and sits near typical bone-transducer resonance, giving the most perceived loudness per milliwatt. That serves the power, size, and pleasantness priorities together.
-- Final limits are set by listening tests in Phase 1.
-
-### D10. Band floor calibrated to the owner's hearing `[High]` as a principle
-- Measure her upper hearing limit with a tone sweep. Start the processed band slightly below that limit, not at a fixed 20 kHz, so there's no gap and no doubled sounds.
-- Stored as a firmware constant (per side, but it should be identical on both).
-
-### D11. Linear regulator only; no switch-mode supplies anywhere `[High]`
-- Switching regulators produce audible inductor whine, the exact artifact the owner already hears from chargers.
-
-### D12. Modes `[High]` as requirements
-- **Full:** everything in the band, pitched down.
-- **Transient-only:** steady tones (charger and LED-driver whine) suppressed; changing sounds (chirps, clicks, rustles) passed through. The expected default indoors.
-- **Off:** silent, with the MCU in a low-power state.
-- The processing algorithm (heterodyne vs. log compression) may be a sub-mode or a build-time choice. Decide after Phase 1 listening.
-
-### D13. Mic = purpose-built digital ultrasonic MEMS (Syntiant/Knowles SPH0641LU4H-1) `[Med]`
-- PDM output with a dedicated **ultrasonic mode** (clock 3.072–4.8 MHz), rated 100 Hz–80 kHz, with a published ultrasonic response curve, 3.50 × 2.65 mm, bottom port, ±1 dB sensitivity matching.
-- **Why:** (1) its ultrasonic performance is specified, not inferred; (2) **noise immunity**: a 40 dB analog preamp sitting millimeters from a ~300 kHz H-bridge switching hundreds of mA is the analog design's biggest hidden risk, and a digital bitstream largely eliminates it; (3) fewer parts (no preamp, bias network, or ADC); (4) tight sensitivity matching helps the two independent units stay balanced (R7).
-- **Costs:** the MCU needs a DFSDM peripheral (hardware PDM decoding) or a software decoder; mode-sequencing rule (**the datasheet says: don't power up or wake directly into ultrasonic mode**; start in standard mode, then raise the clock); about 1 mA supply, roughly the same as the analog chain it replaces.
-- **Verify:** lifecycle (DigiKey lists it as Active; one distributor lists "Not For New Designs"); LCSC/JLC stock or global sourcing.
-- **Rejected:** analog SPV0142LR5H-1. Its ultrasonic response isn't in the rated spec, and it needs a noise-sensitive analog front end. Kept as a fallback only.
-
-### Parked or rejected ideas (for context)
-- **Forward "gaze distance" sensing:** redundant with stereo vision, so it adds no new information.
-- **Haptic channel for above 60 kHz:** optional future layer. Note that anything vibrating on the head is also *heard* through bone conduction, so it wouldn't be pure touch. Local nature above about 60 kHz is sparse; that band is mostly electronics and rodent repellers.
-- **Blindspot Proximity (sensors on the glasses):** parked. The owner has long hair, which blocks rear-facing time-of-flight sensors at the temple tips.
+1. Comfort, size, weight
+2. Power draw
+3. Circuit simplicity and part count
+4. Cost
+5. Sound pleasantness (close 5th; the reason for digital DSP over analog)
 
 ---
 
-## 6. Architecture (per side)
+## 3. Architecture (per side)
 
 ```
-[SPH0641LU4H-1 PDM mic, ultrasonic mode, clock 3.072–4.8 MHz]
-      → [MCU DFSDM (hardware PDM filter) → ≥192 kS/s PCM, DMA]
-      → [DSP: band select → shift/compress → squelch/transient gate → volume]
-      → [Noise-shaped PWM ~312 kHz] → [H-bridge, 2× complementary MOSFET pairs]
-      → [RC-BC02 transducer]
+SPH0641LU4H-1 digital mic ──PDM 1-bit @ 4.0 MHz──▶ STM32L452 DFSDM (hardware PDM→PCM)
+                                                        │ 200 kS/s PCM via DMA
+                                                        ▼
+                                  DSP: band select → shift/compress → gate → volume
+                                                        │
+                                  noise-shaped PWM (TIM1, complementary + dead-time)
+                                                        ▼
+                               H-bridge (2 complementary MOSFET pairs) → RC-BC02 transducer
 
-Power: [LiPo w/ protection] → [MCP73831 charger] → [low-noise LDO 3.3 V, ≥300 mA] → all
-Controls: 1 button (mode / volume), SWD pads for programming
+Power:    LiPo (with protection) → MCP73831 charger → low-noise LDO → everything
+Controls: 1 button; SWD pogo pads for programming; magnetic pogo pins for charging
 ```
 
-**Why digital (D13):** the mic outputs a digital bitstream, so there's no analog signal for the nearby H-bridge switching to corrupt, and no preamp, bias network, or ADC to build. Audible-band content is removed by a digital high-pass filter after decimation.
+Two identical, fully independent units, one per temple arm. No wires or radio between them (D2).
 
-## 7. DSP specification
+---
 
-### 7.1 Sampling
-- Single channel per unit at 192 kS/s baseline (Nyquist 96 kHz) `[Med]`. The mic response probably rolls off around 60–80 kHz anyway. Could go to 250 kS/s if the mic supports it.
-- Local bats (big brown and eastern red, common in the region) call roughly 25–50 kHz `[Med]`, well inside the band.
+## 4. Decisions
 
-### 7.2 Algorithms (implement both in simulation; choose after listening)
-- **A. Digital heterodyne (low CPU):** multiply by a local oscillator, low-pass, decimate. Clean tonal output but only a band of limited width at a time; the oscillator frequency is tunable. Estimated CPU need: low tens of MHz.
-- **B. Short-time FFT log frequency compression (the "pretty" mode):** map 20–96 kHz onto about 1.5–4 kHz on a logarithmic scale, with overlap-add resynthesis. Keeps timing and relative loudness across the whole band. Estimated about 60–120 MHz-equivalent of work `[Low]`. **This must be profiled; it may not fit 80 MHz at 192 kS/s**, in which case reduce the FFT size or overlap, or sample at a lower rate.
-- **Transient-only gate:** in B, subtract each frequency bin's slowly updated noise floor (spectral subtraction), which kills steady tones. In A, use an envelope-based squelch with a slowly updated floor.
+Each decision gives the choice, the reasoning, and what was rejected. **Changed in v0.3** marks revisions.
 
-### 7.3 Latency
-- Target ≤20 ms end-to-end so the sound tracks head turns naturally `[Med]` on the threshold. An STFT frame at 512 points and 192 kHz is about 2.7 ms, so there's plenty of room.
+### D1. Output: bone conduction at the root of the cheekbone arch `[High]`
+- **Site:** root of the zygomatic arch, about one finger-width above the jaw joint (mandibular condyle) and 1–1.5 cm forward of the tragus.
+- **Why:** thin soft tissue over bone, close to the cochlea, the site commercial bone-conduction headsets use. Sitting above the jaw joint keeps contact steady when the jaw moves.
+- **Rejected:** streaming to the Ear Opens (violates §1.2.2); temple (the temporalis muscle damps vibration, estimated 5–10 dB worse `[Low]`, and it's a glasses-pressure headache spot); air-conduction speaker (the Ear Open pod is in the way); mastoid (crowded by the Ear Open hook and counterweight).
 
-### 7.4 PWM noise shaping (owner-specific requirement)
-- Quantization noise must be **inaudible to the owner at max volume.** Shaped noise must not land in the audible range up to roughly 20 kHz (and ideally stays below threshold up to 40 kHz), with bone-conducted ultrasound perception as an extra caution.
-- **Verify in simulation:** compute the shaped noise spectrum through the transducer's electrical low-pass (coil inductance and resistance). Choose noise-shaper order and PWM resolution accordingly (9-bit at ~156 kHz is a fallback option).
+### D2. Two independent mono units, no link `[High]`
+- **Why:** at ultrasonic wavelengths (under 1 cm) the head casts a strong acoustic shadow, so the loudness difference between ears (interaural level difference) is the main direction cue. Each side processing only its own mic preserves that cue for free. It also removes wiring across the hinges (the biggest mechanical failure risk) and halves each clasp's size.
+- **Cost accepted:** 2 MCUs, 2 batteries, no shared settings.
 
-### 7.5 Controls
-- One button: short press cycles modes; press-and-hold ramps volume through discrete steps. Both reset to defaults at power-on (D3).
+### D3. Fixed gain plus manual stepped volume; no automatic gain control `[High]`
+- Independent AGC on each side would equalize the two sides and erase the loudness difference. Volume uses discrete indexed steps; volume and mode **reset to known defaults at power-on**, so both sides start matched.
+
+### D4. Digital DSP, not analog frequency division `[High]`
+- Analog division (comparator plus counter) sounds harsh and buzzy and throws away loudness. The real-time digital options are heterodyne and spectral frequency compression (§5). Time expansion, which most online bat demos use, can't run in real time.
+
+### D5. MCU = STM32L452CEU6 (QFN-48, 7×7 mm) `[High]` for DFSDM · `[Med]` for package — **Changed in v0.3**
+- **What it is:** an ST ultra-low-power Arm Cortex-M4F at 80 MHz with DSP instructions, a floating-point unit, 160 KB of RAM, and a **DFSDM**: a hardware block that converts the mic's PDM bitstream to PCM without CPU help.
+- **Why the change:** the v0.2 pick, the STM32L432KC, **has no DFSDM.** Its datasheet (DS11451 Rev 4) never mentions it. The L452 datasheet (DS11912 Rev 7 §3.21) confirms it. The L452 also has TIM1, an advanced timer with complementary outputs and dead-time, which is what the H-bridge needs.
+- **Tradeoff:** 7×7 mm instead of 5×5 mm. The alternatives were a 5×5 mm BGA (out of stock), a 3.4×3.7 mm chip-scale package (needs a pricier HDI board), or keeping the L432 and decoding PDM in software (eats CPU the DSP needs). Details and options: `docs/research/A1-A2-mcu-and-mic.md`.
+- **JLC:** Extended part C222355, **16 in stock** (2026-09-30). Thin; buy early.
+- **Awaiting owner OK** on option (a) vs the others.
+
+### D6. Output stage: filterless PWM into an H-bridge; no amplifier IC `[Med]`
+- TIM1 generates PWM at about 312.5 kHz (80 MHz ÷ 256 = 8-bit resolution), driving an H-bridge made from two complementary MOSFET pairs, which drives the transducer directly. The coil's inductance and resistance act as a low-pass filter.
+- **Removes:** the amplifier IC, its idle current, and the DAC.
+- **Squelch:** hold both bridge legs at the same level, so zero current flows and there's zero noise.
+- **v0.3 correction — the noise headroom is much smaller than v0.2 claimed. See §6.** Solving this is the main job of C3.
+
+### D7. Transducer = RC-BC02 / "GD02"-class module `[Med]`
+- A tiny bone-conduction exciter: 12.6 × 6 × 4 mm, 8 Ω, 0.3 W, 300–19,000 Hz, 88 dB at 1 kHz. It's the smallest part found that has a datasheet. 8 Ω draws about half the current of 4 Ω parts.
+- A DIY glasses build reported it as quiet. That's acceptable (listening will be quiet) and mitigated by the D1 site and the D9 output band.
+- Coil inductance is unpublished. Measure it (E1). Placeholder is 0.3 mH.
+- Bench comparison part: Dayton BCE-1 (21 × 14 × 7.8 mm, 4 Ω, 2.1 kHz resonance).
+
+### D8. Factory assembly at JLCPCB `[High]`
+- All SMD parts are machine-placed. The owner hand-solders only the transducer leads, battery, and optionally the button. MEMS mics are land-grid parts that can only be reflowed, so **the mic must be JLC-assemblable.** It is: see D13.
+
+### D9. Output band ≈ 1.5–4 kHz `[Med]`
+- This is the ear's most sensitive region and near typical bone-transducer resonance, so it gives the most loudness per milliwatt. Final limits come from Phase 1 listening.
+
+### D10. Band floor calibrated to the owner's hearing `[High]` as a principle
+- Measure her upper hearing limit (C5/E5). Start the processed band just below it, so there's no gap and no doubled sounds. Stored as a firmware constant, identical on both sides.
+
+### D11. Linear regulation only `[High]`
+- Switch-mode regulators produce audible inductor whine (§1.2.3).
+
+### D12. Modes `[High]` as requirements
+- **Full:** the whole band, pitched down.
+- **Transient-only (indoor default):** steady tones (charger and LED-driver whine) suppressed; changing sounds (chirps, clicks, rustles) passed through.
+- **Off:** silent. MCU in Stop 2 (about 2 µA) and mic unpowered.
+- Heterodyne vs compression may become a sub-mode or a build-time choice after Phase 1.
+
+### D13. Mic = SPH0641LU4H-1 digital MEMS with ultrasonic mode `[High]` — **v0.3: sourcing confirmed**
+- **What it is:** a Knowles/Syntiant microphone with a 1-bit PDM output, 3.50 × 2.65 × 0.98 mm, bottom port. In ultrasonic mode it takes a 3.072–4.8 MHz clock, draws 845 µA typical, and has a published response curve to 80 kHz, with ±1 dB sensitivity matching (good for L/R balance).
+- **Why digital:** the ultrasonic response is specified; a 1-bit stream is immune to noise from the H-bridge a few mm away (an analog preamp with 40 dB gain would not be); no preamp, bias network, or ADC.
+- **Datasheet rules the firmware must follow** (Rev B, 2015-04-06):
+  - Never power up or wake directly into ultrasonic mode. Start in standard mode (1.024–2.475 MHz), then raise the clock. Mode change ≤10 ms, power-up ≤50 ms.
+  - Clock duty cycle must be 48–52% above 2.4 MHz.
+- **JLC:** Extended part C2879853, **1,076 in stock**, $1.99 (2026-09-30).
+- **Still open:** lifecycle status, a backup part, and the ultrasonic noise floor (not in the datasheet; measure it, E3).
+- **Fallback:** SPV0142LR5H-1 analog mic (ultrasonic response not rated; needs an analog front end).
+
+### D14. Clock and sample-rate plan `[Med]` — **New in v0.3**
+- SYSCLK = 80 MHz (must stay in voltage Range 1, since Range 2 caps peripheral clocks at 26 MHz and PWM needs 80).
+- **Mic clock = DFSDM clock output = 80 MHz ÷ 20 = 4.0 MHz.** Ultrasonic mode, and an even divider, which should give a clean 50% duty cycle (confirm in the reference manual, RM0394).
+- **Output rate = 4.0 MHz ÷ 20 = 200 kS/s** (Nyquist 100 kHz). Two candidate filter setups for C1/A3 to compare in simulation:
+  - (i) DFSDM sinc filter decimating by 20 directly;
+  - (ii) DFSDM decimates by 10 to 400 kS/s, then a CPU half-band filter decimates by 2.
+  - (ii) costs a little CPU but likely gives a cleaner top octave. A decimation ratio of only 20 leaves the mic's own shaped noise rising toward 100 kHz `[Med]`.
+- **Startup:** clock ÷40 (2.0 MHz, standard mode), wait ≥50 ms, switch to ÷20 (4.0 MHz), wait ≥10 ms, unmute.
+- The earlier 3.2 MHz idea (÷25) is rejected. An odd divider risks breaking the 48–52% duty-cycle rule.
+
+### Parked or rejected ideas
+- **Forward "gaze distance" sensing:** redundant with stereo vision.
+- **Haptic channel for >60 kHz:** optional future layer. Anything vibrating on the head is also heard by bone conduction. Nature above 60 kHz is sparse (it's mostly electronics and rodent repellers).
+- **Blindspot Proximity on the glasses:** parked. Long hair blocks rear-facing time-of-flight sensors.
+
+---
+
+## 5. DSP
+
+### 5.1 Sampling
+- 200 kS/s single channel (D14). The mic's published curve stops at 80 kHz; expect roll-off above that.
+- Local bats (big brown, eastern red) call at roughly 25–50 kHz `[Med]` (verify in C6).
+- A high-pass after decimation removes audible-band content, so she doesn't hear the room twice. The corner is set by D10.
+
+### 5.2 Algorithms (build both in simulation; choose by listening)
+- **A. Heterodyne (low CPU):** multiply by a local oscillator, low-pass, decimate. Clean and tonal, but it covers one band of limited width at a time; the oscillator frequency is tunable. Estimate: low tens of MHz `[Med]`.
+- **B. STFT log frequency compression ("pretty" mode):** a short-time FFT maps 20–100 kHz onto roughly 1.5–4 kHz on a log scale, with overlap-add resynthesis. Keeps timing and relative loudness across the whole band. Estimate: 60–120 MHz-equivalent `[Low]`. **It may not fit at 200 kS/s**; if not, use a smaller FFT, less overlap, or a lower rate. A 512-point frame is 2.56 ms with 390 Hz bins.
+- **Transient-only gate:** in B, spectral subtraction against a slowly updated per-bin noise floor. In A, envelope squelch with a slow floor.
+
+### 5.3 Latency
+- Target ≤20 ms end to end, so sound tracks head turns `[Med]`. The STFT frame alone is ~2.6 ms, so there's room.
+
+### 5.4 Controls
+- One button: short press cycles modes; press-and-hold steps volume. Both reset at power-on (D3).
+
+---
+
+## 6. Output noise (owner-specific; **reframed in v0.3**)
+
+**The requirement:** PWM quantization noise must be inaudible to her at max volume. That means nothing audible up to ~20 kHz, ideally nothing perceptible up to ~40 kHz, since bone conduction can carry ultrasound to the ear.
+
+**What v0.2 got wrong:** it computed ~60× oversampling from the <5 kHz *signal* band. Noise shaping, though, has to keep noise out of the whole band she can *hear*, 0–20 kHz (or 40 kHz). Against 40 kHz, 312.5 kHz PWM is only about **4× oversampling**, and a noise shaper at 4× buys only a few dB. The "filterless 8-bit PWM + noise shaping" idea is not proven. It needs real modelling (C3).
+
+**What helps:**
+- The coil low-pass. With the 0.3 mH / 8 Ω placeholder, the corner is about 4.2 kHz, giving about 37 dB of first-order attenuation at the carrier. It also attenuates the 20–40 kHz band by 14–20 dB.
+- The transducer's own mechanical roll-off above ~19 kHz (datasheet band edge). The actual ultrasonic leakage is C7.
+- Squelch: no drive at all when nothing is present (T6).
+- **3-level ("class-BD") modulation** on the H-bridge: zero differential drive at idle, and the ripple lands at 2× the PWM rate.
+
+**What hurts:** digital volume turns the signal down but leaves the noise where it is. **The signal-to-noise ratio is worst at the low volumes she'll actually use.** Candidate fixes for C3:
+- (a) Scale bridge drive so full-scale PWM equals the max loudness she needs, and spend all 8 bits on the useful range.
+- (b) Higher-order shaper combined with lower resolution at a higher PWM rate.
+- (c) One small series inductor (0805) plus a capacitor to make a 2nd-order filter.
+
+C3 picks, with plots.
+
+---
+
+## 7. Power (per side) — **re-estimated in v0.3 from datasheet numbers**
+
+| Block | Current | Basis |
+|---|---|---|
+| Mic, ultrasonic mode | ~0.9–1.1 mA | 845 µA typ at 1.8 V; rises with supply voltage and clock load `[High]` |
+| MCU, algorithm A | ~3–4 mA | 84 µA/MHz run, 27 µA/MHz sleep at 80 MHz; CPU busy ~30% `[Med]` |
+| MCU, algorithm B | ~5–7 mA | same, CPU busy ~70–90% `[Low]` |
+| Peripherals (TIM1, DFSDM, DMA) | ~1 mA | TIM1 alone 8.1 µA/MHz ≈ 0.65 mA `[Med]` |
+| Transducer, average at listening level | ~2–5 mA; ~0 squelched | `[Low]`, measure (E4) |
+| LDO idle current | <0.05 mA | typical for low-Iq LDOs `[Med]` |
+| **Total** | **~7–11 mA (A), ~9–14 mA (B)** | `[Low]` |
+
+**Runtime:** ~3–5 h on a 40 mAh cell, ~8–12 h on 100 mAh. v0.2's 5–8 mA estimate for A was optimistic, because at 80 MHz the CPU alone draws ~6.7 mA when it's awake. **For all-day wear, plan for ~100 mAh per side.** Mass trade-off in B4.
+
+**Power levers, most effective first:** squelch (and CPU sleep while squelched) · output band placement (D9) · algorithm choice · CPU sleep between DMA blocks.
+
+**Supply rail** `[Med]`: a 3.3 V rail from a LiPo needs ≤100 mV dropout at ~400 mA bridge peaks (3.3 V ÷ 8 Ω) once the cell sags to 3.4 V. That's hard. Options for B2:
+- (a) **Drop the rail to 3.0 V.** Every part is fine at 3.0 V, and it leaves ~300 mV of headroom.
+- (b) 3.3 V rail plus a firmware duty cap.
+- (c) Run the bridge straight from the battery. **Rejected:** gain would then track the charge state (≈1.8 dB from 4.2 V to 3.4 V), so the two sides would drift out of balance and bias perceived direction (D3).
+
+Leaning (a).
+
+---
 
 ## 8. Physical layout (per side)
 
-- **Front clasp, just behind the hinge on the temple arm:** PCB (about 10×20 mm `[Med]`) with the mic facing outward, plus battery and button. Most ultrasonic MEMS mics have their sound port on the bottom, so the **PCB needs a port hole and the clasp needs an outward-facing acoustic opening covered by thin mesh** (thick foam absorbs ultrasound).
-- **Along the temple arm:** thin 2-conductor lead to the transducer.
-- **Drop-arm near the ear:** a short spring arm hanging 1–2 cm below the temple arm, pressing the transducer onto the cheekbone arch root with light, even force through a broad pad. Must keep ≥1–1.5 cm clearance from the tragus and the Ear Open pod through head turns and facial movement.
-- **Electrical isolation from skin:** the transducer's metal parts and solder joints must be fully insulated (silicone pad plus sealed housing). Sweat can otherwise conduct drive current through the skin.
-- **Programming:** SWD pogo pads. **Charging:** magnetic pogo connector plus nightly dock.
-- **Weight target:** under about 8 g per side total `[Low]`. Glasses start hurting at roughly 15 g per side added.
-
-## 9. Candidate parts (verify stock at JLCPCB before schematic)
-
-| Function | Candidate | Confidence | Verify |
-|---|---|---|---|
-| MCU | STM32 with **DFSDM**. Check first: does STM32L432KC/L442KC (QFN-32, 5×5 mm) have DFSDM? ST's own listings are inconsistent. Confirmed fallback: STM32L452CE (UFQFPN-48, 7×7 mm) | `[Med]` | DFSDM presence in the datasheet; JLC stock |
-| Mic | **Syntiant SPH0641LU4H-1** (PDM, ultrasonic mode, 3.50 × 2.65 mm) — see D13. Fallback: SPV0142LR5H-1 analog | `[Med]` | Lifecycle; LCSC/JLC stock or global sourcing |
-| Preamp | Not needed with the digital mic (TLV9061 only if falling back to analog) | `[High]` | — |
-| H-bridge | 2× complementary dual MOSFET, SOT-363 or similar, logic-level at 3.3 V | `[Med]` | On-resistance, gate threshold |
-| Charger | MCP73831 (SOT-23-5) | `[High]` | — |
-| LDO | Low-noise 3.3 V, ≥300 mA | `[Med]` | Current headroom for transducer peaks |
-| Transducer | RC-BC02 / GD02 class | `[Med]` | Measure coil inductance |
-| Battery | 30–100 mAh LiPo with protection circuit | `[Med]` | Fit in clasp; choose after Phase 2 current measurements |
-
-H-bridge supply: the 3.3 V rail, with firmware capping maximum duty cycle to limit peak current. That's fine at the intended quiet listening levels `[Med]`.
-
-## 10. Power budget (per side, estimates)
-
-| Block | Current |
-|---|---|
-| MEMS mic | ~0.15 mA |
-| Preamp | ~0.5 mA |
-| MCU, algorithm A | ~2–3 mA |
-| MCU, algorithm B | ~8–10 mA `[Low]` |
-| Transducer, average at listening level | ~2–5 mA; about 0 when squelched |
-| **Total** | **~5–8 mA (A), ~12–16 mA (B)** `[Low]` |
-
-About 3–8 hours on 40 mAh, roughly double on 100 mAh. **Power levers, most effective first:** squelch, output band placement (D9), algorithm choice.
-
-## 11. Phase plan
-
-### Phase 1: DSP simulation (Claude Code, no hardware) ← START HERE
-1. Find openly licensed full-spectrum bat and insect recordings (sample rate ≥192 kHz). Also generate synthetic test signals: steady 25 kHz "charger whine", chirps, and clicks.
-2. Implement algorithms A and B plus the transient-only gate in Python (numpy/scipy).
-3. Render WAV files for listening. The owner picks the algorithm, band limits (D9), and gate behavior.
-4. Model 8-bit noise-shaped PWM through a coil low-pass filter (placeholder inductance of about 0.3 mH for 8 Ω, updated once measured) and plot the audible-band noise (§7.4).
-5. Estimate processing cost per sample for each algorithm against the L432's 80 MHz budget.
-6. **Exit:** chosen algorithm and parameters; noise-shaping design shown to be inaudible on paper.
-
-### Phase 1b: Hearing calibration
-- Tone sweep to find the owner's upper hearing limit, which sets the band floor (D10). Use decent full-range headphones, not the Ear Opens, which may roll off at the top.
-
-### Phase 2: Bench hardware (in parallel once parts arrive)
-- Order: 2× RC-BC02, 1× Dayton BCE-1, **NUCLEO-L476RG** (DFSDM confirmed; Elecrow publishes an SPH0641 example for it), **Elecrow SPH0641LU4H-1 digital mic breakout** ×2, MOSFETs, plus one analog SPV0142 breakout as a comparison.
-- Measure the RC-BC02's coil inductance.
-- Placement test: exciter on the cheekbone arch root vs. the temple, while wearing Ear Opens playing phone audio; talk and chew; check clearance.
-- Port the chosen DSP to firmware. Measure CPU load and current per mode.
-- **Exit:** T1, T2, T3, and T6 pass on the bench rig (wired, not wearable yet).
-
-### Phase 3: PCB
-- Schematic (checked against JLC stock), then the owner does layout in KiCad, then Claude reviews layout, runs design-rule checks, and generates BOM and placement files, then order assembled boards.
-
-### Phase 4: Mechanical and integration
-- 3D-print clasps and drop-arms, iterating on fit.
-- **Exit:** all of T1–T6 pass while worn.
-
-## 12. Open questions and risks
-
-| # | Question / risk | Confidence it's a real problem | Resolved by |
-|---|---|---|---|
-| R1 | RC-BC02 too quiet at a few mA at the cheekbone site | `[Med]` | Phase 2 placement test |
-| R2 | RC-BC02 inductance too low for filterless PWM | `[Low]` | LCR measurement; fix is one inductor |
-| R3 | Algorithm B too heavy for 80 MHz at 192 kS/s | `[Med]` | Phase 1 cost estimate, Phase 2 profiling |
-| R4 | No suitable ultrasonic MEMS mic stocked at JLC | `[Med]` | Parts check before schematic |
-| R5 | Bone-conduction stereo too weak for T3 | `[Med]` | Phase 2 test; weak left/right is partly inherent |
-| R6 | Drop-arm contact comfort (pressure, jaw movement) | `[Med]` | Phase 2 and 4 wear tests |
-| R7 | Small mismatches between sides (mic sensitivity, transducer coupling) bias perceived direction | `[Low]` | Per-side gain trim constant set at calibration |
-| R8 | Preamp or ADC noise floor too high for distant bats | `[Med]` | Phase 2 outdoor test |
-
-## 13. Program context (other projects, not in scope here)
-
-- **Northsense:** torso band with 8 LRA motors plus IMU providing a constant north cue. Next project.
-- **Blindspot Proximity:** parked (hair blocks rear sensors on the glasses). The torso band hardware from Northsense would be reused if it's revived with a different sensor placement.
-- **Design principles for the whole program:** continuous rather than alert-style signals; direction mapped to body location; adaptive normalization only where it doesn't destroy the cue (not here, per D3); quiet by default; comfort first; add senses one at a time.
-
-## 14. Glossary
-
-- **Heterodyne:** shifting frequencies down by multiplying the signal with a tone, then filtering. Hears one band at a time.
-- **Log frequency compression:** squeezing a wide frequency range into a narrow one on a logarithmic scale, so every octave keeps a proportional share of the output. Hearing aids use this.
-- **Squelch:** muting output when the signal is below a threshold.
-- **Noise shaping:** feedback in the quantizer that pushes rounding noise out of the band you care about and into frequencies you can't hear, where it gets filtered.
-- **Oversampling ratio:** how many times faster the PWM runs than the audio band needs; more oversampling means more room to push noise out of the way.
-- **Interaural level difference:** the loudness difference between your two ears, the main cue for locating high-frequency sounds.
+- **Front clasp, just behind the hinge:** PCB (~10×20 mm `[Med]`, may grow slightly with the 7×7 MCU), battery, button. The mic port is on the bottom, so **the PCB needs a port hole, and the clasp an outward-facing opening covered with thin mesh.** Thick foam absorbs ultrasound.
+- **Along the temple arm:** thin two-conductor lead to the transducer.
+- **Drop-arm near the ear:** a short spring arm, 1–2 cm below the temple arm, pressing the transducer onto the cheekbone arch root with light, even force through a broad pad. It must keep ≥1–1.5 cm clearance from the tragus and the Ear Open pod through head turns and facial movement.
+- **Skin isolation:** transducer metal and solder joints fully insulated (silicone pad plus sealed housing). Sweat can otherwise carry drive current through skin.
+- **Programming:** SWD pogo pads. **Charging:** magnetic pogo connector plus a nightly dock.
+- **Mass target:** under ~8 g per side `[Low]`. Glasses get uncomfortable at ~15 g added per side.
 
 ---
 
-## 15. Research task list (for Claude Code)
+## 9. Parts (candidates; nothing ordered)
 
-Status key: `OPEN` · `IN PROGRESS` · `DONE` (with a pointer to the result). Priority: **P1** blocks the schematic or Phase 1 · **P2** needed before board order · **P3** needed before final assembly.
+Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 
-For every task, the output is a short written finding: sources with dates, 2–3 options with tradeoffs, a recommendation, and the confidence level. Part numbers always come with plain-language descriptions (§0 rule 1).
-
-### A. Blocking architecture questions (P1)
-
-| ID | Task | Why it matters | Output |
+| Function | Part (what it is) | JLC | Status |
 |---|---|---|---|
-| A1 | **Does the STM32L432KC or STM32L442KC have a DFSDM peripheral?** Check the datasheet's feature list and block diagram, not marketing blurbs (ST's product listings contradict each other). If neither does, compare: (a) STM32L452CC/CE in UFQFPN-48 7×7 mm (DFSDM confirmed), (b) software PDM decoding via SPI and DMA on the L432 (estimate CPU load and current), (c) any other low-power MCU with hardware PDM decoding that fits a ≤7×7 mm package. | Decides the MCU and board size. | MCU recommendation plus DFSDM evidence |
-| A2 | **Mic sourcing.** SPH0641LU4H-1: lifecycle status (DigiKey says Active; one distributor says "Not For New Designs"), stock at DigiKey, Mouser, and LCSC, and the JLC path (Basic, Extended, global sourcing, or consignment). Also survey newer purpose-built ultrasonic digital MEMS mics (Syntiant's selection guide covers ultrasonic parts; check TDK, Infineon, and others). | The whole input chain depends on it. | Primary plus backup mic, with evidence |
-| A3 | **Clock and sample-rate plan.** The mic's ultrasonic mode needs a 3.072–4.8 MHz clock. Find a clock the MCU can generate from its system clock that divides cleanly down to an output sample rate of about 192–250 kS/s. Specify the DFSDM filter settings (sinc order, decimation ratio) plus any CPU cleanup filter. Pull the ultrasonic-mode noise floor and response curve from the datasheet. | A mismatched clock plan means awkward sample rates or no ultrasonic mode. | Clock tree, sample rate, filter configuration |
-| A4 | **Transducer options.** Find a datasheet with coil inductance for RC-BC02/GD02-class modules (needed for the filterless PWM design, D6). Search for anything smaller or more efficient that's purchasable in single quantities. List current, buyable listings with stated dimensions. | Sets output efficiency, size, and whether an extra inductor is needed. | 2–3 buyable options with specs |
+| MCU | **STM32L452CEU6**: 80 MHz Cortex-M4F with hardware PDM decoder (DFSDM), QFN-48 7×7 mm | C222355 · Extended · 16 in stock · $6.90 | Recommended; awaiting owner OK (D5) |
+| Mic | **SPH0641LU4H-1**: digital MEMS mic with ultrasonic mode, 3.5×2.65 mm | C2879853 · Extended · 1,076 in stock · $1.99 | Lifecycle/backup check open (A2) |
+| H-bridge | 2× complementary dual MOSFET (one N + one P per package), SOT-363 or smaller, fully on at 3.0–3.3 V gate drive | — | B1 |
+| Charger | **MCP73831**: single-cell LiPo linear charger, SOT-23-5; charge current set by one resistor | C424093 (‑2ACI/OT) · Extended · 9,478 in stock · $0.78 | Check min charge current vs cell size (B3) |
+| LDO | Low-noise linear regulator, 3.0 V (or 3.3 V), ≥400 mA peak, low dropout, low idle current | — | B2 |
+| Transducer | RC-BC02 / GD02-class bone-conduction exciter, 8 Ω | not JLC; hand-soldered | Inductance unknown (E1) |
+| Battery | 40–100 mAh LiPo with protection circuit | not JLC; hand-soldered | B4 |
+| Preamp / ADC | Not needed (digital mic) | — | — |
 
-### B. Parts selection for the schematic (P2)
+---
 
-| ID | Task | Constraints |
+## 10. Phase plan
+
+### Phase 1: DSP simulation (Claude, no hardware) ← **current**
+1. Test corpus: openly licensed full-spectrum recordings (≥192 kS/s) of bats and katydids, plus synthetic signals (steady 25 kHz whine, chirps, clicks, mixtures) (C1).
+2. Front-end model: the mic's ultrasonic response (digitized from the datasheet) plus the DFSDM decimation options from D14.
+3. Algorithms A and B plus the transient gate in Python (numpy/scipy); render WAVs for listening.
+4. Output model: noise-shaped PWM → H-bridge → coil low-pass; plot noise in the 0–40 kHz band (§6, C3).
+5. Cycle-cost estimate for each algorithm on the Cortex-M4F (C2).
+6. **Exit:** algorithm and parameters chosen by the owner; an output-stage design shown on paper to be inaudible to her.
+
+### Phase 1b: Hearing calibration
+- Tone-sweep WAVs (C5) played on decent full-range headphones, not the Ear Opens. The result sets the D10 band floor.
+
+### Phase 2: Bench hardware
+- Buy: 2× RC-BC02, 1× Dayton BCE-1, **NUCLEO-L476RG** (an ST dev board; its STM32L476 has the same core and a larger DFSDM), 2× SPH0641LU4H-1 breakout boards, MOSFETs, and 1× SPV0142 analog breakout for comparison.
+- Measure transducer inductance (E1); placement test (E2); mic comparison (E3); port the DSP; measure CPU load and current (E4).
+- **Exit:** T1, T2, T3, T6 pass on a wired bench rig.
+
+### Phase 3: PCB
+- Schematic checked against JLC stock → owner lays out in KiCad → Claude reviews and runs DRC, generates BOM and placement files → order assembled boards.
+
+### Phase 4: Mechanical and integration
+- 3D-printed clasps and drop-arms; iterate on fit. **Exit:** T1–T6 pass while worn.
+
+---
+
+## 11. Risks
+
+| # | Risk | Likelihood | Resolved by |
+|---|---|---|---|
+| R1 | RC-BC02 too quiet at a few mA at the cheekbone site | `[Med]` | E2 |
+| R2 | RC-BC02 inductance too low for filterless PWM | `[Low]` | E1; fix is one inductor |
+| R3 | Algorithm B too heavy for 80 MHz at 200 kS/s | `[Med]` | C2, then Phase 2 profiling |
+| ~~R4~~ | ~~No ultrasonic MEMS mic stocked at JLC~~ | **Resolved v0.3**: C2879853, 1,076 in stock | — |
+| R5 | Bone-conduction stereo too weak for T3 | `[Med]` | Phase 2 |
+| R6 | Drop-arm comfort (pressure, jaw movement) | `[Med]` | Phase 2 and 4 wear tests |
+| R7 | L/R mismatch (mic sensitivity, transducer coupling) biases direction | `[Low]` | Per-side gain trim set at calibration |
+| R8 | **Mic ultrasonic self-noise** too high for distant bats (not in datasheet) | `[Med]` | E3, outdoor test |
+| **R9** | **PWM noise audible to the owner** (only ~4× oversampling against her hearing band, §6) | `[Med]` | C3 |
+| **R10** | **MCU stock is thin** (16 at JLC) | `[Med]` | Buy or pre-order early; UFBGA fallback |
+| **R11** | **Battery life under ~5 h on small cells** (§7) | `[Med]` | E4 measurements, B4 |
+
+---
+
+## 12. Research and task list
+
+Status: `OPEN` · `IN PROGRESS` · `DONE` (with a pointer). Priority: **P1** blocks Phase 1 or the schematic · **P2** before board order · **P3** before final assembly.
+
+### A. Architecture (P1)
+| ID | Task | Status |
 |---|---|---|
-| B1 | **H-bridge switches.** Complementary MOSFET pairs, or a tiny H-bridge IC with near-zero idle current. Must switch fully with 3.3 V gate drive and have low resistance at that voltage. Confirm the chosen MCU has an advanced timer with complementary outputs and dead-time insertion for driving the bridge. | Smallest package JLC assembles; idle current ≈ 0 |
-| B2 | **Linear regulator (LDO).** 3.3 V, low noise, ≥300 mA, low idle current, low dropout so the LiPo is usable down to about 3.4 V. | No switching regulators, ever (constraint 3) |
-| B3 | **LiPo charger.** MCP73831 or better; check JLC stock; set charge current to ≤1C for 30–100 mAh cells. | Small package; silent operation |
-| B4 | **Battery.** LiPo cells with built-in protection, 30–100 mAh. List candidates with L×W×T dimensions, mass, and sourcing. | Must fit the front clasp; mass budget §8 |
-| B5 | **Button.** Smallest tactile switch suitable for a glasses clasp (side- or top-actuated). | JLC assemblable preferred |
-| B6 | **Connectors.** 2-pin magnetic pogo connector for charging; SWD programming footprint (Tag-Connect vs. plain pogo pads); ESD protection on exposed contacts. | Tiny; exposed contacts must survive sweat |
-| B7 | **Costing.** Full BOM cost per side, plus JLC assembly cost for 2, 5, and 10 boards. | — |
+| A1 | Which MCU has DFSDM; pick one | **DONE**: `docs/research/A1-A2-mcu-and-mic.md`. L432 has none; recommend L452CEU6. Awaiting owner pick. |
+| A2 | Mic lifecycle, stock, JLC path; backup ultrasonic mics | **IN PROGRESS**: JLC stock confirmed. Lifecycle and backup open. |
+| A3 | Clock/sample-rate plan and DFSDM filter settings | **IN PROGRESS**: plan in D14. Verify the CKOUT duty cycle in RM0394; simulate filter options (i) vs (ii). |
+| A4 | Transducer options: find inductance data; anything smaller or more efficient that's buyable in 1s | OPEN |
 
-### C. DSP and firmware research (P1 for Phase 1)
-
-| ID | Task | Output |
+### B. Schematic parts (P2)
+| ID | Task | Notes |
 |---|---|---|
-| C1 | **Test recordings.** Find openly licensed full-spectrum recordings (sample rate ≥192 kHz) of regionally relevant species: big brown bat, eastern red bat, katydids. Record the license terms. Generate synthetic test signals too (steady 25 kHz whine, chirps, clicks, mixtures). | Test corpus plus license notes |
-| C2 | **Algorithm cost.** Estimate cycles per sample for heterodyne vs. STFT log compression on a Cortex-M4F (use CMSIS-DSP benchmarks where available). | Does algorithm B fit the MCU budget? (R3) |
-| C3 | **Noise-shaping design.** PWM resolution and frequency options on the chosen MCU's timers; noise-shaper design; model the audible-band noise through the transducer coil (§7.4). | Parameters that keep noise inaudible to the owner |
-| C4 | **Transient-only gate.** Spectral subtraction parameters; evaluate on a whine-plus-chirp mixture. | Tuned parameters plus listening WAVs |
-| C5 | **Hearing test files.** Generate calibrated sweep WAVs for the owner's upper-limit test (D10), with instructions. | WAV files plus procedure |
-| C6 | **Local bat frequencies.** Verify call frequency ranges for local bat species from the literature. | Band limits sanity check |
-| C7 | **Transducer ultrasonic leakage.** Quantify the RC-BC02's response above 20 kHz from datasheet or literature, relevant to bone-conducted ultrasound perception (§7.4). | Is extra output filtering needed? |
+| B1 | H-bridge MOSFETs (or tiny H-bridge IC with ~0 idle current) | Must be fully on at 3.0 V gate drive; smallest JLC package. TIM1 complementary outputs with dead-time confirmed. |
+| B2 | LDO | 3.0 vs 3.3 V rail (§7); ≥400 mA peak; low noise; low Iq |
+| B3 | Charger | MCP73831 stocked (C424093). Check its minimum programmable charge current against a 40 mAh cell (≤1C). |
+| B4 | Battery | 40–100 mAh protected LiPo; L×W×T, mass, sourcing. §7 favors ~100 mAh. |
+| B5 | Button | Smallest tactile switch; JLC-assemblable preferred |
+| B6 | Connectors | Magnetic 2-pin charge pogo; SWD footprint (Tag-Connect vs pogo pads); ESD protection on exposed contacts |
+| B7 | Costing | BOM per side; JLC assembly cost for 2/5/10 boards |
 
-### D. Mechanical and materials sourcing (P3)
-
-| ID | Task | Output |
+### C. DSP and firmware (P1 for Phase 1)
+| ID | Task | Status |
 |---|---|---|
-| D1 | **Materials.** Superelastic nitinol wire (diameter options, suppliers); skin-safe silicone sheet (thickness, hardness); JLC PA12 nylon printing rules (minimum wall, tolerances, cost). | Sourcing list |
-| D2 | **Acoustic mesh for the mic opening.** Must pass 20–80 kHz with little loss, keep out dust and sweat. Check attenuation data for hydrophobic acoustic vents and membranes; many are specified only for voice frequencies. | Mesh part or design rule |
-| D3 | **Skin-contact insulation.** Approach for sealing the transducer and solder joints (silicone pad plus potting or conformal coat); materials that are skin-safe for all-day wear. | Build method |
+| C1 | Test corpus (licensed recordings + synthetic signals) | OPEN |
+| C2 | Cycle cost of A vs B on the M4F (CMSIS-DSP benchmarks) | OPEN |
+| C3 | Output-stage noise design (§6): modulation type, shaper order, drive scaling, filtering | OPEN; **now the biggest technical unknown** |
+| C4 | Transient gate tuning on whine-plus-chirp mixtures | OPEN |
+| C5 | Hearing-test sweep WAVs plus procedure | OPEN |
+| C6 | Local bat call frequencies from the literature | OPEN |
+| C7 | Transducer response above 20 kHz (bone-conducted ultrasound leakage) | OPEN |
 
-### E. Owner bench measurements (Claude Code supports with procedures and analysis)
+### D. Mechanical and materials (P3)
+| ID | Task |
+|---|---|
+| D1 | Nitinol wire, skin-safe silicone, JLC PA12 nylon print rules |
+| D2 | Acoustic mesh that passes 20–80 kHz and keeps out dust and sweat |
+| D3 | Skin-contact insulation method for the transducer |
 
+### E. Owner bench measurements (Claude writes procedures and analyzes results)
 | ID | Measurement | Resolves |
 |---|---|---|
-| E1 | RC-BC02 coil inductance with an LCR meter | R2 |
-| E2 | Placement test: cheekbone arch root vs. temple, with Ear Opens playing; talk and chew | R1, R6 |
-| E3 | Mic comparison: SPH0641 (digital) vs. SPV0142 (analog), using the HC-SR04, keys, and outdoor recordings | Validates D13 |
-| E4 | Current profiling per mode with the PPK2 | §10 power budget |
-| E5 | Hearing sweep with the C5 files | D10 band floor |
+| E1 | Transducer coil inductance (LCR meter) | R2, C3 |
+| E2 | Placement: cheekbone arch root vs temple, with Ear Opens playing; talk and chew | R1, R6 |
+| E3 | Mic comparison, digital vs analog; ultrasonic noise floor | D13, R8 |
+| E4 | Current per mode (PPK2) | §7, R11 |
+| E5 | Hearing sweep with the C5 files | D10 |
 
-**Suggested order:** A1 → A2 → A3 (in parallel with C1 → C2 for Phase 1) → A4 → B-series → C3/C4 → D-series. E-series tasks run whenever hardware arrives.
+**Suggested order:** owner picks MCU (D5) → C1 → A3/C3 simulation → C2 → A2 finish → A4 → B-series → D-series. E-series whenever hardware arrives.
+
+---
+
+## 13. Program context (not in scope)
+- **Northsense:** torso band, 8 LRA motors plus IMU giving a constant north cue. Next project.
+- **Blindspot Proximity:** parked (hair blocks rear sensors on glasses); may reuse the Northsense torso hardware.
+- **Program principles:** continuous signals rather than alerts; direction mapped to body location; adaptive normalization only where it doesn't destroy the cue (not here, D3); quiet by default; comfort first; one new sense at a time.
+
+---
+
+## 14. Glossary
+- **PDM (pulse-density modulation):** a 1-bit stream at MHz rates where the density of 1s tracks the signal. MEMS mics output it; it has to be filtered and decimated to get normal samples.
+- **DFSDM:** the STM32 hardware block that does that PDM-to-PCM filtering.
+- **Decimation:** lowering the sample rate after filtering out content that wouldn't fit.
+- **Heterodyne:** shifting frequencies down by multiplying by a tone, then filtering. You hear one band at a time.
+- **Log frequency compression:** squeezing a wide frequency range into a narrow one on a log scale, so each octave keeps its share (hearing aids use this).
+- **Squelch:** muting output below a threshold.
+- **Noise shaping:** feedback in the quantizer that pushes rounding noise out of the band you care about into a band where it's filtered or inaudible.
+- **Oversampling ratio:** how much faster the converter runs than twice the band it must keep clean. Higher means more room to push noise away.
+- **Interaural level difference:** the loudness difference between your ears; the main cue for locating high-frequency sounds.
+- **3-level (class-BD) PWM:** H-bridge modulation where both legs switch so the load sees +V, 0, or −V. Zero drive at idle, and ripple at twice the switching rate.
+
+---
+
+## 15. Changelog
+
+### v0.3 (2026-09-30)
+- **§1 MVP section created and locked** (goal, owner constraints, success tests carried over unchanged in substance from v0.2 §1, §2, §4).
+- **D5 MCU changed: STM32L432KC → STM32L452CEU6.** The L432 has no DFSDM (verified in the datasheet). Pending owner OK.
+- **D13 mic:** JLC stock confirmed (C2879853); datasheet firmware rules recorded; R4 resolved.
+- **D14 new:** clock plan, 4.0 MHz mic clock, 200 kS/s (replaces 192 kS/s).
+- **§6 new:** v0.2's 60× oversampling claim corrected to ~4× against the owner's hearing band. Output-noise design is now the top technical risk (R9, C3).
+- **§7:** power re-estimated from datasheet run currents (~7–14 mA vs 5–16 mA); battery recommendation raised toward ~100 mAh; 3.0 V rail proposed.
+- Removed stale analog-chain items (preamp current, preamp/ADC noise in R8).
+- Added R9–R11. Research findings moved into `docs/research/`.
+
+### v0.2
+- Design-chat handoff (original document).
