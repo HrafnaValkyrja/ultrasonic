@@ -2,7 +2,7 @@
   (version "D")
   (design
     (source "gen.py")
-    (date "09/30/2026 04:31 PM")
+    (date "09/30/2026 04:46 PM")
     (tool "SKiDL (2.3.0)")
     (sheet
       (number 1)
@@ -579,7 +579,7 @@
         (field
           (name "SKiDL Tag") "D1")
         (field
-          (name "SKiDL Line") "gen.py:140"))
+          (name "SKiDL Line") "gen.py:141"))
       (libsource
         (lib "lcsc")
         (part "PESD5V0S1BL,315"))
@@ -605,7 +605,7 @@
         (field
           (name "SKiDL Tag") "D2")
         (field
-          (name "SKiDL Line") "gen.py:140"))
+          (name "SKiDL Line") "gen.py:141"))
       (libsource
         (lib "lcsc")
         (part "PESD5V0S1BL,315"))
@@ -631,7 +631,7 @@
         (field
           (name "SKiDL Tag") "D3")
         (field
-          (name "SKiDL Line") "gen.py:148"))
+          (name "SKiDL Line") "gen.py:149"))
       (libsource
         (lib "lcsc")
         (part "ESD9X5.0ST5G"))
@@ -1229,7 +1229,7 @@
         (field
           (name "SKiDL Tag") "SW1")
         (field
-          (name "SKiDL Line") "gen.py:179"))
+          (name "SKiDL Line") "gen.py:180"))
       (libsource
         (lib "lcsc")
         (part "KXT321LHS"))
@@ -1398,14 +1398,14 @@
       (ref "U2")
       (value "SPH0641LU4H-1")
       (description "Digital MEMS Microphone, LGA-5")
-      (footprint "Sensor_Audio:Knowles_LGA-5_3.5x2.65mm")
+      (footprint "lcsc:Knowles_LGA-5_3.5x2.65mm_Port0.6")
       (fields
         (field
           (name "LCSC") "C2879853")
         (field
           (name "Description") "Digital MEMS Microphone, LGA-5")
         (field
-          (name "Footprint") "Sensor_Audio:Knowles_LGA-5_3.5x2.65mm")
+          (name "Footprint") "lcsc:Knowles_LGA-5_3.5x2.65mm_Port0.6")
         (field
           (name "Datasheet") "https://www.knowles.com/docs/default-source/model-downloads/sph0641lu4h-1-revb.pdf")
         (field
@@ -1437,7 +1437,7 @@
         (field
           (name "SKiDL Tag") "U3")
         (field
-          (name "SKiDL Line") "gen.py:153"))
+          (name "SKiDL Line") "gen.py:154"))
       (libsource
         (lib "Battery_Management")
         (part "MCP73832-2-OT"))
@@ -1463,7 +1463,7 @@
         (field
           (name "SKiDL Tag") "U4")
         (field
-          (name "SKiDL Line") "gen.py:168"))
+          (name "SKiDL Line") "gen.py:169"))
       (libsource
         (lib "lcsc")
         (part "TPS7A2030PDQNR"))

@@ -113,7 +113,8 @@ def build():
         c = C(ref, "15p", "C15p"); c[1] += n; c[2] += gnd
 
     # ------------------------------------------------------------ microphone (ADF1)
-    u2 = Part("Sensor_Audio", "SPH0641LU4H-1", ref="U2", tag="U2")
+    u2 = Part("Sensor_Audio", "SPH0641LU4H-1", ref="U2", tag="U2",
+              footprint="lcsc:Knowles_LGA-5_3.5x2.65mm_Port0.6")   # 0.6 mm port (stock is 0.5)
     u2.fields["LCSC"] = "C2879853"
     mic_vdd, mic_clk, mic_dat = Net("MIC_VDD"), Net("MIC_CLK"), Net("MIC_DATA")
     mic_vdd.drive = skidl.POWER                        # a GPIO is the supply here, on purpose
