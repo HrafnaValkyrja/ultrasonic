@@ -1,4 +1,4 @@
-# Stereo Ultrasound — Project Spec v0.11
+# Stereo Ultrasound — Project Spec v0.12
 
 **Owner:** Valkyrie
 **Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. v0.5 applies the full-plan sanity check (`docs/research/review-2026-09-30.md`). Next: shopping-list approval (O3) → Phase 1 simulation and first bench orders. No hardware purchased.
@@ -16,7 +16,7 @@
 2. **Gloss every part number** in plain language on first mention in any document or message: what it is, and why it's there.
 3. **Primary sources.** Datasheets for specs; distributor or JLC listings for stock and price, always with the query date. Findings go in `docs/research/`, one file per task, and get summarized here. Numeric models live in `sim/` and are cited by script name.
 4. **Decisions as 2–3 options with tradeoffs plus a recommendation.** The owner picks. Nothing is final without her approval.
-5. **Part-choice checklist:** smallest package JLC can assemble · lowest power · **no switch-mode regulators anywhere** · in stock or sourceable. JLC "Basic" parts carry no setup fee, "Extended" parts carry a small one; say which.
+5. **Part-choice checklist:** smallest package JLC can assemble · lowest power · **switching regulators only as allowed by D11** · in stock or sourceable. JLC "Basic" parts carry no setup fee, "Extended" parts carry a small one; say which.
 6. **Teach the why** (DSP, PDM, noise shaping, power design), briefly and without condescension.
 7. **Be blunt.** If something in this spec is wrong, flag it, fix it here, bump the version, and log it in §15.
 8. **Show, don't just tell.** The owner is a visual learner. When a mechanism, layout, flow or comparison is involved, draw it: author the SVG in `docs/diagrams/`, render it with `docs/diagrams/render.sh`, and send the **PNG** into the chat, where it displays inline (SVG files only appear as file cards). Label the arrows; one figure, one claim.
@@ -31,7 +31,7 @@ A wearable that lets the owner hear ultrasound (roughly 20–96 kHz) in real tim
 ### 1.2 Owner constraints
 1. **Full-time glasses wearer.** The device clips onto her main glasses via removable 3D-printed clasps.
 2. **Nothing Ear (open) headphones are worn constantly and reserved for phone audio.** The device must not use them as output, must not interfere with their fit, and must not bump the driver pod (over the ear opening, between helix root and tragus; shifts slightly during wear). The counterweight bulb sits behind the ear.
-3. **Unusually good high-frequency hearing** (hears some charger and LED-driver whine). So: no audible self-noise, no switching regulators, PWM noise kept well above her hearing.
+3. **Unusually good high-frequency hearing** (hears some charger and LED-driver whine). So: any self-noise must be no louder than the ambient background, and PWM noise is kept well above her hearing. *(Owner change 2026-09-30: the blanket "no switching regulators" rule was removed.)*
 4. **Comfort and size are the top priority.** Bulky or uncomfortable means unworn means failed. Bulk goes at the front of the frame near the hinges, never near the neck or behind the ears.
 
 ### 1.3 Success tests
@@ -137,6 +137,10 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
   - See `A3-clock-and-peripherals.md` §5.
 - **JLC:** Extended part C222355, **16 in stock** (2026-09-30). Buy early (R10).
 
+- **v0.12: moving to STM32U575CIU6Q** (owner removed the SMPS rule; D11). It's a Cortex-M33 at up to 160 MHz with DSP and FPU and an internal core SMPS, in the **same 7×7 mm UFQFPN-48**. MCU run current ~19.5 µA/MHz vs 84. The 160 MHz headroom also removes the CPU risk for log compression (R3).
+  - Drop-in alternative: STM32U585CIU6Q (same chip plus crypto).
+  - JLC (2026-09-30): U575CIU6Q C5271013, 8 in stock, $8.93; U585CIU6Q C5271021, 15 in stock, $12.52. Stock is thin, so buy early.
+  - **Must re-verify before the schematic (A1/A3 reopened):** the U5 replaces DFSDM with the **MDF/ADF** digital filters, so the clock plan, filter orders and pin map need redoing. Also the advanced timer with complementary outputs and dead time for the bridge, and the SMPS inductor layout.
 ### D6. Output stage: 200 kHz 2-level PWM, 3rd-order noise shaping, discrete H-bridge `[Med]` — **Rewritten v0.5**
 - **What it is:** TIM1, the MCU's motor-control timer, switches an H-bridge made of two complementary MOSFET pairs (each pair is one N-channel + one P-channel transistor in a 1.6 mm package). The bridge drives the transducer directly, and the transducer coil smooths the switching into sound.
 - **Carrier:** **200 kHz**, centre-aligned (ARR = 200), with one duty update per period over DMA. It is synchronous with the input chain (D14), and 201 duty levels.
@@ -180,8 +184,13 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 ### D10. Band floor calibrated to the owner's hearing `[High]` as a principle
 - Measure her upper hearing limit (C5/E5). Start the processed band just below it, so there's no gap and no doubled sounds. Stored as a firmware constant, identical on both sides.
 
-### D11. Linear regulation only `[High]`
-- Switch-mode regulators produce audible inductor whine (§1.2.3).
+### D11. Switching regulator for the MCU core; linear for everything else `[Med]` — **Changed v0.12 (owner)**
+- The owner removed the no-switching rule. The limit is now that self-noise is no louder than the ambient background (§1.2.3).
+- **Use:** the MCU's internal SMPS for its ~1.2 V core only. That's where the efficiency gain is: the core's LDO throws away about 60% of its input.
+  - Keep it in forced fixed-frequency (PWM) mode, never burst/skip mode, which is the usual source of audible whine at light load.
+  - Use a shielded, low-magnetostriction inductor, with no Class-2 ceramics on the switching node.
+- **Main 3.0 V rail stays a linear LDO.** A battery-to-3.0 V buck would save only ~10%, and the mic and bridge supply benefit from a quiet rail.
+- **Check:** the owner's listening test on the bench (E11). If whine is audible over a quiet room's background, fall back to the LDO. The chip can switch regulators on the fly.
 
 ### D12. Modes `[High]` as requirements
 - **Full:** the whole band, pitched down.
@@ -354,7 +363,7 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 7. **Idle-listening mode** (C9, `[Low]` estimate): when nothing ultrasonic is happening, run only a cheap band-energy detector at a low clock and keep a ~10 ms look-back buffer. Wake to full processing on activity, with the buffer covering the wake-up, so call onsets aren't clipped. Could save ~1–2 mA in quiet periods. Evaluate in S3.
 
 **v0.10 power findings (2026-09-30):**
-- **A newer MCU doesn't help under our rules.** The STM32U575's 19.5 µA/MHz needs its internal SMPS (switching regulator). On its LDO it draws 5.4 mA at 64 MHz, ~84 µA/MHz, the same as the L452 (DS13737 Rev 8, Table 37). The SMPS route conflicts with §1.2.3, so it's off the table unless the owner changes that rule.
+- **STM32U575: 19.5 µA/MHz on its internal SMPS.** On its LDO it draws 5.4 mA at 64 MHz, ~84 µA/MHz, the same as the L452 (DS13737 Rev 8, Table 37). With the SMPS allowed (D11, v0.12), the MCU drops from ~3.8 mA to ~0.9 mA always-on `[Med]`.
 - **The big allowed lever is the idle-listening mode (C9), now the top power item.**
   - When the ultrasonic band is quiet, the CPU clock is divided down, a few band-energy detectors (each with a slowly tracking floor, so steady whines don't count) run on the DFSDM stream, and the bridge stops. The mic clock never changes, so there's no DFSDM restart.
   - A ~10 ms look-back buffer covers the wake-up, so call onsets aren't clipped.
@@ -437,7 +446,7 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 
 | Function | Part (what it is) | JLC | Status |
 |---|---|---|---|
-| MCU | **STM32L452CEU6**: 80 MHz Cortex-M4F with hardware PDM decoder, QFN-48 7×7 mm | C222355 · Extended · 16 · $6.90 | **Chosen** (D5); buy early |
+| MCU | **STM32U575CIU6Q**: 160 MHz Cortex-M33 with internal core SMPS and MDF/ADF PDM filters, QFN-48 7×7 mm (v0.12; was STM32L452CEU6) | C5271013 · Extended · 8 · $8.93 | **Chosen** (D5, D11); re-verify MDF plan (A1/A3) |
 | Mic | **SPH0641LU4H-1**: digital MEMS mic with ultrasonic mode, 3.5×2.65 mm | C2879853 · Extended · 1,076 · $1.99 | **Chosen** (D13); lifecycle OK |
 | Mic backup | **TDK T5838**: PDM mic, ultrasonic mode to ~50 kHz | C7230692 · Extended · 684 · $3.47 | Backup only |
 | Crystal | **Q13FC13500004**: 32.768 kHz watch crystal, 3.2×1.5 mm (or X1A0000610002, 2.0×1.2 mm) | C32346 · **Basic** · 467k · $0.17 (C55208 · Extended · 22.5k) | Recommended (D16) |
@@ -474,11 +483,11 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 
 **Bench rules:**
 - Listening tests run on battery, never laptop USB. USB streaming is for recording only.
-- Use **NUCLEO-L452RE**, not -P: the -P variant has an onboard switching regulator.
+- Use **NUCLEO-U575ZI-Q** (SMPS variant, v0.12). E11: owner listens for whine with the board against her temple in a quiet room.
 - Check whether the Nucleo's user LED shares PA5; if so, remove its solder bridge.
 
 **Shopping list v0.5** (to price and verify before ordering; owner approves):
-- 2× **NUCLEO-L452RE**: ST dev board with the same MCU. ST eStore / DigiKey list it in stock.
+- 2× **NUCLEO-U575ZI-Q**: ST dev board with the new MCU and its SMPS (v0.12; replaces NUCLEO-L452RE). Check stock at order time.
 - 2–3× **Elecrow CCB50641P** SPH0641LU4H-1 mic boards: $12.50 each, in stock.
 - **One JLC order** (Claude designs it):
   - ~5× discrete-bridge test boards (final MOSFETs, gate pulls, sense resistor, headers);
@@ -533,7 +542,7 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | ~~O2~~ | ~~Test a spot nearer the tragus?~~ | **Resolved 2026-09-30:** the tragus is the primary site, and the owner says it fits more easily (D1) |
 | **O3** | Approve the v0.5 shopping list once priced | — |
 | **O5** | Pod layout inside the ~35 mm between the vision line and the ear keep-out (v0.9): stacked, thicker pod with a ~105 mAh cell vs a slimmer pod with a smaller cell (runtime cost) | One pod if the 105–120 mAh class meets the runtime after E4 |
-| **O6** | Allow a switch-mode regulator **only** as the MCU core's internal SMPS (STM32U575/U585 "Q" variants, same 7×7 mm QFN-48): forced-PWM (fixed frequency, MHz range, never burst mode), shielded low-magnetostriction inductor, no Class-2 caps on it, and it **must pass the owner's own listening test on the bench** before adoption. Saves ~3 mA always-on (MCU ~3.8 → ~0.9 mA) or ~1.2 mA with idle mode. §1.2.3 is owner-locked, so this needs her explicit change | Bench-test it (buy one NUCLEO-U575ZI-Q alongside the L452 board); decide by ear |
+| ~~O6~~ | **Resolved 2026-09-30: owner removed the rule; see D11, D5.** Was: allow a switch-mode regulator only as the MCU core's internal SMPS (STM32U575/U585 "Q" variants, same 7×7 mm QFN-48): forced-PWM (fixed frequency, MHz range, never burst mode), shielded low-magnetostriction inductor, no Class-2 caps on it, and it **must pass the owner's own listening test on the bench** before adoption. Saves ~3 mA always-on (MCU ~3.8 → ~0.9 mA) or ~1.2 mA with idle mode. §1.2.3 is owner-locked, so this needs her explicit change | Bench-test it (buy one NUCLEO-U575ZI-Q alongside the L452 board); decide by ear |
 | **O4** | Confirm the D18 reading of §1.2.4: cell along the arm, in front of the ear, nothing behind it | Yes; it's what makes the 12 h battery comfortable |
 
 Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 or the schematic · **P2** before board order · **P3** before final assembly.
@@ -592,6 +601,7 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 | E7 | **New.** Low-level distortion and idle silence on the bridge test board | R9, R12 |
 | E8 | **New.** Stereo A/B: free-running vs shared clock (S4) | R5, D2 |
 | E10 | **New v0.9.** Peripheral-vision boundary: glasses on, eyes fixed on a point straight ahead, a helper slides a pen tip forward along the temple arm from the ear until the owner first detects it. Mark the spot and measure from the hinge; repeat 3×, both eyes; also check just above and below the arm. The pod's front end goes ≥5 mm behind the mark | Vision no-go line (§8) |
+| E11 | **New v0.12.** SMPS whine: board running the real load pattern, pressed against the temple in a quiet room; owner listens. Pass = not louder than the room's background | D11 |
 | E9 | **Partly done 2026-09-30** (no ruler; scale from the speaker ring, see `ear-open-fit.md`; still wanted: ruler shot and mouth-open shot). Photo measurement: glasses + Ear (open) worn, mm ruler at the ear; lateral view of both ears, rear-oblique view, and mouth-open view (procedure in `ear-open-fit.md`) | D1 pad location, D4 arm geometry, keep-out at true scale |
 
 **Suggested order:** O1 and O3 → order transducers and Nucleos → JLC board designs → C1 → Phase 1 algorithms → S1/S2 as parts arrive → B-series → D-series.
@@ -628,6 +638,10 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ---
 
 ## 15. Changelog
+
+### v0.12 (2026-09-30) — switching regulator unlocked
+- **Owner changed §1.2.3:** the no-switching-regulator rule is removed. The limit is now "self-noise no louder than ambient background."
+- D11 rewritten: internal core SMPS in forced-PWM mode; main rail stays linear. D5: moving to STM32U575CIU6Q (same package, ~4× lower MCU current, 160 MHz); A1/A3 reopened for its MDF/ADF filters. Bench boards: NUCLEO-U575ZI-Q. New E11 (whine listening test).
 
 ### v0.11 (2026-09-30)
 - Owner: log compression becomes the only mode if it sounds better (D12). New O6: a narrowly scoped SMPS option (MCU core only, forced PWM, owner listening test) proposed; §1.2.3 unchanged pending her decision.

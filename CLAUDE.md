@@ -6,7 +6,7 @@
   - gloss every part number;
   - use primary sources, with dates;
   - present 2–3 options with a recommendation, and the owner decides;
-  - no switch-mode regulators;
+  - switching regulators only as spec D11 allows (MCU core SMPS; self-noise no louder than ambient);
   - be blunt;
   - show, don't just tell.
 - Research notes live in `docs/research/`; numeric checks in `sim/checks/`.
