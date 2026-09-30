@@ -247,6 +247,10 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
   - Clock: MSI locked to the 32.768 kHz crystal, **80 MHz in voltage Range 2** (allows up to 110 MHz). Actual 80.009 MHz; mic clock 4.0004 MHz; PWM period 200 counts; dead time in 12.5 ns steps, set separately for rising and falling edges.
   - Mic decimation in hardware: ADF sinc5 ÷5 → 800 kS/s, then its reshape filter ÷4 → **200 kS/s** (passes to ~89 kHz, rejects ~70 dB above ~120 kHz). The CPU half-band disappears. Fallback: ÷10 + CPU half-band, as before. ST publishes no response at this rate, so S1 sweeps it.
   - GPDMA takes any request on any channel, so the L452's DMA conflict is gone.
+  - **Errata firmware rules (ES0499 Rev 12, checked 2026-09-30):**
+    - handle the MSI PLL unlock interrupt by disabling and re-enabling PLL mode (spurious unlocks, §2.2);
+    - switch PLL2/PLL3/HSI48/SHSI off before Stop 2 (§2.2.5);
+    - never use TIM1 ocref_clr with combined or asymmetric PWM (no workaround); faults go through BKIN.
   - Idle mode: ADF + low-power DMA keep filling a ~40 ms look-back buffer in Stop 2. The ADF's built-in sound-activity detector is broadband: speech and footsteps trip it as easily as bats. So band detection stays in software (C9).
 - **⚠️ Duty-cycle risk:** DFSDM's clock output is characterized at 45–55% on a sister chip. The mic needs 48–52%. Typical is 50%, and **S1 scopes it**. Fallback: a timer-generated clock into DFSDM's CKIN pin.
 - **Decimation choice (S1 measures both):**
