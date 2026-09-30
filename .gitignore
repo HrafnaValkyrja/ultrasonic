@@ -10,3 +10,4 @@ skidl*.erc
 fp-info-cache
 # simulation outputs (regenerate with the scripts)
 sim/out/
+hw/mech/out/
