@@ -8,7 +8,10 @@ Blocks (spec §4, §7, §9; parts and LCSC numbers from .pcba-workflow/sourcing-
   Mic     SPH0641LU4H-1 on the ADF: clock PB3, data PB4, powered from PA5 so Off really is off (D12)
   Bridge  2x PMCXB290UE complementary pairs on TIM1 CH1/CH1N/CH2/CH2N, 100k gate pulls (D6)
   Power   MCP73831 charger (45 mA) -> 105 mAh cell (with its own protection PCB) -> TPS7A2030 3.0 V LDO
-  I/O     button PA0 (wake), battery sense PA4 (1M/1M, 2 uA), charge status PA10, SWD pads
+  I/O     button PA0 (wake), battery sense PA4 (1M/1M, 2 uA), charge status PA10 (open-drain),
+          VBUS sense PA1 (dock detect), SWD pads
+Rev B (2026-09-30, audit fixes): MCP73832 instead of MCP73831 (NM-1), VBUS sense (PWR-05),
+C4 10 uF 0603 (NM-7), R1 10k (NM-11), C20 at VBAT (NM-5).
 Change this file, never the generated netlist.
 """
 from __future__ import annotations
@@ -33,7 +36,7 @@ PAD = "TestPoint:TestPoint_Pad_D1.0mm"
 
 # LCSC numbers (sourcing lock + dated lookups 2026-09-30); every placed part carries one.
 LCSC = {
-    "R33": "C25105", "R22k": "C25768", "R100k": "C25741", "R1M": "C26083",
+    "R33": "C25105", "R10k": "C25744", "R22k": "C25768", "R100k": "C25741", "R1M": "C26083",
     "C15p": "C1548", "C100n": "C1525", "C1u": "C52923", "C2u2": "C107369", "C4u7": "C23733",
     "C10u_0603": "C19702", "C22u_0603": "C59461",
 }
@@ -84,7 +87,7 @@ def build():
     gnd += u1["VSS"], u1["VSSA"], u1["VSSSMPS"]
     for i, ref in enumerate(("C1", "C2", "C3")):                     # one 100 nF per VDD pin
         c = C(ref, "100n", "C100n"); c[1] += v3; c[2] += gnd
-    c = C("C4", "4u7", "C4u7"); c[1] += v3; c[2] += gnd                # MCU bulk
+    c = C("C4", "10u", "C10u_0603", C0603); c[1] += v3; c[2] += gnd     # MCU bulk: AN5373 wants 10 uF typ, 4.7 min after DC bias
     c = C("C5", "1u", "C1u"); c[1] += v3; c[2] += gnd                  # VDDA
     c = C("C6", "100n", "C100n"); c[1] += v3; c[2] += gnd              # VDDA HF
     c = C("C7", "10u", "C10u_0603", C0603); c[1] += v3; c[2] += gnd    # VDDSMPS input (ST: 10 uF, >=10 V)
@@ -99,7 +102,8 @@ def build():
         c = C(ref, "2u2", "C2u2"); c[1] += vdd11; c[2] += gnd
     nrst = Net("NRST"); nrst += u1["NRST"]
     c = C("C10", "100n", "C100n"); c[1] += nrst; c[2] += gnd
-    r = R("R1", "100k", "R100k"); r[1] += u1["PH3"]; r[2] += gnd       # BOOT0 low: boot from flash
+    r = R("R1", "10k", "R10k"); r[1] += u1["PH3"]; r[2] += gnd         # BOOT0 low: boot from flash (10k as AN5373)
+    c = C("C20", "100n", "C100n"); c[1] += v3; c[2] += gnd              # at VBAT (pin 1), AN5373: 100 nF VBAT-to-VDD
     # 32.768 kHz crystal, LSE high drive; never toggle PC13 (ES0499 2.2.1): left unconnected
     y1 = Part("lcsc", "Q13FC1350000400", value="32.768k", ref="Y1", tag="Y1")
     y1.fields["LCSC"] = "C32346"
@@ -143,12 +147,22 @@ def build():
     j_vbus[1] += vbus; j_gchg[1] += gnd
     d3 = Part("lcsc", "ESD9X5.0ST5G", ref="D3", tag="D3"); d3.fields["LCSC"] = "C87910"
     d3["C"] += vbus; d3["A"] += gnd
-    u3 = Part("Battery_Management", "MCP73831-2-OT", ref="U3", tag="U3"); u3.fields["LCSC"] = "C424093"
+    # MCP73832: same die as the MCP73831 but an OPEN-DRAIN status output, so PA10 never sees the charger's
+    # 5 V (DS13737 Table 93 note 6 forbids >VDD+0.3 V with the internal pull enabled). Same datasheet
+    # DS20001984H, same pinout. JLC C38066, Extended, 7165 in stock 2026-09-30.
+    u3 = Part("Battery_Management", "MCP73832-2-OT", ref="U3", tag="U3"); u3.fields["LCSC"] = "C38066"
     u3["V_{DD}"] += vbus; u3["V_{SS}"] += gnd; u3["V_{BAT}"] += vbat
     c = C("C15", "4u7", "C4u7"); c[1] += vbus; c[2] += gnd
     c = C("C16", "4u7", "C4u7"); c[1] += vbat; c[2] += gnd
     r = R("R7", "22k", "R22k"); r[1] += u3["PROG"]; r[2] += gnd        # 1000 V / 22k = 45 mA
-    chg = Net("CHG_STAT"); chg += u3["STAT"], u1["PA10"]              # MCU pull-up; low = charging
+    chg = Net("CHG_STAT"); chg += u3["STAT"], u1["PA10"]              # open-drain: low = charging
+    r = R("R11", "100k", "R100k"); r[1] += chg; r[2] += v3              # external pull-up to 3.0 V
+    # VBUS sense: tells firmware it is docked. Firmware then sleeps, so the system load drops below
+    # the charger's termination current and charging can finish (audit PWR-05). 2.5 V at PA1 from 5 V.
+    vbs = Net("VBUS_SENSE")
+    r = R("R12", "100k", "R100k"); r[1] += vbus; r[2] += vbs
+    r = R("R13", "100k", "R100k"); r[1] += vbs; r[2] += gnd
+    vbs += u1["PA1"]
     j_bp, j_bn = pad("J5", "BAT+"), pad("J6", "BAT-")
     j_bp[1] += vbat; j_bn[1] += gnd
     u4 = Part("lcsc", "TPS7A2030PDQNR", ref="U4", tag="U4"); u4.fields["LCSC"] = "C5220164"
@@ -174,7 +188,7 @@ def build():
         if lab == "SWCLK":
             n += u1["PA14"]
     # spare pins, left free on purpose (A3-u575-plan.md §3); PC13 stays static next to the crystal
-    for pin in ("PC13", "PH0", "PH1", "PA1", "PA2", "PA3", "PA6", "PB1", "PB13", "PB14", "PB15",
+    for pin in ("PC13", "PH0", "PH1", "PA2", "PA3", "PA6", "PB1", "PB13", "PB14", "PB15",
                 "PA11", "PA12", "PA15", "PB5", "PB6", "PB7", "PB8"):
         u1[pin] += NC
     return u1

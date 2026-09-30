@@ -2,7 +2,7 @@
   (version "D")
   (design
     (source "gen.py")
-    (date "09/30/2026 07:15 AM")
+    (date "09/30/2026 04:31 PM")
     (tool "SKiDL (2.3.0)")
     (sheet
       (number 1)
@@ -59,7 +59,7 @@
         (field
           (name "SKiDL Tag") "C1")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -85,7 +85,7 @@
         (field
           (name "SKiDL Tag") "C10")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -111,7 +111,7 @@
         (field
           (name "SKiDL Tag") "C11")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -137,7 +137,7 @@
         (field
           (name "SKiDL Tag") "C12")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -163,7 +163,7 @@
         (field
           (name "SKiDL Tag") "C13")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -189,7 +189,7 @@
         (field
           (name "SKiDL Tag") "C14")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -215,7 +215,7 @@
         (field
           (name "SKiDL Tag") "C15")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -241,7 +241,7 @@
         (field
           (name "SKiDL Tag") "C16")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -267,7 +267,7 @@
         (field
           (name "SKiDL Tag") "C17")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -293,7 +293,7 @@
         (field
           (name "SKiDL Tag") "C18")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -319,7 +319,7 @@
         (field
           (name "SKiDL Tag") "C19")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -345,7 +345,7 @@
         (field
           (name "SKiDL Tag") "C2")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -354,6 +354,32 @@
         (tstamps "/"))
       (component_classes)
       (tstamps "507fddd0-e494-5270-a7e4-2511aa140519"))
+    (comp
+      (ref "C20")
+      (value "100n")
+      (description "Unpolarized capacitor")
+      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (fields
+        (field
+          (name "LCSC") "C1525")
+        (field
+          (name "Description") "Unpolarized capacitor")
+        (field
+          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "C20")
+        (field
+          (name "SKiDL Line") "gen.py:52"))
+      (libsource
+        (lib "Device")
+        (part "C"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "de69f183-3e24-5ca0-bc14-716aaad4df38"))
     (comp
       (ref "C3")
       (value "100n")
@@ -371,7 +397,7 @@
         (field
           (name "SKiDL Tag") "C3")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -382,22 +408,22 @@
       (tstamps "299afff0-b6cf-50c0-a677-db76bcc001ee"))
     (comp
       (ref "C4")
-      (value "4u7")
+      (value "10u")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0603_1608Metric")
       (fields
         (field
-          (name "LCSC") "C23733")
+          (name "LCSC") "C19702")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0603_1608Metric")
         (field
           (name "Datasheet"))
         (field
           (name "SKiDL Tag") "C4")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -423,7 +449,7 @@
         (field
           (name "SKiDL Tag") "C5")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -449,7 +475,7 @@
         (field
           (name "SKiDL Tag") "C6")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -475,7 +501,7 @@
         (field
           (name "SKiDL Tag") "C7")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -501,7 +527,7 @@
         (field
           (name "SKiDL Tag") "C8")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -527,7 +553,7 @@
         (field
           (name "SKiDL Tag") "C9")
         (field
-          (name "SKiDL Line") "gen.py:49"))
+          (name "SKiDL Line") "gen.py:52"))
       (libsource
         (lib "Device")
         (part "C"))
@@ -553,7 +579,7 @@
         (field
           (name "SKiDL Tag") "D1")
         (field
-          (name "SKiDL Line") "gen.py:136"))
+          (name "SKiDL Line") "gen.py:140"))
       (libsource
         (lib "lcsc")
         (part "PESD5V0S1BL,315"))
@@ -579,7 +605,7 @@
         (field
           (name "SKiDL Tag") "D2")
         (field
-          (name "SKiDL Line") "gen.py:136"))
+          (name "SKiDL Line") "gen.py:140"))
       (libsource
         (lib "lcsc")
         (part "PESD5V0S1BL,315"))
@@ -605,7 +631,7 @@
         (field
           (name "SKiDL Tag") "D3")
         (field
-          (name "SKiDL Line") "gen.py:144"))
+          (name "SKiDL Line") "gen.py:148"))
       (libsource
         (lib "lcsc")
         (part "ESD9X5.0ST5G"))
@@ -631,7 +657,7 @@
         (field
           (name "SKiDL Tag") "J1")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -657,7 +683,7 @@
         (field
           (name "SKiDL Tag") "J2")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -683,7 +709,7 @@
         (field
           (name "SKiDL Tag") "J3")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -709,7 +735,7 @@
         (field
           (name "SKiDL Tag") "J4")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -735,7 +761,7 @@
         (field
           (name "SKiDL Tag") "J5")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -761,7 +787,7 @@
         (field
           (name "SKiDL Tag") "J6")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -787,7 +813,7 @@
         (field
           (name "SKiDL Tag") "L1")
         (field
-          (name "SKiDL Line") "gen.py:95"))
+          (name "SKiDL Line") "gen.py:98"))
       (libsource
         (lib "lcsc")
         (part "DFE201610E-2R2M=P2"))
@@ -813,7 +839,7 @@
         (field
           (name "SKiDL Tag") "Q1")
         (field
-          (name "SKiDL Line") "gen.py:65"))
+          (name "SKiDL Line") "gen.py:68"))
       (libsource
         (lib "NO_LIB")
         (part "PMCXB290UE"))
@@ -839,7 +865,7 @@
         (field
           (name "SKiDL Tag") "Q2")
         (field
-          (name "SKiDL Line") "gen.py:65"))
+          (name "SKiDL Line") "gen.py:68"))
       (libsource
         (lib "NO_LIB")
         (part "PMCXB290UE"))
@@ -850,12 +876,12 @@
       (tstamps "7852643a-7934-5503-82c8-62f05e9bd38e"))
     (comp
       (ref "R1")
-      (value "100k")
+      (value "10k")
       (description "Resistor")
       (footprint "Resistor_SMD:R_0402_1005Metric")
       (fields
         (field
-          (name "LCSC") "C25741")
+          (name "LCSC") "C25744")
         (field
           (name "Description") "Resistor")
         (field
@@ -865,7 +891,7 @@
         (field
           (name "SKiDL Tag") "R1")
         (field
-          (name "SKiDL Line") "gen.py:43"))
+          (name "SKiDL Line") "gen.py:46"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -891,7 +917,7 @@
         (field
           (name "SKiDL Tag") "R10")
         (field
-          (name "SKiDL Line") "gen.py:43"))
+          (name "SKiDL Line") "gen.py:46"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -900,6 +926,84 @@
         (tstamps "/"))
       (component_classes)
       (tstamps "99b6d9e4-efbb-57f3-bc7c-dc7822d36beb"))
+    (comp
+      (ref "R11")
+      (value "100k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (fields
+        (field
+          (name "LCSC") "C25741")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "R11")
+        (field
+          (name "SKiDL Line") "gen.py:46"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "146f51db-bb3a-5131-afc8-7744106d2cfe"))
+    (comp
+      (ref "R12")
+      (value "100k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (fields
+        (field
+          (name "LCSC") "C25741")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "R12")
+        (field
+          (name "SKiDL Line") "gen.py:46"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "9f75750b-4097-5a2a-b9eb-5e3f319978ce"))
+    (comp
+      (ref "R13")
+      (value "100k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (fields
+        (field
+          (name "LCSC") "C25741")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "R13")
+        (field
+          (name "SKiDL Line") "gen.py:46"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "2e9cb324-63c9-5ad4-ba1a-b618f4020bea"))
     (comp
       (ref "R2")
       (value "33")
@@ -917,7 +1021,7 @@
         (field
           (name "SKiDL Tag") "R2")
         (field
-          (name "SKiDL Line") "gen.py:43"))
+          (name "SKiDL Line") "gen.py:46"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -943,7 +1047,7 @@
         (field
           (name "SKiDL Tag") "R3")
         (field
-          (name "SKiDL Line") "gen.py:43"))
+          (name "SKiDL Line") "gen.py:46"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -969,7 +1073,7 @@
         (field
           (name "SKiDL Tag") "R4")
         (field
-          (name "SKiDL Line") "gen.py:43"))
+          (name "SKiDL Line") "gen.py:46"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -995,7 +1099,7 @@
         (field
           (name "SKiDL Tag") "R5")
         (field
-          (name "SKiDL Line") "gen.py:43"))
+          (name "SKiDL Line") "gen.py:46"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1021,7 +1125,7 @@
         (field
           (name "SKiDL Tag") "R6")
         (field
-          (name "SKiDL Line") "gen.py:43"))
+          (name "SKiDL Line") "gen.py:46"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1047,7 +1151,7 @@
         (field
           (name "SKiDL Tag") "R7")
         (field
-          (name "SKiDL Line") "gen.py:43"))
+          (name "SKiDL Line") "gen.py:46"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1073,7 +1177,7 @@
         (field
           (name "SKiDL Tag") "R8")
         (field
-          (name "SKiDL Line") "gen.py:43"))
+          (name "SKiDL Line") "gen.py:46"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1099,7 +1203,7 @@
         (field
           (name "SKiDL Tag") "R9")
         (field
-          (name "SKiDL Line") "gen.py:43"))
+          (name "SKiDL Line") "gen.py:46"))
       (libsource
         (lib "Device")
         (part "R"))
@@ -1125,7 +1229,7 @@
         (field
           (name "SKiDL Tag") "SW1")
         (field
-          (name "SKiDL Line") "gen.py:165"))
+          (name "SKiDL Line") "gen.py:179"))
       (libsource
         (lib "lcsc")
         (part "KXT321LHS"))
@@ -1151,7 +1255,7 @@
         (field
           (name "SKiDL Tag") "TP1")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -1177,7 +1281,7 @@
         (field
           (name "SKiDL Tag") "TP2")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -1203,7 +1307,7 @@
         (field
           (name "SKiDL Tag") "TP3")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -1229,7 +1333,7 @@
         (field
           (name "SKiDL Tag") "TP4")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -1255,7 +1359,7 @@
         (field
           (name "SKiDL Tag") "TP5")
         (field
-          (name "SKiDL Line") "gen.py:55"))
+          (name "SKiDL Line") "gen.py:58"))
       (libsource
         (lib "Connector")
         (part "TestPoint"))
@@ -1281,7 +1385,7 @@
         (field
           (name "SKiDL Tag") "U1")
         (field
-          (name "SKiDL Line") "gen.py:81"))
+          (name "SKiDL Line") "gen.py:84"))
       (libsource
         (lib "MCU_ST_STM32U5")
         (part "STM32U575CIUxQ"))
@@ -1307,7 +1411,7 @@
         (field
           (name "SKiDL Tag") "U2")
         (field
-          (name "SKiDL Line") "gen.py:112"))
+          (name "SKiDL Line") "gen.py:116"))
       (libsource
         (lib "Sensor_Audio")
         (part "SPH0641LU4H-1"))
@@ -1318,14 +1422,14 @@
       (tstamps "7a03e947-39e7-5554-99eb-b5f6bb184fae"))
     (comp
       (ref "U3")
-      (value "MCP73831-2-OT")
-      (description "Single cell, Li-Ion/Li-Po charge management controller, 4.20V, Tri-State Status Output, in SOT23-5 package")
+      (value "MCP73832-2-OT")
+      (description "Single cell, Li-Ion/Li-Po charge management controller, 4.20V, Open-Drain Status Output, in SOT23-5 package")
       (footprint "Package_TO_SOT_SMD:SOT-23-5")
       (fields
         (field
-          (name "LCSC") "C424093")
+          (name "LCSC") "C38066")
         (field
-          (name "Description") "Single cell, Li-Ion/Li-Po charge management controller, 4.20V, Tri-State Status Output, in SOT23-5 package")
+          (name "Description") "Single cell, Li-Ion/Li-Po charge management controller, 4.20V, Open-Drain Status Output, in SOT23-5 package")
         (field
           (name "Footprint") "Package_TO_SOT_SMD:SOT-23-5")
         (field
@@ -1333,10 +1437,10 @@
         (field
           (name "SKiDL Tag") "U3")
         (field
-          (name "SKiDL Line") "gen.py:146"))
+          (name "SKiDL Line") "gen.py:153"))
       (libsource
         (lib "Battery_Management")
-        (part "MCP73831-2-OT"))
+        (part "MCP73832-2-OT"))
       (sheetpath
         (names "/")
         (tstamps "/"))
@@ -1359,7 +1463,7 @@
         (field
           (name "SKiDL Tag") "U4")
         (field
-          (name "SKiDL Line") "gen.py:154"))
+          (name "SKiDL Line") "gen.py:168"))
       (libsource
         (lib "lcsc")
         (part "TPS7A2030PDQNR"))
@@ -1385,7 +1489,7 @@
         (field
           (name "SKiDL Tag") "Y1")
         (field
-          (name "SKiDL Line") "gen.py:104"))
+          (name "SKiDL Line") "gen.py:108"))
       (libsource
         (lib "lcsc")
         (part "Q13FC1350000400"))
@@ -1416,6 +1520,10 @@
         (pin "1")
         (pintype "PASSIVE"))
       (node
+        (ref "C20")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
         (ref "C3")
         (pin "1")
         (pintype "PASSIVE"))
@@ -1442,6 +1550,10 @@
       (node
         (ref "Q2")
         (pin "4")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R11")
+        (pin "2")
         (pintype "PASSIVE"))
       (node
         (ref "R3")
@@ -1508,13 +1620,17 @@
       (name "CHG_STAT")
       (class "Default")
       (node
+        (ref "R11")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
         (ref "U1")
         (pin "31")
         (pintype "BIDIRECTIONAL"))
       (node
         (ref "U3")
         (pin "1")
-        (pintype "TRISTATE")))
+        (pintype "OPEN-COLLECTOR")))
     (net
       (code 4)
       (name "GA_N")
@@ -1632,6 +1748,10 @@
         (pin "2")
         (pintype "PASSIVE"))
       (node
+        (ref "C20")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
         (ref "C3")
         (pin "2")
         (pintype "PASSIVE"))
@@ -1693,6 +1813,10 @@
         (pintype "PASSIVE"))
       (node
         (ref "R10")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R13")
         (pin "2")
         (pintype "PASSIVE"))
       (node
@@ -2032,11 +2156,31 @@
         (pin "1")
         (pintype "PASSIVE"))
       (node
+        (ref "R12")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
         (ref "U3")
         (pin "4")
         (pintype "POWER-IN")))
     (net
       (code 25)
+      (name "VBUS_SENSE")
+      (class "Default")
+      (node
+        (ref "R12")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R13")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "U1")
+        (pin "11")
+        (pintype "BIDIRECTIONAL")))
+    (net
+      (code 26)
       (name "VDD11")
       (class "Default")
       (node
@@ -2060,7 +2204,7 @@
         (pin "46")
         (pintype "POWER-IN")))
     (net
-      (code 26)
+      (code 27)
       (name "VLXSMPS")
       (class "Default")
       (node
