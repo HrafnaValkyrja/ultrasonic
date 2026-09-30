@@ -1,0 +1,68 @@
+# Handoff: cloud session → Valhalla (local, i9-14900HX), 2026-09-30
+
+Written by the cloud session for its local continuation. **Read this first, then `CLAUDE.md` and `docs/spec.md`.**
+Branch: `claude/clever-mayer-s5rxuw` (everything below is committed and pushed).
+
+## Why the move
+The adversarial audit workflow runs at most (CPU cores − 2) agents at once, capped at 16. The cloud container has 4 cores, so 2 agents ran at a time: about 6–10 h for the whole audit. With the i9-14900HX's 32 threads, 16 run at once.
+
+## One-time setup on Valhalla
+1. **Linux shell:** on Windows, use **WSL2 with Ubuntu 24.04**. `tools/setup.sh` is apt-based and installs KiCad 10, ngspice, FreeRouting, the Python venv and mermaid-cli.
+2. **Clone and set up:**
+   ```bash
+   git clone <repo> ultrasonic && cd ultrasonic && git checkout claude/clever-mayer-s5rxuw
+   tools/setup.sh              # idempotent; needs sudo for apt
+   source tools/env.sh && python3 tools/smoke/run_all.py    # all smoke tests must pass
+   ```
+3. **Scratch workspace:** unzip the bundle so it sits **next to** the repo, as `../ultrasonic-scratch/`. It holds:
+   - datasheets and extracted text (`ds/`, `u5/`);
+   - the owner's current ST documents (`st_new/`);
+   - papers, partial audit outputs (`audit/`);
+   - the workflow journal and `done.json`;
+   - the full cloud transcript (`session-transcript.jsonl`, backup only).
+
+   `own/` and `earopen/` contain the owner's personal photos. **Never commit them.**
+4. **Start the session:** run `claude remote-control` in the repo folder. It appears in the Claude Code app.
+
+## Resume the adversarial audit
+- **Script:** `.claude/workflows/adversarial-methodology-audit.js`. It's portable (paths via args), and it skips any agent whose result is in `args.done`.
+- **Refresh `done.json`:** the owner can ask the cloud session for a fresh one at switch-over, since the cloud run keeps going until then. Or regenerate it from a journal:
+  ```bash
+  python3 .claude/workflows/export_done.py ../ultrasonic-scratch/workflow-journal.jsonl > ../ultrasonic-scratch/done.json
+  ```
+- **Run it:** use the Workflow tool with `name: "adversarial-methodology-audit"` and
+  `args: {"repo": "<abs path to repo>", "scratch": "<abs path to ultrasonic-scratch>", "date": "<today>", "done": <contents of done.json>}`.
+- **Current datasheets:** the audit now points auditors at the owner's current ST documents (`st_new/`: DS13737 Rev 10, ES0499 Rev 12, RM0456 Rev 7, AN5373 Rev 7).
+- **What was already done:** results finished in the cloud used DS13737 Rev 8. Rev 8 → Rev 10 changed nothing for the pins or power pins we use (`docs/research/datasheet-provenance.md`), so they stand.
+- **Once the local run is going,** tell the cloud session to stop its run, so the same work isn't paid for twice.
+
+## State of the project (details in `docs/spec.md` v0.13 and `docs/design-review-v1.md`)
+- **Design:**
+  - STM32U575 on its SMPS; SPH0641 mic on ADF1; H-bridge of two PMCXB290UE, 2-level PWM at 200 kHz;
+  - MCP73831 charger and TPS7A2030 LDO; 105 mAh cell;
+  - pod 35×9×14 mm; board 20×11.5 mm, 4 layers.
+- **Schematic source of truth:** `hw/pod/gen.py`.
+- **Draft board** (proof of fit, not a layout to order): `hw/pod/kicad-draft/`.
+- **Owner decisions made:**
+  - tragus arm = **superelastic NiTi wire** (O7);
+  - **dark mode** for every visual;
+  - she wants to **understand** the design. Teaching track is `docs/learn/`, pitched at an RF/analogue/digital-packets/CAD/device-physics engineer. Don't explain basics.
+- **Open decisions:**
+  - O3 bench kit: the staged ~$60–75 list, plus using parts she already has;
+  - O4 cell position reading;
+  - O5 keep 105 mAh;
+  - "final board as the prototype" (option C: the pod board in a snap-off test frame). Recommended, not yet approved.
+- **Known fixes to make:**
+  - C4 → 10 µF 0603 (AN5373 VDD bulk);
+  - the missing ground plane in the draft; vias in the MCU exposed pad;
+  - mic port 0.8 mm;
+  - redraw the PMCXB290UE footprint from Nexperia Fig. 32;
+  - fetch real datasheets for the ESD diodes, KXT321LHS and the passives.
+- **Firmware rules from errata (spec D14):**
+  - MSI-PLL unlock handler;
+  - PLL2/3, HSI48 and SHSI off before Stop 2;
+  - no TIM1 ocref_clr.
+- **Waiting on the owner:**
+  - ruler and mouth-open photos (E9);
+  - pen-tip vision test (E10);
+  - 100 g temple-arm test (E12).
