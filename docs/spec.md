@@ -1,4 +1,4 @@
-# Stereo Ultrasound — Project Spec v0.10
+# Stereo Ultrasound — Project Spec v0.11
 
 **Owner:** Valkyrie
 **Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. v0.5 applies the full-plan sanity check (`docs/research/review-2026-09-30.md`). Next: shopping-list approval (O3) → Phase 1 simulation and first bench orders. No hardware purchased.
@@ -187,7 +187,7 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 - **Full:** the whole band, pitched down.
 - **Transient-only (indoor default):** steady tones (charger and LED-driver whine) suppressed; changing sounds (chirps, clicks, rustles) passed through.
 - **Off:** silent. MCU in Stop 2 (~2 µA), mic unpowered, bridge stopped.
-- Heterodyne vs compression may become a sub-mode or a build-time choice after Phase 1.
+- **v0.11 (owner):** if log compression (B) sounds better in Phase 1 listening, it becomes the **only** processing mode. The always-on current difference is ~1.6 mA, and with idle-listening mode ~0.4 mA. Heterodyne (A) stays in the code only as a fallback if B won't fit the CPU (R3).
 
 ### D13. Mic = SPH0641LU4H-1 digital MEMS with ultrasonic mode `[High]` — **v0.5: lifecycle OK, response data**
 - **What it is:** a Knowles/Syntiant microphone, 3.50×2.65×0.98 mm, bottom port Ø0.325 mm, 1-bit PDM output.
@@ -533,6 +533,7 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | ~~O2~~ | ~~Test a spot nearer the tragus?~~ | **Resolved 2026-09-30:** the tragus is the primary site, and the owner says it fits more easily (D1) |
 | **O3** | Approve the v0.5 shopping list once priced | — |
 | **O5** | Pod layout inside the ~35 mm between the vision line and the ear keep-out (v0.9): stacked, thicker pod with a ~105 mAh cell vs a slimmer pod with a smaller cell (runtime cost) | One pod if the 105–120 mAh class meets the runtime after E4 |
+| **O6** | Allow a switch-mode regulator **only** as the MCU core's internal SMPS (STM32U575/U585 "Q" variants, same 7×7 mm QFN-48): forced-PWM (fixed frequency, MHz range, never burst mode), shielded low-magnetostriction inductor, no Class-2 caps on it, and it **must pass the owner's own listening test on the bench** before adoption. Saves ~3 mA always-on (MCU ~3.8 → ~0.9 mA) or ~1.2 mA with idle mode. §1.2.3 is owner-locked, so this needs her explicit change | Bench-test it (buy one NUCLEO-U575ZI-Q alongside the L452 board); decide by ear |
 | **O4** | Confirm the D18 reading of §1.2.4: cell along the arm, in front of the ear, nothing behind it | Yes; it's what makes the 12 h battery comfortable |
 
 Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 or the schematic · **P2** before board order · **P3** before final assembly.
@@ -627,6 +628,9 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ---
 
 ## 15. Changelog
+
+### v0.11 (2026-09-30)
+- Owner: log compression becomes the only mode if it sounds better (D12). New O6: a narrowly scoped SMPS option (MCU core only, forced PWM, owner listening test) proposed; §1.2.3 unchanged pending her decision.
 
 ### v0.10 (2026-09-30) — power levers
 - STM32U5 checked: its low µA/MHz needs its internal SMPS; on LDO it matches the L452, so no MCU swap. The idle-listening mode (C9) becomes the main power lever (~50% cut at 75% quiet time).
