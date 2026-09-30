@@ -1,4 +1,4 @@
-# Stereo Ultrasound — Project Spec v0.7
+# Stereo Ultrasound — Project Spec v0.8
 
 **Owner:** Valkyrie
 **Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. v0.5 applies the full-plan sanity check (`docs/research/review-2026-09-30.md`). Next: shopping-list approval (O3) → Phase 1 simulation and first bench orders. No hardware purchased.
@@ -362,6 +362,23 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 
 ## 8. Physical layout (per side) — **v0.6: split along the arm for balance (D18)**
 
+> **v0.8 (owner, 2026-09-30): one pod between the eye and the ear, swept-back arm.**
+> Measured on the owner's photos (`docs/research/ear-open-fit.md`; scale ±20% until the ruler shot):
+> - **Pod:** a single pod on the temple arm, from just behind the hinge to ≥5 mm ahead of the
+>   Ear (open) hook. That's **~60 mm** of usable length, and it holds both the electronics and the battery.
+> - **Arm (owner's aesthetic request):** swept **back** from the pod's rear-lower edge to the pad.
+>   - Any sweep of 11° or more clears the Ear (open) by ≥5 mm.
+>   - **25–35°** looks clearly swept and clears by 8–9 mm; the arm is ~22–24 mm long.
+>   - Starting the arm further forward lengthens it (softer spring, more snag risk) without adding clearance.
+> - **Fit:** PCB (~20 mm) + ~105 mAh cell (~30 mm) + walls ≈ 54 mm fits in line. A 150 mAh cell
+>   (40–45 mm) does not fit in line; it would sit beside or under the PCB (a thicker pod), or
+>   needs a shorter, fatter cell. B4 decides.
+> - **Balance:** with the pod centred ~35 mm behind the hinge, the nose pads carry 3.9 g per side
+>   (105 mAh) or 4.9 g (150 mAh), against 3.1–3.7 g for the cell-further-back layout below.
+>   That's the price of keeping everything in front of the ear hook. The owner's call (O5).
+>
+> The v0.6 text below remains the fallback.
+
 - **Front module, at the hinge:** PCB, mic, button, crystal.
   - **PCB size** `[Med]` (parts-area estimate): ~10×20 mm with parts on both sides (4-layer), or ~10×28 mm single-sided. The 7×7 mm MCU sets the ~10 mm width.
   - The mic faces outward here: the head-shadow cue needs it on the side of the head, and the front keeps it clear of hair and the Ear Open.
@@ -492,6 +509,7 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | ~~O1~~ | ~~Battery and runtime target~~ | **Resolved 2026-09-30:** ≥8 h, target ~12 h, design for balance (D18) |
 | ~~O2~~ | ~~Test a spot nearer the tragus?~~ | **Resolved 2026-09-30:** the tragus is the primary site, and the owner says it fits more easily (D1) |
 | **O3** | Approve the v0.5 shopping list once priced | — |
+| **O5** | One pod between eye and ear (v0.8) vs cell further back (v0.6): 60 mm limit and ~1 g more on the nose, against a split pod | One pod if the 105–120 mAh class meets the runtime after E4 |
 | **O4** | Confirm the D18 reading of §1.2.4: cell along the arm, in front of the ear, nothing behind it | Yes; it's what makes the 12 h battery comfortable |
 
 Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 or the schematic · **P2** before board order · **P3** before final assembly.
@@ -585,6 +603,9 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ---
 
 ## 15. Changelog
+
+### v0.8 (2026-09-30) — pod between eye and ear, swept-back arm
+- Owner request: one pod on the temple arm between her deep-set eyes and the Ear (open) keep-out, with the transducer arm swept back. Measured on her photos: ~60 mm usable; 25–35° sweep clears the Ear (open) by 8–9 mm. New O5 (layout versus battery size and nose load).
 
 ### v0.7 (2026-09-30) — fit around the Nothing Ear (open)
 - Analyzed Ear (open) geometry from official dimensions (51.3×41.4×14.4 mm, 8.1 g, 14.2 mm driver) and review photos (`docs/research/ear-open-fit.md`). Its hook junction sits above the tragus and slightly proud of the ear's front edge; its pod angles back into the concha; its speaker aims at the canal behind the tragus.
