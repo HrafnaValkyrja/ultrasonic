@@ -1,0 +1,10 @@
+# Python bytecode
+__pycache__/
+*.pyc
+# SKiDL run logs (written to the working directory)
+skidl*.log
+skidl*.erc
+# KiCad backups and lock files
+*-backups/
+*.lck
+fp-info-cache
