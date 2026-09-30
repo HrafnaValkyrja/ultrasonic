@@ -1,8 +1,8 @@
-# Stereo Ultrasound — Project Spec v0.3
+# Stereo Ultrasound — Project Spec v0.4
 
 **Owner:** Valkyrie
-**Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. Architecture mostly settled; MCU choice changed in this version (see D5). Next: Phase 1 DSP simulation plus remaining P1 research. No hardware purchased.
-**Last updated:** 2026-09-30 (Claude Code session). See §15 for what changed from v0.2.
+**Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. Next: Phase 1 DSP simulation, remaining P1 research, and ordering long-lead bench parts (Phase 2). No hardware purchased.
+**Last updated:** 2026-09-30 (Claude Code session). See §15 for the changelog.
 
 **Confidence tags:** `[High]` verified from a primary source or well established · `[Med]` reasoned estimate, likely right · `[Low]` guess, verify before relying on it.
 
@@ -92,12 +92,12 @@ Each decision gives the choice, the reasoning, and what was rejected. **Changed 
 ### D4. Digital DSP, not analog frequency division `[High]`
 - Analog division (comparator plus counter) sounds harsh and buzzy and throws away loudness. The real-time digital options are heterodyne and spectral frequency compression (§5). Time expansion, which most online bat demos use, can't run in real time.
 
-### D5. MCU = STM32L452CEU6 (QFN-48, 7×7 mm) `[High]` for DFSDM · `[Med]` for package — **Changed in v0.3**
+### D5. MCU = STM32L452CEU6 (QFN-48, 7×7 mm) `[High]` — **Decided v0.4 (owner approved 2026-09-30)**
 - **What it is:** an ST ultra-low-power Arm Cortex-M4F at 80 MHz with DSP instructions, a floating-point unit, 160 KB of RAM, and a **DFSDM**: a hardware block that converts the mic's PDM bitstream to PCM without CPU help.
 - **Why the change:** the v0.2 pick, the STM32L432KC, **has no DFSDM.** Its datasheet (DS11451 Rev 4) never mentions it. The L452 datasheet (DS11912 Rev 7 §3.21) confirms it. The L452 also has TIM1, an advanced timer with complementary outputs and dead-time, which is what the H-bridge needs.
 - **Tradeoff:** 7×7 mm instead of 5×5 mm. The alternatives were a 5×5 mm BGA (out of stock), a 3.4×3.7 mm chip-scale package (needs a pricier HDI board), or keeping the L432 and decoding PDM in software (eats CPU the DSP needs). Details and options: `docs/research/A1-A2-mcu-and-mic.md`.
 - **JLC:** Extended part C222355, **16 in stock** (2026-09-30). Thin; buy early.
-- **Awaiting owner OK** on option (a) vs the others.
+- **Approved by owner** (option a).
 
 ### D6. Output stage: filterless PWM into an H-bridge; no amplifier IC `[Med]`
 - TIM1 generates PWM at about 312.5 kHz (80 MHz ÷ 256 = 8-bit resolution), driving an H-bridge made from two complementary MOSFET pairs, which drives the transducer directly. The coil's inductance and resistance act as a low-pass filter.
@@ -148,6 +148,23 @@ Each decision gives the choice, the reasoning, and what was rejected. **Changed 
   - (ii) costs a little CPU but likely gives a cleaner top octave. A decimation ratio of only 20 leaves the mic's own shaped noise rising toward 100 kHz `[Med]`.
 - **Startup:** clock ÷40 (2.0 MHz, standard mode), wait ≥50 ms, switch to ÷20 (4.0 MHz), wait ≥10 ms, unmute.
 - The earlier 3.2 MHz idea (÷25) is rejected. An odd divider risks breaking the 48–52% duty-cycle rule.
+
+### D15. Firmware toolchain: bare C with CMake, CMSIS + ST LL drivers, CMSIS-DSP `[Med]` — **New in v0.4 (delegated to Claude)**
+- **Stack:**
+  - C11 built with `arm-none-eabi-gcc` and CMake, from the command line.
+  - ST's CMSIS device headers plus the **LL (low-layer) drivers**: thin, register-level helpers from the STM32CubeL4 package.
+  - **CMSIS-DSP** (Arm's optimized DSP library) for FFTs, FIR filters, and vector math.
+  - STM32CubeMX is used only as a read-only checker for the pinout and clock tree; its generated code is not used.
+- **Why:**
+  - This project is timing-critical glue between three peripherals: DFSDM → DMA → CPU → TIM1 PWM. Register-level control makes buffer timing and latency explicit.
+  - The HAL (ST's heavyweight driver layer) adds callbacks and overhead that get in the way here.
+  - CMSIS-DSP is also the reference for the cycle-cost estimates in C2, so benchmarks and firmware use the same code.
+  - Command-line builds are reproducible, work in CI, and work in the environment Claude builds from.
+- **Owner side:** flash and debug through the Nucleo's built-in ST-LINK, using STM32CubeProgrammer, OpenOCD, or VS Code with the Cortex-Debug extension. No IDE lock-in.
+- **Rejected:**
+  - STM32CubeIDE + HAL: fastest to a first blink, but heavy, IDE-bound, and opaque on timing.
+  - Rust (embassy / stm32 crates): DFSDM support is immature, and the DSP libraries are less proven on the M4F.
+  - Zephyr RTOS: heavyweight, and DFSDM support is limited.
 
 ### Parked or rejected ideas
 - **Forward "gaze distance" sensing:** redundant with stereo vision.
@@ -244,7 +261,7 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 
 | Function | Part (what it is) | JLC | Status |
 |---|---|---|---|
-| MCU | **STM32L452CEU6**: 80 MHz Cortex-M4F with hardware PDM decoder (DFSDM), QFN-48 7×7 mm | C222355 · Extended · 16 in stock · $6.90 | Recommended; awaiting owner OK (D5) |
+| MCU | **STM32L452CEU6**: 80 MHz Cortex-M4F with hardware PDM decoder (DFSDM), QFN-48 7×7 mm | C222355 · Extended · 16 in stock · $6.90 | **Chosen** (D5); buy early (R10) |
 | Mic | **SPH0641LU4H-1**: digital MEMS mic with ultrasonic mode, 3.5×2.65 mm | C2879853 · Extended · 1,076 in stock · $1.99 | Lifecycle/backup check open (A2) |
 | H-bridge | 2× complementary dual MOSFET (one N + one P per package), SOT-363 or smaller, fully on at 3.0–3.3 V gate drive | — | B1 |
 | Charger | **MCP73831**: single-cell LiPo linear charger, SOT-23-5; charge current set by one resistor | C424093 (‑2ACI/OT) · Extended · 9,478 in stock · $0.78 | Check min charge current vs cell size (B3) |
@@ -268,10 +285,35 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 ### Phase 1b: Hearing calibration
 - Tone-sweep WAVs (C5) played on decent full-range headphones, not the Ear Opens. The result sets the D10 band floor.
 
-### Phase 2: Bench hardware
-- Buy: 2× RC-BC02, 1× Dayton BCE-1, **NUCLEO-L476RG** (an ST dev board; its STM32L476 has the same core and a larger DFSDM), 2× SPH0641LU4H-1 breakout boards, MOSFETs, and 1× SPV0142 analog breakout for comparison.
-- Measure transducer inductance (E1); placement test (E2); mic comparison (E3); port the DSP; measure CPU load and current (E4).
-- **Exit:** T1, T2, T3, T6 pass on a wired bench rig.
+### Phase 2: Bench prototype — **rewritten v0.4**
+Built in four stages. S1 and S2 don't depend on Phase 1, so long-lead parts get ordered now and the stages run alongside the simulation.
+
+| Stage | Build | Answers | Needs Phase 1? |
+|---|---|---|---|
+| **S1: Ears** | Mic breakout → DFSDM at 4.0 MHz → capture ~0.3 s bursts of raw 200 kS/s audio to RAM, then dump to PC | Whether the D14 clock plan works; the mic's real ultrasonic noise floor (R8, E3); **real recordings of the owner's house and yard to feed back into Phase 1** | No |
+| **S2: Voice** | PWM → H-bridge → transducer, playing test tones and clips from flash | E1 (coil inductance), E2 (placement with Ear Opens on), R1 (loud enough?), **R9 (hiss or whine audible with PWM running at zero signal?)** | No |
+| **S3: Brain** | S1 + S2 joined, with the chosen algorithm in real time | R3 (does B fit the CPU?), E4 (current per mode), latency | Yes |
+| **S4: Stereo** | Two full units on a rough head mount (old glasses or a headband), wired, battery-powered | **Exit: T1, T2, T3, T6 pass** | Yes |
+
+S2 matters most: it tests the three shakiest assumptions (PWM noise, loudness, placement) before any DSP exists.
+
+**Bench rules:**
+- **Listening tests run on battery.** Use a LiPo plus a linear-regulator module, never laptop USB. USB ground noise would mask or fake the T6 and R9 results.
+- **Use NUCLEO-L452RE, not NUCLEO-L452RE-P.** The -P variant carries an onboard switching regulator (D11).
+
+**Shopping list** (to price and verify before ordering):
+- 2× **NUCLEO-L452RE**: ST's dev board with the same MCU as the final PCB, so CPU and current numbers carry over. It has an ST-LINK debugger built in. The ST eStore and DigiKey show it in stock (web search snippet 2026-09-30; confirm at order time).
+- 5× **custom mic breakouts, JLC-assembled** (Claude designs them): SPH0641LU4H-1 plus decoupling capacitor, bottom-port hole, 0.1" header. These replace the unverified Elecrow breakout and prototype the final port-hole design.
+- 3× **RC-BC02** transducers and 1× **Dayton BCE-1** for comparison. Likely long shipping, so **order first**.
+- 2× **DRV8833 modules**: a small dual H-bridge motor-driver IC that runs from ~2.7 V. It gets sound out fast in S2. The discrete MOSFET bridge from D6 replaces it on the PCB.
+- 2× small protected LiPo cells, plus 2× linear-regulator modules.
+- Test sources: **HC-SR04** (a 40 kHz ultrasonic rangefinder module) as a steady emitter for T3; keys for jingle tests.
+- Optional: 1× SPV0142LR5H-1 analog-mic breakout (E3 comparison only). Deprioritized now that the digital mic is JLC-stocked.
+- Owner's existing kit: LCR meter (E1), PPK2 power profiler (E4).
+
+**Split:**
+- Claude: mic-breakout PCB, all firmware (D15), capture and analysis scripts, test procedures.
+- Owner: ordering, wiring, all listening and wear tests.
 
 ### Phase 3: PCB
 - Schematic checked against JLC stock → owner lays out in KiCad → Claude reviews and runs DRC, generates BOM and placement files → order assembled boards.
@@ -306,7 +348,7 @@ Status: `OPEN` · `IN PROGRESS` · `DONE` (with a pointer). Priority: **P1** blo
 ### A. Architecture (P1)
 | ID | Task | Status |
 |---|---|---|
-| A1 | Which MCU has DFSDM; pick one | **DONE**: `docs/research/A1-A2-mcu-and-mic.md`. L432 has none; recommend L452CEU6. Awaiting owner pick. |
+| A1 | Which MCU has DFSDM; pick one | **DONE**: `docs/research/A1-A2-mcu-and-mic.md`. L432 has none; **L452CEU6 chosen** (D5). |
 | A2 | Mic lifecycle, stock, JLC path; backup ultrasonic mics | **IN PROGRESS**: JLC stock confirmed. Lifecycle and backup open. |
 | A3 | Clock/sample-rate plan and DFSDM filter settings | **IN PROGRESS**: plan in D14. Verify the CKOUT duty cycle in RM0394; simulate filter options (i) vs (ii). |
 | A4 | Transducer options: find inductance data; anything smaller or more efficient that's buyable in 1s | OPEN |
@@ -349,7 +391,7 @@ Status: `OPEN` · `IN PROGRESS` · `DONE` (with a pointer). Priority: **P1** blo
 | E4 | Current per mode (PPK2) | §7, R11 |
 | E5 | Hearing sweep with the C5 files | D10 |
 
-**Suggested order:** owner picks MCU (D5) → C1 → A3/C3 simulation → C2 → A2 finish → A4 → B-series → D-series. E-series whenever hardware arrives.
+**Suggested order:** order long-lead bench parts (transducers, Nucleos) → design mic breakout → C1 → A3/C3 simulation → C2 → A2 finish → A4 → B-series → D-series. E-series whenever hardware arrives.
 
 ---
 
@@ -375,6 +417,13 @@ Status: `OPEN` · `IN PROGRESS` · `DONE` (with a pointer). Priority: **P1** blo
 ---
 
 ## 15. Changelog
+
+### v0.4 (2026-09-30)
+- §1 MVP confirmed by owner.
+- **D5 decided:** STM32L452CEU6.
+- **D15 new:** firmware toolchain (bare C, CMake, CMSIS + LL, CMSIS-DSP), decided by Claude at the owner's request.
+- **§10 Phase 2 rewritten:** staged bench plan (S1–S4); NUCLEO-L452RE replaces L476RG; custom JLC mic breakout replaces the unverified Elecrow part; DRV8833 module for early output tests; battery-only listening rule.
+- §8: PCB size estimate (~10×20 mm double-sided, ~10×28 mm single-sided).
 
 ### v0.3 (2026-09-30)
 - **§1 MVP section created and locked** (goal, owner constraints, success tests carried over unchanged in substance from v0.2 §1, §2, §4).
