@@ -1,11 +1,12 @@
 {
-  "tracks": 476,
-  "vias": 36,
+  "tracks": 549,
+  "vias": 41,
   "drc_errors": 8,
   "by_type": {
     "courtyards_overlap": 8
   },
-  "unconnected": 8,
+  "unconnected": 0,
   "courtyard_overlaps": [],
-  "pad_clashes": []
+  "pad_clashes": [],
+  "note": "DRC at JLC min spacing 0.09 mm; courtyard overlaps are 1 mm test pads with 2 mm courtyard rings"
 }

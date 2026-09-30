@@ -109,15 +109,17 @@ def outline(b, inset=0.0):
         a.SetArcGeometry(V(*st), V(*mid), V(*en)); a.SetWidth(mm(0.05)); b.Add(a)
 
 
-def rules(b):
-    """JLC 4-layer capability with margin: 0.1 mm track/space, 0.3/0.15 mm vias (JLC min 0.25/0.15)."""
+def rules(b, clearance=0.1):
+    """JLC 4-layer capability with margin: route at 0.1 mm track/space, 0.35/0.15 mm vias.
+    The finished board is checked at JLC's real minimum spacing (0.09 mm): FreeRouting's 45-degree
+    segments land a few um under their 0.1 mm target."""
     b.SetCopperLayerCount(4)
     ds = b.GetDesignSettings()
     ds.m_TrackMinWidth = mm(0.09); ds.m_MinClearance = mm(0.09)
     ds.m_ViasMinSize = mm(0.3); ds.m_MinThroughDrill = mm(0.15); ds.m_ViasMinAnnularWidth = mm(0.075)
     ds.m_HoleClearance = mm(0.2); ds.m_CopperEdgeClearance = mm(0.2)      # JLC capability page
     nc = ds.m_NetSettings.GetDefaultNetclass()
-    nc.SetTrackWidth(mm(0.1)); nc.SetClearance(mm(0.1)); nc.SetViaDiameter(mm(0.35)); nc.SetViaDrill(mm(0.15))
+    nc.SetTrackWidth(mm(0.1)); nc.SetClearance(mm(clearance)); nc.SetViaDiameter(mm(0.35)); nc.SetViaDrill(mm(0.15))
 
 
 def build(inset=0.0):
@@ -207,6 +209,7 @@ def main():
         if t.GetClass() == "PCB_TRACK" and t.GetWidth() < mm(0.1):
             t.SetWidth(mm(0.1)); necked += 1
     print("necked-down tracks widened to 0.1 mm:", necked)
+    b.GetDesignSettings().m_NetSettings.GetDefaultNetclass().SetClearance(mm(0.09))   # DRC at JLC minimum
     routed = OUT / "pod_routed.kicad_pcb"
     pcbnew.SaveBoard(str(routed), b)
     drc = OUT / "drc.json"

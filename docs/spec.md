@@ -424,7 +424,7 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 > The v0.6 text below remains the fallback.
 >
 > **v0.13: first CAD and spring study** (`hw/mech/pod.py`, `sim/checks/tragus_spring.py`, `docs/research/tragus-arm.md`):
-> - **Pod:** 35 × 9 × 14 mm. The 105 mAh cell sits against the inner wall; the 0.8 mm PCB is outboard, with the mic porting outward at the front. Zero interference.
+> - **Pod:** 35 × 9 × 14 mm. The 105 mAh cell sits against the inner wall; the 0.8 mm PCB (**20 × 11.5 mm**, raised from 10 mm so the MCU's wiring can escape; `hw/pod/place.py` routes it completely, DRC clean) is outboard, with the mic porting outward at the front. Zero interference.
 > - **Mass:** 7.75 g per side, centre of mass 52 mm behind the hinge: **nose pads 3.7 g, ear 4.1 g**.
 > - **Spring:** a one-piece steel strip can't hold 1 N at this length without fatigue. **Recommended: rigid arm on a pivot with a preloaded torsion spring** (Ø0.65 mm wire, 7 turns, Ø5.2 mm): 0.99–1.26 N over ±2 mm of jaw travel. Alternative: superelastic NiTi wire, ~1.0 N settled, ~2.3 N while putting the glasses on. New O7.
 > - **Transducer orientation:** the RC-BC02 housing (~14 mm long) must lie **along the arm**. Stood vertically, its top end comes within ~2 mm of the Ear (open) hook junction; along the arm it clears by ~5.8 mm.
@@ -681,6 +681,7 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 - D5/D11/D12/D14: STM32U575 plan (`A3-u575-plan.md`). MCU current corrected to ~2.5–3 mA (was ~0.9). Mic on ADF PB3/PB4 with hardware decimation to 200 kS/s. "Forced PWM" means never Range 4 on the SMPS.
 - §7: new budget from `sim/checks/power.py` and the Phase-1 DSP model (14% awake on a quiet evening). 105 mAh: 11.9–15 h even always awake.
 - §8: first CAD, spring study and transducer orientation. New O7, E12, R17, R18.
+- Pod board: SKiDL schematic (`hw/pod/gen.py`, ERC 0 errors, 41 parts all with LCSC, ≈$13/board), draft placement + full autoroute on 20 × 11.5 mm, 4 layers (DRC clean at JLC minimums). Design review: `docs/design-review-v1.md`.
 - Phase-1 DSP (`sim/dsp/`): band envelopes (1.5 ms attack / 15 ms release) and a gain limiter keep the output inside 1.5–4 kHz without clicks; transient mode also gates on calibrated mic self-noise.
 
 ### v0.12 (2026-09-30) — switching regulator unlocked

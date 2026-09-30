@@ -56,7 +56,7 @@ All the test sounds are synthetic. Real recordings replace them in Phase 1 (C1, 
 
 ![pod](review-v1/pod_views.png)
 
-- **Pod:** 35 × 9 × 14 mm, clipped to the outside of the temple arm, front edge on your peripheral-vision limit.
+- **Pod:** 35 × 9 × 14 mm (the board is 20 × 11.5 mm), clipped to the outside of the temple arm, front edge on your peripheral-vision limit.
 - **Inside:** a 105 mAh cell against the inner wall, the 20×10 mm board outboard of it, the mic porting outward at the front.
 - **Weight:** 7.75 g per side. **3.7 g on the nose pads and 4.1 g on the ear.**
 - **Arm:** sweeps back 30° to the pad. The transducer housing lies *along* the arm, which keeps it 5.8 mm from the Ear (open) hook. Upright, it would be 2 mm away.
@@ -75,7 +75,17 @@ All the test sounds are synthetic. Real recordings replace them in Phase 1 (C1, 
 
 ## 6. The board
 
-<!-- BOARD_RESULTS -->
+![board](review-v1/board_draft.png)
+
+**Draft layout (proof it fits, not the final layout):**
+- **Size:** 20 × 11.5 mm, 4 layers, parts on both sides. I raised it from 10 mm: at 10 mm the MCU's wiring couldn't escape, and the pod's inside height is 12.4 mm, so 11.5 fits.
+- **Autorouted in full:** 549 tracks, 41 vias.
+- **DRC:** 0 real errors and 0 unconnected, checked at JLC's 0.09 mm minimum spacing. The only flags are the courtyard rings of neighbouring 1 mm test pads (`hw/pod/place.py`).
+- **Before your real layout:**
+  - ground planes, and vias under the MCU's centre pad;
+  - widen the mic port hole to 0.8 mm (the library footprint has 0.5);
+  - redraw the PMCXB290UE footprint from Nexperia's land pattern;
+  - keep the SMPS loop (pin 20 → L1 → C8/C9) tighter than the router did.
 
 - **Schematic:** `hw/pod/gen.py` (code is the source of truth) → `hw/pod/pod.net`. ERC: 0 errors.
 - **41 parts, every one with a JLC part number** (`hw/pod/bom_jlc.csv`, stock checked 2026-09-30).
