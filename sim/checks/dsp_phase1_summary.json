@@ -1,0 +1,37 @@
+{
+  "input_dbfs": -45.4,
+  "b_transient_dbfs": -23.8,
+  "b_full_dbfs": -23.2,
+  "a_dbfs": -28.2,
+  "idle_active_fraction": 0.934,
+  "peak_b_transient": 0.301,
+  "window_rms_dbfs_b_transient": {
+    "hc_sr04": -20.6,
+    "bat_search": -22.2,
+    "bat_buzz": -21.2,
+    "red_bat": -24.7,
+    "keys": -21.5,
+    "whines_only": -90.1
+  },
+  "window_rms_dbfs_b_full": {
+    "hc_sr04": -20.5,
+    "bat_search": -21.8,
+    "bat_buzz": -20.4,
+    "red_bat": -24.2,
+    "keys": -21.4,
+    "whines_only": -41.4
+  },
+  "silence_b_transient_dbfs": -79.6,
+  "silence_b_full_dbfs": -79.3,
+  "silence_idle_active_fraction": 0.0,
+  "quiet_event_fraction": 0.107,
+  "quiet_idle_active_fraction": 0.138,
+  "quiet_false_wake_fraction": 0.032,
+  "quiet_events_caught": [
+    true,
+    true,
+    true,
+    true
+  ],
+  "runtime_s": 14.2
+}

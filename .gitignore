@@ -8,3 +8,5 @@ skidl*.erc
 *-backups/
 *.lck
 fp-info-cache
+# simulation outputs (regenerate with the scripts)
+sim/out/
