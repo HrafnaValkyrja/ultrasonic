@@ -1,5 +1,7 @@
 # Handoff: cloud session → Valhalla (local, i9-14900HX), 2026-09-30
 
+**Owner decision: this project now runs only on Valhalla, with Remote Control. Cloud sessions are retired.** The cloud session `session_016uLR3rVesNK6FmgR7vwByF` is archived once the teleport works.
+
 Written by the cloud session for its local continuation. **Read this first, then `CLAUDE.md` and `docs/spec.md`.**
 Branch: `claude/clever-mayer-s5rxuw` (everything below is committed and pushed).
 
@@ -34,7 +36,10 @@ If the hash doesn't match, find the bad part by size (every part except part19 i
    - the full cloud transcript (`session-transcript.jsonl`, backup only).
 
    `own/` and `earopen/` contain the owner's personal photos. **Never commit them.**
-4. **Start the session:** run `claude remote-control` in the repo folder. It appears in the Claude Code app.
+4. **Start the session** by teleporting (above), then **turn on Remote Control**: run `/remote-control` (or `/rc`) inside the session. The owner steers it from the Claude app and claude.ai as well as the terminal.
+   - **Make it permanent:** `/config` → **Enable Remote Control for all sessions**, or `"remoteControlAtStartup": true` in `~/.claude/settings.json` (user settings; a project `settings.json` can't turn it on).
+   - **Stay awake:** the machine must stay on and the `claude` process running. It reconnects by itself after sleep or a network drop.
+   - **After a restart:** `claude --continue` in the repo brings the conversation back; with auto-connect on, Remote Control reconnects too.
 
 ## Resume the adversarial audit
 - **Script:** `.claude/workflows/adversarial-methodology-audit.js`. It's portable (paths via args), and it skips any agent whose result is in `args.done`.

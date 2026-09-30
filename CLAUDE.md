@@ -21,6 +21,9 @@
 - **Self-taught, wants the why.** Explain briefly, never condescend.
   - **Level:** RF, analogue, digital packets/data, CAD and device physics are known ground. Pitch explanations at the black boxes: MCU internals, datasheets, PCB stack-ups, DSP on sampled audio (`docs/learn/`).
 
+## Where this runs
+On the owner's machine (Valhalla: i9-14900HX, WSL2 Ubuntu 24.04) with Remote Control, so she can steer from the Claude app. Cloud sessions were retired on 2026-09-30. The SessionStart hook sources `tools/env.sh` locally; it never installs anything locally, because setup needs sudo.
+
 ## Tools
 - `tools/setup.sh` installs everything idempotently (details in `tools/README.md`). Run `source tools/env.sh` before using the tools.
 - **Circuits:** ngspice 42.
