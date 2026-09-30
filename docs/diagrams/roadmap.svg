@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 470" role="img" aria-label="Project roadmap: concept and paper design are done; next is the bench rig, then the real boards, then wearing it. A list of the four things needed from the owner." font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f2328"/></marker>
+  </defs>
+  <rect width="1000" height="470" rx="14" fill="#fbfaf7"/>
+  <text x="40" y="40" font-size="18" font-weight="700" fill="#1f2328">Where the project is</text>
+
+  <!-- stages -->
+  <g font-size="13" text-anchor="middle" fill="#1f2328">
+    <rect x="30" y="80" width="170" height="120" rx="10" fill="#e8f3ec" stroke="#1baf7a" stroke-width="1.8"/>
+    <text x="115" y="108" font-weight="700">1. Concept</text>
+    <text x="115" y="132">what it must do</text>
+    <text x="115" y="150">(your MVP, locked)</text>
+    <text x="115" y="184" font-weight="700" fill="#1a7a55">✓ done</text>
+
+    <rect x="225" y="80" width="170" height="120" rx="10" fill="#e8f3ec" stroke="#1baf7a" stroke-width="1.8"/>
+    <text x="310" y="108" font-weight="700">2. Paper design</text>
+    <text x="310" y="132">parts, circuit, board,</text>
+    <text x="310" y="150">pod, battery, sims</text>
+    <text x="310" y="184" font-weight="700" fill="#1a7a55">✓ done today</text>
+
+    <rect x="420" y="80" width="170" height="120" rx="10" fill="#fff4ea" stroke="#b8520a" stroke-width="2.4"/>
+    <text x="505" y="108" font-weight="700">3. Bench rig</text>
+    <text x="505" y="132">test the unknowns</text>
+    <text x="505" y="150">with cheap dev parts</text>
+    <text x="505" y="184" font-weight="700" fill="#b8520a">◀ NEXT: needs your OK</text>
+
+    <rect x="615" y="80" width="170" height="120" rx="10" fill="#ffffff" stroke="#8a8676" stroke-width="1.6"/>
+    <text x="700" y="108" font-weight="700">4. Real boards</text>
+    <text x="700" y="132">you lay out the tiny</text>
+    <text x="700" y="150">board, JLC builds it</text>
+    <text x="700" y="184" fill="#57606a">after the bench</text>
+
+    <rect x="810" y="80" width="160" height="120" rx="10" fill="#ffffff" stroke="#8a8676" stroke-width="1.6"/>
+    <text x="890" y="108" font-weight="700">5. Wear it</text>
+    <text x="890" y="132">house walk, bats,</text>
+    <text x="890" y="150">2 h comfort (T1–T6)</text>
+    <text x="890" y="184" fill="#57606a">the goal</text>
+  </g>
+  <g stroke="#1f2328" stroke-width="1.8" marker-end="url(#a)">
+    <line x1="200" y1="140" x2="222" y2="140"/><line x1="395" y1="140" x2="417" y2="140"/>
+    <line x1="590" y1="140" x2="612" y2="140"/><line x1="785" y1="140" x2="807" y2="140"/>
+  </g>
+
+  <!-- what I need -->
+  <rect x="30" y="235" width="940" height="210" rx="10" fill="#ffffff" stroke="#1f2328" stroke-width="1.4"/>
+  <text x="50" y="265" font-size="15" font-weight="700" fill="#1f2328">What I need from you (that's all, for now)</text>
+  <g font-size="13.5" fill="#1f2328">
+    <text x="50" y="298"><tspan font-weight="700">1. OK to buy the bench kit</tspan> (~$180–230 + shipping). You place the orders; I send you the exact list and links.</text>
+    <text x="50" y="328"><tspan font-weight="700">2. Two photos:</tspan> glasses + Ear (open) on, a ruler at the ear; and the same with your mouth wide open.</text>
+    <text x="50" y="358"><tspan font-weight="700">3. Two 5-minute home tests:</tspan> pen-tip vision check (where the pod may start), and hang ~100 g off your temple arm (how much it flexes).</text>
+    <text x="50" y="388"><tspan font-weight="700">4. Two yes/no answers:</tspan> keep the 105 mAh battery I sized? · nothing goes behind the ear, only in front of it along the arm — right?</text>
+    <text x="50" y="424" fill="#57606a">Everything else (firmware, test-board design, the NiTi forming jig, layout review) is mine to do.</text>
+  </g>
+</svg>

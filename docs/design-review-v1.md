@@ -71,7 +71,7 @@ All the test sounds are synthetic. Real recordings replace them in Phase 1 (C1, 
 | Tuning on the bench | Swap the spring or move its stop | New wire, new heat-set at ~500 °C |
 | Downside | A small hinge (dirt, hair) | Force depends on history; fiddly to form |
 
-**Recommendation: A for the prototype.** B is the product candidate once T5 tells us which force you like. A plain steel strip (the obvious idea) can't hold 1 N without fatiguing.
+**You chose B (NiTi), 2026-09-30.** Plan: `docs/research/tragus-arm.md`. A plain steel strip (the obvious idea) can't hold 1 N without fatiguing.
 
 ## 6. The board
 
@@ -121,8 +121,10 @@ All the test sounds are synthetic. Real recordings replace them in Phase 1 (C1, 
    | 2 | Elecrow SPH0641 mic board | The ultrasonic mic on a breakout, for S1 before our own boards exist | $12.50 | (spec §10) |
    | 2 | Adafruit #1570 100 mAh LiPo | Bench battery, about our size | $5.95 | [Adafruit](https://www.adafruit.com/product/1570) |
    | 1 | JLC order: 5 bridge test boards + 5 mic port coupons | S1, S2 | ~$40–60 est. | I design it; you order it |
+   | 2 | HC-SR04 ultrasonic rangefinder | A known 40 kHz test sound, and the T3 left/right test source | ~$2 | any electronics shop |
+   | 1 m each | Superelastic NiTi wire, Ø0.8 and Ø0.9 mm | The tragus arm you chose (O7) | ~$8–15 per metre `[Low]` | medical/hobby wire suppliers; I'll pick listings |
 
-   **Total ≈ $160–190** plus shipping. The transducers ship slowest, so they go first.
+   **Total ≈ $180–230** plus shipping. Shaping NiTi needs ~500 °C: a butane torch (~$20) is enough if you don't have one. The transducers ship slowest, so they go first.
 4. **O4:** confirm the reading of §1.2.4: cell along the arm, in front of the ear, nothing behind it.
 5. **Photos and quick tests you can do at home:**
    - ruler photo and mouth-open photo (E9);

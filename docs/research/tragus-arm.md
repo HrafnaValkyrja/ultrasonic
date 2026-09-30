@@ -21,7 +21,7 @@ Assumed jaw motion: ±2 mm normal to the skin. The mouth-open photo (E9) replace
 | **Tuning on the bench (T5)** | Easy: swap the spring, or move the preload stop | Hard: new wire, new heat-set | – |
 | **Downsides** | A hinge: dirt and hair can get in, and there's a gap to seal | Force depends on history (1–2.3 N); forming NiTi is fiddly; nobody sells this shape | Doesn't work |
 
-**Recommendation: A for the prototype.**
+**Recommendation was A for the prototype; the owner chose B (see "Owner decision" below).**
 - The force is predictable, it's the easiest to tune on the bench, and springs this size are
   off-the-shelf.
 - B is the elegant product answer: no hinge, the same material as the Ear (open)'s hook, and a
@@ -37,6 +37,15 @@ Material data:
 - Music wire (ASTM A228) at 0.65 mm: tensile ~2,200 MPa, E 207 GPa (textbook values). Torsion-spring rate from the Spring Manufacturers Institute form, k ≈ E·d⁴/(67.9·D·n) per radian. `[Med]`
 
 ![force vs travel](../../sim/out/mech/tragus_spring.png) *(regenerate with the script)*
+
+## Owner decision (2026-09-30): NiTi wire arm (option B)
+
+What that means in practice:
+1. **Wire:** superelastic NiTi, Ø0.8–0.85 mm, straight annealed ("superelastic, Af ~0–20 °C"). It's sold by the metre by medical-wire and hobby suppliers. Buy two diameters (0.8 and 0.9 mm) so the bench can pick the force.
+2. **Shaping:** NiTi only keeps a new shape after heat-setting: clamp it in a steel jig, heat to ~500 °C for 10–20 min, then quench in water. A small hobby kiln or a butane torch with a thermocouple does it. I'll design the jig: a printed template with steel pins and screws the wire wraps round.
+3. **Root support:** where the wire leaves the pod, a curved printed saddle spreads the bend over a few mm. Without it, all the strain concentrates at one point and the wire takes a permanent set (the model shows the strain piling up there).
+4. **Force check on the bench:** kitchen scale under the pad at the glasses' worn position. Measure while putting the glasses on (~2 N expected) and after settling (~1 N), then again after 100 on/off cycles.
+5. **Pad mount:** the transducer housing clamps onto the wire end, lying along the arm (below).
 
 ## New findings from the CAD (`hw/mech/pod.py`)
 

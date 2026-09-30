@@ -426,7 +426,7 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 > **v0.13: first CAD and spring study** (`hw/mech/pod.py`, `sim/checks/tragus_spring.py`, `docs/research/tragus-arm.md`):
 > - **Pod:** 35 × 9 × 14 mm. The 105 mAh cell sits against the inner wall; the 0.8 mm PCB (**20 × 11.5 mm**, raised from 10 mm so the MCU's wiring can escape; `hw/pod/place.py` routes it completely, DRC clean) is outboard, with the mic porting outward at the front. Zero interference.
 > - **Mass:** 7.75 g per side, centre of mass 52 mm behind the hinge: **nose pads 3.7 g, ear 4.1 g**.
-> - **Spring:** a one-piece steel strip can't hold 1 N at this length without fatigue. **Recommended: rigid arm on a pivot with a preloaded torsion spring** (Ø0.65 mm wire, 7 turns, Ø5.2 mm): 0.99–1.26 N over ±2 mm of jaw travel. Alternative: superelastic NiTi wire, ~1.0 N settled, ~2.3 N while putting the glasses on. New O7.
+> - **Spring:** a one-piece steel strip can't hold 1 N at this length without fatigue. **Recommended: rigid arm on a pivot with a preloaded torsion spring** (Ø0.65 mm wire, 7 turns, Ø5.2 mm): 0.99–1.26 N over ±2 mm of jaw travel. Alternative: superelastic NiTi wire, ~1.0 N settled, ~2.3 N while putting the glasses on. **O7 resolved: the owner chose NiTi.**
 > - **Transducer orientation:** the RC-BC02 housing (~14 mm long) must lie **along the arm**. Stood vertically, its top end comes within ~2 mm of the Ear (open) hook junction; along the arm it clears by ~5.8 mm.
 > - **Reaction:** the pad's 1 N pushes the temple arm outward and twists it (~25 N·mm). The clip needs ~5 N of grip on the arm's top and bottom edges. New E12 measures her temple arm's stiffness.
 >
@@ -579,7 +579,7 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | **O3** | Approve the v0.5 shopping list once priced | — |
 | **O5** | Pod layout inside the ~35 mm between the vision line and the ear keep-out (v0.9): stacked, thicker pod with a ~105 mAh cell vs a slimmer pod with a smaller cell (runtime cost) | One pod if the 105–120 mAh class meets the runtime after E4 |
 | ~~O6~~ | **Resolved 2026-09-30: owner removed the rule; see D11, D5.** Was: allow a switch-mode regulator only as the MCU core's internal SMPS (STM32U575/U585 "Q" variants, same 7×7 mm QFN-48): forced-PWM (fixed frequency, MHz range, never burst mode), shielded low-magnetostriction inductor, no Class-2 caps on it, and it **must pass the owner's own listening test on the bench** before adoption. Saves ~3 mA always-on (MCU ~3.8 → ~0.9 mA) or ~1.2 mA with idle mode. §1.2.3 is owner-locked, so this needs her explicit change | Bench-test it (buy one NUCLEO-U575ZI-Q alongside the L452 board); decide by ear |
-| **O7** | **New v0.13.** Tragus spring: (A) pivot + preloaded torsion spring, (B) superelastic NiTi wire arm | A for the prototype: predictable force, and tunable by swapping the spring. B is the product candidate once T5 finds her preferred force |
+| ~~O7~~ | **Resolved 2026-09-30: owner chose (B), a superelastic NiTi wire arm** (no hinge; same material as the Ear (open) hook). Was: (A) pivot + torsion spring vs (B) NiTi | Plan in `tragus-arm.md` "Owner decision": Ø0.8–0.85 mm superelastic wire, heat-set in a printed-and-steel jig, curved root support; the bench measures force before and after 100 on/off cycles |
 | **O4** | Confirm the D18 reading of §1.2.4: cell along the arm, in front of the ear, nothing behind it | Yes; it's what makes the 12 h battery comfortable |
 
 Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 or the schematic · **P2** before board order · **P3** before final assembly.
@@ -678,6 +678,7 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ## 15. Changelog
 
 ### v0.13 (2026-09-30) — U5 plan, DSP model, first CAD
+- **Owner: O7 → superelastic NiTi wire arm.**
 - D5/D11/D12/D14: STM32U575 plan (`A3-u575-plan.md`). MCU current corrected to ~2.5–3 mA (was ~0.9). Mic on ADF PB3/PB4 with hardware decimation to 200 kS/s. "Forced PWM" means never Range 4 on the SMPS.
 - §7: new budget from `sim/checks/power.py` and the Phase-1 DSP model (14% awake on a quiet evening). 105 mAh: 11.9–15 h even always awake.
 - §8: first CAD, spring study and transducer orientation. New O7, E12, R17, R18.
