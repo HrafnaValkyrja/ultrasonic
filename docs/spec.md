@@ -1,7 +1,7 @@
 # Stereo Ultrasound — Project Spec v0.3
 
 **Owner:** Valkyrie
-**Status:** Concept phase. Architecture mostly settled; MCU choice changed in this version (see D5). Next: Phase 1 DSP simulation plus remaining P1 research. No hardware purchased.
+**Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. Architecture mostly settled; MCU choice changed in this version (see D5). Next: Phase 1 DSP simulation plus remaining P1 research. No hardware purchased.
 **Last updated:** 2026-09-30 (Claude Code session). See §15 for what changed from v0.2.
 
 **Confidence tags:** `[High]` verified from a primary source or well established · `[Med]` reasoned estimate, likely right · `[Low]` guess, verify before relying on it.
@@ -224,7 +224,12 @@ Leaning (a).
 
 ## 8. Physical layout (per side)
 
-- **Front clasp, just behind the hinge:** PCB (~10×20 mm `[Med]`, may grow slightly with the 7×7 MCU), battery, button. The mic port is on the bottom, so **the PCB needs a port hole, and the clasp an outward-facing opening covered with thin mesh.** Thick foam absorbs ultrasound.
+- **Front clasp, just behind the hinge:** PCB, battery, button.
+  - **PCB size estimate** `[Med]`, from a parts-area sum, not a layout:
+    - ~10 × 20 mm with parts on both sides, 4-layer;
+    - ~10 × 28 mm with parts on one side only.
+  - The 7×7 mm MCU sets the ~10 mm minimum width. See §9 for the parts that drive the area.
+  - The battery will probably be about as large as the board (B4). The mic port is on the bottom, so **the PCB needs a port hole, and the clasp an outward-facing opening covered with thin mesh.** Thick foam absorbs ultrasound.
 - **Along the temple arm:** thin two-conductor lead to the transducer.
 - **Drop-arm near the ear:** a short spring arm, 1–2 cm below the temple arm, pressing the transducer onto the cheekbone arch root with light, even force through a broad pad. It must keep ≥1–1.5 cm clearance from the tragus and the Ear Open pod through head turns and facial movement.
 - **Skin isolation:** transducer metal and solder joints fully insulated (silicone pad plus sealed housing). Sweat can otherwise carry drive current through skin.
