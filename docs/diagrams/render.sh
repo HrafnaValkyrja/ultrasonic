@@ -12,7 +12,7 @@ case "$src" in
     # shellcheck source=/dev/null
     . "$here/tools/env.sh"
     [ -x "$MMDC" ] || { echo "render.sh: mermaid-cli missing; run tools/setup.sh" >&2; exit 1; }
-    "$MMDC" -q -p "$MMDC_PUPPETEER_CONFIG" -s 2 -b white -i "$src" -o "$out" ;;
+    "$MMDC" -q -p "$MMDC_PUPPETEER_CONFIG" -w 1200 -s 2 -b white -i "$src" -o "$out" ;;
   *.svg)
     read -r w h < <(grep -o 'viewBox="[^"]*"' "$src" | head -1 | tr -d '"' | awk '{print $3, $4}')
     chrome=""

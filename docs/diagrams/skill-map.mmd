@@ -1,0 +1,32 @@
+%% How the skills and tools carry a board from spec to order. Each step ends in
+%% PASS / BLOCKED / USER_REVIEW; changing anything upstream re-opens the steps after it.
+flowchart TB
+    subgraph design["DESIGN"]
+        direction LR
+        spec["<b>Spec</b><br/>docs/spec.md<br/>(you decide O-items)"]
+        parts["<b>Parts</b><br/>qualify-pcba-sourcing<br/>+ jlc-parts"]
+        circuit["<b>Circuit</b><br/>design-and-review-circuit<br/>+ spice-sim (ngspice)"]
+        sch["<b>Schematic</b><br/>SKiDL code<br/>+ schematic-humanizer"]
+        spec -->|requirements| parts -->|"dated stock,<br/>exact parts"| circuit -->|reviewed| sch
+    end
+    subgraph build["BUILD"]
+        direction LR
+        layout["<b>Layout</b><br/>you, in KiCad<br/>+ pcb-layout-review"]
+        release["<b>Release files</b><br/>Gerber · BOM · placement<br/>pcb-kicad + release skill"]
+        order["<b>JLC order</b><br/>operate-jlcpcb-order<br/>you approve + pay"]
+        layout -->|"DRC 0,<br/>visual pass"| release -->|"frozen,<br/>hashed"| order
+    end
+    mech["<b>Clasp + tragus arm</b><br/>cad-mech<br/>(build123d, scikit-fem)"]
+    vis["<b>Diagrams for you</b><br/>visual-explainer (inline PNGs), at every step"]
+    design -->|"netlist"| build
+    mech -.->|"outline, keep-outs, balance"| build
+    vis ~~~ design
+
+    classDef you fill:#fff4ea,stroke:#b8520a,color:#1f2328
+    classDef step fill:#ffffff,stroke:#1f2328,color:#1f2328
+    classDef note fill:#f3f1ea,stroke:#8a8676,color:#1f2328,stroke-dasharray: 4 3
+    class spec,layout,order you
+    class parts,circuit,sch,release,mech step
+    class vis note
+    style design fill:#fbfaf7,stroke:#c9c5b8
+    style build fill:#fbfaf7,stroke:#c9c5b8
