@@ -90,3 +90,21 @@ Outputs are written to `hw/mech/out/`: STEP for every part; STL for the printabl
 - **E12:** the temple arm's stiffness, sideways and in twist.
 - **E1:** transducer mass and size.
 - **T5:** preferred force. The spring's stop sets the preload, so it can be tuned.
+
+## Sleeve and wiring (owner, 2026-09-30: arm 20 mm / 30°, wiring cross-section A)
+Two wires (four with the pad LED, `pad-led.md`) run beside the NiTi inside a silicone sleeve. Diagram: `docs/diagrams/arm-wiring.svg`.
+
+**Order matters:** heat-set the NiTi first (~500 °C would destroy silicone and insulation), then fit the wires and sleeve.
+
+**Making the sleeve (ranked):**
+1. **Off-the-shelf silicone tubing (recommended).**
+   - **Size:** ID ~1.0–1.2 mm and OD ~2.0 mm for the two-wire version; ID ~1.4 mm and OD ~2.2–2.4 mm with the LED wires. Silicone tube stretches, so a slightly undersized ID grips.
+   - **Fitting it:** wet the inside with isopropyl alcohol. Silicone swells slightly in IPA, so the bundle slides in; it shrinks back as the IPA evaporates.
+   - **Finishing:** seal both ends with RTV silicone adhesive where they enter the heel and the pad housing.
+2. **Dip-coating** in pourable platinum-cure silicone, several dips. The result is seamless and can be pigmented, but its thickness is harder to control.
+3. **Printed TPU tube:** a 2 mm OD flexible tube is at the edge of what FDM (filament printing) can do. No.
+
+**Wires:**
+- **Type:** fine PTFE-insulated or litz (multi-strand) wire, ~0.25–0.3 mm OD. The bridge's ~0.3 A peaks are fine on this.
+- **Routing:** twist them loosely around the NiTi, about one turn per 10 mm, so bending doesn't stretch them.
+- **Strain relief:** leave a slack loop inside the pod.

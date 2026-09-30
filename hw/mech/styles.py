@@ -42,6 +42,9 @@ def body():
 
 def plate(pts_xz, y0, thick, ch=0.0):
     """Polygon given in (x, z) on the plane y = y0, extruded outward (+y) by thick."""
+    area = sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in zip(pts_xz, pts_xz[1:] + pts_xz[:1]))
+    if area > 0:            # the extrusion direction follows the winding; keep it clockwise
+        pts_xz = list(reversed(pts_xz))
     f = extrude(Polygon(*pts_xz, align=None), amount=thick)       # z in [0, thick]
     s = Pos(0, y0, 0) * Rot(90, 0, 0) * f                          # maps (x, zs, t) -> (x, y0 + t, zs)
     if ch > 0:

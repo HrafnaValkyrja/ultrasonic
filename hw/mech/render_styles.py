@@ -16,8 +16,8 @@ from mathutils import Vector
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "out" / "styles"
 INFO = json.loads((OUT / "parts.json").read_text())
-GLOW = {"cyan": (0.0, 0.85, 1.0), "magenta": (1.0, 0.05, 0.55), "amber": (1.0, 0.45, 0.02)}
-RIM = {"cyan": ((0.0, 0.7, 1.0), (1.0, 0.1, 0.6)), "magenta": ((1.0, 0.1, 0.6), (0.1, 0.6, 1.0)),
+GLOW = {"blue": (0.0, 0.18, 1.0), "cyan": (0.0, 0.85, 1.0), "magenta": (1.0, 0.05, 0.55), "amber": (1.0, 0.45, 0.02)}
+RIM = {"blue": ((0.0, 0.7, 1.0), (1.0, 0.1, 0.6)), "cyan": ((0.0, 0.7, 1.0), (1.0, 0.1, 0.6)), "magenta": ((1.0, 0.1, 0.6), (0.1, 0.6, 1.0)),
        "amber": ((1.0, 0.5, 0.1), (0.2, 0.5, 1.0))}
 
 
@@ -42,10 +42,12 @@ def materials(glow, concept):
     body = (0.018, 0.018, 0.02) if concept != "heatsink" else (0.05, 0.052, 0.058)
     return {
         "body": mat("body", body, 0.0, 0.62),
-        "armour": mat("armour", (0.06, 0.065, 0.075), 0.85, 0.32) if concept == "blade" else mat("fins", (0.02, 0.02, 0.022), 0.9, 0.4),
+        "armour": mat("armour", (0.06, 0.065, 0.075), 0.85, 0.32) if concept.startswith("blade") else mat("fins", (0.02, 0.02, 0.022), 0.9, 0.4),
         "chrome": mat("chrome", (0.9, 0.9, 0.92), 1.0, 0.07),
+        "paint": mat("chrome_paint", (0.8, 0.8, 0.82), 1.0, 0.22),
+        "adapter": mat("adapter", (0.03, 0.03, 0.034), 0.0, 0.5),
         "metal": mat("metal", (0.55, 0.56, 0.6), 1.0, 0.25),
-        "glow": mat("glow", GLOW[glow], 0.0, 0.4, GLOW[glow], 18.0),
+        "glow": mat("glow", GLOW[glow], 0.0, 0.4, GLOW[glow], 18.0 if glow != "blue" else 3.0),
         "sleeve": mat("sleeve", (0.01, 0.01, 0.012), 0.0, 0.55),
         "silicone_pad": mat("pad", (0.12, 0.12, 0.13), 0.0, 0.45),
         "pad_housing": mat("housing", body, 0.0, 0.62),
@@ -72,7 +74,7 @@ def area(name, loc, target, size, power, colour):
     look_at(o, target)
 
 
-def scene(concept):
+def scene(concept, floor=True):
     clear()
     info = INFO[concept]
     mats = materials(info["glow"], concept)
@@ -83,8 +85,9 @@ def scene(concept):
         o.data.materials.append(mats.get(stl.stem, mats["body"]))
         bpy.ops.object.shade_auto_smooth(angle=math.radians(35))
     # glossy dark floor for neon reflections
-    bpy.ops.mesh.primitive_plane_add(size=1.0, location=(0.05, 0.0, -0.045))
-    bpy.context.object.data.materials.append(mat("floor", (0.01, 0.011, 0.014), 0.0, 0.18))
+    if floor:
+        bpy.ops.mesh.primitive_plane_add(size=1.0, location=(0.05, 0.0, -0.045))
+        bpy.context.object.data.materials.append(mat("floor", (0.01, 0.011, 0.014), 0.0, 0.18))
     w = bpy.data.worlds.new("w")
     bpy.context.scene.world = w
     w.use_nodes = True
@@ -95,6 +98,12 @@ def scene(concept):
     area("rim1", (0.13, 0.06, 0.03), c, 0.05, 1.2, r1)
     area("rim2", (-0.03, -0.02, 0.05), c, 0.05, 0.9, r2)
     area("fill", (0.05, 0.10, -0.04), c, 0.1, 0.12, (0.6, 0.65, 0.8))
+    if concept.endswith("exploded"):
+        area("inb", (0.06, -0.14, -0.06), c, 0.08, 0.12, (0.85, 0.9, 1.0))     # technical view: neutral studio light, adapter in light grey
+        c = (0.062, 0.002, -0.004)
+        area("s1", (0.05, -0.12, -0.09), c, 0.12, 1.6, (1.0, 1.0, 1.0))
+        area("s2", (0.10, -0.10, 0.08), c, 0.12, 1.0, (0.9, 0.95, 1.0))
+        bpy.data.objects["adapter"].data.materials[0] = mat("adapter_hi", (0.45, 0.47, 0.5), 0.0, 0.45)
     return c
 
 
@@ -125,14 +134,17 @@ def render(path, samples=128):
     bpy.ops.render.render(write_still=True)
 
 
-VIEWS = {"hero": ((0.16, 0.15, 0.055), 70, 14), "side": ((0.052, 0.22, -0.006), 80, 32)}
+VIEWS = {"hero": ((0.16, 0.15, 0.055), 70, 14), "side": ((0.052, 0.22, -0.006), 80, 32),
+         "under": ((0.085, -0.17, -0.075), 50, 22), "inboard": ((0.03, -0.17, 0.03), 70, 16)}
+VIEWS_FOR = {"blade2_exploded": ("under",)}
 
 
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
     for concept in (argv or list(INFO)):
-        for view, (loc, lens, fstop) in VIEWS.items():
-            c = scene(concept)
+        for view in VIEWS_FOR.get(concept, ("hero", "side")):
+            loc, lens, fstop = VIEWS[view]
+            c = scene(concept, floor=view not in ("under", "inboard"))
             camera(c, loc, lens, fstop)
             render(OUT / f"{concept}_{view}.png")
 
