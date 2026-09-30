@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 640" role="img" aria-label="Pod PCB status on 2026-09-30. Requirements and parts are done. The schematic is about 80 percent: generated, ERC clean, the MCU side independently verified, the rest not. Simulation is partial. Footprints about 15 percent: one of seven hand-imported footprints checked, the bridge transistor footprint known wrong. Layout about 10 percent: a feasibility autoroute only. Review, release files, bring-up firmware and bench proof of the risky assumptions are not started." font-family="Helvetica, Arial, sans-serif">
+  <rect width="1000" height="640" rx="14" fill="#fbfaf7"/>
+  <text x="40" y="42" font-size="19" font-weight="700" fill="#1f2328">Pod PCB: where we are (2026-09-30)</text>
+  <text x="40" y="66" font-size="13" fill="#57606a">Bar = how complete the step is. Green done · blue in progress · orange known problem · grey not started</text>
+  <g font-size="14" fill="#1f2328">
+    <!-- row template: label at x=40, bar at x=330 (width 300 = 100%), note at x=645 -->
+    <text x="40" y="112">1  Requirements (spec v0.14)</text>
+    <rect x="330" y="98" width="300" height="18" rx="4" fill="#e8f3ec"/><rect x="330" y="98" width="300" height="18" rx="4" fill="#1a7a55"/>
+    <text x="645" y="112" font-size="12" fill="#57606a">done; decisions tracked as O-items</text>
+
+    <text x="40" y="164">2  Parts + dated JLC stock</text>
+    <rect x="330" y="150" width="300" height="18" rx="4" fill="#e8f3ec"/><rect x="330" y="150" width="285" height="18" rx="4" fill="#1a7a55"/>
+    <text x="645" y="164" font-size="12" fill="#57606a">46 parts, all with LCSC numbers; re-check stock at order</text>
+
+    <text x="40" y="216">3  Schematic (Rev C)</text>
+    <rect x="330" y="202" width="300" height="18" rx="4" fill="#e8f0fb"/><rect x="330" y="202" width="240" height="18" rx="4" fill="#2a78d6"/>
+    <text x="645" y="210" font-size="12" fill="#57606a">ERC clean. MCU side independently verified;</text>
+    <text x="645" y="225" font-size="12" fill="#57606a">power, bridge, mic side NOT yet (audit gap)</text>
+
+    <text x="40" y="268">4  Circuit simulation</text>
+    <rect x="330" y="254" width="300" height="18" rx="4" fill="#e8f0fb"/><rect x="330" y="254" width="150" height="18" rx="4" fill="#2a78d6"/>
+    <text x="645" y="262" font-size="12" fill="#57606a">bridge SPICE used a stand-in transistor,</text>
+    <text x="645" y="277" font-size="12" fill="#57606a">not the PMCXB290UE we'll build with</text>
+
+    <text x="40" y="320">5  Footprints</text>
+    <rect x="330" y="306" width="300" height="18" rx="4" fill="#fff4ea"/><rect x="330" y="306" width="45" height="18" rx="4" fill="#b8520a"/>
+    <text x="645" y="314" font-size="12" fill="#57606a">1 of 7 hand-imported ones checked;</text>
+    <text x="645" y="329" font-size="12" fill="#57606a">bridge transistor's is known wrong</text>
+
+    <text x="40" y="372">6  Layout</text>
+    <rect x="330" y="358" width="300" height="18" rx="4" fill="#fff4ea"/><rect x="330" y="358" width="30" height="18" rx="4" fill="#b8520a"/>
+    <text x="645" y="366" font-size="12" fill="#57606a">feasibility autoroute only: no ground plane,</text>
+    <text x="645" y="381" font-size="12" fill="#57606a">unknown if it still fits once it has one</text>
+
+    <text x="40" y="424">7  Review, DRC, release files</text>
+    <rect x="330" y="410" width="300" height="18" rx="4" fill="#f3f1ea"/>
+    <text x="645" y="424" font-size="12" fill="#57606a">needs a real layout first</text>
+
+    <text x="40" y="476">8  Bring-up firmware</text>
+    <rect x="330" y="462" width="300" height="18" rx="4" fill="#f3f1ea"/>
+    <text x="645" y="470" font-size="12" fill="#57606a">none yet. Can start now: it compiles</text>
+    <text x="645" y="485" font-size="12" fill="#57606a">without hardware (clocks, mic, bridge, LED)</text>
+
+    <text x="40" y="528">9  Bench proof of the risky parts</text>
+    <rect x="330" y="514" width="300" height="18" rx="4" fill="#f3f1ea"/>
+    <text x="645" y="522" font-size="12" fill="#57606a">nothing bought. Unproven: bridge FETs, transducer</text>
+    <text x="645" y="537" font-size="12" fill="#57606a">load, mic ultrasonic mode, SMPS whine, PWM → mic</text>
+  </g>
+  <line x1="40" y1="565" x2="960" y2="565" stroke="#c9c5b8"/>
+  <text x="40" y="592" font-size="14" font-weight="700" fill="#1f2328">Bottom line: a solid paper design (steps 1–3), roughly a third of the way to a board you can order.</text>
+  <text x="40" y="614" font-size="13" fill="#57606a">The spec's plan puts bench proof (Phase 2) before the pod board (Phase 3). Nothing about the circuit has touched real hardware yet.</text>
+</svg>

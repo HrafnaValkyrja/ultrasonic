@@ -48,9 +48,13 @@ What that means in practice:
    - The wire sits on the skin (~30–33 °C) but also sees cold outdoor days, so Af must sit below the coldest wear temperature.
      - The Confluent SE508 data sheet gives a finished-product Af of −25 to 30 °C, so the grade matters: ask for Af ≤ 0 °C.
    - *Temperature changes the force a little:* the plateau stress rises ~6–7 MPa/°C above Af (Confluent), so the pad presses a bit harder when warm than on a cold morning. The bench measures it at skin temperature.
-   - *The ~500 °C step is shape-setting, done once when the arm is made.* In use the wire never needs heat. It's sold by the metre by medical-wire and hobby suppliers. Buy two diameters (0.8 and 0.9 mm) so the bench can pick the force.
-2. **Shaping:** NiTi only keeps a new shape after heat-setting: clamp it in a steel jig, heat to ~500 °C for 10–20 min, then quench in water. A small hobby kiln or a butane torch with a thermocouple does it. I'll design the jig: a printed template with steel pins and screws the wire wraps round.
-3. **Root support:** where the wire leaves the pod, a curved printed saddle spreads the bend over a few mm. Without it, all the strain concentrates at one point and the wire takes a permanent set (the model shows the strain piling up there).
+   - **Buy it straight and already superelastic ("straight-annealed"). No heat-setting (owner, 2026-09-30: hard no).** Cut to length. Buy 0.7, 0.75 and 0.8 mm so the bench can pick the force (the force scales with d³).
+2. **Direction comes from the holes, not from bending the wire (owner, 2026-09-30).** The wire stays straight.
+   - The heel's blind hole points it down and back at 30°, and angled ~10° toward the head, so the pad sits ~3–4 mm "inside" the skin when free (the preload).
+   - The pad housing has a matching angled blind hole.
+   - Retention: epoxy in each hole, plus a crimped stainless tube or a cross-pin as a mechanical stop, because NiTi's oxide skin glues only moderately.
+   - ~~Heat-set shaping in a jig~~ is dropped.
+3. **Root support:** the heel's hole mouth flares into a printed curved saddle, which spreads the bend over a few mm. Without it, all the strain concentrates at one point and the wire takes a permanent set (the model shows the strain piling up there).
 4. **Force check on the bench:** kitchen scale under the pad at the glasses' worn position. Measure while putting the glasses on (~2 N expected) and after settling (~1 N), then again after 100 on/off cycles.
 5. **Pad mount:** the transducer housing clamps onto the wire end, lying along the arm (below).
 
@@ -94,7 +98,7 @@ Outputs are written to `hw/mech/out/`: STEP for every part; STL for the printabl
 ## Sleeve and wiring (owner, 2026-09-30: arm 20 mm / 30°, wiring cross-section A)
 Two wires (four with the pad LED, `pad-led.md`) run beside the NiTi inside a silicone sleeve. Diagram: `docs/diagrams/arm-wiring.svg`.
 
-**Order matters:** heat-set the NiTi first (~500 °C would destroy silicone and insulation), then fit the wires and sleeve.
+**Order:** cut the straight wire, thread wires and wire through the sleeve, then glue both ends into the heel and pad holes (no heat step anywhere).
 
 **Making the sleeve (ranked):**
 1. **Off-the-shelf silicone tubing (recommended).**

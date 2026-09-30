@@ -2,7 +2,10 @@
 
     blender -b -P hw/mech/render_styles.py -- [concept ...]    # -> hw/mech/out/styles/<concept>_<view>.png
 
-CPU only: never touches the GPU/graphics stack (owner rule). Units: STL in mm, imported at 0.001 so
+Lighting: REAL (owner, 2026-09-30): an HDRI environment from Blender's bundled studio lights plus
+one soft window-style key, neutral table. The old coloured neon rims are kept only as NEON=1.
+Device: Cycles on the GPU (OptiX) when available - owner allowed it; this only USES the card, it
+changes no driver or graphics setting. Falls back to CPU. Units: STL in mm, imported at 0.001 so
 Blender works in metres. Frame: x = back along the temple, y = outward, z = up.
 """
 import json
@@ -74,6 +77,25 @@ def area(name, loc, target, size, power, colour):
     look_at(o, target)
 
 
+import os
+NEON = os.environ.get("NEON") == "1"
+HDRI = "/usr/lib/blender/datafiles/studiolights/world/interior.exr"
+
+
+def real_world(c):
+    w = bpy.data.worlds.new("w")
+    bpy.context.scene.world = w
+    w.use_nodes = True
+    nt = w.node_tree
+    env = nt.nodes.new("ShaderNodeTexEnvironment")
+    env.image = bpy.data.images.load(HDRI)
+    bg = nt.nodes["Background"]
+    bg.inputs["Strength"].default_value = 0.45
+    nt.links.new(env.outputs["Color"], bg.inputs["Color"])
+    area("key", (0.02, 0.16, 0.12), c, 0.12, 0.9, (1.0, 0.97, 0.92))     # soft window light
+    area("bounce", (0.12, -0.05, 0.02), c, 0.1, 0.15, (0.95, 0.97, 1.0))
+
+
 def scene(concept, floor=True):
     clear()
     info = INFO[concept]
@@ -85,6 +107,16 @@ def scene(concept, floor=True):
         o.data.materials.append(mats.get(stl.stem, mats["body"]))
         bpy.ops.object.shade_auto_smooth(angle=math.radians(35))
     # glossy dark floor for neon reflections
+    c = (0.049, 0.004, -0.008)
+    if not NEON:
+        if floor:
+            bpy.ops.mesh.primitive_plane_add(size=1.0, location=(0.05, 0.0, -0.045))
+            bpy.context.object.data.materials.append(mat("table", (0.42, 0.40, 0.37), 0.0, 0.55))
+        real_world(c)
+        if concept.endswith("exploded"):
+            bpy.data.objects["adapter"].data.materials[0] = mat("adapter_hi", (0.45, 0.47, 0.5), 0.0, 0.45)
+            c = (0.062, 0.002, -0.004)
+        return c
     if floor:
         bpy.ops.mesh.primitive_plane_add(size=1.0, location=(0.05, 0.0, -0.045))
         bpy.context.object.data.materials.append(mat("floor", (0.01, 0.011, 0.014), 0.0, 0.18))
@@ -125,11 +157,28 @@ def render(path, samples=128):
     s = bpy.context.scene
     s.render.engine = "CYCLES"
     s.cycles.device = "CPU"
+    try:
+        prefs = bpy.context.preferences.addons["cycles"].preferences
+        for kind in ("OPTIX", "CUDA"):
+            try:
+                prefs.compute_device_type = kind
+            except TypeError:
+                continue            # this Blender build lacks that backend (Ubuntu's has no OptiX)
+            prefs.get_devices()
+            gpus = [d for d in prefs.devices if d.type == kind]
+            if gpus:
+                for d in prefs.devices:
+                    d.use = d.type == kind
+                s.cycles.device = "GPU"
+                break
+    except Exception as e:  # no GPU backend: CPU is fine
+        print("GPU unavailable:", e)
+    print("Cycles device:", s.cycles.device, bpy.context.preferences.addons["cycles"].preferences.compute_device_type)
     s.cycles.samples = samples
     s.cycles.use_denoising = True
     s.render.resolution_x, s.render.resolution_y = 1400, 900
     s.view_settings.view_transform = "AgX"
-    s.view_settings.look = "AgX - Punchy"
+    s.view_settings.look = "AgX - Punchy" if NEON else "None"
     s.render.filepath = str(path)
     bpy.ops.render.render(write_still=True)
 

@@ -40,11 +40,18 @@ Owner asked: light the ring on the pad housing with an LED if current and packag
 | steady 0.5 mA while awake | 7.7–12.3 h | 16.9–28.7 h |
 
 **Recommended firmware behaviour:**
-- The ring glows only while the chain is awake, with brightness following what it hears, so it pulses with bat calls.
+- **Owner, 2026-09-30: solid, as a power-on indicator. No pulsing; battery cost accepted.** That's ~0.5 mA whenever the device is on, including idle. Always-awake worst case: 7.7 h; quiet room: ~15.5 h pessimistic.
+- ~~Brightness follows what it hears~~ (dropped).
 - The button toggles it.
 - It turns off automatically below ~20% charge.
 
 That keeps the ring mostly dark in quiet places, and the always-awake pessimistic case back at the 8 h minimum when it counts.
+
+## Building it (the owner's concern)
+The hard part is soldering fine wires to a 1.0 × 0.5 mm LED by hand. Ways to make it easy:
+1. **Buy LEDs that come pre-wired.** Model-railway and scale-model shops sell 0402/0603 SMD LEDs with ~0.1 mm enamelled leads already soldered (`[Med]`: a common hobby item, no specific listing checked yet). Then the only joints are two big pads on the board.
+2. **Use an 0603 (1.6 × 0.8 mm) instead of an 0402.** It is much easier to hand-solder and still fits under a 5 mm ring. Same circuit.
+3. **Build the pad in this order:** LED glued face-up in its pocket → leads out through the wire hole → clear epoxy poured into the ring groove over it → transducer and wires → potting.
 
 ## Packaging options (ranked)
 | | How | Wires in the sleeve | Verdict |

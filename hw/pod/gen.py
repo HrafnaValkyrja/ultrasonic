@@ -12,6 +12,9 @@ Blocks (spec §4, §7, §9; parts and LCSC numbers from .pcba-workflow/sourcing-
           VBUS sense PA1 (dock detect), SWD pads
 Rev B (2026-09-30, audit fixes): MCP73832 instead of MCP73831 (NM-1), VBUS sense (PWR-05),
 C4 10 uF 0603 (NM-7), R1 10k (NM-11), C20 at VBAT (NM-5).
+Rev C (2026-09-30, owner O8): power-indicator LED in the pad housing, solid while on:
+VBAT -> R14 2k2 -> J7 (LED+) ~wire~ LED ~wire~ J8 (LED-) -> PB7 (open-drain, TIM4_CH2).
+~0.35-0.75 mA over the battery range; firmware holds it steady with a >20 kHz duty set from VBAT.
 Change this file, never the generated netlist.
 """
 from __future__ import annotations
@@ -36,7 +39,7 @@ PAD = "TestPoint:TestPoint_Pad_D1.0mm"
 
 # LCSC numbers (sourcing lock + dated lookups 2026-09-30); every placed part carries one.
 LCSC = {
-    "R33": "C25105", "R10k": "C25744", "R22k": "C25768", "R100k": "C25741", "R1M": "C26083",
+    "R33": "C25105", "R2k2": "C25879", "R10k": "C25744", "R22k": "C25768", "R100k": "C25741", "R1M": "C26083",
     "C15p": "C1548", "C100n": "C1525", "C1u": "C52923", "C2u2": "C107369", "C4u7": "C23733",
     "C10u_0603": "C19702", "C22u_0603": "C59461",
 }
@@ -181,6 +184,13 @@ def build():
     btn = Net("BTN")
     sw[1] += v3; sw[2] += btn; btn += u1["PA0"]                         # WKUP1, active high
     r = R("R10", "100k", "R100k"); r[1] += btn; r[2] += gnd
+    # power-indicator LED, off-board in the pad housing (docs/research/pad-led.md). Fed from VBAT:
+    # a blue LED needs ~2.7 V, too close to the 3.0 V rail. PB7 is 5 V tolerant (FT, DS13737 Rev 8).
+    led_a, led_k = Net("LED_A"), Net("LED_K")
+    r = R("R14", "2k2", "R2k2"); r[1] += vbat; r[2] += led_a
+    p = pad("J7", "LED+"); p[1] += led_a
+    p = pad("J8", "LED-"); p[1] += led_k
+    led_k += u1["PB7"]
     for ref, lab, n in (("TP1", "SWDIO", Net("SWDIO")), ("TP2", "SWCLK", Net("SWCLK")),
                         ("TP3", "NRST", nrst), ("TP4", "3V0", v3), ("TP5", "GND", gnd)):
         p = pad(ref, lab); p[1] += n
@@ -190,7 +200,7 @@ def build():
             n += u1["PA14"]
     # spare pins, left free on purpose (A3-u575-plan.md §3); PC13 stays static next to the crystal
     for pin in ("PC13", "PH0", "PH1", "PA2", "PA3", "PA6", "PB1", "PB13", "PB14", "PB15",
-                "PA11", "PA12", "PA15", "PB5", "PB6", "PB7", "PB8"):
+                "PA11", "PA12", "PA15", "PB5", "PB6", "PB8"):
         u1[pin] += NC
     return u1
 
