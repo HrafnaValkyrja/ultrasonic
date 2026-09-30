@@ -1,6 +1,6 @@
 # A1 + A2 findings: MCU (DFSDM) and mic sourcing
 
-**Date:** 2026-09-30 · **Status:** A1 DONE (pending owner pick) · A2 PARTIAL (stock checked, lifecycle and alternatives still open)
+**Date:** 2026-09-30 · **Status:** A1 DONE (L452CEU6 chosen) · A2 DONE (lifecycle, breakouts and backups checked)
 
 ---
 
@@ -71,7 +71,29 @@ The **NUCLEO-L476RG** dev board (v0.2 Phase 2 plan) has an STM32L476 with a larg
 
 **Risk R4 ("no suitable mic stocked at JLC") is resolved for now.** The part is directly assemblable as an Extended part.
 
-### Still open
-- Lifecycle status (DigiKey "Active" vs one distributor's "Not For New Designs"). Needs a check on the Syntiant/DigiKey pages.
-- Survey of newer ultrasonic-capable digital MEMS mics as a backup (Syntiant, TDK/InvenSense, Infineon).
-- **SPH0641LM4H-1 vs LU4H-1:** check whether the LM4H-1 also has an ultrasonic mode. If it does, it's a second source.
+### Lifecycle (checked 2026-09-30) — A2 DONE
+- **DigiKey:** **Active**, 22,134 in stock, $3.22, manufacturer shown as Syntiant.
+- **Syntiant** reissued the datasheet as **Rev B-1, dated 2024-12-02**. Same ultrasonic mode and the same 10–80 kHz curve (+15 dB peak near 25 kHz, ~+8 dB across 35–65 kHz). A vendor that reissues a datasheet in late 2024 is still supporting the part.
+- **Mouser:** "NRND" (not recommended for new designs), seen only in a search snippet; the page itself was blocked. Unverified.
+- **Verdict:** fine for this project `[Med]`. Buy spares with the first order: they're $2–3 each, and one reel-cut covers every board this project will ever need.
+
+### Ready-made breakout boards (for the bench, S1)
+| Board | Price, stock | Notes |
+|---|---|---|
+| **Elecrow CCB50641P** | $12.50 ($9 at 5+), in stock | 15×20 mm. Fastest route to S1. |
+| Switch Science #3379 | ¥1,527, 17 in stock | Japan |
+| Syntiant KAS-700-0164 eval board | $31.35, 22 at DigiKey | 14-week lead time listed |
+| ⚠️ **RAK18032** | $7.50 | **Don't buy.** Sold as an "ultrasonic SPH0641" board but carries the **SPH0655LM4H-1**, whose datasheet only plots to 20 kHz. |
+
+The v0.4 plan called the Elecrow board "unverified". It exists and is in stock, so v0.5 uses it for S1.
+
+### Backup mics (no newer purpose-built part exists)
+| Part (what it is) | Ultrasonic spec | JLC (2026-09-30) | Verdict |
+|---|---|---|---|
+| **TDK T5838**: PDM digital MEMS mic with a low-power ultrasonic mode | Plot stops at **50 kHz**, +17 dB peak near 26 kHz | C7230692, Extended, 684 in stock, $3.47 | **Backup.** Covers the bat band (25–50 kHz) but not 50–80 kHz. |
+| TDK ICS-41352: PDM mic | Response to 85 kHz | C3019173, 0 in stock; **Obsolete** at DigiKey | Not viable |
+| TDK ICS-41350: PDM mic | To 40 kHz | C3171856, 87 in stock | Too narrow |
+| ST IMP23ABSU: **analog** MEMS mic | To 80 kHz | C3171746, 154 in stock, $4.93 | Analog fallback (needs a preamp and ADC) |
+| Infineon / Vesper | No ultrasonic parts found | — | — |
+
+Checking whether the SPH0641LM4H-1 (C497724) also has an ultrasonic mode is no longer needed: the LU4H-1 is Active and stocked.

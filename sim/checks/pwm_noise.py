@@ -32,6 +32,7 @@ def run(fs, levels, order, sig_dbfs=-20.0, f0=2500.0, dur=0.5, dither=True, L=0.
             {"0.2-8k": (200, 8e3), "8-20k": (8e3, 20e3), "20-40k": (20e3, 40e3)}.items()}, fc
 
 cfgs = [("312.5 kHz, 256 lvl, no shaping", 312.5e3, 256, 0),
+        ("200 kHz, 201 lvl (AD), 2nd-order", 200e3, 201, 2),
         ("312.5 kHz, 256 lvl, 2nd-order", 312.5e3, 256, 2),
         ("200 kHz, 401 lvl (BD), 2nd-order", 200e3, 401, 2)]
 for name, fs, lv, o in cfgs:
