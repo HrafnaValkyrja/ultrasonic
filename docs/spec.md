@@ -1,4 +1,4 @@
-# Stereo Ultrasound — Project Spec v0.13
+# Stereo Ultrasound — Project Spec v0.14
 
 **Owner:** Valkyrie
 **Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. v0.5 applies the full-plan sanity check (`docs/research/review-2026-09-30.md`). Next: shopping-list approval (O3) → Phase 1 simulation and first bench orders. No hardware purchased.
@@ -128,7 +128,8 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 - Analog division (comparator plus counter) sounds harsh and buzzy and throws loudness away.
 - The real-time digital options are heterodyne and spectral frequency compression (§5). Time expansion, which most bat demos use, can't run in real time.
 
-### D5. MCU = STM32L452CEU6 (QFN-48, 7×7 mm) `[High]` — **Decided v0.4 (owner approved)**
+### D5. MCU = STM32U575CIU6Q (QFN-48, 7×7 mm, internal SMPS) `[High]` — **Changed v0.12 (was STM32L452CEU6, decided v0.4)**
+- **v0.14 note (audit MP-07):** the pin map and text below are the L452 history. The current pin map is `hw/pod/gen.py` and `A3-u575-plan.md` §3: mic on ADF1 (PB3 clock, PB4 data), bridge on TIM1 (PA8/PA7/PA9/PB0).
 - **What it is:** ST's ultra-low-power Arm Cortex-M4F at 80 MHz, with DSP instructions, an FPU and 160 KB RAM. It includes the **DFSDM**, a hardware PDM-to-PCM converter for the mic. The v0.2 pick (L432) lacks the DFSDM. Details: `docs/research/A1-A2-mcu-and-mic.md`.
 - **Pin check (v0.5):** every needed function is available on the 48-pin package.
   - mic clock PA5, mic data PB1;
@@ -153,6 +154,15 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 - **What it is:** TIM1, the MCU's motor-control timer, switches an H-bridge made of two complementary MOSFET pairs (each pair is one N-channel + one P-channel transistor in a 1.6 mm package). The bridge drives the transducer directly, and the transducer coil smooths the switching into sound.
 - **Carrier:** **200 kHz**, centre-aligned (ARR = 200), with one duty update per period over DMA. It is synchronous with the input chain (D14), and 201 duty levels.
   - *Changed from 312.5 kHz.* That rate wasn't a multiple of the sample rate, so switching leakage would fold to 87.5 kHz and play as a tone.
+- **v0.14, audit MP-01: the shaper's noise lands in the mic band.** "Coherent clocks put leakage at 0 Hz" holds for the carrier and its harmonics, **not** for the noise shaper's broadband quantisation noise. At 200 kHz that noise sits at **−35 dB re full scale across 20–85 kHz** on the bridge voltage (−59 dB in coil current), which is exactly the band the mic processes. If any of it couples back (rail, ground, mechanical), the device hears itself. `sim/checks/pwm_ultrasonic_leak.py`, same timer clock (80 MHz):
+
+  | PWM rate / levels | mic band (V) | audio band 3–16 kHz | extra gate current |
+  |---|---|---|---|
+  | 200 kHz / 201 (today) | −35 dB | −87 dB | — |
+  | 400 kHz / 101 | −45 dB | −102 dB | +0.3 mA |
+  | **800 kHz / 51** | **−59 dB** | **−117 dB** | **+0.8 mA** |
+
+  **Recommendation:** leave the hardware as is. The PWM rate is a firmware setting, and all three rows run on the same timer and bridge. Measure the real coupling on the bench (S2), then pick the lowest rate that keeps the self-noise below the mic's own floor.
 - **Modulation: 2-level ("AD").** The two bridge legs are driven as complements.
   - At idle, a small ripple current (≈ Vbus / (4·L·f), e.g. 12.5 mA at 0.3 mH) flows back and forth. It costs 0.04–0.4 mW.
   - While that ripple exceeds the signal current, the bridge's **dead-time errors cancel exactly**, so quiet sounds stay undistorted.
@@ -392,7 +402,21 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
   - Estimated draw at 75% quiet time: ~3.3 mA (A) and ~3.7 mA (B), against 7.2 and 8.8 mA always-on, so 8 h needs ~35 mAh instead of ~70–85 mAh `[Low]`.
   - Worst case, when the band is always busy, falls back to full draw. So the cell should still be sized for the always-on case, or for a measured duty cycle from E4.
 
-**v0.13 budget (U575 on SMPS + idle-listening mode; `sim/checks/power.py`):**
+**v0.14 budget: supersedes v0.13 below** (`sim/checks/power.py` rev 2; audit PWR-01..04, dsp-1/2/8):
+- **Mic current re-derived at our 3.0 V / 4 MHz:** 1.1 / 1.35 / 2.15 mA. It was quoted at the datasheet's 1.8 V / 3.072 MHz point. Bridge 0.77 mA from our own SPICE; gate pulls added; transducer range widened (still an untraced guess until E1/E4).
+- **The pessimistic case now also shrinks capacity:** 90% / 85% / 75% usable.
+- **Full chain awake:** 5.0 / 6.8 / 9.8 mA. **Idle:** 1.7 / 2.2 / 3.4 mA.
+- **Idle detector rev 2** (FFT snapshot every 5 ms plus a narrowband test; `sim/checks/idle_detector.py`). The old detector woke on audible speech: 95% awake on speech alone, and 67% in a room without electronics. Its 14% was the synthetic whines masking this. Rev 2 results:
+  - awake time: speech only 5%, quiet room 18%;
+  - Port Meadow (real AudioMoth recordings, 270 files): 95.5% of 10,024 annotated bat calls caught within 10 ms, and no pass missed entirely;
+  - CPU: ~3.4 Mcycle/s, down from ~12. It fits the 16 MHz idle clock.
+- **Runtime with 105 mAh:**
+  - awake all the time: **8.0–13.2 h**;
+  - half the time: 11.9–19.9 h;
+  - quiet room: 17–30 h.
+- **So the 8 h minimum holds even never sleeping, with no margin.** The idle mode is now load-bearing; keep 105 mAh (O5).
+
+**v0.13 budget (superseded by v0.14 above; U575 on SMPS + idle-listening mode; `sim/checks/power.py`):**
 - **Full chain awake:** 4.6 / 6.0 / 7.5 mA (low / nominal / high). **Idle:** 1.5 / 1.9 / 2.4 mA; the mic (~1 mA) is now the biggest idle load.
 - **Awake time** from the Phase-1 DSP model (`sim/dsp/run_phase1.py`): **14%** on a simulated quiet evening, with all 4 events caught within 10 ms; 93% on a deliberately busy scene.
 - **Runtime with a 105 mAh cell:**
@@ -426,6 +450,10 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 >   That's the price of keeping everything in front of the ear hook. The owner's call (O5).
 >
 > The v0.6 text below remains the fallback.
+>
+> **v0.14: CAD rev 2** (`hw/mech/pod.py`; sketches `hw/mech/out/pod_sketches.png`):
+> - **Pod grows to 38 × 10 × 15 mm** (was 35 × 9 × 14). The cell is now modelled at the EEMB LP401230 spec sheet's **maximum** envelope (31 × 4.3 × 12.5), plus a ~3 mm protection board `[Low]`, with 0.3 mm assembly clearance. The v0.13 box fitted only the nominal cell with zero clearance. All 8 checked part pairs clear by ≥0.2 mm. ~7.1 g per side.
+> - **Arm drawn as the real NiTi wire** in two variants for the reopened O7 (A: 20 mm on the plateau; B: 30 mm elastic, anchor moved forward, pad unchanged).
 >
 > **v0.13: first CAD and spring study** (`hw/mech/pod.py`, `sim/checks/tragus_spring.py`, `docs/research/tragus-arm.md`):
 > - **Pod:** 35 × 9 × 14 mm. The 105 mAh cell sits against the inner wall; the 0.8 mm PCB (**20 × 11.5 mm**, raised from 10 mm so the MCU's wiring can escape; `hw/pod/place.py` routes it completely, DRC clean) is outboard, with the mic porting outward at the front. Zero interference.
@@ -584,6 +612,7 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | **O5** | Pod layout inside the ~35 mm between the vision line and the ear keep-out (v0.9): stacked, thicker pod with a ~105 mAh cell vs a slimmer pod with a smaller cell (runtime cost) | One pod if the 105–120 mAh class meets the runtime after E4 |
 | ~~O6~~ | **Resolved 2026-09-30: owner removed the rule; see D11, D5.** Was: allow a switch-mode regulator only as the MCU core's internal SMPS (STM32U575/U585 "Q" variants, same 7×7 mm QFN-48): forced-PWM (fixed frequency, MHz range, never burst mode), shielded low-magnetostriction inductor, no Class-2 caps on it, and it **must pass the owner's own listening test on the bench** before adoption. Saves ~3 mA always-on (MCU ~3.8 → ~0.9 mA) or ~1.2 mA with idle mode. §1.2.3 is owner-locked, so this needs her explicit change | Bench-test it (buy one NUCLEO-U575ZI-Q alongside the L452 board); decide by ear |
 | ~~O7~~ | **Resolved 2026-09-30: owner chose (B), a superelastic NiTi wire arm** (no hinge; same material as the Ear (open) hook). Was: (A) pivot + torsion spring vs (B) NiTi | Plan in `tragus-arm.md` "Owner decision": Ø0.8–0.85 mm superelastic wire, heat-set in a printed-and-steel jig, curved root support; the bench measures force before and after 100 on/off cycles |
+| **O7b** | **Reopened v0.14 (audit mech-1..4).** The NiTi chart O7 was decided on was not a model past ~3 mm. On the plateau, a 20 mm × Ø0.85 mm arm pushes **2.3 N while loading and ~1.0 N while unloading**, so the force swings with jaw motion, and root strain reaches 4–7%. Two independent models agree within 3% (`sim/checks/niti_closed_form.py`, the auditor's elastica). Options: **(A) keep the 20 mm arm**: 1.0–2.3 N, history-dependent, strain near NiTi's 6% recovery limit. **(B) a 30 mm arm, kept elastic**: 0.7/1.0/1.3 N at 5/7/9 mm, linear, ~1.3% strain, but a 54° sweep instead of 30°. **(C) the pivot + torsion spring** (v0.13 option A): 0.99–1.26 N | **B**, if the 54° look is acceptable: it trades a superelastic "flat force" that doesn't exist for a predictable spring. Either way, bend a coupon on the bench first: NiTi's modulus is uncertain ±30% |
 | **O4** | Confirm the D18 reading of §1.2.4: cell along the arm, in front of the ear, nothing behind it | Yes; it's what makes the 12 h battery comfortable |
 
 Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 or the schematic · **P2** before board order · **P3** before final assembly.
@@ -680,6 +709,21 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ---
 
 ## 15. Changelog
+
+### v0.14 (2026-09-30) — audit fixes (Claude, autonomous; owner decisions pending)
+- **Audit:** `docs/audit/2026-09-30-audit-report.md` (partial). Every change below comes from a finding there, and each was re-checked by a different method before it was applied.
+- **Schematic Rev B** (`hw/pod/gen.py`):
+  - MCP73832 (open-drain STAT) with a 100k pull-up. Fixes NM-1: the MCP73831 put 5 V on PA10.
+  - VBUS sense on PA1, so the firmware can sleep when docked and the charger can terminate (PWR-05).
+  - C4 10 µF 0603, BOOT0 10k, 100 nF at VBAT.
+  - Mic footprint with a 0.6 mm port.
+  - ERC 0 errors; 45 parts, all with LCSC numbers.
+- **D6:** shaped PWM noise in the mic band (MP-01), options table; the decision waits for bench coupling data.
+- **§7:** power budget rev 2 and idle detector rev 2 (validated on real Port Meadow recordings). Always-awake runtime drops to 8.0–13.2 h.
+- **§8 / O7b:** NiTi reopened on corrected numbers; CAD rev 2 (38 × 10 × 15 mm pod, max cell envelope, gap checks).
+- **Board draft:** 0.8 mm with a real stackup; mic port 0.6 mm. FP-1 (oversized TPS7A20 pads) was checked and **not upheld**.
+- **D5:** title corrected to the U575 (MP-07).
+
 
 ### v0.13 (2026-09-30) — U5 plan, DSP model, first CAD
 - **Owner: O7 → superelastic NiTi wire arm.**
