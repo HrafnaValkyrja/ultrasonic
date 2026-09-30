@@ -1,0 +1,438 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1560" font-family="Helvetica, Arial, sans-serif" role="img" aria-label="Every part on the pod board, colour-coded by function, on both faces, with a legend explaining what each part is and why it is needed.">
+<rect x="0.0" y="0.0" width="1500.0" height="1560.0" rx="14" fill="#fbfaf7" fill-opacity="1.0" stroke="none" stroke-width="0"/>
+<text x="36" y="42" font-size="22" font-weight="700" fill="#1f2328">Every part on the pod board, and why it is there</text>
+<text x="36" y="68" font-size="14" fill="#57606a">20 × 11.5 mm, drawn 30× from the draft board file. Colour = job. Gold = copper pads. Front of the pod (toward your eye) is on the left of the outer face and the right of the inner face.</text>
+<text x="60" y="100" font-size="15" font-weight="700" fill="#1f2328">Outer face (toward the pod wall)</text>
+<text x="800" y="100" font-size="15" font-weight="700" fill="#1f2328">Inner face (toward the cell), seen from below</text>
+<rect x="60.0" y="110.0" width="600.0" height="345.0" rx="30.0" fill="#1f4a33" fill-opacity="1.0" stroke="none" stroke-width="0"/>
+<rect x="203.8" y="364.2" width="30.3" height="57.3" rx="3" fill="#2a78d6" fill-opacity="0.55" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="209.7" y="398.9" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="209.7" y="370.1" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="219.0" y="396.9" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C5</text>
+<rect x="58.6" y="113.1" width="62.8" height="62.8" rx="3" fill="#8a8676" fill-opacity="0.55" stroke="#8a8676" stroke-width="1.5"/>
+<rect x="75.0" y="129.5" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="90.0" y="148.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">TP1</text>
+<rect x="512.9" y="164.2" width="30.3" height="57.3" rx="3" fill="#2a78d6" fill-opacity="0.55" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="518.7" y="198.8" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="518.7" y="170.0" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="528.0" y="196.8" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C4</text>
+<rect x="58.6" y="278.7" width="62.8" height="62.8" rx="3" fill="#8a8676" fill-opacity="0.55" stroke="#8a8676" stroke-width="1.5"/>
+<rect x="75.0" y="295.1" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="90.0" y="314.1" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">TP4</text>
+<rect x="203.8" y="295.2" width="30.3" height="57.3" rx="3" fill="#2a78d6" fill-opacity="0.55" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="209.7" y="329.9" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="209.7" y="301.1" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="219.0" y="327.9" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C10</text>
+<rect x="577.6" y="177.4" width="62.7" height="92.7" rx="3" fill="#e87ba4" fill-opacity="0.55" stroke="#e87ba4" stroke-width="1.5"/>
+<rect x="586.1" y="261.2" width="45.7" height="24.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="586.1" y="162.2" width="45.7" height="24.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="609.0" y="227.7" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">SW1</text>
+<rect x="550.3" y="329.5" width="57.3" height="30.3" rx="3" fill="#008300" fill-opacity="0.55" stroke="#008300" stroke-width="1.5"/>
+<rect x="556.2" y="335.3" width="16.8" height="18.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="585.0" y="335.3" width="16.8" height="18.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="579.0" y="348.6" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C9</text>
+<rect x="173.8" y="364.2" width="30.3" height="57.3" rx="3" fill="#2a78d6" fill-opacity="0.55" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="179.7" y="398.9" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="179.7" y="370.1" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="189.0" y="396.9" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C6</text>
+<rect x="486.8" y="236.8" width="46.5" height="91.5" rx="3" fill="#008300" fill-opacity="0.55" stroke="#008300" stroke-width="1.5"/>
+<rect x="495.8" y="292.2" width="28.5" height="27.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="495.8" y="245.8" width="28.5" height="27.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="510.0" y="286.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C7</text>
+<rect x="139.6" y="159.7" width="56.7" height="107.7" rx="3" fill="#4a3aa7" fill-opacity="0.55" stroke="#4a3aa7" stroke-width="1.5"/>
+<rect x="141.0" y="236.0" width="54.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="141.0" y="161.0" width="54.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="168.0" y="217.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">Y1</text>
+<rect x="58.6" y="223.5" width="62.8" height="62.8" rx="3" fill="#8a8676" fill-opacity="0.55" stroke="#8a8676" stroke-width="1.5"/>
+<rect x="75.0" y="239.9" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="90.0" y="258.9" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">TP3</text>
+<rect x="482.9" y="343.6" width="30.3" height="57.3" rx="3" fill="#2a78d6" fill-opacity="0.55" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="488.7" y="378.2" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="488.7" y="349.4" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="498.0" y="376.2" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C2</text>
+<rect x="550.7" y="381.4" width="62.7" height="50.7" rx="3" fill="#008300" fill-opacity="0.55" stroke="#008300" stroke-width="1.5"/>
+<rect x="534.0" y="379.7" width="36.0" height="54.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="594.0" y="379.7" width="36.0" height="54.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="582.0" y="410.7" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">L1</text>
+<rect x="469.3" y="417.3" width="57.3" height="30.3" rx="3" fill="#008300" fill-opacity="0.55" stroke="#008300" stroke-width="1.5"/>
+<rect x="475.2" y="423.2" width="16.8" height="18.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="504.0" y="423.2" width="16.8" height="18.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="498.0" y="436.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C8</text>
+<rect x="173.8" y="295.2" width="30.3" height="57.3" rx="3" fill="#2a78d6" fill-opacity="0.55" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="179.7" y="329.9" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="179.7" y="301.1" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="189.0" y="327.9" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C1</text>
+<rect x="103.6" y="282.3" width="62.8" height="62.8" rx="3" fill="#8a8676" fill-opacity="0.55" stroke="#8a8676" stroke-width="1.5"/>
+<rect x="120.0" y="298.7" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="135.0" y="317.7" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">TP5</text>
+<rect x="203.8" y="157.2" width="30.3" height="57.3" rx="3" fill="#4a3aa7" fill-opacity="0.55" stroke="#4a3aa7" stroke-width="1.5"/>
+<rect x="209.7" y="191.9" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="209.7" y="163.1" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="219.0" y="189.9" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C11</text>
+<rect x="203.8" y="226.2" width="30.3" height="57.3" rx="3" fill="#4a3aa7" fill-opacity="0.55" stroke="#4a3aa7" stroke-width="1.5"/>
+<rect x="209.7" y="260.9" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="209.7" y="232.1" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="219.0" y="258.9" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C12</text>
+<rect x="504.8" y="122.2" width="58.5" height="30.9" rx="3" fill="#2a78d6" fill-opacity="0.55" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="510.6" y="128.0" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="541.2" y="128.0" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="534.0" y="141.6" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">R1</text>
+<rect x="58.6" y="168.3" width="62.8" height="62.8" rx="3" fill="#8a8676" fill-opacity="0.55" stroke="#8a8676" stroke-width="1.5"/>
+<rect x="75.0" y="184.7" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="90.0" y="203.7" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">TP2</text>
+<rect x="234.8" y="157.2" width="250.5" height="250.5" rx="3" fill="#2a78d6" fill-opacity="0.55" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="280.1" y="202.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="280.1" y="244.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="280.1" y="286.5" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="280.1" y="328.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="322.0" y="202.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="322.0" y="244.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="322.0" y="286.5" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="322.0" y="328.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="364.1" y="202.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="364.1" y="244.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="364.1" y="286.5" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="364.1" y="328.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="406.1" y="202.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="406.1" y="244.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="406.1" y="286.5" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="406.1" y="328.6" width="33.9" height="33.9" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="196.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="211.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="226.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="241.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="256.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="271.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="286.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="301.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="316.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="331.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="346.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="243.8" y="361.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="273.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="288.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="303.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="318.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="333.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="348.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="363.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="378.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="393.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="408.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="423.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="438.8" y="372.5" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="361.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="346.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="331.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="316.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="301.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="286.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="271.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="256.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="241.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="226.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="211.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="450.0" y="196.2" width="26.2" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="438.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="423.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="408.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="393.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="378.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="363.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="348.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="333.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="318.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="303.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="288.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="273.8" y="166.2" width="7.5" height="26.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="276.0" y="198.5" width="168.0" height="168.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="360.0" y="286.5" font-size="15" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">U1</text>
+<rect x="482.9" y="164.2" width="30.3" height="57.3" rx="3" fill="#2a78d6" fill-opacity="0.55" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="488.7" y="198.8" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="488.7" y="170.0" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="498.0" y="196.8" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C3</text>
+<circle cx="102.9" cy="372.2" r="12.0" fill="#000000" stroke="#ffffff" stroke-width="1.5"/>
+<rect x="800.0" y="110.0" width="600.0" height="345.0" rx="30.0" fill="#1f4a33" fill-opacity="1.0" stroke="none" stroke-width="0"/>
+<rect x="1161.7" y="389.1" width="62.8" height="62.8" rx="3" fill="#eda100" fill-opacity="0.55" stroke="#eda100" stroke-width="1.5"/>
+<rect x="1178.0" y="405.5" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1193.0" y="424.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">J3</text>
+<rect x="1065.7" y="389.1" width="62.8" height="62.8" rx="3" fill="#eda100" fill-opacity="0.55" stroke="#eda100" stroke-width="1.5"/>
+<rect x="1082.0" y="405.5" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1097.0" y="424.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">J5</text>
+<rect x="1035.3" y="339.6" width="57.3" height="30.3" rx="3" fill="#eb6834" fill-opacity="0.55" stroke="#eb6834" stroke-width="1.5"/>
+<rect x="1041.2" y="345.5" width="16.8" height="18.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1070.0" y="345.5" width="16.8" height="18.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1064.0" y="358.8" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C18</text>
+<rect x="1272.7" y="323.5" width="122.7" height="97.5" rx="3" fill="#1baf7a" fill-opacity="0.55" stroke="#1baf7a" stroke-width="1.5"/>
+<rect x="1287.0" y="386.4" width="15.7" height="21.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1311.7" y="386.4" width="15.7" height="21.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1332.7" y="347.8" width="48.8" height="48.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1311.7" y="336.2" width="15.7" height="21.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1287.0" y="336.2" width="15.7" height="21.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1334.0" y="376.2" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">U2</text>
+<rect x="1115.2" y="161.2" width="125.7" height="104.7" rx="3" fill="#eda100" fill-opacity="0.55" stroke="#eda100" stroke-width="1.5"/>
+<rect x="1124.0" y="176.0" width="39.8" height="18.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1124.0" y="204.5" width="39.8" height="18.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1124.0" y="233.0" width="39.8" height="18.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1192.2" y="233.0" width="39.8" height="18.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1192.2" y="176.0" width="39.8" height="18.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1178.0" y="217.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">U3</text>
+<rect x="818.8" y="204.9" width="58.5" height="30.9" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="824.6" y="210.8" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="855.2" y="210.8" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="848.0" y="224.4" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">R5</text>
+<rect x="860.8" y="146.4" width="58.5" height="30.9" rx="3" fill="#e87ba4" fill-opacity="0.55" stroke="#e87ba4" stroke-width="1.5"/>
+<rect x="866.6" y="152.3" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="897.2" y="152.3" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="890.0" y="165.9" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">R10</text>
+<rect x="1084.8" y="150.3" width="30.3" height="57.3" rx="3" fill="#eda100" fill-opacity="0.55" stroke="#eda100" stroke-width="1.5"/>
+<rect x="1090.7" y="185.0" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1090.7" y="156.2" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1100.0" y="183.0" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C16</text>
+<rect x="1047.7" y="286.9" width="32.7" height="32.7" rx="3" fill="#eb6834" fill-opacity="0.55" stroke="#eb6834" stroke-width="1.5"/>
+<rect x="1044.2" y="288.8" width="13.8" height="9.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1044.2" y="308.0" width="13.8" height="9.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1070.0" y="308.0" width="13.8" height="9.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1070.0" y="288.8" width="13.8" height="9.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1053.8" y="293.0" width="20.4" height="20.4" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1064.0" y="307.2" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">U4</text>
+<rect x="1237.5" y="377.4" width="30.9" height="58.5" rx="3" fill="#1baf7a" fill-opacity="0.55" stroke="#1baf7a" stroke-width="1.5"/>
+<rect x="1243.4" y="413.9" width="19.2" height="16.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1243.4" y="383.3" width="19.2" height="16.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1253.0" y="410.7" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">R2</text>
+<rect x="1237.8" y="295.2" width="30.3" height="57.3" rx="3" fill="#1baf7a" fill-opacity="0.55" stroke="#1baf7a" stroke-width="1.5"/>
+<rect x="1243.7" y="329.9" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1243.7" y="301.1" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1253.0" y="327.9" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C13</text>
+<rect x="1035.3" y="229.6" width="57.3" height="30.3" rx="3" fill="#eb6834" fill-opacity="0.55" stroke="#eb6834" stroke-width="1.5"/>
+<rect x="1041.2" y="235.4" width="16.8" height="18.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1070.0" y="235.4" width="16.8" height="18.6" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1064.0" y="248.7" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C17</text>
+<rect x="804.7" y="392.4" width="62.8" height="62.8" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="821.0" y="408.8" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="836.0" y="427.8" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">J2</text>
+<rect x="852.7" y="392.4" width="62.8" height="62.8" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="869.0" y="408.8" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="884.0" y="427.8" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">J1</text>
+<rect x="822.6" y="361.9" width="32.7" height="20.7" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="824.9" y="363.2" width="9.0" height="18.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="844.1" y="363.2" width="9.0" height="18.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="839.0" y="376.2" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">D2</text>
+<rect x="818.8" y="312.1" width="58.5" height="30.9" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="824.6" y="317.9" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="855.2" y="317.9" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="848.0" y="331.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">R6</text>
+<rect x="902.8" y="204.9" width="58.5" height="30.9" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="908.6" y="210.8" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="939.2" y="210.8" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="932.0" y="224.4" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">R3</text>
+<rect x="1194.7" y="348.0" width="26.7" height="20.7" rx="3" fill="#eda100" fill-opacity="0.55" stroke="#eda100" stroke-width="1.5"/>
+<rect x="1184.0" y="354.5" width="15.6" height="7.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1216.4" y="354.5" width="15.6" height="7.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1208.0" y="362.4" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">D3</text>
+<rect x="876.6" y="361.9" width="32.7" height="20.7" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="878.9" y="363.2" width="9.0" height="18.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="898.1" y="363.2" width="9.0" height="18.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="893.0" y="376.2" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">D1</text>
+<rect x="1017.7" y="389.1" width="62.8" height="62.8" rx="3" fill="#eda100" fill-opacity="0.55" stroke="#eda100" stroke-width="1.5"/>
+<rect x="1034.0" y="405.5" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1049.0" y="424.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">J6</text>
+<rect x="830.1" y="259.2" width="35.7" height="32.7" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="835.1" y="285.2" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="845.6" y="285.2" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="856.1" y="285.2" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="856.1" y="260.0" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="845.6" y="260.0" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="835.1" y="260.0" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="834.4" y="271.9" width="10.5" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="851.1" y="271.9" width="10.5" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="848.0" y="279.6" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">Q2</text>
+<rect x="1012.5" y="135.9" width="30.9" height="58.5" rx="3" fill="#e87ba4" fill-opacity="0.55" stroke="#e87ba4" stroke-width="1.5"/>
+<rect x="1018.4" y="172.4" width="19.2" height="16.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1018.4" y="141.8" width="19.2" height="16.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1028.0" y="169.2" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">R8</text>
+<rect x="922.2" y="393.9" width="91.5" height="46.5" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="931.2" y="403.0" width="27.0" height="28.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="977.8" y="403.0" width="27.0" height="28.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="968.0" y="421.2" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C14</text>
+<rect x="1113.7" y="389.1" width="62.8" height="62.8" rx="3" fill="#eda100" fill-opacity="0.55" stroke="#eda100" stroke-width="1.5"/>
+<rect x="1130.0" y="405.5" width="30.0" height="30.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1145.0" y="424.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">J4</text>
+<rect x="914.1" y="259.2" width="35.7" height="32.7" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="919.1" y="285.2" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="929.6" y="285.2" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="940.1" y="285.2" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="940.1" y="260.0" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="929.6" y="260.0" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="919.1" y="260.0" width="4.8" height="6.0" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="918.4" y="271.9" width="10.5" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="935.2" y="271.9" width="10.5" height="7.5" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="932.0" y="279.6" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">Q1</text>
+<rect x="1240.8" y="150.3" width="30.3" height="57.3" rx="3" fill="#eda100" fill-opacity="0.55" stroke="#eda100" stroke-width="1.5"/>
+<rect x="1246.7" y="185.0" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1246.7" y="156.2" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1256.0" y="183.0" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C15</text>
+<rect x="982.5" y="135.9" width="30.9" height="58.5" rx="3" fill="#e87ba4" fill-opacity="0.55" stroke="#e87ba4" stroke-width="1.5"/>
+<rect x="988.4" y="172.4" width="19.2" height="16.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="988.4" y="141.8" width="19.2" height="16.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="998.0" y="169.2" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">R9</text>
+<rect x="1148.8" y="280.9" width="58.5" height="30.9" rx="3" fill="#eda100" fill-opacity="0.55" stroke="#eda100" stroke-width="1.5"/>
+<rect x="1154.6" y="286.7" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1185.2" y="286.7" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1178.0" y="300.3" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">R7</text>
+<rect x="1042.8" y="136.6" width="30.3" height="57.3" rx="3" fill="#e87ba4" fill-opacity="0.55" stroke="#e87ba4" stroke-width="1.5"/>
+<rect x="1048.7" y="171.2" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="1048.7" y="142.4" width="18.6" height="16.8" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="1058.0" y="169.2" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">C19</text>
+<rect x="902.8" y="312.1" width="58.5" height="30.9" rx="3" fill="#e34948" fill-opacity="0.55" stroke="#e34948" stroke-width="1.5"/>
+<rect x="908.6" y="317.9" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<rect x="939.2" y="317.9" width="16.2" height="19.2" rx="0" fill="#d9b36a" fill-opacity="0.9" stroke="none" stroke-width="0"/>
+<text x="932.0" y="331.5" font-size="11" font-weight="700" text-anchor="middle" fill="#ffffff" stroke="#000000" stroke-width="2.6" paint-order="stroke">R4</text>
+<circle cx="1357.1" cy="372.2" r="12.0" fill="#000000" stroke="#ffffff" stroke-width="1.5"/>
+<text x="1400" y="512" font-size="12" text-anchor="end" fill="#57606a">black dot, both faces = the mic sound port: a hole straight through the board</text>
+<rect x="36.0" y="534.0" width="16.0" height="16.0" rx="3" fill="#2a78d6" fill-opacity="0.8" stroke="none" stroke-width="0"/>
+<text x="60" y="548" font-size="14.5" font-weight="700" fill="#1f2328">1 · Brain</text>
+<text x="60" y="566" font-size="12" fill="#57606a">the MCU and the parts that keep it stable</text>
+<text x="60" y="588" font-size="12" fill="#1f2328"><tspan font-weight="700">U1</tspan>  STM32U575 microcontroller</text>
+<text x="76" y="603" font-size="11.5" fill="#57606a">runs everything: filters the mic, does the FFT, makes the tones, times</text>
+<text x="76" y="618" font-size="11.5" fill="#57606a">the PWM</text>
+<text x="60" y="637" font-size="12" fill="#1f2328"><tspan font-weight="700">C1</tspan>  100 nF</text>
+<text x="76" y="652" font-size="11.5" fill="#57606a">decoupling: a charge reservoir right at a supply pin, so current spikes</text>
+<text x="76" y="667" font-size="11.5" fill="#57606a">don't dip the supply</text>
+<text x="60" y="686" font-size="12" fill="#1f2328"><tspan font-weight="700">C2</tspan>  100 nF</text>
+<text x="76" y="701" font-size="11.5" fill="#57606a">decoupling for another VDD pin (one per pin: each pin's spikes are local)</text>
+<text x="60" y="720" font-size="12" fill="#1f2328"><tspan font-weight="700">C3</tspan>  100 nF</text>
+<text x="76" y="735" font-size="11.5" fill="#57606a">decoupling for the third VDD pin</text>
+<text x="60" y="754" font-size="12" fill="#1f2328"><tspan font-weight="700">C4</tspan>  4.7 µF</text>
+<text x="76" y="769" font-size="11.5" fill="#57606a">bulk store for the whole chip: covers slower dips the 100 nF ones can't</text>
+<text x="60" y="788" font-size="12" fill="#1f2328"><tspan font-weight="700">C5</tspan>  1 µF</text>
+<text x="76" y="803" font-size="11.5" fill="#57606a">VDDA (the analog supply): smooths it for the battery-voltage ADC</text>
+<text x="60" y="822" font-size="12" fill="#1f2328"><tspan font-weight="700">C6</tspan>  100 nF</text>
+<text x="76" y="837" font-size="11.5" fill="#57606a">VDDA high-frequency decoupling</text>
+<text x="60" y="856" font-size="12" fill="#1f2328"><tspan font-weight="700">C10</tspan>  100 nF</text>
+<text x="76" y="871" font-size="11.5" fill="#57606a">on NRST (reset): stops noise from resetting the chip</text>
+<text x="60" y="890" font-size="12" fill="#1f2328"><tspan font-weight="700">R1</tspan>  100 kΩ</text>
+<text x="76" y="905" font-size="11.5" fill="#57606a">holds BOOT0 low so the chip starts our program, not ST's bootloader</text>
+<rect x="36.0" y="920.0" width="16.0" height="16.0" rx="3" fill="#4a3aa7" fill-opacity="0.8" stroke="none" stroke-width="0"/>
+<text x="60" y="934" font-size="14.5" font-weight="700" fill="#1f2328">2 · Clock</text>
+<text x="60" y="952" font-size="12" fill="#57606a">the timing reference for everything</text>
+<text x="60" y="974" font-size="12" fill="#1f2328"><tspan font-weight="700">Y1</tspan>  32.768 kHz crystal</text>
+<text x="76" y="989" font-size="11.5" fill="#57606a">the accurate reference the 80 MHz clock is locked to: both ears then</text>
+<text x="76" y="1004" font-size="11.5" fill="#57606a">agree on pitch</text>
+<text x="60" y="1023" font-size="12" fill="#1f2328"><tspan font-weight="700">C11</tspan>  15 pF</text>
+<text x="76" y="1038" font-size="11.5" fill="#57606a">crystal load capacitor: sets the exact oscillation frequency</text>
+<text x="60" y="1057" font-size="12" fill="#1f2328"><tspan font-weight="700">C12</tspan>  15 pF</text>
+<text x="76" y="1072" font-size="11.5" fill="#57606a">the other load capacitor</text>
+<rect x="36.0" y="1087.0" width="16.0" height="16.0" rx="3" fill="#008300" fill-opacity="0.8" stroke="none" stroke-width="0"/>
+<text x="60" y="1101" font-size="14.5" font-weight="700" fill="#1f2328">3 · Core power</text>
+<text x="60" y="1119" font-size="12" fill="#57606a">the MCU's own 1.1 V switching supply</text>
+<text x="60" y="1141" font-size="12" fill="#1f2328"><tspan font-weight="700">L1</tspan>  2.2 µH inductor</text>
+<text x="76" y="1156" font-size="11.5" fill="#57606a">the energy store of the chip's built-in buck converter (3.0 → 1.1 V)</text>
+<text x="60" y="1175" font-size="12" fill="#1f2328"><tspan font-weight="700">C7</tspan>  10 µF</text>
+<text x="76" y="1190" font-size="11.5" fill="#57606a">buck input capacitor: supplies its 3 MHz current pulses locally</text>
+<text x="60" y="1209" font-size="12" fill="#1f2328"><tspan font-weight="700">C8</tspan>  2.2 µF</text>
+<text x="76" y="1224" font-size="11.5" fill="#57606a">buck output capacitor: smooths the 1.1 V core supply</text>
+<text x="60" y="1243" font-size="12" fill="#1f2328"><tspan font-weight="700">C9</tspan>  2.2 µF</text>
+<text x="76" y="1258" font-size="11.5" fill="#57606a">second output capacitor (ST requires two)</text>
+<rect x="530.0" y="534.0" width="16.0" height="16.0" rx="3" fill="#1baf7a" fill-opacity="0.8" stroke="none" stroke-width="0"/>
+<text x="554" y="548" font-size="14.5" font-weight="700" fill="#1f2328">4 · Ears</text>
+<text x="554" y="566" font-size="12" fill="#57606a">the ultrasonic mic</text>
+<text x="554" y="588" font-size="12" fill="#1f2328"><tspan font-weight="700">U2</tspan>  SPH0641 MEMS mic</text>
+<text x="570" y="603" font-size="11.5" fill="#57606a">hears 20–85 kHz; outputs a 1-bit stream at 4 MHz; ports through a hole</text>
+<text x="570" y="618" font-size="11.5" fill="#57606a">in the board</text>
+<text x="554" y="637" font-size="12" fill="#1f2328"><tspan font-weight="700">C13</tspan>  100 nF</text>
+<text x="570" y="652" font-size="11.5" fill="#57606a">the mic's decoupling: a clean supply means a quiet mic</text>
+<text x="554" y="671" font-size="12" fill="#1f2328"><tspan font-weight="700">R2</tspan>  33 Ω</text>
+<text x="570" y="686" font-size="11.5" fill="#57606a">in series with the 4 MHz mic clock: softens its edges so it radiates</text>
+<text x="570" y="701" font-size="11.5" fill="#57606a">less</text>
+<rect x="530.0" y="716.0" width="16.0" height="16.0" rx="3" fill="#e34948" fill-opacity="0.8" stroke="none" stroke-width="0"/>
+<text x="554" y="730" font-size="14.5" font-weight="700" fill="#1f2328">5 · Voice</text>
+<text x="554" y="748" font-size="12" fill="#57606a">the H-bridge that drives the transducer</text>
+<text x="554" y="770" font-size="12" fill="#1f2328"><tspan font-weight="700">Q1</tspan>  PMCXB290UE N+P pair</text>
+<text x="570" y="785" font-size="11.5" fill="#57606a">one half of the H-bridge: switches transducer end A between 3.0 V and</text>
+<text x="570" y="800" font-size="11.5" fill="#57606a">ground</text>
+<text x="554" y="819" font-size="12" fill="#1f2328"><tspan font-weight="700">Q2</tspan>  PMCXB290UE N+P pair</text>
+<text x="570" y="834" font-size="11.5" fill="#57606a">the other half: end B. A and B in antiphase = ±3 V across the coil</text>
+<text x="554" y="853" font-size="12" fill="#1f2328"><tspan font-weight="700">R3</tspan>  100 kΩ</text>
+<text x="570" y="868" font-size="11.5" fill="#57606a">gate pull-up: keeps Q1's P-FET off while the MCU boots (its pins float</text>
+<text x="570" y="883" font-size="11.5" fill="#57606a">at reset)</text>
+<text x="554" y="902" font-size="12" fill="#1f2328"><tspan font-weight="700">R4</tspan>  100 kΩ</text>
+<text x="570" y="917" font-size="11.5" fill="#57606a">gate pull-down: keeps Q1's N-FET off at reset (no shoot-through at</text>
+<text x="570" y="932" font-size="11.5" fill="#57606a">power-up)</text>
+<text x="554" y="951" font-size="12" fill="#1f2328"><tspan font-weight="700">R5</tspan>  100 kΩ</text>
+<text x="570" y="966" font-size="11.5" fill="#57606a">same for Q2's P-FET</text>
+<text x="554" y="985" font-size="12" fill="#1f2328"><tspan font-weight="700">R6</tspan>  100 kΩ</text>
+<text x="570" y="1000" font-size="11.5" fill="#57606a">same for Q2's N-FET</text>
+<text x="554" y="1019" font-size="12" fill="#1f2328"><tspan font-weight="700">D1</tspan>  ESD diode</text>
+<text x="570" y="1034" font-size="11.5" fill="#57606a">protects the bridge from static on the transducer wire (it touches your</text>
+<text x="570" y="1049" font-size="11.5" fill="#57606a">skin)</text>
+<text x="554" y="1068" font-size="12" fill="#1f2328"><tspan font-weight="700">D2</tspan>  ESD diode</text>
+<text x="570" y="1083" font-size="11.5" fill="#57606a">same, other wire</text>
+<text x="554" y="1102" font-size="12" fill="#1f2328"><tspan font-weight="700">C14</tspan>  22 µF</text>
+<text x="570" y="1117" font-size="11.5" fill="#57606a">local reservoir for the bridge's current peaks, so they don't pull the</text>
+<text x="570" y="1132" font-size="11.5" fill="#57606a">3.0 V rail down</text>
+<text x="554" y="1151" font-size="12" fill="#1f2328"><tspan font-weight="700">J1</tspan>  wire pad</text>
+<text x="570" y="1166" font-size="11.5" fill="#57606a">transducer wire A</text>
+<text x="554" y="1185" font-size="12" fill="#1f2328"><tspan font-weight="700">J2</tspan>  wire pad</text>
+<text x="570" y="1200" font-size="11.5" fill="#57606a">transducer wire B</text>
+<rect x="1010.0" y="534.0" width="16.0" height="16.0" rx="3" fill="#eda100" fill-opacity="0.8" stroke="none" stroke-width="0"/>
+<text x="1034" y="548" font-size="14.5" font-weight="700" fill="#1f2328">6 · Battery + charging</text>
+<text x="1034" y="566" font-size="12" fill="#57606a">fills and holds the cell</text>
+<text x="1034" y="588" font-size="12" fill="#1f2328"><tspan font-weight="700">U3</tspan>  MCP73831 charger</text>
+<text x="1050" y="603" font-size="11.5" fill="#57606a">charges the LiPo safely: constant current, then constant 4.2 V, then</text>
+<text x="1050" y="618" font-size="11.5" fill="#57606a">stops</text>
+<text x="1034" y="637" font-size="12" fill="#1f2328"><tspan font-weight="700">R7</tspan>  22 kΩ</text>
+<text x="1050" y="652" font-size="11.5" fill="#57606a">sets the charge current: 1000 V / 22 kΩ = 45 mA (gentle for a 105 mAh</text>
+<text x="1050" y="667" font-size="11.5" fill="#57606a">cell)</text>
+<text x="1034" y="686" font-size="12" fill="#1f2328"><tspan font-weight="700">C15</tspan>  4.7 µF</text>
+<text x="1050" y="701" font-size="11.5" fill="#57606a">charger input capacitor</text>
+<text x="1034" y="720" font-size="12" fill="#1f2328"><tspan font-weight="700">C16</tspan>  4.7 µF</text>
+<text x="1050" y="735" font-size="11.5" fill="#57606a">charger output / battery-side capacitor</text>
+<text x="1034" y="754" font-size="12" fill="#1f2328"><tspan font-weight="700">D3</tspan>  ESD / TVS diode</text>
+<text x="1050" y="769" font-size="11.5" fill="#57606a">clamps static and reverse polarity on the exposed charge contacts</text>
+<text x="1034" y="788" font-size="12" fill="#1f2328"><tspan font-weight="700">J3</tspan>  wire pad</text>
+<text x="1050" y="803" font-size="11.5" fill="#57606a">charge contact + (5 V from the dock)</text>
+<text x="1034" y="822" font-size="12" fill="#1f2328"><tspan font-weight="700">J4</tspan>  wire pad</text>
+<text x="1050" y="837" font-size="11.5" fill="#57606a">charge contact − (ground)</text>
+<text x="1034" y="856" font-size="12" fill="#1f2328"><tspan font-weight="700">J5</tspan>  wire pad</text>
+<text x="1050" y="871" font-size="11.5" fill="#57606a">battery +</text>
+<text x="1034" y="890" font-size="12" fill="#1f2328"><tspan font-weight="700">J6</tspan>  wire pad</text>
+<text x="1050" y="905" font-size="11.5" fill="#57606a">battery −</text>
+<rect x="1010.0" y="920.0" width="16.0" height="16.0" rx="3" fill="#eb6834" fill-opacity="0.8" stroke="none" stroke-width="0"/>
+<text x="1034" y="934" font-size="14.5" font-weight="700" fill="#1f2328">7 · 3.0 V rail</text>
+<text x="1034" y="952" font-size="12" fill="#57606a">the clean supply for everything else</text>
+<text x="1034" y="974" font-size="12" fill="#1f2328"><tspan font-weight="700">U4</tspan>  TPS7A2030 LDO</text>
+<text x="1050" y="989" font-size="11.5" fill="#57606a">turns 3.3–4.2 V from the cell into a steady 3.0 V, very quietly (7 µV</text>
+<text x="1050" y="1004" font-size="11.5" fill="#57606a">noise)</text>
+<text x="1034" y="1023" font-size="12" fill="#1f2328"><tspan font-weight="700">C17</tspan>  1 µF</text>
+<text x="1050" y="1038" font-size="11.5" fill="#57606a">LDO input capacitor</text>
+<text x="1034" y="1057" font-size="12" fill="#1f2328"><tspan font-weight="700">C18</tspan>  1 µF</text>
+<text x="1050" y="1072" font-size="11.5" fill="#57606a">LDO output capacitor: it needs one to stay stable</text>
+<rect x="1010.0" y="1087.0" width="16.0" height="16.0" rx="3" fill="#e87ba4" fill-opacity="0.8" stroke="none" stroke-width="0"/>
+<text x="1034" y="1101" font-size="14.5" font-weight="700" fill="#1f2328">8 · Button + battery gauge</text>
+<text x="1034" y="1119" font-size="12" fill="#57606a">your input, and how full the cell is</text>
+<text x="1034" y="1141" font-size="12" fill="#1f2328"><tspan font-weight="700">R8</tspan>  1 MΩ</text>
+<text x="1050" y="1156" font-size="11.5" fill="#57606a">top of a divider: halves the battery voltage so the ADC can read it</text>
+<text x="1034" y="1175" font-size="12" fill="#1f2328"><tspan font-weight="700">R9</tspan>  1 MΩ</text>
+<text x="1050" y="1190" font-size="11.5" fill="#57606a">bottom of the divider (2 µA total drain)</text>
+<text x="1034" y="1209" font-size="12" fill="#1f2328"><tspan font-weight="700">C19</tspan>  100 nF</text>
+<text x="1050" y="1224" font-size="11.5" fill="#57606a">holds the divider's voltage steady while the ADC samples it</text>
+<text x="1034" y="1243" font-size="12" fill="#1f2328"><tspan font-weight="700">SW1</tspan>  push button</text>
+<text x="1050" y="1258" font-size="11.5" fill="#57606a">volume, mode, wake from sleep</text>
+<text x="1034" y="1277" font-size="12" fill="#1f2328"><tspan font-weight="700">R10</tspan>  100 kΩ</text>
+<text x="1050" y="1292" font-size="11.5" fill="#57606a">holds the button line low until pressed, so it never reads a phantom</text>
+<text x="1050" y="1307" font-size="11.5" fill="#57606a">press</text>
+<rect x="1010.0" y="1322.0" width="16.0" height="16.0" rx="3" fill="#8a8676" fill-opacity="0.8" stroke="none" stroke-width="0"/>
+<text x="1034" y="1336" font-size="14.5" font-weight="700" fill="#1f2328">9 · Programming pads</text>
+<text x="1034" y="1354" font-size="12" fill="#57606a">how firmware gets in</text>
+<text x="1034" y="1376" font-size="12" fill="#1f2328"><tspan font-weight="700">TP1</tspan>  SWDIO pad</text>
+<text x="1050" y="1391" font-size="11.5" fill="#57606a">debug data line: program and single-step the chip</text>
+<text x="1034" y="1410" font-size="12" fill="#1f2328"><tspan font-weight="700">TP2</tspan>  SWCLK pad</text>
+<text x="1050" y="1425" font-size="11.5" fill="#57606a">debug clock</text>
+<text x="1034" y="1444" font-size="12" fill="#1f2328"><tspan font-weight="700">TP3</tspan>  NRST pad</text>
+<text x="1050" y="1459" font-size="11.5" fill="#57606a">reset, for the programmer</text>
+<text x="1034" y="1478" font-size="12" fill="#1f2328"><tspan font-weight="700">TP4</tspan>  3V0 pad</text>
+<text x="1050" y="1493" font-size="11.5" fill="#57606a">lets the programmer sense the supply</text>
+<text x="1034" y="1512" font-size="12" fill="#1f2328"><tspan font-weight="700">TP5</tspan>  GND pad</text>
+<text x="1050" y="1527" font-size="11.5" fill="#57606a">common ground for the programmer</text>
+</svg>
