@@ -25,3 +25,6 @@ hw/pod/draft/*.svg
 hw/pod/kicad-draft.zip
 hw/pod/kicad-draft/*.kicad_prl
 hw/pod/kicad-draft/*-backups/
+
+# Owner's local drop folder (bundle parts, datasheets); kept out of git
+"From Valkyrie/"

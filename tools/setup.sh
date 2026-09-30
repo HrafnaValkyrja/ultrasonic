@@ -27,7 +27,8 @@ KICAD_SERIES=10.0
 FR_VERSION=2.4.1
 FR_SHA256=251101c3eeac22d7e7dfcf6796603279e5d1000283eb82d8f093780f7afc6aa9
 FR_URL="https://github.com/freerouting/freerouting/releases/download/v${FR_VERSION}/freerouting-${FR_VERSION}.jar"
-PY312=/usr/bin/python3.12
+# The venv must run the interpreter KiCad's pcbnew bindings are built against: the distro's
+# python3 (Ubuntu 24.04 -> 3.12, 26.04 -> 3.14). Detected, not pinned; see sys_python().
 NEWLIB_HARDFP=/usr/lib/arm-none-eabi/newlib/thumb/v7e-m+fp/hard/libc.a
 MMDC_VERSION=11.17.0
 
@@ -216,11 +217,22 @@ done_step
 
 # 3. Python venv ----------------------------------------------------------------------------
 step "Python venv ($ULTRA_VENV)"
-[ -x "$PY312" ] || fail "$PY312 not found (KiCad's pcbnew bindings are built for Python 3.12)"
+# Pick the interpreter that can import pcbnew (KiCad drops it in /usr/lib/python3/dist-packages,
+# which is on the distro python3's path). Falls back to python3 if KiCad isn't installed yet.
+sys_python() {
+  local c
+  for c in /usr/bin/python3 /usr/bin/python3.1[0-9]; do
+    [ -x "$c" ] && "$c" -c 'import pcbnew' 2>/dev/null && { echo "$c"; return 0; }
+  done
+  [ -x /usr/bin/python3 ] && { echo /usr/bin/python3; return 0; }
+  return 1
+}
+SYS_PY="$(sys_python)" || fail "no /usr/bin/python3 found"
+PY_MM="$("$SYS_PY" -c 'import sys; print("%d.%d" % sys.version_info[:2])')"
 if [ ! -x "$ULTRA_VENV/bin/python" ] || \
-   ! "$ULTRA_VENV/bin/python" -c 'import sys; sys.exit(sys.version_info[:2] != (3, 12))' 2>/dev/null; then
+   [ "$("$ULTRA_VENV/bin/python" -c 'import sys; print("%d.%d" % sys.version_info[:2])' 2>/dev/null)" != "$PY_MM" ]; then
   rm -rf "$ULTRA_VENV"
-  run "$PY312" -m venv --system-site-packages "$ULTRA_VENV"
+  run "$SYS_PY" -m venv --system-site-packages "$ULTRA_VENV"
 fi
 run env PIP_DISABLE_PIP_VERSION_CHECK=1 "$ULTRA_VENV/bin/python" -m pip install -q --no-cache-dir \
     -r "$REPO/tools/requirements.txt" -c "$REPO/tools/constraints.txt"

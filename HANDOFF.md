@@ -21,7 +21,9 @@ If the hash doesn't match, find the bad part by size (every part except part19 i
 **How this session got here:** `claude --teleport session_016uLR3rVesNK6FmgR7vwByF`, run from a clean checkout of the repo. That carries the whole cloud conversation over. Paths in that history (`/home/user/ultrasonic`, `/tmp/claude-0/...scratchpad`) are the cloud's; locally they are the repo and `../ultrasonic-scratch`.
 
 ## One-time setup on Valhalla
-1. **Linux shell:** on Windows, use **WSL2 with Ubuntu 24.04**. `tools/setup.sh` is apt-based and installs KiCad 10, ngspice, FreeRouting, the Python venv and mermaid-cli.
+1. **Machine (confirmed 2026-09-30):** native **Ubuntu 26.04.1 LTS** (codename `resolute`), KDE/Wayland, 32 threads, 30 GB RAM. No WSL. Repo at `~/Desktop/ultrasonic`, scratch at `~/Desktop/ultrasonic-scratch`.
+   - **Python is 3.14**, and KiCad 10 for 26.04 is built against it, so `tools/setup.sh` detects the interpreter instead of pinning 3.12 (it used to assume the 24.04 cloud image).
+   - **sudo needs a password**: `setup.sh` uses `sudo -n`, so authenticate first with `SUDO_ASKPASS=/usr/bin/ksshaskpass sudo -A -v` (pops a KDE dialog) and keep the timestamp alive during long installs.
 2. **Clone and set up:**
    ```bash
    git clone <repo> ultrasonic && cd ultrasonic && git checkout claude/clever-mayer-s5rxuw
