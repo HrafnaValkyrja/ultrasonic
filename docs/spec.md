@@ -1,4 +1,4 @@
-# Stereo Ultrasound — Project Spec v0.6
+# Stereo Ultrasound — Project Spec v0.7
 
 **Owner:** Valkyrie
 **Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. v0.5 applies the full-plan sanity check (`docs/research/review-2026-09-30.md`). Next: shopping-list approval (O3) → Phase 1 simulation and first bench orders. No hardware purchased.
@@ -82,16 +82,21 @@ Every rate in the chain is an integer ratio of one 80 MHz clock. Any switching i
 Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** marks the version that changed it.
 
 ### D1. Output site: at the tragus (primary); root of the cheekbone arch (fallback) `[High]` — **v0.5: moved to the tragus, owner-confirmed**
-- **Primary site (owner, 2026-09-30):** against the front of the tragus. The owner confirmed this is *easier* to fit than the cheekbone-arch spot alongside the Ear Opens.
+- **Primary site (owner, 2026-09-30; refined v0.7):** the skin **just in front of the tragus, at its base, at mid-tragus height**. The owner confirmed the tragus area is *easier* to fit than the cheekbone-arch spot alongside the Ear Opens. Geometry: `docs/research/ear-open-fit.md`.
   - **Why it wins:** the literature predicts ~10 dB more loudness and 25–40 dB of left/right isolation instead of ~10–15 dB. The mechanism is *cartilage conduction*: vibrating the tragal cartilage radiates sound into the ear canal (Surendran 2023).
   - **Consequences:** more loudness per milliwatt (battery, R1); much less crosstalk between sides (stereo, R5, D2).
-  - **Caveat:** the jaw joint (mandibular condyle) sits directly in front of the tragus and moves when you talk or chew. Press on the tragus itself, or just above the joint, not on the soft spot over it. E2 finds the exact point, including talk-and-chew checks (T5).
+  - **Fit with the Ear (open) (v0.7):**
+    - Its hook junction comes down the front of the ear at the helix root, *above* the tragus, sitting 0–3 mm proud of the ear's front edge.
+    - Its pod angles down and back into the ear bowl (concha), and its speaker grille aims at the canal entrance behind the tragus.
+    - The only free contact spot near the canal is therefore **in front of the tragus, below the junction**. "Above the jaw joint" (v0.6 advice) is taken by the junction.
+  - **Press inward (into the head), not backward.** Pushing the tragus flap back narrows the canal entrance the Ear (open) aims into, which breaks T4.
+  - **Jaw:** the condyle is directly in front of the tragus, so this skin moves when you chew or open wide. The spring must hold ≥1 N through that motion (E2: talk and chew; T5).
   - The ear canal must stay open for the cartilage path to work. The Ear Opens don't block it.
 - **Fallback site:** root of the zygomatic arch, about one finger-width above the jaw joint and 1–1.5 cm forward of the tragus. Kept in E2 as the comparison.
 - **Evidence** (`docs/research/bone-conduction.md`):
   - The condyle region is 5–10 dB more sensitive than the mastoid at 1–4 kHz, and 3–14 dB more than the temple (McBride 2005/2008).
   - Localization through condyle-placed transducers matches headphones: ~23° error vs ~20° (Wang 2022).
-- **Contact force:** aim for **≥1 N** through a broad, compliant pad. Our inertial exciter loses only a few dB at ~1 N; below ~0.5 N coupling gets weaker and less repeatable. T5 comfort is the limit.
+- **Contact force:** aim for **≥1 N** through a compliant pad of **~8 mm** diameter (or an 8×10 mm oval, long axis vertical), which fits the pocket. That's ~17–20 kPa. Our inertial exciter loses only a few dB at ~1 N; below ~0.5 N coupling gets weaker and less repeatable. T5 comfort is the limit.
 - **Rejected:**
   - Streaming to the Ear Opens (violates §1.2.2).
   - Temple: 3–14 dB worse, and a glasses-pressure headache spot.
@@ -360,7 +365,10 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
   - **PCB size** `[Med]` (parts-area estimate): ~10×20 mm with parts on both sides (4-layer), or ~10×28 mm single-sided. The 7×7 mm MCU sets the ~10 mm width.
   - The mic faces outward here: the head-shadow cue needs it on the side of the head, and the front keeps it clear of hair and the Ear Open.
 - **Battery bay, behind the front module along the temple arm:** the cell lies along the arm (long axis front-to-back), centred ~50–60 mm behind the hinge. It ends before the Ear Open hook, so nothing is behind the ear (§1.2.4). A 2-wire link runs from the front module.
-- **Transducer at the tragus** on a short spring arm, pressing with **≥1 N** through a broad compliant pad (D1). Clear of the Ear Open pod through head turns, talking and chewing.
+- **Transducer arm (v0.7, `docs/research/ear-open-fit.md`):** an **"L" or "J" spring arm** attached to the temple arm ~10–15 mm in front of the ear.
+  - It drops **in front of** the Ear (open)'s hook junction, then turns back to an ~8 mm pad on the skin just in front of the tragus, pressing inward with ≥1 N.
+  - **Clearance:** ≥5 mm from every part of the Ear (open) in nominal fit; ≥8 mm for the vertical run. It must stay clear if the Ear (open) shifts ~3 mm.
+  - If bumped, it deflects *away* from the Ear (open). Smooth, low profile against long hair (R16).
 - **Balance** (`sim/checks/balance.py`; added load per side, estimated masses):
 
   | Layout | ~105 mAh cell (7.3 g) | ~150 mAh cell (8.8 g) |
@@ -540,6 +548,7 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 | E6 | **New.** Mic-clock duty cycle (scope) | R13 |
 | E7 | **New.** Low-level distortion and idle silence on the bridge test board | R9, R12 |
 | E8 | **New.** Stereo A/B: free-running vs shared clock (S4) | R5, D2 |
+| E9 | **New v0.7.** Photo measurement: glasses + Ear (open) worn, mm ruler at the ear; lateral view of both ears, rear-oblique view, and mouth-open view (procedure in `ear-open-fit.md`) | D1 pad location, D4 arm geometry, keep-out at true scale |
 
 **Suggested order:** O1 and O3 → order transducers and Nucleos → JLC board designs → C1 → Phase 1 algorithms → S1/S2 as parts arrive → B-series → D-series.
 
@@ -575,6 +584,12 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ---
 
 ## 15. Changelog
+
+### v0.7 (2026-09-30) — fit around the Nothing Ear (open)
+- Analyzed Ear (open) geometry from official dimensions (51.3×41.4×14.4 mm, 8.1 g, 14.2 mm driver) and review photos (`docs/research/ear-open-fit.md`). Its hook junction sits above the tragus and slightly proud of the ear's front edge; its pod angles back into the concha; its speaker aims at the canal behind the tragus.
+- **D1 refined:** contact on the skin just in front of the tragus, at its base, below the junction, pressing inward (not backward: T4). ~8 mm pad. The v0.6 hint "above the jaw joint" collides with the junction and is withdrawn.
+- **§8:** "L/J" transducer arm dropping in front of the Ear (open); ≥5 mm clearance (≥8 mm for the vertical run); deflects away if bumped.
+- **E9 new:** owner photo measurement to set the keep-out zones at true scale.
 
 ### v0.6 (2026-09-30) — runtime and balance
 - **O1 resolved (owner):** ≥8 h per charge, target ~12 h, design for balance. **D18 new.**
