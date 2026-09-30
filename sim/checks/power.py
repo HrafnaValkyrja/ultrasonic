@@ -20,16 +20,18 @@ OUT.mkdir(parents=True, exist_ok=True)
 
 ACTIVE = {   # full chain running (algorithm B)
     "mic, ultrasonic mode": (0.9, 1.0, 1.1),          # SPH0641LU4H-1: 845 uA typ; more at 3.0 V and 4 MHz
-    "MCU, algo B, 80 MHz on SMPS": (0.9, 1.3, 1.6),   # 44-65 Mcycle/s (C2) x 19.5 uA/MHz (DS13737 Tab.37) + sleep
-    "peripherals (TIM1, MDF, DMA)": (0.6, 0.8, 1.0),
+    # U575 at 80 MHz, Range 2, SMPS: ~40-45 uA/MHz in Ranges 1-3 (DS13737 Rev 8 Table 39, 3.0 V);
+    # the 19.5 uA/MHz headline is Range 4 only, which we don't use on the SMPS (A3-u575-plan.md)
+    "MCU, algo B, 80 MHz on SMPS": (2.3, 2.7, 3.2),
+    "peripherals (TIM1, ADF, DMA)": (0.4, 0.6, 0.8),  # ADF ~40 uA vs MDF ~0.28 mA (A3-u575-plan.md)
     "bridge gate charge + ripple": (0.4, 0.5, 0.6),   # 4 FETs x ~0.5 nC x 200 kHz (B1)
     "transducer, listening level": (0.6, 1.1, 1.7),   # tragus site (D1); E4 measures
     "LDO, crystal, protection": (0.03, 0.05, 0.08),
 }
 IDLE = {     # nothing ultrasonic: band detectors only, bridge stopped
     "mic, ultrasonic mode": (0.9, 1.0, 1.1),          # stays on: the detector needs the band
-    "MCU, detectors at 16 MHz on SMPS": (0.25, 0.4, 0.6),
-    "peripherals (MDF, DMA)": (0.25, 0.35, 0.5),
+    "MCU, detectors at 16 MHz, Range 3, SMPS": (0.5, 0.7, 1.0),
+    "peripherals (ADF, DMA)": (0.05, 0.1, 0.2),
     "LDO, crystal, protection": (0.03, 0.05, 0.08),
 }
 USABLE = 0.85          # usable fraction of rated capacity (cut-off above the knee, ageing)

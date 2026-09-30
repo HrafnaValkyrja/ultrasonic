@@ -1,4 +1,4 @@
-# Stereo Ultrasound — Project Spec v0.12
+# Stereo Ultrasound — Project Spec v0.13
 
 **Owner:** Valkyrie
 **Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. v0.5 applies the full-plan sanity check (`docs/research/review-2026-09-30.md`). Next: shopping-list approval (O3) → Phase 1 simulation and first bench orders. No hardware purchased.
@@ -141,6 +141,14 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
   - Drop-in alternative: STM32U585CIU6Q (same chip plus crypto).
   - JLC (2026-09-30): U575CIU6Q C5271013, 8 in stock, $8.93; U585CIU6Q C5271021, 15 in stock, $12.52. Stock is thin, so buy early.
   - **Must re-verify before the schematic (A1/A3 reopened):** the U5 replaces DFSDM with the **MDF/ADF** digital filters, so the clock plan, filter orders and pin map need redoing. Also the advanced timer with complementary outputs and dead time for the bridge, and the SMPS inductor layout.
+- **v0.13: U5 plan done** (`docs/research/A3-u575-plan.md`; DS13737 Rev 8, RM0456 Rev 6, ES0499 Rev 10).
+  - **Correction:** ~19.5 µA/MHz applies only in voltage Range 4. In Ranges 1–3 on the SMPS it's **~40–45 µA/MHz**, so algorithm B at 80 MHz draws **~2.5–3 mA**, not ~0.9 mA. That's ~45% less than the L452, not ~75%.
+  - **Pins (SMPS package):**
+    - mic on the **ADF**, which draws ~8× less current than the MDF and keeps running in Stop 2: clock **PB3**, data **PB4**;
+    - bridge PA8/PA7/PA9/PB0 (TIM1 CH1/CH1N/CH2/CH2N, unchanged);
+    - button PA0; battery sense PA4; SWD PA13/PA14; crystal PC14/PC15. Never toggle PC13, which sits next to the crystal (ES0499 §2.2.1).
+    - Using PB3 costs the SWO trace pin. Fallback is the MDF on PB8/PB1.
+  - SMPS parts: 2.2 µH inductor (Murata LQM21PN2R2MGHL, a 0805 chip inductor; C341781, Extended, 6,100 in stock on 2026-09-30), 2 × 2.2 µF on VDD11, 10 µF at the SMPS input.
 ### D6. Output stage: 200 kHz 2-level PWM, 3rd-order noise shaping, discrete H-bridge `[Med]` — **Rewritten v0.5**
 - **What it is:** TIM1, the MCU's motor-control timer, switches an H-bridge made of two complementary MOSFET pairs (each pair is one N-channel + one P-channel transistor in a 1.6 mm package). The bridge drives the transducer directly, and the transducer coil smooths the switching into sound.
 - **Carrier:** **200 kHz**, centre-aligned (ARR = 200), with one duty update per period over DMA. It is synchronous with the input chain (D14), and 201 duty levels.
@@ -187,7 +195,7 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 ### D11. Switching regulator for the MCU core; linear for everything else `[Med]` — **Changed v0.12 (owner)**
 - The owner removed the no-switching rule. The limit is now that self-noise is no louder than the ambient background (§1.2.3).
 - **Use:** the MCU's internal SMPS for its ~1.2 V core only. That's where the efficiency gain is: the core's LDO throws away about 60% of its input.
-  - Keep it in forced fixed-frequency (PWM) mode, never burst/skip mode, which is the usual source of audible whine at light load.
+  - Keep it in fixed-frequency (PWM) mode, never burst/skip mode, which is the usual source of audible whine at light load. **v0.13:** the U5 has no mode bit for this. Its SMPS switches at a fixed ~3 MHz in voltage Ranges 1–3 and runs asynchronously only in Range 4. **Rule: never run Range 4 on the SMPS.** Stop 2 stays on the SMPS (ES0499 §2.2.22: Stop 2 on the LDO with RAM partly off can lock the part).
   - Use a shielded, low-magnetostriction inductor, with no Class-2 ceramics on the switching node.
 - **Main 3.0 V rail stays a linear LDO.** A battery-to-3.0 V buck would save only ~10%, and the mic and bridge supply benefit from a quiet rail.
 - **Check:** the owner's listening test on the bench (E11). If whine is audible over a quiet room's background, fall back to the LDO. The chip can switch regulators on the fly.
@@ -195,7 +203,7 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 ### D12. Modes `[High]` as requirements
 - **Full:** the whole band, pitched down.
 - **Transient-only (indoor default):** steady tones (charger and LED-driver whine) suppressed; changing sounds (chirps, clicks, rustles) passed through.
-- **Off:** silent. MCU in Stop 2 (~2 µA), mic unpowered, bridge stopped.
+- **Off:** silent. MCU in Stop 2 (~4–9 µA on the U5, v0.13), mic unpowered, bridge stopped.
 - **v0.11 (owner):** if log compression (B) sounds better in Phase 1 listening, it becomes the **only** processing mode. The always-on current difference is ~1.6 mA, and with idle-listening mode ~0.4 mA. Heterodyne (A) stays in the code only as a fallback if B won't fit the CPU (R3).
 
 ### D13. Mic = SPH0641LU4H-1 digital MEMS with ultrasonic mode `[High]` — **v0.5: lifecycle OK, response data**
@@ -230,6 +238,11 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 - **DFSDM details** (RM0394; `A3-clock-and-peripherals.md` §3):
   - The CKOUT divider can only change with DFSDM disabled. The standard→ultrasonic mode switch is therefore stop, re-divide, restart; the µs gap is harmless `[Med]`.
   - Use **filter 0** (DMA1 channel 5). Filter 1 shares channel 6 with TIM1's update request.
+- **v0.13, STM32U575 (`A3-u575-plan.md`):**
+  - Clock: MSI locked to the 32.768 kHz crystal, **80 MHz in voltage Range 2** (allows up to 110 MHz). Actual 80.009 MHz; mic clock 4.0004 MHz; PWM period 200 counts; dead time in 12.5 ns steps, set separately for rising and falling edges.
+  - Mic decimation in hardware: ADF sinc5 ÷5 → 800 kS/s, then its reshape filter ÷4 → **200 kS/s** (passes to ~89 kHz, rejects ~70 dB above ~120 kHz). The CPU half-band disappears. Fallback: ÷10 + CPU half-band, as before. ST publishes no response at this rate, so S1 sweeps it.
+  - GPDMA takes any request on any channel, so the L452's DMA conflict is gone.
+  - Idle mode: ADF + low-power DMA keep filling a ~40 ms look-back buffer in Stop 2. The ADF's built-in sound-activity detector is broadband: speech and footsteps trip it as easily as bats. So band detection stays in software (C9).
 - **⚠️ Duty-cycle risk:** DFSDM's clock output is characterized at 45–55% on a sister chip. The mic needs 48–52%. Typical is 50%, and **S1 scopes it**. Fallback: a timer-generated clock into DFSDM's CKIN pin.
 - **Decimation choice (S1 measures both):**
   - default ÷10 + CPU half-band (5–10 MHz of CPU, cleaner top octave);
@@ -363,12 +376,21 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 7. **Idle-listening mode** (C9, `[Low]` estimate): when nothing ultrasonic is happening, run only a cheap band-energy detector at a low clock and keep a ~10 ms look-back buffer. Wake to full processing on activity, with the buffer covering the wake-up, so call onsets aren't clipped. Could save ~1–2 mA in quiet periods. Evaluate in S3.
 
 **v0.10 power findings (2026-09-30):**
-- **STM32U575: 19.5 µA/MHz on its internal SMPS.** On its LDO it draws 5.4 mA at 64 MHz, ~84 µA/MHz, the same as the L452 (DS13737 Rev 8, Table 37). With the SMPS allowed (D11, v0.12), the MCU drops from ~3.8 mA to ~0.9 mA always-on `[Med]`.
+- ~~STM32U575: 19.5 µA/MHz on its internal SMPS … MCU ~3.8 → ~0.9 mA~~ **Corrected v0.13:** that figure is Range 4 only. At 80 MHz in Range 2 on the SMPS the MCU draws ~2.5–3 mA with algorithm B (DS13737 Rev 8 Table 39; `A3-u575-plan.md` §5) `[Med]`.
 - **The big allowed lever is the idle-listening mode (C9), now the top power item.**
   - When the ultrasonic band is quiet, the CPU clock is divided down, a few band-energy detectors (each with a slowly tracking floor, so steady whines don't count) run on the DFSDM stream, and the bridge stops. The mic clock never changes, so there's no DFSDM restart.
   - A ~10 ms look-back buffer covers the wake-up, so call onsets aren't clipped.
   - Estimated draw at 75% quiet time: ~3.3 mA (A) and ~3.7 mA (B), against 7.2 and 8.8 mA always-on, so 8 h needs ~35 mAh instead of ~70–85 mAh `[Low]`.
   - Worst case, when the band is always busy, falls back to full draw. So the cell should still be sized for the always-on case, or for a measured duty cycle from E4.
+
+**v0.13 budget (U575 on SMPS + idle-listening mode; `sim/checks/power.py`):**
+- **Full chain awake:** 4.6 / 6.0 / 7.5 mA (low / nominal / high). **Idle:** 1.5 / 1.9 / 2.4 mA; the mic (~1 mA) is now the biggest idle load.
+- **Awake time** from the Phase-1 DSP model (`sim/dsp/run_phase1.py`): **14%** on a simulated quiet evening, with all 4 events caught within 10 ms; 93% on a deliberately busy scene.
+- **Runtime with a 105 mAh cell:**
+  - awake all the time: **11.9–15 h**;
+  - half the time: 18–23 h;
+  - quiet evening: 29–37 h.
+  - So 105 mAh meets 8 h everywhere and 12 h at nominal draw even if the chain never sleeps. An 80 mAh cell drops to 9.1 h at the pessimistic always-awake end, so keep 105 mAh (O5).
 
 **Supply rail** `[Med]`:
 - **3.0 V from a low-dropout LDO**, leaving ~300 mV of headroom at the LiPo's 3.3–3.4 V knee.
@@ -395,6 +417,13 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 >   That's the price of keeping everything in front of the ear hook. The owner's call (O5).
 >
 > The v0.6 text below remains the fallback.
+>
+> **v0.13: first CAD and spring study** (`hw/mech/pod.py`, `sim/checks/tragus_spring.py`, `docs/research/tragus-arm.md`):
+> - **Pod:** 35 × 9 × 14 mm. The 105 mAh cell sits against the inner wall; the 0.8 mm PCB is outboard, with the mic porting outward at the front. Zero interference.
+> - **Mass:** 7.75 g per side, centre of mass 52 mm behind the hinge: **nose pads 3.7 g, ear 4.1 g**.
+> - **Spring:** a one-piece steel strip can't hold 1 N at this length without fatigue. **Recommended: rigid arm on a pivot with a preloaded torsion spring** (Ø0.65 mm wire, 7 turns, Ø5.2 mm): 0.99–1.26 N over ±2 mm of jaw travel. Alternative: superelastic NiTi wire, ~1.0 N settled, ~2.3 N while putting the glasses on. New O7.
+> - **Transducer orientation:** the RC-BC02 housing (~14 mm long) must lie **along the arm**. Stood vertically, its top end comes within ~2 mm of the Ear (open) hook junction; along the arm it clears by ~5.8 mm.
+> - **Reaction:** the pad's 1 N pushes the temple arm outward and twists it (~25 N·mm). The clip needs ~5 N of grip on the arm's top and bottom edges. New E12 measures her temple arm's stiffness.
 >
 > **v0.9 (owner): peripheral vision is a hard no-go zone. No part of the device may be visible
 > with the eyes looking straight ahead.**
@@ -530,6 +559,8 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | **R13** | DFSDM clock duty cycle outside the mic's 48–52% | `[Low]` | S1 scope; timer-clock fallback |
 | **R14** | Acoustic path (port, wall, mesh) cuts ultrasonic sensitivity or adds resonances | `[Med]` | S1 coupons; §8 rules; DSP EQ |
 | **R15** | Self-noise (own speech, chewing, hair) makes transient mode busy | `[Med]` | S1 recordings; gate tuning (C4) |
+| **R17** | **New v0.13.** Temple arm bends and twists under the pad's reaction force, so the pad loses force or the pod rolls | `[Med]` | E12; soft preloaded spring (O7); snug clip |
+| **R18** | **New v0.13.** Mic duty cycle / ADF reshape-filter response at 800 kS/s not as assumed (unpublished) | `[Low]` | S1 scope and sweep; ÷10 + half-band fallback |
 
 ---
 
@@ -543,6 +574,7 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | **O3** | Approve the v0.5 shopping list once priced | — |
 | **O5** | Pod layout inside the ~35 mm between the vision line and the ear keep-out (v0.9): stacked, thicker pod with a ~105 mAh cell vs a slimmer pod with a smaller cell (runtime cost) | One pod if the 105–120 mAh class meets the runtime after E4 |
 | ~~O6~~ | **Resolved 2026-09-30: owner removed the rule; see D11, D5.** Was: allow a switch-mode regulator only as the MCU core's internal SMPS (STM32U575/U585 "Q" variants, same 7×7 mm QFN-48): forced-PWM (fixed frequency, MHz range, never burst mode), shielded low-magnetostriction inductor, no Class-2 caps on it, and it **must pass the owner's own listening test on the bench** before adoption. Saves ~3 mA always-on (MCU ~3.8 → ~0.9 mA) or ~1.2 mA with idle mode. §1.2.3 is owner-locked, so this needs her explicit change | Bench-test it (buy one NUCLEO-U575ZI-Q alongside the L452 board); decide by ear |
+| **O7** | **New v0.13.** Tragus spring: (A) pivot + preloaded torsion spring, (B) superelastic NiTi wire arm | A for the prototype: predictable force, and tunable by swapping the spring. B is the product candidate once T5 finds her preferred force |
 | **O4** | Confirm the D18 reading of §1.2.4: cell along the arm, in front of the ear, nothing behind it | Yes; it's what makes the 12 h battery comfortable |
 
 Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 or the schematic · **P2** before board order · **P3** before final assembly.
@@ -602,6 +634,7 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 | E8 | **New.** Stereo A/B: free-running vs shared clock (S4) | R5, D2 |
 | E10 | **New v0.9.** Peripheral-vision boundary: glasses on, eyes fixed on a point straight ahead, a helper slides a pen tip forward along the temple arm from the ear until the owner first detects it. Mark the spot and measure from the hinge; repeat 3×, both eyes; also check just above and below the arm. The pod's front end goes ≥5 mm behind the mark | Vision no-go line (§8) |
 | E11 | **New v0.12.** SMPS whine: board running the real load pattern, pressed against the temple in a quiet room; owner listens. Pass = not louder than the room's background | D11 |
+| E12 | **New v0.13.** Temple-arm stiffness: glasses on a table, hang 100 g (≈1 N) from the temple arm ~60 mm behind the hinge. Measure how far it moves sideways; then hang it from a 25 mm stick taped under the arm and measure the twist | R17, O7 spring preload |
 | E9 | **Partly done 2026-09-30** (no ruler; scale from the speaker ring, see `ear-open-fit.md`; still wanted: ruler shot and mouth-open shot). Photo measurement: glasses + Ear (open) worn, mm ruler at the ear; lateral view of both ears, rear-oblique view, and mouth-open view (procedure in `ear-open-fit.md`) | D1 pad location, D4 arm geometry, keep-out at true scale |
 
 **Suggested order:** O1 and O3 → order transducers and Nucleos → JLC board designs → C1 → Phase 1 algorithms → S1/S2 as parts arrive → B-series → D-series.
@@ -638,6 +671,12 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ---
 
 ## 15. Changelog
+
+### v0.13 (2026-09-30) — U5 plan, DSP model, first CAD
+- D5/D11/D12/D14: STM32U575 plan (`A3-u575-plan.md`). MCU current corrected to ~2.5–3 mA (was ~0.9). Mic on ADF PB3/PB4 with hardware decimation to 200 kS/s. "Forced PWM" means never Range 4 on the SMPS.
+- §7: new budget from `sim/checks/power.py` and the Phase-1 DSP model (14% awake on a quiet evening). 105 mAh: 11.9–15 h even always awake.
+- §8: first CAD, spring study and transducer orientation. New O7, E12, R17, R18.
+- Phase-1 DSP (`sim/dsp/`): band envelopes (1.5 ms attack / 15 ms release) and a gain limiter keep the output inside 1.5–4 kHz without clicks; transient mode also gates on calibrated mic self-noise.
 
 ### v0.12 (2026-09-30) — switching regulator unlocked
 - **Owner changed §1.2.3:** the no-switching-regulator rule is removed. The limit is now "self-noise no louder than ambient background."
