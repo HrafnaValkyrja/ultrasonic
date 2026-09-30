@@ -9,6 +9,10 @@ export ULTRA_VENV="$ULTRA_TOOLS_HOME/venv"
 
 # FreeRouting jar (symlink to the pinned version) and the Java runtime it needs (>= 25).
 export FREEROUTING_JAR="$ULTRA_TOOLS_HOME/freerouting/freerouting.jar"
+# Cap FreeRouting's JVM heap. Unset, a JVM may claim up to 1/4 of RAM (~7.5 GB here), and six
+# concurrent runs helped freeze the host on 2026-09-30. Verified sufficient on the smoke-test board;
+# raise it (FREEROUTING_JAVA_OPTS=-Xmx2g) if a full pod-board route runs out of heap.
+export FREEROUTING_JAVA_OPTS="${FREEROUTING_JAVA_OPTS:--Xmx1g}"
 if [ -z "${FREEROUTING_JAVA:-}" ]; then
   if [ -x /usr/lib/jvm/java-25-openjdk-amd64/bin/java ]; then
     export FREEROUTING_JAVA=/usr/lib/jvm/java-25-openjdk-amd64/bin/java

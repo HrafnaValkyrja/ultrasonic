@@ -87,7 +87,7 @@ def t_kicad_freerouting(w: Path) -> str:
     pcb, dsn, ses, routed = (w / n for n in ("t.kicad_pcb", "t.dsn", "t.ses", "t_routed.kicad_pcb"))
     pcbnew.SaveBoard(str(pcb), b)
     assert pcbnew.ExportSpecctraDSN(b, str(dsn)), "DSN export failed"
-    sh([os.environ["FREEROUTING_JAVA"], "-jar", os.environ["FREEROUTING_JAR"], "-de", str(dsn),
+    sh([os.environ["FREEROUTING_JAVA"], *os.environ.get("FREEROUTING_JAVA_OPTS", "-Xmx1g").split(), "-jar", os.environ["FREEROUTING_JAR"], "-de", str(dsn),
         "-do", str(ses), "-mp", "20", "--gui.enabled=false"], timeout=240)
     b = pcbnew.LoadBoard(str(pcb))
     assert pcbnew.ImportSpecctraSES(b, str(ses)), "SES import failed"

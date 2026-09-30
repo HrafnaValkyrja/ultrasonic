@@ -23,6 +23,11 @@
 
 ## Where this runs
 On the owner's machine (Valhalla: i9-14900HX, WSL2 Ubuntu 24.04) with Remote Control, so she can steer from the Claude app. Cloud sessions were retired on 2026-09-30. The SessionStart hook sources `tools/env.sh` locally; it never installs anything locally, because setup needs sudo.
+- **Memory discipline (after the 2026-09-30 OOM freeze, `docs/incidents/2026-09-30-oom.md`):** the machine is shared with the owner's desktop, games and other agents.
+  - Start sessions with `tools/claude-session.sh` (tmux + an 18 GB fence).
+  - Run any simulation, routing or bulk data job inside a fence: `systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 <cmd>`.
+  - Workflows: cap live agents (the audit script uses 5). Never let parallel agents run FreeRouting.
+  - Before resuming heavy background work, check `journalctl -k` for recent OOM kills.
 
 ## Tools
 - `tools/setup.sh` installs everything idempotently (details in `tools/README.md`). Run `source tools/env.sh` before using the tools.

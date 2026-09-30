@@ -1,4 +1,6 @@
-# Next actions (written 2026-09-30, ~10% of the usage window left)
+# Next actions (updated 2026-09-30 after the OOM incident)
+
+**Read `docs/incidents/2026-09-30-oom.md` first.** The cron poke is disabled. The audit script is now capped at 5 live agents and fences its sims; resume it only from a session started with `tools/claude-session.sh`.
 
 ## 1. Resume the adversarial audit
 It was running when the window ran low. Finished agents are cached in the run journal.
@@ -35,10 +37,9 @@ Keep true relative levels between the processed output and the audible band; say
 was assumed (bone-conduction loudness vs ambient is not yet measured - E1/E2).
 
 ## 3. Go headless (after the audit)
-tmux is installed. Clean move, restores this conversation:
+Use the fenced launcher (tmux + memory fence), from the repo:
 ```
-tmux new -s ultrasonic
-claude --continue      # inside tmux, from /home/hrafnavalkyrja/Desktop/ultrasonic
+tools/claude-session.sh
 ```
 Then Konsole is disposable. NOTE: `disown` alone did NOT make this session safe - it is still in
 the terminal's foreground process group (`Sl+` on pts/1) and catches SIGHUP.

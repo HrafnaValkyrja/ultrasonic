@@ -15,17 +15,33 @@ export const meta = {
 //            done: { '<agent label>': <result>, ... } }   // results already finished elsewhere are reused
 // Build `done` with: python3 .claude/workflows/export_done.py <journal.jsonl> > done.json
 const A = args || {}
-const REPO = A.repo || '${REPO}'
+const REPO = A.repo || '/home/hrafnavalkyrja/Desktop/ultrasonic'
 const SCR = A.scratch || (REPO + '/../ultrasonic-scratch')
 const AUD = A.audit_dir || (SCR + '/audit')
 const DATE = A.date || '2026-09-30'
 const DONE = A.done || {}
+// Concurrency cap (2026-09-30 incident): 16 parallel agents each launching ngspice (~2.3 GB) or
+// FreeRouting (~2 GB JVM) exhausted 30 GB RAM + 8 GB swap and froze the host for 7 hours. The
+// runtime would allow min(16, cores-2); this caps live agents independently of core count.
+const MAX_LIVE = A.max_agents || 5
+let live = 0
+const waiters = []
+async function slot() {
+  if (live >= MAX_LIVE) await new Promise(r => waiters.push(r))
+  live++
+}
+function release() {
+  live--
+  const w = waiters.shift()
+  if (w) w()
+}
 async function run(prompt, opts) {
   if (opts && opts.label && DONE[opts.label] !== undefined && DONE[opts.label] !== null) {
     log('reusing finished result: ' + opts.label)
     return DONE[opts.label]
   }
-  return agent(prompt, opts)
+  await slot()
+  try { return await agent(prompt, opts) } finally { release() }
 }
 
 const CONTEXT = `
@@ -42,6 +58,7 @@ Key artefacts:
 - Local primary sources (text already extracted): ${SCR}/ds/*.txt and *.pdf (u575.txt = STM32U575 datasheet DS13737, pmcxb290ue.txt, tps7a20.txt, mcp73831.txt, DMC2400UV.txt, fc135.txt, dfe201610e.txt, eemb401230.txt ...), ${SCR}/u575.txt, ${SCR}/u5/ (ST docs mirror incl. possibly RM0456/ES0499), ${SCR}/sph0641_sq.pdf.txt and sph0641_synt.pdf (mic datasheets), ${SCR}/henry2007.txt, mcbride2005.pdf, stanley2006.txt (bone conduction papers), ${SCR}/t5838_v10.txt. Web access is available (load WebFetch/WebSearch via ToolSearch); record URL + access date ${DATE} for anything you use.
 
 HARD RULES:
+- MEMORY: this machine is shared (owner's desktop, games, other agents) and several auditors run at once. Run EVERY simulation or heavy command inside a memory fence, e.g. \`systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 python3 sim/checks/bridge_spice.py\`. If it is killed (exit 137), shrink the problem (shorter record, fewer saved vectors) rather than raising the limit past 4G. Do NOT run FreeRouting (java) at all: judge routing from the existing board files. A previous run of this audit froze the host by running seven ngspice and six FreeRouting processes concurrently.
 - Do NOT modify any tracked file in ${REPO} and do NOT git commit. Do NOT run hw/pod/gen.py, hw/pod/place.py, hw/pod/render.py or docs/learn/make_board_parts.py (they rewrite tracked files). Scripts under sim/ only write to sim/out (git-ignored) and are OK to run. For your own experiments, work in ${AUD}/<your-area>/ (create it).
 - Every finding needs concrete evidence: file:line, a command you ran and its output, or a quoted primary source with location. Say explicitly whether you REPRODUCED something or are REASONING about it.
 - Severity: critical = the board/device would not work, would be unsafe, or a headline claim is invalid; major = a materially wrong number/method that could mislead a decision; minor = real but low impact; info = observation.

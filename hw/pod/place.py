@@ -199,7 +199,7 @@ def main():
     pcbnew.SaveBoard(str(pcb), b)
     br, _ = build(inset=0.2)                                   # routing copy, outline pulled in 0.2 mm
     assert pcbnew.ExportSpecctraDSN(br, str(dsn))
-    subprocess.run([os.environ["FREEROUTING_JAVA"], "-jar", os.environ["FREEROUTING_JAR"], "-de", str(dsn),
+    subprocess.run([os.environ["FREEROUTING_JAVA"], *os.environ.get("FREEROUTING_JAVA_OPTS", "-Xmx1g").split(), "-jar", os.environ["FREEROUTING_JAR"], "-de", str(dsn),
                     "-do", str(ses), "-mp", "150", "--gui.enabled=false"], check=True, timeout=2400,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     b = pcbnew.LoadBoard(str(pcb))
