@@ -8,17 +8,14 @@ Branch: `claude/clever-mayer-s5rxuw` (everything below is committed and pushed).
 ## Why the move
 The adversarial audit workflow runs at most (CPU cores − 2) agents at once, capped at 16. The cloud container has 4 cores, so 2 agents ran at a time: about 6–10 h for the whole audit. With the i9-14900HX's 32 threads, 16 run at once.
 
-## First job for the local session
-**The owner has downloaded the 20 bundle parts and asked Claude to do the reassembly.** Ask her which folder they're in, then:
-```bash
-cd <that folder>
-cat ultrasonic-scratch.zip.part{00..19} > ultrasonic-scratch.zip
-sha256sum ultrasonic-scratch.zip   # must be e47d1e93519f00fdd40d1e1364c22b11b18529978cbd8a378028d7e3102f8b4c
-unzip -q ultrasonic-scratch.zip -d <parent of the repo>   # gives <parent>/ultrasonic-scratch
-```
-If the hash doesn't match, find the bad part by size (every part except part19 is exactly 29,360,128 bytes) and ask her to re-download it.
-
-**How this session got here:** `claude --teleport session_016uLR3rVesNK6FmgR7vwByF`, run from a clean checkout of the repo. That carries the whole cloud conversation over. Paths in that history (`/home/user/ultrasonic`, `/tmp/claude-0/...scratchpad`) are the cloud's; locally they are the repo and `../ultrasonic-scratch`.
+## Migration status: DONE (2026-09-30)
+Valhalla is set up and the cloud session is retired.
+- Workspace reassembled from the 20 parts (checksum verified) at `~/Desktop/ultrasonic-scratch`.
+- Harness installed and **all 9 smoke tests pass**: KiCad 10.0.6, ngspice 45.2, ARM GCC 14.2, Python 3.14 venv with pcbnew 10.0.6, FreeRouting 2.4.1, mermaid-cli.
+- `tools/setup.sh` needed five fixes to run outside the cloud image (see commit `e834e8a`); `render.sh` needed `--headless` (`0ba6f6f`-ish). Re-running setup here is now a no-op.
+- **sudo:** `/etc/sudoers.d/ultrasonic-apt` gives this user passwordless `apt-get`/`apt`/`dpkg` only. Remove with `sudo rm /etc/sudoers.d/ultrasonic-apt`. Nothing else is elevated; don't add `env` to that rule (it would mean full root).
+- The owner's drop folder `From Valkyrie/` is gitignored.
+- Listening tests can use real hardware here: Sennheiser HD650 on a Schiit Valhalla 2 (relevant to D12, algorithm A vs B).
 
 ## One-time setup on Valhalla
 1. **Machine (confirmed 2026-09-30):** native **Ubuntu 26.04.1 LTS** (codename `resolute`), KDE/Wayland, 32 threads, 30 GB RAM. No WSL. Repo at `~/Desktop/ultrasonic`, scratch at `~/Desktop/ultrasonic-scratch`.
