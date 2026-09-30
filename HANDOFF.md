@@ -26,7 +26,7 @@ The adversarial audit workflow runs at most (CPU cores − 2) agents at once, ca
 
 ## Resume the adversarial audit
 - **Script:** `.claude/workflows/adversarial-methodology-audit.js`. It's portable (paths via args), and it skips any agent whose result is in `args.done`.
-- **Refresh `done.json`:** the owner can ask the cloud session for a fresh one at switch-over, since the cloud run keeps going until then. Or regenerate it from a journal:
+- **The cloud run was stopped** at the owner's request on 2026-09-30. `../ultrasonic-scratch/done.json` is final. It holds 2 finished results (`audit:netlist-mcu`, `audit:netlist-other`) that the local run reuses; everything else runs fresh. The two audits that were mid-flight (footprints, spice-bridge) left partial notes in `../ultrasonic-scratch/audit/` and transcripts in `workflow-agent-transcripts/`; they rerun from scratch. To regenerate `done.json` from the journal:
   ```bash
   python3 .claude/workflows/export_done.py ../ultrasonic-scratch/workflow-journal.jsonl > ../ultrasonic-scratch/done.json
   ```
@@ -34,7 +34,6 @@ The adversarial audit workflow runs at most (CPU cores − 2) agents at once, ca
   `args: {"repo": "<abs path to repo>", "scratch": "<abs path to ultrasonic-scratch>", "date": "<today>", "done": <contents of done.json>}`.
 - **Current datasheets:** the audit now points auditors at the owner's current ST documents (`st_new/`: DS13737 Rev 10, ES0499 Rev 12, RM0456 Rev 7, AN5373 Rev 7).
 - **What was already done:** results finished in the cloud used DS13737 Rev 8. Rev 8 → Rev 10 changed nothing for the pins or power pins we use (`docs/research/datasheet-provenance.md`), so they stand.
-- **Once the local run is going,** tell the cloud session to stop its run, so the same work isn't paid for twice.
 
 ## State of the project (details in `docs/spec.md` v0.13 and `docs/design-review-v1.md`)
 - **Design:**
