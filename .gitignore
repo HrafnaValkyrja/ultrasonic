@@ -11,3 +11,11 @@ fp-info-cache
 # simulation outputs (regenerate with the scripts)
 sim/out/
 hw/mech/out/
+# SKiDL by-products
+*_sklib.py
+gen.erc
+gen.log
+hw/pod/draft/*.dsn
+hw/pod/draft/*.ses
+hw/pod/draft/*.png
+hw/pod/draft/*.log
