@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" role="img" aria-label="How a fibre model works. One: slice the wire's cross-section into thin strips called fibres; bending stretches fibres above the centre and squeezes those below, in proportion to their distance from the centre. Two: each fibre follows NiTi's own stress-strain curve, which climbs, goes flat at 450 megapascals while it transforms, and comes back down along a lower 200 megapascal plateau, a hysteresis loop like a magnetic B-H loop, so each fibre remembers its history. Three: along the wire the bending moment grows toward the clamp; at each of 60 sections the model finds the curvature whose fibre stresses add up to that moment, then integrates curvature to get the pad's deflection and force." font-family="Helvetica, Arial, sans-serif">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f2328"/></marker></defs>
+  <rect width="1000" height="500" rx="14" fill="#fbfaf7"/>
+  <text x="40" y="40" font-size="19" font-weight="700" fill="#1f2328">What a fibre model is (for the NiTi arm)</text>
+  <text x="40" y="62" font-size="13" fill="#57606a">A simple spring formula assumes the whole wire stays linear. NiTi doesn't: its outer skin transforms while the core stays elastic.</text>
+
+  <!-- panel 1 -->
+  <text x="40" y="100" font-size="15" font-weight="700" fill="#1f2328">1  Slice the wire into strips</text>
+  <clipPath id="c"><circle cx="150" cy="215" r="70"/></clipPath>
+  <g clip-path="url(#c)">
+    <rect x="80" y="145" width="140" height="14" fill="#e34948" opacity="0.85"/>
+    <rect x="80" y="159" width="140" height="14" fill="#e34948" opacity="0.65"/>
+    <rect x="80" y="173" width="140" height="14" fill="#e34948" opacity="0.45"/>
+    <rect x="80" y="187" width="140" height="14" fill="#e34948" opacity="0.25"/>
+    <rect x="80" y="201" width="140" height="28" fill="#f3f1ea"/>
+    <rect x="80" y="229" width="140" height="14" fill="#2a78d6" opacity="0.25"/>
+    <rect x="80" y="243" width="140" height="14" fill="#2a78d6" opacity="0.45"/>
+    <rect x="80" y="257" width="140" height="14" fill="#2a78d6" opacity="0.65"/>
+    <rect x="80" y="271" width="140" height="14" fill="#2a78d6" opacity="0.85"/>
+    <g stroke="#fbfaf7" stroke-width="1"><line x1="80" y1="159" x2="220" y2="159"/><line x1="80" y1="173" x2="220" y2="173"/><line x1="80" y1="187" x2="220" y2="187"/><line x1="80" y1="201" x2="220" y2="201"/><line x1="80" y1="229" x2="220" y2="229"/><line x1="80" y1="243" x2="220" y2="243"/><line x1="80" y1="257" x2="220" y2="257"/><line x1="80" y1="271" x2="220" y2="271"/></g>
+  </g>
+  <circle cx="150" cy="215" r="70" fill="none" stroke="#1f2328" stroke-width="2"/>
+  <text x="150" y="219" font-size="12" fill="#1f2328" text-anchor="middle">centre: no strain</text>
+  <!-- strain profile -->
+  <line x1="245" y1="145" x2="245" y2="285" stroke="#8a8676" stroke-width="1.2"/>
+  <path d="M245,215 L290,145 M245,215 L200,285" stroke="#1f2328" stroke-width="1.6" fill="none"/>
+  <text x="298" y="152" font-size="12" fill="#e34948">stretched</text>
+  <text x="210" y="300" font-size="12" fill="#2a78d6">squeezed</text>
+  <text x="40" y="318" font-size="12" fill="#57606a">Bend the wire and each strip (a "fibre") is</text>
+  <text x="40" y="334" font-size="12" fill="#57606a">strained in proportion to its distance from the</text>
+  <text x="40" y="350" font-size="12" fill="#57606a">centre: strain = curvature × distance. 41 strips.</text>
+
+  <!-- panel 2 -->
+  <text x="350" y="100" font-size="15" font-weight="700" fill="#1f2328">2  Each fibre follows NiTi's own curve</text>
+  <line x1="380" y1="290" x2="640" y2="290" stroke="#1f2328" stroke-width="1.5" marker-end="url(#a)"/>
+  <line x1="380" y1="290" x2="380" y2="130" stroke="#1f2328" stroke-width="1.5" marker-end="url(#a)"/>
+  <text x="600" y="310" font-size="12" fill="#1f2328">strain</text>
+  <text x="388" y="136" font-size="12" fill="#1f2328">stress</text>
+  <path d="M380,290 L405,175 L600,175" stroke="#b8520a" stroke-width="3" fill="none"/>
+  <path d="M600,175 L612,238 L420,238 L380,290" stroke="#1a7a55" stroke-width="3" fill="none" stroke-dasharray="7 4"/>
+  <text x="470" y="167" font-size="12" fill="#b8520a">loading plateau 450 MPa (transforming)</text>
+  <text x="440" y="256" font-size="12" fill="#1a7a55">unloading plateau ~200 MPa (unsourced)</text>
+  <text x="350" y="334" font-size="12" fill="#57606a">A hysteresis loop, like a core's B–H loop: each fibre</text>
+  <text x="350" y="350" font-size="12" fill="#57606a">remembers how far it has transformed, so the model</text>
+  <text x="350" y="366" font-size="12" fill="#57606a">knows donning from jaw-opening from settling.</text>
+
+  <!-- panel 3 -->
+  <text x="690" y="100" font-size="15" font-weight="700" fill="#1f2328">3  Add them up, along the wire</text>
+  <rect x="690" y="140" width="30" height="46" fill="#ddd4b4" stroke="#1f2328" stroke-width="1.4"/>
+  <text x="705" y="200" font-size="11" fill="#1f2328" text-anchor="middle">heel</text>
+  <path d="M720,160 Q810,166 880,196" stroke="#8a8676" stroke-width="4" fill="none"/>
+  <rect x="880" y="186" width="44" height="30" rx="4" fill="#ffffff" stroke="#1f2328" stroke-width="1.4" transform="rotate(20 902 201)"/>
+  <line x1="905" y1="248" x2="905" y2="214" stroke="#e34948" stroke-width="2" marker-end="url(#a)"/>
+  <text x="915" y="250" font-size="11" fill="#e34948">skin force F</text>
+  <path d="M720,232 L720,300 L905,232 Z" fill="#e8f0fb" stroke="#2a78d6" stroke-width="1.2"/>
+  <text x="728" y="318" font-size="11" fill="#2a78d6">bending moment = F × lever: biggest at the clamp</text>
+  <text x="690" y="350" font-size="12" fill="#57606a">At each of 60 slices along the wire, find the</text>
+  <text x="690" y="366" font-size="12" fill="#57606a">curvature whose fibre stresses add up to that</text>
+  <text x="690" y="382" font-size="12" fill="#57606a">moment. Add up curvature → pad movement and tilt.</text>
+
+  <line x1="40" y1="410" x2="960" y2="410" stroke="#c9c5b8"/>
+  <text x="40" y="436" font-size="13" fill="#1f2328">Same idea as finite elements, cut down to one dimension. Checked against the textbook: 0.5% from the elastic spring</text>
+  <text x="40" y="456" font-size="13" fill="#1f2328">formula, within 4% of the fully-transformed limit. What it can't know: the real unloading plateau. A bench bend-test gives it.</text>
+</svg>
