@@ -1,7 +1,7 @@
-# Stereo Ultrasound — Project Spec v0.5
+# Stereo Ultrasound — Project Spec v0.6
 
 **Owner:** Valkyrie
-**Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. v0.5 applies the full-plan sanity check (`docs/research/review-2026-09-30.md`). Next: owner decisions O1 and O3 in §12 → Phase 1 simulation and first bench orders. No hardware purchased.
+**Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. v0.5 applies the full-plan sanity check (`docs/research/review-2026-09-30.md`). Next: shopping-list approval (O3) → Phase 1 simulation and first bench orders. No hardware purchased.
 **Last updated:** 2026-09-30 (Claude Code session). See §15 for the changelog.
 
 **Confidence tags:** `[High]` verified from a primary source or well established · `[Med]` reasoned estimate, likely right · `[Low]` guess, verify before relying on it.
@@ -56,8 +56,8 @@ A wearable that lets the owner hear ultrasound (roughly 20–96 kHz) in real tim
 ## 3. Architecture (per side)
 
 ```
-                     32.768 kHz crystal ─▶ MSI (auto-trimmed) ─▶ PLL ─▶ 80 MHz — every clock below derives from this
-SPH0641LU4H-1 mic ◀── 4.0 MHz clock (80 MHz ÷ 20) ──┐
+                     32.768 kHz crystal ─▶ MSI (auto-trimmed) ─▶ PLL ─▶ 48–80 MHz per mode (D14) — every clock below derives from this
+SPH0641LU4H-1 mic ◀── 4.0 MHz clock (SYSCLK ÷ 12…20) ──┐
       │ PDM 1-bit                                   │
       ▼                                             │
 STM32L452 DFSDM (hardware PDM→PCM, sinc5 ÷10) ──────┘ 400 kS/s ──▶ half-band FIR ÷2 ──▶ 200 kS/s
@@ -68,7 +68,7 @@ DSP: mic EQ → band select → shift or compress → transient gate → volume 
       ▼
 H-bridge: 2× complementary MOSFET pairs (gates held off by pull resistors until TIM1 takes over) → RC-BC02 transducer
 
-Power:    LiPo (with protection) → MCP73831 charger → low-noise 3.0 V LDO → everything
+Power:    ~105–150 mAh LiPo along the temple arm (with protection) → MCP73831 charger → low-noise 3.0 V LDO → everything
 Controls: 1 button; SWD pogo pads for programming; magnetic pogo pins for charging
 ```
 
@@ -151,6 +151,7 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
   - Integrated H-bridge ICs. DRV8837 has 160–200 ns delays and 30–188 ns edges, and 0.7 mA even at 50 kHz. DRV8210 tops out at 100 kHz with 500 ns dead time. DRV8833 has 450 ns dead time, 450 ns deglitch and 1.1 µs delay.
   - Amplifier IC + DAC: quiescent current, and one more part.
 - **Depends on E1** (coil inductance). If L ≥ ~1 mH, AD's clean range shrinks, so consider 100 kHz / ARR 400.
+- **Gate charge matters for battery life (v0.6):** 4 FETs × Qg × 200 kHz is 0.4 mA at ~0.5 nC but 2 mA at ~2.5 nC. B1 prefers the low-gate-charge pair (DMC2400UV class).
 
 ### D7. Transducer = RC-BC02 / "GD02"-class module `[Med]` — **v0.5: specs disputed**
 - **What it is:** a tiny inertial bone-conduction exciter, rated 300–19,000 Hz, 0.3 W nominal / 0.8 W max.
@@ -208,6 +209,9 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
   - ×16 interpolation → **200 kHz** PWM update.
   - Stays in voltage Range 1: Range 2 caps peripheral clocks at 26 MHz.
 - **Why synchronous:** switching interference coupling into the mic path folds to 0 Hz, where the band-floor high-pass removes it (T6).
+- **Per-mode system clock (v0.6, power):** the tree works at any clock that's a multiple of 8 MHz. The mic divider becomes f/4 MHz (always even) and the PWM period ARR = f/400 kHz: 48 MHz → ARR 120; 64 MHz → ARR 160; 80 MHz → ARR 200.
+  - Algorithm A runs at **48–64 MHz**, saving ~0.8–1 mA. Algorithm B needs **80 MHz**.
+  - Mic clock and PWM rate stay the same; only the PWM step count changes (121–201 levels, fine with the 3rd-order shaper). Switch clocks only at mode changes, since DFSDM must restart.
 - **DFSDM details** (RM0394; `A3-clock-and-peripherals.md` §3):
   - The CKOUT divider can only change with DFSDM disabled. The standard→ultrasonic mode switch is therefore stop, re-divide, restart; the µs gap is harmless `[Med]`.
   - Use **filter 0** (DMA1 channel 5). Filter 1 shares channel 6 with TIM1's update request.
@@ -242,6 +246,12 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 ### D17. Output safety: fixed ceiling and pop-free start `[High]` as requirements — **New v0.5**
 - A **fixed output ceiling** (soft clip), identical on both sides. With fixed gain (D3), a loud nearby source would otherwise become a loud output. Examples: an ultrasonic pest repeller, or the HC-SR04 up close.
 - Power-up, mode changes and squelch transitions must not click (D6 soft start).
+
+### D18. Runtime and weight balance `[High]` as requirements — **New v0.6 (owner, 2026-09-30)**
+- **Runtime:** ≥8 h per charge, target ~12 h. Nightly charging.
+- **Battery:** bay sized for a ~150 mAh cell (~4.5 g); a ~105 mAh cell is the minimum. The exact cell is picked after E4 current measurements (§7).
+- **Balance (owner: "design for balance as needed"):** the cell sits along the temple arm behind the front module, centred as far back as the Ear Open hook allows. This splits the added weight between nose pads and ears instead of loading the nose (§8 table).
+- **Interpretation of §1.2.4** ("bulk at the front near the hinges, never near the neck or behind the ears"): nothing goes behind the ear or toward the neck. The electronics stay at the hinge; only the cell moves rearward along the arm, in front of the ear. §1 text unchanged. **The owner should confirm this reading** (O4).
 
 ### Parked or rejected ideas
 - **Forward "gaze distance" sensing:** redundant with stereo vision.
@@ -299,59 +309,76 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 
 ---
 
-## 7. Power (per side) — **v0.5: runtime tied to battery options**
+## 7. Power (per side) — **v0.6: sized for 8 h minimum, ~12 h target (owner, O1)**
+
+**Requirement (D18):** at least 8 h of wear per charge, ideally ~12 h. Nightly charging.
+
+**Budget after v0.6 optimizations** (tragus site, low-gate-charge MOSFETs, per-mode clock):
 
 | Block | Current | Basis |
 |---|---|---|
 | Mic, ultrasonic mode | ~0.9–1.1 mA | 845 µA typ at 1.8 V; rises with supply and clock load `[High]` |
-| MCU, algorithm A | ~3.2–4.4 mA | 23–48% busy at 80 MHz; 84 µA/MHz run, 27 µA/MHz sleep (`C2-cpu-budget.md`) `[Med]` |
-| MCU, algorithm B (restructured) | ~4.7–5.8 mA | 55–81% busy `[Med]` |
-| Peripherals (TIM1, DFSDM, DMA) | ~1 mA | TIM1 alone ≈ 0.65 mA `[Med]` |
-| Bridge idle ripple + gate charge | ~0.4–2 mA | ripple loss 0.04–0.4 mW; gate charge 4 FETs × 0.5–2.5 nC × 200 kHz, **so pick a low-gate-charge MOSFET pair (B1)** `[Med]` |
-| Transducer, average at listening level | ~2–5 mA; ~0 in long silence | `[Low]`, measure (E4) |
-| LDO idle, crystal | <0.05 mA | `[Med]` |
-| **Total** | **~7.5–13.5 mA (A), ~9–15 mA (B)** | `[Low]` |
+| MCU, algorithm A at 48–64 MHz | ~2.4–3.9 mA | 19–39 M cycles/s; 84 µA/MHz run, 27 µA/MHz sleep (`C2-cpu-budget.md`, D14) `[Med]` |
+| MCU, algorithm B at 80 MHz | ~4.7–5.8 mA | 44–65 M cycles/s `[Med]` |
+| Peripherals (TIM1, DFSDM, DMA) | ~0.6–1.0 mA | TIM1 8.1 µA/MHz `[Med]` |
+| Bridge: gate charge + idle ripple | ~0.4–0.6 mA | 4 FETs × ~0.5 nC × 200 kHz with a low-gate-charge pair (B1); ripple loss 0.04–0.4 mW `[Med]` |
+| Transducer, average at listening level | ~0.6–1.7 mA | was 2–5 mA; the tragus site needs ~10 dB less drive (D1) `[Low]`, measure (E4) |
+| LDO, crystal, battery protection | <0.05 mA | `[Med]` |
+| **Total** | **~5–8.5 mA (A), ~7.5–10.5 mA (B)** | `[Low]` until E4 |
 
-**Runtime by battery** (usable ≈ 85% of rated; `[Low]` until E4):
+**Runtime** (usable ≈ 85% of rated capacity):
 
-| Option | Cell | Size (incl. protection) | Mass | Algorithm A | Algorithm B |
-|---|---|---|---|---|---|
-| (a) | ~40 mAh | ~20×8×3.5 mm | ~1.1 g | ~2.5–4.5 h | ~2.3–3.8 h |
-| (b) | ~60 mAh | ~20×12.5×5.4 mm | ~2 g | ~4–7 h | ~3.5–5.5 h |
-| (c) | ~100 mAh | ~30×12×4 mm | ~3 g | ~6.5–11 h | ~6–9.5 h |
+| Cell | Algorithm A | Algorithm B | Meets |
+|---|---|---|---|
+| ~105 mAh | ~10.5–18 h | ~8.5–12 h | 8 h everywhere; 12 h in A |
+| ~120 mAh | ~12–20 h | ~9.5–13.5 h | 12 h in A, most of B |
+| **~150 mAh** | **~15–25 h** | **~12–17 h** | **12 h everywhere, even at the pessimistic end** |
 
-- The MVP needs 2+ h (T5). All options meet it; (a) only just, in algorithm B.
-- (c) is bigger than the PCB and fights priority #1.
-- **Recommendation: (a) or (b). The owner decides** (§12, O1).
+**Recommendation:** design the battery bay for a ~150 mAh cell (≈4×12×40–45 mm, ≈4.5 g). Fit anything from ~105 mAh up once E4 measures real current.
+- The estimates are `[Low]`, and the extra ~1.5 g costs little when placed for balance (§8).
+- Charge at ≤0.5C (MCP73831 set to ~50–75 mA): ~2.5–3 h, overnight.
 
-**Power levers, most effective first:** squelch with CPU sleep · output band placement (D9) · algorithm choice · DFSDM ÷20 · CPU sleep between DMA blocks.
+**Power levers, most effective first:**
+1. Transducer at the tragus (D1, done).
+2. Squelch with CPU sleep.
+3. Algorithm choice (A is ~2.5 mA cheaper).
+4. Lower clock for A (D14).
+5. Low-gate-charge MOSFETs (B1).
+6. DFSDM ÷20 (saves 0.3–0.6 mA of CPU).
+7. **Idle-listening mode** (C9, `[Low]` estimate): when nothing ultrasonic is happening, run only a cheap band-energy detector at a low clock and keep a ~10 ms look-back buffer. Wake to full processing on activity, with the buffer covering the wake-up, so call onsets aren't clipped. Could save ~1–2 mA in quiet periods. Evaluate in S3.
 
 **Supply rail** `[Med]`:
 - **3.0 V from a low-dropout LDO**, leaving ~300 mV of headroom at the LiPo's 3.3–3.4 V knee.
-- Bridge supply stays on the regulated rail. Running it straight from the battery would make gain track charge by ≈1.8 dB and unbalance the sides.
+- Bridge supply stays on the regulated rail. Running it from the battery would make gain track charge by ≈1.8 dB and unbalance the sides.
 - 2-level modulation *prefers* the full 3.0 V: more ripple means a wider clean range.
 
 ---
 
-## 8. Physical layout (per side)
+## 8. Physical layout (per side) — **v0.6: split along the arm for balance (D18)**
 
-- **Front clasp, just behind the hinge:** PCB, battery, button.
-  - **PCB size** `[Med]` (parts-area estimate): ~10×20 mm with parts on both sides (4-layer), or ~10×28 mm single-sided. It includes the crystal and gate resistors. The 7×7 mm MCU sets the ~10 mm width.
-  - **Battery** sits beside the PCB: 20–30 mm long depending on option (§7).
-  - **Acoustic path rules (v0.5):**
-    - The mic ports through the PCB, so use a **thin board (≤0.8 mm)**.
-    - Keep the port hole short and wide (≥ the mic's Ø0.325 mm port, ~0.6–1.0 mm).
-    - No gasket cavity; the clasp opening directly over the hole; thin mesh, never foam.
-    - Every added mm of channel shifts the 25 kHz resonance (D13), so the S1 coupons test real geometries.
-- **Along the temple arm:** thin two-conductor lead to the transducer. It carries a 200 kHz switching waveform, so route it away from the mic port and clock/data lines.
-- **Drop-arm near the ear:** a short spring arm pressing the transducer on with **≥1 N** (D1) through a broad compliant pad.
-  - Keep ≥1–1.5 cm clearance from the Ear Open pod through head turns and facial movement.
-  - Target: against the front of the tragus (D1), so the arm is short and sits right at the ear.
+- **Front module, at the hinge:** PCB, mic, button, crystal.
+  - **PCB size** `[Med]` (parts-area estimate): ~10×20 mm with parts on both sides (4-layer), or ~10×28 mm single-sided. The 7×7 mm MCU sets the ~10 mm width.
+  - The mic faces outward here: the head-shadow cue needs it on the side of the head, and the front keeps it clear of hair and the Ear Open.
+- **Battery bay, behind the front module along the temple arm:** the cell lies along the arm (long axis front-to-back), centred ~50–60 mm behind the hinge. It ends before the Ear Open hook, so nothing is behind the ear (§1.2.4). A 2-wire link runs from the front module.
+- **Transducer at the tragus** on a short spring arm, pressing with **≥1 N** through a broad compliant pad (D1). Clear of the Ear Open pod through head turns, talking and chewing.
+- **Balance** (`sim/checks/balance.py`; added load per side, estimated masses):
+
+  | Layout | ~105 mAh cell (7.3 g) | ~150 mAh cell (8.8 g) |
+  |---|---|---|
+  | Everything in one pod at the hinge (v0.5) | nose 4.9 g · ear 2.4 g | nose 6.1 g · ear 2.7 g |
+  | Cell centred mid-arm | nose 3.6 g · ear 3.6 g | nose 4.4 g · ear 4.4 g |
+  | **Cell just before the Ear Open hook** | **nose 3.1 g · ear 4.2 g** | **nose 3.7 g · ear 5.1 g** |
+
+  Moving the cell back lets the bigger battery load the nose pads *less* than the small one did at the hinge. **Nose-pad pressure is the usual comfort failure for glasses**, so this is the main lever.
+- **Acoustic path rules (v0.5):**
+  - The mic ports through the PCB, so use a **thin board (≤0.8 mm)**.
+  - Keep the port hole short and wide (~0.6–1.0 mm, larger than the mic's Ø0.325 mm port).
+  - No gasket cavity; the clasp opening directly over the hole; thin mesh, never foam.
+  - The S1 coupons test real geometries.
+- **Wiring along the arm:** battery (2 wires) and transducer (2 wires, a 200 kHz switching waveform). Route the transducer pair away from the mic port and clock/data lines.
 - **Skin isolation:** transducer metal and solder joints fully insulated (silicone pad plus sealed housing).
 - **Programming:** SWD pogo pads. **Charging:** magnetic pogo connector plus a nightly dock.
-- **Mass target:** under ~8 g per side `[Low]`.
-  - Rough budget: battery 1–3 g · PCB with parts ~0.8 g · transducer ~1–1.5 g `[Low]` · clasp and arm 1.5–2.5 g · wire and silicone ~0.3 g.
-  - That's ~5–8 g depending on battery option.
+- **Mass:** ~7.3–8.8 g per side total `[Low]`, near the ~8 g target and well under the ~15 g "glasses start hurting" level, with the load split between nose and ear as above.
 
 ---
 
@@ -367,10 +394,10 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | Crystal | **Q13FC13500004**: 32.768 kHz watch crystal, 3.2×1.5 mm (or X1A0000610002, 2.0×1.2 mm) | C32346 · **Basic** · 467k · $0.17 (C55208 · Extended · 22.5k) | Recommended (D16) |
 | H-bridge | 2× complementary N+P MOSFET pair, SOT-563 1.6×1.6 mm: **NTZD3155C** (onsemi, ~2.5 nC) or **DMC2400UV** (Diodes Inc., ~0.5 nC) | C236117 · Ext · 8,788 · $0.17 / C177025 · Ext · 113 (clone C2940616 · 3,836) | B1: on-resistance at 3.0 V gate drive and gate charge |
 | Gate pulls | 4× resistors (P-gate pull-ups, N-gate pull-downs) | Basic | Mandatory (D6) |
-| Charger | **MCP73831**: single-cell LiPo linear charger, SOT-23-5 | C424093 · Extended · 9,478 · $0.78 | B3 |
+| Charger | **MCP73831**: single-cell LiPo linear charger, SOT-23-5 | C424093 · Extended · 9,478 · $0.78 | B3: set ~50–75 mA (≤0.5C) |
 | LDO | Low-noise 3.0 V linear regulator, low dropout, low idle current | — | B2 |
 | Transducer | RC-BC02 / GD02 bone exciter (8 or 12 Ω, to be measured) | not JLC; hand-soldered | E1 |
-| Battery | 40–100 mAh LiPo with protection circuit (§7 options) | not JLC; hand-soldered | Owner decision O1 |
+| Battery | ~105–150 mAh LiPo with protection circuit, long and low (≈4×12×40–45 mm) to lie along the arm | not JLC; hand-soldered | B4 (after E4) |
 
 ---
 
@@ -439,7 +466,8 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | R8 | Mic ultrasonic self-noise too high for distant bats | `[Low]` (mic is 8–15 dB *more* sensitive in ultrasound) | S1 |
 | R9 | PWM noise audible | **`[Low]`** (v0.5: ~−90 dB with a 3rd-order shaper; 8–16 kHz is the band to watch) | S2 by ear |
 | R10 | MCU stock is thin (16 at JLC) | `[Med]` | Buy or pre-order early |
-| R11 | Battery life vs clasp size | `[Med]` | Owner decision O1; E4 |
+| R11 | Real current above estimate, so 150 mAh doesn't reach 12 h | `[Med]` | E4; power levers in §7 (idle-listening mode C9) |
+| **R16** | A 12 mm-tall battery bay along the arm looks bulky or snags hair | `[Med]` | B4 (find the lowest-profile cell); Phase 4 fit tests |
 | **R12** | Low-level distortion from dead time exceeds the model (node capacitance, MOSFET behaviour) | `[Med]` | S2 measurement |
 | **R13** | DFSDM clock duty cycle outside the mic's 48–52% | `[Low]` | S1 scope; timer-clock fallback |
 | **R14** | Acoustic path (port, wall, mesh) cuts ultrasonic sensitivity or adds resonances | `[Med]` | S1 coupons; §8 rules; DSP EQ |
@@ -452,9 +480,10 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 ### Owner decisions (open)
 | ID | Decision | Recommendation |
 |---|---|---|
-| **O1** | Battery and runtime target (§7 table) | (a) ~40 mAh or (b) ~60 mAh |
+| ~~O1~~ | ~~Battery and runtime target~~ | **Resolved 2026-09-30:** ≥8 h, target ~12 h, design for balance (D18) |
 | ~~O2~~ | ~~Test a spot nearer the tragus?~~ | **Resolved 2026-09-30:** the tragus is the primary site, and the owner says it fits more easily (D1) |
 | **O3** | Approve the v0.5 shopping list once priced | — |
+| **O4** | Confirm the D18 reading of §1.2.4: cell along the arm, in front of the ear, nothing behind it | Yes; it's what makes the 12 h battery comfortable |
 
 Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 or the schematic · **P2** before board order · **P3** before final assembly.
 
@@ -471,8 +500,8 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 |---|---|---|
 | B1 | H-bridge MOSFET pair | **IN PROGRESS**: discrete chosen (D6). Pick NTZD3155C vs DMC2400UV on on-resistance at 3.0 V gate drive **and gate charge**, which sets 0.4–2 mA of switching current. |
 | B2 | 3.0 V LDO | Low noise, low dropout at bridge peaks, low Iq |
-| B3 | Charger | MCP73831 (C424093); program ≤1C for the chosen cell |
-| B4 | Battery | After O1: concrete cell, size, mass, sourcing |
+| B3 | Charger | MCP73831 (C424093); program ~50–75 mA (≤0.5C for 105–150 mAh) |
+| B4 | Battery | 105–150 mAh protected LiPo, **long and low** (target ≤4.5 mm thick, ≤12 mm tall, ≤45 mm long); mass; sourcing. Final pick after E4. |
 | B5 | Button | Smallest tactile switch; JLC-assemblable preferred |
 | B6 | Connectors | Magnetic 2-pin charge pogo; SWD footprint; ESD on exposed contacts |
 | B7 | Costing | BOM per side; JLC assembly for 2/5/10 boards |
@@ -489,6 +518,7 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 | C6 | Local bat call frequencies | OPEN |
 | C7 | Transducer response above 20 kHz | **Mostly moot** (bone-conducted ultrasound thresholds, D6/§6). Check 8–16 kHz response in S2. |
 | C8 | Mic EQ from coupon measurements | **New.** After S1 |
+| C9 | Idle-listening power mode (band-energy detector + look-back buffer + wake) | **New v0.6.** Simulate in Phase 1, measure in S3 |
 
 ### D. Mechanical and materials (P3)
 | ID | Task |
@@ -497,6 +527,7 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 | D2 | Acoustic mesh that passes 20–80 kHz and keeps out dust and sweat |
 | D3 | Skin-contact insulation method for the transducer |
 | D4 | **New.** Drop-arm spring design for ≥1 N with a compliant pad (after E2) |
+| D5 | **New v0.6.** Pod layout and balance: front module + battery bay along the arm; check with `sim/checks/balance.py` and CAD mass properties |
 
 ### E. Owner bench measurements (Claude writes procedures and analyzes results)
 | ID | Measurement | Resolves |
@@ -544,6 +575,12 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ---
 
 ## 15. Changelog
+
+### v0.6 (2026-09-30) — runtime and balance
+- **O1 resolved (owner):** ≥8 h per charge, target ~12 h, design for balance. **D18 new.**
+- **§7 re-budgeted** with the tragus site (transducer drive ÷~3), low-gate-charge MOSFETs, and a 48–64 MHz clock for algorithm A (D14): ~5–8.5 mA (A), ~7.5–10.5 mA (B). The battery bay is sized for ~150 mAh (12 h in both algorithms at the pessimistic end); ≥105 mAh fits.
+- **§8 re-laid-out:** electronics at the hinge, cell along the arm in front of the Ear Open hook. `sim/checks/balance.py` shows the 150 mAh layout loads the nose pads *less* (3.7 g/side) than v0.5's small battery at the hinge (4.9 g/side).
+- New: C9 idle-listening power mode; D5 layout task; R16; O4 (confirm the §1.2.4 reading). R11 reworded.
 
 ### v0.5 (2026-09-30) — full-plan sanity check (`docs/research/review-2026-09-30.md`)
 - **D16 new: crystal clock reference.** Internal oscillators (±1–2%) would put the two ears up to ~380 Hz apart in heterodyne mode.
