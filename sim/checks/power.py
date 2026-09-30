@@ -62,9 +62,9 @@ def main():
     for h, lab in ((8, "8 h minimum"), (12, "12 h target")):
         ax.axhline(h, color=plotstyle.TEXT_2, lw=0.8, ls=":")
         ax.text(101, h, lab, fontsize=8, va="center", color=plotstyle.TEXT_2)
-    for x, lab in ((14, "quiet evening\n(simulated)"), (93, "busy scene\n(simulated)")):
+    for x, lab, y, ha, dx in ((14, "quiet evening\n(simulated)", 55, "left", 1), (93, "busy scene\n(simulated)", 38, "right", -1)):
         ax.axvline(x, color=plotstyle.SERIES[7], lw=0.8)
-        ax.text(x + 1, 55, lab, fontsize=8, color=plotstyle.SERIES[7], va="top")
+        ax.text(x + dx, y, lab, fontsize=8, color=plotstyle.SERIES[7], va="top", ha=ha)
     ax.set_xlabel("time the full chain is awake (%)")
     ax.set_ylabel("runtime per charge (h)")
     ax.set_ylim(0, 60)

@@ -31,7 +31,7 @@ def main():
     for side in ("top", "bottom"):
         run("kicad-cli", "pcb", "render", "--output", str(D / f"view_3d_{side}.png"), "--side", side,
             "--width", "1600", "--height", "900", "--zoom", "0.9", "--quality", "high",
-            "--background", "opaque", str(view))
+            "--background", "transparent", str(view))
     for name, layers in (("front", "F.Cu,F.Silkscreen,Edge.Cuts"), ("back", "B.Cu,B.Silkscreen,Edge.Cuts"),
                          ("inner", "In1.Cu,In2.Cu,Edge.Cuts")):
         svg = D / f"view_{name}.svg"

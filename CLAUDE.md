@@ -17,7 +17,9 @@
   - Render to PNG with `docs/diagrams/render.sh` and send the **PNG** into the chat, where it shows inline. SVG files only appear as file cards.
   - Never send project content to external image-generation APIs.
   - Skill: `.claude/skills/visual-explainer/`.
+- **Dark mode for every visual.** `render.sh` darkens SVGs by default (`docs/diagrams/darken.py`); `tools/plotstyle.py` is dark by default. Use the palette colours those files map.
 - **Self-taught, wants the why.** Explain briefly, never condescend.
+  - **Level:** RF, analogue, digital packets/data, CAD and device physics are known ground. Pitch explanations at the black boxes: MCU internals, datasheets, PCB stack-ups, DSP on sampled audio (`docs/learn/`).
 
 ## Tools
 - `tools/setup.sh` installs everything idempotently (details in `tools/README.md`). Run `source tools/env.sh` before using the tools.

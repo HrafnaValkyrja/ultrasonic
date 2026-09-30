@@ -139,7 +139,7 @@ def render(parts, temple, geom):
     fig = plt.figure(figsize=(13, 5))
     for i, (title, (el, az)) in enumerate(views):
         ax = fig.add_subplot(1, 3, i + 1, projection="3d", proj_type="ortho" if i != 1 else "persp")
-        items = [("temple", temple, ("#1f2328", 0.15))] + [(n, s, colours[n]) for n, (s, _) in parts.items()]
+        items = [("temple", temple, (plotstyle.TEXT_2, 0.25))] + [(n, s, colours[n]) for n, (s, _) in parts.items()]
         for name, shape, (col, alpha) in items:
             vs, tris = shape.tessellate(0.05)
             V = np.array([[p.X, p.Y, p.Z] for p in vs])
@@ -155,6 +155,8 @@ def render(parts, temple, geom):
         ax.set_ylim(-20, 20)
         ax.set_zlim(-35, 10)
         ax.set_box_aspect((55, 40, 45))
+        for axis in (ax.xaxis, ax.yaxis, ax.zaxis):
+            axis.set_pane_color(plotstyle.SURFACE)
         ax.view_init(elev=el, azim=az)
         ax.set_title(title)
         if i == 0:

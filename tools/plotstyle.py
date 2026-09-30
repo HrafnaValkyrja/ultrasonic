@@ -11,12 +11,15 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
-# Validated categorical palette (light surface), fixed order.
-SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"]
-SURFACE = "#fcfcfb"
-TEXT = "#0b0b0b"
-TEXT_2 = "#52514e"
-GRID = "#e4e3df"
+# Dark mode is the default (owner preference, 2026-09-30); PLOT_LIGHT=1 gives the light theme.
+import os  # noqa: E402
+
+if os.environ.get("PLOT_LIGHT") == "1":
+    SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#4a3aa7", "#e34948"]
+    SURFACE, TEXT, TEXT_2, GRID = "#fcfcfb", "#0b0b0b", "#52514e", "#e4e3df"
+else:   # same hues, lifted for contrast on a dark surface
+    SERIES = ["#5b9ff2", "#f58a5c", "#2fc98f", "#f2b632", "#f09bbd", "#35b535", "#8d7ff0", "#ff6d6c"]
+    SURFACE, TEXT, TEXT_2, GRID = "#141518", "#e8e8e5", "#a4a9b0", "#2c2e34"
 
 
 def apply():
