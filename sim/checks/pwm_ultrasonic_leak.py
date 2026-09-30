@@ -91,7 +91,7 @@ def main():
     ax.set_xlabel("kHz")
     ax.set_ylabel("noise density (dB re FS sine per kHz)")
     ax.set_title("Where the PWM noise shaper puts its noise: options vs the mic's 20-85 kHz band")
-    ax.legend(loc="lower right", fontsize=7.5)
+    ax.legend(loc="lower right", fontsize=7.5, labelcolor=plotstyle.TEXT)
     fig.savefig(OUT / "leak.png")
     return rows
 

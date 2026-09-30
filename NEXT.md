@@ -1,8 +1,18 @@
-# Next actions (updated 2026-09-30 after the OOM incident)
+# Next actions (updated 2026-09-30 evening, after the autonomous audit-fix run)
+
+## 0. Owner decisions waiting (spec v0.14)
+- **O7b, tragus arm:** A (20 mm on the plateau, 1.0–2.3 N) vs **B (30 mm elastic, 0.7–1.3 N, 54° sweep; recommended)** vs C (pivot + torsion spring). Pictures: `hw/mech/out/pod_sketches.png`, `sim/out/niti/o7b_force.png`.
+- **O5, pod size:** CAD rev 2 needs 38 × 10 × 15 mm (was 35 × 9 × 14) to fit the cell's maximum envelope.
+- **MCP73832 swap:** applied in schematic Rev B as recommended; revert if she prefers another fix for NM-1.
+- **PWM rate (D6/MP-01):** no decision now; the bench measures the coupling first.
+
+(Resuming the audit below is now LOW priority: the saved results were synthesised by hand and the design fixes applied. Never run it while the owner is away.)
+
+
 
 **Read `docs/incidents/2026-09-30-oom.md` first.** The cron poke is disabled. The audit script is now capped at 5 live agents and fences its sims; resume it only from a session started with `tools/claude-session.sh`.
 
-## 1. Resume the adversarial audit
+## 1. Resume the adversarial audit (low priority, owner present only)
 It was running when the window ran low. Finished agents are cached in the run journal.
 ```
 Workflow({scriptPath: ".claude/workflows/adversarial-methodology-audit.js",

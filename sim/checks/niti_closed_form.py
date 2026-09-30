@@ -55,3 +55,34 @@ for lab, E, d_, L_ in (("B NiTi 0.85 x 30 mm, elastic", 50e3, 0.85, 30.0),
     print(f"  {lab:38s} {' / '.join(f'{f:.2f}' for f in Fs):>20s} {eps * 100:9.1f} %")
 print("  NiTi's elastic modulus is itself strain- and temperature-dependent (30-80 GPa quoted):")
 print("  B and D carry +-30% force uncertainty until a coupon is bent on the bench.")
+
+# ---- picture for O7b
+from pathlib import Path
+import numpy as np
+sys_path = Path(__file__).resolve().parents[2]
+import sys
+sys.path.insert(0, str(sys_path / "tools"))
+import plotstyle  # noqa: E402
+plt = plotstyle.apply()
+fig, ax = plt.subplots(figsize=(8.5, 4.6))
+x = np.linspace(5, 9, 50)
+S = plotstyle.SERIES
+ax.fill_between(x, force(200), force(450), color=S[3], alpha=0.25, lw=0)
+ax.plot(x, np.full_like(x, force(450)), color=S[3], lw=2, label="A  20 mm NiTi on plateau: loading (glasses going on, jaw in)")
+ax.plot(x, np.full_like(x, force(200)), color=S[3], lw=2, ls="--", label="A  ... unloading (jaw out); real force is anywhere in the band")
+Ib = math.pi * 0.85 ** 4 / 64
+ax.plot(x, 3 * 50e3 * Ib * x / 30 ** 3, color=S[1], lw=2.4, label="B  30 mm NiTi, elastic: one line, no history")
+ax.fill_between(x, 3 * 30e3 * Ib * x / 30 ** 3, 3 * 70e3 * Ib * x / 30 ** 3, color=S[1], alpha=0.12, lw=0)
+ax.fill_between(x, 0.99, 1.26, color=S[2], alpha=0.35, lw=0, label="C  pivot + torsion spring (v0.13 study)")
+ax.axhspan(0.8, 1.2, color=S[7], alpha=0.08, lw=0)
+ax.text(5.05, 0.83, "target ~1 N", color=S[7], fontsize=8)
+ax.axvline(7, color=plotstyle.TEXT_2, lw=0.8, ls=":")
+ax.text(7.05, 0.12, "nominal fit; jaw moves +-2 mm", color=plotstyle.TEXT_2, fontsize=8)
+ax.set_xlabel("pad deflection (mm)")
+ax.set_ylabel("force on the tragus (N)")
+ax.set_ylim(0, 3.4)
+ax.set_title("O7b: tragus arm force vs deflection (B's shading: NiTi modulus 30-70 GPa)")
+ax.legend(loc="upper left", fontsize=8, framealpha=0.9, labelcolor=plotstyle.TEXT)
+out = sys_path / "sim/out/niti"
+out.mkdir(parents=True, exist_ok=True)
+fig.savefig(out / "o7b_force.png")
