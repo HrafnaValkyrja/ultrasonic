@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Inside the STM32U575 as used in this design: a bus matrix connects bus masters (CPU core, general DMA, low-power DMA) to slaves (the ADF decimation filter, SRAM, the TIM1 timer, flash, GPIO and ADC). Numbered badges trace one audio sample: the mic's 1-bit stream is decimated by the ADF, copied by DMA into an SRAM ring buffer, processed by the CPU, copied by DMA into the timer's compare register, and switched out to the bridge pins. A clock block derives 80 MHz from an internal oscillator locked to the 32.768 kHz crystal." font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8520a"/></marker>
+  </defs>
+  <rect width="1200" height="800" rx="14" fill="#fbfaf7"/>
+  <text x="36" y="40" font-size="20" font-weight="700" fill="#1f2328">Inside the STM32U575: a small network on a 7 × 7 mm die</text>
+  <text x="36" y="64" font-size="13.5" fill="#57606a">Only the blocks this design uses are shown. Orange badges ①–⑥ follow one audio sample; the CPU touches it only at ④.</text>
+
+  <!-- die -->
+  <rect x="150" y="88" width="900" height="590" rx="16" fill="#ffffff" stroke="#1f2328" stroke-width="2"/>
+  <text x="168" y="112" font-size="12" fill="#57606a">the die (silicon), inside the QFN-48 package</text>
+
+  <!-- masters -->
+  <text x="300" y="140" font-size="11.5" font-weight="700" fill="#2a78d6">BUS MASTERS: can start a read or write</text>
+  <g fill="#e8f0fb" stroke="#2a78d6" stroke-width="1.6">
+    <rect x="300" y="150" width="190" height="90" rx="8"/><rect x="515" y="150" width="170" height="90" rx="8"/><rect x="710" y="150" width="170" height="90" rx="8"/>
+  </g>
+  <g font-size="12.5" text-anchor="middle" fill="#1f2328">
+    <text x="395" y="175" font-weight="700" font-size="14">CPU core</text><text x="395" y="194">Arm Cortex-M33, 80 MHz</text><text x="395" y="211">+ FPU + DSP instructions</text><text x="395" y="229" fill="#57606a">runs our code</text>
+    <text x="600" y="175" font-weight="700" font-size="14">GPDMA</text><text x="600" y="194">16 channels</text><text x="600" y="211">copies memory ↔ periph.</text><text x="600" y="229" fill="#57606a">no CPU involved</text>
+    <text x="795" y="175" font-weight="700" font-size="14">LPDMA</text><text x="795" y="194">low-power DMA</text><text x="795" y="211">keeps working in Stop 2</text><text x="795" y="229" fill="#57606a">(idle mode)</text>
+  </g>
+
+  <!-- bus matrix -->
+  <rect x="190" y="280" width="840" height="56" rx="8" fill="#f3f1ea" stroke="#1f2328" stroke-width="1.6"/>
+  <text x="610" y="304" font-size="15" font-weight="700" text-anchor="middle" fill="#1f2328">Bus matrix (AHB + APB bridges)</text>
+  <text x="610" y="324" font-size="12" text-anchor="middle" fill="#57606a">a crossbar switch: any master can reach any slave; contention is arbitrated per bus cycle</text>
+  <g stroke="#2a78d6" stroke-width="1.6"><line x1="395" y1="240" x2="395" y2="280"/><line x1="600" y1="240" x2="600" y2="280"/><line x1="795" y1="240" x2="795" y2="280"/></g>
+
+  <!-- slaves -->
+  <text x="190" y="372" font-size="11.5" font-weight="700" fill="#1a7a55">SLAVES: memory, and peripherals whose control registers are just memory addresses</text>
+  <g fill="#e8f3ec" stroke="#1baf7a" stroke-width="1.6">
+    <rect x="190" y="385" width="175" height="110" rx="8"/><rect x="390" y="385" width="175" height="110" rx="8"/><rect x="590" y="385" width="175" height="110" rx="8"/>
+    <rect x="800" y="385" width="230" height="110" rx="8"/>
+  </g>
+  <g stroke="#1baf7a" stroke-width="1.6"><line x1="277" y1="385" x2="277" y2="336"/><line x1="477" y1="385" x2="477" y2="336"/><line x1="677" y1="385" x2="677" y2="336"/><line x1="915" y1="385" x2="915" y2="336"/></g>
+  <g font-size="12" text-anchor="middle" fill="#1f2328">
+    <text x="277" y="409" font-weight="700" font-size="13.5">ADF1</text><text x="277" y="428">sigma-delta decimator:</text><text x="277" y="445">CIC (sinc⁵) ÷5 →</text><text x="277" y="462">reshape FIR ÷4</text><text x="277" y="481" fill="#57606a">4 MHz 1-bit → 200 kS/s</text>
+    <text x="477" y="409" font-weight="700" font-size="13.5">SRAM, 786 KB</text><text x="477" y="428">input ring buffer,</text><text x="477" y="445">FFT workspace,</text><text x="477" y="462">output buffer</text>
+    <text x="677" y="409" font-weight="700" font-size="13.5">TIM1</text><text x="677" y="428">counter + compare regs:</text><text x="677" y="445">PWM at 200 kHz,</text><text x="677" y="462">complementary pairs,</text><text x="677" y="479">dead time in hardware</text>
+    <text x="915" y="409" font-weight="700" font-size="13.5">Also on the bus</text><text x="915" y="430">Flash 2 MB (the program)</text><text x="915" y="449">GPIO + EXTI (button, mic power)</text><text x="915" y="468">ADC4 (battery voltage)</text>
+  </g>
+
+  <!-- pins -->
+  <rect x="30" y="412" width="110" height="56" rx="6" fill="#ffffff" stroke="#1f2328"/>
+  <text x="85" y="435" font-size="12.5" font-weight="700" text-anchor="middle" fill="#1f2328">Mic</text>
+  <text x="85" y="453" font-size="11.5" text-anchor="middle" fill="#1f2328">PB3 clk · PB4 data</text>
+  <line x1="140" y1="440" x2="188" y2="440" stroke="#b8520a" stroke-width="2.6" marker-end="url(#d)"/>
+  <rect x="1060" y="512" width="125" height="56" rx="6" fill="#ffffff" stroke="#1f2328"/>
+  <text x="1122" y="535" font-size="12.5" font-weight="700" text-anchor="middle" fill="#1f2328">Bridge</text>
+  <text x="1122" y="553" font-size="11.5" text-anchor="middle" fill="#1f2328">PA8 PA7 PA9 PB0</text>
+  <polyline points="677,495 677,540 1058,540" fill="none" stroke="#b8520a" stroke-width="2.6" marker-end="url(#d)"/>
+
+  <!-- badges -->
+  <g font-size="14" font-weight="700" fill="#ffffff" text-anchor="middle">
+    <circle cx="198" cy="393" r="13" fill="#b8520a"/><text x="198" y="398">1</text>
+    <circle cx="523" cy="158" r="13" fill="#b8520a"/><text x="523" y="163">2</text>
+    <circle cx="398" cy="393" r="13" fill="#b8520a"/><text x="398" y="398">3</text>
+    <circle cx="308" cy="158" r="13" fill="#b8520a"/><text x="308" y="163">4</text>
+    <circle cx="677" cy="158" r="13" fill="#b8520a"/><text x="677" y="163">5</text>
+    <circle cx="598" cy="393" r="13" fill="#b8520a"/><text x="598" y="398">6</text>
+  </g>
+
+  <!-- clock + power -->
+  <rect x="190" y="570" width="410" height="92" rx="8" fill="#fff4ea" stroke="#b8520a" stroke-width="1.6"/>
+  <text x="205" y="593" font-size="13.5" font-weight="700" fill="#b8520a">RCC: the clock tree (think LO distribution)</text>
+  <text x="205" y="613" font-size="12" fill="#1f2328">32.768 kHz crystal → internal RC oscillator (MSI),</text>
+  <text x="205" y="630" font-size="12" fill="#1f2328">frequency-locked to it → PLL → 80 MHz → dividers</text>
+  <text x="205" y="649" font-size="12" fill="#57606a">mic clock, sample rates and PWM all come from one reference</text>
+  <rect x="620" y="570" width="410" height="92" rx="8" fill="#f3f1ea" stroke="#8a8676" stroke-width="1.6"/>
+  <text x="635" y="593" font-size="13.5" font-weight="700" fill="#1f2328">PWR: core supply</text>
+  <text x="635" y="613" font-size="12" fill="#1f2328">3.0 V at the pins; the logic runs at ~1.1 V from an on-die</text>
+  <text x="635" y="630" font-size="12" fill="#1f2328">buck (SMPS, 3 MHz, external 2.2 µH inductor), or from an</text>
+  <text x="635" y="649" font-size="12" fill="#1f2328">on-die LDO: selectable in software</text>
+
+  <!-- walkthrough -->
+  <rect x="36" y="692" width="1128" height="96" rx="10" fill="#ffffff" stroke="#1f2328" stroke-width="1.2"/>
+  <g font-size="12.5" fill="#1f2328">
+    <text x="54" y="715"><tspan font-weight="700" fill="#b8520a">①</tspan> ADF1 turns the mic's 4 Mb/s one-bit stream into 16-bit samples at 200 kS/s.   <tspan font-weight="700" fill="#b8520a">②</tspan> GPDMA copies each one into   <tspan font-weight="700" fill="#b8520a">③</tspan> a ring buffer in SRAM.</text>
+    <text x="54" y="736"><tspan font-weight="700" fill="#b8520a">④</tspan> Every 0.64 ms an interrupt wakes the CPU: FFT over the last 256 samples, then 8 new output values from the 28 oscillators.</text>
+    <text x="54" y="757"><tspan font-weight="700" fill="#b8520a">⑤</tspan> GPDMA writes each value into   <tspan font-weight="700" fill="#b8520a">⑥</tspan> TIM1's compare register, which sets how long each 5 µs PWM period stays high on the bridge pins.</text>
+    <text x="54" y="778" fill="#57606a">In your terms: bus matrix ≈ switch fabric · DMA ≈ NIC doing zero-copy into rings · peripheral registers ≈ a memory-mapped register map · mic + ADF ≈ a sigma-delta ADC split in two</text>
+  </g>
+</svg>
