@@ -7,6 +7,12 @@
 export ULTRA_TOOLS_HOME="${ULTRA_TOOLS_HOME:-/opt/ultrasonic-tools}"
 export ULTRA_VENV="$ULTRA_TOOLS_HOME/venv"
 
+# Temp files on DISK. On Ubuntu 26.04 /tmp is tmpfs (RAM). ngspice's -r raw output can reach
+# ~10 GB, and tmpfs pages can't be reclaimed: that is RAM gone until the file is deleted
+# (2026-09-30 incident). Python tempfile, ngspice and kicad-cli all honour TMPDIR.
+export TMPDIR="${ULTRA_TMPDIR:-$HOME/.cache/ultrasonic-tmp}"
+mkdir -p "$TMPDIR" 2>/dev/null || true
+
 # FreeRouting jar (symlink to the pinned version) and the Java runtime it needs (>= 25).
 export FREEROUTING_JAR="$ULTRA_TOOLS_HOME/freerouting/freerouting.jar"
 # Cap FreeRouting's JVM heap. Unset, a JVM may claim up to 1/4 of RAM (~7.5 GB here), and six
