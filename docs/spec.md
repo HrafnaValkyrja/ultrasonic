@@ -1,4 +1,4 @@
-# Stereo Ultrasound — Project Spec v0.9
+# Stereo Ultrasound — Project Spec v0.10
 
 **Owner:** Valkyrie
 **Status:** Concept phase. §1 MVP confirmed by owner 2026-09-30. MCU (D5) and firmware toolchain (D15) decided. v0.5 applies the full-plan sanity check (`docs/research/review-2026-09-30.md`). Next: shopping-list approval (O3) → Phase 1 simulation and first bench orders. No hardware purchased.
@@ -353,6 +353,14 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 6. DFSDM ÷20 (saves 0.3–0.6 mA of CPU).
 7. **Idle-listening mode** (C9, `[Low]` estimate): when nothing ultrasonic is happening, run only a cheap band-energy detector at a low clock and keep a ~10 ms look-back buffer. Wake to full processing on activity, with the buffer covering the wake-up, so call onsets aren't clipped. Could save ~1–2 mA in quiet periods. Evaluate in S3.
 
+**v0.10 power findings (2026-09-30):**
+- **A newer MCU doesn't help under our rules.** The STM32U575's 19.5 µA/MHz needs its internal SMPS (switching regulator). On its LDO it draws 5.4 mA at 64 MHz, ~84 µA/MHz, the same as the L452 (DS13737 Rev 8, Table 37). The SMPS route conflicts with §1.2.3, so it's off the table unless the owner changes that rule.
+- **The big allowed lever is the idle-listening mode (C9), now the top power item.**
+  - When the ultrasonic band is quiet, the CPU clock is divided down, a few band-energy detectors (each with a slowly tracking floor, so steady whines don't count) run on the DFSDM stream, and the bridge stops. The mic clock never changes, so there's no DFSDM restart.
+  - A ~10 ms look-back buffer covers the wake-up, so call onsets aren't clipped.
+  - Estimated draw at 75% quiet time: ~3.3 mA (A) and ~3.7 mA (B), against 7.2 and 8.8 mA always-on, so 8 h needs ~35 mAh instead of ~70–85 mAh `[Low]`.
+  - Worst case, when the band is always busy, falls back to full draw. So the cell should still be sized for the always-on case, or for a measured duty cycle from E4.
+
 **Supply rail** `[Med]`:
 - **3.0 V from a low-dropout LDO**, leaving ~300 mV of headroom at the LiPo's 3.3–3.4 V knee.
 - Bridge supply stays on the regulated rail. Running it from the battery would make gain track charge by ≈1.8 dB and unbalance the sides.
@@ -619,6 +627,9 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ---
 
 ## 15. Changelog
+
+### v0.10 (2026-09-30) — power levers
+- STM32U5 checked: its low µA/MHz needs its internal SMPS; on LDO it matches the L452, so no MCU swap. The idle-listening mode (C9) becomes the main power lever (~50% cut at 75% quiet time).
 
 ### v0.9 (2026-09-30) — peripheral vision is a no-go zone
 - Owner: no part of the device may enter her peripheral vision. Estimated limit ~18 mm behind the pupil plane (110° field + 5 mm), which shrinks the pod space to ~35 mm; the pod becomes stacked and thicker; balance improves. New E10 (measure her actual field); O5 reframed.
