@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" role="img" aria-label="One side of the device: the ultrasonic mic feeds the DFSDM filter, a half-band filter and the DSP, which compresses ultrasound into 1.5 to 4 kHz; the result is interpolated, noise-shaped and turned into 200 kHz PWM that drives an H-bridge and the transducer at the tragus. A single crystal-locked clock paces both the input path and the output path." font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#1f2328"/>
+    </marker>
+    <marker id="arrowClk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#b8520a"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1000" height="560" rx="14" fill="#fbfaf7"/>
+
+  <!-- section labels -->
+  <text x="40" y="36" font-size="14" font-weight="700" fill="#1f2328">LISTEN  (ultrasound in)</text>
+  <text x="40" y="332" font-size="14" font-weight="700" fill="#1f2328">SPEAK  (audible sound out)</text>
+
+  <!-- Row A: input path, left to right -->
+  <g fill="#ffffff" stroke="#1f2328" stroke-width="1.6">
+    <rect x="40"  y="120" width="170" height="64" rx="8"/>
+    <rect x="270" y="120" width="170" height="64" rx="8"/>
+    <rect x="500" y="120" width="170" height="64" rx="8"/>
+    <rect x="730" y="120" width="230" height="64" rx="8"/>
+  </g>
+  <g font-size="13" fill="#1f2328" text-anchor="middle">
+    <text x="125" y="147" font-weight="700">Ultrasonic mic</text>
+    <text x="125" y="166">SPH0641 · 20–85 kHz</text>
+    <text x="355" y="147" font-weight="700">DFSDM filter</text>
+    <text x="355" y="166">in hardware, ÷10</text>
+    <text x="585" y="147" font-weight="700">Half-band filter</text>
+    <text x="585" y="166">CPU, ÷2</text>
+    <text x="845" y="147" font-weight="700">DSP</text>
+    <text x="845" y="166">EQ → shift / squeeze → gate</text>
+  </g>
+
+  <!-- mic <-> DFSDM: clock out, data back -->
+  <line x1="270" y1="136" x2="212" y2="136" stroke="#b8520a" stroke-width="1.8" marker-end="url(#arrowClk)"/>
+  <text x="241" y="112" font-size="11" fill="#b8520a" text-anchor="middle">clock 4.0 MHz</text>
+  <line x1="210" y1="168" x2="268" y2="168" stroke="#1f2328" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="240" y="200" font-size="11" fill="#1f2328" text-anchor="middle">1-bit data</text>
+
+  <line x1="440" y1="152" x2="498" y2="152" stroke="#1f2328" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="470" y="200" font-size="11" fill="#1f2328" text-anchor="middle">400 kS/s</text>
+  <line x1="670" y1="152" x2="728" y2="152" stroke="#1f2328" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="700" y="200" font-size="11" fill="#1f2328" text-anchor="middle">200 kS/s</text>
+
+  <!-- DSP down to output path -->
+  <line x1="845" y1="184" x2="845" y2="418" stroke="#1f2328" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="855" y="300" font-size="11" fill="#1f2328">12.5 kS/s</text>
+  <text x="855" y="315" font-size="11" fill="#1f2328">(1.5–4 kHz)</text>
+
+  <!-- Row B: output path, right to left -->
+  <g fill="#ffffff" stroke="#1f2328" stroke-width="1.6">
+    <rect x="730" y="420" width="230" height="64" rx="8"/>
+    <rect x="500" y="420" width="170" height="64" rx="8"/>
+    <rect x="270" y="420" width="170" height="64" rx="8"/>
+    <rect x="40"  y="420" width="170" height="64" rx="8"/>
+  </g>
+  <g font-size="13" fill="#1f2328" text-anchor="middle">
+    <text x="845" y="447" font-weight="700">Interpolate ×16</text>
+    <text x="845" y="466">+ noise shaper</text>
+    <text x="585" y="447" font-weight="700">TIM1 PWM</text>
+    <text x="585" y="466">200 kHz, 2-level</text>
+    <text x="355" y="447" font-weight="700">H-bridge</text>
+    <text x="355" y="466">2 MOSFET pairs</text>
+    <text x="125" y="447" font-weight="700">Transducer</text>
+    <text x="125" y="466">at the tragus</text>
+  </g>
+  <line x1="730" y1="452" x2="672" y2="452" stroke="#1f2328" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="700" y="508" font-size="11" fill="#1f2328" text-anchor="middle">duty/cycle</text>
+  <line x1="500" y1="452" x2="442" y2="452" stroke="#1f2328" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="470" y="508" font-size="11" fill="#1f2328" text-anchor="middle">4 gate lines</text>
+  <line x1="270" y1="452" x2="212" y2="452" stroke="#1f2328" stroke-width="1.8" marker-end="url(#arrow)"/>
+  <text x="240" y="508" font-size="11" fill="#1f2328" text-anchor="middle">±3 V switching</text>
+  <text x="125" y="530" font-size="11" fill="#1f2328" text-anchor="middle">→ vibration → cochlea</text>
+
+  <!-- shared clock between the two paths -->
+  <rect x="270" y="244" width="400" height="56" rx="8" fill="#fff4ea" stroke="#b8520a" stroke-width="1.8"/>
+  <text x="470" y="268" font-size="13" font-weight="700" fill="#b8520a" text-anchor="middle">One clock, locked to a watch crystal (80 MHz shown)</text>
+  <text x="470" y="287" font-size="11" fill="#b8520a" text-anchor="middle">both paths tick together → switching leakage lands at 0 Hz</text>
+  <line x1="355" y1="244" x2="355" y2="187" stroke="#b8520a" stroke-width="1.8" marker-end="url(#arrowClk)"/>
+  <line x1="585" y1="300" x2="585" y2="417" stroke="#b8520a" stroke-width="1.8" marker-end="url(#arrowClk)"/>
+  <text x="595" y="364" font-size="11" fill="#b8520a">÷400 → 200 kHz</text>
+  <text x="365" y="222" font-size="11" fill="#b8520a">÷20 → 4.0 MHz</text>
+
+  <!-- power -->
+  <text x="960" y="530" font-size="11" fill="#57606a" text-anchor="end">Power: LiPo 105–150 mAh → charger → 3.0 V linear regulator → all blocks</text>
+</svg>
