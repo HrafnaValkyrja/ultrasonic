@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 430" role="img" aria-label="Two kinds of nickel-titanium wire. Shape-memory wire bends and stays bent until heated. Superelastic wire springs back by itself at room and skin temperature; the arm uses superelastic wire. The 500 degree step happens once, at manufacture, to set the shape." font-family="Helvetica, Arial, sans-serif">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f2328"/></marker></defs>
+  <rect width="1000" height="430" rx="14" fill="#fbfaf7"/>
+  <text x="40" y="40" font-size="18" font-weight="700" fill="#1f2328">Two kinds of NiTi wire: same metal, tuned differently</text>
+
+  <!-- row 1: shape memory -->
+  <text x="40" y="82" font-size="14" font-weight="700" fill="#8a8676">Shape-memory NiTi: NOT what we use</text>
+  <g fill="none" stroke-width="5" stroke-linecap="round">
+    <path d="M90,150 Q130,110 170,150" stroke="#8a8676"/>
+    <path d="M330,150 L410,120" stroke="#8a8676"/>
+    <path d="M560,150 L640,120" stroke="#8a8676"/>
+    <path d="M790,150 Q830,110 870,150" stroke="#8a8676"/>
+  </g>
+  <g font-size="12" fill="#1f2328" text-anchor="middle">
+    <text x="130" y="180">its shape</text>
+    <text x="370" y="180">push it: it bends</text>
+    <text x="600" y="180">let go: it STAYS bent</text>
+    <text x="830" y="180">heat it: shape returns</text>
+  </g>
+  <g stroke="#1f2328" stroke-width="1.6" marker-end="url(#a)">
+    <line x1="200" y1="135" x2="300" y2="135"/><line x1="430" y1="135" x2="530" y2="135"/><line x1="660" y1="135" x2="760" y2="135"/>
+  </g>
+  <text x="710" y="122" font-size="12" fill="#b8520a" text-anchor="middle">🔥 40–70 °C</text>
+
+  <!-- row 2: superelastic -->
+  <rect x="30" y="215" width="940" height="140" rx="10" fill="#e8f3ec" stroke="#1baf7a" stroke-width="1.8"/>
+  <text x="50" y="243" font-size="14" font-weight="700" fill="#1a7a55">Superelastic NiTi: what the arm uses (and what the Ear (open) hook is made of)</text>
+  <g fill="none" stroke-width="5" stroke-linecap="round">
+    <path d="M90,310 Q130,270 170,310" stroke="#1a7a55"/>
+    <path d="M330,310 L410,280" stroke="#1a7a55"/>
+    <path d="M560,310 Q600,270 640,310" stroke="#1a7a55"/>
+  </g>
+  <g font-size="12" fill="#1f2328" text-anchor="middle">
+    <text x="130" y="340">its shape</text>
+    <text x="370" y="340">push it: it bends a lot</text>
+    <text x="600" y="340">let go: springs straight back</text>
+  </g>
+  <g stroke="#1f2328" stroke-width="1.6" marker-end="url(#a)">
+    <line x1="200" y1="295" x2="300" y2="295"/><line x1="430" y1="295" x2="530" y2="295"/>
+  </g>
+  <text x="700" y="285" font-size="12.5" fill="#1a7a55">no heat needed, at room or</text>
+  <text x="700" y="303" font-size="12.5" fill="#1a7a55">skin temperature, every time</text>
+
+  <text x="40" y="390" font-size="13" fill="#1f2328"><tspan font-weight="700">The 500 °C step</tspan> happens once, when the arm is made, to set its shape (like firing clay). Never again after that.</text>
+  <text x="40" y="412" font-size="13" fill="#1f2328"><tspan font-weight="700">What to buy:</tspan> wire whose "Af" temperature is about 0 °C or lower, so it stays springy even on a cold day.</text>
+</svg>
