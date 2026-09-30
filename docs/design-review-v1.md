@@ -9,7 +9,7 @@ Every number links back to the script or note that produced it. Diagrams are in 
 
 ## 1. What one side is
 
-![system](diagrams/system-overview.png)
+![system](review-v1/system-overview.png)
 
 - **Listen:**
   - The **SPH0641LU4H-1** (an ultrasonic-capable digital MEMS microphone, 3.5×2.65 mm) hears 20–85 kHz.
@@ -35,11 +35,15 @@ Every number links back to the script or note that produced it. Diagrams are in 
 | Does the output stage stay clean? | Quiet sounds −61 dB distortion+noise; at the loudness ceiling −52 dB | `sim/checks/bridge_spice.py` (real Diodes MOSFET model) |
 | Is the PWM switching audible? | No: noise is pushed above 13 kHz and the carrier sits at 200 kHz (earlier check) | `sim/checks/pwm_noise.py` |
 
+![dsp](review-v1/spectrograms.png)
+
+![bridge](review-v1/bridge_spectrum.png)
+
 All the test sounds are synthetic. Real recordings replace them in Phase 1 (C1, S1).
 
 ## 3. Battery life
 
-![runtime](../sim/out/power/runtime.png)
+![runtime](review-v1/runtime.png)
 
 - **Full chain awake:** 4.6–7.5 mA. **Idle** (listening for activity): 1.5–2.4 mA.
 - **With the 105 mAh cell:**
@@ -50,7 +54,7 @@ All the test sounds are synthetic. Real recordings replace them in Phase 1 (C1, 
 
 ## 4. Size, weight, balance
 
-![pod](../hw/mech/out/pod_views.png)
+![pod](review-v1/pod_views.png)
 
 - **Pod:** 35 × 9 × 14 mm, clipped to the outside of the temple arm, front edge on your peripheral-vision limit.
 - **Inside:** a 105 mAh cell against the inner wall, the 20×10 mm board outboard of it, the mic porting outward at the front.
@@ -59,7 +63,7 @@ All the test sounds are synthetic. Real recordings replace them in Phase 1 (C1, 
 
 ## 5. The tragus spring (your decision: O7)
 
-![spring](../sim/out/mech/tragus_spring.png)
+![spring](review-v1/tragus_spring.png)
 
 | | A. Rigid arm + torsion spring at a pivot | B. Superelastic NiTi wire arm |
 |---|---|---|
