@@ -1,0 +1,49 @@
+# Stereo Ultrasound: instructions for Claude
+
+**The spec is the source of truth:** `docs/spec.md`.
+- §1 (the MVP) is owner-locked. Never edit it.
+- §0 working rules apply to all work:
+  - gloss every part number;
+  - use primary sources, with dates;
+  - present 2–3 options with a recommendation, and the owner decides;
+  - no switch-mode regulators;
+  - be blunt;
+  - show, don't just tell.
+- Research notes live in `docs/research/`; numeric checks in `sim/checks/`.
+
+## Owner preferences
+- **Visual learner.** Diagrams are the default for any mechanism, layout, flow or comparison.
+  - Author diagrams locally: SVG in `docs/diagrams/`, or Mermaid.
+  - Render to PNG with `docs/diagrams/render.sh` and send the **PNG** into the chat, where it shows inline. SVG files only appear as file cards.
+  - Never send project content to external image-generation APIs.
+  - Skill: `.claude/skills/visual-explainer/`.
+- **Self-taught, wants the why.** Explain briefly, never condescend.
+
+## Tools
+- `tools/setup.sh` installs everything idempotently (details in `tools/README.md`). Run `source tools/env.sh` before using the tools.
+- **Circuits:** ngspice 42.
+- **PCB:** KiCad 10 (`kicad-cli`, `pcbnew` Python API), SKiDL, FreeRouting, easyeda2kicad (footprints by LCSC number).
+- **Firmware:** ARM GCC.
+- **Mechanics:** build123d, scikit-fem.
+- **Parts:** JLC stock and price from the JLCPCB parts API. Always record the query date.
+
+## How the vendored PCBA skills map onto this project
+The eight skills in `.claude/skills/` (manage-pcba-program, plan-electronic-product, qualify-pcba-sourcing, design-and-review-circuit, schematic-humanizer, pcb-layout-review, release-pcba-fabrication, operate-jlcpcb-order) come from `.claude/skills/PCBA-SKILLS-VENDORED.md`. In this repo:
+- **Requirements:** `docs/spec.md` is authoritative. A `product-brief.yaml` or `architecture.md` may be derived from it but must never contradict it; spec changes come first.
+- **Artifacts** go in `.pcba-workflow/` at the repo root, which is the skills' default. Gate status is `PASS`, `BLOCKED` or `USER_REVIEW`. Owner decisions are also tracked as O-items in spec §12.
+- **Schematic source of truth:** the SKiDL generator scripts under `hw/<board>/`. KiCad schematic and netlist files are generated from them. Change the generator, never only the generated files.
+- **PCB source of truth:** the KiCad board file once placement starts. The owner does layout; Claude reviews, runs DRC and produces the release files.
+- **EDA adapter:** KiCad 10 native tooling.
+  - ERC/DRC: `kicad-cli sch erc`, `kicad-cli pcb drc`.
+  - Release files: `kicad-cli pcb export gerbers|drill|pos`.
+  - Renders: `kicad-cli pcb render`, `kicad-cli sch export svg`.
+  - Scripting: the `pcbnew` Python API.
+- **Fabricator:** JLCPCB. Prefer Basic parts, then Extended; record the LCSC number and a dated stock check for every line.
+- **Orders:** the owner places every order and makes every payment. `operate-jlcpcb-order` prepares and reviews the upload (BOM/CPL matching, placement preview checklist) and stops there.
+
+## Boards
+- **Bench (Phase 2):** H-bridge test board; acoustic coupons (mic port-geometry tests).
+- **Product (Phase 3):** one board per side (see spec §8–§9).
+
+## Git
+Work on the session's designated branch. Commit with the attribution trailer the session specifies. Never push to another branch.

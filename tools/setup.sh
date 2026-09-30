@@ -15,6 +15,8 @@
 #   venv  $ULTRA_VENV: Python 3.12 with --system-site-packages, so KiCad's pcbnew module imports;
 #         packages from tools/requirements.txt pinned by tools/constraints.txt
 #   jar   FreeRouting, pinned version and SHA-256, in $ULTRA_TOOLS_HOME/freerouting
+#   npm   @mermaid-js/mermaid-cli (pinned) in $ULTRA_TOOLS_HOME/mermaid, driving the preinstalled
+#         Playwright Chromium (/opt/pw-browsers) instead of downloading its own
 set -Eeuo pipefail
 
 REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -27,6 +29,7 @@ FR_SHA256=251101c3eeac22d7e7dfcf6796603279e5d1000283eb82d8f093780f7afc6aa9
 FR_URL="https://github.com/freerouting/freerouting/releases/download/v${FR_VERSION}/freerouting-${FR_VERSION}.jar"
 PY312=/usr/bin/python3.12
 NEWLIB_HARDFP=/usr/lib/arm-none-eabi/newlib/thumb/v7e-m+fp/hard/libc.a
+MMDC_VERSION=11.17.0
 
 MODE=install QUIET=0 FORCE=0 SMOKE=0 WITH_3D=0
 for arg in "$@"; do
@@ -72,7 +75,7 @@ quick_check() {
   [ -x "$ULTRA_VENV/bin/python" ] && [ -f "$FREEROUTING_JAR" ] && [ -x "$FREEROUTING_JAVA" ] \
     && [ -f "$KICAD10_SYMBOL_DIR/Device.kicad_sym" ] \
     && [ -d "$KICAD10_FOOTPRINT_DIR/Resistor_SMD.pretty" ] \
-    && [ -f "$NEWLIB_HARDFP" ] \
+    && [ -f "$NEWLIB_HARDFP" ] && [ -x "$MMDC" ] && [ -f "$MMDC_PUPPETEER_CONFIG" ] \
     && { [ "$WITH_3D" = 0 ] || [ -d "$KICAD10_3DMODEL_DIR/Resistor_SMD.3dshapes" ]; }
 }
 
@@ -80,7 +83,7 @@ summary_line() {
   if [ -f "$VERSIONS" ]; then
     # shellcheck disable=SC1090
     ( . "$VERSIONS"
-      echo "ngspice ${NGSPICE:-?}, KiCad ${KICAD:-?}, arm-none-eabi-gcc ${ARM_GCC:-?}, FreeRouting ${FREEROUTING:-?} (Java ${FR_JAVA:-?}), venv Python ${VENV_PY:-?}: build123d ${BUILD123D:-?}, scikit-fem ${SKFEM:-?}, SKiDL ${SKIDL:-?}, easyeda2kicad ${EASYEDA2KICAD:-?}" )
+      echo "ngspice ${NGSPICE:-?}, KiCad ${KICAD:-?}, arm-none-eabi-gcc ${ARM_GCC:-?}, FreeRouting ${FREEROUTING:-?} (Java ${FR_JAVA:-?}), venv Python ${VENV_PY:-?}: build123d ${BUILD123D:-?}, scikit-fem ${SKFEM:-?}, SKiDL ${SKIDL:-?}, easyeda2kicad ${EASYEDA2KICAD:-?}, mermaid-cli ${MERMAID:-?}" )
   else
     echo "(versions unknown; run tools/setup.sh --check)"
   fi
@@ -96,7 +99,7 @@ HASH="$(stamp_hash)"
 if [ "$MODE" = install ] && [ "$FORCE" = 0 ] && [ -f "$STAMP" ] \
    && [ "$(cat "$STAMP" 2>/dev/null)" = "$HASH" ] && quick_check; then
   if [ "$QUIET" = 1 ]; then
-    echo "ultrasonic harness ready: $(summary_line). Env: tools/env.sh. Skills: spice-sim, pcb-kicad, jlc-parts, cad-mech."
+    echo "ultrasonic harness ready: $(summary_line). Env: tools/env.sh. Skills: spice-sim, pcb-kicad, jlc-parts, cad-mech, visual-explainer + 8 PCBA skills."
   else
     say "already installed (stamp $HASH): $(summary_line)"
   fi
@@ -114,6 +117,7 @@ verify() {
     echo "ARM_GCC=$(arm-none-eabi-gcc -dumpversion 2>/dev/null)"
     echo "FREEROUTING=$(basename "$(readlink -f "$FREEROUTING_JAR" 2>/dev/null)" .jar 2>/dev/null | sed 's/freerouting-//')"
     echo "FR_JAVA=$("$FREEROUTING_JAVA" -version 2>&1 | grep -o 'version "[0-9.]*' | head -1 | sed 's/version "//')"
+    echo "MERMAID=$("$MMDC" --version 2>/dev/null | head -1)"
     "$ULTRA_VENV/bin/python" - <<'PY' 2>/dev/null
 import importlib.metadata as md, platform
 print(f"VENV_PY={platform.python_version()}")
@@ -134,7 +138,7 @@ PY
   # shellcheck disable=SC1090
   . "$tmp"
   local k
-  for k in NGSPICE KICAD ARM_GCC FREEROUTING FR_JAVA VENV_PY BUILD123D SKFEM SKIDL EASYEDA2KICAD NUMPY SCIPY MATPLOTLIB PCBNEW; do
+  for k in NGSPICE KICAD ARM_GCC FREEROUTING FR_JAVA MERMAID VENV_PY BUILD123D SKFEM SKIDL EASYEDA2KICAD NUMPY SCIPY MATPLOTLIB PCBNEW; do
     if [ -z "${!k:-}" ]; then echo "[setup] MISSING: $k" >&2; ok=0; fi
   done
   [ -f "$NEWLIB_HARDFP" ] || { echo "[setup] MISSING: newlib hard-float multilib ($NEWLIB_HARDFP)" >&2; ok=0; }
@@ -227,7 +231,22 @@ fi
 ln -sfn "freerouting-$FR_VERSION.jar" "$FR_DIR/freerouting.jar"
 done_step
 
-# 5. Verify -------------------------------------------------------------------------------
+# 5. Mermaid CLI ---------------------------------------------------------------------------
+step "mermaid-cli $MMDC_VERSION"
+MM_DIR="$ULTRA_TOOLS_HOME/mermaid"
+command -v npm >/dev/null 2>&1 || fail "npm not found (needed for mermaid-cli)"
+CHROME="$(ls -d /opt/pw-browsers/chromium_headless_shell-*/chrome-linux/headless_shell \
+                 /opt/pw-browsers/chromium-*/chrome-linux/chrome 2>/dev/null | head -1 || true)"
+[ -n "$CHROME" ] || fail "no preinstalled Chromium under /opt/pw-browsers (mermaid-cli needs one)"
+if [ "$("$MMDC" --version 2>/dev/null | head -1)" != "$MMDC_VERSION" ]; then
+  mkdir -p "$MM_DIR"
+  run env PUPPETEER_SKIP_DOWNLOAD=1 npm install --prefix "$MM_DIR" --no-audit --no-fund --silent \
+      "@mermaid-js/mermaid-cli@$MMDC_VERSION"
+fi
+printf '{"executablePath":"%s","args":["--no-sandbox"]}\n' "$CHROME" > "$MMDC_PUPPETEER_CONFIG"
+done_step
+
+# 6. Verify -------------------------------------------------------------------------------
 step "verify"
 verify || fail "verification failed (log: $LOG)"
 done_step
@@ -235,7 +254,7 @@ done_step
 echo "$HASH" > "$STAMP"
 echo "total: $((SECONDS - T_ALL)) s" >> "$LOG"
 if [ "$QUIET" = 1 ]; then
-  echo "ultrasonic harness installed in $((SECONDS - T_ALL)) s: $(summary_line). Env: tools/env.sh. Skills: spice-sim, pcb-kicad, jlc-parts, cad-mech."
+  echo "ultrasonic harness installed in $((SECONDS - T_ALL)) s: $(summary_line). Env: tools/env.sh. Skills: spice-sim, pcb-kicad, jlc-parts, cad-mech, visual-explainer + 8 PCBA skills."
 else
   say "installed and verified in $((SECONDS - T_ALL)) s"
 fi

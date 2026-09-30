@@ -1,17 +1,28 @@
 #!/usr/bin/env bash
-# Render an SVG diagram to a PNG for inline display in chat (the owner's client shows PNGs
+# Render a diagram to a PNG for inline display in chat (the owner's client shows PNGs
 # inline; SVG files only appear as file cards).
-#   docs/diagrams/render.sh <file.svg> [out.png]
-# Size comes from the SVG's viewBox; output is rendered at 2x for crisp text.
+#   docs/diagrams/render.sh <file.svg|file.mmd> [out.png]
+# SVG: sized from its viewBox, rendered at 2x by the preinstalled headless Chromium.
+# Mermaid (.mmd): rendered at 2x by mermaid-cli (installed by tools/setup.sh), white background.
 set -euo pipefail
-svg="$1"; out="${2:-${svg%.svg}.png}"
-read -r w h < <(grep -o 'viewBox="[^"]*"' "$svg" | head -1 | tr -d '"' | awk '{print $3, $4}')
-chrome=""
-for c in /opt/pw-browsers/chromium_headless_shell-*/chrome-linux/headless_shell \
-         /opt/pw-browsers/chromium-*/chrome-linux/chrome; do
-  [ -x "$c" ] && { chrome="$c"; break; }
-done
-[ -n "$chrome" ] || { echo "render.sh: no headless Chromium found under /opt/pw-browsers" >&2; exit 1; }
-"$chrome" --no-sandbox --hide-scrollbars --force-device-scale-factor=2 \
-  --window-size="${w},${h}" --screenshot="$(realpath -m "$out")" "file://$(realpath "$svg")" >/dev/null 2>&1
+src="$1"; out="${2:-${src%.*}.png}"
+case "$src" in
+  *.mmd)
+    here="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+    # shellcheck source=/dev/null
+    . "$here/tools/env.sh"
+    [ -x "$MMDC" ] || { echo "render.sh: mermaid-cli missing; run tools/setup.sh" >&2; exit 1; }
+    "$MMDC" -q -p "$MMDC_PUPPETEER_CONFIG" -s 2 -b white -i "$src" -o "$out" ;;
+  *.svg)
+    read -r w h < <(grep -o 'viewBox="[^"]*"' "$src" | head -1 | tr -d '"' | awk '{print $3, $4}')
+    chrome=""
+    for c in /opt/pw-browsers/chromium_headless_shell-*/chrome-linux/headless_shell \
+             /opt/pw-browsers/chromium-*/chrome-linux/chrome; do
+      [ -x "$c" ] && { chrome="$c"; break; }
+    done
+    [ -n "$chrome" ] || { echo "render.sh: no headless Chromium under /opt/pw-browsers" >&2; exit 1; }
+    "$chrome" --no-sandbox --hide-scrollbars --force-device-scale-factor=2 \
+      --window-size="${w},${h}" --screenshot="$(realpath -m "$out")" "file://$(realpath "$src")" >/dev/null 2>&1 ;;
+  *) echo "render.sh: expected .svg or .mmd, got $src" >&2; exit 2 ;;
+esac
 echo "$out"

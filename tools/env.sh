@@ -31,6 +31,10 @@ fi
 # Matplotlib: never try to open a window.
 export MPLBACKEND="${MPLBACKEND:-Agg}"
 
+# Mermaid CLI (flowcharts to PNG), driving the preinstalled Playwright Chromium headlessly.
+export MMDC="$ULTRA_TOOLS_HOME/mermaid/node_modules/.bin/mmdc"
+export MMDC_PUPPETEER_CONFIG="$ULTRA_TOOLS_HOME/mermaid/puppeteer.json"
+
 # Put the harness venv first, so `python3`/`pip` are the 3.12 venv that can import pcbnew.
 case ":$PATH:" in
   *":$ULTRA_VENV/bin:"*) ;;

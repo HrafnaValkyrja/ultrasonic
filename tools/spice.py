@@ -273,6 +273,21 @@ def run(netlist: str | os.PathLike, *, cwd: str | os.PathLike | None = None, com
                   and "no error" not in ln.lower()]
         warnings = [ln.strip() for ln in log.splitlines() if re.search(r"\bwarning\b", ln, re.I)]
         plots = read_raw(raw) if raw.exists() and raw.stat().st_size > 0 else []
+        # ngspice (42) refuses `.meas` when batch mode writes a rawfile ("No .measure possible
+        # in batch mode (-b) with -r rawfile set!"), so measurements need a second batch pass
+        # without -r. It re-runs the simulation; only netlists that use .meas pay for it.
+        meas_log = ""
+        if re.search(r"^\s*\.meas", net.read_text(errors="replace"), re.I | re.M):
+            mlog = tmp / "meas.log"
+            mcmd = [c for c in cmd if c not in ("-r", str(raw), "-o", str(logf))]
+            mcmd[mcmd.index(str(net)):mcmd.index(str(net))] = ["-o", str(mlog)]
+            try:
+                mproc = subprocess.run(mcmd, cwd=run_dir, capture_output=True, text=True,
+                                       timeout=timeout, env=env)
+            except subprocess.TimeoutExpired as e:
+                raise SpiceError(f"ngspice (.meas pass) timed out after {timeout} s", str(e.stdout or "")) from None
+            meas_log = (mlog.read_text(errors="replace") if mlog.exists() else "") + mproc.stdout + mproc.stderr
+            log += "\n--- .meas pass ---\n" + meas_log
         if keep:
             kd = Path(keep)
             kd.mkdir(parents=True, exist_ok=True)
@@ -283,7 +298,7 @@ def run(netlist: str | os.PathLike, *, cwd: str | os.PathLike | None = None, com
             tail = "\n".join(log.splitlines()[-40:])
             why = "; ".join(errors[:5]) or f"exit code {proc.returncode}" + ("" if plots else ", no analysis output")
             raise SpiceError(f"ngspice failed: {why}\n--- log tail ---\n{tail}", log)
-        return SpiceResult(plots, _parse_meas(log), log, warnings + errors)
+        return SpiceResult(plots, _parse_meas(meas_log or log), log, warnings + errors)
 
 
 # ----------------------------------------------------------------------------- helpers
