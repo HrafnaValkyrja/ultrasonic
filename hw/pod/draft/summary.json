@@ -1,0 +1,11 @@
+{
+  "tracks": 476,
+  "vias": 36,
+  "drc_errors": 8,
+  "by_type": {
+    "courtyards_overlap": 8
+  },
+  "unconnected": 8,
+  "courtyard_overlaps": [],
+  "pad_clashes": []
+}

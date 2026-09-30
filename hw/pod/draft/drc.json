@@ -1,0 +1,405 @@
+{
+    "$schema": "https://schemas.kicad.org/drc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-09-30T07:27:21",
+    "ignored_checks": [
+        {
+            "description": "Footprint has no courtyard defined",
+            "key": "missing_courtyard"
+        },
+        {
+            "description": "Track endpoint not centered on via",
+            "key": "track_not_centered_on_via"
+        },
+        {
+            "description": "Tuning profile track geometries",
+            "key": "tuning_profile_track_geometries"
+        },
+        {
+            "description": "Footprint doesn't match symbol's footprint filters",
+            "key": "footprint_filters_mismatch"
+        },
+        {
+            "description": "Footprint component type doesn't match footprint pads",
+            "key": "footprint_type_mismatch"
+        }
+    ],
+    "included_severities": [
+        "error"
+    ],
+    "kicad_version": "10.0.6",
+    "schematic_parity": [],
+    "source": "pod_routed.kicad_pcb",
+    "unconnected_items": [
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [+3V0] on B.Cu, length 0.4888 mm",
+                    "pos": {
+                        "x": 11.68,
+                        "y": 7.1
+                    },
+                    "uuid": "de867da8-9381-4544-82c7-6ffc78b23615"
+                },
+                {
+                    "description": "Pad 21 [+3V0] of U1 on F.Cu",
+                    "pos": {
+                        "x": 11.25,
+                        "y": 8.4375
+                    },
+                    "uuid": "94ef1a62-c6ee-4c48-9693-99da510b4c13"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [GND] on F.Cu, length 2.0491 mm",
+                    "pos": {
+                        "x": 14.91,
+                        "y": 8.5484
+                    },
+                    "uuid": "585cb949-969a-496a-b021-546f97c4fb66"
+                },
+                {
+                    "description": "Pad 2 [GND] of C8 on F.Cu",
+                    "pos": {
+                        "x": 15.08,
+                        "y": 9.35
+                    },
+                    "uuid": "f78c2161-4346-4510-8032-79bd446fb4f9"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 44 [N$1] of U1 on F.Cu",
+                    "pos": {
+                        "x": 9.25,
+                        "y": 1.5625
+                    },
+                    "uuid": "ed5eaf62-f993-44ac-8111-2dacb59a3aeb"
+                },
+                {
+                    "description": "Pad 1 [N$1] of R1 on F.Cu",
+                    "pos": {
+                        "x": 15.29,
+                        "y": 0.8
+                    },
+                    "uuid": "de7e3631-b714-4c06-9125-565e59df1d76"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 20 [VLXSMPS] of U1 on F.Cu",
+                    "pos": {
+                        "x": 10.75,
+                        "y": 8.4375
+                    },
+                    "uuid": "417ba902-8d4f-4c4c-9ab0-0b0a5b8bbfb7"
+                },
+                {
+                    "description": "Pad 1 [VLXSMPS] of L1 on F.Cu",
+                    "pos": {
+                        "x": 16.4,
+                        "y": 8.6
+                    },
+                    "uuid": "ae077c29-ce4d-4ae6-a7ba-eec1417423a3"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [VDD11] on F.Cu, length 1.8077 mm",
+                    "pos": {
+                        "x": 15.0383,
+                        "y": 8.7501
+                    },
+                    "uuid": "ce04ed84-cc54-4bc7-acb4-b7c95ff1854b"
+                },
+                {
+                    "description": "Pad 1 [VDD11] of C8 on F.Cu",
+                    "pos": {
+                        "x": 14.12,
+                        "y": 9.35
+                    },
+                    "uuid": "197a70c9-4d38-4465-b296-a3dfc7e0586d"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [VBAT_SENSE] on B.Cu, length 0.5525 mm",
+                    "pos": {
+                        "x": 11.4,
+                        "y": 2.08
+                    },
+                    "uuid": "45a3dac2-33e1-424d-b0a5-ae18b83d7615"
+                },
+                {
+                    "description": "Pad 14 [VBAT_SENSE] of U1 on F.Cu",
+                    "pos": {
+                        "x": 7.75,
+                        "y": 8.4375
+                    },
+                    "uuid": "cc3a3074-cd45-4c0b-ab7a-1a3bbdc9272f"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 18 [GB_N] of U1 on F.Cu",
+                    "pos": {
+                        "x": 9.75,
+                        "y": 8.4375
+                    },
+                    "uuid": "bf48b7db-7099-4bd7-b38c-fa106a6b8e6b"
+                },
+                {
+                    "description": "Track [GB_N] on In1.Cu, length 0.7622 mm",
+                    "pos": {
+                        "x": 18.0948,
+                        "y": 6.3916
+                    },
+                    "uuid": "d4a3cb92-d119-43a4-9067-84915aac498a"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 1 [MIC_DATA] of U2 on B.Cu",
+                    "pos": {
+                        "x": 3.504,
+                        "y": 8.4375
+                    },
+                    "uuid": "cea64cf3-6e16-46f2-a897-7a40c36cb19f"
+                },
+                {
+                    "description": "Pad 40 [MIC_DATA] of U1 on F.Cu",
+                    "pos": {
+                        "x": 11.25,
+                        "y": 1.5625
+                    },
+                    "uuid": "2d8226b4-8b3a-4911-8530-393ed42b466c"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        }
+    ],
+    "violations": [
+        {
+            "description": "Courtyards overlap",
+            "items": [
+                {
+                    "description": "Footprint TP4",
+                    "pos": {
+                        "x": 1.0,
+                        "y": 5.8
+                    },
+                    "uuid": "2f00e2f2-156e-4055-8bbb-4677b2e1b69d"
+                },
+                {
+                    "description": "Footprint TP3",
+                    "pos": {
+                        "x": 1.0,
+                        "y": 4.2
+                    },
+                    "uuid": "8abe6df7-6c40-4c71-a6d3-260a1b34b378"
+                }
+            ],
+            "severity": "error",
+            "type": "courtyards_overlap"
+        },
+        {
+            "description": "Courtyards overlap",
+            "items": [
+                {
+                    "description": "Footprint TP4",
+                    "pos": {
+                        "x": 1.0,
+                        "y": 5.8
+                    },
+                    "uuid": "2f00e2f2-156e-4055-8bbb-4677b2e1b69d"
+                },
+                {
+                    "description": "Footprint TP5",
+                    "pos": {
+                        "x": 2.5,
+                        "y": 5.9
+                    },
+                    "uuid": "c8a074ef-783b-4409-89df-da2cfb36dc59"
+                }
+            ],
+            "severity": "error",
+            "type": "courtyards_overlap"
+        },
+        {
+            "description": "Courtyards overlap",
+            "items": [
+                {
+                    "description": "Footprint TP1",
+                    "pos": {
+                        "x": 1.0,
+                        "y": 1.0
+                    },
+                    "uuid": "5896f8a3-23ed-4aa7-8eb0-8f6d800706e0"
+                },
+                {
+                    "description": "Footprint TP2",
+                    "pos": {
+                        "x": 1.0,
+                        "y": 2.6
+                    },
+                    "uuid": "c5dd02ef-aca4-4112-9bb9-8f167c810d02"
+                }
+            ],
+            "severity": "error",
+            "type": "courtyards_overlap"
+        },
+        {
+            "description": "Courtyards overlap",
+            "items": [
+                {
+                    "description": "Footprint J2",
+                    "pos": {
+                        "x": 18.8,
+                        "y": 9.1
+                    },
+                    "uuid": "5979ee25-5f8f-4d19-aafd-b9d501ab099f"
+                },
+                {
+                    "description": "Footprint J1",
+                    "pos": {
+                        "x": 17.2,
+                        "y": 9.1
+                    },
+                    "uuid": "8c7aac0e-7907-461c-8145-cd1d71da9e8b"
+                }
+            ],
+            "severity": "error",
+            "type": "courtyards_overlap"
+        },
+        {
+            "description": "Courtyards overlap",
+            "items": [
+                {
+                    "description": "Footprint J3",
+                    "pos": {
+                        "x": 6.9,
+                        "y": 9.0
+                    },
+                    "uuid": "5a1e66d9-4a9c-44de-aac0-1788e713fd00"
+                },
+                {
+                    "description": "Footprint J4",
+                    "pos": {
+                        "x": 8.5,
+                        "y": 9.0
+                    },
+                    "uuid": "b6b12c6e-7b4b-41be-bcdc-848dab2eb07a"
+                }
+            ],
+            "severity": "error",
+            "type": "courtyards_overlap"
+        },
+        {
+            "description": "Courtyards overlap",
+            "items": [
+                {
+                    "description": "Footprint TP3",
+                    "pos": {
+                        "x": 1.0,
+                        "y": 4.2
+                    },
+                    "uuid": "8abe6df7-6c40-4c71-a6d3-260a1b34b378"
+                },
+                {
+                    "description": "Footprint TP2",
+                    "pos": {
+                        "x": 1.0,
+                        "y": 2.6
+                    },
+                    "uuid": "c5dd02ef-aca4-4112-9bb9-8f167c810d02"
+                }
+            ],
+            "severity": "error",
+            "type": "courtyards_overlap"
+        },
+        {
+            "description": "Courtyards overlap",
+            "items": [
+                {
+                    "description": "Footprint J4",
+                    "pos": {
+                        "x": 8.5,
+                        "y": 9.0
+                    },
+                    "uuid": "b6b12c6e-7b4b-41be-bcdc-848dab2eb07a"
+                },
+                {
+                    "description": "Footprint J5",
+                    "pos": {
+                        "x": 10.1,
+                        "y": 9.0
+                    },
+                    "uuid": "e57bce1f-4769-4865-9425-de315e53a080"
+                }
+            ],
+            "severity": "error",
+            "type": "courtyards_overlap"
+        },
+        {
+            "description": "Courtyards overlap",
+            "items": [
+                {
+                    "description": "Footprint J6",
+                    "pos": {
+                        "x": 11.7,
+                        "y": 9.0
+                    },
+                    "uuid": "c05daed7-f664-4d4f-a401-d86221c58873"
+                },
+                {
+                    "description": "Footprint J5",
+                    "pos": {
+                        "x": 10.1,
+                        "y": 9.0
+                    },
+                    "uuid": "e57bce1f-4769-4865-9425-de315e53a080"
+                }
+            ],
+            "severity": "error",
+            "type": "courtyards_overlap"
+        }
+    ]
+}

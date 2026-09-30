@@ -198,7 +198,7 @@ def main():
     br, _ = build(inset=0.2)                                   # routing copy, outline pulled in 0.2 mm
     assert pcbnew.ExportSpecctraDSN(br, str(dsn))
     subprocess.run([os.environ["FREEROUTING_JAVA"], "-jar", os.environ["FREEROUTING_JAR"], "-de", str(dsn),
-                    "-do", str(ses), "-mp", "40", "--gui.enabled=false"], check=True, timeout=1500,
+                    "-do", str(ses), "-mp", "150", "--gui.enabled=false"], check=True, timeout=2400,
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     b = pcbnew.LoadBoard(str(pcb))
     assert pcbnew.ImportSpecctraSES(b, str(ses))

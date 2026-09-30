@@ -20,3 +20,5 @@ hw/pod/draft/*.ses
 hw/pod/draft/*.png
 hw/pod/draft/*.log
 hw/pod/draft/*.kicad_prl
+hw/pod/draft/pod_view.*
+hw/pod/draft/*.svg
