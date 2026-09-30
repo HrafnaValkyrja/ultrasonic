@@ -111,20 +111,32 @@ All the test sounds are synthetic. Real recordings replace them in Phase 1 (C1, 
 
 1. **O7:** spring A (recommended) or B.
 2. **O5:** keep the 105 mAh stacked pod (recommended; 80 mAh would miss 12 h if the chain never sleeps).
-3. **O3: approve the bench shopping list.** Prices come from search results on 2026-09-30 `[Med]`; re-check at checkout.
+3. **O3: approve the bench shopping list.** Revised 2026-09-30 so the owner's own parts come first and the rest is split into stages. Prices come from search results on 2026-09-30 `[Med]`; re-check at checkout.
 
-   | Qty | Item | What it's for | Each | Where |
-   |---|---|---|---|---|
-   | 2 | NUCLEO-U575ZI-Q | ST dev board with our exact MCU and its SMPS: firmware, S1–S3, the E11 whine test | ~$24.08 | [DigiKey](https://www.digikey.com/en/products/detail/stmicroelectronics/nucleo-u575zi-q/15218436) (519 in stock) · [Mouser](https://gr.mouser.com/en/new/stmicroelectronics/stm-nucleo-u575zi-q-board/) |
-   | 3 | RC-BC02 bone exciter, from two sellers | The transducer we designed around; E1 measures its real size, resistance and inductance | ~$4–5.50 | [maker](http://www.digitalaudioamp.com/product/bonetransducerRC-BC02-1.html) · [Alibaba](https://www.alibaba.com/product-detail/RC-BC02-thin-bone-conduction-transducer_62023855763.html) |
-   | 1 | Dayton BCE-1 bone exciter | Known-good reference to compare loudness against | $11.19 | [Dayton](https://www.daytonaudio.com/product/1170/bce-1-22-x-14mm-bone-conducting-exciter) / Parts Express |
-   | 2 | Elecrow SPH0641 mic board | The ultrasonic mic on a breakout, for S1 before our own boards exist | $12.50 | (spec §10) |
-   | 2 | Adafruit #1570 100 mAh LiPo | Bench battery, about our size | $5.95 | [Adafruit](https://www.adafruit.com/product/1570) |
-   | 1 | JLC order: 5 bridge test boards + 5 mic port coupons | S1, S2 | ~$40–60 est. | I design it; you order it |
-   | 2 | HC-SR04 ultrasonic rangefinder | A known 40 kHz test sound, and the T3 left/right test source | ~$2 | any electronics shop |
-   | 1 m each | Superelastic NiTi wire, Ø0.8 and Ø0.9 mm | The tragus arm you chose (O7) | ~$8–15 per metre `[Low]` | medical/hobby wire suppliers; I'll pick listings |
+   **Stage A: buy now (~$60–75).** These are exact parts; nothing in a parts bin substitutes for them.
 
-   **Total ≈ $180–230** plus shipping. Shaping NiTi needs ~500 °C: a butane torch (~$20) is enough if you don't have one. The transducers ship slowest, so they go first.
+   | Qty | Item | Why it must be this part | Each |
+   |---|---|---|---|
+   | 1 | NUCLEO-U575ZI-Q | Our exact chip with its switching regulator: the whine test (E11) and the mic filter need it | ~$24 |
+   | 3 | RC-BC02 bone exciter (two sellers) | The transducer we designed around; its loudness and electrical data are unpublished | ~$4–5.50 |
+   | 1 | Elecrow SPH0641 mic board | The ultrasonic mic; hobby mics stop at ~20 kHz | $12.50 |
+   | 1 m | Superelastic NiTi wire, Ø0.85 mm, Af ≤ 0 °C | Your arm choice | ~$8–15 `[Low]` |
+
+   **From your cave (free if found):**
+
+   | Look for | Replaces | Notes |
+   |---|---|---|
+   | Any small single-cell LiPo + a USB LiPo charger module (e.g. TP4056) | Adafruit cells ($12) | Skip any cell that's puffy or dented |
+   | HC-SR04 sensor, a 40 kHz ultrasonic transducer, an ultrasonic pest repeller, or a dog whistle | HC-SR04 ($4) | Anything that makes ultrasound on demand |
+   | Old bone-conduction headphones (e.g. AfterShokz/Shokz) | Dayton BCE-1 reference ($11) | We only need a known-good exciter to compare loudness against |
+   | A small audio amp module (PAM8403 class-D, any headphone amp) | The JLC bridge board, for now ($40–60) | Enough to measure loudness on your skin (E1). The real bridge only matters later, for noise and distortion (S2) |
+   | Multimeter, soldering iron, jumper wires, breadboard | – | Needed regardless |
+   | **An oscilloscope** (≥ 50 MHz), if you have one | – | Checks the mic clock (S1). Without one I'll find another way |
+   | Kitchen scale, butane torch | – | Pad force; NiTi shaping |
+
+   **Stage B: later, only once stage A has answered loudness and whine (~$60–90):** a second Nucleo and mic for stereo, and the JLC bridge-and-coupon order. The JLC order can ride along with the first real-board order, so it costs one shipping, not two.
+
+   **Old plan: ≈ $180–230 all at once. New: ≈ $60–75 now**, the rest later and possibly less.
 4. **O4:** confirm the reading of §1.2.4: cell along the arm, in front of the ear, nothing behind it.
 5. **Photos and quick tests you can do at home:**
    - ruler photo and mouth-open photo (E9);
