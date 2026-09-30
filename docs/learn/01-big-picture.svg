@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 640" role="img" aria-label="Lesson 1: the journey of one bat chirp through the device, in six stations: the mic hears it, the chip turns it into numbers, the chip splits it into 28 bands like piano keys, each band plays a matching low note, the notes become fast on-off switching, and the transducer vibrates the bone so the cochlea hears it." font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f2328"/></marker>
+  </defs>
+  <rect width="1100" height="640" rx="14" fill="#fbfaf7"/>
+  <text x="40" y="42" font-size="20" font-weight="700" fill="#1f2328">Lesson 1: the journey of one bat chirp</text>
+  <text x="40" y="68" font-size="14" fill="#57606a">A bat calls at 40 kHz, twice as high as the highest note you can hear. Six steps later, you hear it as a 2.4 kHz chirp.</text>
+
+  <!-- station boxes -->
+  <g fill="#ffffff" stroke="#1f2328" stroke-width="1.5">
+    <rect x="30"  y="100" width="160" height="300" rx="10"/>
+    <rect x="210" y="100" width="160" height="300" rx="10"/>
+    <rect x="390" y="100" width="160" height="300" rx="10"/>
+    <rect x="570" y="100" width="160" height="300" rx="10"/>
+    <rect x="750" y="100" width="160" height="300" rx="10"/>
+    <rect x="930" y="100" width="150" height="300" rx="10"/>
+  </g>
+  <g font-size="15" font-weight="700" fill="#1f2328" text-anchor="middle">
+    <text x="110" y="128">1. Hear</text><text x="290" y="128">2. Count</text><text x="470" y="128">3. Sort</text>
+    <text x="650" y="128">4. Re-sing</text><text x="830" y="128">5. Switch</text><text x="1005" y="128">6. Buzz</text>
+  </g>
+
+  <!-- 1 hear: fast wave -->
+  <polyline fill="none" stroke="#b8520a" stroke-width="2" points="45,200 50,180 55,220 60,180 65,220 70,180 75,220 80,180 85,220 90,180 95,220 100,180 105,220 110,180 115,220 120,180 125,220 130,180 135,220 140,180 145,220 150,180 155,220 160,180 165,220 170,180 175,200"/>
+  <text x="110" y="250" font-size="12" text-anchor="middle" fill="#57606a">air wiggles 40,000×/s</text>
+  <!-- 2 count: pulses then numbers -->
+  <g fill="#1f2328">
+    <rect x="225" y="185" width="4" height="20"/><rect x="233" y="185" width="4" height="20"/><rect x="249" y="185" width="4" height="20"/><rect x="253" y="185" width="4" height="20"/><rect x="257" y="185" width="4" height="20"/><rect x="273" y="185" width="4" height="20"/><rect x="289" y="185" width="4" height="20"/><rect x="293" y="185" width="4" height="20"/><rect x="309" y="185" width="4" height="20"/><rect x="325" y="185" width="4" height="20"/><rect x="329" y="185" width="4" height="20"/><rect x="333" y="185" width="4" height="20"/><rect x="345" y="185" width="4" height="20"/>
+  </g>
+  <text x="290" y="235" font-size="11.5" text-anchor="middle" fill="#1f2328" font-family="Menlo, monospace">12, 57, 88, −9 …</text>
+  <text x="290" y="255" font-size="12" text-anchor="middle" fill="#57606a">200,000 numbers/s</text>
+  <!-- 3 sort: bars like keys -->
+  <g fill="#2a78d6">
+    <rect x="405" y="215" width="7" height="5"/><rect x="415" y="213" width="7" height="7"/><rect x="425" y="210" width="7" height="10"/><rect x="435" y="190" width="7" height="30"/><rect x="445" y="165" width="7" height="55"/><rect x="455" y="185" width="7" height="35"/><rect x="465" y="208" width="7" height="12"/><rect x="475" y="214" width="7" height="6"/><rect x="485" y="215" width="7" height="5"/><rect x="495" y="216" width="7" height="4"/><rect x="505" y="215" width="7" height="5"/><rect x="515" y="216" width="7" height="4"/><rect x="525" y="216" width="7" height="4"/>
+  </g>
+  <line x1="402" y1="221" x2="538" y2="221" stroke="#1f2328" stroke-width="1"/>
+  <text x="405" y="236" font-size="10.5" fill="#57606a">20 kHz</text><text x="538" y="236" font-size="10.5" fill="#57606a" text-anchor="end">85 kHz</text>
+  <text x="470" y="255" font-size="12" text-anchor="middle" fill="#57606a">how loud each of 28 "keys"</text>
+  <!-- 4 re-sing: same pattern low -->
+  <g fill="#1baf7a">
+    <rect x="585" y="215" width="7" height="5"/><rect x="595" y="213" width="7" height="7"/><rect x="605" y="210" width="7" height="10"/><rect x="615" y="190" width="7" height="30"/><rect x="625" y="165" width="7" height="55"/><rect x="635" y="185" width="7" height="35"/><rect x="645" y="208" width="7" height="12"/><rect x="655" y="214" width="7" height="6"/><rect x="665" y="215" width="7" height="5"/><rect x="675" y="216" width="7" height="4"/><rect x="685" y="215" width="7" height="5"/><rect x="695" y="216" width="7" height="4"/><rect x="705" y="216" width="7" height="4"/>
+  </g>
+  <line x1="582" y1="221" x2="718" y2="221" stroke="#1f2328" stroke-width="1"/>
+  <text x="585" y="236" font-size="10.5" fill="#57606a">1.5 kHz</text><text x="718" y="236" font-size="10.5" fill="#57606a" text-anchor="end">4 kHz</text>
+  <text x="650" y="255" font-size="12" text-anchor="middle" fill="#57606a">same pattern, audible keys</text>
+  <!-- 5 switch: PWM -->
+  <polyline fill="none" stroke="#1f2328" stroke-width="2" points="765,210 765,180 772,180 772,210 776,210 776,180 786,180 786,210 788,210 788,180 802,180 802,210 804,210 804,180 816,180 816,210 820,210 820,180 828,180 828,210 834,210 834,180 839,180 839,210 847,210 847,180 850,180 850,210 860,210 860,180 863,180 863,210 873,210 873,180 878,180 878,210 895,210"/>
+  <text x="830" y="235" font-size="12" text-anchor="middle" fill="#57606a">on/off 200,000×/s;</text>
+  <text x="830" y="251" font-size="12" text-anchor="middle" fill="#57606a">the on-time carries the note</text>
+  <!-- 6 buzz -->
+  <circle cx="1005" cy="195" r="26" fill="#fff4ea" stroke="#b8520a" stroke-width="2"/>
+  <path d="M960,195 q6,-10 12,0 q6,10 12,0" fill="none" stroke="#b8520a" stroke-width="2"/>
+  <path d="M1038,195 q6,-10 12,0 q6,10 12,0" fill="none" stroke="#b8520a" stroke-width="2"/>
+  <text x="1005" y="245" font-size="12" text-anchor="middle" fill="#57606a">skin → bone →</text>
+  <text x="1005" y="261" font-size="12" text-anchor="middle" fill="#57606a">cochlea (inner ear)</text>
+
+  <!-- "who does it" row -->
+  <g font-size="12.5" fill="#1f2328" text-anchor="middle">
+    <text x="110" y="300" font-weight="700">the mic</text><text x="110" y="318">a tiny drum</text><text x="110" y="334">3.5 mm across</text>
+    <text x="290" y="300" font-weight="700">the chip's</text><text x="290" y="318">filter hardware</text>
+    <text x="470" y="300" font-weight="700">the chip's</text><text x="470" y="318">software (FFT)</text>
+    <text x="650" y="300" font-weight="700">the chip's</text><text x="650" y="318">software</text><text x="650" y="334">(28 tone makers)</text>
+    <text x="830" y="300" font-weight="700">timer + 4 switches</text><text x="830" y="318">(the "H-bridge")</text>
+    <text x="1005" y="300" font-weight="700">the transducer</text><text x="1005" y="318">at your tragus</text>
+  </g>
+  <g font-size="11.5" fill="#57606a" text-anchor="middle">
+    <text x="110" y="378">Lesson 2</text><text x="290" y="378">Lesson 3</text><text x="470" y="378">Lesson 4</text><text x="650" y="378">Lesson 4</text><text x="830" y="378">Lesson 5</text><text x="1005" y="378">Lesson 6</text>
+  </g>
+
+  <!-- arrows between stations -->
+  <g stroke="#1f2328" stroke-width="2" marker-end="url(#a)">
+    <line x1="190" y1="200" x2="208" y2="200"/><line x1="370" y1="200" x2="388" y2="200"/><line x1="550" y1="200" x2="568" y2="200"/><line x1="730" y1="200" x2="748" y2="200"/><line x1="910" y1="200" x2="928" y2="200"/>
+  </g>
+
+  <!-- key idea -->
+  <rect x="30" y="425" width="1050" height="190" rx="10" fill="#e8f3ec" stroke="#1baf7a" stroke-width="1.6"/>
+  <text x="50" y="455" font-size="16" font-weight="700" fill="#1a7a55">The one idea to hold onto: two pianos</text>
+  <g font-size="14" fill="#1f2328">
+    <text x="50" y="485">Picture an invisible piano whose 28 keys span 20–85 kHz, far above your hearing. Every ultrasonic sound presses some of its keys.</text>
+    <text x="50" y="510">The device watches which keys are pressed, and how hard, and plays the <tspan font-weight="700">same keys on a second, audible piano</tspan> that spans 1.5–4 kHz.</text>
+    <text x="50" y="535">So a bat's sweep from high to low (55 → 26 kHz) still sweeps high to low when you hear it (about 3.0 → 1.8 kHz). The <tspan font-style="italic">shape</tspan> survives.</text>
+    <text x="50" y="560">Only the shape and loudness survive. It isn't a recording played slowly; it's a live "translation" with about 1 ms of delay.</text>
+    <text x="50" y="592" fill="#57606a">The steady whines you hear from chargers press the same keys all the time; step 3 notices "never changes" and lets them fall silent.</text>
+  </g>
+</svg>
