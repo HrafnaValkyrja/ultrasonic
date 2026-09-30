@@ -21,6 +21,13 @@ fi
 export KICAD10_SYMBOL_DIR="${KICAD10_SYMBOL_DIR:-/usr/share/kicad/symbols}"
 export KICAD10_FOOTPRINT_DIR="${KICAD10_FOOTPRINT_DIR:-/usr/share/kicad/footprints}"
 export KICAD10_3DMODEL_DIR="${KICAD10_3DMODEL_DIR:-/usr/share/kicad/3dmodels}"
+# SKiDL 2.3 looks for libraries under older KiCad names (it runs in KICAD9 mode, which reads
+# KiCad 10 libraries fine); point those names at the KiCad 10 libraries.
+for _v in KICAD KICAD6 KICAD7 KICAD8 KICAD9; do
+  export "${_v}_SYMBOL_DIR=${KICAD10_SYMBOL_DIR}"
+  export "${_v}_FOOTPRINT_DIR=${KICAD10_FOOTPRINT_DIR}"
+done
+unset _v
 
 # `requests` (used by easyeda2kicad) ignores SSL_CERT_FILE and ships its own CA list.
 # When a CA bundle is configured (e.g. an egress proxy), point requests at it too.

@@ -204,6 +204,14 @@ mkdir -p "$KCFG"
 for t in sym-lib-table fp-lib-table; do
   if [ ! -f "$KCFG/$t" ] && [ -f "/usr/share/kicad/template/$t" ]; then cp "/usr/share/kicad/template/$t" "$KCFG/$t"; fi
 done
+# SKiDL also loads its KiCad 6-9 tool modules, which warn when their config dirs lack
+# library tables; share the KiCad 10 tables with them.
+for v in 6.0 7.0 8.0 9.0; do
+  mkdir -p "${XDG_CONFIG_HOME:-$HOME/.config}/kicad/$v"
+  for t in sym-lib-table fp-lib-table; do
+    ln -sfn "../$KICAD_SERIES/$t" "${XDG_CONFIG_HOME:-$HOME/.config}/kicad/$v/$t"
+  done
+done
 done_step
 
 # 3. Python venv ----------------------------------------------------------------------------

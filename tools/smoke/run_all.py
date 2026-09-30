@@ -111,26 +111,24 @@ def t_kicad_freerouting(w: Path) -> str:
 
 
 def t_skidl(w: Path) -> str:
-    os.environ.setdefault("KICAD9_SYMBOL_DIR", os.environ["KICAD10_SYMBOL_DIR"])
-    os.environ.setdefault("KICAD8_SYMBOL_DIR", os.environ["KICAD10_SYMBOL_DIR"])
     cwd = os.getcwd()
     os.chdir(w)
     try:
         import skidl
-        from skidl import Net, Part, generate_netlist, lib_search_paths, set_default_tool
-        tool = getattr(skidl, "KICAD9", None) or getattr(skidl, "KICAD8")
+        from skidl import Net, Part, generate_netlist, set_default_tool
+        tool = skidl.KICAD10                      # env.sh points SKiDL at the KiCad 10 libraries
         set_default_tool(tool)
-        lib_search_paths[tool].append(os.environ["KICAD10_SYMBOL_DIR"])
         vin, vout, gnd = Net("VIN"), Net("VOUT"), Net("GND")
-        r = Part("Device", "R", value="1k", footprint="Resistor_SMD:R_0603_1608Metric")
-        c = Part("Device", "C", value="1u", footprint="Capacitor_SMD:C_0603_1608Metric")
+        r = Part("Device", "R", value="1k", footprint="Resistor_SMD:R_0603_1608Metric", ref="R1")
+        c = Part("Device", "C", value="1u", footprint="Capacitor_SMD:C_0603_1608Metric", ref="C1")
+        r.fields["LCSC"] = "C21190"               # 1k 0603, JLC Basic
         vin += r[1]; vout += r[2], c[1]; gnd += c[2]
         out = w / "rc.net"
         generate_netlist(file_=str(out))
         txt = out.read_text()
     finally:
         os.chdir(cwd)
-    assert "VOUT" in txt and "R_0603" in txt, "netlist missing expected content"
+    assert "VOUT" in txt and "R_0603" in txt and "C21190" in txt, "netlist missing expected content"
     return f"netlist {len(txt)} bytes with 2 parts, 3 nets ({tool})"
 
 
