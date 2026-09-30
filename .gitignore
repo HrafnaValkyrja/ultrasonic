@@ -19,3 +19,4 @@ hw/pod/draft/*.dsn
 hw/pod/draft/*.ses
 hw/pod/draft/*.png
 hw/pod/draft/*.log
+hw/pod/draft/*.kicad_prl
