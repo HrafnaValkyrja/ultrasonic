@@ -19,6 +19,7 @@
 5. **Part-choice checklist:** smallest package JLC can assemble · lowest power · **no switch-mode regulators anywhere** · in stock or sourceable. JLC "Basic" parts carry no setup fee, "Extended" parts carry a small one; say which.
 6. **Teach the why** (DSP, PDM, noise shaping, power design), briefly and without condescension.
 7. **Be blunt.** If something in this spec is wrong, flag it, fix it here, bump the version, and log it in §15.
+8. **Show, don't just tell.** The owner is a visual learner. When a mechanism, layout, flow or comparison is involved, draw it: author the SVG in `docs/diagrams/`, render it with `docs/diagrams/render.sh`, and send the **PNG** into the chat, where it displays inline (SVG files only appear as file cards). Label the arrows; one figure, one claim.
 
 ---
 
