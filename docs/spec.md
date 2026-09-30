@@ -549,7 +549,7 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 | E6 | **New.** Mic-clock duty cycle (scope) | R13 |
 | E7 | **New.** Low-level distortion and idle silence on the bridge test board | R9, R12 |
 | E8 | **New.** Stereo A/B: free-running vs shared clock (S4) | R5, D2 |
-| E9 | **New v0.7.** Photo measurement: glasses + Ear (open) worn, mm ruler at the ear; lateral view of both ears, rear-oblique view, and mouth-open view (procedure in `ear-open-fit.md`) | D1 pad location, D4 arm geometry, keep-out at true scale |
+| E9 | **Partly done 2026-09-30** (no ruler; scale from the speaker ring, see `ear-open-fit.md`; still wanted: ruler shot and mouth-open shot). Photo measurement: glasses + Ear (open) worn, mm ruler at the ear; lateral view of both ears, rear-oblique view, and mouth-open view (procedure in `ear-open-fit.md`) | D1 pad location, D4 arm geometry, keep-out at true scale |
 
 **Suggested order:** O1 and O3 → order transducers and Nucleos → JLC board designs → C1 → Phase 1 algorithms → S1/S2 as parts arrive → B-series → D-series.
 

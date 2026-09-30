@@ -63,3 +63,38 @@ The owner's own ear and fit decide everything above. **E9 photo measurement** (1
 6. Optional: a front photo showing the temple arm's height above the tragus.
 
 Claude will mark the keep-out zones on those photos at true scale. The E2 bench fit uses them as the starting point.
+
+## The owner's own fit (E9 photos, 2026-09-30)
+
+Three photos from the owner: right-ear lateral, left-ear angled, left profile with hair down.
+There was no ruler in shot, so scale comes from the Ear (open) speaker ring (~15 mm; it measures
+15.3 mm at the scale used, and the tragus height comes out a plausible 10.9 mm). Distances are
+±20%. The photos stay out of the repo for privacy.
+
+**How her fit differs from the reviewer's:**
+- The pod sits **lower and more upright**. The speaker ring fills the lower concha and sits
+  directly behind the tragus, not above it.
+- The hook comes down the front of the ear **~2.8 mm proud** of the ear's front edge (reviewer:
+  0–3 mm).
+- **8.6 mm** from the bottom of the hook junction down to mid-tragus.
+- The angled photo shows the pod standing out from the ear by roughly its full 14.4 mm depth.
+  Our pad sits flush on the skin, so this doesn't collide, but the arm must stay close to the head.
+- **The glasses temple arm crosses right over the top of the Ear (open) hook.** Attach our arm
+  forward of that crossing.
+- **With hair down, hair covers the ear, the arm and most of the temple arm.** The front of the
+  temple arm near the hinge stays clear. That confirms the mic belongs at the hinge (§8): it
+  would be under hair anywhere further back. The battery bay and the transducer arm will be
+  hidden, which is good for looks but means snag risk (R16).
+- Dangling earrings hang from the lobe, well below the pad. The arm must not reach down there.
+
+**Resulting geometry (right ear):**
+
+| Item | Value |
+|---|---|
+| 8 mm pad, centred ~4.5 mm in front of the tragus at mid-height | **5.3 mm** clear of the Ear (open) (target ≥5) ✓ |
+| Arm vertical run, 8 mm in front of the hook's front edge | **8.0 mm** clear ✓ |
+| Arm drop from temple-arm level to the pad | ~25 mm |
+
+**Still open:** a ruler shot would firm up the scale. A mouth-open photo would show how much
+the pre-tragal skin moves with the jaw. The left ear looked similar in the angled view but
+wasn't measured laterally.
