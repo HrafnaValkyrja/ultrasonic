@@ -66,7 +66,7 @@ Valhalla is set up and the cloud session is retired.
   - O3 bench kit: the staged ~$60–75 list, plus using parts she already has;
   - O4 cell position reading;
   - O5 keep 105 mAh;
-  - "final board as the prototype" (option C: the pod board in a snap-off test frame). Recommended, not yet approved.
+  - ~~"final board as the prototype"~~ **APPROVED (owner; spec O9): rev 1 pod board = the prototype.**
 - **Known fixes to make:**
   - C4 → 10 µF 0603 (AN5373 VDD bulk);
   - the missing ground plane in the draft; vias in the MCU exposed pad;
