@@ -94,3 +94,43 @@ The DRV8833 module's timing is 30–40× coarser than the final design. S2 resul
 It goes in the same JLC order as the acoustic test coupons.
 
 **Capacitor note:** ordinary X5R/X7R ceramic capacitors are slightly piezoelectric and can "sing" when voltage ripple at audio frequencies sits across them. Keep audio-rate ripple off them, or use a low-acoustic-noise type on the bridge supply. The mic datasheet separately forbids Class-2 ceramics near the mic.
+
+## 5. Transistor-level check with a real MOSFET model (v0.13, 2026-09-30)
+
+`sim/checks/bridge_spice.py` runs ngspice 42 on the full bridge:
+- **MOSFETs:** the DMC2400UV model from Diodes' own SPICE collection (model v1.0, 2014-11-18). It stands in for the recommended PMCXB290UE, whose model is behind Nexperia's bot wall; the two have similar gate charge and on-resistance.
+- **Supply and drive:** 3.0 V rail modelled as 0.3 Ω, 22 µF and 100 nF; GPIO gate drive with 2 ns edges through 30 Ω; 100 kΩ gate pulls.
+- **Load:** 35 pF ESD diode per lead; coil modelled as 8 Ω plus 0.3 mH or 1.26 mH.
+- **PWM:** AD modulation, 200 kHz, centre-aligned. Duty is not quantised; quantisation is the noise shaper's job (`pwm_noise.py`).
+
+| Dead time | Idle bus current (0.3 / 1.26 mH) | THD+N, −40 dBFS | THD+N, −12 dBFS (ceiling) |
+|---|---|---|---|
+| 0 | **4.3 / 4.2 mA** (shoot-through) | – | – |
+| 12.5 ns (1 tick) | 0.49 / 0.42 mA | **−61 dB** | **−52 dB** |
+| 25 ns (2 ticks) | 0.20 / 0.10 mA | −48 dB | −38 dB |
+| 37.5 ns (3 ticks) | 0.21 / 0.08 mA | −44 dB | −33 dB |
+
+Gate drive from the GPIOs: 0.28 mA at every dead time, for 4 FETs at 200 kHz.
+
+**What it means:**
+- **Dead time is mandatory.** With none, the model's P-channel turns off slowly (~10 ns through its internal 68 Ω gate resistor) and both FETs conduct: 4.3 mA wasted at idle.
+- **One tick still leaks a little.** At 12.5 ns the P-channel isn't quite off before the N-channel turns on. That's a ~2 mA spike each edge, about +0.3 mA on average. It's harmless to the parts.
+- **Quiet signals stay clean** (−48 to −61 dB). This confirms the AD choice: the coil's ripple current is larger than the signal current, so each edge commutates the same way and the dead-time error doesn't depend on the signal.
+- **Loud signals near the ceiling pick up odd harmonics.** Once the signal current (~85 mA peak at −12 dBFS) exceeds the ripple (~12 mA peak), the current direction stops reversing every cycle, and dead time distorts like a class-D amplifier with no dead-time correction.
+
+**Options (a firmware register, not a hardware decision):**
+1. **12.5 ns:** cleanest sound, costs ~0.3 mA (~5% runtime).
+2. **25 ns plus dead-time compensation in firmware:** add or subtract the dead time to each duty according to the predicted current direction. The load is known, so the direction is too. That recovers most of the loud-signal distortion at 0.2 mA idle.
+3. **25 ns, no compensation:** −38 dB at the ceiling. The ceiling is rare, and the transducer's own distortion is likely larger.
+
+**Recommendation:** start at 12.5 ns on the bench (S2), measure the real PMCXB290UE, then try option 2. The owner doesn't need to decide anything here.
+
+**Testbench bugs found and fixed while doing this.** They're kept here because they'd fool anyone repeating the check:
+1. PWL edge times printed with 5 significant digits rounded ms-scale edges to 100 ns.
+2. Centring both legs' pulses on the same instant produced BD, not AD: identical legs at zero signal, so no coil current.
+3. Snapping edges to the 12.5 ns timer tick made −40 dBFS look like −17 dB THD+N. That's quantisation, not analog distortion.
+4. Resampling the coil current to 400 kS/s aliased the 200 kHz sidebands into the audio band.
+
+**ngspice notes:**
+- The model's ideal "DLIM" limiter diode stalls the timestep. `sim/spice/models/DMC2400UV_ng.lib` adds RS = 10 mΩ and CJO = 1 fF to that diode only.
+- The two legs switching at exactly the same instant also stalls it. A 100 ps skew between legs, realistic for GPIO pins, avoids that, and the signal runs use a 1.9 ms record.

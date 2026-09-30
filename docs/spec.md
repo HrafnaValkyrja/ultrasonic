@@ -158,6 +158,11 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
   - While that ripple exceeds the signal current, the bridge's **dead-time errors cancel exactly**, so quiet sounds stay undistorted.
   - *Changed from the 3-level ("BD") idea in v0.3–v0.4.* BD has no idle ripple, and dead time then distorts quiet signals badly: −10 dB THD+N at −40 dBFS even at 12.5 ns (`sim/checks/deadtime_switching.py`, `C3-output-stage.md`).
 - **Dead time:** 1–2 timer ticks (12.5–25 ns), set per measured MOSFET switching speed.
+  - **v0.13, SPICE with the Diodes DMC2400UV model** (`C3-output-stage.md` §5):
+    - no dead time means shoot-through: 4.3 mA at idle;
+    - 12.5 ns: 0.49 mA idle, THD+N −61 dB at −40 dBFS and −52 dB at the −12 dBFS ceiling;
+    - 25 ns: 0.20 mA idle, −48 / −38 dB.
+    - Start at 12.5 ns; try 25 ns plus firmware dead-time compensation in S2. Gate drive is 0.28 mA.
 - **Noise shaping:** 3rd-order error feedback with one zero at DC and a zero pair near 13 kHz, plus TPDF dither.
   - Modelled noise: −93 dB (0.2–8 kHz), −90 dB (8–20 kHz), −72 dB (20–40 kHz), relative to full scale after the coil (`sim/checks/ntf_compare.py`).
   - Dither is off while squelched, so silence is an exact 50% square wave with zero noise (T6).
