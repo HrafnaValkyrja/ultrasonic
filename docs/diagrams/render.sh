@@ -28,7 +28,10 @@ case "$src" in
     . "$here/tools/env.sh"
     chrome="$(ultra_find_chrome || true)"
     [ -n "$chrome" ] || { echo "render.sh: no Chromium found; install chromium or set ULTRA_CHROME" >&2; exit 1; }
-    "$chrome" --no-sandbox --hide-scrollbars --force-device-scale-factor=2 \
+    # headless_shell is headless by construction; a normal chrome/chromium binary needs telling,
+    # or it opens a real window on the user's desktop and never writes the screenshot.
+    hl=(); case "$chrome" in *headless_shell) ;; *) hl=(--headless=new) ;; esac
+    "$chrome" "${hl[@]}" --no-sandbox --hide-scrollbars --force-device-scale-factor=2 \
       --window-size="${w},${h}" --screenshot="$(realpath -m "$out")" "file://$(realpath "$src")" >/dev/null 2>&1 ;;
   *) echo "render.sh: expected .svg or .mmd, got $src" >&2; exit 2 ;;
 esac
