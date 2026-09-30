@@ -196,7 +196,7 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 - The owner removed the no-switching rule. The limit is now that self-noise is no louder than the ambient background (§1.2.3).
 - **Use:** the MCU's internal SMPS for its ~1.2 V core only. That's where the efficiency gain is: the core's LDO throws away about 60% of its input.
   - Keep it in fixed-frequency (PWM) mode, never burst/skip mode, which is the usual source of audible whine at light load. **v0.13:** the U5 has no mode bit for this. Its SMPS switches at a fixed ~3 MHz in voltage Ranges 1–3 and runs asynchronously only in Range 4. **Rule: never run Range 4 on the SMPS.** Stop 2 stays on the SMPS (ES0499 §2.2.22: Stop 2 on the LDO with RAM partly off can lock the part).
-  - Use a shielded, low-magnetostriction inductor, with no Class-2 ceramics on the switching node.
+  - Use a shielded, low-magnetostriction inductor. **v0.13:** the switching pin itself carries no capacitor. ST requires 2 × 2.2 µF on the core rail and 10 µF at the SMPS input, and no C0G part comes in those values. So those are X5R, placed at the MCU, away from the mic and on the far side of the board from it. Parts: Murata DFE201610E-2R2M (a shielded 2.2 µH metal-alloy inductor, 2.0×1.6 mm; C337891); `B-parts-selection.md`.
 - **Main 3.0 V rail stays a linear LDO.** A battery-to-3.0 V buck would save only ~10%, and the mic and bridge supply benefit from a quiet rail.
 - **Check:** the owner's listening test on the bench (E11). If whine is audible over a quiet room's background, fall back to the LDO. The chip can switch regulators on the fly.
 
@@ -633,7 +633,7 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 | E7 | **New.** Low-level distortion and idle silence on the bridge test board | R9, R12 |
 | E8 | **New.** Stereo A/B: free-running vs shared clock (S4) | R5, D2 |
 | E10 | **New v0.9.** Peripheral-vision boundary: glasses on, eyes fixed on a point straight ahead, a helper slides a pen tip forward along the temple arm from the ear until the owner first detects it. Mark the spot and measure from the hinge; repeat 3×, both eyes; also check just above and below the arm. The pod's front end goes ≥5 mm behind the mark | Vision no-go line (§8) |
-| E11 | **New v0.12.** SMPS whine: board running the real load pattern, pressed against the temple in a quiet room; owner listens. Pass = not louder than the room's background | D11 |
+| E11 | **New v0.12.** SMPS whine: board running the real load pattern, pressed against the temple in a quiet room; owner listens. Pass = not louder than the room's background. **v0.13:** test the idle-listening mode (16 MHz, Range 3) and Stop 2 too, not just full processing | D11 |
 | E12 | **New v0.13.** Temple-arm stiffness: glasses on a table, hang 100 g (≈1 N) from the temple arm ~60 mm behind the hinge. Measure how far it moves sideways; then hang it from a 25 mm stick taped under the arm and measure the twist | R17, O7 spring preload |
 | E9 | **Partly done 2026-09-30** (no ruler; scale from the speaker ring, see `ear-open-fit.md`; still wanted: ruler shot and mouth-open shot). Photo measurement: glasses + Ear (open) worn, mm ruler at the ear; lateral view of both ears, rear-oblique view, and mouth-open view (procedure in `ear-open-fit.md`) | D1 pad location, D4 arm geometry, keep-out at true scale |
 
