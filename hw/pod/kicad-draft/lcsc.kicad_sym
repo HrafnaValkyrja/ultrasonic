@@ -1,0 +1,746 @@
+(kicad_symbol_lib
+  (version 20211014)
+  (generator https://github.com/uPesy/easyeda2kicad.py)
+
+  (symbol "TPS7A2030PDQNR"
+    (in_bom yes)
+    (on_board yes)
+    (property
+      "Reference"
+      "U"
+      (id 0)
+      (at 0 10.16 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Value"
+      "TPS7A2030PDQNR"
+      (id 1)
+      (at 0 -7.62 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Footprint"
+      "lcsc:X2SON-4_L1.0-W1.0-P0.65-TL-EP"
+      (id 2)
+      (at 0 -10.16 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Datasheet"
+      "https://www.lcsc.com/datasheet/C5220164.pdf"
+      (id 3)
+      (at 0 -12.70 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Manufacturer"
+      "TI(德州仪器)"
+      (id 4)
+      (at 0 -15.24 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "MPN"
+      "TPS7A2030PDQNR"
+      (id 5)
+      (at 0 -17.78 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "LCSC Part"
+      "C5220164"
+      (id 6)
+      (at 0 -20.32 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (symbol "TPS7A2030PDQNR_0_1"
+      (rectangle
+        (start -6.35 2.54)
+        (end 6.35 -5.08)
+        (stroke (width 0) (type default))
+        (fill (type background))
+      )
+      (circle
+        (center -5.08 1.27)
+        (radius 0.38)
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (pin unspecified line
+        (at -8.89 -0.00 0)
+        (length 2.54)
+        (name "OUT" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at -8.89 -2.54 0)
+        (length 2.54)
+        (name "GND" (effects (font (size 1.27 1.27))))
+        (number "2" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at 8.89 -2.54 180)
+        (length 2.54)
+        (name "EN" (effects (font (size 1.27 1.27))))
+        (number "3" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at 8.89 -0.00 180)
+        (length 2.54)
+        (name "IN" (effects (font (size 1.27 1.27))))
+        (number "4" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at 0.00 5.08 270)
+        (length 2.54)
+        (name "EP" (effects (font (size 1.27 1.27))))
+        (number "5" (effects (font (size 1.27 1.27))))
+      )
+    )
+  )
+
+  (symbol "DMC2400UV-7"
+    (in_bom yes)
+    (on_board yes)
+    (property
+      "Reference"
+      "Q"
+      (id 0)
+      (at 0 7.62 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Value"
+      "DMC2400UV-7"
+      (id 1)
+      (at 0 -7.62 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Footprint"
+      "lcsc:SOT-563_L1.6-W1.2-P0.50-LS1.6-BL"
+      (id 2)
+      (at 0 -10.16 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Datasheet"
+      "https://lcsc.com/product-detail/New-Arrivals_Diodes-Incorporated-DMC2400UV-7_C177025.html"
+      (id 3)
+      (at 0 -12.70 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Manufacturer"
+      "DIODES(美台)"
+      (id 4)
+      (at 0 -15.24 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "MPN"
+      "DMC2400UV-7"
+      (id 5)
+      (at 0 -17.78 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "LCSC Part"
+      "C177025"
+      (id 6)
+      (at 0 -20.32 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "ki_keywords"
+      "MOSFETs"
+      (id 8)
+      (at 0 -22.86 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (symbol "DMC2400UV-7_0_1"
+      (rectangle
+        (start -6.35 5.08)
+        (end 6.35 -5.08)
+        (stroke (width 0) (type default))
+        (fill (type background))
+      )
+      (circle
+        (center -5.08 3.81)
+        (radius 0.38)
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (pin unspecified line
+        (at 8.89 2.54 180)
+        (length 2.54)
+        (name "D1" (effects (font (size 1.27 1.27))))
+        (number "6" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at 8.89 -0.00 180)
+        (length 2.54)
+        (name "G2" (effects (font (size 1.27 1.27))))
+        (number "5" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at 8.89 -2.54 180)
+        (length 2.54)
+        (name "S2" (effects (font (size 1.27 1.27))))
+        (number "4" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at -8.89 -2.54 0)
+        (length 2.54)
+        (name "D2" (effects (font (size 1.27 1.27))))
+        (number "3" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at -8.89 -0.00 0)
+        (length 2.54)
+        (name "G1" (effects (font (size 1.27 1.27))))
+        (number "2" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at -8.89 2.54 0)
+        (length 2.54)
+        (name "S1" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))
+      )
+    )
+  )
+
+  (symbol "DFE201610E-2R2M=P2"
+    (in_bom yes)
+    (on_board yes)
+    (property
+      "Reference"
+      "L"
+      (id 0)
+      (at 0 5.08 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Value"
+      "DFE201610E-2R2M=P2"
+      (id 1)
+      (at 0 -5.08 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Footprint"
+      "lcsc:L0806"
+      (id 2)
+      (at 0 -7.62 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Datasheet"
+      "https://lcsc.com/product-detail/Inductors-SMD_Murata-Electronics-DFE201610E-2R2M-P2_C337891.html"
+      (id 3)
+      (at 0 -10.16 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Manufacturer"
+      "muRata(村田)"
+      (id 4)
+      (at 0 -12.70 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "MPN"
+      "DFE201610E-2R2M=P2"
+      (id 5)
+      (at 0 -15.24 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "LCSC Part"
+      "C337891"
+      (id 6)
+      (at 0 -17.78 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "ki_keywords"
+      "Inductors/Coils/Transformers"
+      (id 8)
+      (at 0 -20.32 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (symbol "DFE201610E-2R2M=P2_0_1"
+      (arc
+        (start -2.27 0.02)
+        (mid -3.28 1.11)
+        (end -4.29 0.02)
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (arc
+        (start -0.11 0.02)
+        (mid -1.12 1.11)
+        (end -2.13 0.02)
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (arc
+        (start 2.04 0.02)
+        (mid 1.03 1.11)
+        (end 0.02 0.02)
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (arc
+        (start 4.23 0.02)
+        (mid 3.22 1.09)
+        (end 2.21 0.02)
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (pin unspecified line
+        (at 5.08 -0.00 180)
+        (length 1.27)
+        (name "2" (effects (font (size 1.27 1.27))))
+        (number "2" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at -5.08 -0.00 0)
+        (length 1.27)
+        (name "1" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))
+      )
+    )
+  )
+
+  (symbol "Q13FC1350000400"
+    (in_bom yes)
+    (on_board yes)
+    (property
+      "Reference"
+      "X"
+      (id 0)
+      (at 0 5.08 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Value"
+      "Q13FC1350000400"
+      (id 1)
+      (at 0 -5.08 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Footprint"
+      "lcsc:FC-135R_L3.2-W1.5"
+      (id 2)
+      (at 0 -7.62 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Datasheet"
+      "https://lcsc.com/product-detail/SMD-Crystals_EPSON_Q13FC1350000400_32-768KHz-20ppm-12-5pF_C32346.html"
+      (id 3)
+      (at 0 -10.16 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Manufacturer"
+      "EPSON(爱普生)"
+      (id 4)
+      (at 0 -12.70 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "MPN"
+      "Q13FC13500004"
+      (id 5)
+      (at 0 -15.24 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "LCSC Part"
+      "C32346"
+      (id 6)
+      (at 0 -17.78 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "ki_keywords"
+      "Crystals"
+      (id 8)
+      (at 0 -20.32 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "ki_description"
+      "32.768KHz ±20ppm 12.5pF"
+      (id 9)
+      (at 0 -22.86 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (symbol "Q13FC1350000400_0_1"
+      (rectangle
+        (start -0.51 1.78)
+        (end 0.51 -1.78)
+        (stroke (width 0) (type default))
+        (fill (type background))
+      )
+      (polyline
+        (pts
+          (xy -1.02 1.78) (xy -1.02 -1.78)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts
+          (xy 1.02 1.78) (xy 1.02 -1.78)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts
+          (xy -2.54 -0.00) (xy -1.02 -0.00)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts
+          (xy 1.02 -0.00) (xy 2.54 -0.00)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (pin unspecified line
+        (at -5.08 -0.00 0)
+        (length 2.54)
+        (name "1" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at 5.08 -0.00 180)
+        (length 2.54)
+        (name "2" (effects (font (size 1.27 1.27))))
+        (number "2" (effects (font (size 1.27 1.27))))
+      )
+    )
+  )
+
+  (symbol "KXT321LHS"
+    (in_bom yes)
+    (on_board yes)
+    (property
+      "Reference"
+      "SW"
+      (id 0)
+      (at 0 3.81 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Value"
+      "KXT321LHS"
+      (id 1)
+      (at 0 -6.35 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Footprint"
+      "lcsc:SW-SMD_L3.0-W2.0-LS3.5"
+      (id 2)
+      (at 0 -8.89 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Datasheet"
+      "https://lcsc.com/product-detail/Others_C-K-KXT321LHS_C221821.html"
+      (id 3)
+      (at 0 -11.43 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Manufacturer"
+      "C&K"
+      (id 4)
+      (at 0 -13.97 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "MPN"
+      "KXT321LHS"
+      (id 5)
+      (at 0 -16.51 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "LCSC Part"
+      "C221821"
+      (id 6)
+      (at 0 -19.05 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "ki_keywords"
+      "Tactile Switches"
+      (id 8)
+      (at 0 -21.59 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (symbol "KXT321LHS_0_1"
+      (circle
+        (center -2.54 -1.27)
+        (radius 0.76)
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (circle
+        (center 2.54 -1.27)
+        (radius 0.76)
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts
+          (xy -2.54 -1.27) (xy 2.54 0.25)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (pin unspecified line
+        (at -7.62 -1.27 0)
+        (length 5.08)
+        (name "1" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at 7.62 -1.27 180)
+        (length 5.08)
+        (name "2" (effects (font (size 1.27 1.27))))
+        (number "2" (effects (font (size 1.27 1.27))))
+      )
+    )
+  )
+
+  (symbol "PESD5V0S1BL,315"
+    (in_bom yes)
+    (on_board yes)
+    (property
+      "Reference"
+      "E"
+      (id 0)
+      (at 0 5.08 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Value"
+      "PESD5V0S1BL,315"
+      (id 1)
+      (at 0 -5.08 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Footprint"
+      "lcsc:SOD-882_L1.0-W0.6-BI"
+      (id 2)
+      (at 0 -7.62 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Datasheet"
+      "https://lcsc.com/product-detail/Diodes-ESD_NXP_PESD5V0S1BL-315_PESD5V0S1BL-315_C84374.html"
+      (id 3)
+      (at 0 -10.16 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Manufacturer"
+      "Nexperia(安世)"
+      (id 4)
+      (at 0 -12.70 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "MPN"
+      "PESD5V0S1BL,315"
+      (id 5)
+      (at 0 -15.24 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "LCSC Part"
+      "C84374"
+      (id 6)
+      (at 0 -17.78 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "ki_keywords"
+      "ESD Protection Devices"
+      (id 8)
+      (at 0 -20.32 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "ki_description"
+      "PESD5V0S1BL,315"
+      (id 9)
+      (at 0 -22.86 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (symbol "PESD5V0S1BL,315_0_1"
+      (polyline
+        (pts
+          (xy -3.30 -2.54) (xy -3.30 2.54)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts
+          (xy -3.30 2.54) (xy -2.54 2.54)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts
+          (xy 3.56 2.54) (xy 3.56 -2.54)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts
+          (xy 3.56 -2.54) (xy 2.79 -2.54)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts
+          (xy -6.35 -0.00) (xy 6.35 -0.00)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (polyline
+        (pts
+          (xy -0.76 2.54) (xy -3.30 -0.00) (xy -0.76 -2.54) (xy -0.76 2.54)
+        )
+        (stroke (width 0) (type default))
+        (fill (type background))
+      )
+      (polyline
+        (pts
+          (xy 1.02 -2.54) (xy 3.56 -0.00) (xy 1.02 2.54) (xy 1.02 -2.54)
+        )
+        (stroke (width 0) (type default))
+        (fill (type background))
+      )
+      (pin input line
+        (at -10.16 -0.00 0)
+        (length 5.08)
+        (name "1" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))
+      )
+      (pin input line
+        (at 10.16 -0.00 180)
+        (length 5.08)
+        (name "2" (effects (font (size 1.27 1.27))))
+        (number "2" (effects (font (size 1.27 1.27))))
+      )
+    )
+  )
+
+  (symbol "ESD9X5.0ST5G"
+    (in_bom yes)
+    (on_board yes)
+    (property
+      "Reference"
+      "D"
+      (id 0)
+      (at 0 5.08 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Value"
+      "ESD9X5.0ST5G"
+      (id 1)
+      (at 0 -5.08 0)
+      (effects (font (size 1.27 1.27) ) )
+    )
+    (property
+      "Footprint"
+      "lcsc:SOD-923_L0.8-W0.6-LS1.0-RD"
+      (id 2)
+      (at 0 -7.62 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Datasheet"
+      "https://lcsc.com/product-detail/Diodes-ESD_ON_ESD9X5-0ST5G_ESD9X5-0ST5G_C87910.html"
+      (id 3)
+      (at 0 -10.16 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "Manufacturer"
+      "onsemi(安森美)"
+      (id 4)
+      (at 0 -12.70 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "MPN"
+      "ESD9X5.0ST5G"
+      (id 5)
+      (at 0 -15.24 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "LCSC Part"
+      "C87910"
+      (id 6)
+      (at 0 -17.78 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (property
+      "ki_keywords"
+      "ESD Protection Devices"
+      (id 8)
+      (at 0 -20.32 0)
+      (effects (font (size 1.27 1.27) ) hide)
+    )
+    (symbol "ESD9X5.0ST5G_0_1"
+      (polyline
+        (pts
+          (xy 1.27 1.52) (xy -1.27 -0.00) (xy 1.27 -1.78) (xy 1.27 1.52)
+        )
+        (stroke (width 0) (type default))
+        (fill (type background))
+      )
+      (polyline
+        (pts
+          (xy -1.27 1.78) (xy -1.27 -1.78)
+        )
+        (stroke (width 0) (type default))
+        (fill (type none))
+      )
+      (pin unspecified line
+        (at -5.08 -0.00 0)
+        (length 3.81)
+        (name "C" (effects (font (size 1.27 1.27))))
+        (number "1" (effects (font (size 1.27 1.27))))
+      )
+      (pin unspecified line
+        (at 5.08 -0.00 180)
+        (length 3.81)
+        (name "A" (effects (font (size 1.27 1.27))))
+        (number "2" (effects (font (size 1.27 1.27))))
+      )
+    )
+  )
+)

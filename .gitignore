@@ -22,3 +22,6 @@ hw/pod/draft/*.log
 hw/pod/draft/*.kicad_prl
 hw/pod/draft/pod_view.*
 hw/pod/draft/*.svg
+hw/pod/kicad-draft.zip
+hw/pod/kicad-draft/*.kicad_prl
+hw/pod/kicad-draft/*-backups/
