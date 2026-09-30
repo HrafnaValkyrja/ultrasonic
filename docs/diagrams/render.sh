@@ -23,12 +23,11 @@ case "$src" in
       src="$tmp"
     fi
     read -r w h < <(grep -o 'viewBox="[^"]*"' "$src" | head -1 | tr -d '"' | awk '{print $3, $4}')
-    chrome=""
-    for c in /opt/pw-browsers/chromium_headless_shell-*/chrome-linux/headless_shell \
-             /opt/pw-browsers/chromium-*/chrome-linux/chrome; do
-      [ -x "$c" ] && { chrome="$c"; break; }
-    done
-    [ -n "$chrome" ] || { echo "render.sh: no headless Chromium under /opt/pw-browsers" >&2; exit 1; }
+    here="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+    # shellcheck source=/dev/null
+    . "$here/tools/env.sh"
+    chrome="$(ultra_find_chrome || true)"
+    [ -n "$chrome" ] || { echo "render.sh: no Chromium found; install chromium or set ULTRA_CHROME" >&2; exit 1; }
     "$chrome" --no-sandbox --hide-scrollbars --force-device-scale-factor=2 \
       --window-size="${w},${h}" --screenshot="$(realpath -m "$out")" "file://$(realpath "$src")" >/dev/null 2>&1 ;;
   *) echo "render.sh: expected .svg or .mmd, got $src" >&2; exit 2 ;;

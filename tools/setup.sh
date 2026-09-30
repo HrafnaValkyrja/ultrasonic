@@ -47,11 +47,15 @@ done
 
 APT_PKGS=(ngspice gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
           kicad kicad-symbols kicad-footprints openjdk-25-jre-headless
-          librsvg2-bin python3.12-venv cmake ninja-build)
+          librsvg2-bin python3-venv cmake ninja-build)   # python3-venv tracks the distro python3
 if [ "$WITH_3D" = 1 ]; then APT_PKGS+=(kicad-packages3d); fi
 
 SUDO=()
-if [ "$(id -u)" -ne 0 ]; then SUDO=(sudo -n); fi
+if [ "$(id -u)" -ne 0 ]; then
+  # -n (never prompt) suits CI and the cloud image. On a desktop, SUDO_ASKPASS lets sudo ask
+  # through a GUI dialog instead of failing when the timestamp lapses mid-install.
+  if [ -n "${SUDO_ASKPASS:-}" ] && [ -x "${SUDO_ASKPASS}" ]; then SUDO=(sudo -A); else SUDO=(sudo -n); fi
+fi
 
 STAMP="$ULTRA_TOOLS_HOME/.setup-stamp"
 VERSIONS="$ULTRA_TOOLS_HOME/versions.txt"
@@ -157,7 +161,9 @@ if [ "$MODE" = check ]; then
 fi
 
 # ---------------------------------------------------------------- install
-"${SUDO[@]}" mkdir -p "$ULTRA_TOOLS_HOME"
+# Only escalate when the tools dir isn't already there and ours: on a desktop, sudo may need a
+# password, and re-running setup shouldn't ask for one when there is nothing to create.
+if [ ! -d "$ULTRA_TOOLS_HOME" ]; then "${SUDO[@]}" mkdir -p "$ULTRA_TOOLS_HOME"; fi
 if [ ! -w "$ULTRA_TOOLS_HOME" ]; then "${SUDO[@]}" chown "$(id -u):$(id -g)" "$ULTRA_TOOLS_HOME"; fi
 exec 9>"$ULTRA_TOOLS_HOME/.lock"
 flock -w 1800 9 || fail "another setup.sh holds $ULTRA_TOOLS_HOME/.lock"
@@ -174,11 +180,24 @@ run() { if [ "$QUIET" = 1 ]; then "$@" >> "$LOG" 2>&1; else "$@" 2>&1 | tee -a "
 step "apt packages"
 MISSING=()
 for p in "${APT_PKGS[@]}"; do dpkg_ok "$p" || MISSING+=("$p"); done
+# A distro KiCad (e.g. 9.x on Ubuntu 26.04) satisfies dpkg_ok but cannot open this project's
+# files, so ask apt for the PPA version whenever the installed major series is wrong.
+INSTALLED_KICAD="$(dpkg-query -W -f='${Version}' kicad 2>/dev/null || true)"
+if [ -n "$INSTALLED_KICAD" ] && [ "${INSTALLED_KICAD%%.*}" != "${KICAD_SERIES%%.*}" ]; then
+  say "  KiCad $INSTALLED_KICAD installed, need ${KICAD_SERIES%%.*}.x: upgrading from the PPA"
+  case " ${MISSING[*]:-} " in *" kicad "*) ;; *) MISSING+=(kicad kicad-symbols kicad-footprints) ;; esac
+fi
 if [ "${#MISSING[@]}" -gt 0 ]; then
   say "  installing: ${MISSING[*]}"
   CODENAME="$(. /etc/os-release && echo "${VERSION_CODENAME:-noble}")"
   PPA_LIST="/etc/apt/sources.list.d/kicad-${KICAD_SERIES}-releases.sources"
-  if [ ! -f "$PPA_LIST" ]; then
+  # Another file may already carry this PPA (e.g. added by add-apt-repository, which inlines the
+  # key). Two entries for one URI with different Signed-By values is fatal to apt: "The list of
+  # sources could not be read." So add ours only when nothing references the PPA yet.
+  PPA_URI="https://ppa.launchpadcontent.net/kicad/kicad-${KICAD_SERIES}-releases/ubuntu/"
+  if grep -rqsF "$PPA_URI" /etc/apt/sources.list /etc/apt/sources.list.d/ 2>/dev/null; then
+    say "  KiCad $KICAD_SERIES PPA already configured; leaving it alone"
+  elif [ ! -f "$PPA_LIST" ]; then
     "${SUDO[@]}" install -d -m 0755 /etc/apt/keyrings
     "${SUDO[@]}" install -m 0644 "$REPO/tools/keys/kicad-ppa.asc" /etc/apt/keyrings/kicad-ppa.asc
     printf 'Types: deb\nURIs: https://ppa.launchpadcontent.net/kicad/kicad-%s-releases/ubuntu/\nSuites: %s\nComponents: main\nSigned-By: /etc/apt/keyrings/kicad-ppa.asc\n' \
@@ -186,12 +205,19 @@ if [ "${#MISSING[@]}" -gt 0 ]; then
   fi
   PREV_JAVA="$(readlink -f "$(command -v java 2>/dev/null || true)" 2>/dev/null || true)"
   run "${SUDO[@]}" apt-get -o DPkg::Lock::Timeout=600 update -q
-  run "${SUDO[@]}" env DEBIAN_FRONTEND=noninteractive apt-get -o DPkg::Lock::Timeout=600 \
+  # No `sudo env ...`: a sudoers rule scoped to apt-get (a sensible thing to grant) doesn't cover
+  # env, and granting env would mean granting everything. --force-conf* keeps dpkg from prompting
+  # about config files, which is what DEBIAN_FRONTEND=noninteractive was guarding against.
+  run "${SUDO[@]}" apt-get -o DPkg::Lock::Timeout=600 \
+      -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef \
       install -y -q --no-install-recommends "${MISSING[@]}"
   # Installing JDK 25 flips the auto-mode `java` alternative; keep the image's default.
   NOW_JAVA="$(readlink -f "$(command -v java 2>/dev/null || true)" 2>/dev/null || true)"
   if [ -n "$PREV_JAVA" ] && [ "$PREV_JAVA" != "$NOW_JAVA" ] && [ -x "$PREV_JAVA" ]; then
-    run "${SUDO[@]}" update-alternatives --set java "$PREV_JAVA"
+    # Best-effort: on a shared desktop this may need a password we don't have. Say so rather than
+    # failing the whole install, and let env.sh pin FREEROUTING_JAVA to the JDK we want.
+    "${SUDO[@]}" update-alternatives --set java "$PREV_JAVA" 2>/dev/null \
+      || say "  note: left the system 'java' default as the installer set it (needs sudo to restore)"
   fi
   # env.sh picked FREEROUTING_JAVA before JDK 25 existed; re-resolve it now.
   if [ "$FREEROUTING_JAVA" = java ]; then unset FREEROUTING_JAVA; . "$REPO/tools/env.sh"; fi
@@ -255,9 +281,8 @@ done_step
 step "mermaid-cli $MMDC_VERSION"
 MM_DIR="$ULTRA_TOOLS_HOME/mermaid"
 command -v npm >/dev/null 2>&1 || fail "npm not found (needed for mermaid-cli)"
-CHROME="$(ls -d /opt/pw-browsers/chromium_headless_shell-*/chrome-linux/headless_shell \
-                 /opt/pw-browsers/chromium-*/chrome-linux/chrome 2>/dev/null | head -1 || true)"
-[ -n "$CHROME" ] || fail "no preinstalled Chromium under /opt/pw-browsers (mermaid-cli needs one)"
+CHROME="$(ultra_find_chrome || true)"
+[ -n "$CHROME" ] || fail "no Chromium found (mermaid-cli needs one): install chromium, or set ULTRA_CHROME"
 if [ "$("$MMDC" --version 2>/dev/null | head -1)" != "$MMDC_VERSION" ]; then
   mkdir -p "$MM_DIR"
   run env PUPPETEER_SKIP_DOWNLOAD=1 npm install --prefix "$MM_DIR" --no-audit --no-fund --silent \

@@ -42,7 +42,26 @@ export MPLBACKEND="${MPLBACKEND:-Agg}"
 export MMDC="$ULTRA_TOOLS_HOME/mermaid/node_modules/.bin/mmdc"
 export MMDC_PUPPETEER_CONFIG="$ULTRA_TOOLS_HOME/mermaid/puppeteer.json"
 
-# Put the harness venv first, so `python3`/`pip` are the 3.12 venv that can import pcbnew.
+# First usable headless Chromium, for mermaid-cli and the SVG renderer. Order: explicit override,
+# the cloud image's preinstall, a Playwright/Puppeteer cache, then a browser on PATH. Echoes the
+# path and returns 1 if there is none.
+ultra_find_chrome() {
+  local c
+  if [ -n "${ULTRA_CHROME:-}" ] && [ -x "${ULTRA_CHROME}" ]; then printf '%s\n' "$ULTRA_CHROME"; return 0; fi
+  for c in /opt/pw-browsers/chromium_headless_shell-*/chrome-linux/headless_shell \
+           /opt/pw-browsers/chromium-*/chrome-linux/chrome \
+           "$HOME"/.cache/ms-playwright/chromium_headless_shell-*/chrome-linux*/headless_shell \
+           "$HOME"/.cache/ms-playwright/chromium-*/chrome-linux*/chrome \
+           "$HOME"/.cache/puppeteer/chrome/*/chrome-linux*/chrome; do
+    [ -x "$c" ] && { printf '%s\n' "$c"; return 0; }
+  done
+  for c in chromium chromium-browser google-chrome-stable google-chrome brave-browser; do
+    command -v "$c" >/dev/null 2>&1 && { command -v "$c"; return 0; }
+  done
+  return 1
+}
+
+# Put the harness venv first, so `python3`/`pip` are the venv that can import pcbnew.
 case ":$PATH:" in
   *":$ULTRA_VENV/bin:"*) ;;
   *) if [ -d "$ULTRA_VENV/bin" ]; then export PATH="$ULTRA_VENV/bin:$PATH"; fi ;;
