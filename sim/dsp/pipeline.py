@@ -220,6 +220,61 @@ def limiter(y, fs, ceiling_dbfs, attack_ms=0.5, release_ms=60.0):
     return soft_ceiling(y * g, ceiling_dbfs + 3)
 
 
+def idle_detector_fft(x, hop_ms=5.0, nfft=256, f_lo=20e3, f_hi=85e3, n_bands=4, up_s=3.0,
+                      down_s=0.3, thresh_db=15.0, hang_s=0.3, peak_db=10.0, bin_up_s=3.0, bin_down_s=1.0,
+                      smooth_bins=1):
+    """Idle-listening wake detector, rev 2 (after audit dsp-1/dsp-8).
+
+    Instead of four IIR band filters running on every sample (~10 Mcycle/s, and their 2nd-order
+    skirts let audible speech wake the chain), take one 256-point Hann-windowed FFT snapshot every
+    hop_ms and sum band energies from its bins, reusing algorithm B's FFT. Hann leakage from speech
+    at <= 6 kHz into bins >= 20 kHz is about -90 dB, so speech no longer wakes it.
+    Cost at 5 ms: 200 FFTs/s x ~17 kcycles = ~3.4 Mcycle/s, fits a 16 MHz idle clock.
+    Limit: with 1.28 ms snapshots every 5 ms, a single call shorter than ~3.7 ms can fall between
+    snapshots; bat calls come in trains, and the look-back buffer covers the wake-up.
+    Returns (active per hop, active fraction, hop seconds).
+    """
+    hop = int(round(FS * hop_ms / 1000))
+    win = np.hanning(nfft)
+    freqs = np.fft.rfftfreq(nfft, 1 / FS)
+    edges = np.geomspace(f_lo, f_hi, n_bands + 1)
+    idx = np.digitize(freqs, edges) - 1
+    ok = (idx >= 0) & (idx < n_bands)
+    n = (len(x) - nfft) // hop + 1
+    hop_s = hop / FS
+    a_up, a_dn = np.exp(-hop_s / up_s), np.exp(-hop_s / down_s)
+    floor = None
+    band_bins = np.nonzero((freqs >= f_lo) & (freqs < f_hi))[0]
+    b_up, b_dn = np.exp(-hop_s / bin_up_s), np.exp(-hop_s / bin_down_s)
+    bfloor = None
+    active = np.zeros(n, bool)
+    hang = 0
+    for i in range(n):
+        seg = x[i * hop: i * hop + nfft] * win
+        p = np.abs(np.fft.rfft(seg)) ** 2
+        e = np.bincount(idx[ok], weights=p[ok], minlength=n_bands)
+        if floor is None:
+            floor = e.copy()
+        floor = np.where(e > floor, a_up * floor + (1 - a_up) * e, a_dn * floor + (1 - a_dn) * e)
+        if peak_db is None:
+            hit = np.any(e > floor * 10 ** (thresh_db / 10))
+        else:
+            # Narrowband test: bat calls light up a few bins; broadband lifts (speech leakage,
+            # rustle, the mic's own noise) raise every bin together. Compare each bin to its own
+            # slow floor, then require the best bin to stand out from the band's median bin.
+            pb = p[band_bins]
+            if smooth_bins > 1:        # average neighbouring bins: tames single-bin chi-square scatter
+                pb = np.convolve(pb, np.ones(smooth_bins) / smooth_bins, 'same')
+            if bfloor is None:
+                bfloor = pb.copy() + 1e-30
+            r = pb / bfloor
+            bfloor = np.where(pb > bfloor, b_up * bfloor + (1 - b_up) * pb, b_dn * bfloor + (1 - b_dn) * pb)
+            hit = (r.max() > 10 ** (thresh_db / 10)) and (r.max() / np.median(r) > 10 ** (peak_db / 10))
+        hang = int(hang_s / hop_s) if hit else max(hang - 1, 0)
+        active[i] = hang > 0
+    return active, active.mean(), hop_s
+
+
 def soft_ceiling(y, ceiling_dbfs):
     c = 10 ** (ceiling_dbfs / 20)
     return c * np.tanh(y / c)

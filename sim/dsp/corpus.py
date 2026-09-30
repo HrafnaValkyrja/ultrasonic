@@ -119,7 +119,7 @@ def _filt(sos, x):
     return signal.sosfilt(sos, x)
 
 
-def quiet_scene(duration=30.0, seed=2):
+def quiet_scene(duration=30.0, seed=2, whines=True):
     """A quiet evening indoors/porch: steady whines + speech all the time, and a few short events.
 
     Events: two bat passes (~1.2 s each), one burst of keys, one rangefinder burst train (0.4 s).
@@ -150,6 +150,8 @@ def quiet_scene(duration=30.0, seed=2):
     sp = _filt(_bandpass(200, 6000), rng.standard_normal(n)) * (0.5 + 0.5 * np.sin(2 * np.pi * 3 * t)) ** 2
     parts = {"bats": (ev, 66), "keys": (keys, 62), "hc_sr04": (hc, 75),
              "charger_whine": (whine, 40), "led_driver": (led, 35), "speech_band": (sp, 60)}
+    if not whines:          # a room with no electronics: exposes detectors that wake on audible speech
+        del parts["charger_whine"], parts["led_driver"]
     mix = np.zeros(n)
     for sig, db in parts.values():
         nz = np.abs(sig) > 1e-9
