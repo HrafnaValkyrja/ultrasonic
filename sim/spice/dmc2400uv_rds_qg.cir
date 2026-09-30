@@ -1,0 +1,37 @@
+* DMC2400UV Rds(on) and gate charge at Vgs=3.0 V
+.include /home/user/ultrasonic/sim/spice/models/DMC2400UV.lib
+* Rds(on): N at 200 mA, P at 200 mA, Vgs = 3.0 V (and 2.5 / 4.5 for checking against the datasheet)
+XN dn gn 0 DMC2400UV_NMOS
+VGN gn 0 3.0
+IDN 0 dn 0.2
+XP dp gp 0 DMC2400UV_PMOS
+VGP gp 0 -3.0
+IDP dp 0 0.2
+* gate charge: charge gate through 1 mA current source to 3.0 V with drain switching 3 V via 15 ohm load
+XNq dq gq 0 DMC2400UV_NMOS
+RL vdd dq 15
+VDD vdd 0 3.0
+IG 0 gq PULSE(0 1m 1u 1n 1n 20u 100u)
+.control
+op
+let rn=v(dn)/0.2
+let rp=-v(dp)/0.2
+print rn rp
+alter VGN dc=2.5
+alter VGP dc=-2.5
+op
+let rn=v(dn)/0.2
+let rp=-v(dp)/0.2
+print rn rp
+alter VGN dc=4.5
+alter VGP dc=-4.5
+op
+let rn=v(dn)/0.2
+let rp=-v(dp)/0.2
+print rn rp
+tran 1n 12u
+meas tran t3 WHEN v(gq)=3.0 RISE=1
+meas tran t45 WHEN v(gq)=4.5 RISE=1
+print (t3-1u)*1m (t45-1u)*1m
+.endc
+.end
