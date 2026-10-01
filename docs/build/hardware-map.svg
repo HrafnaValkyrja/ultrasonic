@@ -1,0 +1,190 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-label="Where every bought part goes in one pod. Left: the pod body section with the two lid screws that double as charge contacts, their captured brass nuts and silicone leads, the cell on VHB tape, two foam strips springing the PCB, and the mic washer. Right: the heel, the NiTi arm with four litz conductors beside it, and the pad with its set screw and nut, M1.2 closure screw, silicone contact disc and epoxy LED ring. Bottom: totals for the pair." font-family="Helvetica, Arial, sans-serif">
+  <rect width="1200" height="800" rx="14" fill="#fbfaf7"/>
+  <text x="40" y="44" font-size="20" font-weight="700" fill="#1f2328">What to buy, and where each piece goes (one pod)</text>
+  <text x="40" y="68" font-size="13" fill="#57606a">Schematic, not to scale. The numbers in circles match the lists. Red = hard to buy in small quantities. Same number = same part.</text>
+
+  <!-- ======================= Panel A: pod body ======================= -->
+  <rect x="30" y="90" width="410" height="530" rx="10" fill="#ffffff" stroke="#8a8676" stroke-width="1"/>
+  <text x="48" y="116" font-size="14" font-weight="700" fill="#1f2328">Pod body: tub + lid</text>
+  <text x="48" y="134" font-size="11" fill="#57606a">section, outer face up</text>
+
+  <!-- dock pogo pin -->
+  <rect x="358" y="112" width="8" height="34" rx="3" fill="#ddd4b4" stroke="#b8520a" stroke-width="1.2"/>
+  <text x="350" y="128" font-size="11" fill="#57606a" text-anchor="end">dock pogo pin</text>
+  <text x="350" y="141" font-size="11" fill="#57606a" text-anchor="end">touches the head</text>
+
+  <!-- tub and lid -->
+  <rect x="55" y="170" width="360" height="130" rx="8" fill="#fbfaf7" stroke="#1f2328" stroke-width="1.5"/>
+  <rect x="55" y="155" width="360" height="16" rx="4" fill="#e8f0fb" stroke="#2a78d6" stroke-width="1.2"/>
+  <text x="70" y="167" font-size="11" fill="#2a78d6">lid</text>
+  <text x="64" y="296" font-size="11" fill="#57606a">tub (inner face, toward the head)</text>
+
+  <!-- PCB, cell, tape, foam -->
+  <rect x="75" y="200" width="220" height="8" fill="#1a7a55"/>
+  <text x="246" y="196" font-size="11" fill="#1a7a55">PCB</text>
+  <rect x="95" y="209" width="18" height="36" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1"/>
+  <rect x="255" y="209" width="18" height="36" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1"/>
+  <rect x="75" y="245" width="250" height="38" rx="3" fill="#fff4ea" stroke="#b8520a" stroke-width="1.2"/>
+  <text x="200" y="268" font-size="12" fill="#b8520a" text-anchor="middle">cell</text>
+  <rect x="75" y="283" width="250" height="4" fill="#4a3aa7"/>
+
+  <!-- mic chimney + washer -->
+  <rect x="120" y="171" width="14" height="22" fill="#e8f0fb" stroke="#2a78d6" stroke-width="1"/>
+  <rect x="125" y="155" width="4" height="38" fill="#fbfaf7"/>
+  <rect x="115" y="193" width="24" height="7" fill="#fff4ea" stroke="#b8520a" stroke-width="1"/>
+
+  <!-- lid screw, boss, nut, lead -->
+  <rect x="338" y="171" width="48" height="50" fill="#f3f1ea" stroke="#8a8676" stroke-width="1"/>
+  <rect x="348" y="185" width="28" height="12" fill="#ddd4b4" stroke="#b8520a" stroke-width="1.2"/>
+  <rect x="358" y="158" width="8" height="40" fill="#c9c5b8" stroke="#1f2328" stroke-width="1"/>
+  <rect x="350" y="151" width="24" height="7" rx="2" fill="#c9c5b8" stroke="#1f2328" stroke-width="1"/>
+  <path d="M348,191 C330,191 318,214 296,205" fill="none" stroke="#e34948" stroke-width="2.5"/>
+
+  <!-- badges A -->
+  <g font-size="12" font-weight="700" text-anchor="middle">
+    <circle cx="392" cy="140" r="10" fill="#2a78d6"/><text x="392" y="144" fill="#ffffff">1</text>
+    <circle cx="400" cy="232" r="10" fill="#e34948"/><text x="400" y="236" fill="#ffffff">2</text>
+    <line x1="394" y1="224" x2="378" y2="197" stroke="#e34948" stroke-width="1"/>
+    <circle cx="318" cy="226" r="10" fill="#2a78d6"/><text x="318" y="230" fill="#ffffff">3</text>
+    <circle cx="342" cy="276" r="10" fill="#2a78d6"/><text x="342" y="280" fill="#ffffff">4</text>
+    <line x1="334" y1="281" x2="326" y2="285" stroke="#4a3aa7" stroke-width="1"/>
+    <circle cx="138" cy="228" r="10" fill="#2a78d6"/><text x="138" y="232" fill="#ffffff">5</text>
+    <circle cx="160" cy="182" r="10" fill="#2a78d6"/><text x="160" y="186" fill="#ffffff">6</text>
+  </g>
+
+  <!-- list A -->
+  <g font-size="12" fill="#57606a">
+    <circle cx="56" cy="331" r="10" fill="#2a78d6"/><text x="56" y="335" fill="#ffffff" font-weight="700" text-anchor="middle">1</text>
+    <text x="74" y="335" font-size="13" font-weight="700" fill="#1f2328">M1.4 × 3 pan / cheese head, A2 · 2 per pod</text>
+    <text x="74" y="351">lid screws; the heads are the charge contacts</text>
+    <text x="74" y="367">(top = +5 V). Buy 3 mm only: 4 mm is too long.</text>
+
+    <circle cx="56" cy="387" r="10" fill="#e34948"/><text x="56" y="391" fill="#ffffff" font-weight="700" text-anchor="middle">2</text>
+    <text x="74" y="391" font-size="13" font-weight="700" fill="#1f2328">M1.4 brass hex nut, DIN 934 · 4 per pod</text>
+    <text x="74" y="407">2 lid (side-entry pockets), 1 heel, 1 pad.</text>
+    <text x="74" y="423">Marketplace only. Solders with plain rosin flux.</text>
+
+    <circle cx="56" cy="443" r="10" fill="#2a78d6"/><text x="56" y="447" fill="#ffffff" font-weight="700" text-anchor="middle">3</text>
+    <text x="74" y="447" font-size="13" font-weight="700" fill="#1f2328">30 AWG silicone wire, red + black · 2 × 35 mm</text>
+    <text x="74" y="463">soldered to each lid nut on the bench → VBUS / GND_CHG</text>
+
+    <circle cx="56" cy="483" r="10" fill="#2a78d6"/><text x="56" y="487" fill="#ffffff" font-weight="700" text-anchor="middle">4</text>
+    <text x="74" y="487" font-size="13" font-weight="700" fill="#1f2328">3M VHB 4914, 0.25 mm · cell to inner wall</text>
+    <text x="74" y="503">fits the 0.3 mm gap. Cut free with floss, never pry.</text>
+
+    <circle cx="56" cy="523" r="10" fill="#2a78d6"/><text x="56" y="527" fill="#ffffff" font-weight="700" text-anchor="middle">5</text>
+    <text x="74" y="527" font-size="13" font-weight="700" fill="#1f2328">Closed-cell PE foam, ~1.5 mm · 2 strips</text>
+    <text x="74" y="543">1.1 × 17.5 mm; spring the PCB up against the lid</text>
+
+    <circle cx="56" cy="563" r="10" fill="#2a78d6"/><text x="56" y="567" fill="#ffffff" font-weight="700" text-anchor="middle">6</text>
+    <text x="74" y="567" font-size="13" font-weight="700" fill="#1f2328">PORON 4701-30, 0.79 mm · washer Ø3 / Ø1</text>
+    <text x="74" y="583">mic seal on the chimney tip; replace when opened</text>
+  </g>
+
+  <!-- ======================= Panel B: heel, arm, pad ======================= -->
+  <rect x="460" y="90" width="710" height="530" rx="10" fill="#ffffff" stroke="#8a8676" stroke-width="1"/>
+  <text x="478" y="116" font-size="14" font-weight="700" fill="#1f2328">Heel → NiTi arm → pad</text>
+
+  <!-- pod underside + heel -->
+  <rect x="480" y="128" width="250" height="14" fill="#f3f1ea" stroke="#8a8676" stroke-width="1"/>
+  <text x="488" y="139" font-size="10" fill="#57606a">pod (above)</text>
+  <polygon points="560,142 655,142 645,220 580,238" fill="#fbfaf7" stroke="#1f2328" stroke-width="1.5"/>
+  <text x="552" y="190" font-size="11" fill="#57606a" text-anchor="end">heel (printed)</text>
+  <line x1="600" y1="150" x2="624.3" y2="193.7" stroke="#e8f0fb" stroke-width="10" stroke-linecap="round"/>
+
+  <!-- litz (2 drawn for 4) -->
+  <path d="M624,146 C630,190 657,205 652,240 S692,280 685,300 S716,318 724,336" fill="none" stroke="#e34948" stroke-width="1.6"/>
+  <path d="M628,146 C634,190 661,205 656,240 S696,280 689,300 S720,318 728,336" fill="none" stroke="#2a78d6" stroke-width="1.6"/>
+  <ellipse cx="649" cy="222" rx="8" ry="4" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1"/>
+
+  <!-- NiTi -->
+  <line x1="600" y1="150" x2="716.6" y2="359.8" stroke="#4a3aa7" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- heel set screw + nut (perpendicular to the wire, toward the front) -->
+  <g transform="translate(617,180.6) rotate(150.9)">
+    <rect x="11" y="-7" width="7" height="14" fill="#ddd4b4" stroke="#b8520a" stroke-width="1"/>
+    <rect x="3" y="-3" width="24" height="6" fill="#c9c5b8" stroke="#1f2328" stroke-width="1"/>
+  </g>
+
+  <!-- pad -->
+  <rect x="670" y="335" width="80" height="170" rx="10" fill="#fbfaf7" stroke="#1f2328" stroke-width="1.5"/>
+  <rect x="682" y="372" width="56" height="112" rx="3" fill="#fff4ea" stroke="#b8520a" stroke-width="1"/>
+  <text x="710" y="432" font-size="11" fill="#b8520a" text-anchor="middle" transform="rotate(-90 710 428)">transducer</text>
+  <line x1="702.5" y1="334.4" x2="716.6" y2="359.8" stroke="#4a3aa7" stroke-width="4" stroke-linecap="round"/>
+  <g transform="translate(711,349) rotate(-29.1)">
+    <rect x="10" y="-7" width="7" height="14" fill="#ddd4b4" stroke="#b8520a" stroke-width="1"/>
+    <rect x="3" y="-3" width="22" height="6" fill="#c9c5b8" stroke="#1f2328" stroke-width="1"/>
+  </g>
+  <rect x="662" y="395" width="8" height="60" rx="2" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1.2"/>
+  <text x="655" y="474" font-size="11" fill="#57606a" text-anchor="end">skin side</text>
+  <rect x="750" y="405" width="6" height="40" fill="#e8f0fb" stroke="#2a78d6" stroke-width="1.2"/>
+  <g stroke="#2a78d6" stroke-width="1.2"><line x1="759" y1="413" x2="769" y2="409"/><line x1="759" y1="425" x2="770" y2="425"/><line x1="759" y1="437" x2="769" y2="441"/></g>
+  <rect x="703" y="487" width="8" height="18" fill="#c9c5b8" stroke="#1f2328" stroke-width="1"/>
+  <rect x="698" y="505" width="18" height="5" rx="2" fill="#c9c5b8" stroke="#1f2328" stroke-width="1"/>
+
+  <!-- badges B -->
+  <g font-size="12" font-weight="700" text-anchor="middle">
+    <circle cx="636" cy="262" r="10" fill="#e34948"/><text x="636" y="266" fill="#ffffff">7</text>
+    <circle cx="556" cy="224" r="10" fill="#e34948"/><text x="556" y="228" fill="#ffffff">8</text>
+    <line x1="564" y1="218" x2="591" y2="196" stroke="#e34948" stroke-width="1"/>
+    <circle cx="583" cy="166" r="10" fill="#e34948"/><text x="583" y="170" fill="#ffffff">2</text>
+    <line x1="590" y1="173" x2="602" y2="185" stroke="#e34948" stroke-width="1"/>
+    <circle cx="712" cy="282" r="10" fill="#2a78d6"/><text x="712" y="286" fill="#ffffff">9</text>
+    <circle cx="672" cy="210" r="10" fill="#2a78d6"/><text x="672" y="214" fill="#ffffff">10</text>
+    <circle cx="768" cy="328" r="10" fill="#e34948"/><text x="768" y="332" fill="#ffffff">8</text>
+    <line x1="759" y1="331" x2="735" y2="337" stroke="#e34948" stroke-width="1"/>
+    <circle cx="768" cy="354" r="10" fill="#e34948"/><text x="768" y="358" fill="#ffffff">2</text>
+    <line x1="758" y1="352" x2="728" y2="343" stroke="#e34948" stroke-width="1"/>
+    <circle cx="738" cy="516" r="10" fill="#2a78d6"/><text x="738" y="520" fill="#ffffff">11</text>
+    <circle cx="646" cy="396" r="10" fill="#2a78d6"/><text x="646" y="400" fill="#ffffff">12</text>
+    <circle cx="782" cy="400" r="10" fill="#2a78d6"/><text x="782" y="404" fill="#ffffff">13</text>
+  </g>
+
+  <!-- list B -->
+  <g font-size="12" fill="#57606a">
+    <circle cx="812" cy="146" r="10" fill="#e34948"/><text x="812" y="150" fill="#ffffff" font-weight="700" text-anchor="middle">7</text>
+    <text x="830" y="150" font-size="13" font-weight="700" fill="#1f2328">NiTi Ø0.75 / Ø0.80, straight, superelastic</text>
+    <text x="830" y="166">20 mm per arm = heel 4.0 + span 11.8 + pad 3.5.</text>
+    <text x="830" y="182">Af ≤ 0 °C and Ø0.85 are not stock items.</text>
+
+    <circle cx="812" cy="202" r="10" fill="#e34948"/><text x="812" y="206" fill="#ffffff" font-weight="700" text-anchor="middle">8</text>
+    <text x="830" y="206" font-size="13" font-weight="700" fill="#1f2328">M1.4 set screw · heel × 3 mm, pad × 2 mm</text>
+    <text x="830" y="222">through nut 2, onto a flat filed on the NiTi.</text>
+    <text x="830" y="238">Cheap stock is cone-point slotted, not hex cup.</text>
+
+    <circle cx="812" cy="258" r="10" fill="#2a78d6"/><text x="812" y="262" fill="#ffffff" font-weight="700" text-anchor="middle">9</text>
+    <text x="830" y="262" font-size="13" font-weight="700" fill="#1f2328">Litz 7 × 0.05 mm, Ø0.21 · 4 conductors</text>
+    <text x="830" y="278">bundle Ø0.51 in the Ø1.0 pad / Ø1.2 heel channels;</text>
+    <text x="830" y="294">one loose turn round the NiTi in the flex zone</text>
+
+    <circle cx="812" cy="314" r="10" fill="#2a78d6"/><text x="812" y="318" fill="#ffffff" font-weight="700" text-anchor="middle">10</text>
+    <text x="830" y="318" font-size="13" font-weight="700" fill="#1f2328">Neutral-cure RTV silicone (never acetoxy)</text>
+    <text x="830" y="334">dabs: wire exits, transducer dots, joint cover</text>
+
+    <circle cx="812" cy="354" r="10" fill="#2a78d6"/><text x="812" y="358" fill="#ffffff" font-weight="700" text-anchor="middle">11</text>
+    <text x="830" y="358" font-size="13" font-weight="700" fill="#1f2328">M1.2 × 4 pan · 1 per pod</text>
+    <text x="830" y="374">closes the pad. Ream its pilot to Ø1.0, not 0.95.</text>
+
+    <circle cx="812" cy="394" r="10" fill="#2a78d6"/><text x="812" y="398" fill="#ffffff" font-weight="700" text-anchor="middle">12</text>
+    <text x="830" y="398" font-size="13" font-weight="700" fill="#1f2328">Silicone disc Ø8 × 1 mm, Shore 30–40A</text>
+    <text x="830" y="414">punched from sheet; Sil-Poxy (skin-safe) or RTV</text>
+
+    <circle cx="812" cy="434" r="10" fill="#2a78d6"/><text x="812" y="438" fill="#ffffff" font-weight="700" text-anchor="middle">13</text>
+    <text x="830" y="438" font-size="13" font-weight="700" fill="#1f2328">Clear 30-min epoxy + ~0.1 % white pigment</text>
+    <text x="830" y="454">cast LED diffuser ring, ~0.02 ml per pad</text>
+
+    <text x="812" y="500" fill="#1f2328" font-weight="700">Why the Ø1.0 pilot (item 11)?</text>
+    <text x="812" y="518">A machine screw in a Ø0.95 hole has ~92 % thread</text>
+    <text x="812" y="534">engagement: that is a tapping-drill hole. Forming</text>
+    <text x="812" y="550">threads that deep in brittle resin splits the boss.</text>
+    <text x="812" y="566">Ø1.0 gives ~74 %, inside the 60–75 % plastics range.</text>
+  </g>
+
+  <!-- ======================= totals ======================= -->
+  <rect x="30" y="640" width="1140" height="140" rx="10" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1"/>
+  <text x="50" y="666" font-size="14" font-weight="700" fill="#1a7a55">For the pair (2 pods), minimum</text>
+  <text x="50" y="690" font-size="13" fill="#1f2328">4 × M1.4×3 pan · 8 × M1.4 brass nut · 2 × M1.4×3 set · 2 × M1.4×2 set · 2 × M1.2×4 pan · 2 NiTi arms (20 mm) · 8 × ~80 mm litz · 4 × 35 mm silicone wire</text>
+  <text x="50" y="714" font-size="13" fill="#1f2328">Buy at least 3× every small part: M1.4 nuts and set screws jump off tweezers and are gone.</text>
+  <text x="50" y="738" font-size="13" fill="#1f2328">Verified core spend ≈ $99 (NiTi, driver kit, litz, silicone wire, resin, pogo pins), read 2026-09-30, before shipping and tax.</text>
+  <text x="50" y="762" font-size="11" fill="#57606a">Counts from hw/mech/notes/shell.md, heel.md, pad.md (2026-09-30). Evidence and options: docs/build/hardware.md.</text>
+</svg>

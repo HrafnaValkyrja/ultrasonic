@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 420" role="img" aria-label="Three contact-pad profiles on the skin, each shown flat to the skin and tilted 7 degrees as the jaw moves. Flat: full contact when aligned, but when tilted it rests on one edge, which digs in. Convex dome: contacts in the middle; when tilted the contact point rolls a little and pressure stays central. Concave: cradles a bump, but on fairly flat pre-tragal skin it touches only at its rim, and worse when tilted. Recommended: a gentle convex dome, about 0.6 mm crown over the 9 mm pad." font-family="Helvetica, Arial, sans-serif">
+  <rect width="1000" height="420" rx="14" fill="#fbfaf7"/>
+  <text x="40" y="40" font-size="19" font-weight="700" fill="#1f2328">Contact pad profile: what happens when the pad tilts</text>
+  <text x="40" y="62" font-size="13" fill="#57606a">The pad tilts about ±7° around its worn angle as your jaw moves (NiTi model). Red = where the pressure goes.</text>
+  <g font-size="14" font-weight="700" fill="#1f2328">
+    <text x="90" y="100">Flat</text><text x="400" y="100">Convex dome (recommended)</text><text x="745" y="100">Concave</text>
+  </g>
+  <g font-size="12" fill="#57606a"><text x="40" y="128">aligned</text><text x="40" y="238">tilted 7°</text></g>
+  <!-- skin lines -->
+  <g stroke="#b8520a" stroke-width="3"><line x1="40" y1="190" x2="300" y2="190"/><line x1="350" y1="190" x2="640" y2="190"/><line x1="690" y1="190" x2="960" y2="190"/>
+  <line x1="40" y1="300" x2="300" y2="300"/><line x1="350" y1="300" x2="640" y2="300"/><line x1="690" y1="300" x2="960" y2="300"/></g>
+  <text x="250" y="206" font-size="11" fill="#b8520a">skin</text>
+  <!-- flat aligned -->
+  <rect x="100" y="150" width="110" height="26" fill="#ffffff" stroke="#1f2328" stroke-width="1.5"/>
+  <rect x="100" y="176" width="110" height="14" fill="#8a8676"/>
+  <rect x="100" y="188" width="110" height="3" fill="#e34948"/>
+  <!-- flat tilted -->
+  <g transform="rotate(-7 210 300)"><rect x="100" y="260" width="110" height="26" fill="#ffffff" stroke="#1f2328" stroke-width="1.5"/><rect x="100" y="286" width="110" height="14" fill="#8a8676"/></g>
+  <circle cx="208" cy="299" r="6" fill="#e34948"/>
+  <text x="70" y="335" font-size="12" fill="#1f2328">edge digs in, middle lifts off</text>
+  <!-- convex aligned -->
+  <rect x="440" y="150" width="110" height="26" fill="#ffffff" stroke="#1f2328" stroke-width="1.5"/>
+  <path d="M440,176 L550,176 L550,180 Q495,198 440,180 Z" fill="#8a8676"/>
+  <ellipse cx="495" cy="189" rx="28" ry="3" fill="#e34948"/>
+  <!-- convex tilted -->
+  <g transform="rotate(-7 495 300)"><rect x="440" y="260" width="110" height="26" fill="#ffffff" stroke="#1f2328" stroke-width="1.5"/><path d="M440,286 L550,286 L550,290 Q495,308 440,290 Z" fill="#8a8676"/></g>
+  <ellipse cx="502" cy="299" rx="26" ry="3" fill="#e34948"/>
+  <text x="405" y="335" font-size="12" fill="#1f2328">contact rolls a little, stays central</text>
+  <!-- concave aligned -->
+  <rect x="770" y="150" width="110" height="26" fill="#ffffff" stroke="#1f2328" stroke-width="1.5"/>
+  <path d="M770,176 L880,176 L880,190 Q825,174 770,190 Z" fill="#8a8676"/>
+  <circle cx="772" cy="189" r="4" fill="#e34948"/><circle cx="878" cy="189" r="4" fill="#e34948"/>
+  <!-- concave tilted -->
+  <g transform="rotate(-7 880 300)"><rect x="770" y="260" width="110" height="26" fill="#ffffff" stroke="#1f2328" stroke-width="1.5"/><path d="M770,286 L880,286 L880,300 Q825,284 770,300 Z" fill="#8a8676"/></g>
+  <circle cx="878" cy="299" r="6" fill="#e34948"/>
+  <text x="720" y="335" font-size="12" fill="#1f2328">rim only; worse when tilted</text>
+  <line x1="40" y1="360" x2="960" y2="360" stroke="#c9c5b8"/>
+  <text x="40" y="386" font-size="13" fill="#1f2328">Concave only wins when pressing ON a bump (the tragus flap itself), which we avoid: the target is the flatter skin in front of it.</text>
+  <text x="40" y="406" font-size="13" fill="#1f2328">Recommended: gentle convex dome, ~0.6 mm crown over the 9 mm pad (≈17 mm radius). Sugru squashes flatter under 1 N, so contact area grows.</text>
+</svg>

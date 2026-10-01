@@ -1,0 +1,277 @@
+(export 
+  (version "D")
+  (design
+    (source "gen.py")
+    (date "09/30/2026 11:39 PM")
+    (tool "SKiDL (2.3.0)")
+    (sheet
+      (number 1)
+      (name "/")
+      (tstamps "/")
+      (title_block
+        (title)
+        (company)
+        (rev)
+        (date)
+        (source "gen.py")
+        (comment
+          (number "1")
+          (value ""))
+        (comment
+          (number "2")
+          (value ""))
+        (comment
+          (number "3")
+          (value ""))
+        (comment
+          (number "4")
+          (value ""))
+        (comment
+          (number "5")
+          (value ""))
+        (comment
+          (number "6")
+          (value ""))
+        (comment
+          (number "7")
+          (value ""))
+        (comment
+          (number "8")
+          (value ""))
+        (comment
+          (number "9")
+          (value "")))))
+  (components
+    (comp
+      (ref "D1")
+      (value "BLUE_0402")
+      (description "Light emitting diode")
+      (footprint "LED_SMD:LED_0402_1005Metric")
+      (fields
+        (field
+          (name "LCSC") "C131223")
+        (field
+          (name "MPN") "16-213/BHC-AN1P2/3T")
+        (field
+          (name "Description") "Light emitting diode")
+        (field
+          (name "Footprint") "LED_SMD:LED_0402_1005Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "D1")
+        (field
+          (name "SKiDL Line") "gen.py:57"))
+      (libsource
+        (lib "Device")
+        (part "LED"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "730dc923-5f42-5190-a58b-2dbed3a5d5b0"))
+    (comp
+      (ref "J1")
+      (value "OUT_A")
+      (description "test point")
+      (footprint "padboard:WirePad_SMD_0.7x1.8mm")
+      (fields
+        (field
+          (name "DNP_BOM") "pad")
+        (field
+          (name "Description") "test point")
+        (field
+          (name "Footprint") "padboard:WirePad_SMD_0.7x1.8mm")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "J1")
+        (field
+          (name "SKiDL Line") "gen.py:54"))
+      (libsource
+        (lib "Connector")
+        (part "TestPoint"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "d7608689-a7d2-514c-aa16-0f8bde5cf213"))
+    (comp
+      (ref "J2")
+      (value "OUT_B")
+      (description "test point")
+      (footprint "padboard:WirePad_SMD_0.7x1.8mm")
+      (fields
+        (field
+          (name "DNP_BOM") "pad")
+        (field
+          (name "Description") "test point")
+        (field
+          (name "Footprint") "padboard:WirePad_SMD_0.7x1.8mm")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "J2")
+        (field
+          (name "SKiDL Line") "gen.py:54"))
+      (libsource
+        (lib "Connector")
+        (part "TestPoint"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "5e0b731b-c654-5cf6-8847-00f2f042255c"))
+    (comp
+      (ref "J3")
+      (value "LED+")
+      (description "test point")
+      (footprint "padboard:WirePad_SMD_0.7x1.8mm")
+      (fields
+        (field
+          (name "DNP_BOM") "pad")
+        (field
+          (name "Description") "test point")
+        (field
+          (name "Footprint") "padboard:WirePad_SMD_0.7x1.8mm")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "J3")
+        (field
+          (name "SKiDL Line") "gen.py:54"))
+      (libsource
+        (lib "Connector")
+        (part "TestPoint"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "feeefe1a-2e42-5bb8-adfa-cd7486f50a6d"))
+    (comp
+      (ref "J4")
+      (value "LED-")
+      (description "test point")
+      (footprint "padboard:WirePad_SMD_0.7x1.8mm")
+      (fields
+        (field
+          (name "DNP_BOM") "pad")
+        (field
+          (name "Description") "test point")
+        (field
+          (name "Footprint") "padboard:WirePad_SMD_0.7x1.8mm")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "J4")
+        (field
+          (name "SKiDL Line") "gen.py:54"))
+      (libsource
+        (lib "Connector")
+        (part "TestPoint"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "c449faf0-e5d1-5f09-ba34-b969c94251c8"))
+    (comp
+      (ref "J5")
+      (value "XDCR_A")
+      (description "test point")
+      (footprint "padboard:WirePad_PTH_D0.45mm_Pad0.85mm")
+      (fields
+        (field
+          (name "DNP_BOM") "pad")
+        (field
+          (name "Description") "test point")
+        (field
+          (name "Footprint") "padboard:WirePad_PTH_D0.45mm_Pad0.85mm")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "J5")
+        (field
+          (name "SKiDL Line") "gen.py:54"))
+      (libsource
+        (lib "Connector")
+        (part "TestPoint"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "f5689b7a-fac2-5a8c-aa11-b3b9d837b29f"))
+    (comp
+      (ref "J6")
+      (value "XDCR_B")
+      (description "test point")
+      (footprint "padboard:WirePad_PTH_D0.45mm_Pad0.85mm")
+      (fields
+        (field
+          (name "DNP_BOM") "pad")
+        (field
+          (name "Description") "test point")
+        (field
+          (name "Footprint") "padboard:WirePad_PTH_D0.45mm_Pad0.85mm")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "J6")
+        (field
+          (name "SKiDL Line") "gen.py:54"))
+      (libsource
+        (lib "Connector")
+        (part "TestPoint"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "0e3756c0-0751-5147-8013-57cbcb656651")))
+  (nets
+    (net
+      (code 1)
+      (name "LED_A")
+      (class "Default")
+      (node
+        (ref "D1")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J3")
+        (pin "1")
+        (pintype "PASSIVE")))
+    (net
+      (code 2)
+      (name "LED_K")
+      (class "Default")
+      (node
+        (ref "D1")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J4")
+        (pin "1")
+        (pintype "PASSIVE")))
+    (net
+      (code 3)
+      (name "OUT_A")
+      (class "Default")
+      (node
+        (ref "J1")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J5")
+        (pin "1")
+        (pintype "PASSIVE")))
+    (net
+      (code 4)
+      (name "OUT_B")
+      (class "Default")
+      (node
+        (ref "J2")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J6")
+        (pin "1")
+        (pintype "PASSIVE")))))

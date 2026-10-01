@@ -1,0 +1,4 @@
+(fp_lib_table
+	(version 7)
+	(lib (name "padboard")(type "KiCad")(uri "${KIPRJMOD}/padboard.pretty")(options "")(descr "hand-solder wire pads"))
+)
