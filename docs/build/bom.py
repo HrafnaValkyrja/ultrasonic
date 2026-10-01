@@ -38,10 +38,13 @@ ITEMS = [
     # --- pad board (same panel)
     ("Pad board", "Everlight 16-213/BHC-AN1P2 blue 0402 LED", "LED1", "C131223", 1, 0.0291, "O8", "on the tiny pad board"),
     # --- off-board
-    ("Cell", "Renata ICP501233PA-02, 175 mAh, PCM", "BT1", "Mouser / Renata", 1, None, "O16", "price + stock to confirm; ship by ground"),
+    ("Cell", "Renata ICP501233PA-02, 175 mAh, PCM", "BT1", "Renata distributor quote", 1, None, "O16", "NO public price: not on Digi-Key, Mouser blocks reads, Renata shows no price (2026-10-01); request a quote"),
     ("Cell", "Adafruit #1570 105 mAh (bench stand-in)", "BT1 alt", "Adafruit / Digi-Key", 0, 5.95, "option", "set qty 1 for early bench tests"),
-    ("Transducer", "RC-BC02 bone-conduction exciter", "XDCR", "marketplace", 1, None, "rev C", "buy 3+ from two listings (specs disagree)"),
-    ("Connector", "magnetic pogo pair (pre-built) + own magnets", "J-dock", "TBD (research stopped)", 1, None, "O16", "USB-C fallback space reserved"),
+    ("Transducer", "RC-BC02 bone-conduction exciter", "XDCR", "marketplace", 1, None, "rev C", "listing URLs were never saved; price unknown; buy 3+ from two listings"),
+    ("Connector", "Xinyangze YZT0675 5-pin magnetic TARGET (pod side, magnets built in)", "J-dock", "LCSC C5126848", 1, 2.40, "O16", "21.2 x 6.86 x 2.8 mm; 51 in stock 2026-10-01; fits the bigger rev-1 bottom face"),
+    ("Connector", "Xinyangze YZP0048 magnetic POGO head (cable side)", "dock", "LCSC C5126845", 0.5, 2.75, "O16", "one per cable; 45 in stock; 4-pin target alt C6276862 $1.76"),
+    ("Connector", "Adafruit 5358 + 5412 magnetic pair (bench alt)", "J-dock alt", "adafruit.com", 0, 11.45, "option", "$6.50 + $4.95, 21 x 7 face; for early tests"),
+    ("Connector", "sealed USB-C receptacle (fallback, space reserved)", "J-usbc", "Same Sky UJ32-C-H-G-MSMT IP68", 0, None, "option", "6.75 x 8.55 x 2.76; price not retrieved"),
     ("Arm", "NiTi superelastic wire 0.75 mm", "arm", "Kellogg's W-NITI-0.75-SE", 0.1, 13.49, "O7b", "$13.49 per 5 ft (~76 arms)"),
     ("Arm", "Litz 7/44 served, 0.21 mm", "4 conductors", "elecify.com", 0.05, 0.71, "O11", "$0.71 per 10 m"),
     ("Arm", "M1.4 set screw", "NiTi lock", "Polar Bear / FastenerMart", 2, 0.16, "O16", "pack price spread"),
