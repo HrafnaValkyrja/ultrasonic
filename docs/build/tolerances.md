@@ -15,7 +15,7 @@ Legend: ✅ fine · ⚠️ tight, with a note on what to do · ❌ not yet desig
 | Seam cut-guide groove | 0.4 × 0.4 mm | ⚠️ At the 0.4 mm resin minimum. Open it with a blade if it prints shallow. |
 | Cell (175 mAh) ↔ tub | 0.3 mm tape gap; 0.07 mm at the strut-relief corner fill | ⚠️ The pouch's rounded corner gives more real clearance. Dry-fit the cell first. |
 | Board ↔ cavity walls | 0.3 mm all round | ✅ |
-| **Board retention** | — | ❌ **Not in the rev-1 shell yet.** Next round: the round-1 scheme, i.e. lid ribs on the clamp bands plus foam strips on the cell. |
+| Board retention | Two lid ribs press the outer-face clamp bands (0.05 mm gap when seated); 1.5 mm closed-cell foam strips on the cell, compressed to 1.4 mm, push the board up | ✅ Added 2026-10-01. Keep the 0.6 mm top/bottom edge bands free of parts on both faces (the rough layout does). |
 | Switch plunger head ↔ lid bore | 0.15 mm per side (Ø2.9 in Ø3.2) | ✅ |
 | Plunger stem ↔ switch | KMT0 travel is only 0.15 ± 0.1 mm | ⚠️ Stack tolerance (board ±0.1, lid ±0.1) can pre-press or miss the switch. Print the stem 0.2 mm long and sand it to a light touch. The silicone skin over it is the spring. |
 | Dock target ↔ floor window | +0.1 mm per side (21.4 × 7.06 window for a 21.2 × 6.86 part) | ✅ Glued in, back potted. |
