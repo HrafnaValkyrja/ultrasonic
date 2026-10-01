@@ -10,7 +10,10 @@ from pathlib import Path
 import bpy
 from mathutils import Vector
 
-D = Path(__file__).resolve().parent / "out" / "final"
+import sys
+_args = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+D = Path(_args[0]) if _args else Path(__file__).resolve().parent / "out" / "final"
+VIEWS_REQ = _args[1:] or ["assembled", "open", "exploded"]
 INFO = json.loads((D / "parts.json").read_text())
 HDRI = "/usr/lib/blender/datafiles/studiolights/world/interior.exr"
 MATS = {  # base colour, metallic, roughness, extra
@@ -104,6 +107,8 @@ def shoot(c, loc, lens, out):
     bpy.ops.render.render(write_still=True)
 
 
-for mode, loc, lens in (("assembled", (0.15, 0.15, 0.05), 62), ("open", (0.11, 0.16, 0.04), 62),
-                        ("exploded", (0.17, 0.19, 0.06), 50)):
-    shoot(scene(mode), loc, lens, D / f"{mode}.png")
+VIEWS = {"assembled": ("assembled", (0.15, 0.15, 0.05), 62), "open": ("open", (0.11, 0.16, 0.04), 62),
+         "exploded": ("exploded", (0.17, 0.19, 0.06), 50), "top": ("assembled", (0.075, 0.115, 0.095), 70)}
+for v in VIEWS_REQ:
+    mode, loc, lens = VIEWS[v]
+    shoot(scene(mode), loc, lens, D / f"{v}.png")
