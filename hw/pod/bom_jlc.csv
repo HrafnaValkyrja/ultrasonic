@@ -3,6 +3,7 @@ Comment,Designator,Footprint,LCSC Part #,Qty,In sourcing lock
 15p,"C11,C12",C_0402_1005Metric,C1548,2,yes
 22u,C14,C_0603_1608Metric,C59461,1,yes
 4u7,"C15,C16",C_0402_1005Metric,C23733,2,yes
+10n,C22,C_0402_1005Metric,C15195,1,dated lookup
 10u,"C21,C4,C7",C_0603_1608Metric,C19702,3,yes
 1u,"C17,C18,C5",C_0402_1005Metric,C52923,3,yes
 2u2,"C8,C9",C_0402_1005Metric,C107369,2,yes
@@ -15,6 +16,9 @@ PMCXB290UE,"Q1,Q2",SOT1216_L1.1-W1.0-P0.35-BL-EP,C19654206,2,yes
 2k2,"R10,R14",R_0402_1005Metric,C25879,2,dated lookup
 5k1,R18,R_0402_1005Metric,C25905,1,dated lookup
 33,R2,R_0402_1005Metric,C25105,1,dated lookup
+0,R20,R_0402_1005Metric,C17168,1,dated lookup
+0.33,R21,R_0603_1608Metric,C23410,1,dated lookup
+1k,R22,R_0402_1005Metric,C11702,1,dated lookup
 100k,"R11,R12,R13,R3,R4,R5,R6",R_0402_1005Metric,C25741,7,yes
 1M,"R8,R9",R_0402_1005Metric,C26083,2,dated lookup
 10k B3435,RT1,R_0402_1005Metric,C77131,1,dated lookup

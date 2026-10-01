@@ -13,8 +13,10 @@ Protect,ESD9X5.0ST5G (VBUS),D3,C87910,1,0.0478,0.05,rev C,
 Protect,PESD5V0S1BL (bridge outputs),"D1, D2",C84374,2,0.0334,0.07,rev C,
 USB,TPD2E2U06DRLR (D+/D- ESD),U6,C1972959,1,0.3224,0.32,rev D,USB FS on PA11/PA12
 UI,"C&K KMT022NGJLHS IP68 switch, 1.6 N, 600k cycles",SW1,C221707,1,0.3902,0.39,rev D,replaces KXT321; 2.2k pull-down for >= 1 mA contact current
-Passives,0402/0603 capacitors (Basic),C*,various,22,0.0120,0.26,rev D,22 parts
-Passives,0402 resistors (Basic),R*,various,20,0.0030,0.06,rev D,20 parts
+Test,0.33 ohm 1% 0603 100 mW bridge shunt 0603WAF330LT5E,R21,C23410,1,0.0055,0.01,rev E,Extended; lift it to disconnect the bridge
+Test,0 ohm 0402 link (LDO -> 3V0),R20,C17168,1,0.0025,0.00,rev E,lift it to meter or inject the 3V0 rail
+Passives,0402/0603 capacitors (Basic),C*,various,23,0.0120,0.28,rev E,23 parts (C22 10n added)
+Passives,0402 resistors (Basic),R*,various,21,0.0030,0.06,rev E,21 parts (R22 1k added)
 Pad board,Everlight 16-213/BHC-AN1P2 blue 0402 LED,LED1,C131223,1,0.0291,0.03,O8,on the tiny pad board
 Cell,"Renata ICP501233PA-02, 175 mAh, PCM",BT1,Renata distributor quote,1,TBD,TBD,O16,"NO public price: not on Digi-Key, Mouser blocks reads, Renata shows no price (2026-10-01); request a quote"
 Cell,Adafruit #1570 105 mAh (bench stand-in),BT1 alt,Adafruit / Digi-Key,0,5.9500,0.00,option,set qty 1 for early bench tests

@@ -4,7 +4,7 @@
 
 Prices: JLC parts API 2026-10-01T04:05Z (tools/jlc.py) or the sourcing lock 2026-09-30, unit price at
 low quantity. 'TBD' = not yet priced. Board parts are per pod; the pair needs 2x.
-Status: rev C / rev D = in hw/pod/gen.py (Rev D 2026-10-01); O16 = owner-approved, off-board or not yet built;
+Status: rev C / rev D / rev E = in hw/pod/gen.py (Rev E 2026-10-01); O16 = owner-approved, off-board or not yet built;
 option = alternative; off-board = hand-built/bought, not on the JLC board.
 """
 import csv
@@ -32,9 +32,12 @@ ITEMS = [
     ("Protect", "PESD5V0S1BL (bridge outputs)", "D1, D2", "C84374", 2, 0.0334, "rev C", ""),
     ("USB", "TPD2E2U06DRLR (D+/D- ESD)", "U6", "C1972959", 1, 0.3224, "rev D", "USB FS on PA11/PA12"),
     ("UI", "C&K KMT022NGJLHS IP68 switch, 1.6 N, 600k cycles", "SW1", "C221707", 1, 0.3902, "rev D", "replaces KXT321; 2.2k pull-down for >= 1 mA contact current"),
+    # --- rev-1 test hooks (Rev E)
+    ("Test", "0.33 ohm 1% 0603 100 mW bridge shunt 0603WAF330LT5E", "R21", "C23410", 1, 0.0055, "rev E", "Extended; lift it to disconnect the bridge"),
+    ("Test", "0 ohm 0402 link (LDO -> 3V0)", "R20", "C17168", 1, 0.0025, "rev E", "lift it to meter or inject the 3V0 rail"),
     # --- passives (approx. counts after O16)
-    ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 22, 0.012, "rev D", "22 parts"),
-    ("Passives", "0402 resistors (Basic)", "R*", "various", 20, 0.003, "rev D", "20 parts"),
+    ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 23, 0.012, "rev E", "23 parts (C22 10n added)"),
+    ("Passives", "0402 resistors (Basic)", "R*", "various", 21, 0.003, "rev E", "21 parts (R22 1k added)"),
     # --- pad board (same panel)
     ("Pad board", "Everlight 16-213/BHC-AN1P2 blue 0402 LED", "LED1", "C131223", 1, 0.0291, "O8", "on the tiny pad board"),
     # --- off-board

@@ -21,6 +21,11 @@ magnetic USB dock contacts J3 VBUS / J4 GND / J10 D+ / J11 D- / J12 CC (Rd 5.1k 
 readable on PA3 through 10k); D4 1N5819WS blocks reverse docking; U6 TPD2E2U06 ESD on D+/D-;
 USB FS on PA11/PA12 for ROM DFU; IP68 switch C&K KMT022NGJLHS (1.6 N) with a 2.2k pull-down so the
 contact sees >= 1 mA while pressed (KMT0 datasheet minimum); PA10 keeps R11 as a pull-up.
+Rev E (2026-10-01, owner O9/O15: rev 1 is the prototype, so it carries its own test hooks):
+R20 0R between the LDO and the 3V0 rail (lift it: meter in series, or a bench 3.0 V on TP4);
+R21 0.33R low-side bridge shunt (lift it: bridge disconnected) sensed on PA6 = ADC1_IN11
+through R22/C22 (1k/10n, 16 kHz), so the pod measures its own exciter's |Z| for the USB self-test;
+test pads TP6 VSYS, TP7 VDD11, TP8 MIC_CLK, TP9 MIC_DATA, TP10 I_BR, TP11 LDO_OUT.
 Change this file, never the generated netlist.
 """
 from __future__ import annotations
@@ -50,11 +55,13 @@ LCSC = {
     "R33": "C25105", "R2k2": "C25879", "R10k": "C25744", "R22k": "C25768", "R100k": "C25741", "R1M": "C26083",
     "C15p": "C1548", "C100n": "C1525", "C1u": "C52923", "C2u2": "C107369", "C4u7": "C23733",
     "C10u_0603": "C19702", "C22u_0603": "C59461", "R5k1": "C25905",
+    # Rev E, JLC parts API 2026-10-01T22:55Z
+    "R0": "C17168", "R0R33_0603": "C23410", "R1k": "C11702", "C10n": "C15195",
 }
 
 
-def R(ref, value, key):
-    r = Part("Device", "R", value=value, footprint=R0402, ref=ref, tag=ref)
+def R(ref, value, key, fp=R0402):
+    r = Part("Device", "R", value=value, footprint=fp, ref=ref, tag=ref)
     r.fields["LCSC"] = LCSC[key]
     return r
 
@@ -137,14 +144,14 @@ def build():
     gnd += u2["GND"], u2["SEL"]                        # SELECT tied (D13)
 
     # ------------------------------------------------------------ H-bridge (TIM1)
-    outa, outb = Net("OUT_A"), Net("OUT_B")
+    outa, outb, brt = Net("OUT_A"), Net("OUT_B"), Net("BRIDGE_RTN")
     legs = (("Q1", outa, "PA8", "PA7", "R3", "R4", "GA"), ("Q2", outb, "PA9", "PB0", "R5", "R6", "GB"))
     for qref, out, p_pin, n_pin, rp, rn, g in legs:
         q = pmcxb290ue(qref)
         gp, gn = Net(f"{g}_P"), Net(f"{g}_N")
         gp += u1[p_pin], q["G_P"]                       # TIM1_CHx drives the P gate (polarity inverted)
         gn += u1[n_pin], q["G_N"]                       # TIM1_CHxN drives the N gate
-        v3 += q["S_P"]; gnd += q["S_N"]
+        v3 += q["S_P"]; brt += q["S_N"]
         out += q["D_P"], q["D_N"]
         r = R(rp, "100k", "R100k"); r[1] += gp; r[2] += v3     # P off at reset (TIM1 pins float)
         r = R(rn, "100k", "R100k"); r[1] += gn; r[2] += gnd    # N off at reset
@@ -153,6 +160,13 @@ def build():
         d[1] += out; d[2] += gnd
         p = pad(jref, lab); p[1] += out
     c = C("C14", "22u", "C22u_0603", C0603); c[1] += v3; c[2] += gnd   # bridge current peaks
+    # low-side shunt: 0.33R x 375 mA (3.0 V into 8R) = 124 mV, 46 mW of 100 mW; ~4 % of the drive.
+    # Ground-referenced, so one ADC pin reads the exciter current (self-test |Z| sweep, open/short check).
+    r = R("R21", "0.33", "R0R33_0603", "Resistor_SMD:R_0603_1608Metric"); r[1] += brt; r[2] += gnd
+    isns = Net("I_SENSE")
+    r = R("R22", "1k", "R1k"); r[1] += brt; r[2] += isns
+    c = C("C22", "10n", "C10n"); c[1] += isns; c[2] += gnd             # 16 kHz: passes 1.5-4 kHz tones, not the PWM
+    isns += u1["PA6"]                                                   # ADC1_IN11
 
     # ------------------------------------------------------------ power + magnetic USB dock (Rev D)
     vsys, dock_vbus = Net("VSYS"), Net("DOCK_VBUS")
@@ -203,9 +217,11 @@ def build():
     j_bp, j_bn = pad("J5", "BAT+"), pad("J6", "BAT-")
     j_bp[1] += vbat; j_bn[1] += gnd
     u4 = Part("lcsc", "TPS7A2030PDQNR", ref="U4", tag="U4"); u4.fields["LCSC"] = "C5220164"
-    u4["IN"] += vsys; u4["EN"] += vsys; u4["OUT"] += v3; gnd += u4["GND"], u4["EP"]   # SYS <= 4.9 V < LDO 6 V max
+    v3_ldo = Net("LDO_OUT")
+    u4["IN"] += vsys; u4["EN"] += vsys; u4["OUT"] += v3_ldo; gnd += u4["GND"], u4["EP"]   # SYS <= 4.9 V < LDO 6 V max
     c = C("C17", "1u", "C1u"); c[1] += vsys; c[2] += gnd
-    c = C("C18", "1u", "C1u"); c[1] += v3; c[2] += gnd
+    c = C("C18", "1u", "C1u"); c[1] += v3_ldo; c[2] += gnd           # stays at the LDO for stability
+    r = R("R20", "0", "R0"); r[1] += v3_ldo; r[2] += v3                # lift: measure or inject the 3V0 rail
     vs = Net("VBAT_SENSE")                                              # 1M/1M: 2 uA, 2.1 V max at PA4
     r = R("R8", "1M", "R1M"); r[1] += vbat; r[2] += vs
     r = R("R9", "1M", "R1M"); r[1] += vs; r[2] += gnd
@@ -227,14 +243,16 @@ def build():
     p = pad("J8", "LED-"); p[1] += led_k
     led_k += u1["PB7"]
     for ref, lab, n in (("TP1", "SWDIO", Net("SWDIO")), ("TP2", "SWCLK", Net("SWCLK")),
-                        ("TP3", "NRST", nrst), ("TP4", "3V0", v3), ("TP5", "GND", gnd)):
+                        ("TP3", "NRST", nrst), ("TP4", "3V0", v3), ("TP5", "GND", gnd),
+                        ("TP6", "VSYS", vsys), ("TP7", "VDD11", vdd11), ("TP8", "MIC_CLK", mic_clk),
+                        ("TP9", "MIC_DATA", mic_dat), ("TP10", "I_BR", brt), ("TP11", "LDO_OUT", v3_ldo)):
         p = pad(ref, lab); p[1] += n
         if lab == "SWDIO":
             n += u1["PA13"]
         if lab == "SWCLK":
             n += u1["PA14"]
     # spare pins, left free on purpose (A3-u575-plan.md §3); PC13 stays static next to the crystal
-    for pin in ("PC13", "PH0", "PH1", "PA6", "PB1", "PB15", "PB5", "PB6", "PB8"):
+    for pin in ("PC13", "PH0", "PH1", "PB1", "PB15", "PB5", "PB6", "PB8"):
         u1[pin] += NC
     return u1
 

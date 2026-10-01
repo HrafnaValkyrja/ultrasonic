@@ -1,4 +1,4 @@
-"""Rev-1 board ROUGH DRAFT: 28 x 13 mm, 4 layers, parts on both faces, from pod.net (Rev D).
+"""Rev-1 board ROUGH DRAFT: 28 x 13 mm, 4 layers, parts on both faces, from pod.net (Rev E).
 
     source tools/env.sh && systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 \
         python3 hw/pod/place_r1.py [--no-route]      # -> hw/pod/draft_r1/*
@@ -41,10 +41,14 @@ PLACE = {
     "C3": (17.6, 3.51, 90, "F"), "C4": (18.8, 3.51, 90, "F"), "C7": (18.0, 6.5, 90, "F"),
     "C2": (17.6, 9.49, 90, "F"), "C8": (17.6, 11.5, 0, "F"), "L1": (20.4, 10.64, 0, "F"), "C9": (20.3, 8.57, 0, "F"),
     "R1": (17.0, 1.6, 0, "F"),
+    "C22": (10.6, 11.6, 0, "F"), "R22": (12.6, 11.6, 0, "F"),   # 16 kHz I_SENSE filter right under PA6 (pin 16)
     "SW1": (22.0, 6.5, 0, "F"), "R10": (23.0, 9.5, 0, "F"),
     # test pads along the top edge (outside the 0.6 mm clamp band), wire pads in two rear columns
     "TP1": (20.6, 1.4, 0, "F"), "TP2": (22.0, 1.4, 0, "F"), "TP3": (23.4, 1.4, 0, "F"),
     "TP4": (24.8, 1.4, 0, "F"), "TP5": (26.2, 1.4, 0, "F"),
+    # Rev E test pads in the free front strip (clear of the mic port at x 3.9, y 6.5); mic pads by the mic
+    "TP6": (1.6, 1.4, 0, "F"), "TP7": (3.1, 1.4, 0, "F"), "TP10": (4.6, 1.4, 0, "F"),
+    "TP8": (1.6, 11.6, 0, "F"), "TP9": (3.1, 11.6, 0, "F"), "TP11": (4.6, 11.6, 0, "F"),
     "J3": (24.9, 3.4, 0, "F"), "J4": (24.9, 5.0, 0, "F"), "J10": (24.9, 6.6, 0, "F"),
     "J11": (24.9, 8.2, 0, "F"), "J12": (24.9, 9.8, 0, "F"), "J9": (24.9, 11.4, 0, "F"),
     "J5": (26.6, 3.4, 0, "F"), "J6": (26.6, 5.0, 0, "F"), "J1": (26.6, 6.6, 0, "F"),
@@ -56,13 +60,15 @@ PLACE = {
     # charger + LDO + dock protection: rear, near the wire pads
     "U3": (17.0, 3.0, 0, "B"), "C15": (15.3, 2.2, 90, "B"), "C16": (18.7, 2.2, 90, "B"), "C21": (17.0, 4.9, 0, "B"),
     "RT1": (19.8, 4.6, 90, "B"),
+    "R20": (21.4, 10.1, 0, "B"),                     # LDO -> 3V0 link
     "U4": (21.4, 7.4, 0, "B"), "C17": (21.4, 5.9, 0, "B"), "C18": (21.4, 8.9, 0, "B"),
     "R12": (23.0, 2.2, 90, "B"), "R13": (24.0, 2.2, 90, "B"),
     "D3": (23.6, 4.6, 0, "B"), "D4": (24.2, 6.4, 0, "B"), "U6": (23.8, 8.6, 0, "B"),
     "R18": (23.0, 10.4, 90, "B"), "R19": (24.4, 10.4, 90, "B"), "R14": (23.7, 11.8, 0, "B"),
     # H-bridge: rear-middle, far from the mic
     "Q1": (15.8, 8.0, 0, "B"), "Q2": (18.6, 8.0, 0, "B"),
-    "R3": (15.8, 6.6, 0, "B"), "R4": (15.8, 9.4, 0, "B"), "R5": (18.6, 6.6, 0, "B"), "R6": (18.6, 9.4, 0, "B"),
+    "R3": (15.5, 6.6, 0, "B"), "R4": (15.5, 9.4, 0, "B"), "R5": (18.9, 6.6, 0, "B"), "R6": (18.9, 9.4, 0, "B"),
+    "R21": (17.2, 8.0, 90, "B"),                     # 0.33R low-side shunt between the legs
     "C14": (17.3, 11.4, 0, "B"), "D1": (16.0, 10.3, 0, "B"), "D2": (19.6, 10.3, 0, "B"),
 }
 
@@ -107,7 +113,7 @@ def main(route=True):
         br, _ = build(inset=0.2)
         assert pcbnew.ExportSpecctraDSN(br, str(dsn))
         subprocess.run([os.environ["FREEROUTING_JAVA"], *os.environ.get("FREEROUTING_JAVA_OPTS", "-Xmx1g").split(),
-                        "-jar", os.environ["FREEROUTING_JAR"], "-de", str(dsn), "-do", str(ses), "-mp", "100",
+                        "-jar", os.environ["FREEROUTING_JAR"], "-de", str(dsn), "-do", str(ses), "-mp", "200",
                         "--gui.enabled=false"], check=True, timeout=3000, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         b = pcbnew.LoadBoard(str(placed))
         assert pcbnew.ImportSpecctraSES(b, str(ses))

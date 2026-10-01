@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 780" role="img" aria-label="Block schematic of one pod, rev 1. Dock contacts (VBUS, GND, D+, D-) through protection into a BQ25180 charger with power path; the charger feeds VSYS and charges the 175 mAh cell, with an NTC on the cell. VSYS feeds a 3.0 V LDO for the MCU, mic and bridge. The STM32U575 MCU on its internal switching regulator connects to the ultrasonic mic on ADF1, drives an H-bridge of two transistor pairs that feeds the bone-conduction transducer through the arm wires, drives the pad LED, reads the IP68 button, battery and USB sense dividers, talks to the charger over I2C, and does USB full speed for firmware updates." font-family="Helvetica, Arial, sans-serif">
   <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f2328"/></marker></defs>
   <rect width="1200" height="780" rx="14" fill="#fbfaf7"/>
-  <text x="36" y="40" font-size="20" font-weight="700" fill="#1f2328">One pod, rev 1: block schematic (gen.py Rev D)</text>
-  <text x="36" y="62" font-size="13" fill="#57606a">Blue = in hw/pod/gen.py (Rev D, ERC clean, 54 parts). Green = off-board (hand-wired). Grey dashed = proposed rev-1 test hooks.</text>
+  <text x="36" y="40" font-size="20" font-weight="700" fill="#1f2328">One pod, rev 1: block schematic (gen.py Rev E)</text>
+  <text x="36" y="62" font-size="13" fill="#57606a">Blue = in hw/pod/gen.py (Rev E, ERC clean, 58 placed parts + pads). Green = off-board (hand-wired).</text>
   <g font-size="12" fill="#1f2328">
     <!-- dock -->
     <rect x="36" y="100" width="150" height="120" rx="8" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
@@ -25,7 +25,7 @@
     <text x="428" y="292" font-weight="700">Cell: Renata 175 mAh</text><text x="428" y="312">PCM inside · NTC taped on</text><text x="428" y="330" fill="#57606a">wires to J5/J6 (+ NTC)</text>
     <!-- LDO -->
     <rect x="646" y="100" width="160" height="80" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
-    <text x="658" y="122" font-weight="700">U4 TPS7A2030</text><text x="658" y="142">VSYS → 3.0 V rail</text><text x="658" y="160" fill="#57606a">quiet LDO for audio</text>
+    <text x="658" y="122" font-weight="700">U4 TPS7A2030</text><text x="658" y="142">VSYS → 3.0 V rail</text><text x="658" y="160" fill="#57606a">R20 0 Ω link → 3V0 rail</text>
     <!-- MCU -->
     <rect x="646" y="230" width="260" height="250" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.5"/>
     <text x="660" y="254" font-size="14" font-weight="700">U1 STM32U575 (Cortex-M33)</text>
@@ -34,7 +34,7 @@
     <text x="660" y="316">ADF1 ← mic: PB3 clk, PB4 data</text>
     <text x="660" y="336">TIM1 → bridge: PA8/PA7, PA9/PB0</text>
     <text x="660" y="356">USB FS: PA11 D−, PA12 D+</text>
-    <text x="660" y="376">ADC: VBAT PA4, VBUS PA1, TS PA2</text>
+    <text x="660" y="376">ADC: VBAT PA4, VBUS PA1, TS PA2, I_br PA6</text>
     <text x="660" y="396">button PA0 · LED PB7 · mic power PA5</text>
     <text x="660" y="416">SWD PA13/PA14 (test pads)</text>
     <text x="660" y="440" fill="#57606a">BOOT0 10k; ROM DFU via a boot stub</text>
@@ -44,7 +44,7 @@
     <text x="972" y="122" font-weight="700">U2 SPH0641LU4H-1 mic</text><text x="972" y="142">20–85 kHz, PDM 4 MHz</text><text x="972" y="160" fill="#57606a">ports through the board</text><text x="972" y="178" fill="#57606a">+ lid (mesh-covered)</text>
     <!-- bridge -->
     <rect x="960" y="230" width="200" height="100" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
-    <text x="972" y="252" font-weight="700">H-bridge Q1/Q2</text><text x="972" y="272">2× PMCXB290UE pairs</text><text x="972" y="290">200 kHz PWM, 100k pulls</text><text x="972" y="310" fill="#57606a">ESD D1/D2 at the outputs</text>
+    <text x="972" y="252" font-weight="700">H-bridge Q1/Q2</text><text x="972" y="272">2× PMCXB290UE pairs</text><text x="972" y="290">200 kHz PWM, 100k pulls</text><text x="972" y="310" fill="#57606a">R21 0.33 Ω low-side shunt</text>
     <!-- pad -->
     <rect x="960" y="380" width="200" height="110" rx="8" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
     <text x="972" y="402" font-weight="700">Pad (at the tragus)</text><text x="972" y="422">RC-BC02 transducer</text><text x="972" y="440">pad board: blue LED</text><text x="972" y="460" fill="#57606a">4 litz wires up the arm</text><text x="972" y="478" fill="#57606a">J1/J2 audio, J7/J8 LED</text>
@@ -52,11 +52,11 @@
     <rect x="646" y="520" width="160" height="60" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
     <text x="658" y="542" font-weight="700">SW1 IP68 switch</text><text x="658" y="562">C&amp;K KMT022 (1.6 N) → PA0</text>
     <!-- test hooks -->
-    <rect x="36" y="420" width="560" height="160" rx="8" fill="#f3f1ea" stroke="#8a8676" stroke-width="1.5" stroke-dasharray="6 4"/>
-    <text x="48" y="442" font-weight="700">Rev-1 test hooks (bigger board, proposed)</text>
-    <text x="48" y="464">• a test pad on every rail and key signal (3V0, VSYS, VBAT, VCORE, mic clk/data, bridge outs)</text>
-    <text x="48" y="484">• 0 Ω links to power each block on its own: charger | LDO | mic | bridge</text>
-    <text x="48" y="504">• optional bridge current shunt → ADC: the pod measures its own transducer (self-test)</text>
+    <rect x="36" y="420" width="560" height="160" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+    <text x="48" y="442" font-weight="700">Rev-1 test hooks (Rev E, in the schematic)</text>
+    <text x="48" y="464">• test pads: 3V0, VSYS, VDD11, LDO_OUT, MIC_CLK, MIC_DATA, I_BR (+ VBAT/VBUS/outs on J pads)</text>
+    <text x="48" y="484">• R20 0 Ω: lift it to meter the 3V0 rail or feed it from a bench supply</text>
+    <text x="48" y="504">• R21 0.33 Ω shunt → R22/C22 (16 kHz) → PA6: the pod measures its exciter |Z|; lift = bridge off</text>
     <text x="48" y="524">• SWD pads + a snap-off test frame on the same JLC panel (spec O9)</text>
     <text x="48" y="548" fill="#57606a">Self-test over USB: rails, clocks, mic stream to a PC spectrogram, PWM-noise A/B, charger log.</text>
     <text x="48" y="566" fill="#57606a">(design started, research stopped; plan in spec O15)</text>
