@@ -25,7 +25,9 @@ Rev E (2026-10-01, owner O9/O15: rev 1 is the prototype, so it carries its own t
 R20 0R between the LDO and the 3V0 rail (lift it: meter in series, or a bench 3.0 V on TP4);
 R21 0.33R low-side bridge shunt (lift it: bridge disconnected) sensed on PA6 = ADC1_IN11
 through R22/C22 (1k/10n, 16 kHz), so the pod measures its own exciter's |Z| for the USB self-test;
-test pads TP6 VSYS, TP7 VDD11, TP8 MIC_CLK, TP9 MIC_DATA, TP10 I_BR, TP11 LDO_OUT.
+test pad TP6 VSYS (the charger has no ADC; the other rails are covered by TP4, J pads and the
+outer-face caps C8/C9; mic and bridge are checked over USB instead). Test pads TP1-TP6 are 0.7 mm
+(hw/lib/pod.pretty, P50 pogo at 1.27 mm pitch); the hand-soldered J wire pads stay 1.0 mm.
 Change this file, never the generated netlist.
 """
 from __future__ import annotations
@@ -48,7 +50,8 @@ skidl.set_default_tool(skidl.KICAD10)
 skidl.lib_search_paths[skidl.KICAD10].insert(0, str(REPO / "hw/lib/lcsc"))
 
 R0402, C0402, C0603 = "Resistor_SMD:R_0402_1005Metric", "Capacitor_SMD:C_0402_1005Metric", "Capacitor_SMD:C_0603_1608Metric"
-PAD = "TestPoint:TestPoint_Pad_D1.0mm"
+PAD = "TestPoint:TestPoint_Pad_D1.0mm"        # J wire pads (hand-soldered)
+PAD_TP = "pod:TestPoint_Pad_D0.7mm"            # TP probe / pogo pads
 
 # LCSC numbers (sourcing lock + dated lookups 2026-09-30); every placed part carries one.
 LCSC = {
@@ -72,8 +75,8 @@ def C(ref, value, key, fp=C0402):
     return c
 
 
-def pad(ref, label):
-    p = Part("Connector", "TestPoint", value=label, footprint=PAD, ref=ref, tag=ref)
+def pad(ref, label, fp=PAD):
+    p = Part("Connector", "TestPoint", value=label, footprint=fp, ref=ref, tag=ref)
     p.fields["DNP_BOM"] = "pad"      # copper only, nothing to place
     return p
 
@@ -244,9 +247,8 @@ def build():
     led_k += u1["PB7"]
     for ref, lab, n in (("TP1", "SWDIO", Net("SWDIO")), ("TP2", "SWCLK", Net("SWCLK")),
                         ("TP3", "NRST", nrst), ("TP4", "3V0", v3), ("TP5", "GND", gnd),
-                        ("TP6", "VSYS", vsys), ("TP7", "VDD11", vdd11), ("TP8", "MIC_CLK", mic_clk),
-                        ("TP9", "MIC_DATA", mic_dat), ("TP10", "I_BR", brt), ("TP11", "LDO_OUT", v3_ldo)):
-        p = pad(ref, lab); p[1] += n
+                        ("TP6", "VSYS", vsys)):
+        p = pad(ref, lab, PAD_TP); p[1] += n
         if lab == "SWDIO":
             n += u1["PA13"]
         if lab == "SWCLK":

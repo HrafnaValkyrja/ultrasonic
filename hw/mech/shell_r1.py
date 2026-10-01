@@ -5,7 +5,7 @@
 What changed from hw/mech/shell.py (round-1 agent, screwed lid):
 - NO screws in the housing. The lid locates on a 0.5 mm lip inside the tub opening and is taped for
   testing, then bonded (MS-polymer / neutral RTV). An outer V-groove marks the seam as a cut line.
-- Cell Renata ICP501233PA-02 (35 x 12 x 5.3, PCM inside); PCB rev 1 = 28 x 13 x 0.8.
+- Cell Renata ICP501233PA-02 (35 x 12 x 5.3, PCM inside); PCB rev 1 = 34 x 13 x 0.8.
 - 'Belly' under the front 25 mm holds the magnetic dock target (Xinyangze YZT0675, 21.2 x 6.86 x
   2.8, LCSC C5126848) flush in the floor; its rear step face is where a sealed USB-C (Same Sky UJ32,
   6.75 x 8.55 x 2.76) would open if the magnetic part fails (keep-out reserved). The rear stays
@@ -40,7 +40,7 @@ CAV = dict(x0=X0 + W, x1=X1 - W, y0=Y_IN + W, z0=Z0 + W, z1=Z1 - W)            #
 BAY = dict(x0=X0 + W, x1=X_BELLY - W, z0=Z_BELLY + W, z1=CAV["z0"])            # connector bay
 ZC = (CAV["z0"] + CAV["z1"]) / 2                                               # board centre line
 CELL = dict(x0=30.6, x1=65.6, y0=5.4, y1=10.7, z0=ZC - 6.0, z1=ZC + 6.0)
-PCB = dict(x0=30.6, x1=58.6, y0=12.1, y1=12.9, z0=ZC - 6.5, z1=ZC + 6.5)
+PCB = dict(x0=30.6, x1=64.6, y0=12.1, y1=12.9, z0=ZC - 6.5, z1=ZC + 6.5)
 PARTS = [dict(y0=10.9, y1=12.1), dict(y0=12.9, y1=14.1)]
 MIC = (34.5, ZC)
 SWITCH = (52.6, ZC)          # board x 22.0 (hw/pod/place_r1.py): clear of the MCU

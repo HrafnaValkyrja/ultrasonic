@@ -1,4 +1,4 @@
-"""Rev-1 board ROUGH DRAFT: 28 x 13 mm, 4 layers, parts on both faces, from pod.net (Rev E).
+"""Rev-1 board ROUGH DRAFT: 34 x 13 mm (grown rearward 2026-10-01; shell_r1 PCB x 30.6-64.6), 4 layers, parts on both faces, from pod.net (Rev E).
 
     source tools/env.sh && systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 \
         python3 hw/pod/place_r1.py [--no-route]      # -> hw/pod/draft_r1/*
@@ -27,7 +27,9 @@ HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location("place_v0", HERE / "place.py")
 P = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(P)
-P.W, P.H, P.CORNER = 28.0, 13.0, 1.0           # outline() reads these module globals
+P.W, P.H, P.CORNER = 34.0, 13.0, 1.0           # outline() reads these module globals
+_fp_lib = P.fp_lib
+P.fp_lib = lambda lib: str(HERE.parents[1] / "hw/lib/pod.pretty") if lib == "pod" else _fp_lib(lib)
 OUT = HERE / "draft_r1"
 OUT.mkdir(exist_ok=True)
 mm = pcbnew.FromMM
@@ -43,16 +45,13 @@ PLACE = {
     "R1": (17.0, 1.6, 0, "F"),
     "C22": (10.6, 11.6, 0, "F"), "R22": (12.6, 11.6, 0, "F"),   # 16 kHz I_SENSE filter right under PA6 (pin 16)
     "SW1": (22.0, 6.5, 0, "F"), "R10": (23.0, 9.5, 0, "F"),
-    # test pads along the top edge (outside the 0.6 mm clamp band), wire pads in two rear columns
-    "TP1": (20.6, 1.4, 0, "F"), "TP2": (22.0, 1.4, 0, "F"), "TP3": (23.4, 1.4, 0, "F"),
-    "TP4": (24.8, 1.4, 0, "F"), "TP5": (26.2, 1.4, 0, "F"),
-    # Rev E test pads in the free front strip (clear of the mic port at x 3.9, y 6.5); mic pads by the mic
-    "TP6": (1.6, 1.4, 0, "F"), "TP7": (3.1, 1.4, 0, "F"), "TP10": (4.6, 1.4, 0, "F"),
-    "TP8": (1.6, 11.6, 0, "F"), "TP9": (3.1, 11.6, 0, "F"), "TP11": (4.6, 11.6, 0, "F"),
-    "J3": (24.9, 3.4, 0, "F"), "J4": (24.9, 5.0, 0, "F"), "J10": (24.9, 6.6, 0, "F"),
-    "J11": (24.9, 8.2, 0, "F"), "J12": (24.9, 9.8, 0, "F"), "J9": (24.9, 11.4, 0, "F"),
-    "J5": (26.6, 3.4, 0, "F"), "J6": (26.6, 5.0, 0, "F"), "J1": (26.6, 6.6, 0, "F"),
-    "J2": (26.6, 8.2, 0, "F"), "J7": (26.6, 9.8, 0, "F"), "J8": (26.6, 11.4, 0, "F"),
+    # test pads: one 1.27 mm-pitch row along the top edge (P50 pogo jig), outside the 0.6 mm clamp band
+    **{f"TP{i + 1}": (24.4 + 1.27 * i, 1.3, 0, "F") for i in range(6)},
+    # wire pads: two columns at the rear edge, where the arm wires come up behind the board
+    "J3": (31.4, 3.4, 0, "F"), "J4": (31.4, 5.0, 0, "F"), "J10": (31.4, 6.6, 0, "F"),
+    "J11": (31.4, 8.2, 0, "F"), "J12": (31.4, 9.8, 0, "F"), "J9": (31.4, 11.4, 0, "F"),
+    "J5": (33.0, 3.4, 0, "F"), "J6": (33.0, 5.0, 0, "F"), "J1": (33.0, 6.6, 0, "F"),
+    "J2": (33.0, 8.2, 0, "F"), "J7": (33.0, 9.8, 0, "F"), "J8": (33.0, 11.4, 0, "F"),
     # ================= B (inner face, toward the cell)
     "U2": (3.9, 6.5, 90, "B"), "R2": (6.6, 8.0, 90, "B"), "C13": (6.6, 5.0, 90, "B"),
     "R8": (10.0, 2.0, 90, "B"), "R9": (11.0, 2.0, 90, "B"), "C19": (12.0, 2.0, 90, "B"),
@@ -60,11 +59,11 @@ PLACE = {
     # charger + LDO + dock protection: rear, near the wire pads
     "U3": (17.0, 3.0, 0, "B"), "C15": (15.3, 2.2, 90, "B"), "C16": (18.7, 2.2, 90, "B"), "C21": (17.0, 4.9, 0, "B"),
     "RT1": (19.8, 4.6, 90, "B"),
-    "R20": (21.4, 10.1, 0, "B"),                     # LDO -> 3V0 link
-    "U4": (21.4, 7.4, 0, "B"), "C17": (21.4, 5.9, 0, "B"), "C18": (21.4, 8.9, 0, "B"),
-    "R12": (23.0, 2.2, 90, "B"), "R13": (24.0, 2.2, 90, "B"),
-    "D3": (23.6, 4.6, 0, "B"), "D4": (24.2, 6.4, 0, "B"), "U6": (23.8, 8.6, 0, "B"),
-    "R18": (23.0, 10.4, 90, "B"), "R19": (24.4, 10.4, 90, "B"), "R14": (23.7, 11.8, 0, "B"),
+    "R20": (22.74, 10.1, 0, "B"),                     # LDO -> 3V0 link
+    "U4": (22.74, 7.4, 0, "B"), "C17": (22.74, 5.9, 0, "B"), "C18": (22.74, 8.9, 0, "B"),
+    "R12": (25.3, 2.2, 90, "B"), "R13": (26.9, 2.2, 90, "B"),
+    "D3": (26.26, 4.6, 0, "B"), "D4": (27.22, 6.4, 0, "B"), "U6": (26.58, 8.6, 0, "B"),
+    "R18": (25.3, 10.4, 90, "B"), "R19": (27.54, 10.4, 90, "B"), "R14": (26.42, 11.8, 0, "B"),
     # H-bridge: rear-middle, far from the mic
     "Q1": (15.8, 8.0, 0, "B"), "Q2": (18.6, 8.0, 0, "B"),
     "R3": (15.5, 6.6, 0, "B"), "R4": (15.5, 9.4, 0, "B"), "R5": (18.9, 6.6, 0, "B"), "R6": (18.9, 9.4, 0, "B"),

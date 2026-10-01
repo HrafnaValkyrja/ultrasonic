@@ -2,7 +2,7 @@
   <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f2328"/></marker></defs>
   <rect width="1200" height="780" rx="14" fill="#fbfaf7"/>
   <text x="36" y="40" font-size="20" font-weight="700" fill="#1f2328">One pod, rev 1: block schematic (gen.py Rev E)</text>
-  <text x="36" y="62" font-size="13" fill="#57606a">Blue = in hw/pod/gen.py (Rev E, ERC clean, 58 placed parts + pads). Green = off-board (hand-wired).</text>
+  <text x="36" y="62" font-size="13" fill="#57606a">Blue = in hw/pod/gen.py (Rev E, ERC clean, 58 placed parts + pads; board 34 × 13). Green = off-board (hand-wired).</text>
   <g font-size="12" fill="#1f2328">
     <!-- dock -->
     <rect x="36" y="100" width="150" height="120" rx="8" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
@@ -54,7 +54,7 @@
     <!-- test hooks -->
     <rect x="36" y="420" width="560" height="160" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
     <text x="48" y="442" font-weight="700">Rev-1 test hooks (Rev E, in the schematic)</text>
-    <text x="48" y="464">• test pads: 3V0, VSYS, VDD11, LDO_OUT, MIC_CLK, MIC_DATA, I_BR (+ VBAT/VBUS/outs on J pads)</text>
+    <text x="48" y="464">• 0.7 mm test pads: SWD ×3, 3V0, GND, VSYS (VBAT/VBUS/outs on the J wire pads)</text>
     <text x="48" y="484">• R20 0 Ω: lift it to meter the 3V0 rail or feed it from a bench supply</text>
     <text x="48" y="504">• R21 0.33 Ω shunt → R22/C22 (16 kHz) → PA6: the pod measures its exciter |Z|; lift = bridge off</text>
     <text x="48" y="524">• SWD pads + a snap-off test frame on the same JLC panel (spec O9)</text>
