@@ -23,11 +23,15 @@ USB FS on PA11/PA12 for ROM DFU; IP68 switch C&K KMT022NGJLHS (1.6 N) with a 2.2
 contact sees >= 1 mA while pressed (KMT0 datasheet minimum); PA10 keeps R11 as a pull-up.
 Rev E (2026-10-01, owner O9/O15: rev 1 is the prototype, so it carries its own test hooks):
 R20 0R between the LDO and the 3V0 rail (lift it: meter in series, or a bench 3.0 V on TP4);
-R21 0.33R low-side bridge shunt (lift it: bridge disconnected) sensed on PA6 = ADC1_IN11
+R21 0.1R 1206 low-side bridge shunt (lift it: bridge disconnected) sensed on PA6 = ADC1_IN11
 through R22/C22 (1k/10n, 16 kHz), so the pod measures its own exciter's |Z| for the USB self-test;
 test pad TP6 VSYS (the charger has no ADC; the other rails are covered by TP4, J pads and the
 outer-face caps C8/C9; mic and bridge are checked over USB instead). Test pads TP1-TP6 are 0.7 mm
 (hw/lib/pod.pretty, P50 pogo at 1.27 mm pitch); the hand-soldered J wire pads stay 1.0 mm.
+Assembly-cost audit (2026-10-01, JLC parts API 23:20Z): C8/C9 2.2 uF -> Basic C12530 (6.3 V on a
+1.1 V rail); shunt 0.33R 0603 Extended -> 0.1R 1206 Basic C25334; D1/D2 PESD5V0S1BL fitted DNP
+(footprints kept): the bridge outputs only reach the sealed exciter, and the FET body diodes clamp
+them to the rails with C14 behind. 14 -> 11 Extended part types.
 Change this file, never the generated netlist.
 """
 from __future__ import annotations
@@ -56,10 +60,10 @@ PAD_TP = "pod:TestPoint_Pad_D0.7mm"            # TP probe / pogo pads
 # LCSC numbers (sourcing lock + dated lookups 2026-09-30); every placed part carries one.
 LCSC = {
     "R33": "C25105", "R2k2": "C25879", "R10k": "C25744", "R22k": "C25768", "R100k": "C25741", "R1M": "C26083",
-    "C15p": "C1548", "C100n": "C1525", "C1u": "C52923", "C2u2": "C107369", "C4u7": "C23733",
+    "C15p": "C1548", "C100n": "C1525", "C1u": "C52923", "C2u2": "C12530", "C4u7": "C23733",
     "C10u_0603": "C19702", "C22u_0603": "C59461", "R5k1": "C25905",
     # Rev E, JLC parts API 2026-10-01T22:55Z
-    "R0": "C17168", "R0R33_0603": "C23410", "R1k": "C11702", "C10n": "C15195",
+    "R0": "C17168", "R0R1_1206": "C25334", "R1k": "C11702", "C10n": "C15195",
 }
 
 
@@ -160,12 +164,14 @@ def build():
         r = R(rn, "100k", "R100k"); r[1] += gn; r[2] += gnd    # N off at reset
     for dref, jref, out, lab in (("D1", "J1", outa, "XDCR_A"), ("D2", "J2", outb, "XDCR_B")):
         d = Part("lcsc", "PESD5V0S1BL,315", ref=dref, tag=dref); d.fields["LCSC"] = "C84374"
+        d.fields["DNP_BOM"] = "dnp"                  # footprint only: fit by hand if ESD ever shows up
         d[1] += out; d[2] += gnd
         p = pad(jref, lab); p[1] += out
     c = C("C14", "22u", "C22u_0603", C0603); c[1] += v3; c[2] += gnd   # bridge current peaks
-    # low-side shunt: 0.33R x 375 mA (3.0 V into 8R) = 124 mV, 46 mW of 100 mW; ~4 % of the drive.
-    # Ground-referenced, so one ADC pin reads the exciter current (self-test |Z| sweep, open/short check).
-    r = R("R21", "0.33", "R0R33_0603", "Resistor_SMD:R_0603_1608Metric"); r[1] += brt; r[2] += gnd
+    # low-side shunt: 0.1R x ~315 mA peak (3.0 V into 8R + 1.2R of FETs) = 31 mV, ~170 counts on the
+    # 14-bit ADC; 10 mW of 250 mW; ~1 % of the drive. Ground-referenced, so one ADC pin reads the
+    # exciter current (self-test |Z| sweep with synchronous detection, open/short check).
+    r = R("R21", "0.1", "R0R1_1206", "Resistor_SMD:R_1206_3216Metric"); r[1] += brt; r[2] += gnd
     isns = Net("I_SENSE")
     r = R("R22", "1k", "R1k"); r[1] += brt; r[2] += isns
     c = C("C22", "10n", "C10n"); c[1] += isns; c[2] += gnd             # 16 kHz: passes 1.5-4 kHz tones, not the PWM

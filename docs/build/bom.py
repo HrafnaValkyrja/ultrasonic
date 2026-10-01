@@ -29,14 +29,14 @@ ITEMS = [
     ("Power", "TPS7A2030 3.0 V LDO", "U4", "C5220164", 1, 0.2175, "rev C", "input moves to VSYS"),
     ("Protect", "1N5819WS (reverse docking)", "D4", "C191023", 1, 0.0137, "rev D", ""),
     ("Protect", "ESD9X5.0ST5G (VBUS)", "D3", "C87910", 1, 0.0478, "rev C", ""),
-    ("Protect", "PESD5V0S1BL (bridge outputs)", "D1, D2", "C84374", 2, 0.0334, "rev C", ""),
+    ("Protect", "PESD5V0S1BL (bridge outputs)", "D1, D2", "C84374", 0, 0.0334, "rev E DNP", "footprints kept, not fitted: FET body diodes clamp; outputs reach only the sealed exciter"),
     ("USB", "TPD2E2U06DRLR (D+/D- ESD)", "U6", "C1972959", 1, 0.3224, "rev D", "USB FS on PA11/PA12"),
     ("UI", "C&K KMT022NGJLHS IP68 switch, 1.6 N, 600k cycles", "SW1", "C221707", 1, 0.3902, "rev D", "replaces KXT321; 2.2k pull-down for >= 1 mA contact current"),
     # --- rev-1 test hooks (Rev E)
-    ("Test", "0.33 ohm 1% 0603 100 mW bridge shunt 0603WAF330LT5E", "R21", "C23410", 1, 0.0055, "rev E", "Extended; lift it to disconnect the bridge"),
+    ("Test", "0.1 ohm 1% 1206 bridge shunt 1206W4F100LT5E", "R21", "C25334", 1, 0.0055, "rev E", "Basic (was 0.33R Extended C23410); lift it to disconnect the bridge"),
     ("Test", "0 ohm 0402 link (LDO -> 3V0)", "R20", "C17168", 1, 0.0025, "rev E", "lift it to meter or inject the 3V0 rail"),
     # --- passives (approx. counts after O16)
-    ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 23, 0.012, "rev E", "23 parts (C22 10n added)"),
+    ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 23, 0.012, "rev E", "23 parts (C22 10n added); C8/C9 2.2 uF now Basic C12530"),
     ("Passives", "0402 resistors (Basic)", "R*", "various", 21, 0.003, "rev E", "21 parts (R22 1k added)"),
     # --- pad board (same panel)
     ("Pad board", "Everlight 16-213/BHC-AN1P2 blue 0402 LED", "LED1", "C131223", 1, 0.0291, "O8", "on the tiny pad board"),
@@ -60,7 +60,7 @@ ITEMS = [
 ONE_TIME = [
     ("JLC 4-layer PCB, 5 boards, 0.8 mm", 15, 35),
     ("JLC assembly setup + stencil (double-sided)", 25, 60),
-    ("JLC loading fee per Extended part type (~13 types x ~$3)", 30, 45),
+    ("JLC loading fee per Extended part type (11 types x ~$3, after the 2026-10-01 audit)", 33, 40),
     ("Shipping (+ duties, country-dependent)", 20, 60),
 ]
 

@@ -59,15 +59,15 @@ PLACE = {
     # charger + LDO + dock protection: rear, near the wire pads
     "U3": (17.0, 3.0, 0, "B"), "C15": (15.3, 2.2, 90, "B"), "C16": (18.7, 2.2, 90, "B"), "C21": (17.0, 4.9, 0, "B"),
     "RT1": (19.8, 4.6, 90, "B"),
-    "R20": (22.74, 10.1, 0, "B"),                     # LDO -> 3V0 link
-    "U4": (22.74, 7.4, 0, "B"), "C17": (22.74, 5.9, 0, "B"), "C18": (22.74, 8.9, 0, "B"),
+    "R20": (23.4, 11.4, 0, "B"),                     # LDO -> 3V0 link
+    "U4": (24.2, 7.4, 0, "B"), "C17": (24.2, 5.9, 0, "B"), "C18": (24.2, 8.9, 0, "B"),
     "R12": (25.3, 2.2, 90, "B"), "R13": (26.9, 2.2, 90, "B"),
     "D3": (26.26, 4.6, 0, "B"), "D4": (27.22, 6.4, 0, "B"), "U6": (26.58, 8.6, 0, "B"),
     "R18": (25.3, 10.4, 90, "B"), "R19": (27.54, 10.4, 90, "B"), "R14": (26.42, 11.8, 0, "B"),
     # H-bridge: rear-middle, far from the mic
     "Q1": (15.8, 8.0, 0, "B"), "Q2": (18.6, 8.0, 0, "B"),
     "R3": (15.5, 6.6, 0, "B"), "R4": (15.5, 9.4, 0, "B"), "R5": (18.9, 6.6, 0, "B"), "R6": (18.9, 9.4, 0, "B"),
-    "R21": (17.2, 8.0, 90, "B"),                     # 0.33R low-side shunt between the legs
+    "R21": (21.6, 7.6, 90, "B"),                     # 0.1R 1206 low-side shunt, right behind Q2
     "C14": (17.3, 11.4, 0, "B"), "D1": (16.0, 10.3, 0, "B"), "D2": (19.6, 10.3, 0, "B"),
 }
 
@@ -89,9 +89,109 @@ def gnd_plane(b):
     return z
 
 
-def build(inset=0.0):
+DNP = ("D1", "D2")                                   # footprints kept, not fitted (gen.py audit note)
+VIA_D, VIA_DRILL, STUB_W, GAP = 0.35, 0.15, 0.15, 0.12   # mm; GAP = copper clearance kept by the fan-out
+
+
+def _rect(p):
+    bb = p.GetBoundingBox()
+    return [pcbnew.ToMM(v) for v in (bb.GetX(), bb.GetY(), bb.GetRight(), bb.GetBottom())]
+
+
+def _d_rect(x, y, r):
+    """Distance from a point to an axis-aligned rectangle (0 inside)."""
+    dx = max(r[0] - x, 0, x - r[2]); dy = max(r[1] - y, 0, y - r[3])
+    return (dx * dx + dy * dy) ** 0.5
+
+
+def gnd_fanout(b, fps, inset=0.0):
+    """Give every GND pad its own short via down to the In1 plane before routing, so the router never
+    spends space on ground. Each via goes outward from its part (then sideways if blocked) and keeps
+    GAP from every other net's copper on both faces (vias go through the board) and from other vias.
+    The MCU's exposed pad gets a 3 x 3 via grid inside it (thermal + ground). Returns (added, skipped)."""
+    gnd = b.FindNet("GND")
+    others = [(_rect(p), p) for f in fps.values() for p in f.Pads() if p.GetNetname() != "GND"]   # incl. holes
+    vias, added, skipped = [], 0, []
+    V = lambda x, y: pcbnew.VECTOR2I(mm(x), mm(y))
+
+    def free(x, y, seg_from=None, layer_pads=None):
+        lo = 0.45 + inset
+        if not (lo <= x <= P.W - lo and lo <= y <= P.H - lo):
+            return False
+        if any(((x - vx) ** 2 + (y - vy) ** 2) ** 0.5 < VIA_D + 0.2 for vx, vy in vias):
+            return False
+        if any(_d_rect(x, y, r) < VIA_D / 2 + GAP for r, _ in others):
+            return False
+        if seg_from:                                     # the stub track must clear other pads on its layer
+            x0, y0 = seg_from
+            for k in range(1, 10):
+                t = k / 10
+                px, py = x0 + (x - x0) * t, y0 + (y - y0) * t
+                if any(_d_rect(px, py, r) < STUB_W / 2 + GAP for r, _ in layer_pads):
+                    return False
+        return True
+
+    def add_via(x, y):
+        v = pcbnew.PCB_VIA(b); v.SetPosition(V(x, y)); v.SetWidth(mm(VIA_D)); v.SetDrill(mm(VIA_DRILL))
+        v.SetNet(gnd); b.Add(v); vias.append((x, y))
+
+    ep = None
+    for p in fps["U1"].Pads():                           # the MCU's exposed pad (GND)
+        r = _rect(p)
+        if p.GetNetname() == "GND" and min(r[2] - r[0], r[3] - r[1]) > 3:
+            ep = r
+    for ref, f in fps.items():
+        if ref in DNP:
+            continue
+        fx, fy = (pcbnew.ToMM(c) for c in (f.GetPosition().x, f.GetPosition().y))
+        for p in f.Pads():
+            if p.GetNetname() != "GND" or p.GetAttribute() == pcbnew.PAD_ATTRIB_NPTH:
+                continue
+            r = _rect(p); cx, cy = (r[0] + r[2]) / 2, (r[1] + r[3]) / 2
+            if ref == "U1" and min(r[2] - r[0], r[3] - r[1]) > 3:        # exposed pad: via grid inside it
+                for i in (-1, 0, 1):
+                    for j in (-1, 0, 1):
+                        add_via(cx + 1.2 * i, cy + 1.2 * j); added += 1
+                continue
+            layer = pcbnew.B_Cu if f.IsFlipped() else pcbnew.F_Cu
+            if ref == "U1" and ep:                       # ring GND pins: straight inward onto the exposed pad
+                ex = min(max(cx, ep[0] + 0.3), ep[2] - 0.3); ey = min(max(cy, ep[1] + 0.3), ep[3] - 0.3)
+                t = pcbnew.PCB_TRACK(b); t.SetStart(V(cx, cy)); t.SetEnd(V(ex, ey))
+                t.SetWidth(mm(STUB_W)); t.SetLayer(layer); t.SetNet(gnd); b.Add(t); added += 1
+                continue
+            layer_pads = [(rr, pp) for rr, pp in others if pp.IsOnLayer(layer)]
+            ox, oy = cx - fx, cy - fy                     # outward from the part's centre
+            n = (ox * ox + oy * oy) ** 0.5
+            ox, oy = (ox / n, oy / n) if n > 1e-6 else (0.0, 1.0)     # single-pad parts (TP, J): try below first
+            dirs = [(ox, oy), (-oy, ox), (oy, -ox), (ox - oy, oy + ox), (ox + oy, oy - ox), (0, -1), (0, 1), (-1, 0), (1, 0)]
+            half = max(r[2] - r[0], r[3] - r[1]) / 2
+            done = False
+            for dx, dy in dirs:
+                m = (dx * dx + dy * dy) ** 0.5
+                dx, dy = dx / m, dy / m
+                for d in (half + VIA_D / 2 + 0.05, half + VIA_D / 2 + 0.25, half + VIA_D / 2 + 0.5):
+                    x, y = cx + dx * d, cy + dy * d
+                    if free(x, y, (cx, cy), layer_pads):
+                        t = pcbnew.PCB_TRACK(b); t.SetStart(V(cx, cy)); t.SetEnd(V(x, y))
+                        t.SetWidth(mm(STUB_W)); t.SetLayer(layer); t.SetNet(gnd); b.Add(t)
+                        add_via(x, y); added += 1; done = True
+                        break
+                if done:
+                    break
+            if not done:
+                skipped.append(f"{ref}.{p.GetNumber()}")
+    return added, skipped
+
+
+def build(inset=0.0, fanout=True):
     P.PLACE = PLACE
     b, fps = P.build(inset)
+    for ref in DNP:
+        fps[ref].SetDNP(True); fps[ref].SetExcludedFromBOM(True); fps[ref].SetExcludedFromPosFiles(True)
+    if fanout:
+        added, skipped = gnd_fanout(b, fps, inset)
+        if not inset:
+            print(f"GND fan-out: {added} vias; no room at: {', '.join(skipped) or 'none'}")
     gnd_plane(b)
     pcbnew.ZONE_FILLER(b).Fill(b.Zones())
     return b, fps
