@@ -43,7 +43,7 @@ The eight skills in `.claude/skills/` (manage-pcba-program, plan-electronic-prod
 - **Requirements:** `docs/spec.md` is authoritative. A `product-brief.yaml` or `architecture.md` may be derived from it but must never contradict it; spec changes come first.
 - **Artifacts** go in `.pcba-workflow/` at the repo root, which is the skills' default. Gate status is `PASS`, `BLOCKED` or `USER_REVIEW`. Owner decisions are also tracked as O-items in spec §12.
 - **Schematic source of truth:** the SKiDL generator scripts under `hw/<board>/`. KiCad schematic and netlist files are generated from them. Change the generator, never only the generated files.
-- **PCB source of truth:** the KiCad board file once placement starts. The owner does layout; Claude reviews, runs DRC and produces the release files.
+- **PCB source of truth:** the KiCad board file once placement starts. Layout is done **together** (owner decision 2026-09-30, spec O14): Claude leads and teaches each step, the owner drives KiCad; Claude runs DRC, reviews, and produces the release files.
 - **EDA adapter:** KiCad 10 native tooling.
   - ERC/DRC: `kicad-cli sch erc`, `kicad-cli pcb drc`.
   - Release files: `kicad-cli pcb export gerbers|drill|pos`.
