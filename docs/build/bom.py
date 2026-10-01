@@ -4,7 +4,7 @@
 
 Prices: JLC parts API 2026-10-01T04:05Z (tools/jlc.py) or the sourcing lock 2026-09-30, unit price at
 low quantity. 'TBD' = not yet priced. Board parts are per pod; the pair needs 2x.
-Status: rev C = in hw/pod/gen.py today; O16 = owner-approved change not yet in the generator;
+Status: rev C / rev D = in hw/pod/gen.py (Rev D 2026-10-01); O16 = owner-approved, off-board or not yet built;
 option = alternative; off-board = hand-built/bought, not on the JLC board.
 """
 import csv
@@ -23,18 +23,18 @@ ITEMS = [
     # --- output stage
     ("Bridge", "PMCXB290UE N+P pair", "Q1, Q2", "C19654206", 2, 0.1706, "rev C", "footprint must be redrawn (Nexperia Fig. 32)"),
     # --- power (O16)
-    ("Charger", "BQ25180YBGR (NTC/JEITA, power path, I2C)", "U3", "C3682423", 1, 2.0419, "O16", "replaces MCP73832"),
+    ("Charger", "BQ25180YBGR (NTC/JEITA, power path, I2C)", "U3", "C3682423", 1, 2.0419, "rev D", "replaces MCP73832"),
     ("Charger", "MCP73832-2-OT", "U3 (old)", "C38066", 0, 0.9492, "rev C (removed)", "qty 0 after O16"),
-    ("Charger", "NTC 10k B3435 NCP15XH103F03RC", "RT1 (on cell)", "C77131", 1, 0.0199, "O16", ""),
+    ("Charger", "NTC 10k B3435 NCP15XH103F03RC", "RT1 (+ J9 pad for a cell NTC)", "C77131", 1, 0.0199, "rev D", ""),
     ("Power", "TPS7A2030 3.0 V LDO", "U4", "C5220164", 1, 0.2175, "rev C", "input moves to VSYS"),
-    ("Protect", "1N5819WS (reverse docking)", "D4", "C191023", 1, 0.0137, "O16", ""),
+    ("Protect", "1N5819WS (reverse docking)", "D4", "C191023", 1, 0.0137, "rev D", ""),
     ("Protect", "ESD9X5.0ST5G (VBUS)", "D3", "C87910", 1, 0.0478, "rev C", ""),
     ("Protect", "PESD5V0S1BL (bridge outputs)", "D1, D2", "C84374", 2, 0.0334, "rev C", ""),
-    ("USB", "TPD2E2U06DRLR (D+/D- ESD)", "U6", "C1972959", 1, 0.3224, "O16", "USB FS on PA11/PA12"),
-    ("UI", "C&K KMT031NGJLHS IP68 switch", "SW1", "C221708", 1, 0.3821, "O16", "replaces KXT321; sealed"),
+    ("USB", "TPD2E2U06DRLR (D+/D- ESD)", "U6", "C1972959", 1, 0.3224, "rev D", "USB FS on PA11/PA12"),
+    ("UI", "C&K KMT022NGJLHS IP68 switch, 1.6 N, 600k cycles", "SW1", "C221707", 1, 0.3902, "rev D", "replaces KXT321; 2.2k pull-down for >= 1 mA contact current"),
     # --- passives (approx. counts after O16)
-    ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 22, 0.012, "rev C+O16", "~22 parts"),
-    ("Passives", "0402 resistors (Basic)", "R*", "various", 18, 0.003, "rev C+O16", "~18 parts"),
+    ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 22, 0.012, "rev D", "22 parts"),
+    ("Passives", "0402 resistors (Basic)", "R*", "various", 20, 0.003, "rev D", "20 parts"),
     # --- pad board (same panel)
     ("Pad board", "Everlight 16-213/BHC-AN1P2 blue 0402 LED", "LED1", "C131223", 1, 0.0291, "O8", "on the tiny pad board"),
     # --- off-board
