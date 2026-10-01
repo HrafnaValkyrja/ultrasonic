@@ -43,7 +43,7 @@ CELL = dict(x0=30.6, x1=65.6, y0=5.4, y1=10.7, z0=ZC - 6.0, z1=ZC + 6.0)
 PCB = dict(x0=30.6, x1=58.6, y0=12.1, y1=12.9, z0=ZC - 6.5, z1=ZC + 6.5)
 PARTS = [dict(y0=10.9, y1=12.1), dict(y0=12.9, y1=14.1)]
 MIC = (34.5, ZC)
-SWITCH = (45.0, ZC)
+SWITCH = (52.6, ZC)          # board x 22.0 (hw/pod/place_r1.py): clear of the MCU
 DOCK = dict(x0=31.5, x1=52.7, y0=9.75 - 3.43, y1=9.75 + 3.43, z0=Z_BELLY, z1=Z_BELLY + 2.8)
 USBC_KEEPOUT = dict(x0=47.9, x1=X_BELLY, y0=9.75 - 4.3, y1=9.75 + 4.3, z0=BAY["z0"], z1=BAY["z0"] + 2.8)
 
@@ -103,6 +103,10 @@ def lid_base():
     l = l - Pos(MIC[0], Y_OUT + 0.7, MIC[1]) * Rot(90, 0, 0) * extrude(RegularPolygon(1.9, 6), amount=0.8, both=True)
     l = l - Pos(SWITCH[0], Y_OUT, SWITCH[1]) * Rot(90, 0, 0) * Cylinder(1.6, 6.0)           # plunger bore
     l = l - Pos(SWITCH[0], Y_OUT + 0.7, SWITCH[1]) * Rot(90, 0, 0) * Cylinder(2.6, 0.5)     # skin recess
+    # board retention (no screws): two ribs press the board's outer-face clamp bands (no parts within
+    # 0.6 mm of its top/bottom edges); foam strips on the cell push it up against them
+    for zb in (PCB["z1"] - 0.6, PCB["z0"]):
+        l = l + box(PCB["x0"] + 0.5, PCB["x1"] - 0.5, PCB["y1"] + 0.05, Y_SPLIT + 0.01, zb, zb + 0.6)
     return l
 
 
@@ -169,6 +173,9 @@ def placeholders():
         - box(SWITCH[0] - 1.6, SWITCH[0] + 1.6, 12.8, 14.2, SWITCH[1] - 1.6, SWITCH[1] + 1.6),
         "switch": box(SWITCH[0] - 1.5, SWITCH[0] + 1.5, 12.9, 13.55, SWITCH[1] - 1.3, SWITCH[1] + 1.3),
         "dock": box(DOCK["x0"], DOCK["x1"], DOCK["y0"], DOCK["y1"], DOCK["z0"], DOCK["z1"]),
+        # 1.5 mm closed-cell foam strips under the board's inner-face clamp bands, compressed to 1.4
+        "foam_top": box(PCB["x0"] + 1.0, PCB["x1"] - 1.0, CELL["y1"], PCB["y0"], PCB["z1"] - 0.6, PCB["z1"]),
+        "foam_bot": box(PCB["x0"] + 1.0, PCB["x1"] - 1.0, CELL["y1"], PCB["y0"], PCB["z0"], PCB["z0"] + 0.6),
     }
 
 
@@ -189,7 +196,7 @@ def main():
     pad = HERE / "out/parts/pad"
     common = {"tub": (t, "body", (0, 0, 0)), "plunger": (plunger(), "metal", (0, 12, 0)),
               **{k: (v, {"cell": "cell", "pcb": "pcb", "parts_in": "chips", "parts_out": "chips",
-                          "switch": "metal", "dock": "metal"}[k], (0, {"cell": 5, "dock": -8}.get(k, 9), 0))
+                          "switch": "metal", "dock": "metal", "foam_top": "silicone", "foam_bot": "silicone"}[k], (0, {"cell": 5, "dock": -8}.get(k, 9), 0))
                  for k, v in ph.items()}}
     steps = {"pad_cup": ("pad_cup.step", "body", (0, -6, 0)), "transducer": ("ref_transducer_RC-BC02.step", "transducer", (0, -2, 0)),
              "pad_board": ("pad_board_led.step", "pcb", (0, 2, 0)), "pad_cap": ("pad_cap_strut.step", "armour", (0, 5, 0)),
