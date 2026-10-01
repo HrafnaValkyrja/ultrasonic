@@ -78,6 +78,13 @@ def tub(heel_mod=None):
     if heel_mod is not None:
         t = t - heel_mod.heel_cut()
     t = t - box(DOCK["x0"] - 0.1, DOCK["x1"] + 0.1, DOCK["y0"] - 0.1, DOCK["y1"] + 0.1, Z_BELLY - 1, DOCK["z1"])  # dock window
+    # strut relief (2026-10-01): the NiTi strut passes 0.65 mm from the inner-bottom rear edge. Fill the
+    # cavity's corner there (the cell's corner clears it by ~0.07 mm on the tape side), then cut the outside
+    # corner back on the line y + z = -3.65, keeping 0.6 mm of wall. Local to x 62-68, outboard of the
+    # NiTi socket (y >= 3.9), so the heel's socket and wire channel are untouched.
+    cz = CAV["z0"]
+    t = t + blade.prism_yz([(CAV["y0"], cz), (CAV["y0"] + 1.0, cz), (CAV["y0"], cz + 1.0)], 62.0, CAV["x1"])
+    t = t - blade.prism_yz([(3.9, -12.5), (3.9, -3.65 - 3.9), (-3.65 + 12.5, -12.5)], 62.0, 68.5)
     return t - seam_groove()
 
 

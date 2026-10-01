@@ -170,8 +170,12 @@ CH_DN_TOP = 0.25                            # -b1 side (wire never goes there in
 CH_SIDE_TOP = 0.30                          # +-b2 (wire never goes there in the model; bumps)
 CH_BOT = F.STRUT_CLEARANCE_BOTTOM           # 0.15 all round at T
 # strut outer section (b1, b2), chamfered rectangle; tapered in b1 (top face) only
-COND_R, COND_B1, COND_B2 = 0.5, -0.35, -1.8  # conductor channel (4 x ~0.3 mm OD wires), FRONT side
-STRUT_B2 = (-2.90, 1.30)              # rear face only 1.3 behind the wire (Ear (open) side)
+# conductor channel: REAR side, in line with the heel's channel entry (local b +2.25) so the 4 wires run
+# straight across the flex zone instead of crossing over the NiTi (pinch risk, owner 2026-10-01).
+# Sized for a shrink-tubed bundle (~1.0 mm OD; owner shrink-tubes the wires through joints): bore 1.6.
+COND_R, COND_B1, COND_B2 = 0.6, 0.0, 2.25    # bare bundle bore; the shrink tube stops in COND_CBORE
+COND_CBORE_R, COND_CBORE_L = 0.8, 1.7          # 1.6 mm counterbore at the strut top seats the tube end
+STRUT_B2 = (-1.45, 3.65)              # rear grew 2.35 for the conductor bore (check Ear (open) clearance on E9)
 STRUT_B1_LO = -1.45
 STRUT_B1_HI_TOP, STRUT_B1_HI_BOT = 1.90, 1.20
 STRUT_CH = 0.4
@@ -180,7 +184,7 @@ STRUT_RAKE = 0.8                            # top face raked 13 deg: outboard (+
 HEEL_CH_ENTRY = np.array([63.793, 2.681, -8.175])   # heel.py checks.json channel.entry_world (read 23:40)
 COND_END = 1.5                              # conductor channel ends here (breaks into the riser over ~0.7 mm)
 # hex collar ("jack") around the socket: flats across b2 (set screw enters a flat)
-COLLAR_AF = 5.9
+COLLAR_AF = 7.4                                 # was 5.9; grown so the rear wire bore keeps 0.6 walls
 COLLAR_A0, COLLAR_A1 = -0.40, 4.40              # nut corners at 2.0 -/+ 1.79, + 0.6 walls
 Y_COLLAR_TOP = 7.62                         # flat top (world y); the nut's top flat sits just below
 # set screw M1.4 x 2 through a captured brass M1.4 nut, entering from the REAR flat (+b2)
@@ -367,7 +371,8 @@ def nut_pocket(with_slot=True, grow=0.0):
     of the collar. Once the set screw holds its centre, the floor stops it turning."""
     af = NUT["pocket_af"] + 2 * grow
     pts, ac = _hex_flat_b1(af)
-    loc = sloc(SET_ALONG, 0.0, NUT_B2_IN - grow, x_dir=A_W, z_dir=B2_W)
+    # FRONT side (-b2) since 2026-10-01: the rear is the wires' path, in line with the heel channel
+    loc = sloc(SET_ALONG, 0.0, -(NUT_B2_IN - grow), x_dir=-A_W, z_dir=-B2_W)
     p = loc * extrude(Polygon(*pts, align=None), amount=NUT_T + 2 * grow)
     if with_slot:
         p = p + loc * extrude(Polygon((-ac / 2, 0), (ac / 2, 0), (ac / 2, 6), (-ac / 2, 6), align=None),
@@ -422,16 +427,18 @@ def build_cap():
     v["socket"] = sloc(MOUTH - EPS) * Cylinder(SOCK_R, SOCK_DEPTH - MOUTH + EPS, align=(Align.CENTER, Align.CENTER, Align.MIN))
     v["conductor"] = sloc(ALONG_TOP - 0.2, COND_B1, COND_B2) * Cylinder(COND_R, COND_END - ALONG_TOP + 0.2,
                                                                          align=(Align.CENTER, Align.CENTER, Align.MIN))
+    v["conductor_cbore"] = sloc(ALONG_TOP - 0.2, COND_B1, COND_B2) * Cylinder(COND_CBORE_R, COND_CBORE_L + 0.2,
+                                                                             align=(Align.CENTER, Align.CENTER, Align.MIN))
     v["nut"] = nut_pocket()
-    v["setscrew_hole"] = sloc(SET_ALONG, 0, 0.0, x_dir=A_W, z_dir=B2_W) * Cylinder(
+    v["setscrew_hole"] = sloc(SET_ALONG, 0, 0.0, x_dir=-A_W, z_dir=-B2_W) * Cylinder(
         FS["M1.4_pan"]["clear"] / 2, COLLAR_AF / 2 + 0.5, align=(Align.CENTER, Align.CENTER, Align.MIN))
     loc_v = {
         "board_recess": lbox(-REC_U, REC_U, Y_SPLIT - 1, Y_BRD, BOARD["e3_0"] - FIT, BOARD["e3_1"] + FIT),
         "pocket_bottom": lbox(-REC_U, REC_U, Y_SPLIT - 1, POCKET_Y, -6.3, -2.0) - _dam(),
-        "pocket_top_front": lbox(-REC_U, 0.0, Y_SPLIT - 1, POCKET_Y, 2.0, 6.3) - _dam(),
+        "pocket_top_front": lbox(-REC_U, 0.0, Y_SPLIT - 1, POCKET_Y, 2.0, 4.95) - _dam(),   # shortened: clears the front nut
         "pocket_top_rear": lbox(0.0, REC_U, Y_SPLIT - 1, POCKET_Y, 2.0, W_REAR_POCKET) - _dam(),
         "wirepath_rear": lbox(0.0, REC_U, Y_SPLIT - 1, WIREPATH_Y, W_REAR_POCKET - EPS, W_WIREPATH_END),
-        "riser": lbox(-2.3, -1.3, Y_SPLIT - 1, 5.3, 5.6, 6.6),
+        "riser": lbox(1.3, 2.3, Y_SPLIT - 1, 5.3, 5.6, 6.6),          # REAR since 2026-10-01 (wire path)
         "diffuser": ycyl(0, 0, RING_OD / 2, Y_BRD - EPS, Y_BEZ + 1),
         "closure_hole": ycyl(0, W_SCREW, SCREW["clear"] / 2, Y_SPLIT - 1, Y_BEZ + 1),
     }
@@ -458,10 +465,10 @@ def build_cap():
         "nut_hex_lower": nut_pocket(with_slot=False) & (sloc(0, -10, 0) * Box(20, 20, 20, align=(Align.MIN, Align.CENTER, Align.CENTER)) - sloc(0, -0.3, 0) * Box(20, 20, 20, align=(Align.MIN, Align.CENTER, Align.CENTER))),
         "board_recess": PAD_LOC * lbox(-REC_U, REC_U, Y_BRD - 0.1, Y_BRD, BOARD["e3_0"] - FIT, BOARD["e3_1"] + FIT),
         "pocket_bottom": PAD_LOC * (lbox(-REC_U, REC_U, Y_BRD - 0.1, POCKET_Y, -6.3, -2.0) - _dam()),
-        "pocket_top_front": PAD_LOC * (lbox(-REC_U, 0.0, Y_BRD - 0.1, POCKET_Y, 2.0, 6.3) - _dam()),
+        "pocket_top_front": PAD_LOC * (lbox(-REC_U, 0.0, Y_BRD - 0.1, POCKET_Y, 2.0, 4.95) - _dam()),
         "pocket_top_rear": PAD_LOC * (lbox(0.0, REC_U, Y_BRD - 0.1, POCKET_Y, 2.0, W_REAR_POCKET) - _dam()),
         "wirepath_rear": PAD_LOC * lbox(0.0, REC_U, Y_BRD - 0.1, WIREPATH_Y, W_REAR_POCKET, W_WIREPATH_END),
-        "riser": PAD_LOC * lbox(-2.3, -1.3, Y_BRD - 0.1, 5.3, 5.6, 6.6),
+        "riser": PAD_LOC * lbox(1.3, 2.3, Y_BRD - 0.1, 5.3, 5.6, 6.6),
         "diffuser": PAD_LOC * (ycyl(0, 0, RING_OD / 2, Y_BRD + 0.05, Y_BEZ - 0.7)),
     }
     return cap, env, pr
@@ -528,12 +535,12 @@ def build_hardware():
     hw = {}
     # brass M1.4 nut (DIN 934: 3.0 AF x 1.2), modelled with a 1.4 bore (threads engage the screw)
     pts, _ = _hex_flat_b1(NUT["s"])
-    loc = sloc(SET_ALONG, 0.0, NUT_B2_IN + 0.05, x_dir=A_W, z_dir=B2_W)
+    loc = sloc(SET_ALONG, 0.0, -(NUT_B2_IN + 0.05), x_dir=-A_W, z_dir=-B2_W)
     nut = loc * extrude(Polygon(*pts, align=None), amount=NUT["m"])
     nut = nut - loc * Cylinder(FS["M1.4_set"]["d"] / 2, 5, align=(Align.CENTER, Align.CENTER, Align.CENTER))
     hw["nut_M1.4_brass"] = nut
     # set screw M1.4 x 2, cup point resting on the wire's filed flat at b2 = -0.30
-    hw["setscrew_M1.4x2"] = sloc(SET_ALONG, 0, SET_FLAT, x_dir=A_W, z_dir=B2_W) * Cylinder(
+    hw["setscrew_M1.4x2"] = sloc(SET_ALONG, 0, -SET_FLAT, x_dir=-A_W, z_dir=-B2_W) * Cylinder(
         FS["M1.4_set"]["d"] / 2, SET_L, align=(Align.CENTER, Align.CENTER, Align.MIN))
     # closure screw M1.2 x 4: head on the cap face; shank modelled at the pilot dia inside the cup
     head = ycyl(0, W_SCREW, SCREW["head_d"] / 2, Y_CAP, Y_CAP + SCREW["head_h"])
@@ -584,7 +591,7 @@ def build_wire_ref():
     """Reference NiTi (owned by the arm): worn shape s = 0..SPAN, then 3.5 mm in the socket with the flat."""
     free = tube(wire_points("worn_3.5"), WIRE_R)
     ins = sloc(0) * Cylinder(WIRE_R, SOCK_DEPTH, align=(Align.CENTER, Align.CENTER, Align.MIN))
-    flat = sloc(SET_ALONG - 0.75, 0, SET_FLAT, x_dir=A_W, z_dir=B2_W) * Box(1.5, 2.0, 1.0, align=(Align.MIN, Align.CENTER, Align.MIN))
+    flat = sloc(SET_ALONG + 0.75, 0, -SET_FLAT, x_dir=-A_W, z_dir=-B2_W) * Box(1.5, 2.0, 1.0, align=(Align.MIN, Align.CENTER, Align.MIN))
     return Compound(list(free.solids()) + [ins - flat])
 
 
@@ -772,7 +779,7 @@ def main(render=False):
         walls[f"cap.{k}->outside"] = dist(faces_of(p), faces_of(cap_env))
     pair_skip = {("conductor", "riser"), ("board_recess", "pocket_bottom"), ("board_recess", "pocket_top_front"),
                  ("board_recess", "pocket_top_rear"), ("board_recess", "wirepath_rear"), ("board_recess", "diffuser"),
-                 ("pocket_top_front", "riser"), ("pocket_top_front", "pocket_top_rear"), ("pocket_top_front", "wirepath_rear"),
+                 ("pocket_top_front", "riser"), ("pocket_top_rear", "riser"), ("wirepath_rear", "riser"), ("conductor_cbore", "conductor"), ("pocket_top_front", "pocket_top_rear"), ("pocket_top_front", "wirepath_rear"),
                  ("pocket_top_rear", "wirepath_rear"), ("socket", "wire_channel"), ("nut_hex_lower", "socket"),
                  ("board_recess", "riser")}   # connected by design
     ks = list(cap_pr)
@@ -790,7 +797,7 @@ def main(render=False):
     walls["strut web, wire slot <-> conductor (top)"] = round(
         math.hypot(COND_B1 - min(max(COND_B1, -(WIRE_R + CH_DN_TOP) + WIRE_R + CH_SIDE_TOP), WIRE_R + CH_UP_TOP - WIRE_R - CH_SIDE_TOP),
                    abs(COND_B2)) - (WIRE_R + CH_SIDE_TOP) - COND_R, 3)
-    walls["strut wall, conductor -> front face (-b2)"] = round(COND_B2 - COND_R - STRUT_B2[0], 3)
+    walls["strut wall, conductor -> rear face (+b2)"] = round(STRUT_B2[1] - COND_B2 - COND_R, 3)
     walls["strut wall, conductor -> inner face (-b1)"] = round(COND_B1 - COND_R - STRUT_B1_LO, 3)
     walls["collar, nut -> rear flat (set screw side)"] = round(COLLAR_AF / 2 - NUT_B2_OUT, 3)
     _ac = NUT["pocket_af"] * 2 / math.sqrt(3)

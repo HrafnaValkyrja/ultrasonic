@@ -101,7 +101,9 @@ ACCESS_D = 1.6                # key/screw access bore, nut -> front face
 FRONT_T = NUT_T1 + 0.80       # raked front face, from the socket axis along -B (0.8 behind the nut)
 BOSS_R, BOSS_YC, BOSS_ZC = 2.8, 2.6, -7.25      # "pivot boss" barrel along x (old pivot_boss r 2.8)
 BOSS_X0, BOSS_X1, BOSS_CH = 56.0, 64.8, 0.4      # front disc pokes out under the raked keel face
-CH_D = 1.2                    # conductor channel (4 x ~0.3 mm OD: bundle ~0.72 mm)
+CH_D = 1.0                    # conductor channel inside the heel: bare 4 x 0.21 litz bundle (~0.5 mm); static
+CH_CBORE_D, CH_CBORE_L = 1.6, 1.0   # mouth counterbore on the land: seats the end of the shrink tube that
+                                    # protects the bundle through the flex joint (owner 2026-10-01)
 CH_B0, CH_N0 = 2.25, 0.55     # channel entry on the land (local b, n)
 CH_C1_H = -1.30               # 1st corner: straight up from the land (local h), 2.45 above it
 CH_C2 = np.array([65.75, 2.75, -5.70])     # 2nd corner: after running rearward inside the heel
@@ -362,7 +364,10 @@ def heel_add():
 def heel_cut(undersize=False):
     """Solid to SUBTRACT from the tub: socket (+drill point), flare, set-screw holes, nut pocket+slot,
     conductor channel. undersize=True gives the PRINT version (socket and screw hole to be reamed)."""
-    return socket_cut(undersize) + flare_cut() + screw_cuts(undersize) + nut_pocket() + channel_cut()
+    pts = channel_path()[0]
+    d = (pts[1] - pts[0]) / np.linalg.norm(pts[1] - pts[0])
+    cbore = _cyl(pts[0] - d * 0.6, pts[0] + d * CH_CBORE_L, CH_CBORE_D / 2)
+    return socket_cut(undersize) + flare_cut() + screw_cuts(undersize) + nut_pocket() + channel_cut() + cbore
 
 
 # ----------------------------------------------------------------------------- hardware + reference models
