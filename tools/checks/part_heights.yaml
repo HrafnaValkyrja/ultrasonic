@@ -1,0 +1,125 @@
+# Part facts from manufacturer datasheets: the maximum height of every part on the pod board, and where the mic's acoustic port is.
+# Read by tools/checks/interfaces.py [heights] [mic-port] [clamp-bands]: every part must stay inside the 1.2 mm height band of its
+# face (hw/mech/shell_r1.py PARTS: B face pod y 10.9-12.1, F face pod y 12.9-14.1). The band comes from the shell, not from this file.
+#
+# max_mm  height above the board surface, MAXIMUM (nominal + the datasheet's upper tolerance), solder fillet not included.
+# Lookup order for a board footprint: its schematic LCSC number (by_lcsc) -> its footprint item name (by_footprint) -> unknown.
+# An unknown part is a WARN in the checker, never a PASS. Add a row here with its source when it appears.
+#
+# Provenance: each datasheet was read on 2026-10-02 (LCSC copies are the PDFs linked from jlcpcb.com's parts search, which
+# tools/jlc.py returns as "datasheet"; the quote is the line the number came from). Where a catalogue lists a close variant
+# (not the exact orderable code) the row says so and takes the larger value.
+# solder_margin_mm: how far the hand-soldered blob of a J wire pad reaches past the copper pad's edge (an allowance, not a datasheet
+# number: a 0.21 mm litz conductor on a D1.0 pad). [clamp-bands] and [inside] grow every J pad by it; the wires themselves leave
+# rearward into the 2.1 mm gap behind the board (tolerances.md), not toward the long edges the lid ribs press.
+version: 1
+read: 2026-10-02
+solder_margin_mm: 0.25
+
+by_lcsc:
+  # ---- MLCC capacitors (Samsung, one catalogue for all: LCSC copies of "MLCC_2014_1", Nov 2015, 84 pp) ----
+  C1525:
+    part: Samsung CL05B104KO5NNNC, 100 nF 16 V X7R 0402
+    max_mm: 0.55
+    source: Samsung MLCC catalogue Nov 2015, Standard & High Capacitors table, "Thickness Max.(mm)" column, row CL05B104KO5NNN
+  C52923:
+    part: Samsung CL05A105KA5NQNC, 1 uF 25 V X5R 0402
+    max_mm: 0.60
+    source: same catalogue, row CL05A105KA5NQN, Thickness Max. 0.60
+  C12530:
+    part: Samsung CL05A225MQ5NSNC, 2.2 uF 6.3 V X5R 0402, soft termination
+    max_mm: 0.57
+    source: same catalogue, rows CL05A225MQ5NNN (0.55) and CL05A225MP5NSN (0.57, the S-termination variant); the larger is used
+    variant_note: exact code CL05A225MQ5NSN is not listed
+  C23733:
+    part: Samsung CL05A475MP5NRNC, 4.7 uF 10 V X5R 0402
+    max_mm: 0.65
+    source: same catalogue, row CL05A475MP5NRN, Thickness Max. 0.65
+  C15195:
+    part: Samsung CL05B103KB5NNNC, 10 nF 50 V X7R 0402
+    max_mm: 0.55
+    source: same catalogue, row CL05B103KB5NNN, Thickness Max. 0.55
+  C19702:
+    part: Samsung CL10A106KP8NNNC, 10 uF 10 V X5R 0603
+    max_mm: 0.90
+    source: same catalogue, row CL10A106MP8NNN (same size, voltage and thickness code 8, M tolerance), Thickness Max. 0.90
+    variant_note: exact code CL10A106KP8NNN is not listed
+  C59461:
+    part: Samsung CL10A226MQ8NRNC, 22 uF 6.3 V X5R 0603
+    max_mm: 1.00
+    source: same catalogue, row CL10A226MQ8NRN, Thickness Max. 1.00
+  C1548:
+    part: FH (Fenghua) 0402CG150J500NT, 15 pF 50 V C0G 0402
+    max_mm: 0.70
+    source: FH 0402 datasheet (LCSC C1548, 2 pp), thickness T 0.50 +-0.05 up to 0.50 +-0.20 by capacitance row; the worst row is used
+  # ---- chip resistors (Uni-Royal thick-film chip series data sheet, 9 pp, PDF created 2019-02-26) ----
+  C25744: {part: Uni-Royal 0402WGF1002TCE 10k 0402, max_mm: 0.40, source: "Uni-Royal chip series sheet, dimensions table, 0402 H = 0.35 +-0.05"}
+  C25105: {part: Uni-Royal 0402WGF330JTCE 33R 0402, max_mm: 0.40, source: "Uni-Royal chip series sheet, 0402 H = 0.35 +-0.05"}
+  C25741: {part: Uni-Royal 0402WGF1003TCE 100k 0402, max_mm: 0.40, source: "Uni-Royal chip series sheet, 0402 H = 0.35 +-0.05"}
+  C26083: {part: Uni-Royal 0402WGF1004TCE 1M 0402, max_mm: 0.40, source: "Uni-Royal chip series sheet, 0402 H = 0.35 +-0.05"}
+  C25879: {part: Uni-Royal 0402WGF2201TCE 2k2 0402, max_mm: 0.40, source: "Uni-Royal chip series sheet, 0402 H = 0.35 +-0.05"}
+  C25905: {part: Uni-Royal 0402WGF5101TCE 5k1 0402, max_mm: 0.40, source: "Uni-Royal chip series sheet, 0402 H = 0.35 +-0.05"}
+  C17168: {part: Uni-Royal 0402WGF0000TCE 0R jumper 0402, max_mm: 0.40, source: "Uni-Royal chip series sheet, 0402 H = 0.35 +-0.05"}
+  C11702: {part: Uni-Royal 0402WGF1001TCE 1k 0402, max_mm: 0.40, source: "Uni-Royal chip series sheet, 0402 H = 0.35 +-0.05"}
+  C25334: {part: Uni-Royal 1206W4F100LT5E 0.1R 1206, max_mm: 0.65, source: "Uni-Royal chip series sheet, 1206 H = 0.55 +-0.10"}
+  C77131: {part: Murata NCP15XH103F03RC 10k NTC 0402, max_mm: 0.55, source: "Murata NTC thermistor catalogue (LCSC copy), 0402 chip drawing, T = 0.5 +-0.05"}
+  # ---- diodes / ESD ----
+  C84374: {part: Nexperia PESD5V0S1BL DFN1006-2 (SOD882) ESD diode, max_mm: 0.50, source: "Nexperia PESD5V0S1BL datasheet, SOD882 outline table (issue 2019-10-21), A max 0.50 incl. plating"}
+  C87910: {part: onsemi ESD9X5.0ST5G SOD-923 ESD diode, max_mm: 0.43, source: "onsemi ESD9X datasheet, features 'Low body height 0.017 in (0.43 mm) max'; case 514AA outline table, A max 0.43"}
+  C191023: {part: Hottech 1N5819WS SOD-323 Schottky diode, max_mm: 1.00, source: "Hottech 1N5819WS datasheet, SOD-323 outline table, A max 1.000"}
+  # ---- magnetics and crystal ----
+  C337891: {part: Murata DFE201610E-2R2M=P2 2.2 uH inductor 2.0 x 1.6 mm, max_mm: 1.00, source: "Murata spec J(E)TE243A-0001 p.1 (PDF 2017-04-17), side view '1.0 max'"}
+  C32346: {part: Epson Q13FC13500004 (FC-135) 32.768 kHz crystal 3.2 x 1.5 mm, max_mm: 0.90, source: "Epson FC-135 sheet (PDF 2025-06-10), external dimensions 0.8 +-0.1"}
+  # ---- discrete semiconductors and ICs ----
+  C19654206:
+    part: Nexperia PMCXB290UE(Z) complementary MOSFET pair, DFN1010B-6 (SOT1216)
+    max_mm: 0.40
+    source: Nexperia PMCXB290UE v.1 (30 May 2023), Fig. 31 package outline SOT1216, A max 0.40 (nom 0.37, min 0.34)
+  C5271013:
+    part: ST STM32U575CIU6Q, UFQFPN48 7 x 7 mm
+    max_mm: 0.60
+    source: ST DS13737 Rev 8 (Aug 2023) section 6.1 Table 154 'UFQFPN48 mechanical data', A max 0.600
+  C2879853:
+    part: Knowles/Syntiant SPH0641LU4H-1 ultrasonic PDM mic, 3.50 x 2.65 mm, bottom port
+    max_mm: 1.08
+    source: Syntiant SPH0641LU4H-1 datasheet Rev B-1 (2 Dec 2024), section 8 Mechanical specifications, Height 0.98 +-0.10
+    # `port`: where the acoustic port (AP) sits, derived from the datasheet's land pattern so the checker can compare the footprint's
+    # drilled hole with it. Datasheet page 9 (section 8, bottom view) and page 10 (section 9 Example Land Pattern), read 2026-10-02 as
+    # the page images: pads 1/5 form one row and 2/4 the next (row pitch 0.822, pad 0.725 x 0.522, 0.300 between rows); the two pad
+    # columns are 1.675 apart and the AP is on their centre line, 1.513 beyond the near edge of the pad-2/4 row:
+    # along = 0.822 + (1.513 - 0.522 / 2) = 2.074 mm from the pad-1/5 row centre, away from the pad-2/4 row, across = 0.
+    # The AP is Ø0.325 +-0.05 (section 8 table). The drawing's AP-to-edge dimension (1.040) is a reference value with no tolerance,
+    # and the general tolerance is +-0.15 mm, more than the 0.1125 mm radial slack a Ø0.6 hole leaves: confirm on the first article.
+    port:
+      d_mm: 0.325
+      d_tol_mm: 0.05
+      rows: [[1, 5], [2, 4]]
+      along_mm: 2.074
+      across_mm: 0.0
+      note: "land pattern, sections 8 and 9, Rev B-1 2 Dec 2024"
+      source: "Syntiant SPH0641LU4H-1 datasheet pp.9-10"
+  C3682423:
+    part: TI BQ25180YBGR charger, DSBGA-8 (YBG)
+    max_mm: 0.65
+    source: TI BQ25180 Rev C (Nov 2025), tape-and-reel table K0 = 0.65 mm (pocket depth made to fit the part's thickness); upper bound, the outline drawing is not in the PDF text
+    variant_note: a bound, not the part's own A-max; confirm on TI's YBG0008 drawing when the footprint is next reviewed
+  C5220164:
+    part: TI TPS7A2030PDQNR LDO, X2SON-4 (DQN) 1 x 1 mm
+    max_mm: 0.40
+    source: TI TPS7A20 SBVS338H, package drawing DQN0004A 'X2SON - 0.4 mm max height'
+  C1972959:
+    part: TI TPD2E2U06DRLR 2-channel ESD protection, SOT-5X3 (DRL)
+    max_mm: 0.60
+    source: TI TPD2E2U06 Rev C (Jul 2021), package drawing DRL0005A 'SOT - 0.6 mm max height'
+  # ---- switch ----
+  C221707:
+    part: C&K KMT022NGJLHS, IP68 tactile switch, 3.0 x 2.6 mm
+    max_mm: 0.65
+    source: C&K KMT0 series datasheet p.B-9 (21 Mar 2018), part-number key 'Total Height 0 = 0.65 mm' (nominal; the drawing gives no upper tolerance)
+
+by_footprint:
+  # copper-only pads: TP probe pads have no body
+  # J wire pads: the hand-soldered litz on top IS the part. An allowance, not a datasheet value: solder blob <= 0.5 mm + one 0.21 mm
+  # litz conductor + 0.09 margin. Replace it with a measurement from the first hand-soldered pod.
+  TestPoint_Pad_D1.0mm: {max_mm: 0.8, kind: allowance, source: "design allowance for a hand-soldered 0.21 mm litz wire on a D1.0 pad (blob 0.5 + wire 0.21 + 0.09); wire count: docs/system/reg-board.md issue 5"}
+  TestPoint_Pad_D0.7mm: {max_mm: 0.0, source: "copper pad with no body (hw/lib/pod.pretty)"}

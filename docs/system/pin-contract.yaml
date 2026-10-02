@@ -20,11 +20,25 @@
 #   af         alternate-function number the firmware will use (ST GPIO_AF<n>_...); omitted for analog / additional functions
 #   alternates [{signal, af, ecr}] accepted while an open ECR proposes it: WARN citing the ECR, never PASS
 #   complement_of  the entry this one pairs with: same timer and channel, N output (complementary PWM with dead time)
-#   absent_ecr if the net or its via part no longer exists and this ECR is open: WARN citing it instead of FAIL
+#   absent_ecr if the net or its via part is GONE from the schematic (the ECR removes it) and this ECR is open: WARN citing it
+#              instead of FAIL. A part that is still there but wired differently (R11 on GND instead of +3V0) stays a FAIL
 #   role       why the pin has this job (function F-row in integration-map.md Section 1)
+# `hazards` are facts about what a pin does BESIDES its job (reset-state pulls, dead-battery pull-downs, boot-ROM drive), tied to
+# the ECR that tracks the fix. A net on a hazard pin is a WARN citing the ECR (FAIL once the ECR is closed or rejected while the
+# hazard is still there). Fields: port (the physical pin, so the hazard follows the pin, not the net), note, source, ecr, and
+#   cleared_by  {pin, net}: a schematic fix that removes the hazard (then the check says so instead of warning)
+#   mitigation  firmware: no schematic fix exists; the WARN stays while the ECR is open and clears when it is closed or verified
+# A contract that shrinks is a FAIL, not a warning: every I/O net on U1 needs a row (or a listing under `unconstrained`, with a
+# reason), every power pin of the package needs a rail under `power_pins`, `signals` and `power_pins` may not be empty, and
+# `hazards` may not be empty while the ECR named in `hazards_tracked_by` is open. Deleting a row therefore cannot pass a commit.
 # Verified against the open data on 2026-10-02 (pin-data commit and licence: tools/data/stm32_open_pin_data/SOURCE.md).
 version: 1
 updated: 2026-10-02
+
+# nets on U1 deliberately without a contract row, each with its reason: `unconstrained: {NET_NAME: "why no signal is needed"}`
+unconstrained: {}
+# the ECR that tracks the pin hazards below; while it is open the hazards list cannot be empty
+hazards_tracked_by: ECR-0013
 
 mcu:
   ref: U1
@@ -97,3 +111,27 @@ signals:
   - {id: LSE_OUT, net: LSE_OUT, signal: RCC_OSC32_OUT, role: "32.768 kHz crystal (F2)"}
   - {id: BTN, net: BTN, signal: PWR_WKUP1, role: "button wake from Off/Stop (F11)"}
   - {id: LED_K, net: LED_K, signal: TIM4_CH2, af: 2, role: "LED cathode, open-drain, duty set from VBAT (F12); gen.py: PB7 TIM4_CH2"}
+
+# What the pins do besides their job. Sources are ST's datasheet and reference manual (text read 2026-10-02) and the audit
+# docs/system/audit-datasheet-claims.md; ECR-0013 tracks every one.
+hazards:
+  - port: PA15
+    ecr: ECR-0013
+    note: "UCPD dead battery: after reset a 5.1k pull-down (UCPD1_CC1) sits on this pin while PB5 (UCPD1_DBCC1) is not tied low; against R17 10k it holds the charger interrupt near 1 V = stuck low until firmware sets PWR_UCPDR.UCPD_DBDIS"
+    source: "ST DS13737 Rev 8 pin definitions table note 4; RM0456 Rev 7 p.459 (quoted in the audit, finding i)"
+    cleared_by: {pin: PB5, net: GND}
+  - port: PB15
+    ecr: ECR-0013
+    note: "UCPD dead battery: after reset a 5.1k pull-down (UCPD1_CC2) is activated by high level on PB14 (UCPD1_DBCC2 = I2C_SDA, idles high); a bridge N gate here is held OFF until PWR_UCPDR.UCPD_DBDIS is set"
+    source: "ST DS13737 Rev 8 pin definitions table note 4; ECR-0013 S2"
+    mitigation: firmware
+  - port: PB4
+    ecr: ECR-0013
+    note: "after reset PB4 is NJTRST with an internal pull-up (30-50k to VDD): ~60 uA back-feeds the mic through MIC_DATA while its PA5-gated supply is off (reset, ROM DFU, Off); firmware must set PB4 analog / no pull before Off"
+    source: "ST DS13737 Rev 8 pin definitions table note 5; RM0456 Rev 7 section 13.3.1 (audit claim 5)"
+    mitigation: firmware
+  - port: PA2
+    ecr: ECR-0013
+    note: "ROM bootloader (USART2) drives this pin push-pull with pull-up during DFU: TS reads high ('cold'), charging pauses for the whole DFU session"
+    source: "ST AN2606 Rev 69 Table 199 p.466 (audit claim 2)"
+    mitigation: firmware

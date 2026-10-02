@@ -1,0 +1,1315 @@
+# Requirement -> verification matrix (VCRM): how each requirement will be proven met, and how far along that is.
+# Read and checked by tools/checks/vcrm.py; explained in docs/system/vcrm.md. Hand-kept: change a row in the same commit
+# that changes the evidence behind it. docs/spec.md wins: section 1 is owner-locked and quoted verbatim below.
+#
+# Row fields
+#   id            S1.1-goal | S1.2-C<n> | S1.3-T<n> for section 1; a spec item id (D17, O12) or <item>-<aspect> (O12-sealing)
+#   kind          mvp (section 1, locked) | decision (spec D-item) | owner (spec O-item)
+#   source        where the requirement lives (docs/spec.md anchor)
+#   spec_block    decision / owner rows: the spec block this row summarises (D11, O12). The checker hashes that block
+#   spec_hash     first 10 hex of the block hash when the row was last reviewed; a changed block turns the row WARN
+#                 ("requirement text changed, re-review"). Print current values: python3 tools/checks/vcrm.py --hashes
+#   text          section 1: the spec text VERBATIM (never edit; the checker compares it with the spec). Others: a short summary
+#   method        Test | Analysis | Inspection | Demonstration (every method the row uses)
+#   stage         the stages that carry verification. C = in a computer before hardware (simulation, analysis, scripts,
+#                 firmware on a host, inspection of CAD/schematic, owner listening on headphones). D = on rev 1 hardware:
+#                 bench, wear, field. A stage not listed here has no verification defined yet.
+#   c_role        required when stage lists C: decides (a computer-side check can settle the requirement) | surrogate (models, analyses
+#                 and inspections of the enabling conditions; the requirement itself is judged on rev 1: perception, comfort,
+#                 sealing, noise, current). Surrogate rows are the ones rev 1 must reveal (O18)
+#   status        not-started | partial | done (the whole row; must agree with status_by_stage)
+#                   not-started  nothing exists that could show pass or fail
+#                   partial      something real exists (a model, a check, an inspection, a result) but it does not cover the
+#                                whole requirement, or it is blocked, stale or not yet on the final design/hardware
+#                   done         verification complete, passing, with evidence
+#   status_by_stage  {C: ..., D: ...}; required when stage lists both
+#   owner_items   plm items (docs/system/plm/items.yaml) that carry the requirement
+#   functions     F-rows of docs/system/integration-map.md that implement it (optional)
+#   artefacts     what verifies it, and EXISTS today: file paths or globs; E1..E12 (spec 12.E procedures); S1..S4 (spec 10
+#                 stages); C1..C9 (spec 12.C tasks); interfaces:<id> (a check in tools/checks/interfaces.py);
+#                 bom_check:<id> (a check in tools/checks/bom_check.py); ERC (SKiDL ERC inside hw/pod/gen.py);
+#                 DRC (a KiCad board for kicad-cli pcb drc). An E/S/C item is a defined procedure, not a result:
+#                 status says whether it was done.
+#   planned       what is missing and would verify it (free text; not validated)
+#   evidence      what shows the stated status: an exact tracked file path (no directory, no pattern, never CLAUDE.md, the spec or
+#                 this matrix) or a commit hash. Every evidence file is pinned in evidence_pins below: a changed file is a WARN
+#   ecrs          open ECRs that block or change this row (docs/system/plm/ecr/); each is validated and cited as WARN
+#   related       other VCRM rows that share evidence with this one (validated)
+#   covers        spec items this row also verifies (O7, O7b) or sub-requirements (O16(3)); a row id already covers its own item
+#   c_none_reason required when stage lacks C: why nothing can be checked in a computer
+#   next          one line: the next action that moves this row (shown in the generated tables of vcrm.md)
+#   known_fail    set ONLY when the design today is known not to meet the requirement (not merely unverified): shows as WARN
+#   known_fail_ref  required with known_fail: the ECR or doc that tracks the failure; 'none; <where it is written down>' when no ECR does
+#   gap           what is missing to verify it, in plain words, with the numbers. Never write what a cited check currently says
+#                 (PASS, WARN, counts): the checker runs the scripts and reports it live
+#
+# Top-level keys (besides version, updated and requirements)
+#   section1_lock    {commit, sha256}: spec section 1 must equal its text at that commit (git, not this file, is the baseline).
+#                    python3 tools/checks/vcrm.py --lock prints the record. section1_unlock: "<owner, date, why>" downgrades a
+#                    difference to a WARN while the owner's change is being committed; remove it once section1_lock is updated
+#   evidence_pins    hash of each evidence file as last reviewed (managed by --update-pins; marked block below)
+#   stage_c_baseline rows whose stage C was started (partial or done) when last reviewed; a row leaving the list is a WARN
+#                    (python3 tools/checks/vcrm.py --baseline prints the current list)
+#   not_verifiable   spec D/O items with no row, each with the reason (a waiver is a recorded decision, not an omission)
+#   ecrs_no_row      open ECRs no row cites, each with the reason
+#   acknowledged     WARN keys (see --json "keys") the owner has accepted; only --strict reads it
+version: 2
+updated: 2026-10-02
+
+section1_lock: {commit: "e5caa3dab1256d67675daa88eb9cc8efbcfd0f4a", sha256: "e2f9a8e8ebf1eb97"}   # unchanged since 2026-09-30
+
+# vcrm:pins:begin (rewritten by tools/checks/vcrm.py --update-pins; the hash of each evidence file when its rows were last reviewed)
+evidence_pins:
+  "docs/build/bom.py": "1ac4af4c81"
+  "docs/build/hardware_checks.py": "3b695bc5bf"
+  "docs/build/tolerances.md": "13099f559e"
+  "docs/research/A3-u575-plan.md": "ed9d824656"
+  "docs/research/ear-open-fit.md": "9989f8ab7c"
+  "docs/research/pad-led.md": "74e219f7ee"
+  "docs/system/integration-map.md": "691dac315d"
+  "docs/system/physical.md": "be19a73b90"
+  "docs/system/sub-debug-test.md": "7e365f7d39"
+  "docs/system/sub-dock-usb.md": "def7fd457b"
+  "docs/system/sub-power.md": "12086e6fd3"
+  "hw/mech/frame.py": "a4558cc4b7"
+  "hw/mech/heel.py": "47a6a72f88"
+  "hw/mech/pad.py": "00d8456a0d"
+  "hw/mech/pod.py": "8c7cdb7476"
+  "hw/mech/shell_r1.py": "ad1df2fdfc"
+  "hw/padboard/gen.py": "602c2ac9a9"
+  "hw/pod/gen.py": "5a486628ed"
+  "hw/pod/system_map.py": "9316eedc97"
+  "sim/checks/assembly_fees.py": "09bf63afc2"
+  "sim/checks/balance.py": "3b9348b1ac"
+  "sim/checks/bridge_spice.py": "01edb203ac"
+  "sim/checks/deadtime_switching.py": "195db1493e"
+  "sim/checks/dsp_phase1_summary.json": "97250ccd9f"
+  "sim/checks/idle_detector.py": "dfda96c50e"
+  "sim/checks/niti_arm_real.py": "62944f12dd"
+  "sim/checks/niti_closed_form.py": "262b850086"
+  "sim/checks/ntf_compare.py": "89bf4f3e86"
+  "sim/checks/power.py": "4be180d9b4"
+  "sim/checks/pwm_ultrasonic_leak.py": "d1434d9786"
+  "sim/checks/sot1216_footprint.py": "e90d73f50f"
+  "sim/checks/tragus_spring.py": "989334e909"
+  "sim/data/sph0641_ultrasonic_response.json": "e564317789"
+  "sim/dsp/nature_demo.py": "48ca02df64"
+  "sim/dsp/pipeline.py": "9aa630fa71"
+  "sim/dsp/run_phase1.py": "fe7912bd11"
+  "tools/checks/bom_check.py": "3a2a49045a"
+# vcrm:pins:end
+
+stage_c_baseline: [S1.1-goal, S1.2-C1, S1.2-C2, S1.2-C3, S1.2-C4, S1.3-T1, S1.3-T2, S1.3-T4, S1.3-T5, S1.3-T6, D1-force,
+  D2-nolink, D3, D6-output, D9, D11-topology, D11-selfnoise, D12-modes, D12-off, D13-mic, D14-clocks, D16-crystal,
+  D17-ceiling, D17-popfree, D18-runtime, D18-balance, O8-led, O9-prototype, O10-twostage, O12-dock, O12-sealing,
+  O12-fastcharge, O13-budget, O16-cell, O16-connector, O16-nohousingscrews, O16-ip68switch, O16-oneboard, O16-pad,
+  O17-wiring, O18-diagnosability, O18-firmware-fixable, O18-stageC-classes, O19-reliability, O19-serviceability,
+  O20-finalsize]
+
+not_verifiable:
+  D4: "A method choice (digital DSP, not analog division). Its outcome is proven through D12-modes and the T1 and T2 rows, not by a check of its own."
+  D5: "A component choice (STM32U575CIU6Q). What can fail is checked elsewhere: pin functions by interfaces:pins (O18-stageC-classes), run time by D18-runtime, the core SMPS by D11-topology, stock by ECR-0008 (O16-cell)."
+  D8: "A process choice (factory assembly at JLCPCB). bom_check (jlc-bom, assembly-tier, stock-lock) checks what it needs and rows O13-budget, O18-stageC-classes and O19-reliability cite it; no separate requirement to verify."
+  D15: "A toolchain choice (bare C, CMake, CMSIS). No testable claim until firmware exists; ECR-0010 plans host-tested code first."
+  O3: "An owner action (approve the shopping list once priced). Nothing to verify."
+  O4: "An owner action (confirm the D18 reading of section 1.2.4). S1.2-C4 and D18-balance carry it in their gap and next."
+  O5: "Superseded in part by O20 (growth is acceptable if it is clearance). Its open question, a stacked thicker pod against a slimmer one, belongs to the simplification study and O20-finalsize."
+  O14: "A process rule (the PCB layout is done together). Nothing to verify."
+  O15: "Superseded by O20 (rev 1 is final-size). Its question about debugging over USB is carried by O18-diagnosability (F4 self-test)."
+
+ecrs_no_row: {}
+
+acknowledged: {}
+
+requirements:
+  # =========================================================================================== section 1 (locked)
+  - id: S1.1-goal
+    kind: mvp
+    source: "docs/spec.md §1.1"
+    text: |-
+      A wearable that lets the owner hear ultrasound (roughly 20–96 kHz) in real time, in stereo, by shifting it down into a comfortable audible band and delivering it by bone conduction. It mounts on her everyday prescription glasses and must feel like an extension of her body, not a gadget.
+    method: [Analysis, Test, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-AUDIO-IN, SUB-PROCESSING, SUB-OUTPUT, REG-PAD]
+    functions: [F1, F2, F3]
+    artefacts: [sim/dsp/pipeline.py, sim/dsp/run_phase1.py, sim/data/sph0641_ultrasonic_response.json, docs/research/A3-u575-plan.md, "interfaces:mic-port", "interfaces:pins", E3, S1, S4]
+    planned: ["CPU budget re-costed for the U575 (C2 is an L452 estimate)", "end-to-end latency measurement against the 20 ms target (spec 5.3)"]
+    evidence: [sim/dsp/run_phase1.py, sim/checks/dsp_phase1_summary.json]
+    related: [S1.3-T1, S1.3-T2, S1.3-T3, S1.3-T5]
+    known_fail: "The locked text says roughly 20-96 kHz; the design delivers about 20-85 kHz (the mic is characterised to 80 kHz, the ADF filter passes to about 89 kHz; spec D14 band-edge note). Spec section 1 stays as written; accepting the gap or buying the top octave back is the owner's call."
+    known_fail_ref: "none; the owner decides 85 versus 96 kHz (spec D14 band-edge note). The locked text stays as written"
+    next: "Re-cost the CPU budget for the U575; owner decides the 85 kHz versus 96 kHz top end"
+    gap: >-
+      C: the Phase-1 chain model covers 20-85 kHz on a synthetic corpus and on real 192 kS/s recordings (Port Meadow); the
+      CPU budget for real time is still an L452-era estimate (sub-processing issue 5), so real time on the U575 is unproven.
+      "In stereo" and "feel like an extension of her body" are only verified through T3 and T5. D: S4 is the exit test
+      (T1, T2, T3, T6 on two full units); the mic's response through the as-built port is unmeasured (E3).
+      interfaces:mic-port reads the port hole against the lid port live (ECR-0011 moved the hole onto the lid port).
+
+  - id: S1.2-C1
+    kind: mvp
+    source: "docs/spec.md §1.2 item 1"
+    text: |-
+      **Full-time glasses wearer.** The device clips onto her main glasses via removable 3D-printed clasps.
+    method: [Inspection, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-POD-BODY, PHYSICAL]
+    artefacts: [hw/mech/frame.py, hw/mech/pod.py, hw/mech/blade.py, E9, E12, "interfaces:frame"]
+    planned: ["fit and removal test of the printed adapter on her own glasses (printed dummy pair, ECR-0006)"]
+    evidence: [hw/mech/frame.py, hw/mech/pod.py]
+    ecrs: [ECR-0001, ECR-0006]
+    next: "Print the adapter and try it on her glasses (ECR-0006 dummy pair); measure her temple section"
+    gap: >-
+      C: a separate printed frame adapter exists (dovetail rail, snap tab, parametric in the temple section), but the
+      temple section (2.5 x 5.0 mm in frame.py) is a generic value, not measured on her frames (E9 is photo-based and partly
+      done); the ~5 N grip on the temple edges that the pad's 1 N reaction needs (spec 8, v0.13 note) is unverified, and E12
+      (temple stiffness) is not done. frame.py still carries pre-rev-1 pod constants (ECR-0001). D: fit, grip and removal on
+      her glasses.
+
+  - id: S1.2-C2
+    kind: mvp
+    source: "docs/spec.md §1.2 item 2"
+    text: |-
+      **Nothing Ear (open) headphones are worn constantly and reserved for phone audio.** The device must not use them as output, must not interfere with their fit, and must not bump the driver pod (over the ear opening, between helix root and tragus; shifts slightly during wear). The counterweight bulb sits behind the ear.
+    method: [Inspection, Analysis, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-ARM, REG-PAD, PHYSICAL]
+    artefacts: [docs/research/ear-open-fit.md, hw/mech/frame.py, hw/mech/pad.py, hw/mech/heel.py, E2, E9]
+    planned: ["clearance check of the rev-1 arm, strut and pad against an Ear (open) keep-out solid in CAD (STEP boolean, nominal and +3 mm shift)"]
+    evidence: [docs/research/ear-open-fit.md]
+    ecrs: [ECR-0006]
+    related: [S1.3-T4]
+    next: "Add an Ear (open) keep-out solid and check arm, strut and pad against it; take the ruler shot (E9)"
+    gap: >-
+      C: "does not use them as output" holds by inspection (the pod has no radio and F3 drives only the exciter).
+      Clearance (at least 5 mm, 8 mm on the vertical run, still clear after a 3 mm shift; spec 8) rests on photo
+      measurements good to +-20% until the ruler shot (E9) and was last checked before the strut grew rearward and the
+      pad collar grew to 7.4 mm across flats (reg-arm issue 10); no solid-model check against an Ear (open) exists.
+      D: wear with the Ear (open) in, over a full session (E2, T4).
+
+  - id: S1.2-C3
+    kind: mvp
+    source: "docs/spec.md §1.2 item 3"
+    text: |-
+      **Unusually good high-frequency hearing** (hears some charger and LED-driver whine). So: any self-noise must be no louder than the ambient background, and PWM noise is kept well above her hearing. *(Owner change 2026-09-30: the blanket "no switching regulators" rule was removed.)*
+    method: [Analysis, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-OUTPUT, SUB-PROCESSING, SUB-POWER, SUB-AUDIO-IN]
+    functions: [F2, F3]
+    artefacts: [sim/checks/pwm_noise.py, sim/checks/ntf_compare.py, sim/checks/pwm_ultrasonic_leak.py, sim/checks/bridge_spice.py, sim/checks/deadtime_switching.py, E3, E7, E11, S2]
+    planned: ["model of the noise coupling path (rail, ground, exciter vibration) into the mic (a layout-noise model is in progress in sim/noise by another agent, uncommitted on 2026-10-02)", "a number for the ambient background it is compared with"]
+    evidence: [sim/checks/ntf_compare.py, sim/checks/pwm_ultrasonic_leak.py]
+    related: [S1.3-T6, D11-selfnoise]
+    next: "Model the PWM and SMPS coupling path into the mic; fix a number for 'ambient'"
+    gap: >-
+      C: the PWM quantisation noise is modelled (about -90 dB re full scale in 8-20 kHz after the coil, 3rd-order shaper);
+      the same noise sits at -35 dB re FS on the bridge voltage across the mic's 20-85 kHz band (MP-01), so the device can
+      hear itself if any of it couples back, and nobody has modelled that coupling. The core SMPS has no noise model. "Ambient
+      background" has no number. D: E7 (idle silence, 8-16 kHz by ear) and E11 (SMPS whine in a quiet room) need rev 1 on
+      battery.
+
+  - id: S1.2-C4
+    kind: mvp
+    source: "docs/spec.md §1.2 item 4"
+    text: |-
+      **Comfort and size are the top priority.** Bulky or uncomfortable means unworn means failed. Bulk goes at the front of the frame near the hinges, never near the neck or behind the ears.
+    method: [Analysis, Inspection, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [PHYSICAL, REG-POD-BODY, REG-BOARD, SUB-POWER]
+    artefacts: [sim/checks/balance.py, hw/mech/shell_r1.py, hw/mech/frame.py, E10, E12, "interfaces:frame"]
+    planned: ["numeric size and mass targets (none exist; O20 defines none)", "whole-pod mass and centre of mass from the rev-1 CAD with one density plus parts"]
+    evidence: [sim/checks/balance.py, hw/mech/shell_r1.py]
+    ecrs: [ECR-0001, ECR-0006]
+    related: [D18-balance, O20-finalsize, S1.3-T5]
+    next: "Set numeric size and mass targets; owner confirms the D18 reading (O4)"
+    gap: >-
+      C: nothing sits behind the ear or toward the neck in the CAD (pod x 29.5-67.5 mm behind the hinge), but "near the
+      hinges" versus a 38 mm pod running to the Ear (open) hook rests on the D18 reading that the owner has not yet confirmed
+      (O4 is open). The vision no-go line (nothing forward of about 18 mm behind the pupil plane) is an estimate until E10.
+      No size or mass limit is written down, so size cannot pass or fail. D: wear the weighted dummy pair (ECR-0006), then rev 1.
+
+  - id: S1.3-T1
+    kind: mvp
+    source: "docs/spec.md §1.3"
+    text: |-
+      **T1 House walk:** she hears ultrasonic sources (electronics, etc.) around the house. In Transient-only mode the house is tolerable, not overwhelming.
+    method: [Analysis, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING, SUB-AUDIO-IN]
+    functions: [F1, F2]
+    artefacts: [sim/dsp/run_phase1.py, sim/dsp/corpus.py, sim/dsp/pipeline.py, sim/checks/idle_detector.py, C1, C4, S1, S4]
+    planned: ["end-to-end chain scenario T1 (sim/e2e, in progress by another agent, uncommitted on 2026-10-02)", "owner listening verdict on the rendered WAVs (sim/out/dsp/*.wav)", "her own home recordings through the chain (S1)"]
+    evidence: [sim/dsp/run_phase1.py, sim/checks/dsp_phase1_summary.json]
+    related: [D12-modes]
+    next: "Owner listens to the Phase-1 WAVs; record her home (S1); tune the gate (C4)"
+    gap: >-
+      C: on the synthetic corpus (HC-SR04, keys, charger and LED whines) transient mode keeps the events and drops the
+      whines (whines-only window -90.1 dBFS against -41.4 in full mode), but the corpus was written by the same author as
+      the gate, the corpus (C1) and gate tuning with self-noise (C4) are both OPEN, and "tolerable, not overwhelming" is her
+      judgement, not yet asked. D: the house walk itself, after S4 (rev 1 on battery).
+
+  - id: S1.3-T2
+    kind: mvp
+    source: "docs/spec.md §1.3"
+    text: |-
+      **T2 Nature sit:** outside at dusk, bats and other ultrasonic wildlife come through as comfortable, non-shrill sound.
+    method: [Analysis, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING, SUB-AUDIO-IN, SUB-OUTPUT]
+    functions: [F1, F2, F3]
+    artefacts: [sim/dsp/nature_demo.py, sim/checks/idle_detector.py, sim/dsp/pipeline.py, C6, E2, S4]
+    planned: ["owner listening verdict on sim/out/nature/2_translated_only.wav and 3_combined.wav (R19)"]
+    evidence: [sim/dsp/nature_demo.py, sim/checks/idle_detector.py]
+    ecrs: [ECR-0007]
+    next: "Owner judges the nature WAVs; play them through the exciter at the tragus (E2, ECR-0007)"
+    gap: >-
+      C: real Port Meadow recordings (Zenodo 22079773, CC-BY-4.0) run through algorithm B render to WAVs, and the idle
+      detector caught 95.5% of 10,024 annotated bat calls within 10 ms (spec v0.14). The WAVs have not been judged "comfortable,
+      non-shrill" by the owner, and playing them through the real exciter at the tragus (E2, ECR-0007) is the first test of the
+      bone-conduction path. Level calibration of the clips is assumed. D: dusk sit in the yard, rev 1 on battery.
+
+  - id: S1.3-T3
+    kind: mvp
+    source: "docs/spec.md §1.3"
+    text: |-
+      **T3 Localization:** eyes closed, she can point left/right toward an ultrasonic source (e.g. a 40 kHz rangefinder emitter) better than chance.
+    method: [Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: not-started
+    status_by_stage: {C: not-started, D: not-started}
+    owner_items: [SUB-AUDIO-IN, SUB-PROCESSING, SUB-OUTPUT, REG-PAD]
+    functions: [F1, F3]
+    artefacts: [E2, E8, S4]
+    planned: ["stage-C scenario T3 in sim/e2e/chain.py (level difference through two independent chains, tragus crosstalk, random relative phase): in progress by another agent, uncommitted on 2026-10-02; cite it here when it lands", "pass rule for 'better than chance' (the spec states none): e.g. a binomial test over a fixed number of blind trials, proposed to the owner"]
+    related: [S1.1-goal]
+    next: "Land the stage-C level-difference scenario and agree the blind-trial pass rule with the owner"
+    gap: >-
+      Nothing verifies this yet. Stage C is defined but not started: the end-to-end chain (sim/e2e) is being built with a T3
+      scenario, uncommitted on 2026-10-02. It depends on free-running phase between the unlinked units (D2; E8 and S4 A/B
+      measure it), on mic and coupling match between sides (R7, +-1 dB mic) and on the tragus isolation figure (25-40 dB),
+      all literature or unmeasured. "Better than chance" has no trial count or statistic. A rev-1 discovery (O18) until a
+      model exists.
+  - id: S1.3-T4
+    kind: mvp
+    source: "docs/spec.md §1.3"
+    text: |-
+      **T4 Coexistence:** Ear Opens worn and playing phone audio the whole time; no fit interference; both streams distinguishable.
+    method: [Inspection, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-ARM, REG-PAD, PHYSICAL]
+    artefacts: [docs/research/ear-open-fit.md, hw/mech/pad.py, hw/mech/heel.py, E2, E9]
+    planned: ["the Ear (open) keep-out solid check (see S1.2-C2)"]
+    evidence: [docs/research/ear-open-fit.md]
+    ecrs: [ECR-0006, ECR-0007]
+    related: [S1.2-C2]
+    next: "Re-run the Ear (open) clearance on the rev-1 arm; run E2 with the Ear (open) playing"
+    gap: >-
+      C: same clearance analysis as S1.2-C2, stale since the strut and collar grew. "Both streams distinguishable"
+      (the device plays 1.5-4 kHz by bone conduction at the tragus while phone audio plays in the Ear (open)) has no model
+      and no pass rule. D: E2 with the Ear (open) playing and translated files at the tragus (ECR-0007), then a full wear
+      session.
+
+  - id: S1.3-T5
+    kind: mvp
+    source: "docs/spec.md §1.3"
+    text: |-
+      **T5 Wearability:** 2+ hours with no pressure pain at the transducer site or temples, including while talking and eating.
+    method: [Analysis, Test, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-ARM, REG-PAD, REG-POD-BODY, PHYSICAL]
+    artefacts: [sim/checks/niti_closed_form.py, sim/checks/niti_arm_real.py, sim/checks/niti_preload.py, sim/checks/tragus_spring.py, sim/checks/balance.py, E2, E12]
+    planned: ["2 h wear of the ballasted printed dummy pair with a sheet of pressure-point scores (ECR-0006)", "temple clip pressure estimate"]
+    evidence: [sim/checks/niti_closed_form.py, sim/checks/tragus_spring.py]
+    ecrs: [ECR-0006]
+    related: [D1-force, D18-balance, O16-pad]
+    next: "Bend a NiTi coupon; wear the ballasted dummy pair for 2 h (ECR-0006)"
+    gap: >-
+      C: pad force is modelled twice (two independent models agree within 3%), but NiTi modulus is uncertain +-30% and no
+      coupon has been bent; the pad is 50 mm2 against the 100-150 mm2 the owner asked for (1 N is 20 kPa on 50 mm2, 7-10 kPa
+      on 100-150); the pod's mass lower bound is already about 10.2 g (D18-balance); temple pressure from the clip is not
+      modelled. D: 2 hours worn, talking and eating; pass is her report of no pressure pain at the tragus or temples.
+
+  - id: S1.3-T6
+    kind: mvp
+    source: "docs/spec.md §1.3"
+    text: |-
+      **T6 Silence:** with no ultrasound present, the device is inaudible to her. No hiss, no whine.
+    method: [Analysis, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-OUTPUT, SUB-PROCESSING, SUB-AUDIO-IN, SUB-POWER]
+    functions: [F2, F3]
+    artefacts: [sim/checks/pwm_noise.py, sim/checks/ntf_compare.py, sim/checks/pwm_ultrasonic_leak.py, sim/dsp/run_phase1.py, E3, E7, E11, S4]
+    planned: ["end-to-end chain scenario T6 with an audibility proxy (sim/e2e, in progress by another agent, uncommitted on 2026-10-02)", "mapping from dBFS at the PWM to bone-conducted loudness for her hearing", "a blind device-on versus device-off forced-choice trial as the pass rule"]
+    evidence: [sim/checks/dsp_phase1_summary.json, sim/checks/ntf_compare.py]
+    related: [S1.2-C3, D11-selfnoise]
+    next: "Map dBFS to bone-conducted loudness; run E7 and E11 as soon as rev 1 runs on battery"
+    gap: >-
+      C: the model's output for a silent input is -79.6 dBFS in transient mode (silence_b_transient_dbfs); with dither off
+      while squelched the PWM idles as an exact 50% square wave. That is mic self-noise passed through the translation, not an
+      audibility result: no model turns a dBFS number into what she hears through bone, and the SMPS is not modelled. D:
+      E7, E11 and E3, then T6 in a quiet room worn, with the Ear Opens off and on.
+
+  # =========================================================================================== decisions with verifiable content
+  - id: D1-force
+    kind: decision
+    source: "docs/spec.md D1 (contact force), O7b"
+    spec_block: D1
+    spec_hash: e8a65c7438
+    text: "Pad force of at least 1 N at the pre-tragal skin through a compliant pad, held through jaw motion (talk and chew), without much more (comfort). Pressing inward, not backward. Also carries O2, O7 and O7b (the tragus site, the NiTi wire arm, 20 mm at 30 degrees) and the preload from tilting the arms inward (O11)."
+    method: [Analysis, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-ARM, REG-PAD]
+    artefacts: [sim/checks/niti_arm_real.py, sim/checks/niti_closed_form.py, sim/checks/niti_preload.py, sim/checks/tragus_spring.py, docs/build/hardware_checks.py, docs/research/tragus-arm.md, E2, E12, "interfaces:frame"]
+    planned: ["coupon bend of the real wire: force before and after 100 on/off cycles (O7b)"]
+    evidence: [sim/checks/niti_closed_form.py, sim/checks/niti_arm_real.py, docs/build/hardware_checks.py]
+    ecrs: [ECR-0001, ECR-0006]
+    related: [S1.3-T5]
+    covers: [O2, O7, O7b, O11]
+    next: "Bend a coupon of the real wire; measure force before and after 100 cycles"
+    gap: >-
+      C: two independent models agree within 3% (loading plateau 450 MPa, about 2.3 N loading and 1.0 N unloading for the
+      20 mm x 0.85 mm arm); hardware_checks.py records that no 0.75-0.85 mm wire with Af at or below 0 C is buyable off the
+      shelf, wire diameter differs between frame.py (0.80) and the BOM (0.75), and heel and pad checks still read frame.py
+      (ECR-0001). D: coupon bend, force at the pad on a scale, then E2 and E12 with jaw motion.
+
+  - id: D2-nolink
+    kind: decision
+    source: "docs/spec.md D2, E8, S4"
+    spec_block: D2
+    spec_hash: "e6f86f69b8"
+    text: "Two independent mono units with no link between them (no wiring across the hinges, no shared settings). Each side processes its own mic, which keeps the loudness difference between the ears; the units' free-running phase differs, and S4 measures whether that spoils the left/right cue."
+    method: [Inspection, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING, SUB-OUTPUT, SUB-AUDIO-IN]
+    functions: [F1, F2, F3]
+    artefacts: [hw/pod/gen.py, docs/system/integration-map.md, E8, S4]
+    planned: ["a stage-C model of the left/right level cue through two unlinked chains with random relative phase (the T3 scenario in sim/e2e is in progress by another agent, uncommitted on 2026-10-02)"]
+    evidence: [hw/pod/gen.py, docs/system/integration-map.md]
+    related: [S1.3-T3, D16-crystal]
+    next: "Land the stage-C T3 scenario; plan the E8 A/B (free-running against one shared clock) for the first two built pods"
+    gap: >-
+      C: by inspection of the schematic and the integration map, nothing on the board leaves the pod for the other pod: every
+      J pad goes to its own pod's exciter, LED, cell, NTC or dock, and the MCU has no radio. That is the structure, not the
+      claim. The claim is that the left/right cue survives free-running phase, which D2 itself rates [Med] ("a simple model keeps
+      its direction") and no model in the repo tests; the tragus isolation figure (25-40 dB) is from the literature. D: E8 and S4
+      compare free-running units with units sharing one clock; if the difference is large, a link is the fallback (spec parked ideas).
+
+  - id: D3
+    kind: decision
+    source: "docs/spec.md D3, §5.4"
+    spec_block: D3
+    spec_hash: 9a26f1597f
+    text: "Fixed gain plus manual stepped volume, no automatic gain control; volume and mode reset to known defaults at power-on; coarse (~4 dB) steps with a tick pattern; a long press returns that side to the default so both sides re-match in two presses."
+    method: [Analysis, Test]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING, SUB-UI]
+    functions: [F11]
+    artefacts: [sim/dsp/pipeline.py, "interfaces:pins"]
+    planned: ["host unit tests of the mode and volume state machine, tick patterns, power-on defaults (ECR-0010 item 2)"]
+    evidence: [sim/dsp/pipeline.py]
+    ecrs: [ECR-0010]
+    next: "Write the mode and volume state machine as host-tested code (ECR-0010)"
+    gap: >-
+      C: the Phase-1 model has fixed gain (BConfig.gain_db) and no AGC, but the 4 dB steps are a comment, not code. There is no
+      firmware: state machine, tick pattern and reset are unwritten, and the gesture set has holes (spec 5.4 gives no on/off
+      gesture or timing; sub-ui issue 5, owner picks A/B/C). D: re-match both pods in two presses; measure the real step
+      size at the exciter (E7 sense resistor).
+
+  - id: D6-output
+    kind: decision
+    source: "docs/spec.md D6, E7"
+    spec_block: D6
+    spec_hash: "96afd38a0c"
+    text: "Output stage: TIM1 at a 200 kHz centre-aligned 2-level PWM (201 duty levels) with 3rd-order noise shaping, driving a discrete H-bridge of two complementary MOSFET pairs that drives the exciter directly; the exciter's coil smooths the switching into sound."
+    method: [Analysis, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-OUTPUT, SUB-PROCESSING, SUB-POWER]
+    functions: [F3, F4]
+    artefacts: [sim/checks/pwm_noise.py, sim/checks/ntf_compare.py, sim/checks/pwm_ultrasonic_leak.py, sim/checks/deadtime_switching.py, sim/checks/bridge_spice.py, sim/checks/bridge_fet_compare.py, sim/checks/sot1216_footprint.py, "interfaces:rails", "bom_check:footprints", E7]
+    planned: ["measured coil R and L in place of the 8 ohm / 0.3 mH placeholders (E1, D7-transducer)", "a model of the shaper's noise coupling back into the mic (sim/noise is in progress by another agent, uncommitted on 2026-10-02)", "the PMCXB290UE transistor model, or a measured stand-in"]
+    evidence: [sim/checks/bridge_spice.py, sim/checks/ntf_compare.py, sim/checks/deadtime_switching.py]
+    ecrs: [ECR-0003, ECR-0004, ECR-0005]
+    related: [D17-popfree, D11-selfnoise, D7-transducer, S1.3-T6]
+    next: "Decide with the simplification study whether the discrete bridge stays (ECR-0003, ECR-0004), then re-run the output checks on the surviving design"
+    gap: >-
+      C: the quantiser and noise shaper (pwm_noise, ntf_compare, pwm_ultrasonic_leak), the dead-time behaviour (deadtime_switching)
+      and the FETs at transistor level (bridge_spice) are modelled with ideal or stand-in parts: Diodes' DMC2400UV stands in
+      because Nexperia's PMCXB290UE model is not available (sub-output issue 7), and the coil is an assumed 8 ohm and 0.3 mH.
+      The shaper's noise lands in the mic band (spec D6, audit MP-01) and nothing models the coupling. The bridge's land pattern
+      for PMCXB290UE is known-bad until ECR-0004 lands (it is on hold for the simplification study), ECR-0003 would move leg B
+      to PA10/PB15, and the rail check reads the bridge peaks against the LDO rating (ECR-0005). D: E7 measures idle silence and
+      low-level distortion on the bridge shunt.
+
+  - id: D7-transducer
+    kind: decision
+    source: "docs/spec.md D7, E1"
+    spec_block: D7
+    spec_hash: "4fdd98eeb3"
+    text: "Transducer: an RC-BC02 / 'GD02'-class inertial bone-conduction exciter, 0.3 W nominal and 0.8 W maximum, rated 300-19,000 Hz. The maker's pages disagree on size (12.5 x 5 x 3.5 or 12.6 x 6 x 4 mm) and coil (8 or 12 ohm), and no inductance is published, so a sample is measured (E1)."
+    method: [Test]
+    stage: [D]
+    c_none_reason: "Only the part itself can answer: the coil R and L, the real size and the output level need a sample on a bench (E1, E2); the models assume 8 ohm and 0.3 mH."
+    status: not-started
+    owner_items: [SUB-OUTPUT, REG-PAD]
+    artefacts: [E1, E2, sim/checks/pwm_noise.py]
+    planned: ["E1: coil resistance and inductance of a bought sample (LCR meter)", "E2: the translated files played through it at the tragus (ECR-0007)"]
+    ecrs: [ECR-0007]
+    related: [D6-output]
+    next: "Order the exciters (ECR-0007); measure R and L (E1); feed the numbers into the output-stage checks"
+    gap: >-
+      Nothing is measured: the sample is not bought (ECR-0007 proposes ordering now). Size, resistance (8 or 12 ohm) and
+      inductance (0.3 mH is a placeholder; the one published bone transducer, a larger one, is 1.26 mH) all rest on the maker's
+      disagreeing pages. The pad, the exciter cup and the bridge's filtering all depend on them.
+
+  - id: D9
+    kind: decision
+    source: "docs/spec.md D9"
+    spec_block: D9
+    spec_hash: a574fcf7ea
+    text: "Output band about 1.5-4 kHz; keep the floor at or above ~1.5 kHz (below that the ear is phase-sensitive and the unlinked units' random phase could scramble direction)."
+    method: [Analysis, Test]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING]
+    functions: [F2]
+    artefacts: [sim/dsp/pipeline.py, sim/dsp/run_phase1.py, E7]
+    planned: ["an assertion in the Phase-1 run that no output energy lies below 1.5 kHz (spectrograms are only looked at today)"]
+    evidence: [sim/dsp/pipeline.py, sim/dsp/run_phase1.py]
+    related: [S1.3-T3]
+    next: "Assert the 1.5 kHz floor in the Phase-1 run; measure the output spectrum on the 1 ohm sense (E7)"
+    gap: >-
+      C: pipeline.map_freq maps 20-85 kHz log-wise onto 1.5-4 kHz (BConfig.out_lo, out_hi); nothing asserts the floor,
+      and algorithm A (heterodyne) sets its band by LO and low-pass instead. D: measure the output spectrum on the 1 ohm
+      sense resistor (E7); whether the floor really protects direction is S4/E8.
+
+  - id: D10
+    kind: decision
+    source: "docs/spec.md D10, C5, E5"
+    spec_block: D10
+    spec_hash: 3b98c2c586
+    text: "The band floor is calibrated to the owner's hearing: measure her upper hearing limit (C5 sweep files, E5), start the processed band just below it; stored as a firmware constant identical on both sides."
+    method: [Test, Inspection]
+    stage: [C]
+    c_role: decides
+    status: not-started
+    owner_items: [SUB-PROCESSING]
+    functions: [F2]
+    artefacts: [C5, E5, sim/dsp/pipeline.py]
+    planned: ["C5 tone-sweep WAVs and procedure (OPEN)", "a check that both pods' firmware carry the same constant"]
+    next: "Write the C5 sweep WAVs and procedure; owner runs E5 on headphones"
+    gap: >-
+      Nothing is built: C5 is OPEN and E5 is not done. It needs only decent full-range headphones (not the Ear Opens), so it
+      does not wait for hardware (Phase 1b). pipeline.BConfig.f_lo = 20 kHz is a placeholder, and there is no firmware to
+      carry the constant.
+
+  - id: D11-topology
+    kind: decision
+    source: "docs/spec.md D11"
+    spec_block: D11
+    spec_hash: 167f8025c3
+    text: "The only switching regulator is the MCU core SMPS (fixed-frequency PWM, never Range 4 on the SMPS, shielded low-magnetostriction inductor, X5R caps at the MCU away from the mic); every other rail is linear (also carries O6)."
+    method: [Inspection, Analysis]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING, SUB-POWER]
+    functions: [F2, F7]
+    artefacts: [hw/pod/gen.py, hw/pod/system_map.py, docs/system/integration-map.md, docs/research/A3-u575-plan.md, ERC, E11]
+    planned: ["netlist rule: exactly one inductor, on VLXSMPS", "firmware rule: voltage Range and SMPS mode policy (no firmware yet)"]
+    evidence: [hw/pod/gen.py, hw/pod/system_map.py]
+    related: [D11-selfnoise]
+    covers: [O6]
+    next: "Add a netlist rule 'one inductor, on VLXSMPS'; settle the L1 and C8/C9 questions"
+    gap: >-
+      C: inspected 2026-10-02 from the SKiDL build: the only inductor is L1 (DFE201610E-2R2M, VLXSMPS to VDD11); U3 (BQ25180,
+      linear charger) and U4 (TPS7A2030, LDO) do not switch. Open: no script guards that, the spec names two different
+      inductors (D5 says LQM21PN2R2MGHL, D11 and Rev E use the DFE201610E), its magnetostriction is unpublished, C8/C9 are 6.3 V
+      parts against the datasheet's 10 V (sub-processing issues 1 and 11), and "far side of the board from the mic" is a layout
+      rule with no check. The firmware rule has no firmware.
+
+  - id: D11-selfnoise
+    kind: decision
+    source: "docs/spec.md D11, §1.2.3, E11"
+    spec_block: D11
+    spec_hash: 167f8025c3
+    text: "Self-noise no louder than the ambient background: owner listening test (E11) on the real load pattern in Full, Transient-only, idle-listening and Stop 2, board against her temple in a quiet room; if whine is audible, fall back to the LDO."
+    method: [Test, Analysis]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING, SUB-OUTPUT, SUB-POWER, SUB-AUDIO-IN]
+    functions: [F2, F3]
+    artefacts: [sim/checks/pwm_ultrasonic_leak.py, sim/checks/pwm_noise.py, sim/checks/ntf_compare.py, E3, E7, E11]
+    evidence: [sim/checks/pwm_ultrasonic_leak.py]
+    related: [S1.2-C3, S1.3-T6, D11-topology]
+    next: "Run E11 on rev 1 on battery; name the room 'ambient' is measured in"
+    gap: >-
+      C: PWM noise is modelled; SMPS audibility cannot be simulated with what we have (no inductor magnetostriction data, no
+      supply-ripple-to-audio model; the dock's magnets sit near L1 on some pods, sub-processing issue 11). Only E11 decides.
+      D: E11 on rev 1 on battery; "ambient background" needs a number or a stated room.
+
+  - id: D12-modes
+    kind: decision
+    source: "docs/spec.md D12"
+    spec_block: D12
+    spec_hash: b15befa59f
+    text: "Full: the whole band pitched down. Transient-only (indoor default): steady tones (charger, LED-driver whine) suppressed, changing sounds (chirps, clicks, rustles) passed. If log compression (B) sounds better in Phase 1 it becomes the only processing mode."
+    method: [Analysis, Demonstration]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING]
+    functions: [F2, F11]
+    artefacts: [sim/dsp/run_phase1.py, sim/dsp/pipeline.py, sim/dsp/corpus.py, sim/checks/idle_detector.py, C1, C4, S1]
+    evidence: [sim/checks/dsp_phase1_summary.json, sim/dsp/run_phase1.py]
+    related: [S1.3-T1]
+    next: "Tune the gate (C4) on real recordings (S1); owner picks algorithm A or B by ear"
+    gap: >-
+      C: on the synthetic corpus, whines-only output is -90.1 dBFS in transient mode against -41.4 in full while HC-SR04,
+      bat and key events pass (-20.6 to -24.7 dBFS); the corpus is the gate's own author's sanity check, C4 and C1 are OPEN,
+      real recordings of her home (S1) do not exist, and she has not yet chosen A or B by listening (Phase 1 exit). D: real
+      charger and LED-driver whine on rev 1.
+
+  - id: D12-off
+    kind: decision
+    source: "docs/spec.md D12"
+    spec_block: D12
+    spec_hash: b15befa59f
+    text: "Off: silent. MCU in Stop 2 (~4-9 uA on the U5), mic unpowered, bridge stopped."
+    method: [Inspection, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING, SUB-AUDIO-IN, SUB-POWER, SUB-OUTPUT]
+    functions: [F1, F2, F3]
+    artefacts: [hw/pod/gen.py, ERC, "interfaces:pins", sim/checks/power.py, E4]
+    planned: ["a firmware rule parking PB3 and PB4 (analog, no pull) before Stop 2", "PPK2 reading in Stop 2 (bring-up step 10)"]
+    evidence: [hw/pod/gen.py]
+    ecrs: [ECR-0010, ECR-0013]
+    next: "Write Stop 2 entry with PB3 and PB4 parking; measure the Off current with the PPK2"
+    gap: >-
+      C: the hardware path exists (mic supply from GPIO PA5, four gate pulls R3-R6 hold the bridge off); no firmware, so
+      Stop 2 entry, the Stop-2 SMPS rule (ES0499 2.2.22) and pin parking are untested. Known: PB4's NJTRST pull-up back-feeds
+      the unpowered mic in reset, ROM DFU and Off, about 60 uA against a 16.5-24 uA Off budget (audit of 2026-10-02, claim 5),
+      firmware-fixable in Off. D: PPK2 in series with the supply, expect about 16.5-24 uA (an estimate); MIC_VDD must read 0
+      in Off, reset and DFU.
+
+  - id: D13-mic
+    kind: decision
+    source: "docs/spec.md D13, E3"
+    spec_block: D13
+    spec_hash: "4fed91a567"
+    text: "Mic: Knowles/Syntiant SPH0641LU4H-1 digital MEMS, 3.50 x 2.65 x 0.98 mm, bottom port 0.325 mm, 1-bit PDM, ultrasonic mode on a 3.072-4.8 MHz clock, sensitivity matched within +-1 dB; JLC C2879853 (Extended)."
+    method: [Analysis, Inspection, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-AUDIO-IN, REG-BOARD]
+    functions: [F1]
+    artefacts: [sim/data/sph0641_ultrasonic_response.json, "interfaces:mic-port", "bom_check:identity", "bom_check:stock-lock", E3, S1]
+    planned: ["acoustic coupons: the response through the as-built port hole, lid duct and mesh (E3, S1)", "the two mics' sensitivity match, measured (R7)"]
+    evidence: [sim/data/sph0641_ultrasonic_response.json, hw/pod/gen.py]
+    ecrs: [ECR-0011]
+    related: [S1.1-goal, O12-sealing]
+    next: "Print the acoustic coupons and measure the port response (E3, S1); the mesh decision comes with them"
+    gap: >-
+      C: the datasheet response is digitised (+14.7 dB at 25 kHz and +12.7 dB at 80 kHz relative to 1 kHz, on the maker's
+      fixture); the port hole's position against the lid port is read live (interfaces:mic-port; ECR-0011 moved the hole onto
+      the lid port); the part's identity and stock are read by bom_check. The response through our port hole, lid duct and mesh
+      is unknown (the fixture's 25 kHz peak is an acoustic-path resonance that the real path will reshape), the +-1 dB match
+      between the two units is the datasheet's, and nothing characterises the mic above 80 kHz (S1.1-goal). D: coupons, then E3.
+
+  - id: D14-clocks
+    kind: decision
+    source: "docs/spec.md D14, S1"
+    spec_block: D14
+    spec_hash: "394a199f32"
+    text: "Everything runs from one clock, so every rate is an integer ratio and nothing beats: the mic clock is 4.0 MHz (HCLK/20 at 80 MHz), decimation gives 200 kS/s, the DSP output is 12.5 kS/s, and x16 interpolation reaches the 200 kHz PWM update."
+    method: [Analysis, Test]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING, SUB-AUDIO-IN, SUB-OUTPUT]
+    functions: [F1, F2, F3]
+    artefacts: [docs/research/A3-u575-plan.md, sim/dsp/pipeline.py, "interfaces:pins", S1]
+    planned: ["a script that recomputes the divider chain for each clock mode of the plan (P80, P160, P64, P48): even dividers, 4.0 MHz mic clock, 200 kHz PWM, dead-time tick", "scope the mic clock duty cycle (the mic needs 48-52 percent; ST does not specify the ADF's)"]
+    evidence: [docs/research/A3-u575-plan.md, sim/dsp/pipeline.py]
+    next: "Write the divider-chain script; bring up the ADF and scope the mic clock on rev 1"
+    gap: >-
+      C: A3-u575-plan.md (section 2) works the chain out on paper for four clock modes (default P80: mic clock HCLK/20, PCM and
+      PWM rate HCLK/400, every divider even, MSI locked to the LSE); no script recomputes it, and the ADF's reshape filter
+      that produces 200 kS/s has unpublished coefficients (plan section 0). Spec D14 still describes the L452 route (DFSDM sinc5,
+      then a CPU half-band); the plan's CIC5 and reshape filter replace it (its section 6 lists what changes in the spec) and reach the same 4.0 MHz, 200 kS/s and 200 kHz.
+      D: scope the mic clock duty, the PWM synchrony and the DSP rate on rev 1.
+
+  - id: D16-crystal
+    kind: decision
+    source: "docs/spec.md D16, E8, S1"
+    spec_block: D16
+    spec_hash: "3796ab32ef"
+    text: "A 32.768 kHz watch crystal (LSE) auto-trims the MSI oscillator that feeds the PLL, so the two units' clocks agree far better than the internal oscillators' 1-2 percent; the residual of about 1-2 Hz between sides in heterodyne mode is accepted."
+    method: [Inspection, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING]
+    functions: [F2]
+    artefacts: [hw/pod/gen.py, ERC, "interfaces:pins", "bom_check:identity", docs/research/A3-u575-plan.md, E8, S1]
+    planned: ["crystal load match: the crystal's CL against the two 15 pF capacitors and the placed board's strays", "start-up margin at the lowest supply"]
+    evidence: [hw/pod/gen.py, docs/research/A3-u575-plan.md]
+    related: [D2-nolink, D14-clocks]
+    next: "Check the load capacitance once the board is placed; measure the offset between two units (E8)"
+    gap: >-
+      C: Y1 (32.768 kHz, C32346, a Basic part) sits on PC14/PC15 as the LSE with two 15 pF load capacitors; the pin check
+      reads the pins and bom_check reads the part's identity; the plan locks the MSI to it. Nothing models the load match,
+      start-up margin or the inter-unit offset the spec accepts at 1-2 Hz. D: E8 and S1 (two free-running units on the same
+      file): measure the clock offset and the level wobble it causes.
+
+  - id: D17-ceiling
+    kind: decision
+    source: "docs/spec.md D17"
+    spec_block: D17
+    spec_hash: 82ed746676
+    text: "A fixed output ceiling (soft clip), identical on both sides, so a loud nearby source (ultrasonic pest repeller, HC-SR04 up close) cannot become a loud output."
+    method: [Analysis, Test, Inspection]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING, SUB-OUTPUT]
+    functions: [F3]
+    artefacts: [sim/dsp/pipeline.py, sim/dsp/run_phase1.py, sim/dsp/corpus.py, sim/checks/bridge_spice.py, "interfaces:pins", E7, "interfaces:rails"]
+    planned: ["end-to-end chain scenario D17 (sim/e2e, in progress by another agent, uncommitted on 2026-10-02)", "a pest-repeller-at-10-cm case in the corpus", "a ceiling expressed in coil current or skin vibration, tied to a safe level"]
+    evidence: [sim/dsp/pipeline.py, sim/checks/dsp_phase1_summary.json]
+    ecrs: [ECR-0009, ECR-0005]
+    next: "Tie the ceiling to a coil current or vibration level; add the pest-repeller case"
+    gap: >-
+      C: pipeline.limiter holds the output at -12 dBFS (at most ceiling +3 dB for the 0.5 ms attack; the busy-scene peak is
+      0.301 = -10.4 dBFS). The ceiling is set in dBFS at the PWM, about 85 mA peak against 315 mA full scale (derived,
+      sub-output issue 3); nothing ties it to a vibration or hearing-safe level (R23), and "identical on both sides"
+      needs the firmware constant. ECR-0009 moves it into firmware independent of volume and conflicts with the docked
+      self-test (owner decides). D: coil-current peak under the loudest sources, both pods (E7).
+
+  - id: D17-popfree
+    kind: decision
+    source: "docs/spec.md D17, D6"
+    spec_block: D17
+    spec_hash: 82ed746676
+    text: "Power-up, mode changes and squelch transitions must not click (soft start and stop; gate pulls and safe idle states set before outputs are enabled)."
+    method: [Inspection, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-OUTPUT, SUB-PROCESSING]
+    functions: [F3]
+    artefacts: [hw/pod/gen.py, ERC, sim/checks/bridge_spice.py, "interfaces:pins", E7]
+    planned: ["a start/stop transient simulation of the bridge and coil", "host test of the soft-start and safe-state register sequence"]
+    evidence: [hw/pod/gen.py]
+    ecrs: [ECR-0009]
+    next: "Simulate start/stop transients; write the soft-start sequence as host-tested code"
+    gap: >-
+      C: the reset-state half is covered by hardware (R3-R6 hold the four gates off; the ROM bootloader leaves PA8 and PB0
+      alone). No simulation of start/stop transients exists (bridge_spice.py covers idle current, shoot-through and distortion);
+      soft start and the TIM1 safe-state settings are firmware, unwritten; PA6 is I_SENSE, so there is no TIM1_BKIN source
+      (sub-processing issue 6). D: scope and ear on power-up, mode changes and squelch on/off (E7).
+
+  - id: D18-runtime
+    kind: decision
+    source: "docs/spec.md D18, §7"
+    spec_block: D18
+    spec_hash: 0b78a80748
+    text: "At least 8 h of wear per charge, target about 12 h; nightly charging (also carries O1). Cell now the Renata ICP501233PA-02, 175 mAh (O16)."
+    method: [Analysis, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-POWER, SUB-PROCESSING]
+    functions: [F7, F8]
+    artefacts: [sim/checks/power.py, sim/checks/idle_detector.py, sim/dsp/run_phase1.py, "interfaces:rails", E4, S3]
+    planned: ["LED current added to power.py (0.14-0.73 mA on battery)", "full-charge run-down on a realistic duty cycle"]
+    evidence: [sim/checks/power.py, sim/checks/idle_detector.py]
+    ecrs: [ECR-0008]
+    related: [O12-fastcharge, O16-cell]
+    covers: [O1]
+    next: "Add the LED to power.py; measure current per mode (E4); run a cell down"
+    gap: >-
+      C: power.py rev 2 gives 5.0 / 6.8 / 9.8 mA awake and 1.7 / 2.2 / 3.4 mA idle (low/nominal/high); with 175 mAh the
+      always-awake runtime is 13.4-22.0 h (derived 2026-10-01 for 00-whole; the same model gives 8.0-13.2 h for 105 mAh).
+      Every current is [Low] or [Med] until E4. The idle mode has two plans (16 MHz Range 3 run versus Stop 2 with ADF and
+      LPDMA; sub-processing issue 4) that change the number and the LED; the Off budget is an estimate; the cell is
+      quote-only. D: E4 (PPK2 per mode), then a run-down.
+
+  - id: D18-balance
+    kind: decision
+    source: "docs/spec.md D18, §8"
+    spec_block: D18
+    spec_hash: 0b78a80748
+    text: "Weight balance: the cell lies along the temple arm in front of the ear, nothing behind the ear or toward the neck, so added weight splits between nose pads and ears (spec §8: ~8 g per side target, ~15 g is where glasses start to hurt)."
+    method: [Analysis, Test, Inspection]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [PHYSICAL, REG-POD-BODY, SUB-POWER]
+    artefacts: [sim/checks/balance.py, hw/mech/shell_r1.py, hw/mech/frame.py, hw/mech/pod.py, E12, "interfaces:frame"]
+    planned: ["whole-pod mass and centre of mass from the rev-1 CAD with one density plus parts, dock target, adapter and wires"]
+    evidence: [sim/checks/balance.py, hw/mech/shell_r1.py]
+    ecrs: [ECR-0001, ECR-0006]
+    related: [S1.2-C4, S1.3-T5, O20-finalsize]
+    known_fail: "Rev-1 mass is already at least ~10.2 g per pod before parts, dock target, adapter and wires (00-whole key numbers, derived 2026-10-01), above the ~8 g target in spec §8; ~15 g is where glasses start to hurt."
+    known_fail_ref: "none; the mass and size work is the simplification study (docs/research/simplify/size.md) and spec O20"
+    next: "Compute rev-1 mass and centre of mass from the CAD; weigh the dummy pair"
+    gap: >-
+      C: balance.py still holds the old 105 / 150 mAh layouts with estimated masses; no script computes the rev-1 pod's mass
+      or centre of mass (two resin densities sit in one sum; no document owns the total, physical.md issue 8). O4, the owner's
+      confirmation of the D18 reading, is open. D: weigh the dummy pair ballasted to the real mass (ECR-0006); E12 gives the
+      temple stiffness; then weigh rev 1.
+
+  # =========================================================================================== owner decisions
+  - id: O8-led
+    kind: owner
+    source: "docs/spec.md O8"
+    spec_block: O8
+    spec_hash: a03df80940
+    text: "Pad LED: solid power-on indicator (no pulsing) in the pad housing; battery cost accepted; thicker sleeve welcome (R14 + J7/J8 on PB7, blue 0402 LED on the pad board)."
+    method: [Inspection, Analysis, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-UI, REG-PAD, REG-ARM]
+    functions: [F12]
+    artefacts: [docs/research/pad-led.md, hw/padboard/gen.py, hw/padboard/drc.json, hw/pod/gen.py, ERC, "interfaces:pins"]
+    planned: ["LED current in power.py", "check that the LED PWM (above 20 kHz) stays out of the mic path and her hearing"]
+    evidence: [docs/research/pad-led.md, hw/padboard/gen.py]
+    related: [D18-runtime]
+    next: "Add LED current to power.py; settle the LED PWM against the idle-mode plan"
+    gap: >-
+      C: the circuit and the pad board exist (pad-board DRC 0); LED current is 0.14-0.73 mA on battery (derived from R14
+      2k2 off VSYS) and is not in power.py. TIM4 stops in Stop 2, so if idle listening uses Stop 2 the LED is either full
+      current or off (sub-ui issue 6); docked VSYS is 4.5 V, which changes the duty (issue 7); PB7 has no series resistor and
+      rides the arm bundle beside OUT_A and OUT_B (00-whole risk 3). D: LED steady on battery and docked; no audible or
+      mic-path artefact from the PWM.
+
+  - id: O9-prototype
+    kind: owner
+    source: "docs/spec.md O9"
+    spec_block: O9
+    spec_hash: 540dc3b29e
+    text: "Rev 1 of the final pod board IS the prototype: no dev boards or separate bridge test boards; debug access from the board itself (test pads) plus a snap-off test frame on the same JLC panel."
+    method: [Inspection]
+    stage: [C]
+    c_role: decides
+    status: partial
+    owner_items: [SUB-DEBUG-TEST, REG-BOARD]
+    functions: [F14]
+    artefacts: [hw/pod/gen.py, ERC, "bom_check:refs"]
+    planned: ["snap-off test frame and pogo jig design", "inspection of the release panel and BOM for stray test boards"]
+    evidence: [hw/pod/gen.py]
+    ecrs: [ECR-0010]
+    related: [O18-diagnosability]
+    next: "Design the snap-off test frame and pogo jig; decide the SWD probe or a BOOT0 pad"
+    gap: >-
+      TP1-TP6 (SWDIO, SWCLK, NRST, +3V0, GND, VSYS) are in the schematic and the board draft. The snap-off test frame is
+      undesigned (sub-debug-test issue 3). A blank U575 can only be flashed over SWD and no SWD probe is recorded in the
+      owner's kit (issue 1; a BOOT0 pad is recommended). CLAUDE.md lists acoustic coupons as bench boards while O9 says no
+      separate boards (sub-audio-in issue 4). No release exists yet to inspect.
+
+  - id: O10-twostage
+    kind: owner
+    source: "docs/spec.md O10"
+    spec_block: O10
+    spec_hash: e4feff1622
+    text: "Two-stage build: a TEST build with everything reachable, then a FINAL build with adhesives everywhere except the NiTi wire fasteners, water and sweat resistant, but still cut-openable to change firmware."
+    method: [Inspection, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-POD-BODY, PHYSICAL]
+    artefacts: [hw/mech/shell_r1.py, docs/system/physical.md, docs/build/tolerances.md]
+    planned: ["cut-open and re-seal demonstration on a printed pod, counting cycles the bond survives", "docs/research/sealing-and-service.md (cited by the spec; does not exist)"]
+    evidence: [hw/mech/shell_r1.py, docs/system/physical.md]
+    related: [O19-serviceability, O12-sealing]
+    next: "Write the sealing-and-service note; cut open and re-seal a printed pod"
+    gap: >-
+      C: the rev-1 shell has a seam at y 14.4 with a 0.2 mm tub rebate as the cut line and a lip round the main cavity only
+      (a butt joint round the belly; reg-pod-body issue 13); adhesives, tape and sealants are not chosen. The spec contradicts
+      itself: O10 says the test build is screwed where needed, O16(6) says taped (00-whole). D: cut open and re-seal a printed
+      pod; prove DFU before bonding, since SWD afterwards means cutting.
+
+  - id: O12-dock
+    kind: owner
+    source: "docs/spec.md O12(a)"
+    spec_block: O12
+    spec_hash: 7ff24d808d
+    text: "Firmware and charging through a magnetic USB dock or cable (USB FS on PA11/PA12, ST ROM DFU); the lid screws no longer need to be charge contacts."
+    method: [Analysis, Test, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-DOCK-USB, SUB-PROCESSING, SUB-POWER, REG-POD-BODY]
+    functions: [F5, F9, F10, F15]
+    artefacts: [hw/pod/gen.py, ERC, "interfaces:pins", docs/system/sub-dock-usb.md]
+    planned: ["boot stub and the ROM DFU round trip on rev 1 (bring-up step 6)", "dock cable, 5-pin head and pin order"]
+    evidence: [hw/pod/gen.py, docs/system/sub-dock-usb.md]
+    ecrs: [ECR-0009, ECR-0010, ECR-0013]
+    related: [O18-firmware-fixable]
+    next: "Design the boot stub and DFU entry; fix the dock cable and pin order"
+    gap: >-
+      C: the USB FS pins (PA11/PA12), dock pads and USB ESD exist in the schematic. The boot stub and ROM DFU entry are
+      undesigned (sub-dock-usb issue 4); the exposed DOCK_VBUS contact has no ESD clamp (00-whole risk 2); +3V0 at 2.955-3.045 V
+      sits under the datasheet's 3.0 V VDDUSB minimum, inside the 2.7 V functional guarantee (DS13737 Rev 10), so the bench
+      decides; with charger watchdog option B (the recommended one) a DFU session longer than 160 s power-cycles the pod unless the
+      boot stub disables it first; the 5-pin cable head
+      has no JLC stock. D: enumerate over the dock, jump to ROM DFU and re-flash, charge, with the magnets in place.
+
+  - id: O12-sealing
+    kind: owner
+    source: "docs/spec.md O12(b)"
+    spec_block: O12
+    spec_hash: 7ff24d808d
+    text: "Sealing is critical: outdoor wear in light rain (hair or a hood helps); target IPX4 minimum, IPX5 preferred."
+    method: [Inspection, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-POD-BODY, PHYSICAL, SUB-AUDIO-IN, SUB-UI]
+    artefacts: [docs/system/physical.md, docs/system/reg-pod-body.md, hw/mech/shell_r1.py, "interfaces:mic-port"]
+    planned: ["a spray test plan (IEC 60529 splash and jet tests, as a home proxy; a certified rating is not a goal, O19)", "docs/research/sealing-and-service.md (cited by O10; does not exist)", "mesh, skin, adhesive and gasket chosen"]
+    evidence: [docs/system/physical.md]
+    related: [O10-twostage, O16-ip68switch]
+    known_fail: "The mic port is not sealed: a 1.5 mm open gap between board and lid and no mesh (sub-audio-in issues 2 and 3), a water path to the MCU; the seam is a butt joint round the belly; plunger skin and adhesives are not chosen."
+    known_fail_ref: "none; docs/system/sub-audio-in.md issues 2 and 3"
+    next: "Design the mic seal and mesh, choose skin and adhesive, write the spray-test plan"
+    gap: >-
+      C: the sealing paths are listed (physical.md) and inspection finds them open or undesigned; no path is verified closed.
+      Needs the mesh (spec task D2), skin material, adhesive and a gasket decision first. D: spray test on a built pod;
+      repeat after a cut-open and re-seal cycle.
+
+  - id: O12-fastcharge
+    kind: owner
+    source: "docs/spec.md O12(c), O16(2)"
+    spec_block: O12
+    spec_hash: 7ff24d808d
+    text: "Fastest practical charge: a fast-charge-rated cell and a temperature-qualified (NTC/JEITA) power-path charger (Renata ICP501233PA-02 with TI BQ25180YBGR); firmware sets about 1C (170 mA) over I2C."
+    method: [Analysis, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-POWER]
+    functions: [F5, F6, F13]
+    artefacts: [hw/pod/gen.py, ERC, "interfaces:rails", "interfaces:pins", docs/system/sub-power.md, E4]
+    planned: ["charge log and a cell thermocouple through a full 1C charge (ECR-0009 item 3)", "charge time from the BQ25180 CC/CV profile with the real cell (no source computes it)", "supervised first charge"]
+    evidence: [hw/pod/gen.py, docs/system/sub-power.md]
+    ecrs: [ECR-0009, ECR-0002, ECR-0008, ECR-0013]
+    related: [D18-runtime, O16-cell]
+    next: "Write the charger register plan as firmware; compute charge time; plan the supervised first charge"
+    gap: >-
+      C: a register plan is written (sub-power, extended by the 2026-10-02 datasheet audit and ECR-0013: ICHG 170 mA, TS_HOT,
+      EN_PUSH = 0, PB_LPRESS_ACTION = 00, VINDPM 4.2 V, watchdog) but
+      no firmware writes it, and U3's power-up defaults are unsafe for this cell (TS_HOT 60 C against the cell's 45 C limit,
+      ICHG 10 mA). Charge time is TBD. U3 dissipates 0.2-0.3 W 0.2 mm above the pouch with RT1 3.2 mm away (R23): no thermal
+      model. "Fastest practical" has no number. D: supervised first charge, log TS and cell temperature, measure charge time.
+
+  - id: O13-budget
+    kind: owner
+    source: "docs/spec.md O13"
+    spec_block: O13
+    spec_hash: "299c1b7e9c"
+    text: "Budget is a milestone, not a wall: about $300 should buy mostly-working rev 1 hardware with known, fixable issues in hand (spending can roughly double after that); device manufacturing target about $150; the owner has a full workbench (no tool purchases); the board stays double-sided and may grow a little for the charge circuitry."
+    method: [Analysis, Inspection]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [COST]
+    artefacts: [docs/build/bom.py, docs/build/bom.md, sim/checks/assembly_fees.py, "bom_check:cost-bom", "bom_check:assembly-tier", "bom_check:stock-lock"]
+    planned: ["one total for the first order (parts for the pair, JLC fees on the current fee page, cells, exciters, connector, cable, spares) compared with $300", "the $150 manufacturing target is computed nowhere (spec O19 says unit cost at volume is not a goal)"]
+    evidence: [docs/build/bom.py, sim/checks/assembly_fees.py]
+    related: [O19-reliability, O20-finalsize]
+    next: "Compute the first-order total against $300 once the simplification study fixes the part list; price the TBD items"
+    gap: >-
+      C: docs/build/bom.py prices the parts per pod and per pair (JLC API, 2026-10-01) and estimates the one-time JLC fees as a
+      range; sim/checks/assembly_fees.py recomputes the fee model from JLC's own page (read 2026-10-02), and the study behind it
+      (docs/research/simplify/assembly.md, bottom line 1) says the repo's order structure is out of date. The cells, exciters,
+      connector and cable are TBD or off the board, so no sum is compared with $300; bom_check reads the BOM against the
+      schematic and the assembly tier the cost model assumes. D: the real order total and receipts.
+
+  - id: O16-cell
+    kind: owner
+    source: "docs/spec.md O16(1)"
+    spec_block: O16
+    spec_hash: a603512778
+    text: "Cell: Renata ICP501233PA-02, 175 mAh, protection circuit included, 5.3 x 12 x 35 mm; the casing may grow."
+    method: [Inspection, Analysis, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-POWER, REG-POD-BODY, PHYSICAL]
+    functions: [F5]
+    artefacts: [hw/mech/shell_r1.py, hw/pod/gen.py, docs/build/bom.py, "interfaces:frame"]
+    planned: ["dry-fit the real pouch: lead exit, protection-board bulge, mass"]
+    evidence: [hw/mech/shell_r1.py]
+    ecrs: [ECR-0001, ECR-0008]
+    related: [D18-runtime, O12-fastcharge]
+    next: "Dry-fit the real pouch; re-check the heel exit against it"
+    gap: >-
+      C: a 35 x 12 x 5.3 mm cell envelope sits under the board on foam in the rev-1 shell (all tub/lid overlap checks 0).
+      The lead exit and protection-board bulge are unknown; heel.py still checks frame.py's old LP401230 cell and PCM
+      (ECR-0001; interfaces:frame compares the constant files with the live shell); the price is a quote only and the cell is not bought (ECR-0008). D: dry-fit, weigh and measure the real cell.
+
+  - id: O16-connector
+    kind: owner
+    source: "docs/spec.md O16(3)"
+    spec_block: O16
+    spec_hash: "a603512778"
+    text: "No custom connector board: a pre-built magnetic connector (own magnets are acceptable), and space reserved for a sealed USB-C receptacle as the fallback."
+    method: [Inspection, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-DOCK-USB, REG-POD-BODY]
+    functions: [F5, F10]
+    artefacts: [docs/system/sub-dock-usb.md, hw/pod/gen.py, hw/mech/shell_r1.py, ERC, "interfaces:pins"]
+    planned: ["cut and check the USB-C keep-out in the shell (shell_r1.py defines it and never uses it)", "a cable-side head that is in stock and matches the target (5 contacts)", "mate, tug and release the cable on a built pod"]
+    evidence: [docs/system/sub-dock-usb.md, hw/mech/shell_r1.py]
+    related: [O12-dock]
+    next: "Fix the cable-side part number and stock; cut the USB-C keep-out in the shell model and check its overlap with the target"
+    gap: >-
+      C: the dock uses a bought connector pair and no custom connector board: the pod-side target (Xinyangze YZT0675, five
+      contacts, two NdFeB magnets, C5126848) is glued flush into the belly floor and hand-wired to pads J3/J4/J10/J11/J12
+      (sub-dock-usb.md). Open: the cable-side head (YZP0048, C5126847) showed no stock at JLC on 2026-10-02 and docs/build/bom.md
+      lists a different 4-pin head (sub-dock-usb issue 1); the sealed USB-C fallback (Same Sky UJ32-C-H-G-MSMT) is only a box,
+      USBC_KEEPOUT, that shell_r1.py defines and never cuts or checks, and it overlaps the target's rear 4.8 mm, so it is
+      either/or (issue 10). D: whether the magnets hold under wear, sweat and the cable's pull is untested.
+
+  - id: O16-nohousingscrews
+    kind: owner
+    source: "docs/spec.md O16(6)"
+    spec_block: O16
+    spec_hash: a603512778
+    text: "No screws in the main housing: the test build is taped together, the final build uses adhesives, resins and polymers once verified; screws are fine on the transducer cup and for the NiTi set screws."
+    method: [Inspection]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: done, D: not-started}
+    owner_items: [REG-POD-BODY, REG-PAD, REG-ARM]
+    artefacts: [hw/mech/shell_r1.py, hw/mech/heel.py, hw/mech/pad.py, "interfaces:clamp-bands"]
+    planned: ["inspection of the printed and bonded pod"]
+    evidence: [hw/mech/shell_r1.py, hw/mech/heel.py]
+    related: [O10-twostage]
+    next: "Confirm on the built pod"
+    gap: >-
+      C: inspected 2026-10-02 by search of the rev-1 CAD: tub, lid, spine and belly have no screw features (the lid locates on
+      a lip and is taped; the board is held by ribs and foam); the only screws are the M1.4 NiTi set screws (heel, pad) and the
+      M1.2 cup screw, all allowed by O16(6). D: confirm on the built pod. The spec says O10 "screws where needed" in the
+      test build; O16(6) is the later decision.
+
+  - id: O16-ip68switch
+    kind: owner
+    source: "docs/spec.md O16(7)"
+    spec_block: O16
+    spec_hash: a603512778
+    text: "Button: an IP68 switch (C&K KMT0 class), not a printed flexure."
+    method: [Inspection, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-UI, REG-POD-BODY]
+    functions: [F11]
+    artefacts: ["interfaces:switch", "bom_check:identity", "bom_check:jlc-bom", hw/pod/gen.py, hw/mech/shell_r1.py, docs/build/tolerances.md, ERC]
+    planned: ["press test on a scale (1.6 N is about 163 g) and a one-click-per-press check with the lid just closed"]
+    evidence: [hw/pod/gen.py, docs/build/tolerances.md, 779872e]
+    ecrs: [ECR-0012]
+    related: [O12-sealing, O16-oneboard]
+    next: "Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale"
+    gap: >-
+      C: SW1 is the C&K KMT022NGJLHS (IP68, 1.6 N, 0.15 +-0.1 mm travel; LCSC C221707) in the schematic and JLC BOM. The
+      placed board's footprint copy may still carry the pre-cleanup C221708 (the 3.4 N KMT031): bom_check:identity reads it
+      live and ECR-0012 covers the cleanup. The plunger head sits 0.40 mm under the skin recess floor, so pre-press or no-click is
+      set nowhere (sub-ui issue 1); nothing rigid backs SW1 (issue 2); the skin that seals the lid bore is not chosen (issue 4).
+      D: click feel and stuck-button current (+1.36 mA if pre-pressed).
+
+  - id: O16-oneboard
+    kind: owner
+    source: "docs/spec.md O16(5)"
+    spec_block: O16
+    spec_hash: a603512778
+    text: "One board design for both pods: mic and button on the board centre line, mirrored shells."
+    method: [Inspection, Analysis]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-BOARD, PHYSICAL, REG-POD-BODY, SUB-AUDIO-IN, SUB-UI]
+    artefacts: ["interfaces:mic-port", "interfaces:switch", "interfaces:heights", docs/system/physical.md, hw/mech/shell_r1.py, "interfaces:frame", "interfaces:outline"]
+    planned: ["a script that maps the board into the left and right shells and checks the off-centre parts (TP row, U3, L1, J-pad order, dock pads) in each"]
+    evidence: [hw/mech/shell_r1.py, docs/system/physical.md]
+    ecrs: [ECR-0011, ECR-0001]
+    next: "Script the left-pod board mapping and check the off-centre parts in both shells"
+    gap: >-
+      C: the mic port and the switch both sit at board y 6.5, the centre line of the 13 mm board, so those two are
+      pod-independent (interfaces:mic-port and :switch read them live); everything else lands at a different height per pod (TP row, U3, L1, J-pad order, dock pads, cell lead
+      exit; 00-whole risk 7). Only the right pod's shell was modelled; the left-pod mapping (board rotated 180 degrees about its
+      long axis) has no script. D: build and fit both; check L1 against the dock's rear magnet in the left pod (about 6.6 mm
+      against 14 mm, derived).
+
+  - id: O16-pad
+    kind: owner
+    source: "docs/spec.md O16(4)"
+    spec_block: O16
+    spec_hash: a603512778
+    text: "Contact pad: larger (~100-150 mm2), near-flat, 2 mm edge radius; look for pre-made bone-conduction or audio pads first, else Sugru."
+    method: [Inspection, Test]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-PAD]
+    artefacts: [hw/mech/pad.py, E2]
+    planned: ["search for a pre-made pad", "Sugru moulded face over the whole cup face (about 8 x 14 mm), swappable mould inserts on the bench (O11)"]
+    evidence: [hw/mech/pad.py]
+    related: [S1.3-T5, D1-force]
+    known_fail: "The CAD carries an 8 mm disc (about 50 mm2) or a 6 x 8 mm foot, not the 100-150 mm2 the owner asked for (reg-pad issue 1); the cup face is only about 7.9 mm wide."
+    known_fail_ref: "none; docs/system/reg-pad.md issue 1"
+    next: "Search for a pre-made pad; try Sugru inserts of about 8 x 14 mm"
+    gap: >-
+      C: nobody has searched for a pre-made pad; the options are A (Sugru face over the whole cup face, about 110 mm2),
+      B (grow the cup to 150 mm2, widening the pad toward the Ear (open)) and C (a pre-made pad). D: bench inserts and wear
+      (T5); 1 N is 20 kPa on 50 mm2 and 7-10 kPa on 100-150 mm2 (derived).
+
+  - id: O17-wiring
+    kind: owner
+    source: "docs/spec.md O17"
+    spec_block: O17
+    spec_hash: "8c51a94cf3"
+    text: "The top fin is the 'Spine' (vertebra segments stepping up toward the rear) and the theme runs through the design; the wiring at the arm joint must have clearance, with no pinched wires."
+    method: [Inspection, Test, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-ARM, REG-POD-BODY, PHYSICAL]
+    artefacts: [hw/mech/shell_r1.py, hw/mech/heel.py, docs/research/tragus-arm.md, docs/diagrams/arm-wiring.svg]
+    planned: ["a solid-model clearance check of the litz bundle against the strut and heel, in the worn and the free arm states", "flex the arm joint with a dummy litz bundle (ECR-0006; the same test as O19-reliability)"]
+    evidence: [hw/mech/shell_r1.py, hw/mech/heel.py]
+    ecrs: [ECR-0006]
+    related: [O19-reliability, D1-force]
+    next: "Check the conductor path for clearance in both arm states; include the bundle in the ECR-0006 flex test"
+    gap: >-
+      C: the spine is a shell concept in shell_r1.py (concept_spine, chosen by the owner on 2026-10-01); heel.py cuts a conductor
+      channel for the four litz pad conductors (a bare bundle of about 0.5 mm) with a 0.8 mm bend radius and two bends, threaded
+      with a fish wire. Whether the bundle clears the strut and is never pinched as the arm bends is not checked, and "the
+      theme runs through the design" is the owner's judgement. D: the flex test with a dummy bundle (ECR-0006), then wear.
+
+  - id: O18-diagnosability
+    kind: owner
+    source: "docs/spec.md O18"
+    spec_block: O18
+    spec_hash: 14c59f6ee1
+    text: "Rev 1 must fail informatively: test hooks, telemetry, isolation links, spare MCU pins to pads, the board measures itself (rails and key signals readable by the MCU); simplification may not remove diagnosability without saying so."
+    method: [Inspection, Test]
+    stage: [C, D]
+    c_role: decides
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-DEBUG-TEST, SUB-PROCESSING]
+    functions: [F4, F14]
+    artefacts: [hw/pod/gen.py, ERC, "interfaces:pins", docs/system/sub-debug-test.md]
+    planned: ["self-test firmware and its research note (docs/research/self-test-firmware.md; cited by O15, does not exist)", "bring-up sequence executed on board 1 (2-3 assembled of 5)"]
+    evidence: [hw/pod/gen.py, docs/system/sub-debug-test.md]
+    ecrs: [ECR-0010, ECR-0009, ECR-0003]
+    related: [O9-prototype, O18-firmware-fixable, O18-stageC-classes]
+    known_fail: "The 8 free MCU pins (PC13, PH0, PH1, PB1, PB15, PB5, PB6, PB8) go to no pad (ECR-0003, if approved, spends PB15 and frees PA9 and PB0); VSYS, MIC_VDD, LED current and coil current are not readable by the MCU; there is no pad on MIC_CLK (sub-debug-test issue 4)."
+    known_fail_ref: "none; docs/system/sub-debug-test.md issue 4"
+    next: "List the hooks the simplification study keeps or drops; write the self-test firmware"
+    gap: >-
+      C: isolation links R20 (LDO to rail) and R21 (bridge ground), TP1-TP6, the MCU's own rail readings (VREFINT, VBAT, VBUS,
+      TS, CC) and an eleven-step bring-up sequence exist on paper; the self-test firmware does not, the first flash needs an
+      SWD probe that is not in the kit, and O20 says test access must not cost size, so the simplification study must list
+      each hook it keeps or drops. D: run the bring-up on board 1.
+
+  - id: O18-firmware-fixable
+    kind: owner
+    source: "docs/spec.md O18"
+    spec_block: O18
+    spec_hash: 14c59f6ee1
+    text: "Every uncertain value gets a firmware knob (registers, PWM parameters, clock rates) instead of a fixed part; the USB/DFU update path is the most-verified circuit (SWD pads as backup), so a good share of what goes wrong is fixable in firmware."
+    method: [Inspection, Test]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [SUB-PROCESSING, SUB-DOCK-USB, SUB-DEBUG-TEST]
+    functions: [F10, F14]
+    artefacts: [hw/pod/gen.py, "interfaces:pins", sim/checks/pwm_ultrasonic_leak.py, docs/research/A3-u575-plan.md]
+    planned: ["a knob register: each uncertain value, the firmware setting that moves it, and its range", "firmware tested on a host before the board order (ECR-0010 item 2)"]
+    evidence: [hw/pod/gen.py]
+    ecrs: [ECR-0010]
+    related: [O12-dock, O18-diagnosability]
+    next: "Write the knob register: each uncertain value and the firmware setting that moves it"
+    gap: >-
+      C: knobs exist by design (PWM rate 200 / 400 / 800 kHz on one timer, dead time in 12.5 ns steps per edge, mic clock
+      divider, charger registers), but no list matches uncertain values to knobs, so "an uncertain value with no knob"
+      cannot be found by a script. The mic-clock duty fix has no firmware route on rev 1: the timer-clock fallback needs a CKIN
+      pin that the ADF lacks (sub-audio-in issue 5). No firmware exists and the DFU boot stub is undesigned. D: the DFU round
+      trip (bring-up step 6).
+
+  - id: O18-stageC-classes
+    kind: owner
+    source: "docs/spec.md O18 (development ladder, stage C)"
+    spec_block: O18
+    spec_hash: 14c59f6ee1
+    text: "Stage C (in a computer, before hardware) concentrates on hardware-only failure classes: pinouts, footprints, rail capacity, acoustics, mechanics, noise coupling, thermal, ESD, assembly yield."
+    method: [Analysis, Inspection]
+    stage: [C]
+    c_role: decides
+    status: partial
+    owner_items: [INTEGRATION, SUB-DEBUG-TEST, REG-BOARD, REG-POD-BODY]
+    artefacts: ["interfaces:pins", "interfaces:rails", "interfaces:mic-port", "interfaces:switch", "interfaces:heights", "bom_check:footprints", "bom_check:fp-library", "bom_check:identity", "bom_check:jlc-bom", sim/checks/sot1216_footprint.py, ERC, DRC, hw/mech/shell_r1.py, sim/checks/pwm_ultrasonic_leak.py]
+    planned: ["a check for each class below that has none"]
+    evidence: [sim/checks/sot1216_footprint.py, tools/checks/bom_check.py]
+    related: [O18-diagnosability]
+    next: "Add checks for noise coupling, thermal, ESD and assembly yield"
+    gap: >-
+      Covered by a script: pinouts (interfaces:pins), footprints (bom_check, sot1216_footprint.py), rail capacity
+      (interfaces:rails; ECR-0005 is open), mechanics in part (interfaces:switch and heights, CAD overlap checks in shell_r1.py).
+      Acoustics: geometry only (interfaces:mic-port); the as-built duct's response is unknown (coupons or printed lid
+      variants, sub-audio-in issue 4). NOT covered by anything committed: noise coupling (PWM or SMPS into the mic, its supply and
+      ground; a layout-noise model is in progress in sim/noise, uncommitted on 2026-10-02), thermal (U3 beside the cell), ESD (the dock contacts; DOCK_VBUS has no clamp), assembly yield (0.35 mm
+      SOT1216 and 0.4 mm DSBGA; no JLC DFM run).
+
+  - id: O19-reliability
+    kind: owner
+    source: "docs/spec.md O19"
+    spec_block: O19
+    spec_hash: 44e344c2f9
+    text: "A personal device worn constantly outdoors for years: optimise comfort, reliability (fewer parts and joints, robust packages) and durability (wires, sealing, connectors); after rev 1 change by firmware only; buy critical parts once, with spares."
+    method: [Analysis, Test, Inspection]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-ARM, REG-POD-BODY, SUB-DOCK-USB, REG-BOARD]
+    artefacts: [sim/checks/niti_closed_form.py, sim/checks/niti_arm_real.py, docs/build/hardware_checks.py, "bom_check:stock-lock"]
+    planned: ["about 1000 flex cycles of the arm joint with a dummy litz bundle (ECR-0006)", "dock insert/remove cycle life", "a buy-once spares list for every critical part"]
+    evidence: [sim/checks/niti_closed_form.py, docs/build/hardware_checks.py]
+    ecrs: [ECR-0006, ECR-0008]
+    related: [O19-serviceability]
+    next: "Flex-cycle the arm joint; build the spares list; complete the sourcing lock"
+    gap: >-
+      C: NiTi root strain is the only durability analysis (4-7% on the plateau, near the 6% recovery limit; about 1.3% for the
+      elastic 30 mm option). There is no wire-fatigue count, dock cycle life, or sweat-corrosion check of the exposed contacts, and
+      no spares list (bom_check:stock-lock lists the fitted LCSC numbers with no sourcing-lock row). The 0.35 mm SOT1216 and
+      0.4 mm DSBGA are yield risks. D: joint flex cycles, multi-day wear, dock cycles.
+
+  - id: O19-serviceability
+    kind: owner
+    source: "docs/spec.md O19"
+    spec_block: O19
+    spec_hash: 44e344c2f9
+    text: "Serviceability: the cell can be replaced after it ages, and the owner can repair the device herself (O19)."
+    method: [Inspection, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-POD-BODY, SUB-POWER, REG-ARM, PHYSICAL]
+    artefacts: [docs/system/physical.md, docs/system/reg-pod-body.md, hw/mech/shell_r1.py]
+    planned: ["a timed cell-swap and arm-swap demonstration on the printed dummy pod", "decision on a service joint for rev 1"]
+    evidence: [docs/system/physical.md]
+    related: [O10-twostage, O19-reliability]
+    next: "Time a cell swap and an arm swap on a printed pod"
+    gap: >-
+      C: the service sequences are written down (physical.md), and they show the cost: the cell is on permanent VHB, the arm
+      conductors end on J pads inside the sealed pod, and no connector or service seam exists outside the sealed volume, so
+      each cell or arm swap is a cut-and-rebond cycle (00-whole risk 16); how many cycles the bond survives is unknown. D:
+      do a swap on a printed pod, then on rev 1.
+
+  - id: O20-finalsize
+    kind: owner
+    source: "docs/spec.md O20"
+    spec_block: O20
+    spec_hash: 3e5604fd1d
+    text: "Rev 1 aims to be the final device: size is a rev-1 priority (comfortable enough that if it works out of the box there is no rev 2); test access must not cost size; the 34 x 13 mm draft board and the rev-1 shell, grown under O15, must be re-sized."
+    method: [Analysis, Inspection, Demonstration]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-BOARD, REG-POD-BODY, PHYSICAL]
+    artefacts: [hw/mech/shell_r1.py, hw/mech/frame.py, docs/build/tolerances.md, "interfaces:heights", E10, "interfaces:frame", "interfaces:outline"]
+    planned: ["numeric board and pod envelopes set by the simplification study", "test-access cost in area and mass, per hook"]
+    evidence: [hw/mech/shell_r1.py, docs/build/tolerances.md]
+    ecrs: [ECR-0001, ECR-0006]
+    related: [S1.2-C4, D18-balance]
+    known_fail: "The 34 x 13 mm board and the rev-1 shell were grown under O15 and are due for re-sizing (spec O20); the rev-1 pod measures 38.0 x 11.8 x 15.2 mm plus belly and spine, at least ~10.2 g (00-whole key numbers)."
+    known_fail_ref: "none; the re-sizing is the simplification study (docs/research/simplify/size.md) and spec O20"
+    next: "Set numeric board and pod envelopes in the simplification study"
+    gap: >-
+      interfaces:outline compares the board outline and thickness with the shell and the mic port live
+      (reg-board issue 2). No numeric size target exists, so the requirement cannot pass or fail today: the simplification study should set the
+      board and pod envelopes. The vision no-go line (E10) and the Ear (open) clearance fix the pod length. Each test pad and
+      hook must be justified against size (O18, O20). D: a 2 hour wear (T5) of the re-sized pod.

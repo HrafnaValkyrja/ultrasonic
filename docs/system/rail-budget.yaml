@@ -8,13 +8,37 @@
 # The declared numbers are the design's own (integration-map.md Section 5, sub-power.md, sub-output.md, sim/checks/power.py rev 2).
 # They carry [Low]/[Med] confidence until bench measurement E4; change them here when a source changes, not in the checker.
 #
+# Numbers derived from schematic values are COMPUTED, not typed, so a changed resistor moves the budget:
+#   calc: {volts: V, parallel: [R...]}   V over each resistor in turn, summed (pull-ups to a rail);  series: [R...] = V over the sum
+#         into: peak                     only the peak is computed (the average stays typed); default `both`
+#   derive: {power_w: P, ref: R}         on a rating: the current at which R dissipates P, sqrt(P / R)
+#   sum_of: {rail, rows: [id...]}        the sum of named rows (`id:`) of another rail
+#   assumes: {R14: 2k2}                  a typed number derived with these schematic values: FAIL when the circuit has moved on
+# A waiver's `max_ma` is its ceiling: a bigger overload than the ECR describes FAILs. `hard_limit_ma` on a rating (a regulator's
+# minimum current limit) FAILs at any load, waiver or not. Rails may be listed in any order (dependencies are sorted).
+# smps_allowed (D11) is enforced on the whole circuit: any other inductor, ferrite or switching-node pin is a FAIL.
+# Every net feeding an IC power pin is either a rail below or listed under `unmodelled` with the reason it is not budgeted.
+#
 # source_refs = the parts that ARE the source (or its series link) on the net; they are not loads.
+# `short` on a rating is the phrase the one-line summary uses.
 # Units: mA. avg_ma = [low, high]; the budget uses `high`. peak_ma = the worst instant (default: the average high).
 # Not modelled, on purpose: VBUS (the charger's power path takes the input limit before the cell: ILIM exceeded is a
 # priority rule, not an overload; sub-power.md issue 13) and VBAT (the same cell as VSYS, rated there).
 version: 1
 updated: 2026-10-02
 margin_warn: 0.10          # a peak or average within 10 % of a rating is a WARN
+
+smps_allowed:
+  refs: [U1, L1]
+  source: "D11 (spec): the MCU core SMPS (U1 VLXSMPS -> L1 -> VDD11) is the one switching regulator; CLAUDE.md working rules"
+
+# nets that feed an IC power pin but have no rail row, and why
+unmodelled:
+  VBUS: "charger input: U3's power path takes the input limit before the cell; ILIM exceeded is a priority rule, not an overload (sub-power.md issue 13)"
+  VBAT: "the cell, the same current as VSYS: rated on the VSYS rail"
+  LDO_OUT: "U4 OUT, the 0R link R20 to +3V0: the +3V0 rail carries it"
+  MIC_VDD: "U2's supply from GPIO PA5: its current is a +3V0 load row; the PA5 output-current rating is not checked here"
+  VLXSMPS: "the MCU core SMPS switch node: part of the VDD11 exclusive rail"
 
 rails:
   - id: "+3V0"
@@ -23,11 +47,13 @@ rails:
     source_refs: [R20]
     ratings:
       - name: "U4 rated output current"
+        short: "the U4 LDO rating"
         continuous_ma: 300
         peak_ma: 300
         hard_limit_ma: 360          # current limit, minimum: U4 does not fold back below this
-        source: "TI TPS7A20 SBVS338H section 5.5 (output current 300 mA rated; current limit 360 / 520 / 730 mA min / typ / max); sub-power.md Key numbers"
+        source: "TI TPS7A20 SBVS338H (PDF 2026-09-10): section 5.3 output current 0-300 mA; section 5.5 current limit ICL 360 / 520 / 730 mA min / typ / max; sub-power.md Key numbers"
       - name: "R20 0402 0R jumper"
+        short: "the R20 jumper rating"
         continuous_ma: 1000
         peak_ma: 2000
         source: "Uni-Royal thick-film chip series data sheet (PDF 2019-02-26), jumper table: 0402 rated current 1 A, max overload current 2 A (read 2026-10-02; closes sub-power.md issue 6)"
@@ -44,12 +70,16 @@ rails:
         peak_ma: 2.15
         source: "sim/checks/power.py rev 2 lines 22-24 (1.1 / 1.35 / 2.15 mA at 3.0 V, 4 MHz); sub-audio-in.md. integration-map.md Section 5 still says 0.9-1.1: stale"
       - name: "bridge switching, gate drive and the four 100k gate pulls"
+        id: bridge
         refs: [Q1, Q2, R3, R5]
+        assumes: {R3: 100k, R4: 100k, R5: 100k, R6: 100k}
         avg_ma: [0.56, 1.06]
         peak_ma: 1.06
         source: "sim/checks/power.py rev 2 (bridge gate charge + ripple 0.5-1.0 mA, gate pulls 0.06 mA); sub-output.md Interfaces"
       - name: "exciter through the bridge P sources: listening level average, full-drive peak"
+        id: exciter
         refs: []
+        assumes: {R21: "0.1"}       # the 315 mA includes the 0.1 R shunt in the loop (3.0 V / (8 + 1.2 + 0.1 ohm))
         via: "OUT_A / OUT_B -> J1 / J2 -> arm wires -> RC-BC02 (8 or 12 ohm, unmeasured: E1)"
         avg_ma: [0.4, 2.5]
         peak_ma: 315
@@ -57,16 +87,17 @@ rails:
       - name: "pull-ups R11 100k, R15, R16, R17 10k (all lines low is the worst case)"
         refs: [R11, R15, R16, R17]
         avg_ma: [0.0, 0.0]
-        peak_ma: 0.93
-        source: "derived: 3 x 3.0 V / 10 kohm + 3.0 V / 100 kohm; lines idle high"
+        calc: {volts: 3.0, parallel: [R11, R15, R16, R17], into: peak}
+        source: "computed from the schematic values: 3.0 V over each pull-up (0.93 mA at 100k + 3 x 10k); lines idle high"
       - name: "SW1 contact into the R10 2k2 pull-down while the button is pressed"
         refs: [SW1]
         avg_ma: [0.0, 0.0]
-        peak_ma: 1.4
-        source: "sub-power.md Interfaces: pressing SW1 draws 3.0 V / 2.2 kohm = 1.4 mA"
+        calc: {volts: 3.0, series: [R10], into: peak}
+        source: "computed from R10's schematic value: 3.0 V / 2.2 kohm = 1.36 mA (sub-power.md Interfaces says 1.4 mA)"
     waivers:
       - ecr: ECR-0005
         covers: peak
+        max_ma: 360                 # U4's minimum current limit: the ECR describes ~315 mA, not a load that trips the LDO's limit
         note: "bridge ~315 mA full-drive peak on the 300 mA LDO: simplification study decides (firmware drive cap, larger LDO, or bridge on VBAT/VSYS)"
     notes:
       - "U4 dropout <= 140 mV at 300 mA, so +3V0 holds at a 315 mA peak only while VBAT >= ~3.32 V (sub-power.md Key numbers, derived)"
@@ -78,10 +109,12 @@ rails:
     source_refs: [U3]
     ratings:
       - name: "Renata ICP501233PA-02 cell discharge (on battery VSYS is the cell)"
+        short: "the cell's 2C pulse rating"
         continuous_ma: 175
         peak_ma: 350
         source: "Renata spec Rev V03 (08/2019): 175 mA continuous (1C), 350 mA (2C) in pulses; pulse duration not stated; sub-power.md Constraints"
       - name: "U3 BAT-to-SYS path"
+        short: "the U3 BAT-to-SYS limit"
         continuous_ma: 1500
         peak_ma: 1500
         source: "TI BQ25180 Rev C (Nov 2025) section 7.4: battery discharge current (BAT to SYS) 1.5 A max; abs max SYS discharge 1.5 A DC, 2.5 A for < 20 ms"
@@ -94,9 +127,10 @@ rails:
         refs: []
         avg_ma: [0.0065, 0.0085]
         peak_ma: 0.0085
-        source: "TI TPS7A20 SBVS338H section 5.5: 6.5 uA typ, 8.5 uA max at 25 C"
+        source: "TI TPS7A20 SBVS338H section 5.5: IGND 6.5 uA typ, 8.5 uA max at 25 C, no load"
       - name: "R14 2k2 power LED, on battery (0.14-0.73 mA) up to docked (0.82-0.86 mA)"
         refs: [R14]
+        assumes: {R14: 2k2}
         avg_ma: [0.14, 0.86]
         peak_ma: 0.86
         source: "sub-power.md Interfaces / sub-ui Key numbers (integration-map.md Section 5 still says 0.35-0.75)"
@@ -104,8 +138,8 @@ rails:
         refs: [R8, R9]
         via: "VBAT"
         avg_ma: [0.0021, 0.0021]
-        peak_ma: 0.0021
-        source: "sub-power.md Key numbers: 2.1 uA at 4.2 V"
+        calc: {volts: 4.2, series: [R8, R9]}
+        source: "computed from the schematic values: 4.2 V over R8 + R9 (sub-power.md Key numbers: 2.1 uA at 4.2 V)"
     related_ecrs: [ECR-0005]
     notes:
       - "a docked self-test at full drive adds the charge current on VBUS, not on VSYS; ECR-0009 caps self-test drive"
@@ -116,15 +150,14 @@ rails:
     source_refs: [R21]
     ratings:
       - name: "R21 0.1 ohm 1206, 250 mW"
-        continuous_ma: 1581
-        peak_ma: 1581
-        source: "derived: sqrt(0.25 W / 0.1 ohm) = 1.58 A; 1206W4F100LT5E rated 250 mW (gen.py R21 comment; Uni-Royal sheet); sub-output.md Key numbers: 10 mW of 250 mW at full scale"
+        short: "the R21 shunt rating"
+        derive: {power_w: 0.25, ref: R21}
+        source: "computed from R21's schematic value: sqrt(0.25 W / 0.1 ohm) = 1.58 A; 1206W4F100LT5E rated 250 mW (gen.py R21 comment; Uni-Royal sheet); sub-output.md Key numbers: 10 mW of 250 mW at full scale"
     loads:
       - name: "bridge return current: exciter plus switching, same loads as the +3V0 bridge rows"
         refs: [Q1, Q2, R22]
-        avg_ma: [0.96, 3.56]
-        peak_ma: 316
-        source: "sum of the +3V0 rows 'bridge switching' (0.56-1.06 mA) and 'exciter' (0.4-2.5 mA); peak 315 mA + 1.06 mA"
+        sum_of: {rail: "+3V0", rows: [bridge, exciter]}
+        source: "computed: the +3V0 rows 'bridge switching' (0.56-1.06 mA) plus 'exciter' (0.4-2.5 mA, peak 315 mA)"
     notes:
       - "R22 sits on this net as the I_SENSE tap (a 1k filter into a high-impedance ADC pin): no DC load"
 
