@@ -1,0 +1,537 @@
+{
+ "items": {
+  "COST": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:docs/build/bom.py": "1ac4af4c8167cdcd",
+    "file:hw/pod/bom_jlc.csv": "d35b87918eabb110"
+   }
+  },
+  "INTEGRATION": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:hw/pod/gen.py": "5a486628edd08a89",
+    "file:hw/pod/system_map.py": "9316eedc9788fe53"
+   }
+  },
+  "PHYSICAL": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:docs/build/tolerances.md": "13099f559e727c93",
+    "file:hw/mech/frame.py": "a4558cc4b7da5a09",
+    "sym:hw/mech/shell_r1.py::CAV": "ef5d5ffd83a13869",
+    "sym:hw/mech/shell_r1.py::CELL": "8471e5c4048e14f7",
+    "sym:hw/mech/shell_r1.py::PARTS": "b972ab4df1616743",
+    "sym:hw/mech/shell_r1.py::PCB": "36d5cdfbb12c936f",
+    "sym:hw/mech/shell_r1.py::X0": "73cb98e9e9dee1bd",
+    "sym:hw/mech/shell_r1.py::Y_IN": "add7074bf0dff2b2",
+    "sym:hw/mech/shell_r1.py::Z1": "75ac77523956b7fc"
+   }
+  },
+  "REG-ARM": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:hw/mech/frame.py": "a4558cc4b7da5a09",
+    "file:hw/mech/heel.py": "47a6a72f88e793a7",
+    "file:sim/checks/niti_arm_real.py": "62944f12dde4e774"
+   }
+  },
+  "REG-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:hw/pod/place_r1.py": "577c4f15247a7ab5",
+    "glob:hw/lib/pod.pretty/*.kicad_mod": "09a0210144bdfc1f",
+    "sym:hw/pod/place.py::rules": "cf2bb252c4b5e5fa"
+   }
+  },
+  "REG-PAD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:hw/mech/pad.py": "00d8456a0d641613",
+    "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
+    "file:hw/padboard/mech.py": "7f658b878ab3e395"
+   }
+  },
+  "REG-POD-BODY": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:hw/mech/blade.py": "4f7507b58a9e9bcd",
+    "file:hw/mech/shell_r1.py": "ad1df2fdfc0d0cfc",
+    "file:hw/mech/styles.py": "23dcb6bfe495f82f"
+   }
+  },
+  "SPEC": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:docs/spec.md": "2c286fc2d23109d0"
+   }
+  },
+  "SUB-AUDIO-IN": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "block:MIC": "4ed0052322915170",
+    "sym:hw/mech/shell_r1.py::MIC": "77f46cb342ba62bc"
+   }
+  },
+  "SUB-DEBUG-TEST": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "block:DEBUG": "b8b8b0d939203045",
+    "block:SELFTEST": "b27227583df8ebd3",
+    "ref:R20": "a5162c6335210bda"
+   }
+  },
+  "SUB-DOCK-USB": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "block:DOCK_USB": "6594433d2bc4e20f",
+    "sym:hw/mech/shell_r1.py::DOCK": "360addc9267a5030",
+    "sym:hw/mech/shell_r1.py::USBC_KEEPOUT": "dd58d48b346d5c4e"
+   }
+  },
+  "SUB-OUTPUT": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "block:BRIDGE": "649a2246617b132b",
+    "block:SELFTEST": "b27227583df8ebd3"
+   }
+  },
+  "SUB-POWER": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "block:CELL_PADS": "b47de55fdcea40c9",
+    "block:CHARGER": "09b617628575f972",
+    "block:LDO": "a0fe95e66efd5197",
+    "block:VBAT_SENSE": "abbd7e8cf9ea5820"
+   }
+  },
+  "SUB-PROCESSING": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "block:CLOCK": "0736686412c688d7",
+    "block:CORE_SMPS": "35da7cf5ad91bbf8",
+    "block:MCU": "61ee9174fa8e0c1d",
+    "glob:sim/dsp/*.py": "621ccf694e2ee7fc"
+   }
+  },
+  "SUB-UI": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "block:UI": "3884343172681fde",
+    "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
+    "sym:hw/mech/shell_r1.py::SWITCH": "3a2f78044e80f6d6",
+    "sym:hw/mech/shell_r1.py::plunger": "efd66f32cd629d39"
+   }
+  },
+  "WHOLE": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "86211ef5c3c8431d"
+   }
+  }
+ },
+ "relations": {
+  "R-ARM-PAD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:hw/mech/pad.py": "00d8456a0d641613",
+    "sym:hw/mech/frame.py::PAD_CONTACT": "a9817b30cc013f18",
+    "sym:hw/mech/frame.py::PAD_SOCKET_DEPTH": "efe69b14b1f262c2",
+    "sym:hw/mech/frame.py::pad_pose": "44f555654336b728"
+   }
+  },
+  "R-AUDIO-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "ref:U2": "60848b99c7f48774",
+    "sym:hw/pod/place_r1.py::PLACE[U2]": "7dd67c507d7c0bc5"
+   }
+  },
+  "R-AUDIO-BODY": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod": "889862c5c23dd5ca",
+    "grep:hw/pod/gen.py::Knowles_LGA-5": "191992f13ef883bf",
+    "sym:hw/mech/shell_r1.py::MIC": "77f46cb342ba62bc",
+    "sym:hw/mech/shell_r1.py::PCB": "36d5cdfbb12c936f",
+    "sym:hw/mech/shell_r1.py::lid_base": "2c4b8f88b8c2ba35",
+    "sym:hw/pod/place_r1.py::PLACE[U2]": "7dd67c507d7c0bc5"
+   }
+  },
+  "R-AUDIO-PROC": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:MIC_CLK": "543500e0331e0a78",
+    "net:MIC_DATA": "36e295c9854399d3",
+    "net:MIC_VDD": "46564866a581e04e",
+    "ref:R2": "a81d44d396b3bb4d",
+    "ref:U2": "60848b99c7f48774"
+   }
+  },
+  "R-BOARD-ARM": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "sym:hw/mech/heel.py::CH_EXIT": "31a5e01ff4670e60",
+    "sym:hw/mech/shell_r1.py::CELL": "8471e5c4048e14f7",
+    "sym:hw/mech/shell_r1.py::PCB": "36d5cdfbb12c936f",
+    "sym:hw/pod/place_r1.py::PLACE[J1]": "3c39c6c878272678",
+    "sym:hw/pod/place_r1.py::PLACE[J2]": "aad92e252a0b8c16",
+    "sym:hw/pod/place_r1.py::PLACE[J7]": "b3cd535775593024",
+    "sym:hw/pod/place_r1.py::PLACE[J8]": "ef60df85d7d95f34"
+   }
+  },
+  "R-BOARD-BODY": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "sym:hw/mech/shell_r1.py::PARTS": "b972ab4df1616743",
+    "sym:hw/mech/shell_r1.py::PCB": "36d5cdfbb12c936f",
+    "sym:hw/mech/shell_r1.py::lid_base": "2c4b8f88b8c2ba35",
+    "sym:hw/pod/place_r1.py::P.W": "3fea88ccac5d7057"
+   }
+  },
+  "R-BODY-ARM": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "sym:hw/mech/frame.py::E": "e41a5d539abd8437",
+    "sym:hw/mech/heel.py::heel_add": "f10d6b9f6e8fecbf",
+    "sym:hw/mech/heel.py::heel_cut": "438d7b8d3da63352",
+    "sym:hw/mech/shell_r1.py::tub": "b9b4f10c110d01a3"
+   }
+  },
+  "R-COST-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:hw/pod/bom_jlc.csv": "d35b87918eabb110",
+    "sym:hw/pod/place_r1.py::PLACE": "02706c99975c60eb"
+   }
+  },
+  "R-DEBUG-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "glob:hw/lib/pod.pretty/TestPoint*.kicad_mod": "585ac2adb464351e",
+    "grep:hw/pod/place_r1.py::TP\\{|TP\\d": "026d9080cf8a4ee7"
+   }
+  },
+  "R-DOCK-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "sym:hw/pod/place_r1.py::PLACE[D4]": "e564f0f6a931de6e",
+    "sym:hw/pod/place_r1.py::PLACE[J10]": "5ab7ef1e22814290",
+    "sym:hw/pod/place_r1.py::PLACE[J12]": "30ac358f08bf090f",
+    "sym:hw/pod/place_r1.py::PLACE[J3]": "22077157e8119819",
+    "sym:hw/pod/place_r1.py::PLACE[U6]": "d73c7330c7eeda85"
+   }
+  },
+  "R-DOCK-BODY": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "sym:hw/mech/shell_r1.py::BAY": "d933f8dc8c3634dd",
+    "sym:hw/mech/shell_r1.py::DOCK": "360addc9267a5030",
+    "sym:hw/mech/shell_r1.py::USBC_KEEPOUT": "dd58d48b346d5c4e",
+    "sym:hw/mech/shell_r1.py::tub": "b9b4f10c110d01a3"
+   }
+  },
+  "R-OUT-ARM": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:OUT_A": "330a1a4baea85e82",
+    "net:OUT_B": "28daa1afe5b25714",
+    "sym:hw/mech/heel.py::CH_CBORE_D": "b0ebeb1af4d09325",
+    "sym:hw/mech/heel.py::CH_D": "537ae252b28b7412",
+    "sym:hw/mech/heel.py::CH_EXIT": "31a5e01ff4670e60"
+   }
+  },
+  "R-OUT-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "ref:Q1": "ee76bf015aaaeef6",
+    "ref:R21": "6e745e90b93b9158",
+    "sym:hw/pod/place_r1.py::PLACE[Q1]": "7ad1b56527f93213",
+    "sym:hw/pod/place_r1.py::PLACE[Q2]": "aab6f29572da2521",
+    "sym:hw/pod/place_r1.py::PLACE[R21]": "3e59044ca0e7577e"
+   }
+  },
+  "R-OUT-DEBUG": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "block:SELFTEST": "b27227583df8ebd3",
+    "net:BRIDGE_RTN": "ba784679c5066ccc"
+   }
+  },
+  "R-OUT-PAD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:hw/mech/pad.py": "00d8456a0d641613",
+    "net:OUT_A": "330a1a4baea85e82",
+    "net:OUT_B": "28daa1afe5b25714"
+   }
+  },
+  "R-PHYS-FRAME": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "sym:hw/mech/frame.py::BUTTON": "d646708aa7d8d618",
+    "sym:hw/mech/frame.py::CELL": "31c4767bc3cff96e",
+    "sym:hw/mech/frame.py::MIC_PORT": "9f9b9e155f7478d0",
+    "sym:hw/mech/frame.py::PCB": "f3163c7e25f6a505",
+    "sym:hw/mech/shell_r1.py::CELL": "8471e5c4048e14f7",
+    "sym:hw/mech/shell_r1.py::PCB": "36d5cdfbb12c936f"
+   }
+  },
+  "R-PROC-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "sym:hw/pod/place_r1.py::PLACE[C7]": "f510c366ffeab30d",
+    "sym:hw/pod/place_r1.py::PLACE[L1]": "16564e01d0fc3bd8",
+    "sym:hw/pod/place_r1.py::PLACE[U1]": "8bdf17da1b43ea71",
+    "sym:hw/pod/place_r1.py::PLACE[Y1]": "b91bc6c8060a271a",
+    "sym:hw/pod/place_r1.py::gnd_fanout": "8288d3c1ec09c474"
+   }
+  },
+  "R-PROC-DEBUG": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:NRST": "5a0ee234406e056c",
+    "net:SWCLK": "a5e5e9955f699473",
+    "net:SWDIO": "006f84e328723dd5",
+    "ref:R1": "98a034071214dc27",
+    "ref:R11": "1ba71d80d186ad65"
+   }
+  },
+  "R-PROC-DOCK": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:CC_SENSE": "706d04ad10b5bc95",
+    "net:USB_DM": "e24d0b9352c00b90",
+    "net:USB_DP": "853a8084fd88f631",
+    "net:VBUS_SENSE": "1c80a67291a9fe32"
+   }
+  },
+  "R-PROC-OUT": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:GA_N": "7dc5fe25d4d8a505",
+    "net:GA_P": "e203d4d6a1f6e740",
+    "net:GB_N": "344566bf1bc012e7",
+    "net:GB_P": "4960b15e2d447b14",
+    "net:I_SENSE": "72e7669bf4ee053d"
+   }
+  },
+  "R-PROC-UI": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:BTN": "0900cf1931215b5e",
+    "net:LED_K": "0443cd1bf2f94b91"
+   }
+  },
+  "R-PWR-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "ref:U3": "2dbffb720efa69b7",
+    "sym:hw/pod/place_r1.py::PLACE[C15]": "df30bf0ddd5c00dc",
+    "sym:hw/pod/place_r1.py::PLACE[C16]": "5354cba497626b41",
+    "sym:hw/pod/place_r1.py::PLACE[C21]": "f8c3d9fcab76634e",
+    "sym:hw/pod/place_r1.py::PLACE[U3]": "fcf73ec9ef4c5570",
+    "sym:hw/pod/place_r1.py::PLACE[U4]": "c54f72b5e30d1d1e"
+   }
+  },
+  "R-PWR-BODY": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "sym:hw/mech/shell_r1.py::CELL": "8471e5c4048e14f7",
+    "sym:hw/mech/shell_r1.py::placeholders": "b31122d4903cd422"
+   }
+  },
+  "R-PWR-DEBUG": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:LDO_OUT": "8acd1b01eb1c1fbb",
+    "ref:R20": "a5162c6335210bda",
+    "ref:TP4": "28e2d35c60f96bcb",
+    "ref:TP6": "ca75f0ca752e16a3"
+   }
+  },
+  "R-PWR-DOCK": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:DOCK_VBUS": "a576a3b5a80dae33",
+    "net:VBUS": "63051c79bf155c24",
+    "ref:D4": "ac70a74e6ca108e6",
+    "ref:U3": "2dbffb720efa69b7"
+   }
+  },
+  "R-PWR-OUT-RAIL": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:+3V0": "33b190ec055a07b0",
+    "ref:C14": "10b7c698ba308aa8",
+    "ref:Q1": "ee76bf015aaaeef6",
+    "ref:Q2": "5e868438ed9c2f5d",
+    "ref:U4": "cbc06f459358653c"
+   }
+  },
+  "R-PWR-PROC": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:+3V0": "33b190ec055a07b0",
+    "net:CHG_INT": "5d041a46ddf55c0d",
+    "net:I2C_SCL": "cd56d8e39d3d28c4",
+    "net:I2C_SDA": "29ccc84645975d4b",
+    "net:TS": "ce0991001b6726ca",
+    "net:VBAT_SENSE": "99926d7c044c0247"
+   }
+  },
+  "R-PWR-UI": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:VSYS": "08c3035afb8a2ff6",
+    "ref:R14": "12274da9ee330976"
+   }
+  },
+  "R-SPEC-BODY": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "grep:docs/spec.md::\\bO1[0267]\\b": "a536ed44898d05e4"
+   }
+  },
+  "R-SPEC-POWER": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "grep:docs/spec.md::D11": "752449d2a51feda6",
+    "grep:docs/spec.md::\\bO1[26]\\b": "1c43865ce9e22be6"
+   }
+  },
+  "R-SPEC-UI": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "grep:docs/spec.md::IP68": "a60351277859d7dc",
+    "grep:docs/spec.md::\\bO8\\b": "faeddc50a1c968fc"
+   }
+  },
+  "R-UI-ARM": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "net:LED_A": "a7463c1e8bb60b81",
+    "net:LED_K": "0443cd1bf2f94b91",
+    "sym:hw/mech/heel.py::CH_D": "537ae252b28b7412"
+   }
+  },
+  "R-UI-BODY": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "ref:SW1": "6a5226a0b24dd9c5",
+    "sym:hw/mech/shell_r1.py::SWITCH": "3a2f78044e80f6d6",
+    "sym:hw/mech/shell_r1.py::plunger": "efd66f32cd629d39",
+    "sym:hw/pod/place_r1.py::PLACE[SW1]": "14e7002148f277ac"
+   }
+  },
+  "R-UI-PAD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "stamp": {
+    "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
+    "file:hw/padboard/mech.py": "7f658b878ab3e395",
+    "net:LED_A": "a7463c1e8bb60b81",
+    "net:LED_K": "0443cd1bf2f94b91"
+   }
+  }
+ }
+}
