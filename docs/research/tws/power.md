@@ -1,5 +1,7 @@
 # Power architecture: how earbuds, bone-conduction headsets and hearing aids reach 5–12 h, and what transfers to us
 
+> **Superseded in part, 2026-10-02:** read `docs/research/tws-power-size.md` first. A fact-check found that Option A's -0.8 mA awake saving is an exciter assumption, Option B's "105-120 mAh would do" omits the LED (need ~107-133 mAh), the clock-floor saving is -0.5 to -0.6 mA (not -0.9), Stop 2 puts the SMPS in its asynchronous mode (E11), and the BEST-transducer papers do not apply to the RC-BC02. Section 6 of that note lists every correction.
+
 Research note, 2026-10-01. Read-only research run: nothing in the spec, schematic, firmware or CAD changed.
 All web sources were accessed **2026-10-01**. Anything I could not open is labelled **unverified**.
 Cell choice and form factors are covered by the sibling note `docs/research/tws/battery.md`; this note covers *current draw*.

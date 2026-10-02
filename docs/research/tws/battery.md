@@ -1,5 +1,7 @@
 # Batteries and form factors in TWS earbuds, bone-conduction headsets, audio glasses and hearing aids
 
+> **Superseded in part, 2026-10-02:** read `docs/research/tws-power-size.md` first. A fact-check found errors here (two coin cells do not match the Renata; Grepow 4.2 V coins are +11-26%, not level; the 4.10-4.15 V cycle gain is ~1.25-1.6x, not 1.5-2x; the Sony XM4 and high-voltage cycle-life statements are unsupported; Renata's own 240 mAh and 270 mAh packs and ICR1254 coin cells were missed). Section 6 of that note lists every correction.
+
 Research note, 2026-10-01 (read-only research run; nothing in the spec, schematic or CAD changed).
 Question: is there a cell that does better than our **Renata ICP501233PA-02** (3.7 V Li-ion polymer pouch pack, 175 mAh, PCM built in, ≤ 5.3 × 12 × 35 mm, ~4.2 g) in the pod's battery bay? How do small wearables keep their cells small?
 
