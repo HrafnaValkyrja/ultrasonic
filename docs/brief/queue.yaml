@@ -1,5 +1,5 @@
 # BRIEF queue. entry: id, tier, one_line, rec, if_ignored, blocks, lead_time, src, added, status(open|done|dropped)
-rendered_at: null
+rendered_at: 2026-10-02T18:21-04:00
 items:
   - {id: A-ORDER-LONGLEAD, tier: A, one_line: "Place long-lead orders: 3+ RC-BC02 exciters from 2 listings, NiTi wire 0.75/0.80/0.85, reserve 6-10 STM32U575 (8 left at JLC), get cell quote + connector stock", rec: "order now", if_ignored: "shipping gates the first listening + wear tests", blocks: [E1, E2, ECR-0006, ECR-0007, ECR-0008], lead_time: shipping, src: [ECR-0006, ECR-0007, ECR-0008], added: 2026-10-02, status: open}
   - {id: A-SIMPLIFY-PICK, tier: A, one_line: "Pick the simplification package (study running)", rec: "TBD when study lands", if_ignored: "layout, schematic Rev F, shell resize (O20) stay on hold", blocks: [ECR-0002, ECR-0003, ECR-0004, ECR-0013-S1, shell-resize], lead_time: none, src: [docs/research/simplification-study.md], added: 2026-10-02, status: open}
