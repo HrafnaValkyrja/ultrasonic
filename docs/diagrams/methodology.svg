@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 868" role="img" aria-label="Proposed design method. Six stages left to right: requirements with a verification matrix; items and interface control documents signed by both sides, with a generated N-squared design structure matrix; change requests with targeted impact, states and effectivity; about three parallel AI teams working from frozen interfaces in their own worktrees and returning structured proposals; a serial integration gate running a conflict scan, plm status, executable interface checks, BOM and parity checks, ERC/DRC and the verification matrix; and baseline tags with manifests and as-built records. Failed checks go back to the team; bench results on built pods raise new change requests. Each stage lists what exists today and what is missing. Below, four lanes give the roles of the owner, the lead AI, the AI teams and the automated checks." font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f2328"/></marker><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e34948"/></marker><marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b8520a"/></marker></defs>
+<rect width="1400" height="868" rx="14" fill="#fbfaf7"/>
+<text x="32" y="40" font-size="21" font-weight="700" fill="#1f2328">Proposed design method: requirements → interfaces → change → teams → gate → baseline</text>
+<text x="32" y="64" font-size="13" fill="#57606a">FOSS only, git-native, no servers. Each stage lists what exists today (green) and what is missing (red). Status 2026-10-01.</text>
+<rect x="32" y="78" width="16" height="12" rx="3" fill="#fff4ea" stroke="#b8520a" stroke-width="2"/>
+<text x="54" y="89" font-size="12" fill="#1f2328">owner decides</text>
+<rect x="150" y="78" width="16" height="12" rx="3" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+<text x="172" y="89" font-size="12" fill="#1f2328">lead AI (architect + integrator)</text>
+<rect x="370" y="78" width="16" height="12" rx="3" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<text x="392" y="89" font-size="12" fill="#1f2328">parallel AI teams</text>
+<rect x="509" y="78" width="16" height="12" rx="3" fill="#ffffff" stroke="#4a3aa7" stroke-width="2"/>
+<text x="531" y="89" font-size="12" fill="#1f2328">automated checks</text>
+<path d="M643,84 L677,84" stroke="#e34948" stroke-width="1.8" stroke-dasharray="6 4" fill="none"/>
+<text x="683" y="89" font-size="12" fill="#1f2328">feedback loop</text>
+<rect x="32" y="108" width="206" height="440" rx="10" fill="#fff4ea" stroke="#b8520a" stroke-width="2.2"/>
+<circle cx="56" cy="135" r="14" fill="#fff4ea" stroke="#b8520a" stroke-width="2.2"/>
+<text x="56" y="140" font-size="15" font-weight="700" fill="#b8520a" text-anchor="middle">1</text>
+<text x="78" y="140" font-size="15" font-weight="700" fill="#1f2328">Requirements</text>
+<text x="46" y="166" font-size="11.5" fill="#57606a">owner decides · spec §1 locked</text>
+<text x="46" y="192" font-size="12" fill="#1f2328" xml:space="preserve">docs/spec.md: T1–T6, D-items,</text>
+<text x="46" y="209" font-size="12" fill="#1f2328" xml:space="preserve">O-items (owner decisions)</text>
+<text x="46" y="226" font-size="12" fill="#1f2328" xml:space="preserve">VCRM row per requirement:</text>
+<text x="46" y="243" font-size="12" fill="#1f2328" xml:space="preserve">• method: Test / Analysis /</text>
+<text x="46" y="260" font-size="12" fill="#1f2328" xml:space="preserve">  Inspection / Demo</text>
+<text x="46" y="277" font-size="12" fill="#1f2328" xml:space="preserve">• artefact: sim/checks, E-item,</text>
+<text x="46" y="294" font-size="12" fill="#1f2328" xml:space="preserve">  ERC/DRC, audit</text>
+<text x="46" y="311" font-size="12" fill="#1f2328" xml:space="preserve">• status + evidence (commit)</text>
+<text x="46" y="328" font-size="12" fill="#1f2328" xml:space="preserve">§1 quoted, never edited</text>
+<line x1="44" y1="400" x2="226" y2="400" stroke="#57606a" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="46" y="422" font-size="12" font-weight="700" fill="#1a7a55">Today: have</text>
+<text x="46" y="439" font-size="12" fill="#1a7a55">spec, D/O-items, sim/checks</text>
+<text x="46" y="464" font-size="12" font-weight="700" fill="#e34948">Missing</text>
+<text x="46" y="481" font-size="12" fill="#e34948">VCRM: nothing links a</text>
+<text x="46" y="498" font-size="12" fill="#e34948">requirement to its proof</text>
+<line x1="239" y1="135" x2="257" y2="135" stroke="#1f2328" stroke-width="2" marker-end="url(#a)"/>
+<rect x="258" y="108" width="206" height="440" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.2"/>
+<circle cx="282" cy="135" r="14" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.2"/>
+<text x="282" y="140" font-size="15" font-weight="700" fill="#2a78d6" text-anchor="middle">2</text>
+<text x="304" y="140" font-size="15" font-weight="700" fill="#1f2328">Items + interfaces</text>
+<text x="272" y="166" font-size="11.5" fill="#57606a">lead keeps · teams own items</text>
+<text x="272" y="192" font-size="12" fill="#1f2328" xml:space="preserve">16 items = docs/system set</text>
+<text x="272" y="209" font-size="12" fill="#1f2328" xml:space="preserve">ICD per boundary interface:</text>
+<text x="272" y="226" font-size="12" fill="#1f2328" xml:space="preserve">• type: spatial, energy,</text>
+<text x="272" y="243" font-size="12" fill="#1f2328" xml:space="preserve">  information, material</text>
+<text x="272" y="260" font-size="12" fill="#1f2328" xml:space="preserve">• owning side, value ± tol</text>
+<text x="272" y="277" font-size="12" fill="#1f2328" xml:space="preserve">• watches on exact sources</text>
+<text x="272" y="294" font-size="12" fill="#1f2328" xml:space="preserve">• maturity L0 → L6</text>
+<text x="272" y="311" font-size="12" fill="#1f2328" xml:space="preserve">• both sides sign the stamp</text>
+<text x="272" y="328" font-size="12" fill="#1f2328" xml:space="preserve">N²/DSM generated from netlist</text>
+<text x="272" y="345" font-size="12" fill="#1f2328" xml:space="preserve">→ team clusters, bus items</text>
+<line x1="270" y1="400" x2="452" y2="400" stroke="#57606a" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="272" y="422" font-size="12" font-weight="700" fill="#1a7a55">Today: have</text>
+<text x="272" y="439" font-size="12" fill="#1a7a55">16 items, 34 relations,</text>
+<text x="272" y="456" font-size="12" fill="#1a7a55">watches, integration map</text>
+<text x="272" y="481" font-size="12" font-weight="700" fill="#e34948">Missing</text>
+<text x="272" y="498" font-size="12" fill="#e34948">values, tolerances, owning</text>
+<text x="272" y="515" font-size="12" fill="#e34948">side, 2-side sign-off, DSM;</text>
+<text x="272" y="532" font-size="12" fill="#e34948">board + footprints unwatched</text>
+<line x1="465" y1="135" x2="483" y2="135" stroke="#1f2328" stroke-width="2" marker-end="url(#a)"/>
+<rect x="484" y="108" width="206" height="440" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.2"/>
+<circle cx="508" cy="135" r="14" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.2"/>
+<text x="508" y="140" font-size="15" font-weight="700" fill="#2a78d6" text-anchor="middle">3</text>
+<text x="530" y="140" font-size="15" font-weight="700" fill="#1f2328">Change requests</text>
+<text x="498" y="166" font-size="11.5" fill="#57606a">ECR · owner approves O-items</text>
+<text x="498" y="192" font-size="12" fill="#1f2328" xml:space="preserve">impact from touched refs,</text>
+<text x="498" y="209" font-size="12" fill="#1f2328" xml:space="preserve">nets, symbols (not items)</text>
+<text x="498" y="226" font-size="12" fill="#1f2328" xml:space="preserve">§10 cross-check as YAML,</text>
+<text x="498" y="243" font-size="12" fill="#1f2328" xml:space="preserve">schema-validated</text>
+<text x="498" y="260" font-size="12" fill="#1f2328" xml:space="preserve">class: major / minor; waiver</text>
+<text x="498" y="277" font-size="12" fill="#1f2328" xml:space="preserve">effectivity: rev-1 order,</text>
+<text x="498" y="294" font-size="12" fill="#1f2328" xml:space="preserve">rework, rev 2, build</text>
+<text x="498" y="311" font-size="12" fill="#1f2328" xml:space="preserve">states: proposed → approved</text>
+<text x="498" y="328" font-size="12" fill="#1f2328" xml:space="preserve">→ implemented → verified</text>
+<text x="498" y="345" font-size="12" fill="#1f2328" xml:space="preserve">→ closed</text>
+<line x1="496" y1="400" x2="678" y2="400" stroke="#57606a" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="498" y="422" font-size="12" font-weight="700" fill="#1a7a55">Today: have</text>
+<text x="498" y="439" font-size="12" fill="#1a7a55">10 ECRs, all 'proposed'</text>
+<text x="498" y="464" font-size="12" font-weight="700" fill="#e34948">Missing</text>
+<text x="498" y="481" font-size="12" fill="#e34948">cross-check unfilled 10/10;</text>
+<text x="498" y="498" font-size="12" fill="#e34948">impact 14 listed vs 2 real;</text>
+<text x="498" y="515" font-size="12" fill="#e34948">no close, no effectivity</text>
+<line x1="691" y1="135" x2="709" y2="135" stroke="#1f2328" stroke-width="2" marker-end="url(#a)"/>
+<rect x="710" y="108" width="206" height="440" rx="10" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2.2"/>
+<circle cx="734" cy="135" r="14" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2.2"/>
+<text x="734" y="140" font-size="15" font-weight="700" fill="#1a7a55" text-anchor="middle">4</text>
+<text x="756" y="140" font-size="15" font-weight="700" fill="#1f2328">Parallel AI teams</text>
+<text x="724" y="166" font-size="11.5" fill="#57606a">~3 teams = DSM clusters</text>
+<text x="724" y="192" font-size="12" fill="#1f2328" xml:space="preserve">start from frozen, tagged</text>
+<text x="724" y="209" font-size="12" fill="#1f2328" xml:space="preserve">boundary ICDs</text>
+<text x="724" y="226" font-size="12" fill="#1f2328" xml:space="preserve">• write own items only,</text>
+<text x="724" y="243" font-size="12" fill="#1f2328" xml:space="preserve">  read everything</text>
+<text x="724" y="260" font-size="12" fill="#1f2328" xml:space="preserve">• bus items: propose, never</text>
+<text x="724" y="277" font-size="12" fill="#1f2328" xml:space="preserve">  edit (lead owns them)</text>
+<text x="724" y="294" font-size="12" fill="#1f2328" xml:space="preserve">• one git worktree each</text>
+<text x="724" y="311" font-size="12" fill="#1f2328" xml:space="preserve">• return a patch +</text>
+<text x="724" y="328" font-size="12" fill="#1f2328" xml:space="preserve">  proposals/&lt;team&gt;.yaml</text>
+<text x="724" y="345" font-size="12" fill="#1f2328" xml:space="preserve">  (cross-check, ICD deltas,</text>
+<text x="724" y="362" font-size="12" fill="#1f2328" xml:space="preserve">  every implicit decision)</text>
+<line x1="722" y1="400" x2="904" y2="400" stroke="#57606a" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="724" y="422" font-size="12" font-weight="700" fill="#1a7a55">Today: have</text>
+<text x="724" y="439" font-size="12" fill="#1a7a55">workflows; advisory</text>
+<text x="724" y="456" font-size="12" fill="#1a7a55">check-out (JSON, no lock)</text>
+<text x="724" y="481" font-size="12" font-weight="700" fill="#e34948">Missing</text>
+<text x="724" y="498" font-size="12" fill="#e34948">frozen contracts, worktrees,</text>
+<text x="724" y="515" font-size="12" fill="#e34948">structured proposals</text>
+<line x1="917" y1="135" x2="935" y2="135" stroke="#1f2328" stroke-width="2" marker-end="url(#a)"/>
+<rect x="936" y="108" width="206" height="440" rx="10" fill="#ffffff" stroke="#4a3aa7" stroke-width="2.2"/>
+<circle cx="960" cy="135" r="14" fill="#ffffff" stroke="#4a3aa7" stroke-width="2.2"/>
+<text x="960" y="140" font-size="15" font-weight="700" fill="#4a3aa7" text-anchor="middle">5</text>
+<text x="982" y="140" font-size="15" font-weight="700" fill="#1f2328">Integration gate</text>
+<text x="950" y="166" font-size="11.5" fill="#57606a">lead runs it · one at a time</text>
+<text x="950" y="192" font-size="12" fill="#1f2328" xml:space="preserve">1 conflict scan, all proposals:</text>
+<text x="950" y="209" font-size="12" fill="#1f2328" xml:space="preserve">  same parameter, pin twice,</text>
+<text x="950" y="226" font-size="12" fill="#1f2328" xml:space="preserve">  rails over budget</text>
+<text x="950" y="243" font-size="12" fill="#1f2328" xml:space="preserve">2 plm status: SUSPECT, STALE,</text>
+<text x="950" y="260" font-size="12" fill="#1f2328" xml:space="preserve">  BROKEN, UNMODELLED</text>
+<text x="950" y="277" font-size="12" fill="#1f2328" xml:space="preserve">3 interface checks: erc_assert,</text>
+<text x="950" y="294" font-size="12" fill="#1f2328" xml:space="preserve">  board↔shell, ST pin data</text>
+<text x="950" y="311" font-size="12" fill="#1f2328" xml:space="preserve">4 bom_check, board↔netlist</text>
+<text x="950" y="328" font-size="12" fill="#1f2328" xml:space="preserve">5 ERC/DRC jobset, VCRM</text>
+<text x="950" y="345" font-size="12" fill="#1f2328" xml:space="preserve">ICD change → both sides sign</text>
+<text x="950" y="362" font-size="12" fill="#1f2328" xml:space="preserve">(owner too if an O-item)</text>
+<line x1="948" y1="400" x2="1130" y2="400" stroke="#57606a" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="950" y="422" font-size="12" font-weight="700" fill="#1a7a55">Today: have</text>
+<text x="950" y="439" font-size="12" fill="#1a7a55">SKiDL ERC; DRC by hand</text>
+<text x="950" y="464" font-size="12" font-weight="700" fill="#e34948">Missing</text>
+<text x="950" y="481" font-size="12" fill="#e34948">conflict scan, interface</text>
+<text x="950" y="498" font-size="12" fill="#e34948">checks, parity, commit hook:</text>
+<text x="950" y="515" font-size="12" fill="#e34948">nothing blocks a commit</text>
+<line x1="1143" y1="135" x2="1161" y2="135" stroke="#1f2328" stroke-width="2" marker-end="url(#a)"/>
+<rect x="1162" y="108" width="206" height="440" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.2"/>
+<circle cx="1186" cy="135" r="14" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.2"/>
+<text x="1186" y="140" font-size="15" font-weight="700" fill="#2a78d6" text-anchor="middle">6</text>
+<text x="1208" y="140" font-size="15" font-weight="700" fill="#1f2328">Baseline / release</text>
+<text x="1176" y="166" font-size="11.5" fill="#57606a">lead tags · owner orders + pays</text>
+<text x="1176" y="192" font-size="12" fill="#1f2328" xml:space="preserve">git tag + manifest: hashes,</text>
+<text x="1176" y="209" font-size="12" fill="#1f2328" xml:space="preserve">plm stamps, tool versions,</text>
+<text x="1176" y="226" font-size="12" fill="#1f2328" xml:space="preserve">canonical netlist hash</text>
+<text x="1176" y="243" font-size="12" fill="#1f2328" xml:space="preserve">BL-0: today's set, reviewed</text>
+<text x="1176" y="260" font-size="12" fill="#1f2328" xml:space="preserve">BL-alloc: schematic + ICDs</text>
+<text x="1176" y="277" font-size="12" fill="#1f2328" xml:space="preserve">BL-product-rev1: JLC order</text>
+<text x="1176" y="294" font-size="12" fill="#1f2328" xml:space="preserve">BL-asbuilt-&lt;serial&gt;, per pod:</text>
+<text x="1176" y="311" font-size="12" fill="#1f2328" xml:space="preserve">  board SHA, firmware ID,</text>
+<text x="1176" y="328" font-size="12" fill="#1f2328" xml:space="preserve">  print, cell, rework log</text>
+<line x1="1174" y1="400" x2="1356" y2="400" stroke="#57606a" stroke-width="0.8" stroke-dasharray="3 3"/>
+<text x="1176" y="422" font-size="12" font-weight="700" fill="#1a7a55">Today: have</text>
+<text x="1176" y="439" font-size="12" fill="#1a7a55">release skill (manifests)</text>
+<text x="1176" y="464" font-size="12" font-weight="700" fill="#e34948">Missing</text>
+<text x="1176" y="481" font-size="12" fill="#e34948">no baseline.json, no tags;</text>
+<text x="1176" y="498" font-size="12" fill="#e34948">board not in git;</text>
+<text x="1176" y="515" font-size="12" fill="#e34948">no as-built records</text>
+<path d="M1009,548 V580 H813 V551" stroke="#e34948" stroke-width="1.8" stroke-dasharray="6 4" fill="none" marker-end="url(#ar)"/>
+<text x="823" y="574" font-size="11.5" fill="#e34948">check fails → back to that team</text>
+<path d="M1265,548 V610 H587 V551" stroke="#b8520a" stroke-width="1.8" stroke-dasharray="6 4" fill="none" marker-end="url(#ao)"/>
+<text x="597" y="604" font-size="11.5" fill="#b8520a">bench result on an as-built pod, or a new need → new ECR (effectivity: rework or rev 2)</text>
+<rect x="32" y="638" width="319" height="172" rx="10" fill="#fff4ea" stroke="#b8520a" stroke-width="2"/>
+<text x="46" y="664" font-size="14" font-weight="700" fill="#1f2328">Owner: the change board (one person)</text>
+<text x="46" y="690" font-size="12" fill="#1f2328" xml:space="preserve">• decides the spec and O-items</text>
+<text x="46" y="712" font-size="12" fill="#1f2328" xml:space="preserve">• approves ECRs that touch her decisions</text>
+<text x="46" y="734" font-size="12" fill="#1f2328" xml:space="preserve">• signs any ICD that touches an O-item</text>
+<text x="46" y="756" font-size="12" fill="#1f2328" xml:space="preserve">• places and pays every JLC order</text>
+<text x="46" y="778" font-size="12" fill="#1f2328" xml:space="preserve">• builds and reworks by hand (rework notes)</text>
+<rect x="371" y="638" width="319" height="172" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+<text x="385" y="664" font-size="14" font-weight="700" fill="#1f2328">Lead AI: system architect + integrator</text>
+<text x="385" y="690" font-size="12" fill="#1f2328" xml:space="preserve">• owns the bus items: REG-BOARD, REG-POD-BODY,</text>
+<text x="385" y="712" font-size="12" fill="#1f2328" xml:space="preserve">   MCU pin map, rail/mass/volume budgets, frame.py</text>
+<text x="385" y="734" font-size="12" fill="#1f2328" xml:space="preserve">• regenerates N²/DSM; freezes and tags ICDs</text>
+<text x="385" y="756" font-size="12" fill="#1f2328" xml:space="preserve">• runs the gate, one proposal at a time</text>
+<text x="385" y="778" font-size="12" fill="#1f2328" xml:space="preserve">• signs the ICD side that has no live team</text>
+<rect x="710" y="638" width="319" height="172" rx="10" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<text x="724" y="664" font-size="14" font-weight="700" fill="#1f2328">AI design teams (~3, from DSM clusters)</text>
+<text x="724" y="690" font-size="12" fill="#1f2328" xml:space="preserve">• write only their own items; read everything</text>
+<text x="724" y="712" font-size="12" fill="#1f2328" xml:space="preserve">• start from frozen ICDs, one worktree each</text>
+<text x="724" y="734" font-size="12" fill="#1f2328" xml:space="preserve">• bus items: propose, never edit</text>
+<text x="724" y="756" font-size="12" fill="#1f2328" xml:space="preserve">• return files, not chat: patch + proposal</text>
+<text x="724" y="778" font-size="12" fill="#1f2328" xml:space="preserve">• make every implicit decision explicit</text>
+<rect x="1049" y="638" width="319" height="172" rx="10" fill="#ffffff" stroke="#4a3aa7" stroke-width="2"/>
+<text x="1063" y="664" font-size="14" font-weight="700" fill="#1f2328">Automated checks (FOSS, installed)</text>
+<text x="1063" y="690" font-size="12" fill="#1f2328" xml:space="preserve">• pre-commit hook (seconds): plm status,</text>
+<text x="1063" y="712" font-size="12" fill="#1f2328" xml:space="preserve">   interface checks, bom_check, map regenerate</text>
+<text x="1063" y="734" font-size="12" fill="#1f2328" xml:space="preserve">• tools/ci.sh (3G fence): KiCad 10 jobset,</text>
+<text x="1063" y="756" font-size="12" fill="#1f2328" xml:space="preserve">   ERC/DRC, fab outputs, geometry checks</text>
+<text x="1063" y="778" font-size="12" fill="#1f2328" xml:space="preserve">• built from: SKiDL erc_assert, pcbnew, build123d,</text>
+<text x="1063" y="800" font-size="12" fill="#1f2328" xml:space="preserve">   jsonschema, git tags + core.hooksPath</text>
+<text x="32" y="850" font-size="12.5" fill="#57606a">Details, ranked improvements and sources: docs/research/methodology.md (2026-10-01). Rule set it extends: docs/system/README.md. Tracker: tools/plm.py.</text>
+</svg>

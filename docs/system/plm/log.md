@@ -10,3 +10,5 @@
 - 2026-10-01 20:34 ECR-0008 raised by claude: Reserve STM32U575 MCUs (8 at JLC) and check cell/connector supply
 - 2026-10-01 20:34 ECR-0009 raised by claude: Safety interlocks (no output while docked, output ceiling), charge logging, supervised first charge
 - 2026-10-01 20:34 ECR-0010 raised by claude: Bring-up plan and firmware tested before the board order
+- 2026-10-01 21:00 ECR-0011 raised by claude: DEFECT: mic port hole 0.77 mm off the lid port (footprint origin != port)
+- 2026-10-01 21:00 ECR-0012 raised by claude: DEFECT: wrong LCSC numbers baked into imported footprints (Q1/Q2, SW1)
