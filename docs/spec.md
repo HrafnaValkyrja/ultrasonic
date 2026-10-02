@@ -600,7 +600,7 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | R7 | L/R mismatch (mic sensitivity ±1 dB, coupling) biases direction | `[Low]` | Per-side trim at calibration; D3 re-match |
 | R8 | Mic ultrasonic self-noise too high for distant bats | `[Low]` (mic is 8–15 dB *more* sensitive in ultrasound) | S1 |
 | R9 | PWM noise audible | **`[Low]`** (v0.5: ~−90 dB with a 3rd-order shaper; 8–16 kHz is the band to watch) | S2 by ear |
-| R10 | MCU stock is thin (16 at JLC) | `[Med]` | Buy or pre-order early |
+| R10 | MCU stock is thin (16 at JLC; **8 on 2026-10-01**) | `[Med]` | Buy or pre-order early (ECR-0008) |
 | R11 | Real current above estimate, so 150 mAh doesn't reach 12 h | `[Med]` | E4; power levers in §7 (idle-listening mode C9) |
 | **R16** | A 12 mm-tall battery bay along the arm looks bulky or snags hair | `[Med]` | B4 (find the lowest-profile cell); Phase 4 fit tests |
 | **R12** | Low-level distortion from dead time exceeds the model (node capacitance, MOSFET behaviour) | `[Med]` | S2 measurement |
@@ -609,6 +609,13 @@ Stock and price as of 2026-09-30 from the JLC parts API unless noted.
 | **R15** | Self-noise (own speech, chewing, hair) makes transient mode busy | `[Med]` | S1 recordings; gate tuning (C4) |
 | **R17** | **New v0.13.** Temple arm bends and twists under the pad's reaction force, so the pad loses force or the pod rolls | `[Med]` | E12; soft preloaded spring (O7); snug clip |
 | **R18** | **New v0.13.** Mic duty cycle / ADF reshape-filter response at 800 kS/s not as assumed (unpublished) | `[Low]` | S1 scope and sweep; ÷10 + half-band fallback |
+| **R19** | **New v0.15. Project-level.** The device works but the experience underwhelms: mostly clicks and electronic whine, bats rare and faint, translated sound harsh or muffled through bone. The biggest reason to abandon the project | `[Med]` | Listen to the nature demo (`sim/out/nature/`) now; E2 with the real exciter playing translated files at the tragus (ECR-0007); algorithms chosen by listening (§5.2); T1/T2 |
+| **R20** | **New v0.15. Project-level.** Wearability: tragus pressure, contact with the Ear (open), weight pulling the glasses, hair snag, bulk. Not fixable in firmware | `[Med]` | Weighted printed dummy pair worn 2 h before the board order (ECR-0006); E2; Phase 4 |
+| **R21** | **New v0.15. Project-level.** Never silent (T6): idle hiss or whine against the skull (SMPS, PWM idle, mic self-noise passed through the translation), given the owner's high-frequency hearing | `[Med]` | Idle gate / transient mode (C4); every noise-related setting a firmware knob (O18); E7, E11 on rev 1 day one |
+| **R22** | **New v0.15. Project-level.** Rev 1 dead with no clue why: no boot, no flash, no USB through the magnetic contacts, a mis-soldered 0.4 mm WCSP | `[Med]` | O18 diagnosability: SWD pads + test frame, per-block isolation links, firmware tested before the board arrives, written bring-up plan, 2-3 assembled boards (ECR-0010) |
+| **R23** | **New v0.15. Project-level.** Safety scare: the Li-ion cell on the face heats or swells while charging; the exciter too loud or too hot. Low likelihood, project-ending impact | `[Low]` | Cell with PCM; JEITA/NTC charging; output ceiling (D17); no output while docked; supervised first charge; owner reviews every power/safety ECR against the datasheet (ECR-0009) |
+| **R24** | **New v0.15.** Arm wiring or NiTi joint fatigues after days of wear | `[Med]` | Taped test build (O10); shrink tube + counterbores; flex-cycle the joint on the printed dummy (ECR-0006) |
+| **R25** | **New v0.15. Project-level.** Design paralysis: process overhead outgrows the design; each board revision costs ~3 weeks and $100-200 | `[Med]` | Architecture freeze date after the simplification study; work-in-progress limits; park ideas as ECRs |
 
 ---
 
@@ -731,6 +738,10 @@ Status key: `OPEN` · `IN PROGRESS` · `DONE`. Priority: **P1** blocks Phase 1 o
 ---
 
 ## 15. Changelog
+
+### v0.15 (2026-10-01): prototyping strategy and project-level risks
+- O18: prototyping strategy (no bench rig; rev 1 fails informatively; development ladder A-D; firmware-fixable design rules).
+- §11: R19-R25 added (experience, wearability, silence, dead-on-arrival rev 1, safety, joint fatigue, design paralysis); R10 stock updated (8 at JLC on 2026-10-01). Mitigations tracked as ECR-0006 to ECR-0010 (`docs/system/plm/ecr/`).
 
 ### v0.14 (2026-09-30) — audit fixes (Claude, autonomous; owner decisions pending)
 - **Audit:** `docs/audit/2026-09-30-audit-report.md` (partial). Every change below comes from a finding there, and each was re-checked by a different method before it was applied.
