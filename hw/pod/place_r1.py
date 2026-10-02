@@ -7,7 +7,7 @@ A first pass to prove fit and get a picture of the layout; the real 4-layer boar
 together with the owner (spec O14). Floorplan: docs/diagrams/pcb-floorplan-rev1.svg.
 Coordinates: x = 0 at the front (mic end) running back; y = 0 at the top edge; centre line y = 6.5.
 F (top) faces the lid (outer wall), B faces the cell. Layer 2 (In1) is a solid GND plane.
-Mic port (board x 3.9) and switch (board x 22.0) are on the centre line so one board fits both pods;
+Mic PORT HOLE (board x 3.9; the footprint origin is 0.77 mm away, ECR-0011) and switch (board x 22.0) are on the centre line so one board fits both pods;
 they match hw/mech/shell_r1.py (MIC x 34.5, SWITCH x 52.6 in pod coordinates; board x0 = 30.6).
 All hand-soldered pads (J*, TP*) are on F along the top edge / rear, reachable with the lid off.
 FreeRouting runs once, fenced, JVM capped (tools/env.sh FREEROUTING_JAVA_OPTS).
@@ -53,7 +53,7 @@ PLACE = {
     "J5": (33.0, 3.4, 0, "F"), "J6": (33.0, 5.0, 0, "F"), "J1": (33.0, 6.6, 0, "F"),
     "J2": (33.0, 8.2, 0, "F"), "J7": (33.0, 9.8, 0, "F"), "J8": (33.0, 11.4, 0, "F"),
     # ================= B (inner face, toward the cell)
-    "U2": (3.9, 6.5, 90, "B"), "R2": (6.6, 8.0, 90, "B"), "C13": (6.6, 5.0, 90, "B"),
+    "U2": (4.67, 6.5, 90, "B"), "R2": (7.3, 8.0, 90, "B"), "C13": (7.3, 5.0, 90, "B"),   # ECR-0011: the PORT (0.77 mm off the origin) at (3.9, 6.5) under the lid port
     "R8": (10.0, 2.0, 90, "B"), "R9": (11.0, 2.0, 90, "B"), "C19": (12.0, 2.0, 90, "B"),
     "R11": (10.5, 11.2, 90, "B"), "R15": (12.0, 11.2, 90, "B"), "R16": (13.5, 11.2, 90, "B"), "R17": (15.0, 11.2, 90, "B"),
     # charger + LDO + dock protection: rear, near the wire pads
