@@ -12,3 +12,4 @@
 - 2026-10-01 20:34 ECR-0010 raised by claude: Bring-up plan and firmware tested before the board order
 - 2026-10-01 21:00 ECR-0011 raised by claude: DEFECT: mic port hole 0.77 mm off the lid port (footprint origin != port)
 - 2026-10-01 21:00 ECR-0012 raised by claude: DEFECT: wrong LCSC numbers baked into imported footprints (Q1/Q2, SW1)
+- 2026-10-02 00:57 ECR-0013 raised by claude: Datasheet audit findings: PB5 floating (UCPD dead-battery on PA15), charger register plan, thermal 0.3 W, Off-mode back-feed

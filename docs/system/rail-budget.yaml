@@ -1,0 +1,135 @@
+# Rail budget: what each supply rail can deliver (rating) against what the design says it must (declared loads).
+# tools/checks/interfaces.py [rails] checks both sides, and the schematic against both:
+#   FAIL  a declared total (average against `continuous_ma`, peak against `peak_ma`) exceeds a rating and no open ECR waives it
+#   WARN  exceeded but waived by an open ECR (the ECR is cited); within `margin_warn` of the rating; a rating that is unknown
+#   FAIL  a waiver names an ECR that is missing, closed, verified or rejected (the waiver has expired: fix the load or the rating)
+#   WARN  a part on the rail's net (R, U, Q, D, L, Y, SW) that no declared load accounts for: an unbudgeted load
+#   FAIL  a load declares refs that are not on the rail's net, unless it names how it reaches the rail in `via`
+# The declared numbers are the design's own (integration-map.md Section 5, sub-power.md, sub-output.md, sim/checks/power.py rev 2).
+# They carry [Low]/[Med] confidence until bench measurement E4; change them here when a source changes, not in the checker.
+#
+# source_refs = the parts that ARE the source (or its series link) on the net; they are not loads.
+# Units: mA. avg_ma = [low, high]; the budget uses `high`. peak_ma = the worst instant (default: the average high).
+# Not modelled, on purpose: VBUS (the charger's power path takes the input limit before the cell: ILIM exceeded is a
+# priority rule, not an overload; sub-power.md issue 13) and VBAT (the same cell as VSYS, rated there).
+version: 1
+updated: 2026-10-02
+margin_warn: 0.10          # a peak or average within 10 % of a rating is a WARN
+
+rails:
+  - id: "+3V0"
+    net: "+3V0"
+    source: "U4 TPS7A2030PDQNR (TI 300 mA, 3.0 V ultra-low-noise LDO) through R20 (0R link)"
+    source_refs: [R20]
+    ratings:
+      - name: "U4 rated output current"
+        continuous_ma: 300
+        peak_ma: 300
+        hard_limit_ma: 360          # current limit, minimum: U4 does not fold back below this
+        source: "TI TPS7A20 SBVS338H section 5.5 (output current 300 mA rated; current limit 360 / 520 / 730 mA min / typ / max); sub-power.md Key numbers"
+      - name: "R20 0402 0R jumper"
+        continuous_ma: 1000
+        peak_ma: 2000
+        source: "Uni-Royal thick-film chip series data sheet (PDF 2019-02-26), jumper table: 0402 rated current 1 A, max overload current 2 A (read 2026-10-02; closes sub-power.md issue 6)"
+    loads:
+      - name: "U1 MCU (VDD, VDDA, VDDSMPS, VBAT pins)"
+        refs: [U1]
+        avg_ma: [2.4, 5.8]
+        peak_ma: 5.8
+        source: "integration-map.md Section 5 'MCU ~2.4-5.8 mA run'"
+      - name: "U2 mic, supplied from GPIO PA5 (net MIC_VDD)"
+        refs: [U2]
+        via: "PA5 -> MIC_VDD"
+        avg_ma: [1.1, 2.15]
+        peak_ma: 2.15
+        source: "sim/checks/power.py rev 2 lines 22-24 (1.1 / 1.35 / 2.15 mA at 3.0 V, 4 MHz); sub-audio-in.md. integration-map.md Section 5 still says 0.9-1.1: stale"
+      - name: "bridge switching, gate drive and the four 100k gate pulls"
+        refs: [Q1, Q2, R3, R5]
+        avg_ma: [0.56, 1.06]
+        peak_ma: 1.06
+        source: "sim/checks/power.py rev 2 (bridge gate charge + ripple 0.5-1.0 mA, gate pulls 0.06 mA); sub-output.md Interfaces"
+      - name: "exciter through the bridge P sources: listening level average, full-drive peak"
+        refs: []
+        via: "OUT_A / OUT_B -> J1 / J2 -> arm wires -> RC-BC02 (8 or 12 ohm, unmeasured: E1)"
+        avg_ma: [0.4, 2.5]
+        peak_ma: 315
+        source: "average: sim/checks/power.py 'transducer, listening level' 0.4 / 1.1 / 2.5 mA (untraced guess until E1/E4); peak: gen.py R21 comment ~315 mA = 3.0 V into 8 ohm + FETs; integration-map.md Section 5; the same formula gives 0.32-0.33 A (sub-output.md issue 3, methodology.md 3.0 V / 9.3 ohm = 323 mA)"
+      - name: "pull-ups R11 100k, R15, R16, R17 10k (all lines low is the worst case)"
+        refs: [R11, R15, R16, R17]
+        avg_ma: [0.0, 0.0]
+        peak_ma: 0.93
+        source: "derived: 3 x 3.0 V / 10 kohm + 3.0 V / 100 kohm; lines idle high"
+      - name: "SW1 contact into the R10 2k2 pull-down while the button is pressed"
+        refs: [SW1]
+        avg_ma: [0.0, 0.0]
+        peak_ma: 1.4
+        source: "sub-power.md Interfaces: pressing SW1 draws 3.0 V / 2.2 kohm = 1.4 mA"
+    waivers:
+      - ecr: ECR-0005
+        covers: peak
+        note: "bridge ~315 mA full-drive peak on the 300 mA LDO: simplification study decides (firmware drive cap, larger LDO, or bridge on VBAT/VSYS)"
+    notes:
+      - "U4 dropout <= 140 mV at 300 mA, so +3V0 holds at a 315 mA peak only while VBAT >= ~3.32 V (sub-power.md Key numbers, derived)"
+      - "the D17 output ceiling (-12 dBFS) keeps normal-use peaks near 85 mA; only full-scale tones or self-test sweeps reach 315 mA (sub-output.md issue 3)"
+
+  - id: VSYS
+    net: VSYS
+    source: "U3 BQ25180YBGR SYS (power path): VBUS when docked, the Renata cell through U3's battery FET otherwise"
+    source_refs: [U3]
+    ratings:
+      - name: "Renata ICP501233PA-02 cell discharge (on battery VSYS is the cell)"
+        continuous_ma: 175
+        peak_ma: 350
+        source: "Renata spec Rev V03 (08/2019): 175 mA continuous (1C), 350 mA (2C) in pulses; pulse duration not stated; sub-power.md Constraints"
+      - name: "U3 BAT-to-SYS path"
+        continuous_ma: 1500
+        peak_ma: 1500
+        source: "TI BQ25180 Rev C (Nov 2025) section 7.4: battery discharge current (BAT to SYS) 1.5 A max; abs max SYS discharge 1.5 A DC, 2.5 A for < 20 ms"
+    loads:
+      - name: "U4 LDO input: carries every +3V0 milliamp (a linear regulator draws its output current from VSYS)"
+        refs: [U4]
+        from_rail: "+3V0"
+        source: "linear regulator: input current = output current + quiescent; totals taken from the +3V0 rail above"
+      - name: "U4 quiescent current"
+        refs: []
+        avg_ma: [0.0065, 0.0085]
+        peak_ma: 0.0085
+        source: "TI TPS7A20 SBVS338H section 5.5: 6.5 uA typ, 8.5 uA max at 25 C"
+      - name: "R14 2k2 power LED, on battery (0.14-0.73 mA) up to docked (0.82-0.86 mA)"
+        refs: [R14]
+        avg_ma: [0.14, 0.86]
+        peak_ma: 0.86
+        source: "sub-power.md Interfaces / sub-ui Key numbers (integration-map.md Section 5 still says 0.35-0.75)"
+      - name: "R8 / R9 1M divider on VBAT (same cell)"
+        refs: [R8, R9]
+        via: "VBAT"
+        avg_ma: [0.0021, 0.0021]
+        peak_ma: 0.0021
+        source: "sub-power.md Key numbers: 2.1 uA at 4.2 V"
+    related_ecrs: [ECR-0005]
+    notes:
+      - "a docked self-test at full drive adds the charge current on VBUS, not on VSYS; ECR-0009 caps self-test drive"
+
+  - id: BRIDGE_RTN
+    net: BRIDGE_RTN
+    source: "bridge N-FET sources -> R21 0.1R 1206 shunt -> GND"
+    source_refs: [R21]
+    ratings:
+      - name: "R21 0.1 ohm 1206, 250 mW"
+        continuous_ma: 1581
+        peak_ma: 1581
+        source: "derived: sqrt(0.25 W / 0.1 ohm) = 1.58 A; 1206W4F100LT5E rated 250 mW (gen.py R21 comment; Uni-Royal sheet); sub-output.md Key numbers: 10 mW of 250 mW at full scale"
+    loads:
+      - name: "bridge return current: exciter plus switching, same loads as the +3V0 bridge rows"
+        refs: [Q1, Q2, R22]
+        avg_ma: [0.96, 3.56]
+        peak_ma: 316
+        source: "sum of the +3V0 rows 'bridge switching' (0.56-1.06 mA) and 'exciter' (0.4-2.5 mA); peak 315 mA + 1.06 mA"
+    notes:
+      - "R22 sits on this net as the I_SENSE tap (a 1k filter into a high-impedance ADC pin): no DC load"
+
+  - id: VDD11
+    net: VDD11
+    source: "STM32U575 internal SMPS: VLXSMPS -> L1 -> VDD11 (C8, C9)"
+    exclusive_to: [U1, L1, C8, C9]
+    exclusive_source: "D11 (spec): the MCU core SMPS is the one switching regulator, for the MCU core only; integration-map.md Section 5"

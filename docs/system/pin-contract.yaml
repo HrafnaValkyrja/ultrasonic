@@ -1,0 +1,99 @@
+# MCU pin contract: the peripheral signal each functional net on U1 needs. This is the CONSUMER's side of the interface
+# (what the circuit and the firmware rely on); the other side is the pin the schematic actually uses.
+# tools/checks/interfaces.py [pins] compares the two against ST's own data:
+#   tools/data/stm32_open_pin_data/STM32U575CIUxQ.xml                      pins, positions, signals per pin (UFQFPN48, SMPS pinout)
+#   tools/data/stm32_open_pin_data/GPIO-STM32U5x_gpio_v1_0_Modes.xml      alternate-function numbers per pin and signal
+# FAIL if a net sits on a pin that cannot provide its signal, or on a different alternate function than the one stated here.
+# The contract names SIGNALS, not pins: moving a net to another pin that provides the same signal stays PASS (the pin map in
+# integration-map.md Section 4 is generated from the schematic). Changing a signal (a different timer channel, another ADC)
+# is a design change: edit it here in the same commit, or list it under `alternates` while an ECR proposes it.
+#
+# Entry fields
+#   id         function name (the net name where the net has one)
+#   net        net name in the SKiDL schematic (hw/pod/gen.py), as in integration-map.md Section 3
+#   via        for a net with no name of its own: {ref: R2, from_net: MIC_CLK} = the net on R2's OTHER terminal. The U1 pin is there
+#   signal     required signal. An ST signal name (TIM1_CH1), or one of
+#                GPIO        the pin is a plain GPIO; `modes` (Output, EXTI) must be in its IOModes
+#                NRST        the reset pin (ST pin type Reset)
+#                BOOT0       the BOOT0 pin (PH3)
+#                re:<regex>  any ST signal on the pin that fully matches the regex (ADC nets: re:ADC[14]_IN\d+)
+#   af         alternate-function number the firmware will use (ST GPIO_AF<n>_...); omitted for analog / additional functions
+#   alternates [{signal, af, ecr}] accepted while an open ECR proposes it: WARN citing the ECR, never PASS
+#   complement_of  the entry this one pairs with: same timer and channel, N output (complementary PWM with dead time)
+#   absent_ecr if the net or its via part no longer exists and this ECR is open: WARN citing it instead of FAIL
+#   role       why the pin has this job (function F-row in integration-map.md Section 1)
+# Verified against the open data on 2026-10-02 (pin-data commit and licence: tools/data/stm32_open_pin_data/SOURCE.md).
+version: 1
+updated: 2026-10-02
+
+mcu:
+  ref: U1
+  part: STM32U575CIU6Q (ST Cortex-M33 MCU; the Q suffix = internal-SMPS pinout)
+  package: UFQFPN48
+  mcu_xml: tools/data/stm32_open_pin_data/STM32U575CIUxQ.xml
+  gpio_xml: tools/data/stm32_open_pin_data/GPIO-STM32U5x_gpio_v1_0_Modes.xml
+  # pin 49 is the exposed die pad (not a numbered pin in ST's XML): ST asks for it to be soldered to PCB ground
+  exposed_pad: {pin: 49, net: GND, source: "ST DS13737 Rev 8, section 6.1 Table 154 note 3 (read 2026-10-02)"}
+
+# ST power-pin name -> the net it must sit on (the rails of integration-map.md Section 5)
+power_pins:
+  VBAT: "+3V0"
+  VDDA: "+3V0"
+  VDDSMPS: "+3V0"
+  VDD: "+3V0"
+  VSS: GND
+  VSSA: GND
+  VSSSMPS: GND
+  VDD11: VDD11
+  VLXSMPS: VLXSMPS
+
+signals:
+  # ---- F3 drive the exciter: TIM1 complementary PWM, one leg per channel pair (dead time between P and N gate)
+  - {id: GA_P, net: GA_P, signal: TIM1_CH1, af: 1, role: "bridge leg A, P-FET gate (F3)"}
+  - {id: GA_N, net: GA_N, signal: TIM1_CH1N, af: 1, complement_of: GA_P, role: "bridge leg A, N-FET gate (F3)"}
+  - id: GB_P
+    net: GB_P
+    signal: TIM1_CH2
+    af: 1
+    alternates: [{signal: TIM1_CH3, af: 1, ecr: ECR-0003}]
+    role: "bridge leg B, P-FET gate (F3); ECR-0003 proposes CH3 on PA10"
+  - id: GB_N
+    net: GB_N
+    signal: TIM1_CH2N
+    af: 1
+    complement_of: GB_P
+    alternates: [{signal: TIM1_CH3N, af: 1, ecr: ECR-0003}]
+    role: "bridge leg B, N-FET gate (F3); ECR-0003 proposes CH3N on PB15"
+  # ---- F4 self-test, F8 battery level, F9 dock detect, F6 temperature, F10 CC: ADC inputs
+  - {id: I_SENSE, net: I_SENSE, signal: "re:ADC[14]_IN\\d+", role: "bridge supply current through R21 (F4)"}
+  - {id: VBAT_SENSE, net: VBAT_SENSE, signal: "re:ADC4_IN\\d+", role: "VBAT/2 (F8): must be ADC4, the converter that runs in Stop 2"}
+  - {id: VBUS_SENSE, net: VBUS_SENSE, signal: "re:ADC[14]_IN\\d+", role: "dock detect (F9)"}
+  - {id: TS, net: TS, signal: "re:ADC[14]_IN\\d+", role: "NTC voltage, 20 C charge rule (F6); stays an analog input"}
+  - {id: CC_SENSE, net: CC_SENSE, signal: "re:ADC[14]_IN\\d+", role: "USB CC sense (F10)"}
+  # ---- F1 hear: PDM clock out and data in on the ADF1 filter, supply switched by a GPIO
+  - {id: MIC_CLK, via: {ref: R2, from_net: MIC_CLK}, signal: ADF1_CCK0, af: 3, role: "PDM clock to the mic through R2 33R (F1)"}
+  - {id: MIC_DATA, net: MIC_DATA, signal: ADF1_SDI0, af: 3, role: "PDM data from the mic (F1)"}
+  - {id: MIC_VDD, net: MIC_VDD, signal: GPIO, modes: [Output], role: "GPIO-switched mic supply, off in Off mode (F1, D12)"}
+  # ---- F13 charger link
+  - {id: I2C_SCL, net: I2C_SCL, signal: I2C2_SCL, af: 4, role: "charger I2C clock (F13)"}
+  - {id: I2C_SDA, net: I2C_SDA, signal: I2C2_SDA, af: 4, role: "charger I2C data (F13)"}
+  - {id: CHG_INT, net: CHG_INT, signal: GPIO, modes: [EXTI], role: "charger interrupt (F13): a GPIO with EXTI"}
+  # ---- F10 USB data
+  - {id: USB_DM, net: USB_DM, signal: USB_OTG_FS_DM, af: 10, role: "USB full-speed D- (F10)"}
+  - {id: USB_DP, net: USB_DP, signal: USB_OTG_FS_DP, af: 10, role: "USB full-speed D+ (F10)"}
+  # ---- F14 debug and boot
+  - {id: SWDIO, net: SWDIO, signal: DEBUG_JTMS-SWDIO, af: 0, role: "SWD data (F14)"}
+  - {id: SWCLK, net: SWCLK, signal: DEBUG_JTCK-SWCLK, af: 0, role: "SWD clock (F14)"}
+  - {id: NRST, net: NRST, signal: NRST, role: "reset (F14)"}
+  - {id: BOOT0, via: {ref: R1, from_net: GND}, signal: BOOT0, role: "BOOT0 held low by R1 10k (F14)"}
+  - id: BOOT_RX
+    via: {ref: R11, from_net: "+3V0"}
+    signal: USART1_RX
+    af: 7
+    absent_ecr: ECR-0003
+    role: "PA10 held high for the ROM bootloader's USART detect (F14); ECR-0003 drops R11"
+  # ---- F2 / F11 / F12
+  - {id: LSE_IN, net: LSE_IN, signal: RCC_OSC32_IN, role: "32.768 kHz crystal (F2)"}
+  - {id: LSE_OUT, net: LSE_OUT, signal: RCC_OSC32_OUT, role: "32.768 kHz crystal (F2)"}
+  - {id: BTN, net: BTN, signal: PWR_WKUP1, role: "button wake from Off/Stop (F11)"}
+  - {id: LED_K, net: LED_K, signal: TIM4_CH2, af: 2, role: "LED cathode, open-drain, duty set from VBAT (F12); gen.py: PB7 TIM4_CH2"}

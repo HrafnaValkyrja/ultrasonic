@@ -40,7 +40,7 @@ flowchart LR
 | R20 | 0 Ω 0402 link, LDO_OUT → +3V0 | C17168 · Basic | Test hook (Rev E). Carries every +3V0 milliamp, bridge peaks included |
 | R8, R9, C19 | 1 MΩ / 1 MΩ divider + 100 nF hold cap | C26083, C1525 · Basic | VBAT/2 → PA4. Always connected: 2.1 µA at 4.2 V |
 | R15, R16, R17 | 10 kΩ pull-ups to +3V0 on I2C_SCL, I2C_SDA, CHG_INT | C25744 · Basic | TI asks for 10 kΩ on SCL/SDA (SLUSE99C Table 6-1) |
-| C16, C21, C17, C18 | 4.7 µF VBAT, 10 µF VSYS, 1 µF LDO in, 1 µF LDO out | C23733, C19702, C52923 · Basic | TI: ≥ 10 µF on SYS. C18 must stay at U4 for stability |
+| C16, C21, C17, C18 | 4.7 µF VBAT, 10 µF VSYS, 1 µF LDO in, 1 µF LDO out | C23733, C19702, C52923 · Basic | TI SLUSE99C Table 9-2: CSYS 1 / 10 / 100 µF min/nom/max; 25 V caps recommended on IN/SYS, derated value must stay > 1 µF. C18 must stay at U4 for stability |
 | C15 | 4.7 µF on VBUS at U3 IN (block DOCK_USB) | C23733 · Basic | ≤ 10 µF USB attach limit (gen.py) |
 | J5, J6 | 1.0 mm hand-solder pads, BAT+ / BAT−, F face, rear edge | – | board (33.0, 3.4) and (33.0, 5.0) |
 
@@ -131,7 +131,7 @@ Model: `sim/checks/power.py` rev 2, which is spec §7 v0.14 (l.405–417). The s
 | TS_CONTROL 0xB TS_HOT | 60 °C | **45 °C** (2b11) | The cell may only charge at 0–45 °C. **The default is unsafe for this cell** |
 | IC_CTRL 0x7 WATCHDOG_SEL | 00: registers revert to defaults after 160 s without I2C | see open issue 3 | A revert also restores TS_HOT = 60 °C |
 | IC_CTRL 2XTMR_EN | 0 | 1 | Cold, slow charges must not hit the 6 h safety timer |
-| VBAT_CTRL, BUVLO, ILIM, SYS_REG | 4.20 V, 3.0 V, 500 mA, 4.5 V | keep (SYS_REG 000 = battery tracking is a heat lever) | These already match the cell (4.2 V CV, 3.0 V cut-off) |
+| VBAT_CTRL, BUVLO, ILIM, SYS_REG | 4.20 V, 3.0 V, 500 mA, 4.5 V | keep (SYS_REG 000 battery tracking is NOT a U3 heat lever (datasheet audit 2026-10-02, docs/system/audit-datasheet-claims.md)) | These already match the cell (4.2 V CV, 3.0 V cut-off) |
 | MASK_ID PG_INT_MASK | 0 (enabled) | keep | Docking pulses CHG_INT, which wakes the MCU from Stop 2 to write this plan |
 | SHIP_RST 0x9 EN_PUSH | 1 (push-button on TS/MR enabled on battery: 60 µA pulsed 4 ms / 196 ms; TS < 90 mV for 10 s (MR_LPRESS 01) → PB_LPRESS_ACTION 10 = ship mode) | **0** | No button is wired to TS/MR. Disabling it removes three paths into ship mode on battery: a J8–J9 solder bridge with the LED on, PA2 driven low, and the NTC above ~84 °C (1.5 kΩ × 60 µA = 90 mV, derived) |
 
@@ -143,7 +143,7 @@ Model: `sim/checks/power.py` rev 2, which is spec §7 v0.14 (l.405–417). The s
    - **(B, recommended)** 01 = U3 power-cycles SYS after 160 s without I2C, so the MCU must talk to it at least every ~2 min, waking from Stop 2 if needed (cost ≈ µA). Optionally add WATCHDOG_15S_ENABLE: a hung pod reboots 15 s after docking. That's valuable in a bonded pod with no reset button.
    - **B breaks ROM DFU unless handled:** the ST bootloader never talks I2C, so a DFU session longer than 160 s (40 s with setting 10) power-cycles the pod mid-update. Rule: **the boot stub sets WATCHDOG_SEL = 11 before jumping to ROM DFU**; the application re-arms it (sub-dock-usb DFU step 3).
    - (C) The default 00 restores TS_HOT = 60 °C after a firmware hang. Don't use it.
-4. **RT1 sits 3.2 mm from U3.** U3 dissipates up to ~0.2 W at 1C: (4.5 − 3.3 V) × 0.17 A at 107 °C/W ≈ +21 °C at its die. RT1 therefore reads hot, which errs safe but may stop 1C charging on warm days. **Closes:** log TS against a cell thermocouple during a 1C charge. Levers: SYS_REG battery tracking, moving RT1 (reg-board), or J9.
+4. **RT1 sits 3.2 mm from U3.** U3 dissipates ~0.2 W mid-charge and ~0.3 W at the start of constant current (≈ +31 °C die rise at 107 °C/W) (datasheet audit 2026-10-02, docs/system/audit-datasheet-claims.md); plan on 0.3 W and taper ICHG at low VBAT. RT1 therefore reads hot, which errs safe but may stop 1C charging on warm days. **Closes:** log TS against a cell thermocouple during a 1C charge. Levers: SYS_REG battery tracking, moving RT1 (reg-board), or J9.
 5. **Self-test while docked heats U4, and ECR-0009 forbids it as written.** VSYS is 4.5 V when docked, so a full-scale |Z| sweep (F4, run over USB) puts ~1.5 V × the bridge current across U4 (166 °C/W). ECR-0009 adds "no exciter output while VBUS is present". **Closes:** the owner's ECR-0009 decision (sub-output issue 12): recommended a capped self-test-only exemption (≤ ~−12 dBFS), or SYS_MODE = 01 (system from the battery) during the sweep, or sweep on battery and read back later.
 6. **R20 (0402 0 Ω) carries the whole rail, peaks included.** Its jumper current rating isn't in any source yet. **Closes:** read the Uni-Royal 0402 jumper rating (TBD).
 7. **Rail tolerance vs USB.** +3V0 can be 2.955 V; USB FS needs VDDUSB ≥ 3.0 V, bonded to VDD on this package (A3 §3; datasheet-provenance.md). Details in sub-dock-usb.
@@ -157,8 +157,8 @@ Model: `sim/checks/power.py` rev 2, which is spec §7 v0.14 (l.405–417). The s
     - real charge time;
     - E4 currents (the whole budget is [Low] until then).
 11. **Diagrams:** no dedicated power-tree PNG (the Mermaid above stands in). `schematic-rev1.png` labels the cell "NTC taped on", but the Renata pack has no NTC: RT1 on the board is the default.
-12. **Thermal placement vs cell safety (R23).** U3 (up to ~0.2 W at 1C, ~+21 °C die rise) sits on the B face 0.2 mm above a pouch that may only charge at 0–45 °C, with RT1 beside it. Moving U3 or changing the stack-up changes the cell's temperature during charge. **Closes:** ECR-0009 item 3 (board and cell temperature logged through a full charge before any wear).
-13. **ILIM vs the dock cable.** ILIM defaults to 500 mA and charging runs at 170 mA from docking. A CC-less USB-A cable on an unenumerated PC port is limited to 100 mA by USB 2.0. **Closes:** firmware sets ILIM from CC_SENSE (PA3) or from enumeration (sub-dock-usb issue 9).
+12. **Thermal placement vs cell safety (R23).** U3 (~0.3 W at the start of constant current, ~+31 °C die rise; 0.2 W is mid-charge) sits on the B face 0.2 mm above a pouch that may only charge at 0–45 °C, with RT1 beside it. Moving U3 or changing the stack-up changes the cell's temperature during charge. **Closes:** ECR-0009 item 3 (board and cell temperature logged through a full charge before any wear).
+13. **ILIM vs the dock cable.** ILIM defaults to 500 mA; ICHG powers up at 10 mA and 170 mA is written by firmware (VINDPM defaults to Disabled: set 4.2 V; hold ILIM 100 mA until enumeration). A CC-less USB-A cable on an unenumerated PC port is limited to 100 mA by USB 2.0. **Closes:** firmware sets ILIM from CC_SENSE (PA3) or from enumeration (sub-dock-usb issue 9).
 
 ## Before you change this, check
 - **Charge current or cell:** Renata 1C limit; U3's 10 mA steps; the safety timer; U3 heat → RT1; runtime table; the 2C peak limit vs bridge peaks (sub-output).

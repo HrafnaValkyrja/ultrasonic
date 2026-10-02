@@ -61,7 +61,7 @@ flowchart LR
 ## Interfaces
 | To | Nets / pins (as in integration-map.md) | What crosses / invariant |
 |---|---|---|
-| [sub-power](sub-power.md) | VBUS → U3.A2 IN; C15 at U3 | U3 runs 3.0–5.5 V; overvoltage cut 5.5–5.9 V; input 25 V tolerant. ILIM 500 mA default ≥ 170 mA charge + system. Docking fires U3's power-good interrupt on CHG_INT |
+| [sub-power](sub-power.md) | VBUS → U3.A2 IN; C15 at U3 | U3 runs 3.0–5.5 V; overvoltage cut 5.5–5.9 V; input 25 V tolerant. ILIM 500 mA default ≥ 170 mA charge + system (170 mA is written by firmware; U3 powers up at 10 mA). Docking fires U3's power-good interrupt on CHG_INT |
 | [sub-processing](sub-processing.md) | USB_DP PA12, USB_DM PA11 (AF10, HSI48 + CRS); VBUS_SENSE PA1; CC_SENSE PA3; CHG_INT PA15; N$3 PA10 (R11); N$1 PH3 BOOT0 (R1) | USB needs VDDUSB 3.0–3.6 V, internally tied to VDD on this package (A3 §3, datasheet-provenance). PA1 sits at ~2.2–2.5 V when docked: use it as an ADC input, and **wake on CHG_INT, not on PA1** (its digital-high margin is unverified) |
 | [sub-ui](sub-ui.md) | BTN PA0 | Proposed DFU gesture: hold the button while docking (open issue 4) |
 | [sub-debug-test](sub-debug-test.md) | TP1 SWDIO, TP2 SWCLK, TP3 NRST | SWD is the only recovery from a broken application, and the pads are reachable only with the lid off |
