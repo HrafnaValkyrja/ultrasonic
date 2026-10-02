@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Versioned pre-commit hook (enable once per clone: git config core.hooksPath .githooks).
+# Runs the fast design checks when design-relevant files are staged. FAIL blocks the commit, WARN does not.
+# Bypass in an emergency: git commit --no-verify. Override the check list: PRECOMMIT_CHECKS="interfaces bom_check vcrm".
+set -u
+cd "$(git rev-parse --show-toplevel)" || exit 0
+git diff --cached --name-only | grep -qE '^(hw/|tools/checks/|docs/system/|docs/build/bom|\.pcba-workflow/|sim/checks/)' || exit 0
+source tools/env.sh >/dev/null 2>&1 || { echo "pre-commit: tools/env.sh failed, checks skipped"; exit 0; }
+fence=(systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0)
+command -v systemd-run >/dev/null 2>&1 || fence=()
+rc_all=0
+for c in ${PRECOMMIT_CHECKS:-interfaces bom_check vcrm}; do
+  out=$("${fence[@]}" python3 "tools/checks/$c.py" 2>&1); rc=$?
+  if [ "$rc" -ne 0 ]; then
+    echo "$out" | grep -E '^(FAIL|Traceback|.*Error)' | head -8
+    echo "pre-commit: tools/checks/$c.py exited $rc: commit blocked (git commit --no-verify to bypass)"
+    rc_all=1
+  fi
+done
+# informational only (never blocks): stale docs / suspect relations
+python3 tools/plm.py status 2>/dev/null | grep -E '^(SUSPECT|STALE|BROKEN) \(' | sed 's/^/pre-commit (info): /'
+exit $rc_all
