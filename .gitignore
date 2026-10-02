@@ -28,3 +28,9 @@ hw/pod/kicad-draft/*-backups/
 
 # Owner's local drop folder (bundle parts, datasheets); kept out of git
 From Valkyrie/
+
+# SKiDL side files from tools/plm.py and hw/pod/system_map.py
+/plm.erc
+/plm.log
+hw/pod/system_map.erc
+hw/pod/system_map.log
