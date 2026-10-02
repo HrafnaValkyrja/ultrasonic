@@ -1,0 +1,264 @@
+# Design items and the relations between them (tools/plm.py). Hand-kept: when a new interface appears,
+# add a relation here in the same commit. Watches: see tools/plm.py docstring.
+# Items = the big-picture docs (docs/system/*), each owning the source content it summarises.
+
+items:
+  SPEC:
+    kind: requirement
+    title: Spec (source of truth)
+    doc: docs/spec.md
+    owns: [file:docs/spec.md]
+  WHOLE:
+    kind: whole
+    title: The product on one page
+    doc: docs/system/00-whole.md
+    owns: ['grep:docs/spec.md::\b[DO][0-9]+\b']
+  INTEGRATION:
+    kind: integration
+    title: Integration map (generated)
+    doc: docs/system/integration-map.md
+    owns: [file:hw/pod/gen.py, file:hw/pod/system_map.py]
+  PHYSICAL:
+    kind: physical
+    title: Physical integration, stack-up, assembly
+    doc: docs/system/physical.md
+    owns: [file:hw/mech/frame.py, "sym:hw/mech/shell_r1.py::X0", "sym:hw/mech/shell_r1.py::Y_IN", "sym:hw/mech/shell_r1.py::Z1",
+           "sym:hw/mech/shell_r1.py::CAV", "sym:hw/mech/shell_r1.py::CELL", "sym:hw/mech/shell_r1.py::PCB",
+           "sym:hw/mech/shell_r1.py::PARTS", file:docs/build/tolerances.md]
+  SUB-POWER:
+    kind: subsystem
+    title: Cell, charger, power path, LDO, sensing
+    doc: docs/system/sub-power.md
+    owns: [block:CHARGER, block:LDO, block:VBAT_SENSE, block:CELL_PADS]
+  SUB-AUDIO-IN:
+    kind: subsystem
+    title: Ultrasonic mic, port, PDM capture
+    doc: docs/system/sub-audio-in.md
+    owns: [block:MIC, "sym:hw/mech/shell_r1.py::MIC"]
+  SUB-PROCESSING:
+    kind: subsystem
+    title: MCU, core SMPS, clocks, firmware
+    doc: docs/system/sub-processing.md
+    owns: [block:MCU, block:CORE_SMPS, block:CLOCK, "glob:sim/dsp/*.py"]
+  SUB-OUTPUT:
+    kind: subsystem
+    title: H-bridge, exciter, self-test sense
+    doc: docs/system/sub-output.md
+    owns: [block:BRIDGE, block:SELFTEST]
+  SUB-DOCK-USB:
+    kind: subsystem
+    title: Magnetic dock, USB, ESD, DFU
+    doc: docs/system/sub-dock-usb.md
+    owns: [block:DOCK_USB, "sym:hw/mech/shell_r1.py::DOCK", "sym:hw/mech/shell_r1.py::USBC_KEEPOUT"]
+  SUB-UI:
+    kind: subsystem
+    title: Button and power LED
+    doc: docs/system/sub-ui.md
+    owns: [block:UI, "sym:hw/mech/shell_r1.py::SWITCH", "sym:hw/mech/shell_r1.py::plunger", file:hw/padboard/gen.py]
+  SUB-DEBUG-TEST:
+    kind: subsystem
+    title: SWD, test pads, test hooks, self-test
+    doc: docs/system/sub-debug-test.md
+    owns: [block:DEBUG, ref:R20, block:SELFTEST]
+  REG-POD-BODY:
+    kind: region
+    title: Housing, retention, dock bay, sealing
+    doc: docs/system/reg-pod-body.md
+    owns: [file:hw/mech/shell_r1.py, file:hw/mech/blade.py, file:hw/mech/styles.py]
+  REG-BOARD:
+    kind: region
+    title: The PCB (outline, faces, floorplan, routing)
+    doc: docs/system/reg-board.md
+    owns: [file:hw/pod/place_r1.py, "sym:hw/pod/place.py::rules", "glob:hw/lib/pod.pretty/*.kicad_mod"]
+  REG-ARM:
+    kind: region
+    title: NiTi arm, heel, strut, wire path
+    doc: docs/system/reg-arm.md
+    owns: [file:hw/mech/heel.py, file:hw/mech/frame.py, file:sim/checks/niti_arm_real.py]
+  REG-PAD:
+    kind: region
+    title: Transducer cup, contact face, pad board
+    doc: docs/system/reg-pad.md
+    owns: [file:hw/mech/pad.py, file:hw/padboard/gen.py, file:hw/padboard/mech.py]
+  COST:
+    kind: cost
+    title: BOM and order cost
+    doc: docs/build/bom.md
+    owns: [file:docs/build/bom.py, file:hw/pod/bom_jlc.csv]
+
+relations:
+  # ---------------------------------------------------------------- electrical interfaces (from the schematic)
+  - id: R-PWR-OUT-RAIL
+    a: SUB-POWER
+    b: SUB-OUTPUT
+    what: +3V0 feeds the bridge P sources; ~315 mA peaks vs the LDO's 300 mA rating, buffered by C14
+    watch: [net:+3V0, ref:U4, ref:C14, ref:Q1, ref:Q2]
+  - id: R-PWR-PROC
+    a: SUB-POWER
+    b: SUB-PROCESSING
+    what: MCU supply, VBAT/TS sensing on PA4/PA2, charger I2C PB13/PB14 and IRQ PA15
+    watch: [net:+3V0, net:VBAT_SENSE, net:TS, net:I2C_SCL, net:I2C_SDA, net:CHG_INT]
+  - id: R-PWR-DOCK
+    a: SUB-POWER
+    b: SUB-DOCK-USB
+    what: dock VBUS through D4 into the charger input
+    watch: [net:VBUS, net:DOCK_VBUS, ref:D4, ref:U3]
+  - id: R-PWR-UI
+    a: SUB-POWER
+    b: SUB-UI
+    what: VSYS feeds the LED through R14
+    watch: [net:VSYS, ref:R14]
+  - id: R-PWR-DEBUG
+    a: SUB-POWER
+    b: SUB-DEBUG-TEST
+    what: R20 LDO link, TP4 3V0, TP6 VSYS
+    watch: [net:LDO_OUT, ref:R20, ref:TP4, ref:TP6]
+  - id: R-AUDIO-PROC
+    a: SUB-AUDIO-IN
+    b: SUB-PROCESSING
+    what: mic supply from PA5, PDM clock PB3 (via R2) and data PB4 (ADF1)
+    watch: [net:MIC_VDD, net:MIC_DATA, net:MIC_CLK, ref:R2, ref:U2]
+  - id: R-PROC-OUT
+    a: SUB-PROCESSING
+    b: SUB-OUTPUT
+    what: TIM1 complementary PWM PA8/PA7/PA9/PB0, bridge current sense on PA6
+    watch: [net:GA_P, net:GA_N, net:GB_P, net:GB_N, net:I_SENSE]
+  - id: R-PROC-DOCK
+    a: SUB-PROCESSING
+    b: SUB-DOCK-USB
+    what: USB FS PA11/PA12, CC sense PA3, VBUS sense PA1
+    watch: [net:USB_DP, net:USB_DM, net:CC_SENSE, net:VBUS_SENSE]
+  - id: R-PROC-UI
+    a: SUB-PROCESSING
+    b: SUB-UI
+    what: button on PA0 (WKUP1), LED sink on PB7
+    watch: [net:BTN, net:LED_K]
+  - id: R-PROC-DEBUG
+    a: SUB-PROCESSING
+    b: SUB-DEBUG-TEST
+    what: SWD PA13/PA14, NRST, BOOT0 (R1), bootloader PA10 pull-up (R11)
+    watch: [net:SWDIO, net:SWCLK, net:NRST, ref:R1, ref:R11]
+  - id: R-OUT-DEBUG
+    a: SUB-OUTPUT
+    b: SUB-DEBUG-TEST
+    what: self-test shunt R21 and filter R22/C22 (exciter |Z| over USB)
+    watch: [net:BRIDGE_RTN, block:SELFTEST]
+  # ---------------------------------------------------------------- electrical <-> physical
+  - id: R-AUDIO-BOARD
+    a: SUB-AUDIO-IN
+    b: REG-BOARD
+    what: mic on B at board (3.9, 6.5), 0.6 mm port through the board
+    watch: ["sym:hw/pod/place_r1.py::PLACE[U2]", ref:U2]
+  - id: R-AUDIO-BODY
+    a: SUB-AUDIO-IN
+    b: REG-POD-BODY
+    what: lid mic port + mesh aligned with the board's mic port (pod x 34.5 = board x0 30.6 + 3.9)
+    watch: ["sym:hw/mech/shell_r1.py::MIC", "sym:hw/mech/shell_r1.py::PCB", "sym:hw/pod/place_r1.py::PLACE[U2]", "sym:hw/mech/shell_r1.py::lid_base"]
+  - id: R-UI-BODY
+    a: SUB-UI
+    b: REG-POD-BODY
+    what: switch on F under the lid plunger (pod x 52.6 = board x 22.0); KMT0 travel 0.15 mm tolerance stack
+    watch: ["sym:hw/mech/shell_r1.py::SWITCH", "sym:hw/mech/shell_r1.py::plunger", "sym:hw/pod/place_r1.py::PLACE[SW1]", ref:SW1]
+  - id: R-DOCK-BODY
+    a: SUB-DOCK-USB
+    b: REG-POD-BODY
+    what: magnetic target in the belly bay + window, wired to J3/J4/J10/J11/J12; USB-C fallback keep-out
+    watch: ["sym:hw/mech/shell_r1.py::DOCK", "sym:hw/mech/shell_r1.py::USBC_KEEPOUT", "sym:hw/mech/shell_r1.py::BAY", "sym:hw/mech/shell_r1.py::tub"]
+  - id: R-DOCK-BOARD
+    a: SUB-DOCK-USB
+    b: REG-BOARD
+    what: dock wire pads J3/J4/J10/J11/J12 and protection parts placed at the rear
+    watch: ["sym:hw/pod/place_r1.py::PLACE[J3]", "sym:hw/pod/place_r1.py::PLACE[J10]", "sym:hw/pod/place_r1.py::PLACE[J12]", "sym:hw/pod/place_r1.py::PLACE[U6]", "sym:hw/pod/place_r1.py::PLACE[D4]"]
+  - id: R-PWR-BOARD
+    a: SUB-POWER
+    b: REG-BOARD
+    what: charger cluster around U3 (0.4 mm-pitch balls; C15/C16/C21 placement), LDO cluster
+    watch: ["sym:hw/pod/place_r1.py::PLACE[U3]", "sym:hw/pod/place_r1.py::PLACE[C15]", "sym:hw/pod/place_r1.py::PLACE[C16]", "sym:hw/pod/place_r1.py::PLACE[C21]", "sym:hw/pod/place_r1.py::PLACE[U4]", ref:U3]
+  - id: R-PWR-BODY
+    a: SUB-POWER
+    b: REG-POD-BODY
+    what: cell envelope (35 x 12 x 5.3) in the cavity, foam strips under the board
+    watch: ["sym:hw/mech/shell_r1.py::CELL", "sym:hw/mech/shell_r1.py::placeholders"]
+  - id: R-OUT-BOARD
+    a: SUB-OUTPUT
+    b: REG-BOARD
+    what: bridge legs, shunt, footprints (PMCXB290UE redraw pending)
+    watch: ["sym:hw/pod/place_r1.py::PLACE[Q1]", "sym:hw/pod/place_r1.py::PLACE[Q2]", "sym:hw/pod/place_r1.py::PLACE[R21]", ref:Q1, ref:R21]
+  - id: R-DEBUG-BOARD
+    a: SUB-DEBUG-TEST
+    b: REG-BOARD
+    what: TP1-TP6 pogo row (1.27 mm pitch, 0.7 mm pads) on F top edge, outside the clamp band
+    watch: ["grep:hw/pod/place_r1.py::TP\\{|TP\\d", "glob:hw/lib/pod.pretty/TestPoint*.kicad_mod"]
+  - id: R-PROC-BOARD
+    a: SUB-PROCESSING
+    b: REG-BOARD
+    what: MCU on F centre, SMPS loop (L1, C7, C8/C9), crystal at the front; GND fan-out to In1
+    watch: ["sym:hw/pod/place_r1.py::PLACE[U1]", "sym:hw/pod/place_r1.py::PLACE[L1]", "sym:hw/pod/place_r1.py::PLACE[C7]", "sym:hw/pod/place_r1.py::PLACE[Y1]", "sym:hw/pod/place_r1.py::gnd_fanout"]
+  # ---------------------------------------------------------------- off-board wiring
+  - id: R-OUT-ARM
+    a: SUB-OUTPUT
+    b: REG-ARM
+    what: OUT_A/OUT_B litz wires (J1/J2) up the arm; the 4-wire bundle sets the heel channel and strut bores
+    watch: [net:OUT_A, net:OUT_B, "sym:hw/mech/heel.py::CH_D", "sym:hw/mech/heel.py::CH_CBORE_D", "sym:hw/mech/heel.py::CH_EXIT"]
+  - id: R-UI-ARM
+    a: SUB-UI
+    b: REG-ARM
+    what: LED_A/LED_K wires (J7/J8) are 2 of the 4 arm wires
+    watch: [net:LED_A, net:LED_K, "sym:hw/mech/heel.py::CH_D"]
+  - id: R-OUT-PAD
+    a: SUB-OUTPUT
+    b: REG-PAD
+    what: exciter (RC-BC02, 8 or 12 ohm) in the cup; wire landing at the pad
+    watch: [net:OUT_A, net:OUT_B, file:hw/mech/pad.py]
+  - id: R-UI-PAD
+    a: SUB-UI
+    b: REG-PAD
+    what: LED on the pad board under the cap (O8)
+    watch: [net:LED_A, net:LED_K, file:hw/padboard/gen.py, file:hw/padboard/mech.py]
+  # ---------------------------------------------------------------- physical interfaces
+  - id: R-BOARD-BODY
+    a: REG-BOARD
+    b: REG-POD-BODY
+    what: board outline/position (34 x 13 at pod x 30.6-64.6), height bands, clamp ribs on 0.6 mm edge bands, foam
+    watch: ["sym:hw/mech/shell_r1.py::PCB", "sym:hw/mech/shell_r1.py::PARTS", "sym:hw/mech/shell_r1.py::lid_base", "sym:hw/pod/place_r1.py::P.W"]
+  - id: R-BOARD-ARM
+    a: REG-BOARD
+    b: REG-ARM
+    what: arm wires rise in the 2.1 mm gap behind the board's rear edge to the rear wire pads
+    watch: ["sym:hw/mech/shell_r1.py::PCB", "sym:hw/mech/heel.py::CH_EXIT", "sym:hw/pod/place_r1.py::PLACE[J1]", "sym:hw/pod/place_r1.py::PLACE[J7]"]
+  - id: R-BODY-ARM
+    a: REG-POD-BODY
+    b: REG-ARM
+    what: heel built into the tub; strut clearance to the tub (strut relief); NiTi socket mouth E
+    watch: ["sym:hw/mech/shell_r1.py::tub", "sym:hw/mech/frame.py::E", "sym:hw/mech/heel.py::heel_add", "sym:hw/mech/heel.py::heel_cut"]
+  - id: R-ARM-PAD
+    a: REG-ARM
+    b: REG-PAD
+    what: NiTi pad socket, strut-to-pad slot, conductor bore and counterbore, pad pose (frame)
+    watch: ["sym:hw/mech/frame.py::PAD_CONTACT", "sym:hw/mech/frame.py::pad_pose", "sym:hw/mech/frame.py::PAD_SOCKET_DEPTH", file:hw/mech/pad.py]
+  - id: R-PHYS-FRAME
+    a: PHYSICAL
+    b: REG-POD-BODY
+    what: shared frame constants (frame.py) vs the rev-1 shell's own constants (shell_r1.py overrides several)
+    watch: ["sym:hw/mech/frame.py::PCB", "sym:hw/mech/frame.py::CELL", "sym:hw/mech/frame.py::BUTTON", "sym:hw/mech/frame.py::MIC_PORT", "sym:hw/mech/shell_r1.py::PCB", "sym:hw/mech/shell_r1.py::CELL"]
+  # ---------------------------------------------------------------- requirements and cost
+  - id: R-SPEC-POWER
+    a: SPEC
+    b: SUB-POWER
+    what: D11 switching-regulator rule, power budget and runtime, O12 fast charge, O16 cell/charger
+    watch: ["grep:docs/spec.md::D11", "grep:docs/spec.md::\\bO1[26]\\b"]
+  - id: R-SPEC-UI
+    a: SPEC
+    b: SUB-UI
+    what: O8 LED in the pad housing (solid), O16 IP68 switch
+    watch: ["grep:docs/spec.md::\\bO8\\b", "grep:docs/spec.md::IP68"]
+  - id: R-SPEC-BODY
+    a: SPEC
+    b: REG-POD-BODY
+    what: O10 two-stage build (taped / bonded, cut-openable), O12 sealing, O16 no screws, O17 spine top
+    watch: ["grep:docs/spec.md::\\bO1[0267]\\b"]
+  - id: R-COST-BOARD
+    a: COST
+    b: REG-BOARD
+    what: Extended part types, placements and assembly sides drive the JLC order cost
+    watch: [file:hw/pod/bom_jlc.csv, "sym:hw/pod/place_r1.py::PLACE"]

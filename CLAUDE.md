@@ -10,6 +10,7 @@
   - be blunt;
   - show, don't just tell.
 - Research notes live in `docs/research/`; numeric checks in `sim/checks/`.
+- **Big picture first (owner rule 2026-10-01):** `docs/system/` is the living system doc set (whole, integration map, physical, each subsystem and region). Before any design change: read the affected docs and run `tools/plm.py impact`; after it: update those docs and clear `tools/plm.py status` (suspect relations, stale docs) in the same commit. Agents get the set as mandatory context, check out what they edit, and return the integration-map cross-check with every proposal. Changes go through ECRs (`docs/system/plm/ecr/`).
 
 ## Owner preferences
 - **Visual learner.** Diagrams are the default for any mechanism, layout, flow or comparison.
