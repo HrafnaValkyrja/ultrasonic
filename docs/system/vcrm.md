@@ -152,6 +152,7 @@ The matrix never overrides the spec. If a row shows the design cannot meet a req
 | `O14` | A process rule (the PCB layout is done together). Nothing to verify. |
 | `O15` | Superseded by O20 (rev 1 is final-size). Its question about debugging over USB is carried by O18-diagnosability (F4 self-test). |
 | `O21` | A process rule (no orders until the design is finalized, owner 2026-10-02). Nothing to verify; it blocks E1/E2 and the dummy-wear test (ECR-0006/0007/0008 deferred) until the design freeze. |
+| `O22` | A process rule (the freeze is an evidence gate). It is enforced, not verified: a freeze-gate mode of tools/checks/vcrm.py (planned) evaluates criteria 1-4 from this matrix, interfaces.py and the ECR states; criterion 5 is a recorded review. |
 
 <!-- vcrm:end -->
 
