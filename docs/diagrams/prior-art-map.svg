@@ -1,0 +1,211 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 1166" role="img" aria-label="Prior art mapped onto the Stereo Ultrasound design pipeline. Centre column: our eight process stages, from the owner gate through the lead AI, parallel design teams, adversarial verification, serial integration, the docs/system blackboard and plm.py tracker, code-defined hardware with simulation checks, to rev-1 physical test. Left: eight pre-LLM research clusters (1968-2022). Right: eight LLM-era clusters (2023-2026). Each cluster points at the stage it informs and names the lessons it supports. Green border: a proven method to copy; orange: partial or weak evidence; red: failure evidence to guard against. Three stages carry a FRONTIER tag: doing them across electronics, mechanics and firmware with agent teams under one human owner has no precedent in about 100 opened works." font-family="Helvetica, Arial, sans-serif">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#8a8676"/></marker></defs>
+<rect width="1500" height="1166" rx="14" fill="#fbfaf7"/>
+<text x="30" y="40" font-size="21" fill="#1f2328" font-weight="700">Prior art mapped onto our design pipeline</text>
+<text x="30" y="64" font-size="13" fill="#57606a">Left: pre-LLM engineering research (1968-2022). Right: the LLM era (2023-2026). Centre: our process. L# = ranked lesson in docs/research/prior-art-agentic-engineering.md (2026-10-01).</text>
+<text x="30" y="92" font-size="12" fill="#57606a" font-weight="700">PRE-LLM PRECEDENT</text>
+<text x="750.0" y="92" font-size="12" fill="#57606a" font-weight="700" text-anchor="middle">OUR PIPELINE</text>
+<text x="1470" y="92" font-size="12" fill="#57606a" font-weight="700" text-anchor="end">LLM ERA, 2023-2026</text>
+<path d="M750.0,215 L750.0,224" stroke="#1f2328" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M750.0,337 L750.0,346" stroke="#1f2328" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M750.0,459 L750.0,468" stroke="#1f2328" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M750.0,581 L750.0,590" stroke="#1f2328" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M750.0,703 L750.0,712" stroke="#1f2328" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M750.0,825 L750.0,834" stroke="#1f2328" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M750.0,947 L750.0,956" stroke="#1f2328" stroke-width="1.8" marker-end="url(#a)"/>
+<path d="M492,159.0 L532,159.0 L532,159.0 L570,159.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M492,281.0 L532,281.0 L532,281.0 L570,281.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M492,403.0 L532,403.0 L532,403.0 L570,403.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M492,525.0 L532,525.0 L532,525.0 L570,525.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M492,647.0 L532,647.0 L532,647.0 L570,647.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M492,769.0 L532,769.0 L532,769.0 L570,769.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M492,891.0 L532,891.0 L532,755.0 L570,755.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M492,1013.0 L532,1013.0 L532,1013.0 L570,1013.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1008,159.0 L968,159.0 L968,159.0 L930,159.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1008,281.0 L968,281.0 L968,281.0 L930,281.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1008,281.0 L968,281.0 L968,417.0 L930,417.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1008,403.0 L968,403.0 L968,403.0 L930,403.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1008,525.0 L968,525.0 L968,525.0 L930,525.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1008,647.0 L968,647.0 L968,647.0 L930,647.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1008,769.0 L968,769.0 L968,769.0 L930,769.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1008,891.0 L968,891.0 L968,891.0 L930,891.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1008,1013.0 L968,1013.0 L968,877.0 L930,877.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<path d="M1008,1013.0 L968,1013.0 L968,1013.0 L930,1013.0" fill="none" stroke="#8a8676" stroke-width="1.6" marker-end="url(#a)"/>
+<rect x="572" y="104" width="356" height="110" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.5"/>
+<text x="588" y="130" font-size="15" fill="#1f2328" font-weight="700">Owner gate</text>
+<text x="588" y="156" font-size="12.5" fill="#1f2328">decides O-items, ECRs, orders, payments</text>
+<text x="588" y="174" font-size="12.5" fill="#1f2328">rule: 2-3 options + recommendation</text>
+<rect x="572" y="226" width="356" height="110" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.5"/>
+<text x="588" y="252" font-size="15" fill="#1f2328" font-weight="700">Lead AI (area manager)</text>
+<text x="588" y="278" font-size="12.5" fill="#1f2328">spawns teams, owns shared items,</text>
+<text x="588" y="296" font-size="12.5" fill="#1f2328">merges their work</text>
+<rect x="572" y="348" width="356" height="110" rx="10" fill="#e8f0fb" stroke="#e34948" stroke-width="2.5" stroke-dasharray="7 4"/>
+<text x="588" y="374" font-size="15" fill="#1f2328" font-weight="700">Explore: parallel design teams</text>
+<text x="588" y="400" font-size="12.5" fill="#1f2328">power, output, connector/UI, board,</text>
+<text x="588" y="418" font-size="12.5" fill="#1f2328">mechanics, research</text>
+<rect x="830" y="432" width="86" height="18" rx="9" fill="#e34948"/>
+<text x="873" y="445" font-size="10.5" fill="#ffffff" font-weight="700" text-anchor="middle">FRONTIER</text>
+<rect x="572" y="470" width="356" height="110" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.5"/>
+<text x="588" y="496" font-size="15" fill="#1f2328" font-weight="700">Adversarial verify + audit</text>
+<text x="588" y="522" font-size="12.5" fill="#1f2328">skeptic agents re-derive and attack</text>
+<text x="588" y="540" font-size="12.5" fill="#1f2328">claims; methodology audits</text>
+<rect x="572" y="592" width="356" height="110" rx="10" fill="#e8f0fb" stroke="#e34948" stroke-width="2.5" stroke-dasharray="7 4"/>
+<text x="588" y="618" font-size="15" fill="#1f2328" font-weight="700">Integrate + synthesize</text>
+<text x="588" y="644" font-size="12.5" fill="#1f2328">lead merges one team at a time;</text>
+<text x="588" y="662" font-size="12.5" fill="#1f2328">cross-domain check (integration map §10)</text>
+<rect x="830" y="676" width="86" height="18" rx="9" fill="#e34948"/>
+<text x="873" y="689" font-size="10.5" fill="#ffffff" font-weight="700" text-anchor="middle">FRONTIER</text>
+<rect x="572" y="714" width="356" height="110" rx="10" fill="#e8f0fb" stroke="#e34948" stroke-width="2.5" stroke-dasharray="7 4"/>
+<text x="588" y="740" font-size="15" fill="#1f2328" font-weight="700">Blackboard + PLM tracker</text>
+<text x="588" y="766" font-size="12.5" fill="#1f2328">docs/system + plm.py: watches on nets, parts,</text>
+<text x="588" y="784" font-size="12.5" fill="#1f2328">CAD symbols; SUSPECT, check-outs, ECRs</text>
+<rect x="830" y="798" width="86" height="18" rx="9" fill="#e34948"/>
+<text x="873" y="811" font-size="10.5" fill="#ffffff" font-weight="700" text-anchor="middle">FRONTIER</text>
+<rect x="572" y="836" width="356" height="110" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.5"/>
+<text x="588" y="862" font-size="15" fill="#1f2328" font-weight="700">Code-defined hardware + checks</text>
+<text x="588" y="888" font-size="12.5" fill="#1f2328">SKiDL → KiCad, pcbnew, build123d,</text>
+<text x="588" y="906" font-size="12.5" fill="#1f2328">ngspice, scikit-fem, sim/checks</text>
+<rect x="572" y="958" width="356" height="110" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.5"/>
+<text x="588" y="984" font-size="15" fill="#1f2328" font-weight="700">Rev-1 physical test</text>
+<text x="588" y="1010" font-size="12.5" fill="#1f2328">bring-up, self-test over USB</text>
+<text x="588" y="1028" font-size="12.5" fill="#1f2328">(not reached yet)</text>
+<rect x="30" y="104" width="462" height="110" rx="8" fill="#ffffff" stroke="#b8520a" stroke-width="2"/>
+<rect x="30" y="104" width="7" height="110" rx="3" fill="#b8520a"/>
+<text x="48" y="124" font-size="13.5" fill="#1f2328" font-weight="700">Set-based concurrent engineering (Toyota)</text>
+<text x="480" y="124" font-size="11.5" fill="#b8520a" font-weight="700" text-anchor="end">→ L12, L14</text>
+<text x="48" y="144" font-size="11.5" fill="#57606a">Ward et al. 1995; Sobek, Ward &amp; Liker 1999;</text>
+<text x="48" y="159" font-size="11.5" fill="#57606a">Shallcross et al. 2020 review (the counterweight)</text>
+<text x="48" y="181" font-size="12" fill="#1f2328">Keep feasible sets open, intersect them, narrow late.</text>
+<text x="48" y="196" font-size="12" fill="#1f2328">Evidence: single-firm case studies; complex to run.</text>
+<rect x="30" y="226" width="462" height="110" rx="8" fill="#ffffff" stroke="#1a7a55" stroke-width="2"/>
+<rect x="30" y="226" width="7" height="110" rx="3" fill="#1a7a55"/>
+<text x="48" y="246" font-size="13.5" fill="#1f2328" font-weight="700">Blackboard systems and their control</text>
+<text x="480" y="246" font-size="11.5" fill="#1a7a55" font-weight="700" text-anchor="end">→ L2</text>
+<text x="48" y="266" font-size="11.5" fill="#57606a">Nii 1986; Hayes-Roth BB1 1985; Contract Net 1980;</text>
+<text x="48" y="281" font-size="11.5" fill="#57606a">LLM blackboards: Han &amp; Zhang 2025, Salemi 2025</text>
+<text x="48" y="303" font-size="12" fill="#1f2328">A shared record plus a monitor works, but the model has</text>
+<text x="48" y="318" font-size="12" fill="#1f2328">no control rule: write down who acts next.</text>
+<rect x="30" y="348" width="462" height="110" rx="8" fill="#ffffff" stroke="#e34948" stroke-width="2"/>
+<rect x="30" y="348" width="7" height="110" rx="3" fill="#e34948"/>
+<text x="48" y="368" font-size="13.5" fill="#1f2328" font-weight="700">Coupled decisions and team boundaries</text>
+<text x="480" y="368" font-size="11.5" fill="#e34948" font-weight="700" text-anchor="end">→ L2, L10</text>
+<text x="48" y="388" font-size="11.5" fill="#57606a">Klein et al. 2003; Sosa et al. 2004; Conway 1968;</text>
+<text x="48" y="403" font-size="11.5" fill="#57606a">MacCormack, Baldwin &amp; Rusnak 2012 (mirroring)</text>
+<text x="48" y="425" font-size="12" fill="#1f2328">Tight coupling split across teams converges slowly.</text>
+<text x="48" y="440" font-size="12" fill="#1f2328">Cut teams along coupling clusters; re-form each cycle.</text>
+<rect x="30" y="470" width="462" height="110" rx="8" fill="#ffffff" stroke="#e34948" stroke-width="2"/>
+<rect x="30" y="470" width="7" height="110" rx="3" fill="#e34948"/>
+<text x="48" y="490" font-size="13.5" fill="#1f2328" font-weight="700">N-version programming</text>
+<text x="480" y="490" font-size="11.5" fill="#e34948" font-weight="700" text-anchor="end">→ L7</text>
+<text x="48" y="510" font-size="11.5" fill="#57606a">Knight &amp; Leveson 1986: 27 independently written</text>
+<text x="48" y="525" font-size="11.5" fill="#57606a">versions of one program, 1 million tests</text>
+<text x="48" y="547" font-size="12" fill="#1f2328">Independent authors fail together on the hard parts.</text>
+<text x="48" y="562" font-size="12" fill="#1f2328">Same-model re-derivations are correlated checks.</text>
+<rect x="30" y="592" width="462" height="110" rx="8" fill="#ffffff" stroke="#1a7a55" stroke-width="2"/>
+<rect x="30" y="592" width="7" height="110" rx="3" fill="#1a7a55"/>
+<text x="48" y="612" font-size="13.5" fill="#1f2328" font-weight="700">Interface management</text>
+<text x="480" y="612" font-size="11.5" fill="#1a7a55" font-weight="700" text-anchor="end">→ L9</text>
+<text x="48" y="632" font-size="11.5" fill="#57606a">NASA SE Handbook 6.3 (Rev 2, web 2023);</text>
+<text x="48" y="647" font-size="11.5" fill="#57606a">Doorstop: suspect links cleared one link at a time</text>
+<text x="48" y="669" font-size="12" fill="#1f2328">An interface is re-baselined only when every side</text>
+<text x="48" y="684" font-size="12" fill="#1f2328">that must approve it has signed.</text>
+<rect x="30" y="714" width="462" height="110" rx="8" fill="#ffffff" stroke="#e34948" stroke-width="2"/>
+<rect x="30" y="714" width="7" height="110" rx="3" fill="#e34948"/>
+<text x="48" y="734" font-size="13.5" fill="#1f2328" font-weight="700">Agent-based concurrent engineering, 1993-97</text>
+<text x="480" y="734" font-size="11.5" fill="#e34948" font-weight="700" text-anchor="end">→ L10, L11</text>
+<text x="48" y="754" font-size="11.5" fill="#57606a">PACT 1993, SHADE 1993, Redux / Next-Link 1995;</text>
+<text x="48" y="769" font-size="11.5" fill="#57606a">reviews: Whitfield et al. 2000, Shen et al. 2008</text>
+<text x="48" y="791" font-size="12" fill="#1f2328">Our architecture, 30 years early. It faded. Our reading:</text>
+<text x="48" y="806" font-size="12" fill="#1f2328">weak agents, ontology and wrapper cost; PLM won.</text>
+<rect x="30" y="836" width="462" height="110" rx="8" fill="#ffffff" stroke="#b8520a" stroke-width="2"/>
+<rect x="30" y="836" width="7" height="110" rx="3" fill="#b8520a"/>
+<text x="48" y="856" font-size="13.5" fill="#1f2328" font-weight="700">DSM and change-propagation prediction</text>
+<text x="480" y="856" font-size="11.5" fill="#b8520a" font-weight="700" text-anchor="end">→ L8, L10</text>
+<text x="48" y="876" font-size="11.5" fill="#57606a">Steward 1981; Clarkson, Simons &amp; Eckert 2004 (CPM);</text>
+<text x="48" y="891" font-size="11.5" fill="#57606a">Browning 2001/2016; Brahma &amp; Wynn 2022 review</text>
+<text x="48" y="913" font-size="12" fill="#1f2328">Rank impact by likelihood x impact; margins absorb change.</text>
+<text x="48" y="928" font-size="12" fill="#1f2328">No paper in the review reports ongoing industrial use.</text>
+<rect x="30" y="958" width="462" height="110" rx="8" fill="#ffffff" stroke="#1a7a55" stroke-width="2"/>
+<rect x="30" y="958" width="7" height="110" rx="3" fill="#1a7a55"/>
+<text x="48" y="978" font-size="13.5" fill="#1f2328" font-weight="700">Generated designs that were built and tested</text>
+<text x="480" y="978" font-size="11.5" fill="#1a7a55" font-weight="700" text-anchor="end">→ L13, L15</text>
+<text x="48" y="998" font-size="11.5" fill="#57606a">Lipson &amp; Pollack 2000 (Nature); NASA ST5 antenna,</text>
+<text x="48" y="1013" font-size="11.5" fill="#57606a">flew 2006; Matthews et al. 2023 (PNAS)</text>
+<text x="48" y="1035" font-size="12" fill="#1f2328">Worked inside a space the simulator models well; the</text>
+<text x="48" y="1050" font-size="12" fill="#1f2328">engineer fixed the form, the search set the numbers.</text>
+<rect x="1008" y="104" width="462" height="110" rx="8" fill="#ffffff" stroke="#1a7a55" stroke-width="2"/>
+<rect x="1008" y="104" width="7" height="110" rx="3" fill="#1a7a55"/>
+<text x="1026" y="124" font-size="13.5" fill="#1f2328" font-weight="700">Human in the loop</text>
+<text x="1458" y="124" font-size="11.5" fill="#1a7a55" font-weight="700" text-anchor="end">→ L12</text>
+<text x="1026" y="144" font-size="11.5" fill="#57606a">Magentic-UI 2025; agentic set-based design</text>
+<text x="1026" y="159" font-size="11.5" fill="#57606a">(Brown University, 2026); Chip-Chat 2023</text>
+<text x="1026" y="181" font-size="12" fill="#1f2328">Co-planning plus rare, well-placed approvals beat full</text>
+<text x="1026" y="196" font-size="12" fill="#1f2328">autonomy; low-risk approval requests annoy users.</text>
+<rect x="1008" y="226" width="462" height="110" rx="8" fill="#ffffff" stroke="#e34948" stroke-width="2"/>
+<rect x="1008" y="226" width="7" height="110" rx="3" fill="#e34948"/>
+<text x="1026" y="246" font-size="13.5" fill="#1f2328" font-weight="700">Multi-agent scaling and failure</text>
+<text x="1458" y="246" font-size="11.5" fill="#e34948" font-weight="700" text-anchor="end">→ L2, L11</text>
+<text x="1026" y="266" font-size="11.5" fill="#57606a">MAST 2025 (1600+ traces); Kim et al. 2025/26</text>
+<text x="1026" y="281" font-size="11.5" fill="#57606a">(260 configurations); CooperBench 2026</text>
+<text x="1026" y="303" font-size="12" fill="#1f2328">Parallel: +81% on decomposable tasks, -39% to -70% on</text>
+<text x="1026" y="318" font-size="12" fill="#1f2328">sequential planning; 2 agents 30% worse than 1.</text>
+<rect x="1008" y="348" width="462" height="110" rx="8" fill="#ffffff" stroke="#1a7a55" stroke-width="2"/>
+<rect x="1008" y="348" width="7" height="110" rx="3" fill="#1a7a55"/>
+<text x="1026" y="368" font-size="13.5" fill="#1f2328" font-weight="700">Per-domain generate-check-repair loops</text>
+<text x="1458" y="368" font-size="11.5" fill="#1a7a55" font-weight="700" text-anchor="end">→ L1, L6</text>
+<text x="1026" y="388" font-size="11.5" fill="#57606a">VerilogCoder, MAGE (RTL); PCBSchemaGen (SKiDL);</text>
+<text x="1026" y="403" font-size="11.5" fill="#57606a">PCBWorld (KiCad + DRC); CADTests (B-rep tests)</text>
+<text x="1026" y="425" font-size="12" fill="#1f2328">Exact, localising checker: 94-96% (RTL). Weak checker:</text>
+<text x="1026" y="440" font-size="12" fill="#1f2328">small gains. LLM agents: 0% complete on large boards.</text>
+<rect x="1008" y="470" width="462" height="110" rx="8" fill="#ffffff" stroke="#e34948" stroke-width="2"/>
+<rect x="1008" y="470" width="7" height="110" rx="3" fill="#e34948"/>
+<text x="1026" y="490" font-size="13.5" fill="#1f2328" font-weight="700">Verification by LLMs</text>
+<text x="1458" y="490" font-size="11.5" fill="#e34948" font-weight="700" text-anchor="end">→ L1, L7</text>
+<text x="1026" y="510" font-size="11.5" fill="#57606a">Huang 2024; CRITIC 2024; Panickssery 2024;</text>
+<text x="1026" y="525" font-size="11.5" fill="#57606a">Kim 2025 (correlated errors); Khan 2024 (debate)</text>
+<text x="1026" y="547" font-size="12" fill="#1f2328">No self-correction without outside feedback; models</text>
+<text x="1026" y="562" font-size="12" fill="#1f2328">agree when wrong; a judge between two sides works.</text>
+<rect x="1008" y="592" width="462" height="110" rx="8" fill="#ffffff" stroke="#b8520a" stroke-width="2"/>
+<rect x="1008" y="592" width="7" height="110" rx="3" fill="#b8520a"/>
+<text x="1026" y="612" font-size="13.5" fill="#1f2328" font-weight="700">Isolation and gated merge (software only)</text>
+<text x="1458" y="612" font-size="11.5" fill="#b8520a" font-weight="700" text-anchor="end">→ L4</text>
+<text x="1026" y="632" font-size="11.5" fill="#57606a">CAID 2026 (worktrees, test-gated merge); Claim Plane</text>
+<text x="1026" y="647" font-size="11.5" fill="#57606a">2026 (change intents, n = 6); Relic 2026</text>
+<text x="1026" y="669" font-size="12" fill="#1f2328">Separate worktrees beat &#x27;soft&#x27; file assignment;</text>
+<text x="1026" y="684" font-size="12" fill="#1f2328">executable rules beat written ones (25, 35, 41%).</text>
+<rect x="1008" y="714" width="462" height="110" rx="8" fill="#ffffff" stroke="#e34948" stroke-width="2"/>
+<rect x="1008" y="714" width="7" height="110" rx="3" fill="#e34948"/>
+<text x="1026" y="734" font-size="13.5" fill="#1f2328" font-weight="700">Generated PM, context files, memory</text>
+<text x="1458" y="734" font-size="11.5" fill="#e34948" font-weight="700" text-anchor="end">→ L11</text>
+<text x="1026" y="754" font-size="11.5" fill="#57606a">2023 GPT-4 planning and risk studies; AGENTS.md</text>
+<text x="1026" y="769" font-size="11.5" fill="#57606a">evaluation 2026; STALE 2026; Repo2Skill-Evo 2026</text>
+<text x="1026" y="791" font-size="12" fill="#1f2328">Nothing found on agents running change control. Context</text>
+<text x="1026" y="806" font-size="12" fill="#1f2328">files: no gain, +20% cost. Stale memory spotted ~55%.</text>
+<rect x="1008" y="836" width="462" height="110" rx="8" fill="#ffffff" stroke="#1a7a55" stroke-width="2"/>
+<rect x="1008" y="836" width="7" height="110" rx="3" fill="#1a7a55"/>
+<text x="1026" y="856" font-size="13.5" fill="#1f2328" font-weight="700">Hardware as code</text>
+<text x="1458" y="856" font-size="11.5" fill="#1a7a55" font-weight="700" text-anchor="end">→ L5, L6</text>
+<text x="1026" y="876" font-size="11.5" fill="#57606a">SKiDL (2016 on); Polymorphic Blocks 2020; atopile;</text>
+<text x="1026" y="891" font-size="11.5" fill="#57606a">circuit-synth; build123d; KiCad StepUp</text>
+<text x="1026" y="913" font-size="12" fill="#1f2328">Mature, not new. Typed limits and assertions at build</text>
+<text x="1026" y="928" font-size="12" fill="#1f2328">time; real-board STEP inside the shell for clashes.</text>
+<rect x="1008" y="958" width="462" height="110" rx="8" fill="#ffffff" stroke="#e34948" stroke-width="2"/>
+<rect x="1008" y="958" width="7" height="110" rx="3" fill="#e34948"/>
+<text x="1026" y="978" font-size="13.5" fill="#1f2328" font-weight="700">Checkers that lie</text>
+<text x="1458" y="978" font-size="11.5" fill="#e34948" font-weight="700" text-anchor="end">→ L3, L15</text>
+<text x="1026" y="998" font-size="11.5" fill="#57606a">FEABench 2025; A-Lab 2023 and its 2024 re-analysis;</text>
+<text x="1026" y="1013" font-size="11.5" fill="#57606a">SPhyR 2025/26; CADTests mutation testing</text>
+<text x="1026" y="1035" font-size="12" fill="#1f2328">88% of runs executed, 2 of 15 answers valid; &#x27;new&#x27;</text>
+<text x="1026" y="1050" font-size="12" fill="#1f2328">materials were not new: the auto-checker was unreliable.</text>
+<rect x="30" y="1084" width="1440" height="62" rx="8" fill="#f3f1ea"/>
+<rect x="48" y="1098" width="26" height="14" rx="3" fill="#ffffff" stroke="#1a7a55" stroke-width="2.5"/>
+<text x="82" y="1110" font-size="12.5" fill="#1f2328">proven method: copy it</text>
+<rect x="318" y="1098" width="26" height="14" rx="3" fill="#ffffff" stroke="#b8520a" stroke-width="2.5"/>
+<text x="352" y="1110" font-size="12.5" fill="#1f2328">partial or weak evidence</text>
+<rect x="588" y="1098" width="26" height="14" rx="3" fill="#ffffff" stroke="#e34948" stroke-width="2.5"/>
+<text x="622" y="1110" font-size="12.5" fill="#1f2328">failure evidence: guard against it</text>
+<rect x="858" y="1096" width="86" height="18" rx="9" fill="#e34948"/>
+<text x="901" y="1109" font-size="10.5" fill="#ffffff" font-weight="700" text-anchor="middle">FRONTIER</text>
+<text x="954" y="1110" font-size="12.5" fill="#1f2328">no precedent found for this stage across electronics + mechanics + firmware</text>
+<text x="48" y="1134" font-size="12.5" fill="#1f2328">with agent teams under one human owner (about 100 works opened, 2026-10-01; web search was exhausted, so commercial tools are unseen).</text>
+</svg>
