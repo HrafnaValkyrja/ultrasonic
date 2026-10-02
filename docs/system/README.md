@@ -75,3 +75,4 @@ Status: <revision / state>, updated <date> · Source of truth: <files> · Owner 
 
 ## Change log
 - 2026-10-01: set created (owner rule). `integration-map.md` generated from gen.py Rev E.
+- 2026-10-01: doc set completed (00-whole, physical, 7 subsystem and 4 region docs, diagrams `system-overview-physical` and `board-regions`), then inspected and corrected in one editor pass: interfaces name the doc on the other side, 00-whole gains the status table, "Design-level cross-domain risks" and "Fixes waiting in source files"; ECR-0008/0009 and two relations in `items.yaml` amended.

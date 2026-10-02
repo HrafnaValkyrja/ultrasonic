@@ -152,8 +152,8 @@ relations:
   - id: R-AUDIO-BODY
     a: SUB-AUDIO-IN
     b: REG-POD-BODY
-    what: lid mic port + mesh aligned with the board's mic port (pod x 34.5 = board x0 30.6 + 3.9)
-    watch: ["sym:hw/mech/shell_r1.py::MIC", "sym:hw/mech/shell_r1.py::PCB", "sym:hw/pod/place_r1.py::PLACE[U2]", "sym:hw/mech/shell_r1.py::lid_base"]
+    what: lid mic port + mesh aligned with the board's mic port NPTH (board 3.13 = pod 33.73; the lid bore at pod 34.5 sits on U2's body origin, board 3.9, so 0.77 mm off today)
+    watch: ["sym:hw/mech/shell_r1.py::MIC", "sym:hw/mech/shell_r1.py::PCB", "sym:hw/pod/place_r1.py::PLACE[U2]", "sym:hw/mech/shell_r1.py::lid_base", "grep:hw/pod/gen.py::Knowles_LGA-5", "file:hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod"]
   - id: R-UI-BODY
     a: SUB-UI
     b: REG-POD-BODY
@@ -224,8 +224,8 @@ relations:
   - id: R-BOARD-ARM
     a: REG-BOARD
     b: REG-ARM
-    what: arm wires rise in the 2.1 mm gap behind the board's rear edge to the rear wire pads
-    watch: ["sym:hw/mech/shell_r1.py::PCB", "sym:hw/mech/heel.py::CH_EXIT", "sym:hw/pod/place_r1.py::PLACE[J1]", "sym:hw/pod/place_r1.py::PLACE[J7]"]
+    what: arm wires rise in the 2.1 mm gap behind the board's rear edge (1.1 mm behind the cell, where the heel exit opens) to the rear wire pads J1/J2/J7/J8
+    watch: ["sym:hw/mech/shell_r1.py::PCB", "sym:hw/mech/shell_r1.py::CELL", "sym:hw/mech/heel.py::CH_EXIT", "sym:hw/pod/place_r1.py::PLACE[J1]", "sym:hw/pod/place_r1.py::PLACE[J2]", "sym:hw/pod/place_r1.py::PLACE[J7]", "sym:hw/pod/place_r1.py::PLACE[J8]"]
   - id: R-BODY-ARM
     a: REG-POD-BODY
     b: REG-ARM
