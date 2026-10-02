@@ -1,0 +1,62 @@
+{
+ "S0 Rev E as drawn (double-sided)": {
+  "setup_stencil": 67.54,
+  "feeder": 44.37,
+  "panel_design": 0.0,
+  "smt_joints": 1.19,
+  "manual": 0.0,
+  "other": 0.95,
+  "xray_low": 9.84,
+  "xray_high": 27.88,
+  "total_low": 123.89,
+  "total_high": 141.93,
+  "per_pod_low": 30.97,
+  "per_pod_high": 35.48,
+  "pre_reflow_upper_bound": 11.9
+ },
+ "S0+ with the pad board in the panel": {
+  "setup_stencil": 67.54,
+  "feeder": 45.9,
+  "panel_design": 8.21,
+  "smt_joints": 1.19,
+  "manual": 0.0,
+  "other": 0.95,
+  "xray_low": 9.84,
+  "xray_high": 27.88,
+  "total_low": 133.63,
+  "total_high": 151.67,
+  "per_pod_low": 33.41,
+  "per_pod_high": 37.92,
+  "pre_reflow_upper_bound": 11.9
+ },
+ "S1 all on one face, SW1 hand-soldered": {
+  "setup_stencil": 33.77,
+  "feeder": 42.84,
+  "panel_design": 0.0,
+  "smt_joints": 1.19,
+  "manual": 3.84,
+  "other": 0.95,
+  "xray_low": 9.84,
+  "xray_high": 27.88,
+  "total_low": 92.44,
+  "total_high": 110.48,
+  "per_pod_low": 23.11,
+  "per_pod_high": 27.62,
+  "pre_reflow_upper_bound": 11.9
+ },
+ "S2 double-sided, this study + OUT/PWR/PER cuts": {
+  "setup_stencil": 67.54,
+  "feeder": 36.72,
+  "panel_design": 0.0,
+  "smt_joints": 1.19,
+  "manual": 0.0,
+  "other": 0.95,
+  "xray_low": 9.84,
+  "xray_high": 21.32,
+  "total_low": 116.24,
+  "total_high": 127.72,
+  "per_pod_low": 29.06,
+  "per_pod_high": 31.93,
+  "pre_reflow_upper_bound": 11.9
+ }
+}

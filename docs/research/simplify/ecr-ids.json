@@ -1,0 +1,14 @@
+{
+ "A": {
+  "id": "ECR-0014",
+  "title": "Simplification Package A: low-risk cleanups, the floor (no owner decision reversed; does not meet O20)"
+ },
+ "B": {
+  "id": "ECR-0015",
+  "title": "Simplification Package B (RECOMMENDED): final-size integration (A + bridge/self-test cuts + CC out + LED on the lid + lid-hung 28x12 board)"
+ },
+ "C": {
+  "id": "ECR-0016",
+  "title": "Simplification Package C: B plus the BQ25186 charger swap (owner option; robustness, not simplification)"
+ }
+}

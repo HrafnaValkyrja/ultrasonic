@@ -1,0 +1,2169 @@
+{
+ "opps": [
+  {
+   "id": "PER-07",
+   "name": "Power LED onto the pod lid (light pipe): arm 4 -> 2 wires, pad board deleted",
+   "kind": "cut",
+   "pkgs": "BC",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": -2.25,
+   "vol": -80,
+   "power": "0",
+   "risk": "HW: light pipe, splice",
+   "W": 6,
+   "F": 0,
+   "r": 1,
+   "c": 1,
+   "d": 1,
+   "h": 1,
+   "g": 2,
+   "dec": "O8, O11, O17, O19, O20",
+   "rel": "UI-ARM UI-PAD PWR-UI PROC-UI OUT-ARM OUT-PAD ARM-PAD BOARD-ARM BODY-ARM BOARD-BODY SPEC-UI COST-BOARD",
+   "note": "pad volume -50..-110 mm3, -0.15 g; needs E1 first",
+   "pts": 15.4,
+   "usd_order": -10.0,
+   "rank": 1
+  },
+  {
+   "id": "PER-08",
+   "name": "No LED at all (instead of PER-07)",
+   "kind": "option",
+   "pkgs": "D",
+   "P": 2,
+   "E": 1,
+   "usd_pod": -0.032,
+   "lines": 1,
+   "area": -7.94,
+   "vol": -80,
+   "power": "-0.14..-0.73 mA",
+   "risk": "HW: no board-alive light",
+   "W": 6,
+   "F": 0,
+   "r": 1,
+   "c": -2,
+   "d": -2,
+   "h": 1,
+   "g": 1,
+   "dec": "O8, D3",
+   "rel": "UI-ARM UI-PAD PWR-UI PROC-UI OUT-ARM OUT-PAD ARM-PAD SPEC-UI COST-BOARD",
+   "note": "+0.9 h always-awake pessimistic",
+   "pts": 11.6,
+   "usd_order": -11.66,
+   "rank": 2
+  },
+  {
+   "id": "SIZ-06",
+   "name": "Bend/trim dock tails flat: belly 3.5 -> 2.05 mm (spends O16(3): the USB-C receptacle no longer fits)",
+   "kind": "mech",
+   "pkgs": "BCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": -407,
+   "power": "0",
+   "risk": "HW",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": 0,
+   "d": 0,
+   "h": 1,
+   "g": 1,
+   "dec": "O16(3), O12(a)",
+   "rel": "DOCK-BODY DOCK-BOARD PWR-DOCK PWR-BODY",
+   "note": "spare-target bend + pull test; L1 vs magnets (left pod). Audit: the fallback survives only as a reprinted shell with the belly back at 3.5 mm (+391 mm3 on the B core)",
+   "pts": 7.2,
+   "usd_order": 0,
+   "rank": 3
+  },
+  {
+   "id": "OUT-03",
+   "name": "F4 by synchronous R21 sampling (TRGO2); drop C22 and offset R",
+   "kind": "cut",
+   "pkgs": "BCD",
+   "P": 1,
+   "E": 0,
+   "usd_pod": -0.005,
+   "lines": 1,
+   "area": -1.65,
+   "vol": 0,
+   "power": "0",
+   "risk": "FW: sample instant",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": 0,
+   "d": 2,
+   "h": 0,
+   "g": 1,
+   "dec": "O15/O18, ECR-0009",
+   "rel": "OUT-DEBUG PROC-OUT COST-BOARD OUT-BOARD",
+   "note": "needs OUT-07; real ADC noise unverified",
+   "pts": 6.3,
+   "usd_order": -1.55,
+   "rank": 4
+  },
+  {
+   "id": "FW-1",
+   "name": "Firmware bundle: self-test over-current cutoff, daily wire-health check, ILIM step-up, charge-voltage knob (VBATREG, default 4.20 V)",
+   "kind": "firmware",
+   "pkgs": "ABCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "0",
+   "risk": "FW",
+   "W": 0,
+   "F": 0,
+   "r": 3,
+   "c": 0,
+   "d": 2,
+   "h": 0,
+   "g": 1,
+   "dec": "O18, R23, R24",
+   "rel": "OUT-DEBUG PROC-OUT PWR-PROC PROC-DOCK PWR-OUT-RAIL",
+   "note": "output missed #1,#2; power missed #1,#5; periphery missed #2. Audit: the cutoff runs only while the F4 samples exist (self-test); an always-on guard is a knob costing 0.15-0.34 mA (interpolated, DS13737 Rev 10 Table 103), so sub-output issue 6 stays OPEN. 4.10-4.15 V costs 1-2 h worst-case runtime: knob, not default",
+   "pts": 6.0,
+   "usd_order": 0,
+   "rank": 5
+  },
+  {
+   "id": "OUT-01",
+   "name": "Drop N-gate pull-downs R4, R6 (P pull-ups R3/R5 stay)",
+   "kind": "cut",
+   "pkgs": "BCD",
+   "P": 2,
+   "E": 0,
+   "usd_pod": -0.005,
+   "lines": 0,
+   "area": -3.44,
+   "vol": 0,
+   "power": "-0.03 mA",
+   "risk": "FW: init order",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 1,
+   "dec": "D6 wording",
+   "rel": "PROC-OUT OUT-BOARD COST-BOARD PROC-DEBUG PWR-OUT-RAIL",
+   "note": "",
+   "pts": 5.7,
+   "usd_order": -0.02,
+   "rank": 6
+  },
+  {
+   "id": "OUT-07",
+   "name": "Firmware duty clamp + capped self-test: closes ECR-0005 (3V0 peak 326 -> ~92 mA)",
+   "kind": "enabler",
+   "pkgs": "ABCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "cell stress 93 -> 27 %",
+   "risk": "FW",
+   "W": 0,
+   "F": 0,
+   "r": 4,
+   "c": 0,
+   "d": 1,
+   "h": 0,
+   "g": 1,
+   "dec": "D17, ECR-0005/0009",
+   "rel": "PWR-OUT-RAIL PROC-OUT OUT-DEBUG SPEC-POWER",
+   "note": "PWR-12 = OUT-07; ngspice by reviewer",
+   "pts": 5.0,
+   "usd_order": 0,
+   "rank": 7
+  },
+  {
+   "id": "OUT-02",
+   "name": "R21 shunt 1206 -> 0402 (Panasonic ERJ2BSFR10X, 0.1 ohm current-sense; no Basic 0402 0.1 ohm exists)",
+   "kind": "cut",
+   "pkgs": "ABCD",
+   "P": 0,
+   "E": -1,
+   "usd_pod": 0.068,
+   "lines": 0,
+   "area": -8.52,
+   "vol": 0,
+   "power": "0",
+   "risk": "benign (calibrate the impedance gain)",
+   "W": 0,
+   "F": 0,
+   "r": 1,
+   "c": 0,
+   "d": 1,
+   "h": 0,
+   "g": 0,
+   "dec": "O13 Ext. count",
+   "rel": "OUT-DEBUG OUT-BOARD COST-BOARD PROC-OUT",
+   "note": "",
+   "pts": 4.7,
+   "usd_order": 0.27,
+   "rank": 8
+  },
+  {
+   "id": "PER-03",
+   "name": "Delete R17 (CHG_INT pull-up): PA15 internal pull-up, PB5 strapped to GND against the UCPD dead-battery pull-down (PWR-06 = PER-03)",
+   "kind": "cut",
+   "pkgs": "ABCD",
+   "P": 1,
+   "E": 0,
+   "usd_pod": -0.003,
+   "lines": 0,
+   "area": -1.72,
+   "vol": 0,
+   "power": "0",
+   "risk": "FW: UCPD_DBDIS first",
+   "W": 0,
+   "F": 0,
+   "r": 1,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 0,
+   "dec": "-",
+   "rel": "PWR-PROC PROC-BOARD PWR-BOARD COST-BOARD",
+   "note": "",
+   "pts": 4.3,
+   "usd_order": -0.01,
+   "rank": 9
+  },
+  {
+   "id": "SIZ-01",
+   "name": "Board 34x13 -> 28x12; pod top -0.7 mm (cell sets length)",
+   "kind": "mech",
+   "pkgs": "BCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": -294,
+   "power": "0",
+   "risk": "HW: routing",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": 0,
+   "d": 0,
+   "h": 1,
+   "g": 1,
+   "dec": "O20, O14, O16-5",
+   "rel": "BOARD-BODY BOARD-ARM AUDIO-BOARD AUDIO-BODY UI-BODY DOCK-BOARD PWR-BOARD OUT-BOARD PROC-BOARD DEBUG-BOARD COST-BOARD PHYS-FRAME",
+   "note": "outline is the one irrevocable item: freeze after the dummies",
+   "pts": 4.3,
+   "usd_order": 0,
+   "rank": 10
+  },
+  {
+   "id": "SIZ-05",
+   "name": "Armour plate off (lid 1.0)",
+   "kind": "option",
+   "pkgs": "D",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": -378,
+   "power": "0",
+   "risk": "HW",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": -1,
+   "d": 0,
+   "h": 1,
+   "g": 2,
+   "dec": "spec v0.14 exterior, O17",
+   "rel": "AUDIO-BODY UI-BODY SPEC-BODY",
+   "note": "owner aesthetic call; exclusive with SIZ-04",
+   "pts": 3.4,
+   "usd_order": 0,
+   "rank": 11
+  },
+  {
+   "id": "PER-02",
+   "name": "Delete R11 (ROM loader already pulls PA10 up)",
+   "kind": "cut",
+   "pkgs": "ABCD",
+   "P": 1,
+   "E": 0,
+   "usd_pod": -0.002,
+   "lines": 0,
+   "area": -1.72,
+   "vol": 0,
+   "power": "0",
+   "risk": "FW (stub can pull up)",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 0,
+   "dec": "-",
+   "rel": "PROC-DEBUG COST-BOARD",
+   "note": "",
+   "pts": 3.3,
+   "usd_order": -0.01,
+   "rank": 12
+  },
+  {
+   "id": "ASM-09",
+   "name": "Pad order: shared GND pad between J3 (DOCK_VBUS) and J5 (VBAT); every hand pad on B",
+   "kind": "process",
+   "pkgs": "BCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "0",
+   "risk": "HW",
+   "W": 0,
+   "F": 0,
+   "r": 2,
+   "c": 0,
+   "d": 1,
+   "h": 0,
+   "g": 1,
+   "dec": "O14, O19",
+   "rel": "DOCK-BOARD BOARD-ARM DOCK-BODY PWR-BOARD OUT-ARM",
+   "note": "replaces 'split J pads by face'",
+   "pts": 3.0,
+   "usd_order": 0,
+   "rank": 13
+  },
+  {
+   "id": "PER-12",
+   "name": "PB6 USART1_TX hook + 4 via-dot escapes (PB6, MDF mic-fallback PB8 and PB1, the MIC_DATA net; not pads)",
+   "kind": "cut",
+   "pkgs": "BCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0.8,
+   "vol": 0,
+   "power": "0",
+   "risk": "FW",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": 0,
+   "d": 2,
+   "h": 0,
+   "g": 1,
+   "dec": "O18, O20; MDF mic fallback kept (sub-audio-in issue 5)",
+   "rel": "PROC-BOARD DEBUG-BOARD",
+   "note": "audit: 4 dots, not 2-3, so the MDF mic-clock fallback (PB8 clock, PB1 data) stays a hand-wire fix; the clock end is R2's mic-side pad with R2 lifted",
+   "pts": 3.0,
+   "usd_order": 0,
+   "rank": 14
+  },
+  {
+   "id": "PER-05",
+   "name": "Drop crystal Y1 (Epson FC-135, 32.768 kHz) + C11, C12; HSI16 with docked USB-SOF trim",
+   "kind": "option",
+   "pkgs": "D",
+   "P": 3,
+   "E": 0,
+   "usd_pod": -0.18,
+   "lines": 2,
+   "area": -9.6,
+   "vol": 0,
+   "power": "+0.067 mA awake",
+   "risk": "HW: loses crystal-grade ref",
+   "W": 0,
+   "F": 0,
+   "r": -2,
+   "c": 0,
+   "d": -1,
+   "h": 1,
+   "g": 2,
+   "dec": "D16, D12",
+   "rel": "PROC-BOARD AUDIO-PROC PROC-OUT PROC-DOCK PROC-DEBUG COST-BOARD",
+   "note": "trim is mandatory: untrimmed 3-8x the accepted beat",
+   "pts": 2.9,
+   "usd_order": -3.78,
+   "rank": 15
+  },
+  {
+   "id": "SIZ-11",
+   "name": "Walls 0.8 -> 0.7 mm after a coupon and drop test",
+   "kind": "option",
+   "pkgs": "D",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": -351,
+   "power": "0",
+   "risk": "HW",
+   "W": 0,
+   "F": 0,
+   "r": -2,
+   "c": 0,
+   "d": 0,
+   "h": 1,
+   "g": 2,
+   "dec": "O19, O12(b)",
+   "rel": "BODY-ARM PHYS-FRAME SPEC-BODY",
+   "note": "no data for 0.6-0.7 mm tough-resin walls",
+   "pts": 2.8,
+   "usd_order": 0,
+   "rank": 16
+  },
+  {
+   "id": "PER-06",
+   "name": "Merge C20 into the VDD pin-48 100 nF (<= 1.5 mm from pins 1 and 48)",
+   "kind": "cut",
+   "pkgs": "ABCD",
+   "P": 1,
+   "E": 0,
+   "usd_pod": -0.004,
+   "lines": 0,
+   "area": -1.65,
+   "vol": 0,
+   "power": "0",
+   "risk": "HW small (layout rule)",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 1,
+   "dec": "-",
+   "rel": "PROC-BOARD COST-BOARD",
+   "note": "",
+   "pts": 2.3,
+   "usd_order": -0.02,
+   "rank": 17
+  },
+  {
+   "id": "PER-11",
+   "name": "Drop TP6 (probe VSYS at C21); DFU-first flash via R1 PH3 pad",
+   "kind": "cut",
+   "pkgs": "ABCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": -1.3,
+   "vol": 0,
+   "power": "0",
+   "risk": "FW: boot stub",
+   "W": 0,
+   "F": 0,
+   "r": 1,
+   "c": 0,
+   "d": 1,
+   "h": 0,
+   "g": 1,
+   "dec": "O9, O13, O18",
+   "rel": "DEBUG-BOARD PWR-DEBUG PROC-DEBUG",
+   "note": "",
+   "pts": 2.3,
+   "usd_order": 0,
+   "rank": 18
+  },
+  {
+   "id": "ASM-01",
+   "name": "Standard PCBA in a 70x70 panel; rails are the O9 frame; corrected fee model",
+   "kind": "process",
+   "pkgs": "ABCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "0",
+   "risk": "process",
+   "W": 0,
+   "F": 0,
+   "r": 2,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 0,
+   "dec": "O9, O13",
+   "rel": "COST-BOARD BOARD-BODY DEBUG-BOARD",
+   "note": "Economic PCBA is impossible for this board",
+   "pts": 2.0,
+   "usd_order": 0,
+   "rank": 19
+  },
+  {
+   "id": "ASM-05",
+   "name": "Fab spec: ENIG, rules >= 0.10 mm, EP vias filled/tented, +/-0.1 mm routing, flying probe",
+   "kind": "process",
+   "pkgs": "ABCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "0",
+   "risk": "process",
+   "W": 0,
+   "F": 0,
+   "r": 2,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 0,
+   "dec": "O14",
+   "rel": "COST-BOARD PROC-BOARD AUDIO-BOARD BOARD-BODY DEBUG-BOARD",
+   "note": "via 0.20/0.45 is a layout call, not a rule",
+   "pts": 2.0,
+   "usd_order": 0,
+   "rank": 20
+  },
+  {
+   "id": "PWR-01",
+   "name": "U3 BQ25180 (TI 1 A I2C linear charger, 8-ball DSBGA) -> BQ25186 (same I2C map, leadless WSON-10, adds /PG and /CE)",
+   "kind": "option",
+   "pkgs": "CD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": -0.26,
+   "lines": 0,
+   "area": 3.2,
+   "vol": 0,
+   "power": "die +20 K not +31 K",
+   "risk": "FW regs / HW footprint",
+   "W": 0,
+   "F": 1,
+   "r": 1,
+   "c": 0,
+   "d": 1,
+   "h": 1,
+   "g": 3,
+   "dec": "O16(2)",
+   "rel": "PWR-BOARD PWR-DOCK PWR-PROC COST-BOARD SPEC-POWER",
+   "note": "robustness swap, not a simplification; re-audit SLUSF69A",
+   "pts": 2.0,
+   "usd_order": -1.04,
+   "rank": 21
+  },
+  {
+   "id": "SIZ-15",
+   "name": "Wear dummies at S0/S1/S2 before the outline freeze (extends ECR-0006)",
+   "kind": "process",
+   "pkgs": "ABCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "0",
+   "risk": "process",
+   "W": 0,
+   "F": 0,
+   "r": 2,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 0,
+   "dec": "R20, T5, O20",
+   "rel": "BOARD-BODY PWR-BODY DOCK-BODY BODY-ARM ARM-PAD",
+   "note": "",
+   "pts": 2.0,
+   "usd_order": 0,
+   "rank": 22
+  },
+  {
+   "id": "SIZ-08",
+   "name": "Thin Xinyangze YZ103915020T-04025-02 dock, 2.0 mm, no tails (sample only)",
+   "kind": "option",
+   "pkgs": "D",
+   "P": 0,
+   "E": 0,
+   "usd_pod": -0.72,
+   "lines": 0,
+   "area": 0,
+   "vol": -272,
+   "power": "0",
+   "risk": "HW",
+   "W": 0,
+   "F": 0,
+   "r": -1,
+   "c": 0,
+   "d": 0,
+   "h": 1,
+   "g": 2,
+   "dec": "O16(3), O12(a)",
+   "rel": "DOCK-BODY DOCK-BOARD PWR-DOCK COST-BOARD SPEC-BODY",
+   "note": "0.2 mm stubs: weaker joint on the daily contact; no mating head sold",
+   "pts": 1.8,
+   "usd_order": -2.88,
+   "rank": 23
+  },
+  {
+   "id": "ASM-X",
+   "name": "Build protocol: no-wash + mask the mic port, JLCDFM written OK on footprints, assemble 6-8 boards, reflow-side note",
+   "kind": "process",
+   "pkgs": "ABCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "0",
+   "risk": "process",
+   "W": 0,
+   "F": 0,
+   "r": 1.5,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 0,
+   "dec": "O19, R22",
+   "rel": "AUDIO-BOARD COST-BOARD",
+   "note": "assembly missed #2,#3,#4,#8",
+   "pts": 1.5,
+   "usd_order": 0,
+   "rank": 24
+  },
+  {
+   "id": "PWR-03",
+   "name": "Delete R19 (CC sense), free PA3; Rd R18 and J12 stay",
+   "kind": "cut",
+   "pkgs": "ABCD",
+   "P": 1,
+   "E": 0,
+   "usd_pod": -0.003,
+   "lines": 0,
+   "area": -1.72,
+   "vol": 0,
+   "power": "0",
+   "risk": "FW: ILIM policy",
+   "W": 0,
+   "F": 0,
+   "r": 1,
+   "c": 0,
+   "d": -1,
+   "h": 0,
+   "g": 1,
+   "dec": "O12(c) charge time",
+   "rel": "PROC-DOCK DOCK-BOARD",
+   "note": "= PER-01 CC half; wall chargers never enumerate: write the policy",
+   "pts": 1.3,
+   "usd_order": -0.01,
+   "rank": 25
+  },
+  {
+   "id": "PWR-09",
+   "name": "Drop C17 if U4 sits within ~3 mm of C21",
+   "kind": "option",
+   "pkgs": "D",
+   "P": 1,
+   "E": 0,
+   "usd_pod": -0.012,
+   "lines": 0,
+   "area": -1.65,
+   "vol": 0,
+   "power": "0",
+   "risk": "HW: layout dependent",
+   "W": 0,
+   "F": 0,
+   "r": -1,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 1,
+   "dec": "O14",
+   "rel": "PWR-BOARD",
+   "note": "",
+   "pts": 1.3,
+   "usd_order": -0.05,
+   "rank": 26
+  },
+  {
+   "id": "OUT-04",
+   "name": "Delete D1/D2 DNP footprints (and the unrouted OUT_A stub)",
+   "kind": "cut",
+   "pkgs": "ABCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": -1.16,
+   "vol": 0,
+   "power": "0",
+   "risk": "HW small (no ESD pads)",
+   "W": 0,
+   "F": 0,
+   "r": 1,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 0,
+   "dec": "-",
+   "rel": "OUT-BOARD COST-BOARD OUT-ARM OUT-PAD",
+   "note": "",
+   "pts": 1.2,
+   "usd_order": 0,
+   "rank": 27
+  },
+  {
+   "id": "SIZ-03",
+   "name": "F gap 1.5 -> 1.25 mm (parts <= 1.0 mm)",
+   "kind": "mech",
+   "pkgs": "BCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": -166,
+   "power": "0",
+   "risk": "HW",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": 0,
+   "d": 0,
+   "h": 1,
+   "g": 1,
+   "dec": "O20",
+   "rel": "BOARD-BODY UI-BODY AUDIO-BODY",
+   "note": "1.15 not proven: fillets, lid +/-0.1",
+   "pts": 1.2,
+   "usd_order": 0,
+   "rank": 28
+  },
+  {
+   "id": "ASM-02",
+   "name": "Frame header for SWD on the panel (optional; the 5 pads stay on the board)",
+   "kind": "process",
+   "pkgs": "-",
+   "P": 0,
+   "E": -1,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "0",
+   "risk": "process",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": 1,
+   "d": 0,
+   "h": 0,
+   "g": 1,
+   "dec": "O9, O13, O18",
+   "rel": "DEBUG-BOARD PROC-DEBUG PWR-DEBUG",
+   "note": "no SWD probe in the kit: only worth it with the printed pogo jig rejected",
+   "pts": 1.0,
+   "usd_order": 1.63,
+   "rank": 29
+  },
+  {
+   "id": "OUT-06",
+   "name": "Q1/Q2 -> NTZD3155C (onsemi complementary MOSFET pair, SOT-563) only if JLCDFM refuses the DFN1010B-6 redraw (ECR-0004)",
+   "kind": "option",
+   "pkgs": "-",
+   "P": 0,
+   "E": 0,
+   "usd_pod": -0.004,
+   "lines": 0,
+   "area": 4.74,
+   "vol": 0,
+   "power": "+0.49 mA",
+   "risk": "HW",
+   "W": 0,
+   "F": 1,
+   "r": 1,
+   "c": -2,
+   "d": 1,
+   "h": 0,
+   "g": 2,
+   "dec": "D6, ECR-0004",
+   "rel": "OUT-BOARD PROC-OUT PWR-OUT-RAIL COST-BOARD OUT-DEBUG",
+   "note": "DMC2400UV-7 sold out (stock 0 at 22:22Z); fallback costs the 800 kHz knob",
+   "pts": 1.0,
+   "usd_order": -0.02,
+   "rank": 30
+  },
+  {
+   "id": "SIZ-14",
+   "name": "Wire slack stowed in the board-free rear zone",
+   "kind": "mech",
+   "pkgs": "BCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "0",
+   "risk": "HW",
+   "W": 0,
+   "F": 0,
+   "r": 1,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 0,
+   "dec": "O17",
+   "rel": "BOARD-ARM BODY-ARM DOCK-BODY PWR-BODY",
+   "note": "binding fill is the 1.1 mm gap behind the cell",
+   "pts": 1.0,
+   "usd_order": 0,
+   "rank": 31
+  },
+  {
+   "id": "PER-04",
+   "name": "Drop I2C pull-ups R15/R16, use the MCU internal ones at SCL <= 50 kHz (PWR-07 = PER-04)",
+   "kind": "option",
+   "pkgs": "D",
+   "P": 2,
+   "E": 0,
+   "usd_pod": -0.005,
+   "lines": 0,
+   "area": -3.44,
+   "vol": 0,
+   "power": "0",
+   "risk": "FW slow clock / HW if > 40 pF",
+   "W": 0,
+   "F": 0,
+   "r": -1,
+   "c": 0,
+   "d": -1,
+   "h": 1,
+   "g": 1,
+   "dec": "TI says 10k",
+   "rel": "PWR-PROC PWR-BOARD PROC-BOARD COST-BOARD",
+   "note": "",
+   "pts": 0.7,
+   "usd_order": -0.02,
+   "rank": 32
+  },
+  {
+   "id": "ASM-11",
+   "name": "Count BOM lines and hidden-joint bodies ($1.53 each), not Extended types",
+   "kind": "process",
+   "pkgs": "ABCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "0",
+   "risk": "process",
+   "W": 0,
+   "F": 0,
+   "r": 0.5,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 0,
+   "dec": "O19",
+   "rel": "COST-BOARD",
+   "note": "",
+   "pts": 0.5,
+   "usd_order": 0,
+   "rank": 33
+  },
+  {
+   "id": "OUT-05",
+   "name": "C14 22 uF 0603 -> 1 uF 0402 (existing BOM line)",
+   "kind": "cut",
+   "pkgs": "BCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": -0.021,
+   "lines": 1,
+   "area": -2.63,
+   "vol": 0,
+   "power": "carrier +4 mV on 3V0",
+   "risk": "HW small (scope TP4)",
+   "W": 0,
+   "F": 0,
+   "r": 1,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 1,
+   "dec": "spec cap rule",
+   "rel": "PWR-OUT-RAIL OUT-BOARD COST-BOARD SPEC-POWER",
+   "note": "needs OUT-07; tallest bridge part 1.00 -> 0.60 mm",
+   "pts": 0.5,
+   "usd_order": -1.61,
+   "rank": 34
+  },
+  {
+   "id": "SIZ-04",
+   "name": "Lid wall 1.0 -> 0.8 mm (armour plate kept)",
+   "kind": "mech",
+   "pkgs": "BC",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": -133,
+   "power": "0",
+   "risk": "HW",
+   "W": 0,
+   "F": 0,
+   "r": 0,
+   "c": 0,
+   "d": 0,
+   "h": 1,
+   "g": 1,
+   "dec": "O12(b), O10",
+   "rel": "UI-BODY AUDIO-BODY SPEC-BODY",
+   "note": "",
+   "pts": 0.3,
+   "usd_order": 0,
+   "rank": 35
+  },
+  {
+   "id": "SIZ-02",
+   "name": "Board hung from the lid: 2 pins + 4 VHB spots; ribs, foam, bands out",
+   "kind": "enabler",
+   "pkgs": "BCD",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": 0,
+   "power": "0",
+   "risk": "HW",
+   "W": 0,
+   "F": 0,
+   "r": 3,
+   "c": 0,
+   "d": 0,
+   "h": 1,
+   "g": 1,
+   "dec": "O10, O16(5)(6), O19",
+   "rel": "BOARD-BODY UI-BODY AUDIO-BODY PWR-BODY SPEC-BODY",
+   "note": "closes reg-pod-body issues 2 and 11 (= physical 12); F face hidden: hand pads go to B; needs an SW1 back-stop (sub-ui issue 2 worsens otherwise)",
+   "pts": 0.0,
+   "usd_order": 0,
+   "rank": 36
+  },
+  {
+   "id": "SIZ-07",
+   "name": "Delete the USB-C keep-out (moot once SIZ-06 is taken: the receptacle no longer fits)",
+   "kind": "option",
+   "pkgs": "-",
+   "P": 0,
+   "E": 0,
+   "usd_pod": 0,
+   "lines": 0,
+   "area": 0,
+   "vol": -53,
+   "power": "0",
+   "risk": "HW",
+   "W": 0,
+   "F": 0,
+   "r": -1,
+   "c": 0,
+   "d": 0,
+   "h": 0,
+   "g": 1,
+   "dec": "O16(3)",
+   "rel": "DOCK-BODY SPEC-BODY",
+   "note": "SIZ-06 has already spent the fallback; this adds 0.7 %",
+   "pts": -0.7,
+   "usd_order": 0,
+   "rank": 37
+  },
+  {
+   "id": "PER-01D",
+   "name": "CC leaves the pod: delete R18 (Rd 5.1k), J12, 5th wire; 4-contact Xinyangze magnetic dock (PER-01 / PWR-04)",
+   "kind": "cut",
+   "pkgs": "BCD",
+   "P": 1,
+   "E": 0,
+   "usd_pod": 0.097,
+   "lines": 1,
+   "area": -4.83,
+   "vol": 0,
+   "power": "0",
+   "risk": "HW: rotation keying",
+   "W": 2,
+   "F": 0,
+   "r": -1,
+   "c": -1,
+   "d": -1,
+   "h": 1,
+   "g": 2,
+   "dec": "O12(a)/(c), O16(3); needs O21 lifted for the sample pair",
+   "rel": "PROC-DOCK PWR-DOCK DOCK-BOARD DOCK-BODY PROC-DEBUG BOARD-ARM COST-BOARD",
+   "note": "audit: no rotation-safe order exists with 4 contacts (180 degrees swaps 1<->4 and 2<->3). Pass = the rotated head REPELS on the exact pair to be bought; any partial hold fails; fail = 5-contact target, VBUS on the centre pin, R18/J12 kept (50 placements)",
+   "pts": -1.0,
+   "usd_order": -1.14,
+   "rank": 38
+  }
+ ],
+ "pkg": {
+  "T": {
+   "key": "T",
+   "name": "Today (Rev E)",
+   "placements": 56,
+   "lines": 30,
+   "ext": 11,
+   "blocks": {
+    "MCU": {
+     "today": 12,
+     "kept": 12,
+     "removed": [],
+     "added": 0
+    },
+    "Core SMPS": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Clock": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Mic": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Bridge": {
+     "today": 7,
+     "kept": 7,
+     "removed": [],
+     "added": 0
+    },
+    "Self-test": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Dock / USB": {
+     "today": 8,
+     "kept": 8,
+     "removed": [],
+     "added": 0
+    },
+    "Charger": {
+     "today": 7,
+     "kept": 7,
+     "removed": [],
+     "added": 0
+    },
+    "VBAT sense": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "LDO": {
+     "today": 4,
+     "kept": 4,
+     "removed": [],
+     "added": 0
+    },
+    "UI": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    }
+   },
+   "wires": 12,
+   "pads": 12,
+   "arm": 4,
+   "spare": 8,
+   "board": [
+    34,
+    13
+   ],
+   "usd_pod": 0.0,
+   "removed": [],
+   "added": [],
+   "swap": {},
+   "spare_listed": 8,
+   "spare_unassigned": 8,
+   "spare_clean": 4,
+   "spare_listed_check": 8,
+   "davg": [
+    0,
+    0
+   ],
+   "rt_typ": [
+    21.2,
+    21.2
+   ],
+   "rt_worst": [
+    12.4,
+    12.4
+   ],
+   "court": 246.4,
+   "face": 442,
+   "density_pct": 27.9,
+   "fees_lines_usd": 0.0,
+   "size": {
+    "L": 38.0,
+    "T": 11.8,
+    "H": 15.2,
+    "belly": 3.5,
+    "z": 18.7,
+    "vol": 7801,
+    "mass": 12.42,
+    "nose": 5.97,
+    "off_temple": 13.6,
+    "dvol_pct": 0.0
+   }
+  },
+  "A": {
+   "key": "A",
+   "name": "A  Cleanups",
+   "placements": 52,
+   "lines": 30,
+   "ext": 12,
+   "blocks": {
+    "MCU": {
+     "today": 12,
+     "kept": 10,
+     "removed": [
+      "C20",
+      "R11"
+     ],
+     "added": 0
+    },
+    "Core SMPS": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Clock": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Mic": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Bridge": {
+     "today": 7,
+     "kept": 7,
+     "removed": [],
+     "added": 0
+    },
+    "Self-test": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Dock / USB": {
+     "today": 8,
+     "kept": 7,
+     "removed": [
+      "R19"
+     ],
+     "added": 0
+    },
+    "Charger": {
+     "today": 7,
+     "kept": 6,
+     "removed": [
+      "R17"
+     ],
+     "added": 0
+    },
+    "VBAT sense": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "LDO": {
+     "today": 4,
+     "kept": 4,
+     "removed": [],
+     "added": 0
+    },
+    "UI": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    }
+   },
+   "wires": 12,
+   "pads": 12,
+   "arm": 4,
+   "spare": 9,
+   "board": [
+    34,
+    13
+   ],
+   "usd_pod": 0.056,
+   "removed": [
+    "R11",
+    "R17",
+    "C20",
+    "R19"
+   ],
+   "added": [],
+   "swap": {
+    "R21": "C409058"
+   },
+   "spare_listed": 9,
+   "spare_unassigned": 9,
+   "spare_clean": 5,
+   "spare_listed_check": 9,
+   "davg": [
+    0,
+    0
+   ],
+   "rt_typ": [
+    21.2,
+    21.2
+   ],
+   "rt_worst": [
+    12.4,
+    12.4
+   ],
+   "court": 228.6,
+   "face": 442,
+   "density_pct": 25.9,
+   "fees_lines_usd": 0.0,
+   "size": {
+    "L": 38.0,
+    "T": 11.8,
+    "H": 15.2,
+    "belly": 3.5,
+    "z": 18.7,
+    "vol": 7801,
+    "mass": 12.42,
+    "nose": 5.97,
+    "off_temple": 13.6,
+    "dvol_pct": 0.0
+   },
+   "usd_order_parts": 0.22,
+   "usd_order_fees": 0.0,
+   "usd_order_legacy_ext": 3.0,
+   "usd_order_padboard_est": 0.0,
+   "usd_order_total": 0.22
+  },
+  "B": {
+   "key": "B",
+   "name": "B  Final-size integration",
+   "placements": 49,
+   "lines": 27,
+   "ext": 12,
+   "blocks": {
+    "MCU": {
+     "today": 12,
+     "kept": 10,
+     "removed": [
+      "C20",
+      "R11"
+     ],
+     "added": 0
+    },
+    "Core SMPS": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Clock": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Mic": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Bridge": {
+     "today": 7,
+     "kept": 5,
+     "removed": [
+      "R4",
+      "R6"
+     ],
+     "added": 0
+    },
+    "Self-test": {
+     "today": 3,
+     "kept": 2,
+     "removed": [
+      "C22"
+     ],
+     "added": 0
+    },
+    "Dock / USB": {
+     "today": 8,
+     "kept": 6,
+     "removed": [
+      "R18",
+      "R19"
+     ],
+     "added": 0
+    },
+    "Charger": {
+     "today": 7,
+     "kept": 6,
+     "removed": [
+      "R17"
+     ],
+     "added": 0
+    },
+    "VBAT sense": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "LDO": {
+     "today": 4,
+     "kept": 4,
+     "removed": [],
+     "added": 0
+    },
+    "UI": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 1
+    }
+   },
+   "wires": 9,
+   "pads": 8,
+   "arm": 2,
+   "spare": 9,
+   "board": [
+    28,
+    12
+   ],
+   "usd_pod": 0.122,
+   "removed": [
+    "R11",
+    "R17",
+    "C20",
+    "R19",
+    "R18",
+    "R4",
+    "R6",
+    "C22"
+   ],
+   "added": [
+    "LED1"
+   ],
+   "swap": {
+    "R21": "C409058",
+    "C14": "C52923"
+   },
+   "spare_listed": 9,
+   "spare_unassigned": 8,
+   "spare_clean": 4,
+   "spare_listed_check": 9,
+   "davg": [
+    -0.03,
+    -0.03
+   ],
+   "rt_typ": [
+    21.3,
+    21.3
+   ],
+   "rt_worst": [
+    12.4,
+    12.4
+   ],
+   "court": 214.6,
+   "face": 336,
+   "density_pct": 31.9,
+   "fees_lines_usd": -4.59,
+   "size": {
+    "L": 38.0,
+    "T": 11.35,
+    "H": 14.5,
+    "belly": 2.05,
+    "z": 16.55,
+    "vol": 6829,
+    "mass": 11.96,
+    "nose": 5.76,
+    "off_temple": 13.15,
+    "dvol_pct": -12.5
+   },
+   "usd_order_parts": 0.49,
+   "usd_order_fees": -4.59,
+   "usd_order_legacy_ext": 3.0,
+   "usd_order_padboard_est": -10.0,
+   "usd_order_total": -14.1
+  },
+  "C": {
+   "key": "C",
+   "name": "C  B + BQ25186",
+   "placements": 49,
+   "lines": 27,
+   "ext": 12,
+   "blocks": {
+    "MCU": {
+     "today": 12,
+     "kept": 10,
+     "removed": [
+      "C20",
+      "R11"
+     ],
+     "added": 0
+    },
+    "Core SMPS": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Clock": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Mic": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Bridge": {
+     "today": 7,
+     "kept": 5,
+     "removed": [
+      "R4",
+      "R6"
+     ],
+     "added": 0
+    },
+    "Self-test": {
+     "today": 3,
+     "kept": 2,
+     "removed": [
+      "C22"
+     ],
+     "added": 0
+    },
+    "Dock / USB": {
+     "today": 8,
+     "kept": 6,
+     "removed": [
+      "R18",
+      "R19"
+     ],
+     "added": 0
+    },
+    "Charger": {
+     "today": 7,
+     "kept": 6,
+     "removed": [
+      "R17"
+     ],
+     "added": 0
+    },
+    "VBAT sense": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "LDO": {
+     "today": 4,
+     "kept": 4,
+     "removed": [],
+     "added": 0
+    },
+    "UI": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 1
+    }
+   },
+   "wires": 9,
+   "pads": 8,
+   "arm": 2,
+   "spare": 9,
+   "board": [
+    28,
+    12
+   ],
+   "usd_pod": -0.138,
+   "removed": [
+    "R11",
+    "R17",
+    "C20",
+    "R19",
+    "R18",
+    "R4",
+    "R6",
+    "C22"
+   ],
+   "added": [
+    "LED1"
+   ],
+   "swap": {
+    "R21": "C409058",
+    "C14": "C52923",
+    "U3": "C44639442"
+   },
+   "spare_listed": 9,
+   "spare_unassigned": 8,
+   "spare_clean": 4,
+   "spare_listed_check": 9,
+   "davg": [
+    -0.03,
+    -0.03
+   ],
+   "rt_typ": [
+    21.3,
+    21.3
+   ],
+   "rt_worst": [
+    12.4,
+    12.4
+   ],
+   "court": 217.8,
+   "face": 336,
+   "density_pct": 32.4,
+   "fees_lines_usd": -4.59,
+   "size": {
+    "L": 38.0,
+    "T": 11.35,
+    "H": 14.5,
+    "belly": 2.05,
+    "z": 16.55,
+    "vol": 6829,
+    "mass": 11.96,
+    "nose": 5.76,
+    "off_temple": 13.15,
+    "dvol_pct": -12.5
+   },
+   "usd_order_parts": -0.55,
+   "usd_order_fees": -4.59,
+   "usd_order_legacy_ext": 3.0,
+   "usd_order_padboard_est": -10.0,
+   "usd_order_total": -15.14
+  },
+  "D": {
+   "key": "D",
+   "name": "D  Ceiling (no ECR)",
+   "placements": 41,
+   "lines": 24,
+   "ext": 11,
+   "blocks": {
+    "MCU": {
+     "today": 12,
+     "kept": 10,
+     "removed": [
+      "C20",
+      "R11"
+     ],
+     "added": 0
+    },
+    "Core SMPS": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Clock": {
+     "today": 3,
+     "kept": 0,
+     "removed": [
+      "Y1",
+      "C11",
+      "C12"
+     ],
+     "added": 0
+    },
+    "Mic": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Bridge": {
+     "today": 7,
+     "kept": 5,
+     "removed": [
+      "R4",
+      "R6"
+     ],
+     "added": 0
+    },
+    "Self-test": {
+     "today": 3,
+     "kept": 2,
+     "removed": [
+      "C22"
+     ],
+     "added": 0
+    },
+    "Dock / USB": {
+     "today": 8,
+     "kept": 6,
+     "removed": [
+      "R18",
+      "R19"
+     ],
+     "added": 0
+    },
+    "Charger": {
+     "today": 7,
+     "kept": 4,
+     "removed": [
+      "R15",
+      "R16",
+      "R17"
+     ],
+     "added": 0
+    },
+    "VBAT sense": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "LDO": {
+     "today": 4,
+     "kept": 3,
+     "removed": [
+      "C17"
+     ],
+     "added": 0
+    },
+    "UI": {
+     "today": 3,
+     "kept": 2,
+     "removed": [
+      "R14"
+     ],
+     "added": 0
+    }
+   },
+   "wires": 9,
+   "pads": 8,
+   "arm": 2,
+   "spare": 12,
+   "board": [
+    26,
+    12
+   ],
+   "usd_pod": -0.367,
+   "removed": [
+    "R11",
+    "R17",
+    "C20",
+    "R19",
+    "R18",
+    "R4",
+    "R6",
+    "C22",
+    "Y1",
+    "C11",
+    "C12",
+    "R15",
+    "R16",
+    "C17",
+    "R14",
+    "LED1"
+   ],
+   "added": [],
+   "swap": {
+    "R21": "C409058",
+    "C14": "C52923",
+    "U3": "C44639442"
+   },
+   "spare_listed": 12,
+   "spare_unassigned": 11,
+   "spare_clean": 7,
+   "spare_listed_check": 12,
+   "davg": [
+    -0.1,
+    -0.69
+   ],
+   "rt_typ": [
+    21.5,
+    23.5
+   ],
+   "rt_worst": [
+    12.5,
+    13.2
+   ],
+   "court": 197.4,
+   "face": 312,
+   "density_pct": 31.6,
+   "fees_lines_usd": -9.18,
+   "size": {
+    "L": 37.8,
+    "T": 10.35,
+    "H": 14.3,
+    "belly": 1.25,
+    "z": 15.55,
+    "vol": 5935,
+    "mass": 11.07,
+    "nose": 5.32,
+    "off_temple": 12.15,
+    "dvol_pct": -23.9
+   },
+   "usd_order_parts": -1.47,
+   "usd_order_fees": -9.18,
+   "usd_order_legacy_ext": 0.0,
+   "usd_order_padboard_est": -10.0,
+   "usd_order_total": -20.65
+  }
+ },
+ "var": {
+  "B1": {
+   "key": "B1",
+   "name": "B without PER-01D (dock sample fails): R18 and J12 stay",
+   "placements": 50,
+   "lines": 28,
+   "ext": 12,
+   "blocks": {
+    "MCU": {
+     "today": 12,
+     "kept": 10,
+     "removed": [
+      "C20",
+      "R11"
+     ],
+     "added": 0
+    },
+    "Core SMPS": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Clock": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Mic": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Bridge": {
+     "today": 7,
+     "kept": 5,
+     "removed": [
+      "R4",
+      "R6"
+     ],
+     "added": 0
+    },
+    "Self-test": {
+     "today": 3,
+     "kept": 2,
+     "removed": [
+      "C22"
+     ],
+     "added": 0
+    },
+    "Dock / USB": {
+     "today": 8,
+     "kept": 7,
+     "removed": [
+      "R19"
+     ],
+     "added": 0
+    },
+    "Charger": {
+     "today": 7,
+     "kept": 6,
+     "removed": [
+      "R17"
+     ],
+     "added": 0
+    },
+    "VBAT sense": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "LDO": {
+     "today": 4,
+     "kept": 4,
+     "removed": [],
+     "added": 0
+    },
+    "UI": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 1
+    }
+   },
+   "wires": 10,
+   "pads": 9,
+   "arm": 2,
+   "spare": 9,
+   "board": [
+    28,
+    12
+   ],
+   "usd_pod": null,
+   "removed": [
+    "R11",
+    "R17",
+    "C20",
+    "R19",
+    "R4",
+    "R6",
+    "C22"
+   ],
+   "added": [
+    "LED1"
+   ],
+   "swap": {
+    "R21": "C409058",
+    "C14": "C52923"
+   },
+   "spare_listed": 9,
+   "spare_unassigned": 8,
+   "spare_clean": 4,
+   "spare_listed_check": 9,
+   "size": {
+    "L": 38.0,
+    "T": 11.35,
+    "H": 14.5,
+    "belly": 2.05,
+    "z": 16.55,
+    "vol": 6829,
+    "mass": 11.96,
+    "nose": 5.76,
+    "off_temple": 13.15,
+    "dvol_pct": -12.5
+   }
+  },
+  "B2": {
+   "key": "B2",
+   "name": "B without PER-07 (O8 kept, LED stays on the pad board)",
+   "placements": 48,
+   "lines": 27,
+   "ext": 12,
+   "blocks": {
+    "MCU": {
+     "today": 12,
+     "kept": 10,
+     "removed": [
+      "C20",
+      "R11"
+     ],
+     "added": 0
+    },
+    "Core SMPS": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Clock": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Mic": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Bridge": {
+     "today": 7,
+     "kept": 5,
+     "removed": [
+      "R4",
+      "R6"
+     ],
+     "added": 0
+    },
+    "Self-test": {
+     "today": 3,
+     "kept": 2,
+     "removed": [
+      "C22"
+     ],
+     "added": 0
+    },
+    "Dock / USB": {
+     "today": 8,
+     "kept": 6,
+     "removed": [
+      "R18",
+      "R19"
+     ],
+     "added": 0
+    },
+    "Charger": {
+     "today": 7,
+     "kept": 6,
+     "removed": [
+      "R17"
+     ],
+     "added": 0
+    },
+    "VBAT sense": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "LDO": {
+     "today": 4,
+     "kept": 4,
+     "removed": [],
+     "added": 0
+    },
+    "UI": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    }
+   },
+   "wires": 11,
+   "pads": 10,
+   "arm": 4,
+   "spare": 9,
+   "board": [
+    28,
+    12
+   ],
+   "usd_pod": null,
+   "removed": [
+    "R11",
+    "R17",
+    "C20",
+    "R19",
+    "R18",
+    "R4",
+    "R6",
+    "C22"
+   ],
+   "added": [],
+   "swap": {
+    "R21": "C409058",
+    "C14": "C52923"
+   },
+   "spare_listed": 9,
+   "spare_unassigned": 8,
+   "spare_clean": 4,
+   "spare_listed_check": 9,
+   "size": {
+    "L": 38.0,
+    "T": 11.35,
+    "H": 14.5,
+    "belly": 2.05,
+    "z": 16.55,
+    "vol": 6829,
+    "mass": 11.96,
+    "nose": 5.76,
+    "off_temple": 13.15,
+    "dvol_pct": -12.5
+   }
+  },
+  "B3": {
+   "key": "B3",
+   "name": "B on evidence-free defaults: PER-01D and PER-07 both off",
+   "placements": 49,
+   "lines": 28,
+   "ext": 12,
+   "blocks": {
+    "MCU": {
+     "today": 12,
+     "kept": 10,
+     "removed": [
+      "C20",
+      "R11"
+     ],
+     "added": 0
+    },
+    "Core SMPS": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Clock": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Mic": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "Bridge": {
+     "today": 7,
+     "kept": 5,
+     "removed": [
+      "R4",
+      "R6"
+     ],
+     "added": 0
+    },
+    "Self-test": {
+     "today": 3,
+     "kept": 2,
+     "removed": [
+      "C22"
+     ],
+     "added": 0
+    },
+    "Dock / USB": {
+     "today": 8,
+     "kept": 7,
+     "removed": [
+      "R19"
+     ],
+     "added": 0
+    },
+    "Charger": {
+     "today": 7,
+     "kept": 6,
+     "removed": [
+      "R17"
+     ],
+     "added": 0
+    },
+    "VBAT sense": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    },
+    "LDO": {
+     "today": 4,
+     "kept": 4,
+     "removed": [],
+     "added": 0
+    },
+    "UI": {
+     "today": 3,
+     "kept": 3,
+     "removed": [],
+     "added": 0
+    }
+   },
+   "wires": 12,
+   "pads": 11,
+   "arm": 4,
+   "spare": 9,
+   "board": [
+    28,
+    12
+   ],
+   "usd_pod": null,
+   "removed": [
+    "R11",
+    "R17",
+    "C20",
+    "R19",
+    "R4",
+    "R6",
+    "C22"
+   ],
+   "added": [],
+   "swap": {
+    "R21": "C409058",
+    "C14": "C52923"
+   },
+   "spare_listed": 9,
+   "spare_unassigned": 8,
+   "spare_clean": 4,
+   "spare_listed_check": 9,
+   "size": {
+    "L": 38.0,
+    "T": 11.35,
+    "H": 14.5,
+    "belly": 2.05,
+    "z": 16.55,
+    "vol": 6829,
+    "mass": 11.96,
+    "nose": 5.76,
+    "off_temple": 13.15,
+    "dvol_pct": -12.5
+   }
+  }
+ },
+ "guard_ma": {
+  "25000": 0.15,
+  "200000": 0.24,
+  "400000": 0.34
+ },
+ "guard_rt": {
+  "25000": [
+   20.8,
+   12.2
+  ],
+  "200000": [
+   20.5,
+   12.2
+  ],
+  "400000": [
+   20.2,
+   12.1
+  ]
+ },
+ "belly35": {
+  "vol": 7220,
+  "z": 18.0,
+  "belly": 3.5,
+  "dvol": 391
+ }
+}
