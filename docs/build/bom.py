@@ -28,16 +28,17 @@ ITEMS = [
     ("Charger", "NTC 10k B3435 NCP15XH103F03RC", "RT1 (+ J9 pad for a cell NTC)", "C77131", 1, 0.0199, "rev D", ""),
     ("Power", "TPS7A2030 3.0 V LDO", "U4", "C5220164", 1, 0.2175, "rev C", "input moves to VSYS"),
     ("Protect", "1N5819WS (reverse docking)", "D4", "C191023", 1, 0.0137, "rev D", ""),
-    ("Protect", "ESD9X5.0ST5G (VBUS)", "D3", "C87910", 1, 0.0478, "rev C", ""),
-    ("Protect", "PESD5V0S1BL (bridge outputs)", "D1, D2", "C84374", 0, 0.0334, "rev E DNP", "footprints kept, not fitted: FET body diodes clamp; outputs reach only the sealed exciter"),
+    ("Protect", "TPD1E10B06DPYR (TI bidirectional ESD, 5.5 V working) at the J3 DOCK_VBUS contact", "D5", "C48260", 1, 0.0417, "rev F", "replaces D3 ESD9X5.0 (was behind D4); JLC API 2026-10-02T23:48Z, 299k stock"),
+    ("Protect", "PESD5V0S1BL (bridge outputs)", "D1, D2", "C84374", 0, 0.0334, "rev F removed", "Rev F: DNP footprints deleted (OUT-04)"),
     ("USB", "TPD2E2U06DRLR (D+/D- ESD)", "U6", "C1972959", 1, 0.3224, "rev D", "USB FS on PA11/PA12"),
     ("UI", "C&K KMT022NGJLHS IP68 switch, 1.6 N, 600k cycles", "SW1", "C221707", 1, 0.3902, "rev D", "replaces KXT321; 2.2k pull-down for >= 1 mA contact current"),
     # --- rev-1 test hooks (Rev E)
     ("Test", "0.1 ohm 1% 1206 bridge shunt 1206W4F100LT5E", "R21", "C25334", 1, 0.0055, "rev E", "Basic (was 0.33R Extended C23410); lift it to disconnect the bridge"),
     ("Test", "0 ohm 0402 link (LDO -> 3V0)", "R20", "C17168", 1, 0.0025, "rev E", "lift it to meter or inject the 3V0 rail"),
     # --- passives (approx. counts after O16)
-    ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 23, 0.012, "rev E", "23 parts (C22 10n added); C8/C9 2.2 uF now Basic C12530"),
-    ("Passives", "0402 resistors (Basic)", "R*", "various", 21, 0.003, "rev E", "21 parts (R22 1k added)"),
+    ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 20, 0.012, "rev F", "20 parts (Rev F: C20 removed; C15 itemised below)"),
+    ("Passives", "Murata GRM155R61E475ME15D 4.7 uF 25 V X5R 0402 (charger IN, TI 25 V recommendation)", "C15", "C2858031", 1, 0.0833, "rev F", "Extended; JLC API 2026-10-02T23:50Z, 135k stock"),
+    ("Passives", "0402 resistors (Basic)", "R*", "various", 16, 0.003, "rev F", "16 parts (Rev F: R11, R17, R19 removed; R20 and R21 itemised under Test)"),
     # --- pad board (same panel)
     ("Pad board", "Everlight 16-213/BHC-AN1P2 blue 0402 LED", "LED1", "C131223", 1, 0.0291, "O8", "on the tiny pad board"),
     # --- off-board

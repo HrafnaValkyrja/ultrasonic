@@ -117,9 +117,21 @@ by_lcsc:
     max_mm: 0.65
     source: C&K KMT0 series datasheet p.B-9 (21 Mar 2018), part-number key 'Total Height 0 = 0.65 mm' (nominal; the drawing gives no upper tolerance)
 
+  # ---- Rev F additions (read 2026-10-02) ----
+  C2858031:
+    part: Murata GRM155R61E475ME15D, 4.7 uF 25 V X5R 0402 (charger IN, ECR-0013 S3)
+    max_mm: 0.55
+    source: Murata GRM catalogue (LCSC copy linked from C2858031), dimension table "T max. (mm)" 0.55 for the 0402 (GRM15) size
+  C48260:
+    part: TI TPD1E10B06DPYR bidirectional ESD, X1SON-2 (DPY) 1.0 x 0.6 mm (D5 at J3 DOCK_VBUS)
+    max_mm: 0.45
+    source: TI SLLSEB1G (Feb 2012, revised Aug 2024), package outline DPY0002A "X1SON - 0.45 mm max height"
+
 by_footprint:
   # copper-only pads: TP probe pads have no body
   # J wire pads: the hand-soldered litz on top IS the part. An allowance, not a datasheet value: solder blob <= 0.5 mm + one 0.21 mm
   # litz conductor + 0.09 margin. Replace it with a measurement from the first hand-soldered pod.
   TestPoint_Pad_D1.0mm: {max_mm: 0.8, kind: allowance, source: "design allowance for a hand-soldered 0.21 mm litz wire on a D1.0 pad (blob 0.5 + wire 0.21 + 0.09); wire count: docs/system/reg-board.md issue 5"}
   TestPoint_Pad_D0.7mm: {max_mm: 0.0, source: "copper pad with no body (hw/lib/pod.pretty)"}
+  TestDot_D0.5mm: {max_mm: 0.8, kind: allowance, source: "Rev F copper test dot: same allowance as a wire-tacked pad (blob 0.5 + 0.21 wire + 0.09) in case a fallback wire is tacked on"}
+  WirePad_1.0x2.0mm: {max_mm: 0.8, kind: allowance, source: "Rev F shared GND pad for two hand-soldered 0.21 mm litz wires: same allowance as TestPoint_Pad_D1.0mm"}

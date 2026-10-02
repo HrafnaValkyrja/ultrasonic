@@ -38,8 +38,8 @@ PLACE = {
     # ================= F (outer face): MCU in the middle, quiet strip at the front, SMPS + switch behind it
     "U1": (13.0, 6.5, 0, "F"),
     "Y1": (6.6, 4.2, 90, "F"), "C11": (8.3, 3.28, 90, "F"), "C12": (8.3, 5.58, 90, "F"),
-    "C10": (8.3, 7.88, 90, "F"), "C5": (8.3, 10.18, 90, "F"), "C6": (7.3, 10.18, 90, "F"), "C1": (7.3, 7.88, 90, "F"),
-    "C20": (9.6, 1.6, 0, "F"),
+    "C10": (8.3, 7.88, 90, "F"), "C5": (8.3, 10.18, 90, "F"), "C6": (7.3, 10.18, 90, "F"), "C1": (9.4, 1.85, 90, "F"),
+    
     "C3": (17.6, 3.51, 90, "F"), "C4": (18.8, 3.51, 90, "F"), "C7": (18.0, 6.5, 90, "F"),
     "C2": (17.6, 9.49, 90, "F"), "C8": (17.6, 11.5, 0, "F"), "L1": (20.4, 10.64, 0, "F"), "C9": (20.3, 8.57, 0, "F"),
     "R1": (17.0, 1.6, 0, "F"),
@@ -48,27 +48,32 @@ PLACE = {
     # test pads: one 1.27 mm-pitch row along the top edge (P50 pogo jig), outside the 0.6 mm clamp band
     **{f"TP{i + 1}": (24.4 + 1.27 * i, 1.3, 0, "F") for i in range(6)},
     # wire pads: two columns at the rear edge, where the arm wires come up behind the board
-    "J3": (31.4, 3.4, 0, "F"), "J4": (31.4, 5.0, 0, "F"), "J10": (31.4, 6.6, 0, "F"),
-    "J11": (31.4, 8.2, 0, "F"), "J12": (31.4, 9.8, 0, "F"), "J9": (31.4, 11.4, 0, "F"),
-    "J5": (33.0, 3.4, 0, "F"), "J6": (33.0, 5.0, 0, "F"), "J1": (33.0, 6.6, 0, "F"),
-    "J2": (33.0, 8.2, 0, "F"), "J7": (33.0, 9.8, 0, "F"), "J8": (33.0, 11.4, 0, "F"),
+    "J3": (31.4, 3.0, 0, "F"), "J4": (31.4, 5.1, 0, "F"), "J10": (33.0, 3.0, 0, "F"),
+    "J11": (33.0, 4.6, 0, "F"), "J12": (33.0, 6.2, 0, "F"), "J9": (31.4, 8.8, 0, "F"),
+    "J5": (31.4, 7.2, 0, "F"), "J1": (33.0, 7.8, 0, "F"),
+    "J2": (33.0, 9.4, 0, "F"), "J7": (31.4, 10.4, 0, "F"), "J8": (33.0, 11.0, 0, "F"),
+    # Rev F: D5 ESD at the J3 contact; TP7 printf dot by PB6 (pin 42), reachable with the lid off
+    # C1 (100 nF) serves VDD pin 48 AND VBAT pin 1 (Rev F PER-06): +3V0 pad 0.42 mm from pin 48, 1.02 mm from pin 1 (both <= 1.5)
+    "D5": (29.9, 3.2, 90, "F"), "TP7": (13.2, 1.5, 0, "F"),
     # ================= B (inner face, toward the cell)
+    # Rev F: MDF mic-fallback dots by the mic on B (TP8 PB8 -> R2's mic-side pad, TP9 PB1 -> TP10 MIC_DATA)
+    "TP8": (8.7, 9.4, 0, "B"), "TP9": (8.7, 3.6, 0, "B"), "TP10": (7.3, 3.0, 0, "B"),
     "U2": (4.67, 6.5, 90, "B"), "R2": (7.3, 8.0, 90, "B"), "C13": (7.3, 5.0, 90, "B"),   # ECR-0011: the PORT (0.77 mm off the origin) at (3.9, 6.5) under the lid port
     "R8": (10.0, 2.0, 90, "B"), "R9": (11.0, 2.0, 90, "B"), "C19": (12.0, 2.0, 90, "B"),
-    "R11": (10.5, 11.2, 90, "B"), "R15": (12.0, 11.2, 90, "B"), "R16": (13.5, 11.2, 90, "B"), "R17": (15.0, 11.2, 90, "B"),
+    "R15": (17.5, 4.75, 270, "B"), "R16": (16.3, 4.75, 270, "B"), 
     # charger + LDO + dock protection: rear, near the wire pads
-    "U3": (17.0, 3.0, 0, "B"), "C15": (15.3, 2.2, 90, "B"), "C16": (18.7, 2.2, 90, "B"), "C21": (17.0, 4.9, 0, "B"),
+    "U3": (17.0, 3.0, 0, "B"), "C15": (18.7, 2.2, 90, "B"), "C16": (15.3, 2.2, 90, "B"), "C21": (21.0, 2.0, 0, "B"),
     "RT1": (19.8, 4.6, 90, "B"),
     "R20": (23.4, 11.4, 0, "B"),                     # LDO -> 3V0 link
     "U4": (24.2, 7.4, 0, "B"), "C17": (24.2, 5.9, 0, "B"), "C18": (24.2, 8.9, 0, "B"),
     "R12": (25.3, 2.2, 90, "B"), "R13": (26.9, 2.2, 90, "B"),
-    "D3": (26.26, 4.6, 0, "B"), "D4": (27.22, 6.4, 0, "B"), "U6": (26.58, 8.6, 0, "B"),
-    "R18": (25.3, 10.4, 90, "B"), "R19": (27.54, 10.4, 90, "B"), "R14": (26.42, 11.8, 0, "B"),
+    "D4": (27.22, 6.4, 0, "B"), "U6": (26.58, 8.6, 0, "B"),
+    "R18": (25.3, 10.4, 90, "B"), "R14": (26.42, 11.8, 0, "B"),
     # H-bridge: rear-middle, far from the mic
     "Q1": (15.8, 8.0, 0, "B"), "Q2": (18.6, 8.0, 0, "B"),
     "R3": (15.5, 6.6, 0, "B"), "R4": (15.5, 9.4, 0, "B"), "R5": (18.9, 6.6, 0, "B"), "R6": (18.9, 9.4, 0, "B"),
     "R21": (21.6, 7.6, 90, "B"),                     # 0.1R 1206 low-side shunt, right behind Q2
-    "C14": (17.3, 11.4, 0, "B"), "D1": (16.0, 10.3, 0, "B"), "D2": (19.6, 10.3, 0, "B"),
+    "C14": (17.3, 11.4, 0, "B"), 
 }
 
 
@@ -89,7 +94,7 @@ def gnd_plane(b):
     return z
 
 
-DNP = ("D1", "D2")                                   # footprints kept, not fitted (gen.py audit note)
+DNP = ()                                             # Rev F: D1/D2 footprints removed (OUT-04)
 VIA_D, VIA_DRILL, STUB_W, GAP = 0.35, 0.15, 0.15, 0.12   # mm; GAP = copper clearance kept by the fan-out
 
 
@@ -186,6 +191,7 @@ def gnd_fanout(b, fps, inset=0.0):
 def build(inset=0.0, fanout=True):
     P.PLACE = PLACE
     b, fps = P.build(inset)
+    b.GetDesignSettings().SetBoardThickness(mm(0.8))      # 0.8 mm board (shell PCB y 12.1-12.9, mic port depth; reg-board issue 2)
     for ref in DNP:
         fps[ref].SetDNP(True); fps[ref].SetExcludedFromBOM(True); fps[ref].SetExcludedFromPosFiles(True)
     if fanout:

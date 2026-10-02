@@ -1639,10 +1639,22 @@ def selftest_cases(ctx):
         return Case("pins: pod.net out of step with the circuit (one U1 pin changed)", run, FAIL, "stale")
 
     def hazard_expired():
+        # Rev F cleared PA15 in hardware (PB5 strap) and the rest are firmware-mitigated, so make one hazard un-mitigated
+        c2 = copy.deepcopy(contract)
+        for h in c2["hazards"]:
+            if h["port"] == "PB4":
+                h.pop("mitigation", None)
+
+        def run():
+            with ecr_states(ECR_0013="closed"):
+                return check_pins(c2, sch, data)
+        return Case("pins: ECR-0013 closed while an un-mitigated hazard is still on a used pin", run, FAIL, "closed")
+
+    def hazard_mitigated_closed():
         def run():
             with ecr_states(ECR_0013="closed"):
                 return check_pins(contract, sch, data)
-        return Case("pins: ECR-0013 closed while its hazards are still on used pins", run, FAIL, "closed")
+        return Case("pins: ECR-0013 closed with only firmware-mitigated hazards left (they clear)", run, PASS, "")
 
     def rows_deleted():
         c = copy.deepcopy(contract)
@@ -1812,7 +1824,7 @@ def selftest_cases(ctx):
 
     for build in (mic_origin, mic_stack, mic_lid, mic_face, mic_ap, mic_locating, switch_locating, switch_off, switch_stack, outline_wide, outline_tall, outline_thick, outline_drag, round_trip_mic,
                   dup_ref, inside_far, inside_rear, clamp_body, clamp_tiny, clamp_wire_pad, heights, heights_empty, nets_swap, nets_missing,
-                  pin_wrong, pair, power_pin, ep, netlist, hazard_expired, rows_deleted, contract_empty, power_rows_deleted, unconstrained, budget_unusable, budget_no_d11, hazards_deleted, absent_wrong, absent_removed,
+                  pin_wrong, pair, power_pin, ep, netlist, hazard_expired, hazard_mitigated_closed, rows_deleted, contract_empty, power_rows_deleted, unconstrained, budget_unusable, budget_no_d11, hazards_deleted, absent_wrong, absent_removed,
                   ecr_format, waiver_removed, waiver_expired, overload, waiver_ceiling, hard_limit, assumes, derive, calc_moves, rail_order_, d11_inductor, d11_vdd11,
                   new_rail, topology, frame_expired):
         add(build)

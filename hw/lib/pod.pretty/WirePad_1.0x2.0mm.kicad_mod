@@ -1,0 +1,88 @@
+(footprint "WirePad_1.0x2.0mm"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Wire pad 1.0 x 2.0 mm for two hand-soldered wires (shared GND between dock VBUS and cell +, ASM-09)")
+	(tags "test point SMD pad")
+	(property "Reference" "REF**"
+		(at 0 -0.9 0)
+		(layer "F.SilkS")
+		(uuid "f9422671-e85c-4cad-b022-f1787adcb719")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "WirePad_1.0x2.0mm"
+		(at 0 0.9 0)
+		(layer "F.Fab")
+		(uuid "8013e825-d26f-411f-ab9e-ec24ce505247")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "a4279dad-c9ba-4b47-877d-7385a39ada1b")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "936833fa-7fc5-4607-bd5a-3e06c514fac1")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr exclude_from_pos_files exclude_from_bom)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_rect
+		(start -0.75 -1.25)
+		(end 0.75 1.25)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "68eb7a5d-09c4-4c5b-8f61-2530c8fb8695")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 -0.9 0)
+		(layer "F.Fab")
+		(uuid "7115cafa-4b47-4dad-a63e-a6b86499e8ba")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" smd roundrect
+		(at 0 0)
+		(size 1.0 2.0)
+		(roundrect_rratio 0.25)
+		(layers "F.Cu" "F.Mask")
+		(uuid "0291d784-8671-4e87-9d71-df2544570fa0")
+	)
+	(embedded_fonts no)
+)

@@ -1,0 +1,87 @@
+(footprint "TestDot_D0.5mm"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Copper test dot 0.5 mm (rev-1 hook: tack a wire or touch a probe; not a pogo pad)")
+	(tags "test point SMD pad")
+	(property "Reference" "REF**"
+		(at 0 -0.9 0)
+		(layer "F.SilkS")
+		(uuid "38851972-15ef-483f-9448-9ef1c076e245")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "TestDot_D0.5mm"
+		(at 0 0.9 0)
+		(layer "F.Fab")
+		(uuid "4fc14f2e-50b0-4f9d-88a5-0ac353b47b31")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "b9eea360-8734-40c2-a9a6-685de9602299")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0c19959b-0f5e-4cd2-a9af-f28b3147c7ee")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr exclude_from_pos_files exclude_from_bom)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_circle
+		(center 0 0)
+		(end 0.4 0)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "f1ed5576-bcb9-4e9f-a6e1-939fb038126a")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 -0.9 0)
+		(layer "F.Fab")
+		(uuid "2e7f304f-05c7-4e88-bf1a-ba33cdd1320a")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" smd circle
+		(at 0 0)
+		(size 0.5 0.5)
+		(layers "F.Cu" "F.Mask")
+		(uuid "47784f64-1351-4b16-8979-eabc6126f776")
+	)
+	(embedded_fonts no)
+)

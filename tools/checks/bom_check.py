@@ -118,6 +118,7 @@ LCSC_IDENTITY = {
     "C15195": ("CL05B103KB5NNNC", "0402", "10n"), "C17168": ("0402WGF0000TCE", "0402", "0"),
     "C19702": ("CL10A106KP8NNNC", "0603", "10u"), "C23733": ("CL05A475MP5NRNC", "0402", "4u7"),
     "C25105": ("0402WGF330JTCE", "0402", "33"), "C25334": ("1206W4F100LT5E", "1206", "0.1"),
+    "C2858031": ("GRM155R61E475ME15D", "0402", "4u7 25V"), "C48260": ("TPD1E10B06DPYR", None, None),
     "C25741": ("0402WGF1003TCE", "0402", "100k"), "C25744": ("0402WGF1002TCE", "0402", "10k"),
     "C25879": ("0402WGF2201TCE", "0402", "2k2"), "C25905": ("0402WGF5101TCE", "0402", "5k1"),
     "C26083": ("0402WGF1004TCE", "0402", "1M"), "C52923": ("CL05A105KA5NQNC", "0402", "1u"),
@@ -1162,7 +1163,8 @@ def selftest_cases():
     """(what is broken, [(check, statuses it may give)], how to break it): the failures a past review missed, plus the false alarms to avoid."""
     F, P, W, OK = {FAIL}, {PASS}, {WARN}, {PASS, WARN}
     sch_set = lambda ref, **kv: lambda w: w.sch[ref].update(kv)                       # noqa: E731
-    stale_q1 = lambda w: w.set_field("Q1", "LCSC Part", "C552750")                   # noqa: E731
+    # Rev F: Q1/Q2 moved to the clean pod:Nexperia footprint, so the pre-cleanup copy is exercised on SW1 (lcsc footprint)
+    stale_q1 = lambda w: w.set_field("SW1", "LCSC Part", "C221708")                  # noqa: E731
 
     def duplicate(w):
         w.board.Add(keep(w.pcbnew.Cast_to_FOOTPRINT(w.fp("R3").Duplicate(False))))
@@ -1299,11 +1301,11 @@ def selftest_cases():
         ("1M resistors given the 10k LCSC everywhere", [("identity", F, "R8: gen.py value '1M'")], lambda w: [w.sch[r].update(lcsc="C25744") for r in ("R8", "R9")]),
         ("every 100n capacitor given the 10u 0603 LCSC", [("identity", F, "gen.py value '100n'")], lambda w: [p.update(lcsc="C19702") for p in w.sch.values() if p["value"] == "100n"]),
         ("a part with an LCSC the table does not know", [("identity", W, "no row in LCSC_IDENTITY")], sch_set("R3", lcsc="C99999")),
-        ("a placed part with no LCSC", [("jlc-bom", F, "C20 is placed but has no LCSC")], lambda w: (w.sch["C20"].update(lcsc=""), w.edit("JLC_BOM", lambda t: t.replace(",C1525,", ",,", 1)))),
+        ("a placed part with no LCSC", [("jlc-bom", F, "C2 is placed but has no LCSC")], lambda w: (w.sch["C2"].update(lcsc=""), w.edit("JLC_BOM", lambda t: t.replace(",C1525,", ",,", 1)))),
         ("an unknown DNP_BOM kind", [("jlc-bom", F, "DNP_BOM='maybe'")], sch_set("R3", dnp="maybe")),
         ("BOM csv with a byte-order mark", [("jlc-bom", P)], csv_edit(lambda t: "\ufeff" + t)),
         ("BOM csv designators with spaces", [("jlc-bom", P)], csv_edit(lambda t: t.replace('"C1,C10,C13', '"C1, C10, C13', 1))),
-        ("BOM csv group split over two rows", [("jlc-bom", P)], csv_edit(lambda t: t.replace('"C1,C10,C13,C19,C2,C20,C3,C6",C_0402_1005Metric,C1525,8,yes', '"C1,C10,C13,C19",C_0402_1005Metric,C1525,4,yes\n100n,"C2,C20,C3,C6",C_0402_1005Metric,C1525,4,yes', 1))),
+        ("BOM csv group split over two rows", [("jlc-bom", P)], csv_edit(lambda t: t.replace('"C1,C10,C13,C19,C2,C3,C6",C_0402_1005Metric,C1525,7,yes', '"C1,C10,C13,C19",C_0402_1005Metric,C1525,4,yes\n100n,"C2,C3,C6",C_0402_1005Metric,C1525,3,yes', 1))),
         ("BOM csv with a wrong LCSC", [("jlc-bom", F, "R3: BOM LCSC Part #")], csv_edit(lambda t: t.replace(",C25741,", ",C25744,", 1))),
         ("BOM csv with a renamed header", [("jlc-bom", F, "lacks column")], csv_edit(lambda t: t.replace("LCSC Part #", "LCSC", 1))),
         ("sourcing lock deleted", [("stock-lock", F, "missing or empty"), ("lock-drift", W, "no sourcing lock")], lambda w: w.paths["LOCK"].unlink()),

@@ -84,11 +84,11 @@ rails:
         avg_ma: [0.4, 2.5]
         peak_ma: 315
         source: "average: sim/checks/power.py 'transducer, listening level' 0.4 / 1.1 / 2.5 mA (untraced guess until E1/E4); peak: gen.py R21 comment ~315 mA = 3.0 V into 8 ohm + FETs; integration-map.md Section 5; the same formula gives 0.32-0.33 A (sub-output.md issue 3, methodology.md 3.0 V / 9.3 ohm = 323 mA)"
-      - name: "pull-ups R11 100k, R15, R16, R17 10k (all lines low is the worst case)"
-        refs: [R11, R15, R16, R17]
+      - name: "I2C pull-ups R15, R16 10k (both lines low is the worst case; Rev F: R11 and R17 removed, CHG_INT on the PA15 internal pull-up)"
+        refs: [R15, R16]
         avg_ma: [0.0, 0.0]
-        calc: {volts: 3.0, parallel: [R11, R15, R16, R17], into: peak}
-        source: "computed from the schematic values: 3.0 V over each pull-up (0.93 mA at 100k + 3 x 10k); lines idle high"
+        calc: {volts: 3.0, parallel: [R15, R16], into: peak}
+        source: "computed from the schematic values: 3.0 V over each pull-up (0.60 mA at 2 x 10k); lines idle high"
       - name: "SW1 contact into the R10 2k2 pull-down while the button is pressed"
         refs: [SW1]
         avg_ma: [0.0, 0.0]

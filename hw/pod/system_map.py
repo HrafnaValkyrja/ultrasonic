@@ -24,20 +24,20 @@ OUT = REPO / "docs/system/integration-map.md"
 sys.path.insert(0, str(HERE))
 
 BLOCKS = {
-    "MCU": "U1 C1 C2 C3 C4 C5 C6 C7 C10 C20 R1 R11",
+    "MCU": "U1 C1 C2 C3 C4 C5 C6 C7 C10 R1",
     "CORE_SMPS": "L1 C8 C9",
     "CLOCK": "Y1 C11 C12",
     "MIC": "U2 R2 C13",
-    "BRIDGE": "Q1 Q2 R3 R4 R5 R6 C14 D1 D2",
+    "BRIDGE": "Q1 Q2 R3 R4 R5 R6 C14",
     "SELFTEST": "R21 R22 C22",
     "ARM_PADS": "J1 J2 J7 J8",
-    "DOCK_USB": "J3 J4 J10 J11 J12 D4 D3 U6 R18 R19 R12 R13 C15",
-    "CHARGER": "U3 C16 C21 RT1 J9 R15 R16 R17",
-    "CELL_PADS": "J5 J6",
+    "DOCK_USB": "J3 J4 J10 J11 J12 D4 D5 U6 R18 R12 R13 C15",
+    "CHARGER": "U3 C16 C21 RT1 J9 R15 R16",
+    "CELL_PADS": "J5",
     "VBAT_SENSE": "R8 R9 C19",
     "LDO": "U4 C17 C18 R20",
     "UI": "SW1 R10 R14",
-    "DEBUG": "TP1 TP2 TP3 TP4 TP5 TP6",
+    "DEBUG": "TP1 TP2 TP3 TP4 TP5 TP6 TP7 TP8 TP9 TP10",
 }
 BLOCK_OF = {ref: blk for blk, refs in BLOCKS.items() for ref in refs.split()}
 
@@ -51,7 +51,7 @@ FUNCTIONS = [
      "2 litz wires up the NiTi arm (rear-side route, heel channel, strut bore) to the exciter in the pad", "complementary PWM ~200 kHz with dead time; level/volume control"),
     ("F4 Self-test exciter |Z|", "SELFTEST, BRIDGE", "BRIDGE_RTN -> R21 0.1R -> GND; BRIDGE_RTN -> R22 1k -> I_SENSE (C22 10n) -> PA6 ADC1_IN11",
      "-", "tone sweep + synchronous detection over USB self-test (O15)"),
-    ("F5 Charge the cell", "DOCK_USB, CHARGER, CELL_PADS", "dock J3 DOCK_VBUS -> D4 -> VBUS -> U3 IN; U3 BAT -> VBAT -> J5/J6 -> cell (PCM inside); config over I2C",
+    ("F5 Charge the cell", "DOCK_USB, CHARGER, CELL_PADS", "dock J3 DOCK_VBUS -> D4 -> VBUS -> U3 IN; U3 BAT -> VBAT -> J5 (cell +) / J4 shared GND (cell -) -> cell (PCM inside); config over I2C",
      "magnetic 5-pin target in the belly bay, wired to J3/J4/J10/J11/J12; cell under the board (B side) on foam", "I2C charge current/JEITA setup, charge state"),
     ("F6 Temperature-safe charge", "CHARGER", "TS: RT1 (on board) OR J9 cell NTC, never both -> U3 TS/MR; TS also -> PA2",
      "optional NTC taped on the cell, wire to J9", "firmware 20 C rule reads PA2"),
@@ -59,25 +59,25 @@ FUNCTIONS = [
      "-", "-"),
     ("F8 Battery level", "VBAT_SENSE", "VBAT -> R8 1M / R9 1M (C19) -> VBAT_SENSE -> PA4 (ADC4 works in Stop 2)", "-", "fuel estimate, low-battery cutoff"),
     ("F9 Dock detect", "DOCK_USB", "VBUS -> R12/R13 100k/100k -> VBUS_SENSE -> PA1", "-", "DFU entry, charge mode"),
-    ("F10 USB data / DFU", "DOCK_USB, MCU", "J10 D+ / J11 D- -> U6 ESD -> PA12/PA11 (USB FS); CC: J12 -> R18 5k1 Rd, R19 10k -> CC_SENSE PA3",
+    ("F10 USB data / DFU", "DOCK_USB, MCU", "J10 D+ / J11 D- -> U6 ESD -> PA12/PA11 (USB FS); CC: J12 -> R18 5k1 Rd (CC not sensed since Rev F; ILIM by enumeration)",
      "dock contacts D+/D-/CC", "ROM DFU via boot stub, CDC self-test, firmware update"),
     ("F11 Wake / button", "UI, MCU", "SW1 (3V0 <-> BTN) -> PA0 WKUP1, R10 2k2 pull-down (switch needs >= 1 mA)",
      "SW1 on F at board (22.0, 6.5) under the lid plunger (D3.2 bore, silicone skin), KMT0 travel 0.15 mm", "wake from Off/Stop, on/off, modes"),
     ("F12 Power LED (solid)", "UI, ARM_PADS", "VSYS -> R14 2k2 -> LED_A -> J7 -> wire -> LED in the pad housing -> wire -> J8 -> LED_K -> PB7 (open-drain, FT)",
      "2 more litz wires up the arm (4 total), LED on the tiny pad board (O8)", "duty set from VBAT for steady brightness"),
-    ("F13 Charger link", "CHARGER, MCU", "I2C_SCL PB13, I2C_SDA PB14 (R15/R16 10k to 3V0); CHG_INT -> PA15 (R17)", "-", "I2C2, charger IRQ"),
-    ("F14 Debug / flash / test", "DEBUG, MCU", "TP1 SWDIO PA13, TP2 SWCLK PA14, TP3 NRST, TP4 3V0, TP5 GND, TP6 VSYS; BOOT0 (PH3) R1 10k low; PA10 R11 pull-up (bootloader USART1_RX)",
+    ("F13 Charger link", "CHARGER, MCU", "I2C_SCL PB13, I2C_SDA PB14 (R15/R16 10k to 3V0); CHG_INT -> PA15 (internal pull-up; PB5 strapped to GND, ECR-0013 S1)", "-", "I2C2, charger IRQ"),
+    ("F14 Debug / flash / test", "DEBUG, MCU", "TP1 SWDIO PA13, TP2 SWCLK PA14, TP3 NRST, TP4 3V0, TP5 GND, TP6 VSYS; BOOT0 (PH3) R1 10k low (R1 pad = DFU tack point); TP7 PB6 USART1_TX printf; TP8/TP9/TP10 MDF mic fallback dots; PA10 pulled up by the ROM loader itself (bootloader USART1_RX)",
      "0.7 mm pads in a 1.27 mm row on F, top edge; snap-off test frame (O9)", "SWD, ROM bootloader"),
-    ("F15 ESD at exposed contacts", "DOCK_USB", "D3 on VBUS; U6 on D+/D-; (bridge outputs D1/D2 DNP)", "dock contacts are the only exposed metal", "-"),
+    ("F15 ESD at exposed contacts", "DOCK_USB", "D5 TPD1E10B06 at J3 DOCK_VBUS (bidirectional, 5.5 V working; D4 reverse block); U6 on D+/D-", "dock contacts are the only exposed metal", "-"),
 ]
 
 RAILS = {
     "+3V0": "source: U4 LDO via R20 (TPS7A2030, 300 mA rated, ICL 360 mA min). Loads: MCU ~2.4-5.8 mA run; mic ~0.9-1.1 mA via PA5; "
             "bridge P sources: avg 0.6-1.7 mA at listening level but ~315 mA peaks at full drive (8R + 1.2R FETs) buffered by C14 22 uF; "
-            "pull-ups R11/R15/R16/R17; SW1 contact (>= 1 mA while pressed).",
+            "pull-ups R15/R16; SW1 contact (>= 1 mA while pressed).",
     "VSYS": "source: U3 SYS (power path: VBUS when docked, else VBAT through the BATFET). Loads: U4 LDO input, R14 LED (~0.35-0.75 mA), TP6.",
     "VBAT": "cell (Renata ICP501233PA-02 175 mAh, 3.0-4.2 V, PCM inside) <-> U3 BAT. Loads: R8/R9 divider (2 uA), C16.",
-    "VBUS": "dock 5 V via D4 Schottky (reverse-dock block). Loads: U3 IN, R12/R13 sense, D3 ESD, C15.",
+    "VBUS": "dock 5 V via D4 Schottky (reverse-dock block). Loads: U3 IN, R12/R13 sense, C15 (25 V). DOCK_VBUS side: D5 ESD.",
     "VDD11": "MCU's own SMPS output via L1; MCU core only (D11 allows this switching regulator only).",
     "BRIDGE_RTN": "bridge N-FET sources -> R21 0.1R shunt -> GND (31 mV at 315 mA).",
 }
@@ -86,7 +86,7 @@ OFFBOARD = [
     ("J1 / J2", "OUT_A / OUT_B", "litz wire up the arm -> bone-conduction exciter RC-BC02 (8 or 12 ohm) in the pad"),
     ("J7 / J8", "LED_A / LED_K", "litz wire up the arm -> blue 0402 LED on the pad board"),
     ("J3 / J4 / J10 / J11 / J12", "DOCK_VBUS / GND / USB_DP / USB_DM / CC", "Xinyangze YZT0675 5-pin magnetic target in the belly bay (pogo YZP0048 on the cable)"),
-    ("J5 / J6", "VBAT / GND", "cell leads (PCM inside the cell)"),
+    ("J5 / J4", "VBAT / GND (J4 shared with dock GND, between J3 and J5)", "cell leads (PCM inside the cell)"),
     ("J9", "TS", "optional NTC taped on the cell (then RT1 not fitted)"),
     ("TP1-TP6", "SWDIO, SWCLK, NRST, +3V0, GND, VSYS", "probe / pogo only"),
 ]
@@ -106,9 +106,9 @@ MECH = [
 FIRMWARE = [
     "TIM1 complementary PWM with dead time on PA8/PA7/PA9/PB0 (bridge).",
     "ADF1 (audio digital filter) on PB3 clock / PB4 data, 4 MHz PDM; PA5 is the mic's supply pin.",
-    "ADC: PA4 VBAT (ADC4, works in Stop 2), PA1 VBUS sense, PA2 TS, PA3 CC sense, PA6 bridge current.",
+    "ADC: PA4 VBAT (ADC4, works in Stop 2), PA1 VBUS sense, PA2 TS, PA6 bridge current (PA3 spare since Rev F).",
     "I2C2 on PB13/PB14 to the charger, EXTI on PA15 (CHG_INT).",
-    "USB FS on PA11/PA12 (HSI48 + CRS), ROM DFU; PA10 held high for the bootloader's USART detect.",
+    "USB FS on PA11/PA12 (HSI48 + CRS), ROM DFU (the ROM loader pulls PA10 up itself, AN2606 Table 199); PB6 USART1_TX debug printf (TP7).",
     "Wake: PA0 = WKUP1 (button). LED: PB7 open-drain, PWM duty set from VBAT.",
     "SWD on PA13/PA14. Low-power modes Stop 2 / Off (D12).",
 ]

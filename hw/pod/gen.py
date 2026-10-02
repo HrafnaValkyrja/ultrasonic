@@ -32,6 +32,24 @@ Assembly-cost audit (2026-10-01, JLC parts API 23:20Z): C8/C9 2.2 uF -> Basic C1
 1.1 V rail); shunt 0.33R 0603 Extended -> 0.1R 1206 Basic C25334; D1/D2 PESD5V0S1BL fitted DNP
 (footprints kept): the bridge outputs only reach the sealed exciter, and the FET body diodes clamp
 them to the rails with C14 behind. 14 -> 11 Extended part types.
+Rev F (2026-10-02, Phase 1 "logical simplification" from docs/research/simplification-study.md, package B3 =
+B on the owner-decision defaults; owner phases: Phase 1 logic, then her board review, then Phase 2 miniaturization):
+- removed R11 (ROM loader pulls PA10 up itself, AN2606 Table 199; PA10 spare), R17 (CHG_INT uses the PA15 internal
+  pull-up; PB5 strapped to GND so the UCPD dead-battery 5.1k pull-down can't arm on PA15, ECR-0013 S1), R19 (CC
+  sense; PA3 spare; ILIM policy by enumeration, Rd R18 + J12 stay), C20 (VBAT pin 1 shares the pin-48 100 nF placed
+  <= 1.5 mm from both, PER-06), D1/D2 (DNP footprints, OUT-04).
+- D3 (ESD9X5.0 on internal VBUS behind D4) replaced by D5 TPD1E10B06 (TI bidirectional 5.5 V working ESD) AT the
+  exposed J3 DOCK_VBUS contact (triage Q31): strikes clamp where they land, D4 stays the reverse block.
+- J4 (dock GND) and J6 (cell -) merged into one 1.0 x 2.0 mm GND pad J4, placed between J3 DOCK_VBUS and J5 VBAT
+  (ASM-09: a solder bridge can no longer put the cell on an exposed contact).
+- C15 (charger IN) 4.7 uF 10 V -> 25 V (TI SLUSE99C 9.2.2.1 recommends 25 V-rated caps on IN; ECR-0013 S3).
+- debug/fallback dots (PER-12, O18): TP7 PB6 USART1_TX printf; TP8 PB8 MDF1_CCK0 + TP9 PB1 MDF1_SDI0 + TP10 MIC_DATA
+  = hand-wire recovery to the MDF if the ADF mic-clock duty is bad (sub-audio-in issue 5).
+- Q1/Q2 on the Nexperia Fig. 32 land pattern (ECR-0004, hw/lib/pod.pretty, docs/research/sot1216-footprint.md).
+- kept on purpose: R4/R6 N-gate pull-downs (triage Q19: robustness against firmware init bugs for a device whose
+  firmware changes for years; the study's OUT-01 would drop them), TP6 VSYS (owner-accepted test pad), R22/C22 and
+  C14 22 uF (OUT-03/OUT-05 depend on the OUT-07 clamp, an owner decision), R21 1206 (OUT-02 is size-only: Phase 2),
+  R18 + J12 + 5-contact dock (PER-01D needs a keying sample, O21), LED on the pad board (PER-07 reverses O8).
 Change this file, never the generated netlist.
 """
 from __future__ import annotations
@@ -56,6 +74,8 @@ skidl.lib_search_paths[skidl.KICAD10].insert(0, str(REPO / "hw/lib/lcsc"))
 R0402, C0402, C0603 = "Resistor_SMD:R_0402_1005Metric", "Capacitor_SMD:C_0402_1005Metric", "Capacitor_SMD:C_0603_1608Metric"
 PAD = "TestPoint:TestPoint_Pad_D1.0mm"        # J wire pads (hand-soldered)
 PAD_TP = "pod:TestPoint_Pad_D0.7mm"            # TP probe / pogo pads
+PAD_DOT = "pod:TestDot_D0.5mm"                 # Rev F debug / fallback dots (tack a wire, touch a probe)
+PAD_GND2 = "pod:WirePad_1.0x2.0mm"             # Rev F shared GND wire pad (dock GND + cell -)
 
 # LCSC numbers (sourcing lock + dated lookups 2026-09-30); every placed part carries one.
 LCSC = {
@@ -64,6 +84,8 @@ LCSC = {
     "C10u_0603": "C19702", "C22u_0603": "C59461", "R5k1": "C25905",
     # Rev E, JLC parts API 2026-10-01T22:55Z
     "R0": "C17168", "R0R1_1206": "C25334", "R1k": "C11702", "C10n": "C15195",
+    # Rev F, JLC parts API 2026-10-02T23:48-50Z
+    "C4u7_25V": "C2858031", "ESD_VBUS": "C48260",
 }
 
 
@@ -91,7 +113,7 @@ def pmcxb290ue(ref):
     FOOTPRINT TODO: EasyEDA's SOT1216 pads (0.16 x 0.20) are smaller than Nexperia's Fig. 32 land
     pattern; redraw before layout (B-parts-selection.md)."""
     q = Part(tool=SKIDL, name="PMCXB290UE", ref_prefix="Q", ref=ref, tag=ref,
-             footprint="lcsc:SOT1216_L1.1-W1.0-P0.35-BL-EP",
+             footprint="pod:Nexperia_SOT1216_DFN1010B-6",   # ECR-0004: Nexperia Fig. 32 land pattern
              pins=[Pin(num=1, name="S_N", func=Pin.types.PASSIVE), Pin(num=2, name="G_N", func=Pin.types.PASSIVE), Pin(num=3, name="D_P", func=Pin.types.PASSIVE),
                    Pin(num=4, name="S_P", func=Pin.types.PASSIVE), Pin(num=5, name="G_P", func=Pin.types.PASSIVE), Pin(num=6, name="D_N", func=Pin.types.PASSIVE),
                    Pin(num=7, name="D_N", func=Pin.types.PASSIVE), Pin(num=8, name="D_P", func=Pin.types.PASSIVE)])
@@ -128,7 +150,7 @@ def build():
     nrst = Net("NRST"); nrst += u1["NRST"]
     c = C("C10", "100n", "C100n"); c[1] += nrst; c[2] += gnd
     r = R("R1", "10k", "R10k"); r[1] += u1["PH3"]; r[2] += gnd         # BOOT0 low: boot from flash (10k as AN5373)
-    c = C("C20", "100n", "C100n"); c[1] += v3; c[2] += gnd              # at VBAT (pin 1), AN5373: 100 nF VBAT-to-VDD
+    # Rev F: no separate VBAT cap (was C20): VBAT (pin 1) shares the VDD pin-48 100 nF, placed <= 1.5 mm from both (PER-06)
     # 32.768 kHz crystal, LSE high drive; never toggle PC13 (ES0499 2.2.1): left unconnected
     y1 = Part("lcsc", "Q13FC1350000400", value="32.768k", ref="Y1", tag="Y1")
     y1.fields["LCSC"] = "C32346"
@@ -162,10 +184,7 @@ def build():
         out += q["D_P"], q["D_N"]
         r = R(rp, "100k", "R100k"); r[1] += gp; r[2] += v3     # P off at reset (TIM1 pins float)
         r = R(rn, "100k", "R100k"); r[1] += gn; r[2] += gnd    # N off at reset
-    for dref, jref, out, lab in (("D1", "J1", outa, "XDCR_A"), ("D2", "J2", outb, "XDCR_B")):
-        d = Part("lcsc", "PESD5V0S1BL,315", ref=dref, tag=dref); d.fields["LCSC"] = "C84374"
-        d.fields["DNP_BOM"] = "dnp"                  # footprint only: fit by hand if ESD ever shows up
-        d[1] += out; d[2] += gnd
+    for jref, out, lab in (("J1", outa, "XDCR_A"), ("J2", outb, "XDCR_B")):   # Rev F: D1/D2 DNP footprints removed (OUT-04)
         p = pad(jref, lab); p[1] += out
     c = C("C14", "22u", "C22u_0603", C0603); c[1] += v3; c[2] += gnd   # bridge current peaks
     # low-side shunt: 0.1R x ~315 mA peak (3.0 V into 8R + 1.2R of FETs) = 31 mV, ~170 counts on the
@@ -180,13 +199,14 @@ def build():
     # ------------------------------------------------------------ power + magnetic USB dock (Rev D)
     vsys, dock_vbus = Net("VSYS"), Net("DOCK_VBUS")
     vsys.drive = dock_vbus.drive = skidl.POWER
-    for jref, lab, n in (("J3", "VBUS", dock_vbus), ("J4", "GND_CHG", gnd)):
-        p = pad(jref, lab); p[1] += n
+    p = pad("J3", "VBUS"); p[1] += dock_vbus
+    p = pad("J4", "GND", PAD_GND2); p[1] += gnd                          # dock GND + cell -: sits between J3 and J5 (ASM-09)
+    d5 = Part("lcsc", "TPD1E10B06DPYR", ref="D5", tag="D5", footprint="lcsc:X1SON-2_L1.0-W0.6-P0.65-BI-1")
+    d5.fields["LCSC"] = LCSC["ESD_VBUS"]
+    d5[1] += dock_vbus; d5[2] += gnd                                     # bidirectional 5.5 V working ESD at the exposed contact (Q31)
     d4 = Part("Device", "D_Schottky", value="1N5819WS", footprint="Diode_SMD:D_SOD-323", ref="D4", tag="D4")
     d4.fields["LCSC"] = "C191023"
     d4["A"] += dock_vbus; d4["K"] += vbus                               # upside-down docking can't feed the board
-    d3 = Part("lcsc", "ESD9X5.0ST5G", ref="D3", tag="D3"); d3.fields["LCSC"] = "C87910"
-    d3["C"] += vbus; d3["A"] += gnd
     # BQ25180 (TI SLUSE13): linear charger with power path. IN from the dock, SYS feeds the board,
     # BAT is the cell. Firmware sets ~1C (175 mA) at 20-45 C and 0.3C below 20 C over I2C (JEITA).
     u3 = Part("lcsc", "BQ25180YBGR", ref="U3", tag="U3", footprint="lcsc:DSBGA-8_L1.6-W0.9-R2-C4-P0.40-BL")
@@ -194,17 +214,17 @@ def build():
     u3["IN"] += vbus; u3["SYS"] += vsys; u3["BAT"] += vbat; u3["GND"] += gnd
     scl, sda, chg_int, ts = Net("I2C_SCL"), Net("I2C_SDA"), Net("CHG_INT"), Net("TS")
     scl += u3["SCL"], u1["PB13"]; sda += u3["SDA"], u1["PB14"]; chg_int += u3["/INT"], u1["PA15"]
-    for rref, n in (("R15", scl), ("R16", sda), ("R17", chg_int)):
+    for rref, n in (("R15", scl), ("R16", sda)):                        # Rev F: CHG_INT uses the PA15 internal pull-up (R17 gone)
         r = R(rref, "10k", "R10k"); r[1] += n; r[2] += v3
+    gnd += u1["PB5"]                                                     # strap: a high on PB5 would arm the UCPD 5.1k pull-down on PA15 (ECR-0013 S1)
     ts += u3["TS/MR"], u1["PA2"]                                         # firmware reads TS for the 20 C rule
     p = pad("J9", "NTC"); p[1] += ts                                    # 10k B3435 NTC taped to the cell, other lead to BAT-
     rt = Part("Device", "Thermistor_NTC", value="10k B3435", footprint=R0402, ref="RT1", tag="RT1")
     rt.fields["LCSC"] = "C77131"
     rt[1] += ts; rt[2] += gnd                                            # board NTC: DNP-able if the cell carries one
-    c = C("C15", "4u7", "C4u7"); c[1] += vbus; c[2] += gnd             # USB attach limit <= 10 uF
+    c = C("C15", "4u7 25V", "C4u7_25V"); c[1] += vbus; c[2] += gnd     # USB attach limit <= 10 uF; 25 V per TI 9.2.2.1
     c = C("C16", "4u7", "C4u7"); c[1] += vbat; c[2] += gnd
     c = C("C21", "10u", "C10u_0603", C0603); c[1] += vsys; c[2] += gnd  # TI: >= 10 uF on SYS
-    r = R("R11", "100k", "R100k"); r[1] += u1["PA10"]; r[2] += v3      # PA10 = bootloader USART1_RX: don't float
     # VBUS sense: firmware knows it is docked (DFU entry, charge mode). 2.5 V at PA1 from 5 V.
     vbs = Net("VBUS_SENSE")
     r = R("R12", "100k", "R100k"); r[1] += vbus; r[2] += vbs
@@ -221,10 +241,7 @@ def build():
         pin += NC
     dp += u1["PA12"]; dm += u1["PA11"]
     r = R("R18", "5k1", "R5k1"); r[1] += cc; r[2] += gnd               # Rd: a USB-C source only turns on VBUS for a sink
-    ccs = Net("CC_SENSE")
-    r = R("R19", "10k", "R10k"); r[1] += cc; r[2] += ccs; ccs += u1["PA3"]   # read the source's current advert
-    j_bp, j_bn = pad("J5", "BAT+"), pad("J6", "BAT-")
-    j_bp[1] += vbat; j_bn[1] += gnd
+    p = pad("J5", "BAT+"); p[1] += vbat                                 # cell - lands on the shared GND pad J4
     u4 = Part("lcsc", "TPS7A2030PDQNR", ref="U4", tag="U4"); u4.fields["LCSC"] = "C5220164"
     v3_ldo = Net("LDO_OUT")
     u4["IN"] += vsys; u4["EN"] += vsys; u4["OUT"] += v3_ldo; gnd += u4["GND"], u4["EP"]   # SYS <= 4.9 V < LDO 6 V max
@@ -259,8 +276,15 @@ def build():
             n += u1["PA13"]
         if lab == "SWCLK":
             n += u1["PA14"]
-    # spare pins, left free on purpose (A3-u575-plan.md §3); PC13 stays static next to the crystal
-    for pin in ("PC13", "PH0", "PH1", "PB1", "PB15", "PB5", "PB6", "PB8"):
+    # Rev F debug / fallback dots (PER-12, O18): printf on USART1_TX, and a hand-wire path to the MDF if the ADF
+    # mic-clock duty is out of spec (lift R2, wire TP8 to R2's mic-side pad, TP9 to TP10; firmware moves to MDF1)
+    for ref, lab, n, pin in (("TP7", "DBG_TX", Net("DBG_TX"), "PB6"), ("TP8", "MDF_CCK", Net("MDF_CCK"), "PB8"),
+                             ("TP9", "MDF_SDI", Net("MDF_SDI"), "PB1")):
+        p = pad(ref, lab, PAD_DOT); p[1] += n; n += u1[pin]
+    p = pad("TP10", "MIC_DATA", PAD_DOT); p[1] += mic_dat
+    # spare pins, left free on purpose; PC13 stays static next to the crystal (ES0499 2.2.1); PB15 carries the UCPD
+    # dead-battery pull-down until UCPD_DBDIS (ECR-0013 S2); PA3 / PA10 freed in Rev F
+    for pin in ("PC13", "PH0", "PH1", "PB15", "PA3", "PA10"):
         u1[pin] += NC
     return u1
 

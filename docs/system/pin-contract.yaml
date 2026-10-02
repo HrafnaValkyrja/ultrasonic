@@ -83,7 +83,6 @@ signals:
   - {id: VBAT_SENSE, net: VBAT_SENSE, signal: "re:ADC4_IN\\d+", role: "VBAT/2 (F8): must be ADC4, the converter that runs in Stop 2"}
   - {id: VBUS_SENSE, net: VBUS_SENSE, signal: "re:ADC[14]_IN\\d+", role: "dock detect (F9)"}
   - {id: TS, net: TS, signal: "re:ADC[14]_IN\\d+", role: "NTC voltage, 20 C charge rule (F6); stays an analog input"}
-  - {id: CC_SENSE, net: CC_SENSE, signal: "re:ADC[14]_IN\\d+", role: "USB CC sense (F10)"}
   # ---- F1 hear: PDM clock out and data in on the ADF1 filter, supply switched by a GPIO
   - {id: MIC_CLK, via: {ref: R2, from_net: MIC_CLK}, signal: ADF1_CCK0, af: 3, role: "PDM clock to the mic through R2 33R (F1)"}
   - {id: MIC_DATA, net: MIC_DATA, signal: ADF1_SDI0, af: 3, role: "PDM data from the mic (F1)"}
@@ -100,12 +99,11 @@ signals:
   - {id: SWCLK, net: SWCLK, signal: DEBUG_JTCK-SWCLK, af: 0, role: "SWD clock (F14)"}
   - {id: NRST, net: NRST, signal: NRST, role: "reset (F14)"}
   - {id: BOOT0, via: {ref: R1, from_net: GND}, signal: BOOT0, role: "BOOT0 held low by R1 10k (F14)"}
-  - id: BOOT_RX
-    via: {ref: R11, from_net: "+3V0"}
-    signal: USART1_RX
-    af: 7
-    absent_ecr: ECR-0003
-    role: "PA10 held high for the ROM bootloader's USART detect (F14); ECR-0003 drops R11"
+  # Rev F: BOOT_RX (R11 on PA10) and CC_SENSE (R19 on PA3) removed with their parts: the ROM loader pulls PA10 up itself
+  # (AN2606 Rev 69 Table 199); charge-current policy comes from enumeration, not CC (simplification study PER-02, PWR-03)
+  - {id: DBG_TX, net: DBG_TX, signal: USART1_TX, af: 7, role: "printf telemetry on TP7 (F14, O18; PER-12): SWO is lost to the mic clock on PB3"}
+  - {id: MDF_CCK, net: MDF_CCK, signal: MDF1_CCK0, af: 5, role: "mic-clock fallback dot TP8 (F1, O18; sub-audio-in issue 5): hand-wire to R2's mic-side pad if the ADF clock duty fails"}
+  - {id: MDF_SDI, net: MDF_SDI, signal: MDF1_SDI0, af: 6, role: "mic-data fallback dot TP9, wired to TP10 (MIC_DATA) in the fallback (F1, O18)"}
   # ---- F2 / F11 / F12
   - {id: LSE_IN, net: LSE_IN, signal: RCC_OSC32_IN, role: "32.768 kHz crystal (F2)"}
   - {id: LSE_OUT, net: LSE_OUT, signal: RCC_OSC32_OUT, role: "32.768 kHz crystal (F2)"}
@@ -117,7 +115,7 @@ signals:
 hazards:
   - port: PA15
     ecr: ECR-0013
-    note: "UCPD dead battery: after reset a 5.1k pull-down (UCPD1_CC1) sits on this pin while PB5 (UCPD1_DBCC1) is not tied low; against R17 10k it holds the charger interrupt near 1 V = stuck low until firmware sets PWR_UCPDR.UCPD_DBDIS"
+    note: "UCPD dead battery: after reset a 5.1k pull-down (UCPD1_CC1) sits on this pin while PB5 (UCPD1_DBCC1) is not tied low; against the pull-up it holds the charger interrupt low (Rev F: internal pull-up, so it would read solidly stuck low) until firmware sets PWR_UCPDR.UCPD_DBDIS"
     source: "ST DS13737 Rev 8 pin definitions table note 4; RM0456 Rev 7 p.459 (quoted in the audit, finding i)"
     cleared_by: {pin: PB5, net: GND}
   - port: PB15
