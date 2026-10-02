@@ -2,6 +2,15 @@
 
 **Date:** 2026-10-01 · **Status:** research synthesis. It proposes; the owner decides (spec §0 rule 4). Nothing here changes the spec, `docs/system/` or any tool.
 
+## Bottom line (read this first)
+
+- **Is it new? Mostly no. The combination is, and that is the hard part.** Each ingredient has prior art, some of it 30 years old: hardware defined as code; an AI agent that writes a design, runs a checker (a program that says pass or fail, such as ERC/DRC, a testbench or a simulation with limits) and repairs from the errors; a lead agent spawning parallel sub-agents; 1990s agents that wrap engineering tools and share a design record; change-impact tracking. **Not found in about 100 opened works:** agent teams across electronics, mechanics and firmware on one physical product, with change control down to a net, a part or a CAD symbol, check-out conflict flags between teams, ECRs (engineering change requests) and one human approver.
+- **The frontier is integration and verification across domains, not generation.** Every documented agent loop is exactly as good as its checker. Exact, localising checkers give 94-96 % (digital logic) and 0.65 board completion (PCB routing with DRC after every step). Checkers that merely run give "88 % executable, 2 of 15 valid" (FEABench), and an autonomous lab's "41 new materials" turned out not to be new (A-Lab).
+- **Two frontiers we have not crossed.** (1) The loop through physical test: rev 1 is still ahead. (2) "Generative design" in the optimiser sense: today our numbers are agent-written and checker-verified, not optimised.
+- **Biggest dangers, with evidence.** Parallel teams on coupled work lose (-39 % to -70 % on sequential planning). Same-model verifiers share blind spots (60 % shared wrong answers on one dataset). Our check-outs are advisory and have never run. Our checkers print numbers but almost never assert them (1 of 14 `sim/checks` scripts).
+- **Do first (all "now", about 4-5 agent-days):** L1 falsifiers and asserts, L2 serialise coupled work, L3 audit the checkers, L4 one git worktree per team with a gated merge, L5 one geometry source plus a real-board clash check, L6 a SKiDL rule checker built on the MIT-licensed PCBSchemaGen v2 verifier, L7 decorrelated verifiers.
+- **Limit:** web search ran out early, so commercial and industrial agent systems (Flux, Quilter, JITX, Siemens, PTC, Synopsys) were not seen. "Not found" means not found in what we opened.
+
 **Question (owner, 2026-10-01):** what prior art exists for running "agentic swarms" (many AI agents working in parallel under a lead) on physical engineering? Her framing: we combine *generative design*, *generative project management* and *logic-to-hardware*, at the edge of a frontier. Is it new? What can we borrow, across domains?
 
 **Picture:** [`docs/diagrams/prior-art-map.png`](../diagrams/prior-art-map.png). It puts each prior-art cluster against the stage of our pipeline it informs, and tags each cluster with the lessons (L1–L15) below.
@@ -14,7 +23,7 @@
   - [`classic-concurrent-engineering.md`](prior-art/classic-concurrent-engineering.md): the pre-LLM precedent, 1968–2022.
   - [`generative-design-hw-as-code.md`](prior-art/generative-design-hw-as-code.md): generative design and hardware as code.
   - [`agentic-pm-orchestration.md`](prior-art/agentic-pm-orchestration.md): multi-agent orchestration and generated project management.
-- An independent fact-checker re-opened every cited work and licence. Its corrections are applied here and listed in [`prior-art/fact-check.md`](prior-art/fact-check.md); where this note and a lens note disagree, this note wins.
+- An independent fact-checker re-opened every cited work and licence. Its corrections are applied here and summarised in section 6; where this note and a lens note disagree, this note wins.
 - About 100 works were opened in total. Every citation below carries its URL, its access date and how much of it was read (full text, abstract only, README). Anything seen only as metadata is labelled **unverified**.
 - **Coverage limit, stated up front:** the web-search budget was exhausted early. Discovery went through arXiv, Hugging Face Papers, OpenAlex, Semantic Scholar, CrossRef and direct fetches. Commercial and industrial agent systems (Flux, Quilter, JITX, Zoo, Siemens, PTC, Synopsys) were **not** seen. "Nobody has done X" below means "not found in what we opened", not "proven first".
 
@@ -31,7 +40,7 @@
 
 ---
 
-## 1. Bottom line: is this new?
+## 1. Is this new? The evidence
 
 **Mostly no, and the part that is new is the hardest part.** Every *ingredient* has prior art, much of it 30 years old. The *combination* has none that we found.
 
@@ -132,6 +141,22 @@ Several lessons **independently confirm** the ranked improvements in [`methodolo
 | L13 | Agents pick structure, solvers pick numbers; Pareto + sensitivity | soon | 0.5–1 day | — |
 | L14 | Set-based exchange for open trade-offs, in CAD and simulation only | later | 2–4 h per decision | — |
 | L15 | Close the loop through physical test; calibrate the models | later | ~4 h + 15 min per build | M8, M10 |
+
+### Multi-agent failure modes at a glance
+
+Percentages are MAST's [MAST] per-failure-mode shares of 1,600+ annotated traces (7 frameworks, mostly software tasks). MAST's category totals are not quoted: they could not be found in the paper's text.
+
+| Failure mode | Evidence | Mitigation here | Lesson |
+|---|---|---|---|
+| Repeating steps (15.7 %), not knowing when done (12.4 %), disobeying the task spec (11.8 %) | MAST; clearer role specs gave +9.4 % on ChatDev | Termination condition and role spec in every workflow prompt | L11 |
+| Missing or superficial verification (incomplete 8.2 %, incorrect 9.1 %) | MAST; an objective-level verification step gave +15.6 %; FEABench: 88 % executable, 2 of 15 valid | Falsifiers, asserted spec numbers, mutation-tested checkers | L1, L3 |
+| Misalignment between agents (reasoning-action mismatch 13.2 %, not asking for clarification 6.8 %); two agents 30 % worse than one | MAST; CooperBench [CooperBench] | Freeze interfaces before spawning; a QUESTION escape path; no real-time negotiation between teams | L2, L11 |
+| Error amplification and loss on coupled work | Kim et al. [KimScale]: 17.2x independent vs 4.4x central; -39 % to -70 % on sequential planning | Lead integrates one team at a time; parallel only on decomposable work | L2 |
+| Interference in a shared workspace | CAID [CAID]: worktrees 63.3 vs soft isolation 55.5 (PaperBench) | One worktree per team; test-gated merge | L4 |
+| Correlated or self-favouring verifiers; conformity in debate | Knight & Leveson; 60 % shared wrong answers (one dataset); self-preference; up to 85.5 % conformity | Commit verdicts independently; tool oracles first; a judge between advocates | L7 |
+| Written rules not followed by fresh agents | Relic [Relic]: 25.4 % none, 34.6 % text, 41.2 % executable | Executable gates (hook, merge gate), not mandatory reading | L4 |
+| Stale agent context and memory | STALE [STALE]: 55.2 % best; ours: workflow says ngspice 42, 45.2 installed | Watches on `CLAUDE.md`, workflow prompts and skills | L11 |
+| Cannot tell afterwards who broke what | Who&When [WhoWhen]: agent named 53.5 %, step 14.2 % | `Workflow:` / `Agent:` / `ECR:` commit trailers at change time | L4 |
 
 ### L1. Verifiers return falsifiers; checks assert numbers · **now**
 
@@ -539,9 +564,27 @@ Sets live only in CAD and simulation, never in fabrication, because every extra 
 
 ---
 
+## 6. What the fact-check changed
+
+An independent checker re-opened every cited work and licence on 2026-10-01 (it found no fabricated work). These are the corrections that mattered, all applied above.
+
+- **PCBSchemaGen:** the first notes cited v1 and excluded it as "repo 404, licence unverified". The current v2 (June 2026) has an MIT-licensed repo with a deterministic SKiDL verifier, so it moved to "try" (L6). I re-read its `LICENSE` and the arXiv abstract pages for CAID, Relic, Kim et al. and Design Conductor myself on 2026-10-01 (spot check).
+- **CADTests:** venue is an arXiv preprint, not NeurIPS. The "93.8 % agreement" compared an accuracy with an AUC (a different metric), and rests on two annotators; the "81 % best" was on abstract prompts (62.5 % on detailed ones). Only the mutation-testing pattern is used.
+- **AGENTS.md study:** the notes mixed v1 and v3. The current v3 says context files give no general gain and add over 20 % cost, not that they lower success (L11).
+- **CAID:** "matched single agent" means the same framework, not the same budget (CAID cost 2.8-4.3x). Soft isolation beat the single agent on one of two benchmarks, so "check-outs measurably fail" was dropped; the supported claim is that worktrees beat soft isolation on both (L4).
+- **Relic, Magentic-UI:** the CooperBench figure is v1's; the 30.3 to 51.9 % gain came from a simulated user holding a human-written plan, so it is an upper bound (L12).
+- **Verification rules:** "never vote" and "N same-model checks count as one" overstated the evidence. Independent sampling plus voting works; voting after debate does not; same-model checks are correlated, so discount them (L7). Self-preference is documented evidence, not an inference.
+- **Classic papers:** the "faded without industrial uptake" story and the "three causes" are our synthesis, not claims Shen 2008 or Whitfield 2000 make (Shen mentions industrial applications). Ward 1995 and Sobek 1999 were paywalled previews, so their "27 vs 37 months" and sub-principle details are unverified. Post-and-volunteer allocation is Smith's 1980 Contract Net.
+- **Brahma & Wynn:** "0 methods with ongoing industrial use" counts publications; 15 report preliminary industrial evaluation. Quoted as "no paper reports ongoing industrial use".
+- **Repo facts:** the STEP clash check is not free (47 of 58 component bodies missing without the KiCad 3D library); `erc_assert` has no electrical model; 8 files import `pcbnew`, not 7; `frame.py` and `shell_r1.py` hold two different boards. The LDO margin issue is already ECR-0005.
+- **Novelty claim:** Doorstop-style stamps and suspect links are not new; the narrower claim is watch granularity across ECAD, MCAD and docs, plus check-out flags between agent teams.
+- **Licences:** no "try" tool fails FOSS-only. MAST's code is "licence unverified" (MIT only in PyPI metadata), not "not FOSS".
+
+---
+
 ## Sources
 
-All accessed **2026-10-01**. Full lens notes, with more works, are in [`prior-art/`](prior-art/); corrections are in [`prior-art/fact-check.md`](prior-art/fact-check.md). "Read" says how much was opened.
+All accessed **2026-10-01**. Full lens notes, with more works, are in [`prior-art/`](prior-art/); the corrections applied are summarised in section 6. "Read" says how much was opened.
 
 **LLM agents for physical design**
 
