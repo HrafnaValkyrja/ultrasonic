@@ -384,3 +384,18 @@ rejected_decisions:
     brief already shows A-INSTALL-PERMS as a tier-A ask (queue.yaml:9). Which record reflects her actual words is unknown.
   fix: 'No install is needed today: tier E waits for firmware code that doesn''t exist yet. Put one FYI line with a default in the next brief: ''I read your FOSS rule as covering FOSS installs; I log the
     licence per install; say no if you want to approve each one.'' Edit the memory only after she replies or lets it stand.'
+redecided:
+- id: Q23
+  decision: WATCHDOG_SEL=01 (power-cycle after 160 s without I2C) + RTC keep-alive from Stop 2 + boot stub sets 11 before ROM DFU and the app re-arms it (sub-power issue 3 option B). Adopt 11 only if SLUSE99C/TI
+    confirms WATCHDOG_15S_ENABLE still works with SEL=11 or the IWDG runs in Stop with RTC kicks.
+  to_owner: as a stated trade in the post-pick safety packet (Q22)
+  src: sub-power.md issue 3; SLUSE99C Table 8-4
+- id: Q40
+  decision: single spec-sync pass AFTER the redesign (nothing rewritten twice); L452 DFSDM bullets marked superseded, not re-cited; TIM1-float claim re-verified in RM0456 before re-citing
+- id: Q07
+  decision: 'no new in-pod pad: R1 PH3 (BOOT0) pad on F is the first-flash tack point; if the snap-off frame carries the test pads (ASM-02), BOOT0 also goes to the frame header; VDDUSB residual-risk wording
+    corrected to DS13737 Table 150 fn 1'
+  to_owner: instrument inventory ask goes into the freeze/order package
+- id: Q47
+  decision: 'no install today (firmware code does not exist yet); default reading of the owner rule: FOSS installs allowed with licence logged, freeware = ask; FYI line in the next brief; memory edited
+    only after she replies or lets it stand'

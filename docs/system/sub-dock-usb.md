@@ -113,7 +113,7 @@ flowchart LR
    - **The only feasible route:** from the bay, under the cell (0.8 mm: cavity floor z −8.9 to cell bottom −8.1, `shell_r1.py` L39, L42) to the rear gap (1.1 mm behind the cell), then over the board's rear edge to the F face. Wires can't reach the F face at the board's lower edge: the ribs and foam press the 0.6 mm clamp bands there, with only 0.3 mm to the wall. The strut-relief fill also blocks y 5.1–6.1 at x 62–66.7 (L86).
    - **Moving J3–J12 off the centre line does not shorten it the same way in both pods:** board y 13 is down in the left pod, board y 0 in the right (physical.md). Pads at one edge land at the top in the other pod.
    - **Not decided:** wire gauge (open issue 16), the simplification study and layout (O14).
-6. **USB supply margin.** +3V0 can sit 45 mV below USB's 3.0 V VDDUSB minimum. Options:
+6. **USB supply margin.** +3V0 can sit 45 mV below VDDUSB's 3.0 V spec minimum; per DS13737 Rev 10 Table 150 fn 1: "USB functionality is ensured down to 2.7 V, but some USB electrical characteristics are degraded in 2.7 to 3.0 V range", USB still works there, with slightly degraded electrical characteristics (verified 2026-10-02). Not a functional risk; an eye-diagram/enumeration check at rev-1 bring-up covers it. Options:
    - **(A, recommended)** Bench-test enumeration and DFU with 2.95 V injected on TP4 (R20 lifted) before changing anything.
    - (B) A higher-voltage LDO: re-check mic, bridge gain, spec §7.
    - **Closes:** that bench test.
