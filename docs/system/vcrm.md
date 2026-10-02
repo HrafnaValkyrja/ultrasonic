@@ -151,6 +151,7 @@ The matrix never overrides the spec. If a row shows the design cannot meet a req
 | `O5` | Superseded in part by O20 (growth is acceptable if it is clearance). Its open question, a stacked thicker pod against a slimmer one, belongs to the simplification study and O20-finalsize. |
 | `O14` | A process rule (the PCB layout is done together). Nothing to verify. |
 | `O15` | Superseded by O20 (rev 1 is final-size). Its question about debugging over USB is carried by O18-diagnosability (F4 self-test). |
+| `O21` | A process rule (no orders until the design is finalized, owner 2026-10-02). Nothing to verify; it blocks E1/E2 and the dummy-wear test (ECR-0006/0007/0008 deferred) until the design freeze. |
 
 <!-- vcrm:end -->
 
