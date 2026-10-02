@@ -3,3 +3,4 @@
 - {date: 2026-10-02, what: "Stripped part-identity properties from 11 imported footprints", why: "ECR-0012: wrong LCSC numbers baked in", tier: B, reversible: yes, undo: "git revert 779872e"}
 - {date: 2026-10-02, what: "Applied 9 datasheet-audit corrections to docs/system", why: "audit confirmed numbers wrong; study teams read these docs", tier: B, reversible: yes, undo: "git revert 31375ae"}
 - {date: 2026-10-02, what: "Started memwatch.sh and the 30-min heartbeat; resumed stopped research workflows", why: "owner: keep going agentically, no crashes", tier: B, reversible: yes, undo: "kill memwatch; do not re-arm ScheduleWakeup"}
+- {date: 2026-10-02, what: "Stopped the simplification study and stage-C sim plan workflows at the usage limit; committed the defect-catchers + board draft", why: "protect remaining allowance; work is resumable", tier: B, reversible: yes, undo: "resume with Workflow scriptPath+resumeFromRunId (ids in standing orders)"}
