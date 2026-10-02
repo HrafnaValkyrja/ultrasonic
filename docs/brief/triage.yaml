@@ -1,0 +1,27 @@
+# BRIEF triage rules (owner keyword: BRIEF-ing). Attention is the scarce resource. Updated 2026-10-02.
+# defs: A=needs owner explicit attention; B=FYI one-liner (autonomous, reversible, consequential); C=implicit (lives in docs/ECRs/logs; surfaced on ask).
+tier_A_if_any:
+  - money_or_order_or_owner_physical_action      # orders, payments, prints, measurements, wearing, listening
+  - changes_owner_decision_or_spec_s1_or_goals   # O-items, MVP section 1, personal-device/final-rev1 framing
+  - safety_conclusion_owner_should_verify        # cell, charger, thermal, ESD, skin/ear contact, output level
+  - taste_or_comfort_tradeoff                    # look, feel, wearability values only she can judge
+  - low_confidence_and_costly_if_wrong           # big rework, dead board, wasted order
+  - permission_request                           # freeware, sudo, anything outside standing guardrails
+  - owner_only_data_needed                       # her measurements, photos, hearing
+tier_B_if:                                       # decided by Claude within her direction
+  - reversible_choice_with_cross_cutting_effect  # picks between near-equal options, changes a spec number, closes an ECR
+  - installs_FOSS_or_spends_significant_compute
+  - fixes_a_defect_found_by_checks
+tier_C_otherwise: true
+surprise_test: "would she be upset to find this later with no warning?"   # yes -> A or B
+brief_format:
+  order: [state_line, NEEDS_YOU, FYI, IMPLICIT_topics, WAITING_ON]
+  caps: {NEEDS_YOU: 5, FYI: 5}                   # overflow -> "also waiting: n (ask 'more')"
+  rank_A_by: [lead_time_or_deadline, blocks_most_work, irreversibility]
+  A_item_shape: "<decision/action> | rec: <my recommendation> | if ignored: <consequence> | id"
+  length: "one screen; no prose; diagrams only on ask"
+upkeep:
+  - every new decision/finding/blocker: add or update an entry in queue.yaml in the same step
+  - every heartbeat: re-rank, drop done/stale, escalate anything with a lead time
+  - every autonomous choice: one line in decisions-log.yaml with undo path
+  - on 'BRIEF-ing': render from queue.yaml (open items only), then mark rendered_at

@@ -1,0 +1,5 @@
+# Audit trail of decisions Claude made autonomously (owner away / delegated). entry: date, what, why, tier, reversible, undo
+- {date: 2026-10-01, what: "Placed mic by its port, R2/C13 nudged", why: "ECR-0011 defect: port 0.77 mm off the lid port", tier: B, reversible: yes, undo: "git revert 1e9003d"}
+- {date: 2026-10-02, what: "Stripped part-identity properties from 11 imported footprints", why: "ECR-0012: wrong LCSC numbers baked in", tier: B, reversible: yes, undo: "git revert 779872e"}
+- {date: 2026-10-02, what: "Applied 9 datasheet-audit corrections to docs/system", why: "audit confirmed numbers wrong; study teams read these docs", tier: B, reversible: yes, undo: "git revert 31375ae"}
+- {date: 2026-10-02, what: "Started memwatch.sh and the 30-min heartbeat; resumed stopped research workflows", why: "owner: keep going agentically, no crashes", tier: B, reversible: yes, undo: "kill memwatch; do not re-arm ScheduleWakeup"}
