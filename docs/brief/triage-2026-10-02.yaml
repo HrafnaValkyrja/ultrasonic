@@ -1,0 +1,386 @@
+meta:
+  src: workflow wf_511f9a2d-3b4 (extract, 3 classifiers, skeptic) + lead final cut
+  date: '2026-10-02'
+  counts:
+    questions: 56
+    owner_today_final: 3
+    owner_later: 23
+    claude_decides: 25
+    already_answered: 5
+  final_today:
+  - Q02 (+Q03 E12 same session)
+  - Q01
+  - M2 charging-while-worn
+  demoted:
+    Q05: 'skeptic: blocks nothing today; ask before freeze (O22 c1)'
+  rule: claude-decides items are APPLIED only at their natural point (docs now; schematic at Rev F after the package pick); items in rejected_decisions must be re-decided first
+questions:
+- id: Q01
+  src: 'docs/system/vcrm.yaml:240 (S1.2-C4 next: ''Set numeric size and mass targets'')'
+  q: What per-pod mass and size can you wear all day? The design comes out at about 12.4 g per side, roughly 6 g on each nose pad. The old target was about 8 g, and glasses start to hurt at about 15 g.
+    All the size levers together recover at mos
+  verdict: owner-today
+  note: 'Tape about 12 g of weighed coins or washers to each temple, centred about 50 mm behind the hinge. Wear them 2 h today with the Ear (open) in, while talking and eating. Could you wear that all day?
+    Rec: if yes, I record a ceiling of about 12.5 g per side and keep the 175 mAh cell (size S1). If no, the cell swap (-1.4 g '
+- id: Q02
+  src: docs/spec.md:706 (E10)
+  q: 'Take the no-parts measurements on your own glasses: (1) E10, the peripheral-vision boundary (a helper slides a pen tip along the temple); (2) the temple-arm cross-section with calipers at the pod
+    position (the CAD assumes 2.5 x 5.0 mm); (3)'
+  verdict: owner-today
+  note: 'With a helper, about 20 min, no parts: (1) E10, the pen-tip vision boundary along the temple, 3 times, both eyes, measured from the hinge (spec L706); (2) calipers across your temple arm about
+    50 mm behind the hinge, width and height (the CAD assumes 2.5 x 5.0 mm); (3) the E9 ruler shot and the mouth-open photo (spec L'
+- id: Q03
+  src: docs/system/reg-arm.md:98 (issue 2, 'Options (owner decides after E12)')
+  q: 'Do E12: hang 100 g on the temple arm and measure how far it moves sideways and how much it twists. Then pick the arm preload set. Once the glasses'' own give is counted, the built 3.5 mm set drops
+    to about 0.45 N when the jaw opens, which is'
+  verdict: owner-later
+  note: 'The package is picked and the shell re-size and ECR-0001 arm/heel re-solve start. Optional: add it to today''s Q02 session (same glasses, a 100 g weight and a ruler, about 10 more minutes).'
+- id: Q04
+  src: docs/spec.md:649 (O4, open)
+  q: 'Confirm the D18 reading of spec 1.2.4: the cell, and now the whole 38 mm pod, sits along the temple arm in front of the ear, running back to the Ear (open) hook, with nothing behind the ear or toward
+    the neck.'
+  verdict: already-answered
+  note: 'Close O4 as a B-tier FYI, citing spec L437-440 and L791. Mark the O4 row resolved in spec §12. Remove ''owner confirms the D18 reading (O4)'' from the next and gap fields of vcrm.yaml:241-245 and
+    D18-balance. Change the O4 waiver to ''resolved by the owner''s v0.8 request''. Undo: reopen O4 if she objects in the FYI line.'
+- id: Q05
+  src: docs/system/vcrm.md:81 (S1.1-goal, known fail)
+  q: Does the ~20-85 kHz the design delivers satisfy spec 1.1's 'roughly 20-96 kHz', or should the top octave be bought back?
+  verdict: owner-today
+  note: 'Is ~20-85 kHz ''roughly 20-96 kHz'' for you? Rec: yes. 85 kHz becomes the design and verification target, and the /18 mic clock (4.44 MHz, up to ~96 kHz, unverified above 80 kHz) stays a firmware
+    option to try on rev 1 at no board cost. If ignored: S1.1 stays a known fail, so the freeze gate (O22 criterion 1) can''t pass,'
+- id: Q06
+  src: ECR-0009 (docs/system/plm/ecr/ECR-0009.md:18-24, 'Open conflict ... owner decides')
+  q: Should the exciter be allowed to run while docked, only in a capped USB self-test mode? Or forbid it, and run the |Z| and PWM-noise sweeps on battery and read the results back?
+  verdict: owner-later
+  note: Package picked and charger settled (Q14), and Rev F schematic ready. Ask it as one line of her single owner safety read (A-SAFETY-REVIEW).
+- id: Q07
+  src: docs/system/sub-debug-test.md:152 (issue 1, 'Options (owner)')
+  q: 'Which bench instruments do you already own: an SWD probe (ST-LINK/J-Link), an LCR meter (needed for E1), a PPK2 or uA current meter (E4), and a function generator or sound-card output (for the supply-injection
+    sweep)? The first-flash path d'
+  verdict: claude-decides
+  note: 'Rev F gets a BOOT0 solder-blob/tack pad beside TP4 (option C), so DFU is the first-flash path; the SWD pads stay as backup (A). Bring-up step 1 enters DFU via BOOT0. Residual risk to state: ROM
+    DFU at VDDUSB 3.0 V is marginal (sub-debug-test issue 6, AN2606 asks for 3.3 V), so SWD stays a real fallback. Ask her instrum'
+  REJECTED: 'skeptic: re-decide before applying'
+- id: Q08
+  src: docs/system/sub-dock-usb.md:101 (issue 2, magnet keying / contact order unknown) + docs/research/tws-power-size.md:134 ('Questions for Renata before ordering')
+  q: 'Several geometry and protection choices need facts that only a sample or the vendor can give: magnet polarity keying and contact order; the dock target''s tab and tails; whether the 4-pin head mates;
+    the Renata cell''s lead exit and PCM posit'
+  verdict: owner-later
+  note: 'Package picked. Then one yes/no: ''may I draft the Renata (and, only if Package B, magnet-vendor) questions for you to send?'''
+- id: Q09
+  src: 'docs/system/vcrm.yaml:287 (S1.3-T2 next: ''Owner judges the nature WAVs'')'
+  q: 'Listen on headphones to sim/out/nature/1_audible_only.wav, 2_translated_only.wav and 3_combined.wav (made 2026-10-01) and give a verdict: pleasant or shrill, too loud or too quiet, muffled?'
+  verdict: owner-later
+  note: Claude renders the full 7-file set (NEXT.md §2). Then a 10-minute headphone listen, any time before C4 gate tuning and the E2 exciter listen.
+- id: Q10
+  src: docs/research/tws/battery.md:205 ('Owner's call')
+  q: Should rev 1 have a solder-free service joint for the cell (a tiny 2-pin connector, about 1-2 mm), or accept a cut-and-rebond cycle for every cell or arm swap?
+  verdict: owner-later
+  note: Package picked (board length fixed). Claude reports whether a 2-pin cell connector fits in the freed rear zone, and its size and reliability cost, and asks then, alongside Q12.
+- id: Q11
+  src: docs/spec.md:640 (O14) vs memory autonomous-standing-orders.md Q3
+  q: O14 says you drive KiCad and Claude teaches. The standing orders plan an autonomous Rev F re-place and FreeRouting re-route after the package pick. Which applies to Rev F?
+  verdict: already-answered
+  note: Rev F release layout follows O14 (option A). Claude may run one fenced feasibility re-place/route after the package pick to size the outline, labelled as a draft. Reword standing order Q3 to 'feasibility
+    draft; release layout per O14'. If Claude thinks option B (Claude drafts, she reviews and learns) would serve her be
+- id: Q12
+  src: docs/brief/queue.yaml:5 (A-SIMPLIFY-PICK)
+  q: Which simplification package to adopt once the 5-team study lands (board and shell size, output stage, power architecture, periphery/UI, assembly).
+  verdict: owner-later
+  note: The study lands and Claude sends docs/decisions/simplification-brief.md (one screen plus a diagram), ideally after Q01/Q02 results are in, so the cell and size choice rests on her numbers.
+- id: Q13
+  src: docs/research/simplify/periphery.md:12
+  q: Keep the solid power LED in the pad (O8), move it to the pod lid, or drop it?
+  verdict: owner-later
+  note: Package brief (Q12).
+- id: Q14
+  src: docs/research/simplify/power.md:15
+  q: Swap the charger you named, BQ25180 (8-ball 0.4 mm DSBGA), for the same-family BQ25186 (WSON-10 with exposed pad)?
+  verdict: owner-later
+  note: Package brief (Q12). Her safety read follows on the chosen part.
+- id: Q15
+  src: docs/research/simplify/size.md:75 (SIZ-05 'owner')
+  q: Drop the 0.7 mm armour plate (and/or trim the spine styling) to make the pod thinner and shorten the mic duct?
+  verdict: owner-later
+  note: Package brief, plus printed S1 and S2 dummies (Claude supplies the STLs after the pick).
+- id: Q16
+  src: docs/research/simplify/size.md:93 (SIZ-07 'Owner call (O16-3)')
+  q: Drop the space reserved for the sealed USB-C fallback (O16(3)), given it may be unusable anyway?
+  verdict: owner-later
+  note: Package brief (Q12).
+- id: Q17
+  src: docs/research/simplify/periphery.md:9 (PER-01)
+  q: Drop the CC line from the pod, which moves the 5.1k Rd into the cable plug, or go further to a thin dock target with an owner-built cable head?
+  verdict: owner-later
+  note: Package brief (Q12).
+- id: Q18
+  src: docs/research/simplify/periphery.md:11
+  q: Drop the 32.768 kHz crystal Y1 (spec D16), losing crystal-grade pitch for the heterodyne fallback for good?
+  verdict: claude-decides
+  note: 'Keep Y1/C11/C12 populated (D16 stands). Tell her as a one-line FYI with the package brief, noting that Claude overruled the periphery team''s medium-confidence ''drop LSE'' (PER-05) and why: costs
+    runtime, saves no pod volume. Undo: delete the three parts in hw/pod/gen.py before the freeze; the firmware variant stays in F'
+- id: Q19
+  src: docs/research/simplify/output.md:83 (OUT-01, 'owner confirms the narrower rule')
+  q: 'Narrow D6''s ''gate pulls mandatory'' rule: drop the N-gate pull-downs R4/R6 and keep the P pull-ups?'
+  verdict: claude-decides
+  note: 'Keep R4/R6 populated. D6''s ''gate pulls mandatory'' stands, and so does D17''s pop-free start. Tell her as an FYI with the package brief: Claude overruled OUT-01 on firmware-bug robustness. Undo:
+    delete them in hw/pod/gen.py before the freeze (or leave DNP pads); the rev-1 metering check in output.md §7 still applies.'
+- id: Q20
+  src: docs/research/simplify/output.md:101 (OUT-06)
+  q: Replace the bridge FETs, PMCXB290UE (DFN1010B-6), with DMC2400UV-7 (SOT-563), which supersedes ECR-0004 and the SOT1216 footprint options?
+  verdict: claude-decides
+  note: 'If the discrete bridge stays, adopt OUT-06 in Rev F. Q1/Q2 become Diodes DMC2400UV-7 (20 V complementary N+P MOSFET pair, SOT-563 1.6x1.6 mm, 0.5 mm pitch, visible leads; LCSC C177025, Extended,
+    98 genuine in stock at JLC 2026-10-02T04:57Z). ECR-0004 is closed as superseded and the SOT1216 options are moot. If the old '
+- id: Q21
+  src: docs/system/sub-audio-in.md:92 (issue 4, 'Owner decides')
+  q: 'Acoustic coupons: a separate JLC coupon panel, printed lid variants on the rev-1 board, or both, given O9''s ''no separate test boards''?'
+  verdict: owner-later
+  note: 'Freeze order package (queue.yaml:19 B-ORDER-PACKAGE), once the JLC quote shows the ASM-04 cost: SMT panel fee +$8.21 (unverified) and the different-design fee (unquoted).'
+- id: Q22
+  src: docs/brief/queue.yaml:6 (A-SAFETY-REVIEW)
+  q: 'Your own safety read of the charging design against the BQ25180 datasheet (SLUSE99C): the ECR-0013 safety paragraph and ECR-0009 items 2-5. It covers ~0.3 W of charger heat 0.2 mm above the pouch,
+    the 1C (170 mA) charge rate, the unsafe TS_'
+  verdict: owner-later
+  note: 'The package pick fixes U3. Claude then writes the final register plan and a one-page safety packet, and the independent review of power and charging is done. The packet covers: about 0.3 W of U3
+    heat 0.2 mm above the pouch; the 1C (170 mA) charge rate vs the stale spec B3/section 7 ''<=0.5C'' text (00-whole.md:141); TS_H'
+- id: Q23
+  src: 'docs/system/sub-power.md:141 (issue 3, ''U3 watchdog: pick one (owner/firmware)'')'
+  q: 'Charger watchdog setting: disable it, use the 160 s hardware reset with a keep-alive, or leave the default register revert?'
+  verdict: claude-decides
+  note: 'Set WATCHDOG_SEL = 11 (disabled). The boot stub and the application init both write it first and read it back. Hang recovery comes from three things: the MCU''s own IWDG with health bits that include
+    ''charger poll fresh'' (firmware-emulation.yaml FWSIM-R55); WATCHDOG_15S_ENABLE = 1 as a dock-to-reboot path for a hung pod'
+  REJECTED: 'skeptic: re-decide before applying'
+- id: Q24
+  src: docs/brief/queue.yaml:14 (B-TWS-CELL)
+  q: Charge the cell to 4.10-4.15 V instead of 4.20 V (-10-14% capacity for about 1.25-1.6x the cycle life)?
+  verdict: owner-later
+  note: E4 current-per-mode measurement on rev 1, when the real runtime is known. She can also answer it in the Q22 safety packet.
+- id: Q25
+  src: docs/sim/e2e-chain.yaml:225 (finding F1, 'owner supplies the number (spec L294 has none)')
+  q: Set the D17 output ceiling number, defined as a true-peak limit on the interpolated PWM stream.
+  verdict: owner-later
+  note: E2 at the tragus with real exciters, after the freeze order. Claude's E2 procedure starts at minimum volume and steps up.
+- id: Q26
+  src: docs/spec.md:633 (O7b, 'Claude's proposal (awaiting OK)')
+  q: 'OK the NiTi wire diameter plan? The CAD uses 0.80 mm, O7b proposed 0.75 mm, and the BOM buys only 0.75 mm. The plan: buy 0.75/0.80/0.85 mm in the freeze order and pick on a bench coupon bend.'
+  verdict: owner-later
+  note: Freeze order package (B-ORDER-PACKAGE). Meanwhile Claude makes the CAD sockets and set-screw bores accept 0.75-0.85 mm and fixes the 0.80 mm (frame.py) vs 0.75 mm (bom.md) mismatch.
+- id: Q27
+  src: docs/system/sub-ui.md:110 (issue 5, 'Options for the owner')
+  q: 'Pick the button gesture set and the behaviours the spec doesn''t define: DFU gesture, LED toggle and auto-off below ~20%, charge indication, low-battery warning, and the power-on state after the cell
+    is fitted.'
+  verdict: owner-later
+  note: The package pick settles the LED (O8 vs PER-07/08) and the UI state machine (FWSIM-R18) gets written; final tuning happens on the rev-1 pod.
+- id: Q28
+  src: docs/spec.md:702 (E5)
+  q: Run the hearing sweep with the C5 files on headphones. It sets the D10 band floor and your high-frequency threshold for T6 and PWM noise.
+  verdict: owner-later
+  note: Claude delivers the C5 sweep WAVs and procedure (Claude can write them now, no parts).
+- id: Q29
+  src: 'docs/system/vcrm.md:84 (S1.2-C3 next: ''fix a number for ambient'')'
+  q: 'Define ''ambient'' for spec 1.2.3 (self-noise no louder than ambient) and T6: which room and what level is the reference?'
+  verdict: owner-later
+  note: E11 on rev 1, or earlier if a stage-C noise result fails the strict bar but would pass a masked one.
+- id: Q30
+  src: 'docs/system/vcrm.md:88 (S1.3-T3 next: ''agree the blind-trial pass rule with the owner'')'
+  q: Agree the T3 localisation pass rule (what 'better than chance' means in trials and threshold), whether T3 must hold near the output ceiling, and whether to add per-side trim.
+  verdict: owner-later
+  note: Writing the rev-1 T3 test procedure, after E2 fixes the ceiling.
+- id: Q31
+  src: docs/system/sub-dock-usb.md:131 (issue 15, 'Options (owner decides)')
+  q: 'Clamp the exposed DOCK_VBUS contact: move D3 onto it, add a bidirectional TVS, or rely on D4?'
+  verdict: claude-decides
+  note: Option B. Put a bidirectional TVS at J3 DOCK_VBUS with a working voltage of 5.5 V or more, so USB's 5.25 V maximum never conducts, and keep D4 (1N5819WS, reverse block). A reverse-docked 5 V supply
+    then stays below the TVS working voltage and is blocked by D4, with no short. The part is chosen in Rev F with a dated JLC
+- id: Q32
+  src: docs/sim/acoustics.yaml:92 (options, 'owner decides')
+  q: 'Mic port path: leave it as built (open gap, fails R14 by ~16.5 dB), use a sealed chimney with the bore over the hole, or fit an ID 2.1 gasket at today''s offset?'
+  verdict: claude-decides
+  note: 'Option B: a sealed straight chimney (gasket ID about 1.0-1.4 mm), with the lid bore over the board hole to within 0.2 mm (ECR-0011 alignment), a board hole of 0.8-1.0 mm (inside the spec''s 0.6-1.0
+    range), and a mesh of 60 rayl or less at the window mouth. Evidence (docs/sim/acoustics.yaml results_a, 2026-10-02): as bui'
+- id: Q33
+  src: docs/system/reg-pod-body.md:107 (issue 1, 'Options (owner, O17)')
+  q: 'How should the spine top attach: as part of the tub print, as a lid feature, or as a separate bonded part?'
+  verdict: claude-decides
+  note: 'Option A: fuse the spine top to the tub print, trimmed to y <= 14.0 (reg-pod-body.md issue 1, L107). Add a solid-count check (lid and tub one body each) and re-run checks.json. Applied in the re-sized
+    shell after the package pick (O20). Undo: revert hw/mech/shell_r1.py.'
+- id: Q34
+  src: docs/system/reg-pod-body.md:137 (issue 11, 'Options (owner)')
+  q: 'Give the board''s foam strips a floor: tub ledges, wider inboard strips, or one cell-width foam pad?'
+  verdict: claude-decides
+  note: 'If S1/SIZ-02 is picked, the board hangs from the lid on 2 locating pins + 4 VHB spots, and the foam strips and this question go away. Otherwise use option A: tub ledges flush with the cell face
+    (reg-pod-body.md issue 11, L137), with a gap in the bottom ledge for the under-cell dock-wire route, plus a ''foam on support'' '
+- id: Q35
+  src: docs/system/reg-pad.md:121 (issue 13, 'Options (owner)')
+  q: 'Protect PB7 from the pad-board LED_K/OUT_B adjacency and from arm-wire chafe: reorder the pads, split R14, or both?'
+  verdict: claude-decides
+  note: Option C, both. Reorder the pad-board pads to OUT_A, OUT_B, LED_A, LED_K (free; hw/padboard/layout.py L47-50). Split R14 into 1k + 1k, with one half in series with PB7. That caps fault current into
+    PB7 at about 4.5 mA from VSYS or 3 mA from a bridge output, against its 20 mA absolute maximum. Today PB7 has no series re
+- id: Q36
+  src: docs/system/sub-dock-usb.md:107 (issue 4, 'pick one (owner)')
+  q: 'Firmware update path for the sealed pod: a protected boot stub, dual-bank images, or SWD-only recovery?'
+  verdict: claude-decides
+  note: 'Option A, already specified as FWSIM-R21 (docs/sim/firmware-emulation.yaml:130). The boot stub lives in write-protected first pages (FLASH_WRP1AR). It checks the image CRC, then enters DFU on a
+    backup-register flag or on the button held at reset with VBUS present; an invalid image goes to DFU automatically. Before the '
+- id: Q37
+  src: docs/system/sub-processing.md:144 (issue 1, 'owner picks')
+  q: 'C8/C9 SMPS capacitors: go back to the 10 V Extended part, use a 0603 16 V Basic part, or accept 6.3 V against the datasheet''s 10 V minimum?'
+  verdict: claude-decides
+  note: 'Option (a): return C8/C9 to C107369 (Samsung CL05A225KP5NSNC, 2.2 uF 10 V X5R 0402, Extended). Evidence: DS13737 Rev 10 section 5.1.6 requires a rating of 10 V or more (sub-processing.md issue
+    1). B-parts-selection.md:137 recommended this part originally, and the 6.3 V Basic C12530 was a pre-O19 cost swap. The 0402 foo'
+- id: Q38
+  src: docs/system/sub-processing.md:154 (issue 11, 'raise with the owner')
+  q: Spec D5 names the Murata LQM21PN2R2MGHL SMPS inductor, but Rev E and D11 use the DFE201610E. Update the spec or the schematic?
+  verdict: claude-decides
+  note: Update the D5 text (spec L152) to Murata DFE201610E-2R2M=P2 (shielded metal-alloy 2.2 uH, C337891). This matches D11 (spec L214), B-parts-selection.md:16 and :126 (recommended because D11 asks for
+    a shielded part), .pcba-workflow/sourcing-lock.csv:7 and Rev E. The LQM21PN2R2MGHL mention came from an unverified search s
+- id: Q39
+  src: docs/system/00-whole.md:182 ('spec header v0.14 -> v0.15 (owner)')
+  q: Bump the spec header from v0.14 to v0.15 (the content and changelog are already v0.15).
+  verdict: claude-decides
+  note: 'Change spec:1 from v0.14 to v0.15. Rewrite the stale Status line (spec:4, ''Next: shopping-list approval (O3) -> ... first bench orders'') to reflect O21/O22 (the simplification study is running;
+    no orders until the evidence-gated freeze), and set ''Last updated'' to 2026-10-02. Remove ''spec header bump'' from queue.yaml:8 '
+- id: Q40
+  src: docs/system/00-whole.md:139-146 ('Where the spec and the design disagree today')
+  q: 'Sync the spec text with the design. Stale today: sections 3 and 9 (L452/DFSDM, MCP73831, 105-150 mAh, old FETs); 7 and D18 runtime sized for 105-150 mAh; the charge rule (0.5C or less) vs 170 mA (about
+    1C); O10 ''screwed'' vs O16(6) ''taped''; '
+  verdict: claude-decides
+  note: 'Do it in two passes so nothing is rewritten twice. NOW: mark O3 (spec:629) as superseded by O21; annotate O10 (spec:636) as ''test build taped, per O16(6)''; update the 12.B rows (spec:664 B1 ->
+    PMCXB290UE, spec:666 B3 -> BQ25180, B4 -> Renata 175 mAh, B5 -> KMT0) and the Suggested-order line (spec:711) to the O21/O22 fl'
+  REJECTED: 'skeptic: re-decide before applying'
+- id: Q41
+  src: docs/system/reg-pad.md:89 (issue 1, 'Options (owner decides)')
+  q: Contact face for O16(4) (~100-150 mm2, near-flat, 2 mm edge radius).
+  verdict: claude-decides
+  note: 'First do the pre-made pad search she asked for (desk research, no purchase; nobody has done it, reg-pad.md:89). If a pre-made pad fits the ~8 x 13-19 mm envelope, list it for the freeze package.
+    Otherwise baseline option A in CAD: a Sugru face over the whole cup, ~8 x 14 mm (~110 mm²), slight crown (~0.6 mm per contact'
+- id: Q42
+  src: docs/system/reg-pad.md:94 (issue 3)
+  q: 'Seal the pad cup: peelable RTV, a moulded gasket, or pot it?'
+  verdict: claude-decides
+  note: 'Option A. Test build: cup screwed and dry. Final build: a neutral-cure RTV bead on the cup/cap seam and dabs in every opening (conductor bore, closure-screw hole, set-screw access, nut slot), peelable
+    for exciter service. Neutral cure, not acetoxy, which releases acetic acid next to copper and solder. Verify with the I'
+- id: Q43
+  src: docs/system/reg-pad.md:111 (issue 9)
+  q: Put the pad board on the pod board's 4-layer panel (different-design fee), or order it separately as a 2-layer board?
+  verdict: claude-decides
+  note: If the pad board survives the simplification pick, put it on the pod board's 70 x 70 Standard-PCBA panel as a second design. If PER-07 (LED to the lid) lands, the pad board and its fee disappear.
+    Confirm the different-design fee from the live JLC quote when building the freeze order package; she sees it in the costed t
+- id: Q44
+  src: docs/spec.md:639 (O13, still bold/open)
+  q: Does the ~$300 rev-1 milestone still stand? JLC's Standard PCBA fixed fees come to about $124-142 per order, against the $58-100 bom.md assumed.
+  verdict: owner-later
+  note: The consolidated freeze order package with a live JLC quote (assembly.md §9 steps). Earlier only if the simplification brief shows packages differing by more than ~$50 per order.
+- id: Q45
+  src: 'docs/system/plm/ecr/ECR-0001.md:58 (Decision ''_(owner: approve / reject / revise, date)_'', the same in all 13 ECRs)'
+  q: All 13 ECR Decision sections are empty owner-approval templates. Which ones actually need her?
+  verdict: claude-decides
+  note: 'Close ECR-0011 (defect fixed in 1e9003d, logged in decisions-log.yaml). Set ECR-0012 to ''implemented'' (779872e), then close it. Mark ECR-0006/0007/0008 ''deferred by O21 (2026-10-02)'' in their
+    Decision sections. ECR-0010: items 1, 2 and 4 are Claude''s; item 3 (5 boards, 2-3 assembled) is replaced by the freeze package, '
+- id: Q46
+  src: docs/system/vcrm.md:53 ('Whether to open ECRs for them is the owner's call')
+  q: Open ECRs for the six known-fail requirements (85 kHz, mass, unsealed mic port, pad area, O18 unreadable rails and unrouted spare pins, O20 size)? And which WARNs should be 'acknowledged' for --strict?
+  verdict: claude-decides
+  note: 'Open ECRs where a design fix exists: (1) O18, unreadable rails and unrouted spare pins -> fold into Rev F after the pick; (2) unsealed mic port -> mic seal/mesh design (reg-pod-body, sub-audio-in);
+    (3) pad area -> the Q41 baseline. O20 size is carried by the simplification study; open its ECR with the picked package. D'
+- id: Q47
+  src: docs/brief/queue.yaml:9 (A-INSTALL-PERMS, status pending-index)
+  q: 'Approve the stage-C tool installs: Renode + Robot Framework, vendoring CMSIS/ST LL/Unity/TinyUSB, Gmsh/Elmer, NetworkX, pymoo/SALib, KiBot.'
+  verdict: claude-decides
+  note: 'Install and vendor (option A), but only when a step needs it: tier E is blocked on firmware code that doesn''t exist yet (H-FW1). Log each install with its licence in decisions-log.yaml and post
+    a one-line tier-B FYI in the brief. Do not install Gmsh/Elmer now (OI-4: only if the L3 gate trips; Elmer is a source build, s'
+  REJECTED: 'skeptic: re-decide before applying'
+- id: Q48
+  src: docs/sim/layout-noise.yaml:253 (OI-6)
+  q: Go-ahead for heavy sim runs, and which sweeps matter (layout-noise H4/H5, e2e H2 full factorial).
+  verdict: claude-decides
+  note: 'No heavy runs while the simplification study is still running. After it finishes: layout-noise H4 first (ngspice, <1 GB, 3G fence) once the IF-AGGRESSOR-I export exists. H5 with ranges from datasheet
+    min/max and the UN-1..UN-11 bounds, re-fitted after rev-1 E3/S2 (LN-R12). For the e2e H2 full factorial (e2e-chain.yaml:'
+- id: Q49
+  src: docs/sim/firmware-emulation.yaml:421 (owner_inputs n2)
+  q: 'USB device stack for the CDC self-test: TinyUSB, a minimal CDC of our own, or ST USBX, given D15''s ''bare C + LL''?'
+  verdict: claude-decides
+  note: 'Option A: TinyUSB for the CDC self-test and DFU-runtime class, vendored src/ only under fw/third_party with SOURCE.md. DFU itself stays ST ROM (AN2606), untouched. Amend D15 to add ''TinyUSB for
+    the USB device class'' and log it in §15. Keep USB_STACK {tinyusb, own} in variants.yaml (firmware-emulation.yaml:85). Undo: th'
+- id: Q50
+  src: docs/system/sub-processing.md:147 (issue 4)
+  q: 'Idle-listening plan: run at 16 MHz in Range 3, or Stop 2 + ADF + LPDMA? In Stop 2 the SMPS runs asynchronously and the LED can''t be PWM''d.'
+  verdict: claude-decides
+  note: Start with plan 1 (16 MHz Range 3, as modelled in power.py) as the default, and build plan 2 (Stop 2 + ADF + LPDMA) as a tested variant. Keep the hardware plan-2-compatible through the simplification
+    and Rev F. Pick at bring-up from E4 data, with her E11 listening as the gate. If plan 2 wins, tell her the LED consequen
+- id: Q51
+  src: docs/sim/layout-noise.yaml:248-256 (owner_inputs OI-1, OI-2, OI-3, OI-5)
+  q: 'Layout-noise policy: the margin policy (10 dB below the mic floor, 12 dB on PDM pickup, Kelvin error 2% or less, or calibrate it out), a 0.7 mm MIC_VDD probe pad (O18 vs O20), the LED PWM frequency
+    and the mic divider (/20 or /18), and the '
+  verdict: claude-decides
+  note: 'OI-1: keep the thresholds (10 dB below the floor for tones, 12 dB on PDM pickup, 10 dB sign-off at pessimistic PSRR). For Kelvin, route a Kelvin sense where it''s free, and keep firmware calibration
+    at E1/F4 as the knob (O18). OI-2: yes, one 0.7 mm MIC_VDD pad, counted in the simplification size budget; raw PDM over USB'
+- id: Q52
+  src: docs/research/methodology/method.md:563 (section 9 'Open questions for the owner')
+  q: 'Process questions from the methodology and prior-art research: the JLC parts endpoint; holding a JLC Components API developer account; GitHub vs a self-hosted Forgejo; ICD sign-off; maturity gates;
+    PLM option A/B/C; scoping README rule 3 (t'
+  verdict: already-answered
+  note: 'Residual (1): a workflow hits its context limit even after the docs/system compaction; then ask her about changing rule 3. Residual (2): tools/jlc.py''s endpoint breaks; then ask whether to hold
+    a JLC developer account in her name.'
+- id: Q53
+  src: hw/mech/notes/electronics.md:163 ('owner hasn't approved (USER_REVIEW)')
+  q: 'Old round-1 ''decisions for you'' left in the mech notes and research: board mounting USER_REVIEW, one-board L2/L3, screw-head charge contacts ''need the owner''s OK'', shell S1-S3, heel H1-H3, pad
+    A/B/C, A3 ADF vs MDF, the B-parts D11 rewording'
+  verdict: already-answered
+  note: 'Mark each section ''Superseded by O12/O16/O17 (date); live items tracked in reg-arm 5, reg-pad 7, Q41'' (tier C, no brief line). Undo: git revert.'
+- id: Q54
+  src: docs/build/hardware.md:343 ('Tell the owner, don't design around it')
+  q: 'FYI: Siraya Blu''s heat deflection temperature of 70 C is marginal for glasses left on a car dashboard in summer. There are also purchase choices for the freeze package: set screws and resin.'
+  verdict: owner-later
+  note: The consolidated freeze order package (O21). The heat/cell storage point goes into her O22 safety read (with A-SAFETY-REVIEW / Q22), after Claude adds the Renata storage-temperature limit from the
+    datasheet (Rev V03).
+- id: Q55
+  src: docs/spec.md:629 (O3, still bold/open)
+  q: Approve the shopping list and long-lead orders (exciters, NiTi, MCU reserve, cell quote, connector stock), ECR-0006/0007/0008, and ECR-0010 item 3 (5 boards, 2-3 assembled).
+  verdict: already-answered
+  note: 'Mark O3 (spec:629) ''superseded by O21 (2026-10-02)''. Write ''deferred by O21'' into the ECR-0006/0007/0008 Decision sections and ECR-0010 item 3. Fix the Suggested-order line (spec:711, ''O1
+    and O3 -> order...''). Keep B-ORDER-PACKAGE (queue.yaml:19) as the single trigger-bound item. Undo: git revert.'
+- id: Q56
+  src: docs/brief/queue.yaml:7 (A-PHYSICAL-FIRSTWINS, blocked)
+  q: E1 (coil R/L with an LCR meter), E2 (exciter listening at the tragus), and the weighted dummy-pair wear test with real NiTi.
+  verdict: owner-later
+  note: Parts in hand from the freeze order package (O21), i.e. after the O22 evidence-gated freeze and her order.
+missed_by_extractor:
+- SWD backup after snap-off (owner sub-call at the package pick). ASM-02 (docs/research/simplify/assembly.md:184, :202-203) moves TP1-TP6 off the pod board, so after snap-off the pod has no SWD pads. That
+  changes how O18's 'SWD pads as backup' (spec:644) is met, and O18 requires such a removal to be stated. It is not among the sub-calls Q13-Q21. Its value also depends on whether she owns an ST-Link (Q07).
+- 'Charging while worn (owner-only data, safety weight). Will she ever dock or charge a pod while it is on her head, e.g. at the PC for DFU, self-test or telemetry? She wears glasses full time, and ECR-0009
+  item 1 (ECR-0009.md:10-11) assumes ''docked = not worn, never charge while worn''. If yes: U3''s ~0.3 W sits 0.2 mm above the pouch, which is on the head side of the stack (00-whole risk 13), so it becomes
+  a skin-temperature issue, and firmware must cap ICHG or set CHG_DIS during data sessions. Ask at the package pick, before Rev F places U3, not only in the later Q22 read.'
+- 'Numeric thresholds for the locked section 1.3 tests (owner-later, with E2/Q25). docs/sim/e2e-chain.yaml:166-190 marks several as ''assumed, owner to confirm'': T2.comfort_sl_p99_db <= 60 dB SL (currently
+  83.6, ''would fail''), T1.event_sl_p90_db >= 10, T1.whine_suppression_db >= 20. Only T3 (Q30), T6/ambient (Q29) and the D17 ceiling (Q25) were extracted. O22 criterion 4 grades the stage-C sims against
+  these numbers, so they must either be hers or be explicitly provisional.'
+- 'Assembled-board count (money, freeze package). ASM-02''s diagnosability relies on keeping ''4 assembled: 2 to wear, 2 for diagnosis'' (assembly.md:203). That conflicts with O13''s lever ''assemble 2-3
+  of 5 boards'' (spec:639) and with ECR-0010 item 3.'
+- 'Safety-packet gap. The Q22 packet list leaves out 00-whole.md risk 1: J3 DOCK_VBUS sits 0.6 mm from J5 VBAT, so one solder bridge puts the cell on an exposed contact that can touch skin (sweat electrolysis).
+  The fix is Claude''s (assembly.md:18 item (e): split the J pads by hazard class), but it belongs in her safety read.'
+rejected_decisions:
+- id: Q23
+  problem: 'Q23 sets WATCHDOG_SEL=11 (disabled), reversing sub-power.md:143''s recommendation of 01. It weighs only option 01''s downsides and drops its stated main benefit: ''valuable in a bonded pod with
+    no reset button'' (sub-power.md:143). With 11, recovery from a hang, or from an Off state that never wakes, rests on two legs. (1) The IWDG, which FWSIM-R55 (firmware-emulation.yaml:168) freezes in
+    Stop 2. (2) WATCHDOG_15S_ENABLE, which may be switched off by WATCHDOG_SEL=11 (''completely disabled'', SLUSE99C Table 8-4). The datasheet-only bq25180.py model (U-FW4, :439) can''t settle that; only
+    rev-1 bring-up step 7 can. So a wake-source bug in Off could leave a sealed pod unrecoverable without cutting it open. Off draw is 16-24 uA, so reaching BUVLO takes about a year.'
+  fix: Keep owner_input n4 open as a firmware decision. Adopt 11 only if (a) the datasheet or TI confirms the 15 s HW reset still works with SEL=11, or (b) the IWDG runs in Stop with RTC kicks. Otherwise
+    keep 01 with an RTC keep-alive and the boot-stub disarm (FWSIM-R21). In the Q22 safety packet, state this as a trade with a recommendation, not as a decided line.
+- id: Q40
+  problem: The NOW pass changes 12.B B1 (spec:664) to PMCXB290UE and 'fixes' D6 spec:187 'B1 prefers DMC2400UV'. But Q20 decides to adopt DMC2400UV-7 (OUT-06) in Rev F, so the text gets rewritten twice
+    and contradicts the decided direction in the meantime. Q40's own rule is 'nothing is rewritten twice'. Also, retargeting the RM0394 citation at spec:253 to RM0456 is wrong. spec:252-255 describe the
+    L452's DFSDM, and the U575 has ADF/MDF, not DFSDM, so the swap would attribute L452 facts to the U5 manual.
+  fix: Move the B1 and D6 FET text into the post-pick pass. Mark the L452 DFSDM bullets (spec:253-255) as superseded by the v0.13 U575 bullets instead of re-citing them. For spec:182 (TIM1 outputs float
+    at reset), re-verify the claim in RM0456 before changing the citation.
+- id: Q07
+  problem: 'Q07''s ''BOOT0 solder-blob/tack pad beside TP4'' conflicts with both sibling studies. Periphery PER-11 (periphery.md section 2.8) says no new pad is needed: R1''s PH3 pad is already on F and
+    is the DFU-first tack point. Assembly ASM-02 (assembly.md:184, :202-203, :242) moves TP1-TP6, including TP4, off the board onto the snap-off frame, and also keeps R1''s PH3 pad as the tack point. A
+    new in-pod pad spends O20 area that both studies show isn''t needed. Q07''s residual-risk line (''VDDUSB 3.0 V marginal, AN2606 asks 3.3 V'') also contradicts 00-whole.md risk 9: DS13737 Table 150 allows
+    USB down to 2.7 V, and AN2606''s 3.3 V is boilerplate.'
+  fix: 'Decide this in the package integration. Baseline: R1''s PH3 pad stays exposed on F as the first-flash tack point (PER-11). If ASM-02 is adopted, also bring BOOT0 out to the frame header. Add no
+    new in-pod pad unless the layout session shows R1''s pad can''t be reached. Correct the VDDUSB residual-risk line. Keep the instrument-inventory ask for the freeze package.'
+- id: Q47
+  problem: Minor. Q47 rewrites the stage-c-simulation-plan.md memory ('ask the owner before installing anything', recorded as a 2026-10-02 owner direction) on Claude's own reading of the FOSS rule. Her
+    brief already shows A-INSTALL-PERMS as a tier-A ask (queue.yaml:9). Which record reflects her actual words is unknown.
+  fix: 'No install is needed today: tier E waits for firmware code that doesn''t exist yet. Put one FYI line with a default in the next brief: ''I read your FOSS rule as covering FOSS installs; I log the
+    licence per install; say no if you want to approve each one.'' Edit the memory only after she replies or lets it stand.'
