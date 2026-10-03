@@ -327,6 +327,9 @@ def route(placement, netlist, W, H, out):
         pcbnew.SaveBoard(str(target), bb)
         (out / "drc.json").write_text((out / "drc2.json").read_text())
     best["passes"] = {"first": score(first), "second": score(second), "kept": "second" if bb is not None else "first"}
+    side = Path(str(target) + ".silkdots")
+    side.unlink(missing_ok=True)                    # fresh board: silk.py recomputes its pin-1 dot list
+    subprocess.run([sys.executable, str(HERE / "silk.py"), str(target)], check=True, stdout=subprocess.DEVNULL)
     return best
 
 

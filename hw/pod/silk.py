@@ -1,5 +1,9 @@
 """Silkscreen pass for the pod board: post-route, idempotent, never touches copper.
 
+KNOWN ISSUE (2026-10-03): re-running on an already-silked board can segfault inside pcbnew's SWIG bindings after the
+board drawings are removed; place_r1.py / place_r2.py only call it on freshly routed boards, where it works. Debug before
+relying on manual re-runs. Pin-1 dot list: sidecar <board>.silkdots (fresh boards compute it).
+
     source tools/env.sh && python3 hw/pod/silk.py [board.kicad_pcb]
 
 Owner 2026-10-02: "Make sure the silkscreen looks pretty. I'm still toying with the idea of a translucent material for
@@ -138,11 +142,39 @@ def pin1_dot(board, fp, pads, cu, silk):
     raise SystemExit(f"silk: no clear spot for the pin-1 dot of {fp.GetReference()}")
 
 
-def strip(board):
+MARK = "silk.py dot parts:"
+
+
+def dot_parts(board, path, had_silk):
+    """Parts that get a pin-1 dot, kept in a sidecar <board>.silkdots so a re-run (marks already on Fab) draws the same dots.
+    No sidecar: a board silked before the sidecar existed (Rev F/G draft) uses DOT_PARTS; a fresh board computes the KEEP_MARKS
+    parts whose library silk hits a pad. (Notes inside the board file / iterating drawings twice crashed pcbnew's SWIG
+    bindings, 2026-10-03: the board's drawing list is read exactly once, in strip.)"""
+    side = Path(str(path) + ".silkdots")
+    if side.exists():
+        return set(filter(None, side.read_text().split()))
+    if had_silk:
+        found = set(DOT_PARTS)
+    else:
+        found = set()
+        for fp in board.GetFootprints():
+            if fp.GetReference() not in KEEP_MARKS:
+                continue
+            cu = pcbnew.B_Cu if fp.IsFlipped() else pcbnew.F_Cu
+            silk = pcbnew.B_SilkS if fp.IsFlipped() else pcbnew.F_SilkS
+            pads = side_pads(board, cu)
+            if any(it.GetLayer() == silk and it.GetClass() == "PCB_SHAPE" and hits_pad(it, pads, cu) for it in fp.GraphicalItems()):
+                found.add(fp.GetReference())
+    side.write_text(" ".join(sorted(found)) + "\n")
+    return found
+
+
+def strip(board, path):
     """Refs and non-essential footprint silk -> Fab; remove our own earlier board-level silk (idempotent)."""
-    for d in list(board.GetDrawings()):
-        if d.GetLayer() in (pcbnew.F_SilkS, pcbnew.B_SilkS):
-            board.Remove(d)
+    ours = [d for d in list(board.GetDrawings()) if d.GetLayer() in (pcbnew.F_SilkS, pcbnew.B_SilkS)]
+    dots = dot_parts(board, path, bool(ours))
+    for d in ours:
+        board.Remove(d)
     for fp in board.GetFootprints():
         fab = pcbnew.B_Fab if fp.IsFlipped() else pcbnew.F_Fab
         silk = pcbnew.B_SilkS if fp.IsFlipped() else pcbnew.F_SilkS
@@ -166,9 +198,9 @@ def strip(board):
                     lost = True
             else:
                 it.SetLayer(fab)
-        if lost and fp.GetReference() not in DOT_PARTS:
-            raise SystemExit(f"silk: {fp.GetReference()} library marks hit a pad; add it to DOT_PARTS")
-        if fp.GetReference() in DOT_PARTS:
+        if lost and fp.GetReference() not in dots:
+            raise SystemExit(f"silk: {fp.GetReference()} library marks hit a pad but it is not in the dot list")
+        if fp.GetReference() in dots:
             if fp.GetReference() not in KEEP_FRAME:              # a broken outline reads as damage: dot only
                 for it in fp.GraphicalItems():
                     if it.GetLayer() == silk:
@@ -176,25 +208,40 @@ def strip(board):
             print(f"silk: {fp.GetReference()} library marks too close to pads; pin-1 dot at {pin1_dot(board, fp, pads, cu, silk)}")
 
 
+def board_geom(board):
+    port = next(((pcbnew.ToMM(p.GetPosition().x), pcbnew.ToMM(p.GetPosition().y)) for p in board.FindFootprintByReference("U2").Pads()
+                 if p.GetAttribute() == pcbnew.PAD_ATTRIB_NPTH), PORT)
+    e = board.GetBoardEdgesBoundingBox()
+    W, H = pcbnew.ToMM(e.GetWidth()), pcbnew.ToMM(e.GetHeight())
+    f_parts = [f for f in board.GetFootprints() if not f.IsFlipped()]
+    one_face = all(f.GetReference() == "SW1" or f.GetReference().startswith("TP") for f in f_parts)
+    sw = board.FindFootprintByReference("SW1")
+    sw_l = pcbnew.ToMM(sw.GetCourtyard(pcbnew.F_CrtYd).BBox().GetLeft()) if sw and not sw.IsFlipped() else None
+    return port, W, H, one_face, sw_l
+
+
 def art(board):
     F = pcbnew.F_SilkS
-    # mic port: keep-clear ring + two sound arcs each side ("(( o ))"); ring clears the 0.6 mm hole by 0.35 mm, the outer
-    # right arc stays 0.45 mm off Y1's pads
-    cx, cy = PORT
-    circle(board, F, PORT, 0.72)
+    port, W, H, one_face, sw_l = board_geom(board)
+    # mic port: keep-clear ring + sound arcs each side ("(( o ))"); arcs that would leave the board are dropped
+    circle(board, F, port, 0.72)
     for r in (1.2, 1.65):
-        arc(board, F, PORT, r, 140, 220)
-        arc(board, F, PORT, r, -40, 40)
-    # name block, condensed caps between the button and the rear pads; a hairline rule, then the revision
-    x0, x1 = NAME_ZONE
+        if port[0] - r > 0.4:
+            arc(board, F, port, r, 140, 220)
+        arc(board, F, port, r, -40, 40)
+    if one_face:   # Phase 2: F carries only SW1 (+ bare test pads): name block between the port motif and the button
+        x0, x1 = port[0] + 2.2, (sw_l if sw_l else W / 2) - 0.6
+        yc = H / 2
+    else:          # Rev F/G two-face draft: the part-free strip between SW1 and the rear pads
+        x0, x1 = NAME_ZONE
+        yc = 6.5
     xm = (x0 + x1) / 2
-    text(board, F, "STEREO", xm, 5.15, w=0.86)
-    text(board, F, "ULTRASOUND", xm, 6.75, w=0.62)        # 0.62 wide: KiCad caps the stroke at w/4, JLC wants >= 0.15
-    seg(board, F, (x0 + 0.9, 7.95), (x1 - 0.9, 7.95))            # short of SW1 pad 4
-    text(board, F, "REV F", xm, 9.15, w=0.66)
-    # bottom face: one orientation word for whoever turns the board over (the cell side)
-    B = pcbnew.B_SilkS
-    text(board, B, "CELL SIDE", 13.0, 12.15, w=0.62)
+    text(board, F, "STEREO", xm, yc - 1.35, w=0.86)
+    text(board, F, "ULTRASOUND", xm, yc + 0.25, w=0.62)        # 0.62 wide: KiCad caps the stroke at w/4, JLC wants >= 0.15
+    seg(board, F, (x0 + 0.9, yc + 1.45), (x1 - 0.9, yc + 1.45))
+    text(board, F, "PHASE 2" if one_face else "REV F", xm, yc + 2.65, w=0.66)
+    if not one_face:   # bottom face: one orientation word for whoever turns the board over (the cell side)
+        text(board, pcbnew.B_SilkS, "CELL SIDE", 13.0, 12.15, w=0.62)
 
 
 def project_rules(board_path: Path):
@@ -210,7 +257,7 @@ def project_rules(board_path: Path):
 def main():
     path = Path(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).parent / "draft_r1/pod_r1_routed.kicad_pcb")
     board = pcbnew.LoadBoard(str(path))
-    strip(board)
+    strip(board, path)
     art(board)
     for cu, silk in ((pcbnew.F_Cu, pcbnew.F_SilkS), (pcbnew.B_Cu, pcbnew.B_SilkS)):
         pads = side_pads(board, cu)
