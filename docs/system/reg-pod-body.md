@@ -40,7 +40,7 @@ Status: rev-1 shell CAD (`shell_r1.py`, last changed 2026-10-01 19:16 when the b
 | **Lid** | outer body above y 14.4: 1.0 thick, plus the armour plate (0.7, 0.3 chamfer, y 15.4–16.1) and a circuit-trace groove (0.7 wide, 0.45 deep) | L91–101 |
 | Locating lip | ring 0.5 wall × 0.8 deep (y 13.6–14.4), 0.15 clearance per side, round the **main cavity only** (x 30.45–66.55, z −8.75…4.55). Its lower wall spans the belly bay's opening; round the bay (x 29.5–55.0, z −13.2…−8.9) the seam is a butt joint with a ~0.4 mm tub land after the rebate | L93–95, L39–40, L61–63; `tolerances.md` |
 | Seam groove | `seam_groove()` is a band y 14.2–14.6, 0.4 in from the outer faces, but **only the tub subtracts it** and the tub stops at y 14.4. Real cut line: a **0.2 (y) × 0.4 mm rebate on the tub's top edge**, below the 0.4 mm resin recess minimum, so it may fuse. `lid_base()` and `main()` never cut the lid (O10 cut line) | L66–69, L73, L88, L91–110, L213 |
-| Mic port | Ø1.0 bore through the lid at (34.5, ZC) = board x 3.9 (U2's body origin); the board's port NPTH is at board 3.13 = pod 33.73, **0.77 mm forward**. Hex window (circumradius 1.9, 0.8 deep) at the outer face. **No mesh, no seal to the board** | L45, L102–103; [sub-audio-in](sub-audio-in.md) |
+| Mic port | Ø1.0 bore through the lid at (34.5, ZC) = board x 3.9; the board's port NPTH is also at board 3.9 = pod 34.5 (ECR-0011: U2 origin moved to x 4.67; interfaces.py [mic-port] 0.000 mm, 2026-10-02), **aligned**. Hex window (circumradius 1.9, 0.8 deep) at the outer face. **No mesh, no seal to the board** | L45, L102–103; [sub-audio-in](sub-audio-in.md) |
 | Plunger bore + skin recess | Ø3.2 bore through the lid at (52.6, ZC) = board x 22.0. Recess Ø5.2 × 0.25 in the plate for a bonded silicone skin (material TBD) | L46, L104–105 |
 | Plunger | printed; head Ø2.9 × 0.9, stem Ø1.2 × 1.2, no shoulder. CAD draws it at y 14.2–16.1; seated on the switch it sits at 13.55–15.45. Presses **KMT022** (C&K IP68 SMD tact switch, 1.6 N, travel 0.15 ± 0.1, height 0.65 nominal) | L113–116; `tolerances.md`; C&K KMT0 p.B-9 |
 | Clamp ribs | 2 ribs on the lid, x 31.1–64.1, 0.6 wide (z 3.8–4.4 and −8.6…−8.0), reaching y 12.95: **0.05 mm** above the board's F face | L106–109 |
@@ -52,7 +52,7 @@ Status: rev-1 shell CAD (`shell_r1.py`, last changed 2026-10-01 19:16 when the b
 | To | What crosses | Invariant / state |
 |---|---|---|
 | [reg-board](reg-board.md) | Pocket 34 × 13 × 0.8 at x 30.6–64.6, y 12.1–12.9, z −8.6…4.4; 0.3 mm to the front/top/bottom walls, 2.1 behind; ribs on F bands, foam on B bands; part bands B y 10.9–12.1, F y 12.9–14.1 | No parts within 0.6 of the top/bottom edges, either face. R-BOARD-BODY |
-| [sub-audio-in](sub-audio-in.md) | lid bore Ø1.0 + hex window over board (3.9, 6.5) | Board port is at x 3.13: **0.77 mm off**. 1.5 mm open gap board ↔ lid. R-AUDIO-BODY |
+| [sub-audio-in](sub-audio-in.md) | lid bore Ø1.0 + hex window over board (3.9, 6.5) | Board port is at x 3.9: **aligned** (ECR-0011). 1.5 mm open gap board ↔ lid. R-AUDIO-BODY |
 | [sub-ui](sub-ui.md) | plunger bore over SW1 at board (22.0, 6.5) | KMT0 travel 0.15 ± 0.1 vs the stack tolerance. R-UI-BODY |
 | [sub-dock-usb](sub-dock-usb.md) | DOCK box, window, BAY, USBC_KEEPOUT; 5 wires target → J3/J4/J10/J11/J12 | Wire route belly → rear pads not designed. R-DOCK-BODY |
 | [sub-power](sub-power.md) | CELL envelope, VHB, foam on the cell's outer face | Cell clears the strut-relief fill by ~0.07 mm (L82). R-PWR-BODY |
@@ -114,7 +114,7 @@ Status: rev-1 shell CAD (`shell_r1.py`, last changed 2026-10-01 19:16 when the b
    - (B) Push the board against the front wall and tape it.
    - (C) Add a front stop on the tub.
    - **Closes:** a CAD change + check.
-3. **Mic acoustic path** (body side): the lid bore is 0.77 mm off the board port; the 1.5 mm gap is unsealed; there's no mesh. **Closes:** see `sub-audio-in` issues 1–3 (chimney/boss + mesh seat in the lid).
+3. **Mic acoustic path** (body side): the lid bore is aligned with the board port since ECR-0011; the 1.5 mm gap is unsealed; there's no mesh. **Closes:** see `sub-audio-in` issues 1–3 (chimney/boss + mesh seat in the lid).
 4. **The plunger floats.** The bore is a straight Ø3.2 hole with no shoulder, so the plunger rests on SW1 and its head top sits 0.40 mm below the skin recess floor (Key numbers). The quantity that sets pre-press or no-click is head top ↔ skin underside; no doc or CAD sets it (`tolerances.md` says "stem 0.2 mm long, sand to a light touch"). The KMT022 height is 0.65 mm nominal (C&K KMT0 datasheet p.B-9, 21 Mar 2018, fetched 2026-10-01; sub-ui); **its tolerance is unknown**. **Closes:** set the head length so that "skin just touching the head = SW1 just not pressed", add a retaining shoulder or rely on the skin, and say which (sub-ui issue 1).
 5. **Sealing is undesigned past the seam** (table above). The spec cites `docs/research/sealing-and-service.md` (O10), but it doesn't exist. **Closes:** the sealing note + an IPX4 spray test plan.
 6. **Heel wire-channel exit overlaps the cell's rear end** (x 65.25–66.25 vs 65.6): heel.py still checks against the old cell ([physical.md](physical.md) open issue 2). **Closes:** [reg-arm](reg-arm.md).

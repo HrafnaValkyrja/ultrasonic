@@ -764,8 +764,8 @@ requirements:
     ecrs: [ECR-0009]
     next: "Simulate start/stop transients; write the soft-start sequence as host-tested code"
     gap: >-
-      C: the reset-state half is covered by hardware (R3-R6 hold the four gates off; the ROM bootloader leaves PA8 and PB0
-      alone). No simulation of start/stop transients exists (bridge_spice.py covers idle current, shoot-through and distortion);
+      C: the reset-state half is covered by hardware (R3-R6 hold the four gates off; in the ROM bootloader PA8 is untouched (R3),
+      PA7 is an SPI1 pull-down (+ R4), PA10 is a USART1_RX pull-up (+ R5) and PB15 an SPI2_MOSI pull-down (+ R6): all four gates stay off). No simulation of start/stop transients exists (bridge_spice.py covers idle current, shoot-through and distortion);
       soft start and the TIM1 safe-state settings are firmware, unwritten; PA6 is I_SENSE, so there is no TIM1_BKIN source
       (sub-processing issue 6). D: scope and ear on power-up, mode changes and squelch on/off (E7).
 
@@ -916,7 +916,7 @@ requirements:
     next: "Design the boot stub and DFU entry; fix the dock cable and pin order"
     gap: >-
       C: the USB FS pins (PA11/PA12), dock pads and USB ESD exist in the schematic. The boot stub and ROM DFU entry are
-      undesigned (sub-dock-usb issue 4); the exposed DOCK_VBUS contact has no ESD clamp (00-whole risk 2); +3V0 at 2.955-3.045 V
+      undesigned (sub-dock-usb issue 4); D5 at J3 clamps the exposed DOCK_VBUS contact (Rev F; 00-whole risk 2); +3V0 at 2.955-3.045 V
       sits under the datasheet's 3.0 V VDDUSB minimum, inside the 2.7 V functional guarantee (DS13737 Rev 10), so the bench
       decides; with charger watchdog option B (the recommended one) a DFU session longer than 160 s power-cycles the pod unless the
       boot stub disables it first; the 5-pin cable head
@@ -1185,7 +1185,7 @@ requirements:
     evidence: [hw/pod/gen.py, docs/system/sub-debug-test.md]
     ecrs: [ECR-0010, ECR-0009, ECR-0003]
     related: [O9-prototype, O18-firmware-fixable, O18-stageC-classes]
-    known_fail: "The 8 free MCU pins (PC13, PH0, PH1, PB1, PB15, PB5, PB6, PB8) go to no pad (ECR-0003, if approved, spends PB15 and frees PA9 and PB0); VSYS, MIC_VDD, LED current and coil current are not readable by the MCU; there is no pad on MIC_CLK (sub-debug-test issue 4)."
+    known_fail: "The 6 free MCU pins (PC13, PH0, PH1, PA3, PA9, PB0) go to no pad (Rev F: leg B moved to PA10/PB15 by ECR-0003, PB5 strapped to GND, PB6/PB8/PB1 have TP7/TP8/TP9 dots); VSYS, MIC_VDD, LED current and coil current are not readable by the MCU; there is no pad on MIC_CLK (sub-debug-test issue 4)."
     known_fail_ref: "none; docs/system/sub-debug-test.md issue 4"
     next: "List the hooks the simplification study keeps or drops; write the self-test firmware"
     gap: >-

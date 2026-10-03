@@ -13,8 +13,18 @@ agent use this set for every design change.
    off-board, mechanical, firmware, cross-domain dependencies). Run `python3 tools/plm.py impact <file|ref:X|net:X|item>`
    to list every interface and doc the change touches. A change bigger than a typo gets an ECR
    (`plm.py ecr new`); the owner approves ECRs that touch her decisions.
-2. **After** the change, in the same commit: update every doc it touched: status line, interfaces, key
-   numbers, open issues, change log. Regenerate the integration map when the schematic changes:
+2. **After** the change, in the same commit: update every doc it touched, in the AI-facing format (owner
+   rule 2026-10-01: the docs are written for other Claude instances with a compacted context, not for humans):
+   - **content:** current state only (history = git, no change-log section; one `Rev <letter> <date>:` line at
+     the top says what the latest revision changed); the YAML status header, interfaces, key numbers and open
+     issues all updated;
+   - **form:** YAML blocks and terse key:value lines; stable IDs (D#, O#, R#, F#, ECR-####, relation ids, check
+     ids; a closed issue leaves a gap in its ID sequence, never a renumbering); a source (file:symbol | spec § |
+     commit) and a date on every number; pointers instead of copies; invariants as executable checks
+     (`tools/checks/*`) that the doc lists by id; at most one `why:` line, only when non-obvious; every
+     abbreviation defined once at the top.
+
+   Regenerate the integration map when the schematic changes:
    `source tools/env.sh && python3 hw/pod/system_map.py`. Then `plm.py status`: every SUSPECT relation and
    STALE item it reports must be checked and re-baselined (`plm.py review <id> --by ... --note ...`) before
    the work counts as done.
@@ -57,21 +67,35 @@ Idea sources: Teamcenter-style where-used / change management; Doorstop's suspec
 
 ## Template (every subsystem and region doc)
 
-```
-# <Name>
-Status: <revision / state>, updated <date> · Source of truth: <files> · Owner decisions: <O-items>
+Format of the six Rev F docs (`sub-power`, `sub-processing`, `sub-output`, `sub-dock-usb`, `sub-debug-test`,
+`reg-board`); rule 2 above defines the style.
 
-## Purpose            what it must do; which functions (F-rows in integration-map.md) it carries
-## Big picture        a diagram (PNG in docs/diagrams, dark mode) + 5-10 lines of how it works
-## Elements           parts / features, each glossed (part number = what it is), with LCSC/refs
-## Interfaces         to every other subsystem/region: nets and MCU pins (names exactly as in
-                      integration-map.md), mechanical contacts, firmware dependencies
-## Constraints        spec decisions (D-items), owner decisions (O-items), physics/process limits
-## Key numbers        with source and date
-## Open issues        and risks, each with what would close it
-## Before you change this, check   the specific other docs and invariants a change here can break
-## Change log         dated one-liners
+````
+# <NAME>: <scope> (item <ITEM-ID>)
+Rev <letter> <date>: <one line: what this revision changed; current state only, history = git>
+Status: <schematic / board / firmware state, each with source + date>. Updated <date>.
+
+```yaml
+abbrev: {TERM: meaning}          # every abbreviation, defined once, before use
+item: <ITEM-ID>                  # docs/system/plm/items.yaml
+src_of_truth: ["<file[:symbol or Lnn]>", "<...>"]
+owner_decisions: ["O#", "<...>"]
+open_ecrs: {ECR-####: <state>}
+checks: ["tools/checks/<x>.py [<check id>] (<date>: <result>)"]
+diagrams: ["docs/diagrams/<name>.png"]
 ```
+
+## Purpose            YAML: functions (F-rows in integration-map.md §1), requirements, each with its D-/O-id
+## Big picture        a diagram (PNG in docs/diagrams, dark mode, or mermaid) + at most ~10 key:value lines
+## Elements           YAML list: ref, part (glossed: part number = what it is), lcsc · class · stock · price (query date), position (src)
+## Interfaces         YAML list, one entry per neighbour: to, nets/pins (names exactly as in integration-map.md),
+                      crosses, invariants, src, rel (plm relation id)
+## Constraints        YAML: D-items, O-items, physics/process limits, each with src
+## Key numbers        YAML list: {q: quantity, v: value, src: source + date}; derived values say "derived"
+## Open issues        YAML list with stable IDs (<PREFIX>-<n>, gaps = closed): id, t (what), close (what would
+                      close it), owner (who decides)
+## Before you change this, check   YAML: invariant -> other docs/checks it can break; always: plm.py impact + integration-map §10
+````
 
 ## Change log
 - 2026-10-01: set created (owner rule). `integration-map.md` generated from gen.py Rev E.

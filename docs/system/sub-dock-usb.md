@@ -1,6 +1,6 @@
 # SUB-DOCK-USB: magnetic dock, USB FS, DFU, ESD, dock detect
 Rev F 2026-10-02: D3 (behind D4) -> D5 TPD1E10B06 at J3; R19/CC_SENSE and R11 removed; J4 = shared dock GND + cell − pad between J3 and J5; C15 25 V; pads re-placed in two rear columns (gen.py docstring L35-60).
-Status: schematic Rev F block DOCK_USB (gen.py, 2026-10-02); board autorouted 2026-10-02 (draft_r1/summary.json: 687 tracks, 118 vias, 2 unconnected, neither a dock net; DRC 19 = pad-ring courtyard overlaps). Contact pin order, cable side, DFU firmware not designed. Updated 2026-10-02.
+Status: schematic Rev F block DOCK_USB (gen.py, 2026-10-02); board autorouted 2026-10-02 (draft_r1/summary.json: 687 tracks, 118 vias, 2 unconnected, neither a dock net; DRC 19 courtyard overlaps: 18 J-pad ring pairs + 1 C1↔U1). Contact pin order, cable side, DFU firmware not designed. Updated 2026-10-02.
 abbr: DK-nn = this doc's open-issue ids (stable; external docs cite "sub-dock-usb issue nn" = DK-nn). pod x = board x + 30.6 (place_r1.py docstring). F = board face to lid, B = face to cell.
 src: `hw/pod/gen.py` (DOCK_USB L202-246), `hw/pod/place_r1.py` PLACE (L51-72), `hw/pod/draft_r1/pod_r1_routed.kicad_pcb`, `hw/mech/shell_r1.py` (`DOCK` L47, `BAY` L40, `USBC_KEEPOUT` L48, `CELL` L42), `docs/build/bom.md`, `docs/system/integration-map.md` (authoritative pins/nets)
 owner: O12(a)(b), O16(3)(5)(6), O10, O9/O15, O18, O19, O21 · ECRs open: ECR-0008 (connector stock), ECR-0009 (no exciter output while VBUS present), ECR-0015 PER-01D/SIZ-06 (4-contact dock, USB-C fallback; OFF in B3 defaults) · relations: R-PWR-DOCK, R-PROC-DOCK, R-DOCK-BODY, R-DOCK-BOARD (tools/plm.py)
@@ -45,7 +45,7 @@ flowchart LR
 | R1 (MCU block) | 10 kΩ BOOT0 (PH3) pull-down | C25744 · Basic | (17.0, 1.6) F; R1 pad = DFU tack point (integration-map F14) |
 | USB-C fallback | Same Sky UJ32-C-H-G-MSMT: IP68 USB-C receptacle 6.75×8.55×2.76 mm | not fitted; price TBD (bom.md L33) | keep-out only (DK-10) |
 
-Neighbour pads at 0.6 mm edge gap (solder-bridge pairs; place_r1 L51-54): J3–J4, J3–J10, J4–J11, J10–J11, J11–J12, J12–J1 (OUT_A). Worst: J3–J10 puts DOCK_VBUS on PA12 when docked; PA12 5 V tolerance [TBD DS13737 pin table]. Check: bring-up step 1 meters neighbours (sub-debug-test).
+Neighbour pads at 0.6 mm edge gap (solder-bridge pairs; place_r1 L51-54): J3–J4, J3–J10, J4–J11, J10–J11, J11–J12, J12–J1 (OUT_A), J4–J5 (GND–VBAT, cell short) and J4–J12 (GND–CC). Worst: J3–J10 puts DOCK_VBUS on PA12 when docked; PA12 5 V tolerance [TBD DS13737 pin table]. Check: bring-up step 1 meters neighbours (sub-debug-test).
 
 ### Contact map (target pin order TBD, not recorded: DK-02)
 | Target pos | Pad | Net | If head mates rotated 180° (1↔5, 2↔4) |

@@ -1,6 +1,6 @@
 # Power: cell, charger, power path, LDO, rails (item SUB-POWER)
 changelog: Rev F 2026-10-02: R17 removed (CHG_INT on the PA15 internal pull-up, PB5 strapped to GND, ECR-0013 S1); D3 (VBUS, behind D4) replaced by D5 TPD1E10B06 at the J3 DOCK_VBUS contact; J6 (cell -) merged into the shared GND pad J4; C15 4.7 µF 10 V -> 25 V; charger cluster moved +2.5 mm in x with C15/C16 swapped and R15/R16 beside U3 (ECR-0002 items 1-2 geometry); every power net routed; register plan adds PB_LPRESS_ACTION, ILIM-by-enumeration, watchdog default B (triage Q23).
-Status: schematic Rev F (`hw/pod/gen.py`, commit 407e143; ERC 0 errors / 311 warnings, `hw/pod/gen.erc` 2026-10-02 20:01). Board Rev F routed draft (`hw/pod/draft_r1/pod_r1_routed.kicad_pcb`, commit 4b2c058; `summary.json`: 687 tracks, 118 vias, 2 unconnected (SWCLK->TP2, LED_K->J8; none in this subsystem), DRC 19 = wire-pad courtyard rings only). Phase 1 board for owner review; layout with the owner (O14) not started. Charger firmware not written. Updated 2026-10-02.
+Status: schematic Rev F (`hw/pod/gen.py`, commit 407e143; ERC 0 errors / 311 warnings, `hw/pod/gen.erc` 2026-10-02 20:01). Board Rev F routed draft (`hw/pod/draft_r1/pod_r1_routed.kicad_pcb`, commit 4b2c058; `summary.json`: 687 tracks, 118 vias, 2 unconnected (SWCLK->TP2, LED_K->J8; none in this subsystem), DRC 19 courtyard overlaps: 18 J-pad ring pairs + 1 C1↔U1). Phase 1 board for owner review; layout with the owner (O14) not started. Charger firmware not written. Updated 2026-10-02.
 
 ```yaml
 abbrev: {CC/CV: constant-current / constant-voltage charge, ICHG: charge current, ILIM: input current limit, BUVLO: battery undervoltage lockout,
@@ -10,7 +10,7 @@ abbrev: {CC/CV: constant-current / constant-voltage charge, ICHG: charge current
 src_of_truth: [hw/pod/gen.py (blocks CHARGER, LDO, VBAT_SENSE, CELL_PADS; DOCK_USB for VBUS parts), hw/pod/place_r1.py PLACE, hw/mech/shell_r1.py CELL, docs/spec.md §7 D11 D12 D18]
 generated_views: ["docs/system/integration-map.md (nets/pins/blocks, authoritative)", "docs/system/rail-budget.yaml (checked by tools/checks/interfaces.py rails)"]
 owner_decisions: [O1, O5, O12(c), O13, O16(1)(2), O9/O15 (R20 test link), O19 (cell replaced as it ages)]
-open_ecrs: [ECR-0002 (U3 cluster; placement items 1-2 now in place_r1.py, ECR still 'proposed'), ECR-0005 (LDO rating), ECR-0008 (cell supply), ECR-0009 (R23 safety), ECR-0013 (S1/S3 done in Rev F; F1-F5 firmware open)]
+open_ecrs: [ECR-0002 (U3 cluster; placement items 1-2 now in place_r1.py, ECR still 'proposed'), ECR-0005 (LDO rating), ECR-0008 (cell supply), ECR-0009 (R23 safety), ECR-0013 (S1 done; S3 partial: C15 (IN) moved to 25 V, C21 (SYS) still 10 V C19702; S2 = firmware order, open; F1-F5 firmware open)]
 checks: ["tools/checks/interfaces.py rails (2026-10-02: WARN +3V0 peak 326 mA > U4 300 mA, waived by ECR-0005; WARN VSYS peak 327 mA = 93 % of cell 2C 350 mA)", "tools/checks/interfaces.py pins (TS on PA2 hazard, ECR-0013)"]
 diagrams: [docs/diagrams/schematic-rev1.png (Rev F flowchart, power column), docs/diagrams/board-map-revF.png]
 ```
@@ -56,7 +56,7 @@ U4: {part: "TI TPS7A2030PDQNR 300 mA ultra-low-noise 3.0 V LDO, X2SON-4 1 x 1 mm
 RT1: {part: "Murata NCP15XH103F03RC 10 kΩ B3435 NTC 0402", lcsc: C77131 · Extended · 289,853 · $0.02, note: "fitted by default; measures BOARD temperature ~3.1 mm (centre to centre) from U3, not the cell"}
 J9: {part: copper pad (TS), note: "optional NTC taped to the cell, other lead to GND; if used RT1 is not fitted"}
 J5: {part: "1.0 mm hand-solder pad, VBAT (cell +)", face: F}
-J4: {part: "1.0 x 2.0 mm wire pad pod:WirePad_1.0x2.0mm, GND = dock GND + cell -", face: F, why: "between J3 DOCK_VBUS and J5 VBAT so a solder bridge cannot put the cell on an exposed contact (ASM-09)"}
+J4: {part: "1.0 x 2.0 mm wire pad pod:WirePad_1.0x2.0mm, GND = dock GND + cell -", face: F, why: "J4 separates J3 DOCK_VBUS from J5 VBAT (3.2 mm edge gap), but J5 VBAT is 0.60 mm from J4 GND (bridge = cell short) and 0.89 mm from J12 CC (exposed dock contact); the ASM-09 claim in the gen.py docstring (L45) 'cannot put the cell on an exposed contact' holds for J3 only (PLACE L51-54; reg-board issue 4; DBG-15)"}
 R20: {part: "0 Ω 0402 link LDO_OUT -> +3V0", lcsc: C17168 · Basic, note: "test hook (O9/O15); carries every +3V0 mA, bridge peaks included (PWR-I6)"}
 R8_R9_C19: {part: "1 MΩ / 1 MΩ divider + 100 nF", lcsc: "C26083, C1525 · Basic", note: "VBAT/2 -> PA4; always connected, 2.1 µA at 4.2 V"}
 R15_R16: {part: "10 kΩ pull-ups to +3V0 on I2C_SCL / I2C_SDA", lcsc: C25744 · Basic, src: "TI asks 10 kΩ on SCL/SDA (SLUSE99C Table 6-1)"}
@@ -85,9 +85,9 @@ D4: {part: "1N5819WS Schottky SOD-323, DOCK_VBUS -> VBUS (block DOCK_USB)", lcsc
   src: "integration-map §1 F8/F13, §3; pin-contract.yaml; ECR-0013"
 - to: sub-output   # relation R-PWR-OUT-RAIL
   nets: "+3V0 -> Q1/Q2 S_P, C14 22 µF"
-  crosses: "bridge peak ~315 mA at full drive into 8 Ω (gen.py R21 comment; sub-output 0.32-0.33 A) vs U4 300 mA rating, 360 mA min current limit: ECR-0005"
+  crosses: "+3V0 peak 326 mA at full drive into 8 Ω (tools/checks/interfaces.py rails, 2026-10-02; of it the exciter/bridge peak is 315 mA, gen.py R21 comment, sub-output 0.32-0.33 A) vs U4 300 mA rating, 360 mA min current limit: ECR-0005"
   copper: "U4.1 -> Q1.4 202.5 mΩ, -> Q2.4 198.1 mΩ (0.1 mm tracks): ~65 mV drop at 0.32 A (derived) (LF-2: widen the +3V0 trunk)"
-  src: "sim/noise/out/budget.json dc_rail_paths_mohm, 2026-10-02 20:08, board sha256 cacc72fa (Rev F routed, before the silk pass)"
+  src: "sim/noise/smoke.sh on hw/pod/draft_r1/pod_r1_routed.kicad_pcb (sha e159bccb, 2026-10-02 21:20), budget.json key dc_rail_paths_mohm"
 - to: sub-audio-in
   nets: "+3V0 -> PA5 -> MIC_VDD"
   crosses: "mic 1.1-2.15 mA (sim/checks/power.py); rail noise reaches the mic directly -> U4 is the 7 µVrms part"
@@ -145,11 +145,11 @@ U3_thermal: {val: "θJA 107 °C/W (JEDEC), 65 °C/W (TI EVM); thermal regulation
 U4_out: {val: "3.0 V ± 1.5 % (2.955-3.045 V) over 1-300 mA, line, temperature", src: "TPS7A20 SBVS338H (Jul 2024) §5.5; local copy tps7a20.pdf 663a9ff5bca60864 (datasheet-provenance.md)"}
 U4_limits: {val: "dropout <= 140 mV at 300 mA; current limit 360 / 520 / 730 mA; short-circuit 160 mA", src: "SBVS338H §5.5"}
 U4_noise_iq: {val: "7 µVrms; PSRR 95 dB at 1 kHz, 75 dB at 100 kHz; Iq 6.5 µA typ (8.5 max at 25 °C); θJA 166 °C/W", src: "SBVS338H §5.4-5.5"}
-bridge_peak: {val: "~315 mA on +3V0 (3.0 V into 8 Ω + 1.2 Ω FETs)", src: "gen.py R21 comment; rail-budget.yaml"}
+bridge_peak: {val: "~315 mA exciter/bridge full-drive peak on +3V0 (3.0 V into 8 Ω + 1.2 Ω FETs + 0.1 Ω R21); the whole +3V0 peak with MCU, mic, pull-ups is 326 mA (rail_check)", src: "gen.py R21 comment; rail-budget.yaml exciter row (peak_ma 315); interfaces.py rails 2026-10-02"}
 rail_check: {val: "+3V0 declared peak 326 mA vs U4 300 mA (WARN, waived by ECR-0005); VSYS peak 327 mA = 93 % of cell 2C 350 mA", src: "tools/checks/interfaces.py rails, run 2026-10-02"}
 pullups: {val: "I2C R15/R16: 0.60 mA with both lines low (2 x 3.0 V / 10 kΩ); idle high = 0", src: "rail-budget.yaml (computed)"}
 vbat_sense: {val: "VBAT/2 = 1.5-2.1 V at PA4; divider 2.1 µA; τ = 50 ms", src: "gen.py R8/R9/C19 (derived)"}
-rail_hold: {val: "+3V0 at U4 holds at a 315 mA peak while VBAT >= ~3.32 V (3.0 + 0.14 dropout + 0.315 x (0.48 + 0.09)); at the bridge sources a further ~65 mV copper drop", src: "derived: Renata + SLUSE99C + SBVS338H; budget.json dc_rail_paths_mohm"}
+rail_hold: {val: "+3V0 at U4 holds at a 315 mA peak while VBAT >= ~3.32 V (3.0 + 0.14 dropout + 0.315 x (0.48 + 0.09)); at the bridge sources a further ~65 mV copper drop", src: "derived: Renata + SLUSE99C + SBVS338H; sim/noise/smoke.sh on hw/pod/draft_r1/pod_r1_routed.kicad_pcb (sha e159bccb, 2026-10-02 21:20) dc_rail_paths_mohm"}
 ```
 
 ### Rails
@@ -198,14 +198,14 @@ IC_CTRL_2XTMR_EN: {default: 0, set: 1, why: "cold, slow charges must not hit the
 keep: {VBAT_CTRL: "4.20 V", BUVLO: 3.0 V, SYS_REG: 4.5 V, why: "match the cell (4.2 V CV, 3.0 V cut-off); SYS_REG 000 battery tracking is NOT a U3 heat lever (audit 2026-10-02)", knob: "VBATREG 4.10-4.15 V option: firmware-emulation.yaml / docs/research/tws-power-size.md"}
 MASK_ID_PG_INT_MASK: {default: "0 (enabled)", set: keep, why: "docking pulses CHG_INT and wakes the MCU from Stop 2 to write this plan"}
 SHIP_RST_0x9_EN_PUSH: {default: "1 (TS/MR push-button on battery only, 60 µA pulsed)", set: 0, why: "no button on TS/MR"}
-SHIP_RST_0x9_PB_LPRESS_ACTION: {default: "10 = ship mode after MR_LPRESS (10 s) hold, fires on RELEASE", set: "00", why: "EN_PUSH gates only battery mode; the push-button input is also live while charging (SLUSE99C Table 8-6). Paths it closes: J8-J9 solder bridge with LED on, PA2 driven low, NTC above ~84 °C (1.5 kΩ x 60 µA = 90 mV, derived)", src: "ECR-0013 F2; audit row 1 corrections A/B"}
+SHIP_RST_0x9_PB_LPRESS_ACTION: {default: "10 = ship mode after MR_LPRESS (10 s) hold, fires on RELEASE", set: "00", why: "EN_PUSH gates only battery mode; the push-button input is also live while charging (SLUSE99C Table 8-6). Paths it closes: a J9 solder bridge to a pad that holds TS low (Rev F: J8 (33.0, 11.0) and J9 (31.4, 8.8) are 1.72 mm apart, no longer neighbours; TS neighbours now J5 VBAT 0.60 and J7 LED_A 0.60, both pull TS high = 'cold', J2 OUT_B 0.71 and J1 OUT_A 0.89, whether these hold TS low depends on the TIM1 idle state [TBD]; PLACE L52-54), PA2 driven low, NTC above ~84 °C (1.5 kΩ x 60 µA = 90 mV, derived)", src: "ECR-0013 F2; audit row 1 corrections A/B"}
 write_when: "at boot and on every power-good interrupt; read back and verify (bench); re-assert after watchdog revert / HW reset (FWSIM-R20)"
 ```
 
 ## Open issues
 ```yaml
 # ids stable (referenced from rail-budget.yaml, firmware-emulation.yaml, triage); I8 and I11 closed by Rev F
-PWR-I1: {what: "U4 300 mA rating vs ~315 mA bridge peaks (below the 360 mA min current limit, outside rated/dropout range)", note: "12 Ω exciter (3.0 / 13.3 Ω ≈ 226 mA) removes it; 8 Ω doesn't", closes: "E1 (exciter R) + ECR-0005"}
+PWR-I1: {what: "U4 300 mA rating vs the 326 mA +3V0 peak (315 mA of it the bridge; below the 360 mA min current limit, outside rated/dropout range; interfaces.py rails 2026-10-02)", note: "12 Ω exciter (3.0 / 13.3 Ω ≈ 226 mA) removes it; 8 Ω doesn't", closes: "E1 (exciter R) + ECR-0005"}
 PWR-I2: {what: "charger defaults unsafe/useless for this cell: TS_HOT 60 °C vs 45 °C; ICHG 10 mA can't fill inside the 6 h timer (fault)", closes: "firmware writes the register plan; bench read-back"}
 PWR-I3: {what: "U3 watchdog policy", status: "default B decided by triage Q23 (01 + RTC keep-alive; boot stub sets 11 before ROM DFU; app re-arms); owner sees it in the safety packet (Q22)",
          alternatives: {A: "11 disabled: simple, U3 never self-resets; adopt only if WATCHDOG_15S_ENABLE still works with SEL=11 or the IWDG runs in Stop with RTC kicks", C: "00 default: restores TS_HOT 60 °C after a firmware hang: don't"},

@@ -1,6 +1,6 @@
 # UI: button and power LED
-Status: schematic Rev E, block UI (SW1, R10, R14) + pads J7/J8 (gen.py; ERC 0 errors, `hw/pod/gen.erc` 2026-10-01). Rough-draft layout: BTN is 1 of the 7 unrouted connections (`hw/pod/draft_r1/drc.json` 2026-10-01 19:44). Plunger and lid bore are modelled in `shell_r1.py`; the skin is not chosen. The gesture model is only partly specified. No firmware. Updated 2026-10-01.
-· Source of truth: `hw/pod/gen.py` L241–253, `hw/pod/place_r1.py` L47, L54, L66, `hw/mech/shell_r1.py` (`SWITCH` L46, lid bore/recess L104–105, `plunger` L113–116), `hw/padboard/gen.py` (LED D1), `docs/spec.md` D3, D12, §5.4
+Status: schematic Rev F, block UI (SW1, R10, R14) + pads J7/J8 (gen.py; ERC 0 errors / 311 warnings, `hw/pod/gen.erc` 2026-10-02 20:01). Routed draft: BTN routed; LED_K→J8 unrouted (`hw/pod/draft_r1/drc.json` 2026-10-02T20:07). Plunger and lid bore are modelled in `shell_r1.py`; the skin is not chosen. The gesture model is only partly specified. No firmware. Updated 2026-10-01.
+· Source of truth: `hw/pod/gen.py` L262–275 (L269 "Fed from VBAT"), `hw/pod/place_r1.py` L47, L54, L72, `hw/mech/shell_r1.py` (`SWITCH` L46, lid bore/recess L104–105, `plunger` L113–116), `hw/padboard/gen.py` (LED D1), `docs/spec.md` D3, D12, §5.4
 · Owner decisions: O8 (solid LED in the pad), O16(5) (switch on the board centre line), O16(7) (IP68 switch), O12(b) (sealing), O18 (rev 1 fails informatively) · Open ECRs: none on this block (ECR-0001 touches frame.py's stale `BUTTON`)
 
 ## Purpose
@@ -9,7 +9,7 @@ Status: schematic Rev E, block UI (SW1, R10, R14) + pads J7/J8 (gen.py; ERC 0 er
 - **Must:** stay sealed in light rain (O12b: IPX4 minimum, IPX5 preferred); sit in the same place on both pods (O16-5: board centre line); cost nothing in Off beyond leakage.
 
 ## Big picture
-![Board, both faces: SW1 at (22.0, 6.5) on F, R10 beside it, R14 on B, J7/J8 at the rear](../diagrams/board-regions.png)
+![Board, both faces: SW1 at (22.0, 6.5) on F, R10 beside it, R14 on B, J7/J8 at the rear](../diagrams/board-map-revF.png)
 ![Pod from outside, lid off: interface 2 = button, 3 = the 4 arm wires (2 are the LED pair)](../diagrams/system-overview-physical.png)
 *CAD render with the lid off (plunger on SW1, LED ring on the pad): `hw/mech/out/r1/spine/open.png`.*
 
@@ -55,7 +55,7 @@ flowchart LR
 | SW1 | **C&K KMT022NGJLHS**: nano tactile switch, top-actuated, 3.0 × 2.6 × 0.65 mm, IP68, 1.6 N, silver long-life contacts, 600k cycles | C221707 · Extended · 4,884 · $0.3902 | F at board (22.0, 6.5). Pads 1–2 = +3V0, 3–4 = BTN. Checked 2026-10-01: footprint pads 1/2 are the top row and 3/4 the bottom row; the C&K diagram joins each row, so this matches gen.py |
 | R10 | 2.2 kΩ ±1 % 0402 (Uni-Royal 0402WGF2201TCE), BTN pull-down | C25879 · Basic · 2.24 M · $0.0013 | F (23.0, 9.5). Sets the ≥ 1 mA contact current |
 | R14 | 2.2 kΩ ±1 % 0402, LED series resistor from VSYS | C25879 · Basic | B (26.42, 11.8) |
-| J7, J8 | 1.0 mm hand-solder pads LED+ / LED− (`TestPoint_Pad_D1.0mm`) | copper only | F rear column x 33.0, y 9.8 / 11.4. Neighbours: J2 OUT_B, J12 CC, J9 TS |
+| J7, J8 | 1.0 mm hand-solder pads LED+ / LED− (`TestPoint_Pad_D1.0mm`) | copper only | F rear edge: J7 (31.4, 10.4) inner column, J8 (33.0, 11.0) outer. Neighbours (pad edge gaps, PLACE L54): J7–J9 TS 0.60, J7–J8 0.71, J7–J2 OUT_B 0.89; J8–J2 OUT_B 0.60 |
 | D1 (pad board) | **Everlight 16-213/BHC-AN1P2/3T**: blue 0402 chip LED, 464.5–476.5 nm, 120°; 28.5–72 mcd and V<sub>F</sub> 2.7/3.3/3.7 V at 5 mA; ESD 150 V HBM | C131223 · Extended · 25,755 · $0.0291 | JLC-placed on the 5.0 × 9.3 mm pad board under a cast clear-epoxy ring (`hw/padboard/gen.py`; `pad.md`). Pad-board pads J3 LED+ / J4 LED− (not the pod's J3/J4) |
 | Plunger | printed resin: head Ø2.9 × 0.9, stem Ø1.2 × 1.2 | printed | `shell_r1.py` L113–116 |
 | Skin | silicone membrane over the bore: the seal **and** the return spring | TBD | Material, thickness and adhesive not chosen (physical.md L91) |
@@ -69,7 +69,7 @@ flowchart LR
 | [sub-dock-usb](sub-dock-usb.md) | BTN PA0; VBUS_SENSE PA1 | Proposed DFU gesture: button held at reset with VBUS present (sub-dock-usb issue 4). Docked VSYS = 4.5 V changes the LED current |
 | [sub-debug-test](sub-debug-test.md) | BTN, LED_K | Self-test reports BTN state and a stuck-button flag. In ROM DFU, PB7 is I2C1_SDA with a pull-up to 3.0 V (AN2606 Rev 69 Table 199), so the LED stays dark (derived: 4.5 − 3.0 V < V<sub>F</sub>) |
 | [reg-pod-body](reg-pod-body.md) | SW1 ↔ plunger ↔ bore ↔ skin; board ↔ ribs/foam | Switch at pod x 52.6 = board x 22.0 + 30.6. Changing the switch changes the lid (integration-map §7) |
-| [reg-board](reg-board.md) | SW1 (22.0, 6.5) F; R10 (23.0, 9.5) F; R14 (26.42, 11.8) B; J7 (33.0, 9.8) F; J8 (33.0, 11.4) F | **Unrouted: BTN** from U1 pin 10 (9.56, 8.25) to the SW1 track at (20.5, 7.43), ~11 mm across the MCU (drc.json 19:44). R21 (1206, B) sits under SW1 on the other face |
+| [reg-board](reg-board.md) | SW1 (22.0, 6.5) F; R10 (23.0, 9.5) F; R14 (26.42, 11.8) B; J7 (31.4, 10.4) F; J8 (33.0, 11.0) F | BTN routed (not in the drc.json 2026-10-02T20:07 unconnected list). **Unrouted: LED_K→J8**: U1 PB7 stub end (14.27, 1.20) ↔ J8 stub end (32.44, 11.56), ~20.9 mm. R21 (1206, B) sits under SW1 on the other face |
 | [reg-arm](reg-arm.md) | LED_A (J7), LED_K (J8) | 2 of the 4 litz wires; the 4-wire count sets heel Ø1.0 and strut Ø1.2 (R-UI-ARM) |
 | [reg-pad](reg-pad.md) | LED_A/LED_K → pad-board J3/J4 → LED D1 | Cast epoxy ring, 0.6 mm wide (Ø4.1 plug in Ø5.3); LED top at y 3.88 (`pad.md` L107–109). Pad-board J4 LED_K is 0.45 mm from J2 OUT_B (reg-pad issue 13) |
 | [physical](physical.md) | button stack (interface 2), LED wires (interface 3) | Plunger seated on SW1, skin spans 0.40 mm; assembly step 11 sets the plunger; the foam that backs SW1 has no floor (physical issue 12) |
@@ -124,11 +124,11 @@ flowchart LR
    - **Closes:** bench-measure V<sub>F</sub> at 0.1–1 mA on a pad board; choose the target (≤ the VBAT floor) as a firmware constant.
 8. **PB7 is unprotected against arm-wire faults.**
    - LED_K runs straight into PB7, in the same bundle as OUT_A/OUT_B. A nicked wire can push tens of mA into the pin; its limit is 20 mA (`pcb-mech-interface.md` L33). The proposed fix, R14 split so one half sits in series with PB7, was not adopted in Rev E.
-   - A **J8–J9 solder bridge** with the LED on holds TS low, and U3 enters ship mode after 10 s (TS < 90 mV for 10 s, sub-power).
+   - J8–J9 is not a bridge pair in Rev F (1.72 mm apart, PLACE L52-54); the ship-mode path (TS < 90 mV for 10 s, sub-power) now needs J9 against a pad that holds TS low (J2 OUT_B 0.71, J1 OUT_A 0.89; depends on the TIM1 idle state [TBD]).
    - On the **pad board**, LED_K (J4) sits 0.45 mm from OUT_B (J2) under the epoxy dam: a bridge there drives the bridge output straight into PB7 (reg-pad issue 13).
    - **Closes:** decide in the simplification study (R14 split, pad-board pad order); meter-check J-pad neighbours before power (sub-debug-test bring-up step 1).
 9. **Stale text elsewhere** (not edited here):
-   - gen.py L247–248 "Fed from VBAT" (the code uses VSYS);
+   - gen.py L269 "Fed from VBAT" (the code uses VSYS);
    - `hw/padboard/gen.py` docstring and `hw/mech/notes/pad.md` L64 ("R14 … from VBAT");
    - `datasheet-provenance.md` L24 (SW1 = KXT321LHS, no datasheet);
    - `B-parts-selection.md` §5 (KXT321);

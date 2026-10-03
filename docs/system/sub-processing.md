@@ -40,7 +40,7 @@ HSI48 (+ CRS trim) -> USB FS 48 MHz            internal SMPS 3 MHz: VLXSMPS -> L
 | C4 | 10 µF 0603 bulk on +3V0 | C19702 · Basic | F (18.82, 3.53) | AN5373: 10 µF typ, 4.7 µF min after DC bias |
 | C5, C6 | 1 µF 25 V X5R + 100 nF on VDDA | C52923, C1525 · Basic | F (8.33, 10.21), (7.33, 10.21) | AN5373 |
 | C10 | 100 nF on NRST | C1525 · Basic | F (8.33, 7.91) | AN5373 |
-| Y1 | Q13FC13500004: Epson FC-135 32.768 kHz, 3.2x1.5 mm, CL 12.5 pF | C32346 · Basic | F (6.62, 4.23) | D16: pitch matched between unlinked pods |
+| Y1 | Q13FC1350000400: Epson FC-135 32.768 kHz, 3.2x1.5 mm, CL 12.5 pF | C32346 · Basic | F (6.62, 4.23) | D16: pitch matched between unlinked pods |
 | C11, C12 | 15 pF C0G 0402 (Fenghua 0402CG150J500NT) | C1548 · Basic | F | LSE load (B-parts §4) |
 | R1 | 10 k, PH3-BOOT0 to GND; pad = DFU tack point | C25744 · Basic | F (17.02, 1.62) | boot from flash (AN5373) |
 - drop_in_alt: STM32U585CIU6Q (same die + crypto), C5271021, 15 in stock, $12.52 (spec D5, 2026-09-30).
@@ -147,12 +147,12 @@ FW-14: "frequency plan: LED PWM f = n x fs_out or outside 20-96 kHz; mic divider
 | latency target | <= 20 ms end to end | spec §5.3 | 2026-09-30 |
 | draft: VDD11 pin 46 to nearest 2.2 µF | 10.2 mm (C9); pin 23 to C8 2.4 mm | pcbnew probe of draft (pad centres) | 2026-10-02 |
 | draft: VDDSMPS pin 21 to C7 / VLXSMPS copper | 4.6 mm / 6.7 mm | same probe | 2026-10-02 |
-| draft: VDD pin 48 / VBAT pin 1 to C1 | 1.12 / 1.43 mm (PER-06 <= 1.5 met) | same probe | 2026-10-02 |
+| draft: VDD pin 48 / VBAT pin 1 to C1 | 1.12 / 1.43 mm centre-to-centre (pad edges 0.42 / 1.02 mm, reg-board; PER-06 <= 1.5 met on both metrics) | same probe | 2026-10-02 |
 | draft: VDDA pin 9 to C5 / C6 | 3.2 / 3.7 mm | same probe | 2026-10-02 |
 | draft: LSE copper | LSE_IN 4.5 mm, LSE_OUT 8.0 mm, F only | same probe | 2026-10-02 |
 | draft: L1 to mic U2 | 16.3 mm centre-centre, opposite faces | same probe | 2026-10-02 |
 | draft: unrouted on U1 nets | SWCLK -> TP2, LED_K -> J8 (layout-session items) | `hw/pod/draft_r1/drc.json` | 2026-10-02 20:07 |
-| noise, MCU aggressors on Rev F draft | LN-M01 worst = A05_CPU_HOP 21.875 kHz, 23.1 dB pessimistic (pass >= 0); SMPS A01 46.8 dB, A02 66.7 dB; LN-M04 ADC ref ripple 0.199 mV pk (<= 0.37) at hop 1562 Hz | `sim/noise/out/budget.json` (board sha cacc72faa5bd0f13) | 2026-10-02 |
+| noise, MCU aggressors on Rev F draft | LN-M01 worst = A05_CPU_HOP 21.875 kHz, 23.1 dB pessimistic (pass >= 0); SMPS A01, A02 margins [TBD]; LN-M04 ADC ref ripple 0.199 mV pk (<= 0.37) at hop 1562 Hz | `sim/noise/smoke.sh on hw/pod/draft_r1/pod_r1_routed.kicad_pcb (sha e159bccb, 2026-10-02 21:20)` | 2026-10-02 21:20 |
 
 ## Open issues (IDs kept stable; other docs cite them)
 1. C8/C9 6.3 V (C12530) vs DS §5.1.6 rated >= 10 V; `.pcba-workflow/sourcing-lock.csv` L9 still RECOMMENDED C107369 10 V. Options: (a) C107369 Extended 0402 10 V; (b) Basic 0603 16 V C23630 (2.5x area, conflicts O20); (c) keep, accept deviation. Recommend (a): explicit datasheet line, same footprint, ~$3/order for one more Extended type (`docs/build/bom.md`). Owner.

@@ -39,8 +39,8 @@ Keeps every region (pod body, board, cell, arm, pad) in one coordinate frame, so
 | Main cavity / bay | 30.3–66.7 / 30.3–54.2 | 5.1–14.4 | −8.9–4.7 / −12.4–(−8.9) | L39–40 |
 | Board | 30.6–64.6 | 12.1–12.9 | −8.6–4.4 | L43 |
 | Cell | 30.6–65.6 | 5.4–10.7 | −8.1–3.9 | L42 |
-| Board mic port: NPTH Ø0.6 at board (3.13, 6.5) | 33.73 | 12.1–12.9 | −2.1 | draft board probe (2026-10-01) |
-| Lid mic bore Ø1.0 (= U2 body origin, board 3.9): **0.77 mm behind the board port** | 34.5 | 14.4–16.1 | −2.1 | L45 |
+| Board mic port: NPTH Ø0.6 at board (3.9, 6.5) | 34.5 | 12.1–12.9 | −2.1 | `place_r1.py` L61 (ECR-0011: U2 origin x 4.67); integration-map F1 (2026-10-02) |
+| Lid mic bore Ø1.0 at board x 3.9: **aligned with the board port** (interfaces.py [mic-port] 0.000 mm, 2026-10-02) | 34.5 | 14.4–16.1 | −2.1 | L45 |
 | Switch / plunger (board 22.0, 6.5) | 52.6 | 12.9–13.55 / 14.2–16.1 | −2.1 | L46; STL |
 | Dock target | 31.5–52.7 | 6.32–13.18 | −13.2–(−10.4) | L47 |
 | USB-C fallback keep-out | 47.9–55.0 | 5.45–14.05 | −12.4–(−9.6) | L48 |
@@ -106,7 +106,7 @@ Screws stay only where O16(6) allows them: the M1.2 cup screw and the two M1.4 N
 | # | Step | Test build (taped, reachable) | Final build (bonded, cut-openable) | Source |
 |---|---|---|---|---|
 | 0 | Print a tolerance coupon; wash and cure; ream the NiTi sockets to Ø0.85 and the mic hole to Ø1.0; dry-fit the cell and board | same | same | tolerances L7, L50–52 |
-| 1 | Flash and bench-test the board outside the pod: pogo on TP1–TP6, power on J5/J6; meter the J-pad neighbours first (J3–J5 critical) | same | same | `place_r1.py` L48–54; sub-debug-test bring-up |
+| 1 | Flash and bench-test the board outside the pod: pogo on TP1–TP6, power on J5/J4; meter the J-pad neighbours first (J4–J5 and J5–J12 critical) | same | same | `place_r1.py` L48–54; sub-debug-test bring-up |
 | 2 | Pad: wires through the cap first; solder the pad board (litz on the pads' top halves, exciter leads flush); exciter into the cup; contact face; close with the M1.2 screw; cast the LED ring (24 h) | same | same | `pad.md` steps 1–8 (route text stale) |
 | 3 | Slide a **pre-shrunk** tube (recovered off the arm, ≤ 1.1 OD, ~5 mm) onto the bundle's free ends. It can't pass Ø1.0/Ø1.2 later. **Never heat it on the arm** | same | same | tolerances L30–34; reg-arm issue 12 |
 | 4 | Heel end: file the flat; fish the 4 conductors through the heel channel into the rear gap; seat the tube ends in both Ø1.6 counterbores with ~2 mm slack; NiTi into the heel socket, flat toward the access hole (forward-down); nut + M1.4 × 3 set screw; lock | same | same | `heel.md` steps 3–6 (route stale); tolerances L33–34 |
@@ -127,7 +127,7 @@ Screws stay only where O16(6) allows them: the M1.2 cup screw and the two M1.4 N
 ## Service (O19: the cell is replaced as it ages; the owner repairs)
 | Job | Sequence | Cut-and-rebond cycles | Time |
 |---|---|---|---|
-| Cell swap | cut the seam → lift the lid → lift the board on its 12 wires → desolder J5/J6 (J9) → saw the VHB with dental floss (never pry a pouch) → new cell on new VHB → reverse | 1 per swap | unknown |
+| Cell swap | cut the seam → lift the lid → lift the board on its 12 wires → desolder J5/J4 (J9) → saw the VHB with dental floss (never pry a pouch) → new cell on new VHB → reverse | 1 per swap | unknown |
 | Arm swap (R24 predicts joint fatigue) | cut the seam → desolder J1/J2/J7/J8 → release the heel set screw → draw the bundle out of the heel channel → new arm per steps 2–5 → rebond | 1 per swap | unknown |
 | Firmware | dock, USB DFU; SWD (cut open) only for a bricked application | 0 | – |
 
@@ -136,12 +136,12 @@ No connector or service seam exists outside the sealed volume, and how many cut/
 ## Interfaces between regions (numbers match the diagram)
 | # | Between (docs) | What crosses | Geometry | Nets / F-rows |
 |---|---|---|---|---|
-| 1 | [reg-board](reg-board.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ air ([sub-audio-in](sub-audio-in.md)) | sound | U2 on B; board hole Ø0.6 at pod x 33.73; 1.5 mm open gap; lid Ø1.0 at pod x 34.5 + mesh recess: **0.77 mm offset** | F1 (MIC_DATA, MIC_CLK on board) |
+| 1 | [reg-board](reg-board.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ air ([sub-audio-in](sub-audio-in.md)) | sound | U2 on B; board hole Ø0.6 at pod x 34.5; 1.5 mm open gap; lid Ø1.0 at pod x 34.5 + mesh recess: **aligned (ECR-0011)** | F1 (MIC_DATA, MIC_CLK on board) |
 | 2 | [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) ([sub-ui](sub-ui.md)) | finger force | plunger Ø2.9 / bore Ø3.2, skin → SW1 at board (22.0, 6.5); the skin spans 0.40 over the seated plunger | F11: BTN → PA0 |
 | 3 | [reg-pad](reg-pad.md) ↔ [reg-arm](reg-arm.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) ([sub-output](sub-output.md), [sub-ui](sub-ui.md)) | 4 litz wires | strut bore Ø1.2, 3 mm flex zone in a pre-shrunk tube between Ø1.6 counterbores, heel Ø1.0, exit (65.75, 5.30, −5.62), rear gap 2.1 (1.1 behind the cell) | F3: OUT_A/OUT_B → J1/J2 · F12: LED_A/LED_K → J7/J8 |
 | 4 | [reg-pod-body](reg-pod-body.md) (heel) ↔ [reg-arm](reg-arm.md) ↔ [reg-pad](reg-pad.md) | spring force (≥ 1 N at the skin) | NiTi Ø0.80; sockets 4.0 (heel) and 3.5 (pad) deep; M1.4 set screws | – |
 | 5 | [sub-dock-usb](sub-dock-usb.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) | charge + USB | YZT0675 target flush in the belly; 5 wires under the cell (0.8 mm) to the rear gap (route and gauge TBD) | F5, F9, F10, F15: DOCK_VBUS, GND, USB_DP, USB_DM, CC → J3/J4/J10/J11/J12 |
-| 6 | [sub-power](sub-power.md) (cell) ↔ [reg-board](reg-board.md) | battery | leads to J5/J6; optional NTC to J9 | F5–F8: VBAT, GND, TS |
+| 6 | [sub-power](sub-power.md) (cell) ↔ [reg-board](reg-board.md) | battery | leads to J5/J4; optional NTC to J9 | F5–F8: VBAT, GND, TS |
 | 7 | [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) | retention | ribs on F clamp bands; foam on B clamp bands, **with only 0.1 mm of each strip on the cell** (no floor); 0.6 mm part-free bands on both faces | – |
 | 8 | [reg-pod-body](reg-pod-body.md) (tub ↔ lid) | seal + access | lip round the main cavity, butt joint round the belly, seam at y 14.4, cut line a 0.2 × 0.4 tub rebate | – |
 | 9 | [reg-pod-body](reg-pod-body.md) ↔ glasses | mounting | `blade.py` adapter dovetail + snap tab, 1.8 mm stand-off (centred on `pod.py`'s −2.0, body at −2.1) | §1.2.1 |
@@ -171,8 +171,8 @@ No connector or service seam exists outside the sealed volume, and how many cut/
 | Mass per pod | **≥ ~10.2 g lower bound [derived]** (shell, heel, cell, pad, bare board; before parts, dock target, adapter and wires) vs the ~8 g target | reg-pod-body Key numbers (2026-10-01) |
 
 ## Open issues
-1. **Mic port is unsealed and breaks the spec's acoustic rule.** The 1.5 mm board-to-lid gap opens into the cavity. Close it: add back a chimney + washer (round-1 design) or a gasket on the 3.2 mm seal keep-out, then measure on coupons (S1/E3). A gasket must press round the **board port** (pod x 33.73), not the lid bore, and loads the board through the floorless foam (issue 12).
-   - **1b. Board port and lid bore are 0.77 mm apart** (pod x 33.73 vs 34.5; overlap 0.03 mm). Panel B of the diagram draws them in line and says so. Close it: move U2 to board x 4.67 or the lid bore to pod x 33.73 (sub-audio-in issue 1).
+1. **Mic port is unsealed and breaks the spec's acoustic rule.** The 1.5 mm board-to-lid gap opens into the cavity. Close it: add back a chimney + washer (round-1 design) or a gasket on the 3.2 mm seal keep-out, then measure on coupons (S1/E3). A gasket must press round the **board port** (pod x 34.5, now under the lid bore), and loads the board through the floorless foam (issue 12).
+   - **1b. Board port and lid bore: closed in Rev F** (ECR-0011: U2 moved to board x 4.67, port at pod x 34.5 = lid bore; interfaces.py [mic-port] 0.000 mm nominal, 2026-10-02; Rev E had them 0.77 mm apart, pod x 33.73 vs 34.5). Panel B of the diagram draws them in line (sub-audio-in issue 1).
 2. **Heel wire exit vs the rev-1 cell.** The Ø1.0 exit spans x 65.25–66.25. The cell now ends at x 65.6 (1.1 mm from the rear wall). `heel.py`'s exit check (L540) still tests `frame.py`'s old cell and PCM. Close it: re-run the heel checks against `shell_r1.py`'s cell, or move the exit; dry-fit the real pouch.
 3. **Dock wire route not designed.** 5 wires from the belly bay to the J column at x 62.0. Space: 1.5 mm above the dock in the bay, 0.8 mm under the cell. Close it with a route and a wire-count check (reg-pod-body / sub-dock-usb).
 4. **`frame.py` is stale** for rev 1 (see "Which numbers are live"). Close it by moving the rev-1 numbers into the frame and re-running heel, pad and shell.
@@ -181,7 +181,7 @@ No connector or service seam exists outside the sealed volume, and how many cut/
 7. **Plunger reach.** Seated on SW1, the plunger's head is 0.40 mm below the skin recess floor; no doc or CAD sets head ↔ skin. Fix the head length in CAD (sub-ui issue 1).
 8. **Rev-1 mass: ≥ ~10.2 g before parts, against ~8 g.** Pad 2.19 g (`pad.py`, resin 1.15 g/cm³); shell at 1.18 g/cm³ (reg-pod-body): two densities in one sum. No doc owns the total. Compute it from the STLs with one density plus parts, dock target, adapter and wires (D18, R20; ECR-0006's ballast target).
 9. **Contact face** Ø8 (≈ 50 mm²) vs O16(4)'s 100–150 mm², near-flat, 2 mm edge radius.
-10. **Cell lead exit and PCM position** inside the Renata pouch are unknown, so the J5/J6 lead route is unknown.
+10. **Cell lead exit and PCM position** inside the Renata pouch are unknown, so the J5/J4 lead route is unknown.
 11. **Diagrams:** `system-overview-physical.png` text corrected 2026-10-01 (port offset, VHB, foam, seam, orientation), but Panel B still draws the board hole and lid bore in line, and the foam strips sitting on the cell. `pcb-floorplan-rev1.svg` is drawn for 28 × 13; `arm-wiring.png` shows 2 wires, a silicone sleeve and Ø0.75, all superseded (O8, O11); `docs/build/hardware-map.png` and `hardware.md` §0.5/§6 still show lid-screw charge contacts.
 12. **The foam strips have no floor** (0.1 mm of cell under each). Options and recommendation in reg-pod-body issue 11; then add a "foam ∩ support" check to `shell_r1.py`.
 13. **Seam:** the cut line is a 0.2 mm tub-only rebate (may fuse), and round the belly the seam is a butt joint with no lip (reg-pod-body issues 12, 13).

@@ -6,7 +6,7 @@ Status: schematic Rev F (`hw/pod/gen.py` 407e143, 2026-10-02); board routed `hw/
 abbrev: {SWD: "Arm 2-wire debug port", DFU: "USB Device Firmware Upgrade (ST ROM bootloader)", CDC: "USB virtual serial port", TP: "test pad/dot", P50: "spring test pin, 1.27 mm pitch", MDF/ADF: "STM32U5 multi/audio digital filter", F/B: "board faces: F = outer (lid), B = inner (cell)", "(x, y)": "board mm, origin top-left, KiCad top view"}
 src_of_truth: ["hw/pod/gen.py L153-155 (NRST, C10, R1), L193-200 (R21/R22/C22), L253 (R20), L274-291 (TP1-TP10, spare pins)", "hw/pod/place_r1.py L45-46, L49 (TP row), L57 (TP7), L60 (TP8-TP10), L68, L76", "hw/lib/pod.pretty/TestPoint_Pad_D0.7mm, TestDot_D0.5mm", "docs/system/pin-contract.yaml (DBG_TX, MDF_CCK, MDF_SDI, SWDIO, SWCLK, NRST, BOOT0)", "docs/system/integration-map.md F14 (generated)"]
 owner_decisions: {O9: "rev 1 = prototype: pads + snap-off frame", O10: "bonded final build, cut-openable", O13: "own bench, no tool purchases", O14: "layout together", O15: "self-test over USB (size clause superseded by O20)", O18: "fail informatively; DFU most-verified, SWD backup; spare pins to pads; removals stated", O19: "diagnosability", O20: "test access must not cost size", O21: "no orders before freeze", O22: "freeze = evidence gate"}
-ecrs_open: {ECR-0003: "implemented in Rev F; file still says proposed", ECR-0005: "self-test drive level vs U4 300 mA", ECR-0009: "no output while docked vs docked self-test (DBG-12)", ECR-0010: "bring-up plan + firmware before order", ECR-0013: "S1-S3 implemented in Rev F (PB5 strap, PB15 UCPD, C15 25 V)", ECR-0015: "Package B Phase 2: SIZ-01/02, ASM-09 'post-bond hand pads on B' would move TP row + R1 pad (DBG-13)"}
+ecrs_open: {ECR-0003: "implemented in Rev F; file still says proposed", ECR-0005: "self-test drive level vs U4 300 mA", ECR-0009: "no output while docked vs docked self-test (DBG-12)", ECR-0010: "bring-up plan + firmware before order", ECR-0013: "S1 implemented (PB5 strapped to GND); S2 firmware (UCPD_DBDIS order) open; S3 partial (C15 25 V, C21 still 10 V)", ECR-0015: "Package B Phase 2: SIZ-01/02, ASM-09 'post-bond hand pads on B' would move TP row + R1 pad (DBG-13)"}
 diagrams: ["docs/diagrams/schematic-rev1.png (Rev F flowchart, 56eb73e)", "docs/diagrams/board-map-revF.png (tools/board_map.py, build output)", "board-regions.png is Rev E (2026-10-01): stale"]
 ```
 
@@ -25,6 +25,7 @@ why_blank_needs_hook: "R1 holds BOOT0 low -> boot from (empty) flash; U575 has n
 
 ## Elements (Rev F, positions from pod_r1_routed.kicad_pcb 2026-10-02)
 ```yaml
+elements:
 - {ref: TP1-TP6, part: "Ø0.7 copper pad, P50/probe", nets: "TP1 SWDIO PA13(34) · TP2 SWCLK PA14(37) · TP3 NRST(7) · TP4 +3V0 · TP5 GND · TP6 VSYS", at: "(24.40 + 1.27 i, 1.30) F, i=0..5", src: place_r1.py L49}
 - {ref: TP7, part: "Ø0.5 dot", net: "DBG_TX = PB6(42) USART1_TX AF7", at: "(13.20, 1.50) F"}
 - {ref: TP8, part: "Ø0.5 dot", net: "MDF_CCK = PB8(45) MDF1_CCK0 AF5", at: "(8.70, 9.40) B"}
@@ -61,6 +62,7 @@ silk: "refs on Fab only (hw/pod/silk.py, 2026-10-02): identify pads from board-m
 
 ## What the MCU reads about itself (O18)
 ```yaml
+readable_over_usb:
 - {what: "+3V0 = VDDA = ADC ref", how: "VREFINT ADC4 VIN[0] -> back-calc VDDA; VBAT/4 VIN[14] (VBAT pin 1 tied to +3V0)", src: "RM0456 Rev 7 Table 329 p.1383"}
 - {what: "VDD11 / die temp", how: "VCORE VIN[12] / VSENSE VIN[13]", src: same}
 - {what: "VBAT, VBUS, TS", how: "PA4 VBAT_SENSE (ADC4), PA1 VBUS_SENSE, PA2 TS", src: "integration-map §8"}
@@ -78,12 +80,13 @@ caveats:
   - "CLK: mic-clock duty 48-52 % (D13) needs a scope at R2"
   - "MIC: 200 kS/s x 16 bit = 3.2 Mbit/s vs USB FS bulk ~1.216 MB/s (FWSIM-R60, derived, unverified); docked = record only, never listen (spec L562)"
   - "PWMAB: bridge 200/400/800 kHz vs stopped (or R21 lifted); runs docked -> ECR-0009 conflict (DBG-12)"
-  - "ZSWEEP: PA6 sees i·(2d-1): |Z|, phase at 2f + DC term (sub-output issue 1 option D, unverified); I_SENSE Kelvin error 5.18 % vs <= 2 % on the routed board (LN-M03, layout-noise.yaml 2026-10-02; LF-1 = R21 pad-2 GND stub); full scale > U4 300 mA (ECR-0005); docked heats U4; blocked docked by ECR-0009 unless exemption (DBG-12)"
+  - "ZSWEEP: PA6 sees i·(2d-1): |Z|, phase at 2f + DC term (sub-output issue 1 option D, unverified); I_SENSE Kelvin error 5.2 % vs <= 2 % on Rev F (LN-M03; sim/noise/smoke.sh on hw/pod/draft_r1/pod_r1_routed.kicad_pcb (sha e159bccb, 2026-10-02 21:20); LF-1 = R21 pad-2 GND stub, layout-noise.yaml); full scale > U4 300 mA (ECR-0005); docked heats U4; blocked docked by ECR-0009 unless exemption (DBG-12)"
   - "CHG: U3 status + VBAT/TS/VBUS through a charge (CC no longer read)"
 ```
 
 ## ROM bootloader pin effects (AN2606 Rev 69 Nov 2025 §89 Table 199 pp.466-469; effects derived for Rev F nets)
 ```yaml
+rom_dfu_pin_states:
 - {pin: "PA2 TS", rom: "USART2_TX AF push-pull, pull-up, idles high", effect: "TS ~3.0 V -> U3 reads cold -> charging paused in ROM DFU (DBG-8)"}
 - {pin: "PA3 free", rom: "USART2_RX input pull-up", effect: "idles high, no external load -> no false USART2 detect (CC-steal risk gone with R19)"}
 - {pin: "PA4/PA5/PA6/PA7 VBAT_SENSE/MIC_VDD/I_SENSE/GA_N", rom: "SPI1 slave, pull-downs; PA6 MISO output", effect: "mic unpowered; leg-A N off; PA6 may drive I_SENSE via R22 (<= 3 mA)"}
@@ -117,7 +120,7 @@ local_copy: "scratchpad boot/an2606.pdf, fetched 2026-09-30, SHA-256 b0ed4c4839c
 - {n: 7, do: "I2C2: read U3 at 0x6A; write register plan; charge the real cell; log via self-test", ref: "sub-power issues 2-4"}
 - {n: 8, do: "mic: PA5 on, 4 MHz; stream to PC", expect: "spectrogram of HC-SR04 40 kHz (spec L574)"}
 - {n: 9, do: "bridge: 8-12 Ω resistor on J1/J2 first (electronics.md A.5), low level; then exciter; |Z| sweep low amplitude; PWM-noise A/B", fail: "lift R21 to rule the bridge out"}
-- {n: 10, do: "Off: Stop 2, PPK2 in series", expect: "~16.5-24 µA (sub-power estimate, unmeasured)", fail: "+1.36 mA = SW1 pre-pressed"}
+- {n: 10, do: "Off: Stop 2, PPK2 in series", expect: "≈15.5-22.7 µA (sub-power off_D12: U3 3-3.5 µA with EN_PUSH 0, watchdog off; derived, unmeasured)", fail: "+1.36 mA = SW1 pre-pressed"}
 - {n: 11, do: "only then depanel and build in (physical.md assembly order)"}
 ```
 
@@ -164,8 +167,8 @@ option_bytes: "set nSWBOOT0=0, nBOOT0=1 only once a write-protected boot stub wo
 - {q: "USB at 3.0 V", v: "'functionality ensured down to 2.7 V, some electrical characteristics degraded 2.7-3.0 V'", src: "DS13737 Rev 10 Table 150 fn 1 (verified 2026-10-02)"}
 - {q: "R21 signal", v: "31 mV at ~315 mA peak, ~170 counts 14-bit; 10 mW of 250 mW", src: "gen.py L193-195"}
 - {q: "I_SENSE filter", v: "15.9 kHz (1 kΩ x 10 nF)", src: derived}
-- {q: "I_SENSE Kelvin error", v: "5.18 % of R21 at 5 kHz (limit 2 %)", src: "docs/sim/layout-noise.yaml LN-M03, routed Rev F 2026-10-02"}
-- {q: "Off current", v: "~16.5-24 µA estimate", src: sub-power}
+- {q: "I_SENSE Kelvin error", v: "5.2 % of R21 at 5 kHz (limit 2 %)", src: "LN-M03: sim/noise/smoke.sh on hw/pod/draft_r1/pod_r1_routed.kicad_pcb (sha e159bccb, 2026-10-02 21:20)"}
+- {q: "Off current", v: "≈15.5-22.7 µA estimate (U3 3-3.5 µA with EN_PUSH 0, watchdog off)", src: "sub-power.md off_D12"}
 - {q: "board", v: "34 x 13 x 0.8 mm, 4 layers", src: "interfaces.py outline PASS 2026-10-02"}
 ```
 
@@ -197,7 +200,7 @@ option_bytes: "set nSWBOOT0=0, nBOOT0=1 only once a write-protected boot stub wo
 - id: DBG-9
   t: "R20 current rating unknown (sub-power issue 6); never feed TP4 with R20 fitted (back-drives U4 output; TI behaviour unsourced)"
 - id: DBG-10
-  t: "stale round-1 SWD scheme (1x5 header, front-edge column, lid-screw charging) in hw/mech/notes/electronics.md §A, docs/research/pcb-mech-interface.md §7-§8, docs/build/hardware.md §7; physical.md assembly row 1 still says J5/J6 and J3-J5"
+  t: "stale round-1 SWD scheme (1x5 header, front-edge column, lid-screw charging) in hw/mech/notes/electronics.md §A, docs/research/pcb-mech-interface.md §7-§8, docs/build/hardware.md §7"
 - id: DBG-11
   t: "no test-access map (TPs, dots, probe points, lift links, both faces) or bring-up flow PNG; board-map-revF.png covers part"
 - id: DBG-12

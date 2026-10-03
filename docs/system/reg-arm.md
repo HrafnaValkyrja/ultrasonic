@@ -16,7 +16,7 @@ Status: CAD rev 1, not built. `heel.py` checks.json and `pad.py` strut from 2026
 
 ```mermaid
 flowchart LR
-  J["Board F face, rear column:<br/>J1 OUT_A · J2 OUT_B · J7 LED_A · J8 LED_K"] --> GAP["2.1 mm gap behind the board<br/>(1.1 mm behind the cell)"]
+  J["Board F face, rear edge:<br/>outer column J1 OUT_A · J2 OUT_B · J8 LED_K, inner column J7 LED_A"] --> GAP["2.1 mm gap behind the board<br/>(1.1 mm behind the cell)"]
   GAP --> EXIT["heel channel exit through the tub wall<br/>(65.75, 5.30, −5.62)"]
   EXIT --> CH["heel channel Ø1.0, 7.6 mm, two R0.8 bends"]
   CH --> CB1["Ø1.6 counterbore on the land"]
@@ -48,7 +48,7 @@ flowchart LR
 |---|---|---|
 | [sub-output](sub-output.md) | OUT_A (J1), OUT_B (J2) | 200 kHz, 0–3.0 V square, ~0.3 A peaks; ~0.1 Ω per conductor (derived) |
 | [sub-ui](sub-ui.md) | LED_A (J7), LED_K (J8) | LED_K goes straight to PB7 (20 mA abs max). A worn wire touching OUT_A/OUT_B overloads the pin (open issue 8) |
-| [reg-board](reg-board.md) | J1/J2/J7/J8 at board (33.0, 6.6 / 8.2 / 9.8 / 11.4), F face, rear column (pod x 63.6) | Wires rise behind the board's rear edge (pod x 64.6) in the 2.1 mm gap to the cavity wall (x 66.7); the heel exit opens behind the **cell**, where the gap is 1.1 mm (x 65.6–66.7) |
+| [reg-board](reg-board.md) | J1 (33.0, 7.8), J2 (33.0, 9.4), J8 (33.0, 11.0) outer column (pod x 63.6) and J7 (31.4, 10.4) inner column (pod x 62.0), F face (place_r1.py L53-54, 2026-10-02) | Wires rise behind the board's rear edge (pod x 64.6) in the 2.1 mm gap to the cavity wall (x 66.7); the heel exit opens behind the **cell**, where the gap is 1.1 mm (x 65.6–66.7) |
 | [reg-pod-body](reg-pod-body.md) | Heel fused into the tub's inner-lower corner; channel exit through the tub's inner wall (y 5.1); heel top under the frame adapter | Heel top z −4.30 under the adapter's −3.9 underside; crown −3.78 under the clip lip −3.3. Strut ↔ rev-1 housing 1.18–1.34 mm after the local strut relief (target 1.4) |
 | [reg-pad](reg-pad.md) | Pad socket entry T (66.8, 5.2, −18.42), axis 19.3° to the pad's long axis; strut bore → rear riser → pad-board pads | `frame.pad_pose(state)` moves the pad rigidly with the wire end. heel.py imports pad.py's `build_strut()`, `STRUT_B2`, `STRUT_B1_*` |
 | [physical](physical.md) | `frame.py`: E (61.3, 2.0, −8.3), A_E (0.474, 0.117, −0.873), span 11.81, PAD_CONTACT (70.6, −3.0, −25.0), sweep 30° | The CAD is the **right** pod (x back, y out, z up). The left arm is its mirror image |
@@ -111,7 +111,7 @@ Lower plateau 150 / 250 MPa (0.80 wire): settled 0.96 / 1.14 N. Model checks: 0.
    - hardware.md: heel Ø1.2 / pad Ø1.0.
 
    All of these predate the 2026-10-01 rear-side route. tolerances.md, heel.py and pad.py govern. **Closes:** update the notes before the owner builds.
-8. **LED_K runs in the flexing bundle straight to PB7.** The R14 split into 1k + 1k (C11702) was proposed (electronics.md; pcb-mech-interface.md §6) but isn't in Rev E. **Closes:** a decision in sub-ui.
+8. **LED_K runs in the flexing bundle straight to PB7.** The R14 split into 1k + 1k (C11702) was proposed (electronics.md; pcb-mech-interface.md §6) but isn't in Rev F (gen.py L272: single R14 2k2). **Closes:** a decision in sub-ui.
 9. **Fit to the frame:**
    - The heel only fits under this adapter: `TEMPLE_H` 5.0 is assumed, and it collides above ~5.8 mm (heel H1/risks). **E9** measures the temple.
    - `blade.adapter()` grips only the rail's upper wing, while the pad's 1 N pushes the pod's bottom outward (heel note). That is R17 territory (reg-pod-body).
