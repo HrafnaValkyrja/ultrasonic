@@ -44,10 +44,10 @@ BLOCK_OF = {ref: blk for blk, refs in BLOCKS.items() for ref in refs.split()}
 # function -> (blocks, chain of nets/pins, mechanical counterpart, firmware counterpart)
 FUNCTIONS = [
     ("F1 Hear 20-85 kHz", "MIC, MCU", "MIC_VDD from PA5 (GPIO-switched supply, off in Off mode); MIC_CLK PB3 -> R2 33R -> U2; MIC_DATA U2 -> PB4 (ADF1)",
-     "mic on B at board (3.9, 6.5), 0.6 mm port through the board, lid port D1.0 + hydrophobic mesh on the pod centre line", "ADF1 4 MHz PDM, algorithm A/B"),
+     "mic U2 on B at board (4.67, 6.5), its 0.6 mm port at (3.9, 6.5) through the board, lid port D1.0 + hydrophobic mesh on the pod centre line", "ADF1 4 MHz PDM, algorithm A/B"),
     ("F2 Process", "MCU, CORE_SMPS, CLOCK", "+3V0 -> VDD/VDDA/VDDSMPS; VLXSMPS -> L1 -> VDD11 (C8/C9); LSE Y1 on PC14/PC15",
      "-", "MSI/PLL clocks, LSE (see A3-clock doc), Stop 2 / Off modes (D12)"),
-    ("F3 Drive the exciter", "BRIDGE, ARM_PADS", "TIM1 CH1/CH1N PA8/PA7 -> Q1 gates (GA_P/GA_N); CH2/CH2N PA9/PB0 -> Q2 (GB_P/GB_N); P sources on +3V0, N sources on BRIDGE_RTN; OUT_A/OUT_B -> J1/J2",
+    ("F3 Drive the exciter", "BRIDGE, ARM_PADS", "TIM1 CH1/CH1N PA8/PA7 -> Q1 gates (GA_P/GA_N); CH3/CH3N PA10/PB15 -> Q2 (GB_P/GB_N; Rev F, ECR-0003); P sources on +3V0, N sources on BRIDGE_RTN; OUT_A/OUT_B -> J1/J2",
      "2 litz wires up the NiTi arm (rear-side route, heel channel, strut bore) to the exciter in the pad", "complementary PWM ~200 kHz with dead time; level/volume control"),
     ("F4 Self-test exciter |Z|", "SELFTEST, BRIDGE", "BRIDGE_RTN -> R21 0.1R -> GND; BRIDGE_RTN -> R22 1k -> I_SENSE (C22 10n) -> PA6 ADC1_IN11",
      "-", "tone sweep + synchronous detection over USB self-test (O15)"),
