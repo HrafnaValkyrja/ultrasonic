@@ -1,0 +1,4 @@
+# Phase-2 placement trials (agents); only the chosen placement is committed
+trials/
+*.dsn
+*.ses
