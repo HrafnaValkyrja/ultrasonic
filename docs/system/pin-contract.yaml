@@ -67,17 +67,15 @@ signals:
   - {id: GA_N, net: GA_N, signal: TIM1_CH1N, af: 1, complement_of: GA_P, role: "bridge leg A, N-FET gate (F3)"}
   - id: GB_P
     net: GB_P
-    signal: TIM1_CH2
+    signal: TIM1_CH3
     af: 1
-    alternates: [{signal: TIM1_CH3, af: 1, ecr: ECR-0003}]
-    role: "bridge leg B, P-FET gate (F3); ECR-0003 proposes CH3 on PA10"
+    role: "bridge leg B, P-FET gate (F3); on PA10 since Rev F (ECR-0003); R5 keeps it high for the ROM loader's USART1_RX"
   - id: GB_N
     net: GB_N
-    signal: TIM1_CH2N
+    signal: TIM1_CH3N
     af: 1
     complement_of: GB_P
-    alternates: [{signal: TIM1_CH3N, af: 1, ecr: ECR-0003}]
-    role: "bridge leg B, N-FET gate (F3); ECR-0003 proposes CH3N on PB15"
+    role: "bridge leg B, N-FET gate (F3); on PB15 since Rev F (ECR-0003): the UCPD dead-battery pull-down holds it off until UCPD_DBDIS"
   # ---- F4 self-test, F8 battery level, F9 dock detect, F6 temperature, F10 CC: ADC inputs
   - {id: I_SENSE, net: I_SENSE, signal: "re:ADC[14]_IN\\d+", role: "bridge supply current through R21 (F4)"}
   - {id: VBAT_SENSE, net: VBAT_SENSE, signal: "re:ADC4_IN\\d+", role: "VBAT/2 (F8): must be ADC4, the converter that runs in Stop 2"}

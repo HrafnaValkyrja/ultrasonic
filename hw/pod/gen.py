@@ -46,6 +46,9 @@ B on the owner-decision defaults; owner phases: Phase 1 logic, then her board re
 - debug/fallback dots (PER-12, O18): TP7 PB6 USART1_TX printf; TP8 PB8 MDF1_CCK0 + TP9 PB1 MDF1_SDI0 + TP10 MIC_DATA
   = hand-wire recovery to the MDF if the ADF mic-clock duty is bad (sub-audio-in issue 5).
 - Q1/Q2 on the Nexperia Fig. 32 land pattern (ECR-0004, hw/lib/pod.pretty, docs/research/sot1216-footprint.md).
+- bridge leg B moved from TIM1_CH2/CH2N (PA9/PB0) to TIM1_CH3/CH3N (PA10/PB15, AF1; ECR-0003): frees the jammed
+  east-side escape; R5 (P pull-up) holds PA10 high for the ROM loader; PB15's UCPD dead-battery 5.1k pull-down holds
+  the N gate OFF until firmware sets UCPD_DBDIS (ECR-0013 S2), a safe default.
 - kept on purpose: R4/R6 N-gate pull-downs (triage Q19: robustness against firmware init bugs for a device whose
   firmware changes for years; the study's OUT-01 would drop them), TP6 VSYS (owner-accepted test pad), R22/C22 and
   C14 22 uF (OUT-03/OUT-05 depend on the OUT-07 clamp, an owner decision), R21 1206 (OUT-02 is size-only: Phase 2),
@@ -174,7 +177,7 @@ def build():
 
     # ------------------------------------------------------------ H-bridge (TIM1)
     outa, outb, brt = Net("OUT_A"), Net("OUT_B"), Net("BRIDGE_RTN")
-    legs = (("Q1", outa, "PA8", "PA7", "R3", "R4", "GA"), ("Q2", outb, "PA9", "PB0", "R5", "R6", "GB"))
+    legs = (("Q1", outa, "PA8", "PA7", "R3", "R4", "GA"), ("Q2", outb, "PA10", "PB15", "R5", "R6", "GB"))   # Rev F: leg B on TIM1_CH3/CH3N (ECR-0003)
     for qref, out, p_pin, n_pin, rp, rn, g in legs:
         q = pmcxb290ue(qref)
         gp, gn = Net(f"{g}_P"), Net(f"{g}_N")
@@ -283,8 +286,8 @@ def build():
         p = pad(ref, lab, PAD_DOT); p[1] += n; n += u1[pin]
     p = pad("TP10", "MIC_DATA", PAD_DOT); p[1] += mic_dat
     # spare pins, left free on purpose; PC13 stays static next to the crystal (ES0499 2.2.1); PB15 carries the UCPD
-    # dead-battery pull-down until UCPD_DBDIS (ECR-0013 S2); PA3 / PA10 freed in Rev F
-    for pin in ("PC13", "PH0", "PH1", "PB15", "PA3", "PA10"):
+    # PA3 freed in Rev F; PA9/PB0 freed when leg B moved to PA10/PB15 (ECR-0003)
+    for pin in ("PC13", "PH0", "PH1", "PA3", "PA9", "PB0"):
         u1[pin] += NC
     return u1
 

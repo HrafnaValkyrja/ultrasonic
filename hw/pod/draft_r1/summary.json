@@ -1,4 +1,11 @@
 {
   "courtyard_overlaps": [],
-  "pad_clashes": []
+  "pad_clashes": [],
+  "tracks": 687,
+  "vias": 118,
+  "drc_errors": 19,
+  "by_type": {
+    "courtyards_overlap": 19
+  },
+  "unconnected": 2
 }

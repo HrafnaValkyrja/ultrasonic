@@ -126,8 +126,8 @@ relations:
   - id: R-PROC-DOCK
     a: SUB-PROCESSING
     b: SUB-DOCK-USB
-    what: USB FS PA11/PA12, CC sense PA3, VBUS sense PA1
-    watch: [net:USB_DP, net:USB_DM, net:CC_SENSE, net:VBUS_SENSE]
+    what: "USB FS PA11/PA12, VBUS sense PA1 (Rev F: CC no longer sensed; Rd R18 + J12 stay, ILIM by enumeration)"
+    watch: [net:USB_DP, net:USB_DM, net:VBUS_SENSE, net:CC, ref:R18]
   - id: R-PROC-UI
     a: SUB-PROCESSING
     b: SUB-UI
@@ -136,8 +136,8 @@ relations:
   - id: R-PROC-DEBUG
     a: SUB-PROCESSING
     b: SUB-DEBUG-TEST
-    what: SWD PA13/PA14, NRST, BOOT0 (R1), bootloader PA10 pull-up (R11)
-    watch: [net:SWDIO, net:SWCLK, net:NRST, ref:R1, ref:R11]
+    what: "SWD PA13/PA14, NRST, BOOT0 (R1 pad = DFU tack point), printf on PB6 (TP7), MDF mic-fallback dots (TP8-TP10); Rev F: PA10 pulled up by the ROM loader itself (R11 gone)"
+    watch: [net:SWDIO, net:SWCLK, net:NRST, ref:R1, net:DBG_TX, net:MDF_CCK, net:MDF_SDI]
   - id: R-OUT-DEBUG
     a: SUB-OUTPUT
     b: SUB-DEBUG-TEST

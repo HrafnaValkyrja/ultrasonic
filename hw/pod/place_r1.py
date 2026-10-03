@@ -60,10 +60,11 @@ PLACE = {
     "TP8": (8.7, 9.4, 0, "B"), "TP9": (8.7, 3.6, 0, "B"), "TP10": (7.3, 3.0, 0, "B"),
     "U2": (4.67, 6.5, 90, "B"), "R2": (7.3, 8.0, 90, "B"), "C13": (7.3, 5.0, 90, "B"),   # ECR-0011: the PORT (0.77 mm off the origin) at (3.9, 6.5) under the lid port
     "R8": (10.0, 2.0, 90, "B"), "R9": (11.0, 2.0, 90, "B"), "C19": (12.0, 2.0, 90, "B"),
-    "R15": (17.5, 4.75, 270, "B"), "R16": (16.3, 4.75, 270, "B"), 
-    # charger + LDO + dock protection: rear, near the wire pads
-    "U3": (17.0, 3.0, 0, "B"), "C15": (18.7, 2.2, 90, "B"), "C16": (15.3, 2.2, 90, "B"), "C21": (21.0, 2.0, 0, "B"),
-    "RT1": (19.8, 4.6, 90, "B"),
+    "R15": (20.0, 4.75, 270, "B"), "R16": (18.8, 4.75, 270, "B"), 
+    # charger + LDO + dock protection: rear, near the wire pads. Rev F: charger cluster shifted +2.5 mm in x so the MCU's
+    # top-right pins (26-38) get a via field between the MCU edge (x 16.5) and U3 instead of landing among its 0.4 mm balls
+    "U3": (19.5, 3.0, 0, "B"), "C15": (21.2, 2.2, 90, "B"), "C16": (17.8, 2.2, 90, "B"), "C21": (23.25, 2.0, 0, "B"),
+    "RT1": (22.3, 4.3, 90, "B"),
     "R20": (23.4, 11.4, 0, "B"),                     # LDO -> 3V0 link
     "U4": (24.2, 7.4, 0, "B"), "C17": (24.2, 5.9, 0, "B"), "C18": (24.2, 8.9, 0, "B"),
     "R12": (25.3, 2.2, 90, "B"), "R13": (26.9, 2.2, 90, "B"),
