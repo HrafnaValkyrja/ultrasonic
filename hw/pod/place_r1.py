@@ -1,4 +1,4 @@
-"""Rev-1 board ROUGH DRAFT: 34 x 13 mm (grown rearward 2026-10-01; shell_r1 PCB x 30.6-64.6), 4 layers, parts on both faces, from pod.net (Rev E).
+"""Rev-1 board ROUGH DRAFT: 34 x 13 mm (grown rearward 2026-10-01; shell_r1 PCB x 30.6-64.6), 4 layers, parts on both faces, from pod.net (Rev F; placement as of 2026-10-02).
 
     source tools/env.sh && systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 \
         python3 hw/pod/place_r1.py [--no-route]      # -> hw/pod/draft_r1/*

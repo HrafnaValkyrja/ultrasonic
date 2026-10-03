@@ -6,10 +6,11 @@ Blocks (spec §4, §7, §9; parts and LCSC numbers from .pcba-workflow/sourcing-
 2026-09-30):
   MCU     STM32U575CIU6Q on its internal SMPS (D5, D11; pins from docs/research/A3-u575-plan.md §3)
   Mic     SPH0641LU4H-1 on the ADF: clock PB3, data PB4, powered from PA5 so Off really is off (D12)
-  Bridge  2x PMCXB290UE complementary pairs on TIM1 CH1/CH1N/CH2/CH2N, 100k gate pulls (D6)
-  Power   MCP73831 charger (45 mA) -> 105 mAh cell (with its own protection PCB) -> TPS7A2030 3.0 V LDO
-  I/O     button PA0 (wake), battery sense PA4 (1M/1M, 2 uA), charge status PA10 (open-drain),
-          VBUS sense PA1 (dock detect), SWD pads
+  Bridge  2x PMCXB290UE complementary pairs on TIM1 CH1/CH1N (PA8/PA7) and CH3/CH3N (PA10/PB15, Rev F), 100k gate pulls (D6)
+  Power   BQ25180 I2C charger with power path -> Renata 175 mAh cell (own protection PCB) -> TPS7A2030 3.0 V LDO
+  I/O     button PA0 (wake), battery sense PA4 (1M/1M, 2 uA), charger IRQ PA15 (internal pull-up), VBUS sense PA1
+          (dock detect), SWD pads TP1-TP6, printf/MDF dots TP7-TP10
+  (Blocks as of Rev F; the Rev A-F paragraphs below are the change history.)
 Rev B (2026-09-30, audit fixes): MCP73832 instead of MCP73831 (NM-1), VBUS sense (PWR-05),
 C4 10 uF 0603 (NM-7), R1 10k (NM-11), C20 at VBAT (NM-5).
 Rev C (2026-09-30, owner O8): power-indicator LED in the pad housing, solid while on:
@@ -34,7 +35,7 @@ Assembly-cost audit (2026-10-01, JLC parts API 23:20Z): C8/C9 2.2 uF -> Basic C1
 them to the rails with C14 behind. 14 -> 11 Extended part types.
 Rev F (2026-10-02, Phase 1 "logical simplification" from docs/research/simplification-study.md, package B3 =
 B on the owner-decision defaults; owner phases: Phase 1 logic, then her board review, then Phase 2 miniaturization):
-- removed R11 (ROM loader pulls PA10 up itself, AN2606 Table 199; PA10 spare), R17 (CHG_INT uses the PA15 internal
+- removed R11 (ROM loader pulls PA10 up itself, AN2606 Table 199; PA10 then reused as GB_P, ECR-0003), R17 (CHG_INT uses the PA15 internal
   pull-up; PB5 strapped to GND so the UCPD dead-battery 5.1k pull-down can't arm on PA15, ECR-0013 S1), R19 (CC
   sense; PA3 spare; ILIM policy by enumeration, Rd R18 + J12 stay), C20 (VBAT pin 1 shares the pin-48 100 nF placed
   <= 1.5 mm from both, PER-06), D1/D2 (DNP footprints, OUT-04).
@@ -113,8 +114,7 @@ def pad(ref, label, fp=PAD):
 def pmcxb290ue(ref):
     """Nexperia PMCXB290UE: 20 V complementary N/P pair, DFN1010B-6 (SOT1216), 1.1 x 1.0 mm.
     Pinning per the datasheet (30 May 2023) Table 2: TR1 = N, TR2 = P; pads 7/8 are the drains.
-    FOOTPRINT TODO: EasyEDA's SOT1216 pads (0.16 x 0.20) are smaller than Nexperia's Fig. 32 land
-    pattern; redraw before layout (B-parts-selection.md)."""
+    Footprint: Nexperia Fig. 32 land pattern, hw/lib/pod.pretty (ECR-0004, Rev F); EasyEDA's SOT1216 pads were too small."""
     q = Part(tool=SKIDL, name="PMCXB290UE", ref_prefix="Q", ref=ref, tag=ref,
              footprint="pod:Nexperia_SOT1216_DFN1010B-6",   # ECR-0004: Nexperia Fig. 32 land pattern
              pins=[Pin(num=1, name="S_N", func=Pin.types.PASSIVE), Pin(num=2, name="G_N", func=Pin.types.PASSIVE), Pin(num=3, name="D_P", func=Pin.types.PASSIVE),
@@ -192,7 +192,8 @@ def build():
     c = C("C14", "22u", "C22u_0603", C0603); c[1] += v3; c[2] += gnd   # bridge current peaks
     # low-side shunt: 0.1R x ~315 mA peak (3.0 V into 8R + 1.2R of FETs) = 31 mV, ~170 counts on the
     # 14-bit ADC; 10 mW of 250 mW; ~1 % of the drive. Ground-referenced, so one ADC pin reads the
-    # exciter current (self-test |Z| sweep with synchronous detection, open/short check).
+    # bridge SUPPLY current i*(2d-1), not the coil current: |Z| and phase sit in its 2f component (self-test sweep with
+    # synchronous detection, open/short check; sub-output.md open issue 1). Rails check says ~326 mA peak (interfaces.py).
     r = R("R21", "0.1", "R0R1_1206", "Resistor_SMD:R_1206_3216Metric"); r[1] += brt; r[2] += gnd
     isns = Net("I_SENSE")
     r = R("R22", "1k", "R1k"); r[1] += brt; r[2] += isns
@@ -210,8 +211,9 @@ def build():
     d4 = Part("Device", "D_Schottky", value="1N5819WS", footprint="Diode_SMD:D_SOD-323", ref="D4", tag="D4")
     d4.fields["LCSC"] = "C191023"
     d4["A"] += dock_vbus; d4["K"] += vbus                               # upside-down docking can't feed the board
-    # BQ25180 (TI SLUSE13): linear charger with power path. IN from the dock, SYS feeds the board,
-    # BAT is the cell. Firmware sets ~1C (175 mA) at 20-45 C and 0.3C below 20 C over I2C (JEITA).
+    # BQ25180 (TI SLUSE99C): linear charger with power path. IN from the dock, SYS feeds the board,
+    # BAT is the cell. Firmware sets ICHG 170 mA (code 44) at 20-45 C and 50 mA (code 32) below 20 C over I2C
+    # (register plan: docs/system/sub-power.md).
     u3 = Part("lcsc", "BQ25180YBGR", ref="U3", tag="U3", footprint="lcsc:DSBGA-8_L1.6-W0.9-R2-C4-P0.40-BL")
     u3.fields["LCSC"] = "C3682423"
     u3["IN"] += vbus; u3["SYS"] += vsys; u3["BAT"] += vbat; u3["GND"] += gnd

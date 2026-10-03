@@ -66,3 +66,18 @@
 - 2026-10-02 19:07 ECR-0014 raised by simplify-study: Simplification Package A: low-risk cleanups, the floor (no owner decision reversed; does not meet O20)
 - 2026-10-02 19:07 ECR-0015 raised by simplify-study: Simplification Package B (RECOMMENDED): final-size integration (A + bridge/self-test cuts + CC out + LED on the lid + lid-hung 28x12 board)
 - 2026-10-02 19:07 ECR-0016 raised by simplify-study: Simplification Package C: B plus the BQ25186 charger swap (owner option; robustness, not simplification)
+- 2026-10-02 23:23 review R-PWR-BOARD by claude: Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds
+- 2026-10-02 23:23 review R-AUDIO-PROC by claude: Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds
+- 2026-10-02 23:23 review R-PROC-DOCK by claude: Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds
+- 2026-10-02 23:23 review R-OUT-ARM by claude: Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds
+- 2026-10-02 23:23 review R-OUT-PAD by claude: Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds
+- 2026-10-02 23:23 review R-BOARD-ARM by claude: Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds
+- 2026-10-02 23:23 review R-PWR-OUT-RAIL by claude: Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json
+- 2026-10-02 23:23 review R-PWR-PROC by claude: Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json
+- 2026-10-02 23:23 review R-PWR-DOCK by claude: Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json
+- 2026-10-02 23:23 review R-PROC-OUT by claude: Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json
+- 2026-10-02 23:23 review R-PROC-DEBUG by claude: Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json
+- 2026-10-02 23:23 review R-OUT-BOARD by claude: Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json
+- 2026-10-02 23:23 review R-DOCK-BOARD by claude: Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json
+- 2026-10-02 23:23 review R-DEBUG-BOARD by claude: Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json
+- 2026-10-02 23:23 review R-COST-BOARD by claude: Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json

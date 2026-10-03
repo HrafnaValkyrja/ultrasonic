@@ -199,10 +199,10 @@
   "R-AUDIO-PROC": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds",
    "stamp": {
     "net:MIC_CLK": "543500e0331e0a78",
-    "net:MIC_DATA": "36e295c9854399d3",
+    "net:MIC_DATA": "868cebae98075ae6",
     "net:MIC_VDD": "46564866a581e04e",
     "ref:R2": "a81d44d396b3bb4d",
     "ref:U2": "60848b99c7f48774"
@@ -211,15 +211,15 @@
   "R-BOARD-ARM": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds",
    "stamp": {
     "sym:hw/mech/heel.py::CH_EXIT": "31a5e01ff4670e60",
     "sym:hw/mech/shell_r1.py::CELL": "8471e5c4048e14f7",
     "sym:hw/mech/shell_r1.py::PCB": "36d5cdfbb12c936f",
-    "sym:hw/pod/place_r1.py::PLACE[J1]": "3c39c6c878272678",
-    "sym:hw/pod/place_r1.py::PLACE[J2]": "aad92e252a0b8c16",
-    "sym:hw/pod/place_r1.py::PLACE[J7]": "b3cd535775593024",
-    "sym:hw/pod/place_r1.py::PLACE[J8]": "ef60df85d7d95f34"
+    "sym:hw/pod/place_r1.py::PLACE[J1]": "f867f2ae56cb759a",
+    "sym:hw/pod/place_r1.py::PLACE[J2]": "4281778f5666a552",
+    "sym:hw/pod/place_r1.py::PLACE[J7]": "6e4d27c9a130468d",
+    "sym:hw/pod/place_r1.py::PLACE[J8]": "02eea88b90eedce6"
    }
   },
   "R-BOARD-BODY": {
@@ -247,30 +247,36 @@
   "R-COST-BOARD": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
    "stamp": {
-    "file:hw/pod/bom_jlc.csv": "d35b87918eabb110",
-    "sym:hw/pod/place_r1.py::PLACE": "02706c99975c60eb"
+    "file:hw/pod/bom_jlc.csv": "ddc0cb572b744af6",
+    "sym:hw/pod/place_r1.py::PLACE": "17995b4414b9373a"
    }
   },
   "R-DEBUG-BOARD": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
    "stamp": {
+    "glob:hw/lib/pod.pretty/TestDot*.kicad_mod": "0c5df7c57bf20d7d",
     "glob:hw/lib/pod.pretty/TestPoint*.kicad_mod": "585ac2adb464351e",
-    "grep:hw/pod/place_r1.py::TP\\{|TP\\d": "026d9080cf8a4ee7"
+    "grep:hw/pod/place_r1.py::TP\\{|TP\\d": "5ecb16562e760a80",
+    "sym:hw/pod/place_r1.py::PLACE[R1]": "0ee79bea2dedc061"
    }
   },
   "R-DOCK-BOARD": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
    "stamp": {
     "sym:hw/pod/place_r1.py::PLACE[D4]": "e564f0f6a931de6e",
-    "sym:hw/pod/place_r1.py::PLACE[J10]": "5ab7ef1e22814290",
-    "sym:hw/pod/place_r1.py::PLACE[J12]": "30ac358f08bf090f",
-    "sym:hw/pod/place_r1.py::PLACE[J3]": "22077157e8119819",
+    "sym:hw/pod/place_r1.py::PLACE[D5]": "eab85fb270c949cf",
+    "sym:hw/pod/place_r1.py::PLACE[J10]": "6fb3988d43f9a7db",
+    "sym:hw/pod/place_r1.py::PLACE[J11]": "43c25053f44c8bfe",
+    "sym:hw/pod/place_r1.py::PLACE[J12]": "3dc0f0ac479762a4",
+    "sym:hw/pod/place_r1.py::PLACE[J3]": "ac0b3cf52641ed3f",
+    "sym:hw/pod/place_r1.py::PLACE[J4]": "b85a9b2ab096f6a6",
+    "sym:hw/pod/place_r1.py::PLACE[J5]": "90da71227bdd724e",
     "sym:hw/pod/place_r1.py::PLACE[U6]": "d73c7330c7eeda85"
    }
   },
@@ -288,10 +294,10 @@
   "R-OUT-ARM": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds",
    "stamp": {
-    "net:OUT_A": "330a1a4baea85e82",
-    "net:OUT_B": "28daa1afe5b25714",
+    "net:OUT_A": "5e4d360780fe54df",
+    "net:OUT_B": "28cc65f9b1bf070c",
     "sym:hw/mech/heel.py::CH_CBORE_D": "b0ebeb1af4d09325",
     "sym:hw/mech/heel.py::CH_D": "537ae252b28b7412",
     "sym:hw/mech/heel.py::CH_EXIT": "31a5e01ff4670e60"
@@ -300,9 +306,9 @@
   "R-OUT-BOARD": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
    "stamp": {
-    "ref:Q1": "ee76bf015aaaeef6",
+    "ref:Q1": "9e9cfa60e1e11081",
     "ref:R21": "6e745e90b93b9158",
     "sym:hw/pod/place_r1.py::PLACE[Q1]": "7ad1b56527f93213",
     "sym:hw/pod/place_r1.py::PLACE[Q2]": "aab6f29572da2521",
@@ -321,11 +327,11 @@
   "R-OUT-PAD": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds",
    "stamp": {
     "file:hw/mech/pad.py": "00d8456a0d641613",
-    "net:OUT_A": "330a1a4baea85e82",
-    "net:OUT_B": "28daa1afe5b25714"
+    "net:OUT_A": "5e4d360780fe54df",
+    "net:OUT_B": "28cc65f9b1bf070c"
    }
   },
   "R-PHYS-FRAME": {
@@ -356,35 +362,38 @@
   "R-PROC-DEBUG": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
    "stamp": {
+    "net:DBG_TX": "156ef5ca50669a67",
+    "net:MDF_CCK": "718548747957afd8",
+    "net:MDF_SDI": "c1fdc288c79126c6",
     "net:NRST": "5a0ee234406e056c",
     "net:SWCLK": "a5e5e9955f699473",
     "net:SWDIO": "006f84e328723dd5",
-    "ref:R1": "98a034071214dc27",
-    "ref:R11": "1ba71d80d186ad65"
+    "ref:R1": "98a034071214dc27"
    }
   },
   "R-PROC-DOCK": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds",
    "stamp": {
-    "net:CC_SENSE": "706d04ad10b5bc95",
+    "net:CC": "93d4231c5f4cbaa8",
     "net:USB_DM": "e24d0b9352c00b90",
     "net:USB_DP": "853a8084fd88f631",
-    "net:VBUS_SENSE": "1c80a67291a9fe32"
+    "net:VBUS_SENSE": "1c80a67291a9fe32",
+    "ref:R18": "ce093204d4d7cc1b"
    }
   },
   "R-PROC-OUT": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
    "stamp": {
     "net:GA_N": "7dc5fe25d4d8a505",
     "net:GA_P": "e203d4d6a1f6e740",
-    "net:GB_N": "344566bf1bc012e7",
-    "net:GB_P": "4960b15e2d447b14",
+    "net:GB_N": "db7fd33228e25a99",
+    "net:GB_P": "4da2513e4c86fef4",
     "net:I_SENSE": "72e7669bf4ee053d"
    }
   },
@@ -400,13 +409,13 @@
   "R-PWR-BOARD": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds",
    "stamp": {
     "ref:U3": "2dbffb720efa69b7",
-    "sym:hw/pod/place_r1.py::PLACE[C15]": "df30bf0ddd5c00dc",
-    "sym:hw/pod/place_r1.py::PLACE[C16]": "5354cba497626b41",
-    "sym:hw/pod/place_r1.py::PLACE[C21]": "f8c3d9fcab76634e",
-    "sym:hw/pod/place_r1.py::PLACE[U3]": "fcf73ec9ef4c5570",
+    "sym:hw/pod/place_r1.py::PLACE[C15]": "e2430e5d5ab110d4",
+    "sym:hw/pod/place_r1.py::PLACE[C16]": "1046abf9ef7f0a5b",
+    "sym:hw/pod/place_r1.py::PLACE[C21]": "ed4745bbf1f8e661",
+    "sym:hw/pod/place_r1.py::PLACE[U3]": "86e26f56b4811113",
     "sym:hw/pod/place_r1.py::PLACE[U4]": "c54f72b5e30d1d1e"
    }
   },
@@ -433,10 +442,10 @@
   "R-PWR-DOCK": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
    "stamp": {
-    "net:DOCK_VBUS": "a576a3b5a80dae33",
-    "net:VBUS": "63051c79bf155c24",
+    "net:DOCK_VBUS": "4c532b309d315103",
+    "net:VBUS": "3c204978acb40d2f",
     "ref:D4": "ac70a74e6ca108e6",
     "ref:U3": "2dbffb720efa69b7"
    }
@@ -444,22 +453,22 @@
   "R-PWR-OUT-RAIL": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
    "stamp": {
-    "net:+3V0": "33b190ec055a07b0",
+    "net:+3V0": "ea116e94f98e5ddd",
     "ref:C14": "10b7c698ba308aa8",
-    "ref:Q1": "ee76bf015aaaeef6",
-    "ref:Q2": "5e868438ed9c2f5d",
+    "ref:Q1": "9e9cfa60e1e11081",
+    "ref:Q2": "fc949375a9a8aeae",
     "ref:U4": "cbc06f459358653c"
    }
   },
   "R-PWR-PROC": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
    "stamp": {
-    "net:+3V0": "33b190ec055a07b0",
-    "net:CHG_INT": "5d041a46ddf55c0d",
+    "net:+3V0": "ea116e94f98e5ddd",
+    "net:CHG_INT": "c3179da287aaba5f",
     "net:I2C_SCL": "cd56d8e39d3d28c4",
     "net:I2C_SDA": "29ccc84645975d4b",
     "net:TS": "ce0991001b6726ca",

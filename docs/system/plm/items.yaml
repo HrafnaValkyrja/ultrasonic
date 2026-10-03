@@ -91,17 +91,17 @@ relations:
   - id: R-PWR-OUT-RAIL
     a: SUB-POWER
     b: SUB-OUTPUT
-    what: +3V0 feeds the bridge P sources; ~315 mA peaks vs the LDO's 300 mA rating, buffered by C14
+    what: "+3V0 feeds the bridge P sources; ~0.32-0.33 A peaks (interfaces.py rails 326 mA, 2026-10-02) vs U4 300 mA (ECR-0005), buffered by C14; U4->S_P copper ~0.2 ohm on Rev F"
     watch: [net:+3V0, ref:U4, ref:C14, ref:Q1, ref:Q2]
   - id: R-PWR-PROC
     a: SUB-POWER
     b: SUB-PROCESSING
-    what: MCU supply, VBAT/TS sensing on PA4/PA2, charger I2C PB13/PB14 and IRQ PA15
+    what: "MCU supply (+3V0), VBAT/TS sensing on PA4/PA2, charger I2C PB13/PB14 (R15/R16 10k) and IRQ CHG_INT on PA15 using the MCU internal pull-up (no R17; PB5 strapped to GND against the UCPD dead-battery pull-down, ECR-0013 S1)"
     watch: [net:+3V0, net:VBAT_SENSE, net:TS, net:I2C_SCL, net:I2C_SDA, net:CHG_INT]
   - id: R-PWR-DOCK
     a: SUB-POWER
     b: SUB-DOCK-USB
-    what: dock VBUS through D4 into the charger input
+    what: "dock DOCK_VBUS (J3, D5 TPD1E10B06 ESD at the contact) through D4 into VBUS = charger input (C15 4.7 uF 25 V, R12/R13 dock sense)"
     watch: [net:VBUS, net:DOCK_VBUS, ref:D4, ref:U3]
   - id: R-PWR-UI
     a: SUB-POWER
@@ -121,7 +121,7 @@ relations:
   - id: R-PROC-OUT
     a: SUB-PROCESSING
     b: SUB-OUTPUT
-    what: TIM1 complementary PWM PA8/PA7/PA9/PB0, bridge current sense on PA6
+    what: "TIM1 complementary PWM: leg A CH1/CH1N PA8/PA7, leg B CH3/CH3N PA10/PB15 (AF1, ECR-0003); bridge current sense I_SENSE on PA6 (ADC1_IN11)"
     watch: [net:GA_P, net:GA_N, net:GB_P, net:GB_N, net:I_SENSE]
   - id: R-PROC-DOCK
     a: SUB-PROCESSING
@@ -136,7 +136,7 @@ relations:
   - id: R-PROC-DEBUG
     a: SUB-PROCESSING
     b: SUB-DEBUG-TEST
-    what: "SWD PA13/PA14, NRST, BOOT0 (R1 pad = DFU tack point), printf on PB6 (TP7), MDF mic-fallback dots (TP8-TP10); Rev F: PA10 pulled up by the ROM loader itself (R11 gone)"
+    what: "SWD PA13/PA14, NRST, BOOT0 (R1 pad = DFU tack point), printf on PB6 (TP7), MDF mic-fallback dots TP8 PB8 / TP9 PB1 / TP10 MIC_DATA; ROM loader USART1_RX pin PA10 is now GB_P, held high by R5 + the loader pull-up (R11 gone); PA9 TX is NC"
     watch: [net:SWDIO, net:SWCLK, net:NRST, ref:R1, net:DBG_TX, net:MDF_CCK, net:MDF_SDI]
   - id: R-OUT-DEBUG
     a: SUB-OUTPUT
@@ -147,12 +147,12 @@ relations:
   - id: R-AUDIO-BOARD
     a: SUB-AUDIO-IN
     b: REG-BOARD
-    what: mic on B at board (3.9, 6.5), 0.6 mm port through the board
+    what: "mic U2 on B at board (4.67, 6.5), its 0.6 mm port NPTH at (3.9, 6.5) through the board (ECR-0011)"
     watch: ["sym:hw/pod/place_r1.py::PLACE[U2]", ref:U2]
   - id: R-AUDIO-BODY
     a: SUB-AUDIO-IN
     b: REG-POD-BODY
-    what: lid mic port + mesh aligned with the board's mic port NPTH (board 3.13 = pod 33.73; the lid bore at pod 34.5 sits on U2's body origin, board 3.9, so 0.77 mm off today)
+    what: "lid mic port + mesh aligned with the board's mic port NPTH (board 3.9 = pod 34.5 = lid bore axis; interfaces.py mic-port offset 0.000 mm since Rev F, ECR-0011); sealed duct ID 1.0 recommended (docs/sim/acoustics.yaml option B, A-PORT-SEAL)"
     watch: ["sym:hw/mech/shell_r1.py::MIC", "sym:hw/mech/shell_r1.py::PCB", "sym:hw/pod/place_r1.py::PLACE[U2]", "sym:hw/mech/shell_r1.py::lid_base", "grep:hw/pod/gen.py::Knowles_LGA-5", "file:hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod"]
   - id: R-UI-BODY
     a: SUB-UI
@@ -167,8 +167,8 @@ relations:
   - id: R-DOCK-BOARD
     a: SUB-DOCK-USB
     b: REG-BOARD
-    what: dock wire pads J3/J4/J10/J11/J12 and protection parts placed at the rear
-    watch: ["sym:hw/pod/place_r1.py::PLACE[J3]", "sym:hw/pod/place_r1.py::PLACE[J10]", "sym:hw/pod/place_r1.py::PLACE[J12]", "sym:hw/pod/place_r1.py::PLACE[U6]", "sym:hw/pod/place_r1.py::PLACE[D4]"]
+    what: "dock wire pads J3/J4 (shared GND with cell -, between J3 and J5)/J10/J11/J12 in two rear columns on F; D5 ESD at J3 (F), D4/U6/R12/R13/R18 on B at the rear. Open: 0.60 mm pad gaps J4-J5 (cell short), J5-J12 0.89 (layout session)"
+    watch: ["sym:hw/pod/place_r1.py::PLACE[J3]", "sym:hw/pod/place_r1.py::PLACE[J4]", "sym:hw/pod/place_r1.py::PLACE[J5]", "sym:hw/pod/place_r1.py::PLACE[J10]", "sym:hw/pod/place_r1.py::PLACE[J11]", "sym:hw/pod/place_r1.py::PLACE[J12]", "sym:hw/pod/place_r1.py::PLACE[D5]", "sym:hw/pod/place_r1.py::PLACE[U6]", "sym:hw/pod/place_r1.py::PLACE[D4]"]
   - id: R-PWR-BOARD
     a: SUB-POWER
     b: REG-BOARD
@@ -182,13 +182,13 @@ relations:
   - id: R-OUT-BOARD
     a: SUB-OUTPUT
     b: REG-BOARD
-    what: bridge legs, shunt, footprints (PMCXB290UE redraw pending)
+    what: "bridge legs Q1/Q2 (B face, Nexperia Fig. 32 SOT1216 footprint since Rev F, ECR-0004) and shunt R21 1206 (B, 21.6, 7.6); I_SENSE Kelvin route to R21 (LN-M03 5.2 % vs <= 2 %, layout item)"
     watch: ["sym:hw/pod/place_r1.py::PLACE[Q1]", "sym:hw/pod/place_r1.py::PLACE[Q2]", "sym:hw/pod/place_r1.py::PLACE[R21]", ref:Q1, ref:R21]
   - id: R-DEBUG-BOARD
     a: SUB-DEBUG-TEST
     b: REG-BOARD
-    what: TP1-TP6 pogo row (1.27 mm pitch, 0.7 mm pads) on F top edge, outside the clamp band
-    watch: ["grep:hw/pod/place_r1.py::TP\\{|TP\\d", "glob:hw/lib/pod.pretty/TestPoint*.kicad_mod"]
+    what: "TP1-TP6 pogo row (0.7 mm, 1.27 mm pitch) on F top edge y 1.3, outside the 0.6 mm clamp band; TP7 0.5 mm printf dot on F (13.2, 1.5); TP8-TP10 0.5 mm MDF-fallback dots on B by the mic; R1 PH3 pad on F = DFU tack point; SWCLK->TP2 unrouted (layout session)"
+    watch: ["grep:hw/pod/place_r1.py::TP\\{|TP\\d", "glob:hw/lib/pod.pretty/TestPoint*.kicad_mod", "glob:hw/lib/pod.pretty/TestDot*.kicad_mod", "sym:hw/pod/place_r1.py::PLACE[R1]"]
   - id: R-PROC-BOARD
     a: SUB-PROCESSING
     b: REG-BOARD
@@ -260,5 +260,5 @@ relations:
   - id: R-COST-BOARD
     a: COST
     b: REG-BOARD
-    what: Extended part types, placements and assembly sides drive the JLC order cost
+    what: "BOM lines (JLC Standard PCBA feeder fee ~$1.53 each, Basic or Extended), placements, hidden-joint packages (X-ray) and assembly sides drive the JLC order cost; Extended types only add parts price"
     watch: [file:hw/pod/bom_jlc.csv, "sym:hw/pod/place_r1.py::PLACE"]
