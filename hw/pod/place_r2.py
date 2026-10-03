@@ -8,7 +8,7 @@ top edge, centre line y = H/2). Writes DIR/placed.kicad_pcb + DIR/check.json (+ 
 prints the check. --route runs FreeRouting ONCE, fenced: only the lead session routes, never parallel agents (CLAUDE.md).
 
 The check encodes the Phase-2 rules (docs/research/miniaturization-prelim.md MZG-01..15, ECR-0018, Phase-1 lessons):
-  face      every part on B except SW1 (F): the one-face strategy (MZD-1)
+  face      every part on B except SW1 (F): the one-face strategy (MZD-1); bare test pads TP1-TP6 may sit on F
   fit       courtyards inside the outline; copper >= 0.3 mm from the edge; no courtyard overlap; pads >= 0.12 mm apart
   axis      mic port (U2 NPTH) and SW1 on the centre line (O16-5: one board for both pods)
   near      decoupling / support parts within a set distance of the pins they serve (ST/TI layout rules); I_SENSE filter tight
@@ -39,6 +39,7 @@ mm, MM = pcbnew.FromMM, pcbnew.ToMM
 EDGE_COPPER = 0.3
 PAD_GAP = 0.8                                        # wire pads of different nets
 F_ONLY = {"SW1"}
+F_ALLOWED = {f"TP{i}" for i in range(1, 7)}   # bare SWD/power test pads: no part, no height; bench access before the lid bond
 WIRE_PADS = {"J1", "J2", "J3", "J4", "J5", "J7", "J8", "J9", "J10", "J11", "J12"}
 # (part, anchor ref, max mm between their nearest pads sharing a non-GND net); "anchor.pin" restricts to a pin
 NEAR = [
@@ -56,7 +57,82 @@ ESCAPE, ESCAPE_OK = 0.6, {"C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", 
 FAR_FROM_PORT = [("L1", 10.0), ("Q1", 10.0), ("Q2", 10.0)]
 
 
+VIA_D = 0.35                    # 0.30 broke the 0.2 mm hole clearance (107 DRC errors, 2026-10-03)
+PWR_NET = "+3V0"     # In2 is a +3V0 plane in Phase 2 (stack F sig / In1 GND / In2 +3V0 / B sig): F is almost empty, so it routes
+
+
+def pwr_plane(b, W, H):
+    b.SetLayerType(pcbnew.In2_Cu, pcbnew.LT_POWER)
+    z = pcbnew.ZONE(b)
+    z.SetLayer(pcbnew.In2_Cu)
+    z.SetNet(b.FindNet(PWR_NET))
+    z.SetLocalClearance(mm(0.2))
+    z.SetMinThickness(mm(0.2))
+    ol = z.Outline()
+    ol.NewOutline()
+    for x, y in ((0.3, 0.3), (W - 0.3, 0.3), (W - 0.3, H - 0.3), (0.3, H - 0.3)):
+        ol.Append(mm(x), mm(y))
+    b.Add(z)
+
+
+def net_fanout(b, fps, netname, inset=0.0):
+    """Same idea as place_r1.gnd_fanout for a second plane net: a short stub + via from each pad of `netname` to its plane."""
+    net = b.FindNet(netname)
+    VD, VDR, SW, GAP = R1.VIA_D, R1.VIA_DRILL, R1.STUB_W, R1.GAP
+    others = [(R1._rect(p), p) for f in fps.values() for p in f.Pads() if p.GetNetname() != netname]
+    vias = [(MM(t.GetPosition().x), MM(t.GetPosition().y)) for t in b.GetTracks() if t.GetClass() == "PCB_VIA"]
+    V = lambda x, y: pcbnew.VECTOR2I(mm(x), mm(y))  # noqa: E731
+    added, skipped = 0, []
+    for ref, f in fps.items():
+        if ref in FANOUT_SKIP:                      # fine-pitch ICs: their supply pins route to their own decoupling caps
+            continue
+        fx, fy = MM(f.GetPosition().x), MM(f.GetPosition().y)
+        layer = pcbnew.B_Cu if f.IsFlipped() else pcbnew.F_Cu
+        layer_pads = [(r, p) for r, p in others if p.IsOnLayer(layer)]
+        layer_tracks = [t for t in b.GetTracks() if t.GetClass() == "PCB_TRACK" and t.GetLayer() == layer]
+        for p in f.Pads():
+            if p.GetNetname() != netname:
+                continue
+            r = R1._rect(p); cx, cy = (r[0] + r[2]) / 2, (r[1] + r[3]) / 2
+            ox, oy = cx - fx, cy - fy
+            n = math.hypot(ox, oy)
+            ox, oy = (ox / n, oy / n) if n > 1e-6 else (0.0, 1.0)
+            half = max(r[2] - r[0], r[3] - r[1]) / 2
+            done = False
+            for dx, dy in [(ox, oy), (-oy, ox), (oy, -ox), (ox - oy, oy + ox), (ox + oy, oy - ox), (0, -1), (0, 1), (-1, 0), (1, 0)]:
+                m_ = math.hypot(dx, dy); dx, dy = dx / m_, dy / m_
+                for d in (half + VD / 2 + 0.05, half + VD / 2 + 0.25, half + VD / 2 + 0.5):
+                    x, y = cx + dx * d, cy + dy * d
+                    lo = 0.45 + inset
+                    if not (lo <= x <= W_[0] - lo and lo <= y <= W_[1] - lo):
+                        continue
+                    if any(math.hypot(x - vx, y - vy) < VD + 0.2 for vx, vy in vias):
+                        continue
+                    if any(R1._d_rect(x, y, rr) < VD / 2 + GAP for rr, _ in others):
+                        continue
+                    if any(R1._d_rect(cx + (x - cx) * k / 10, cy + (y - cy) * k / 10, rr) < SW / 2 + GAP
+                           for k in range(1, 10) for rr, _ in layer_pads):
+                        continue
+                    if any(t.GetEffectiveShape().Collide(pcbnew.SEG(V(cx, cy), V(x, y)), mm(SW / 2 + GAP)) for t in layer_tracks
+                           if t.GetNetname() != netname):
+                        continue
+                    t = pcbnew.PCB_TRACK(b); t.SetStart(V(cx, cy)); t.SetEnd(V(x, y)); t.SetWidth(mm(SW)); t.SetLayer(layer); t.SetNet(net); b.Add(t)
+                    v = pcbnew.PCB_VIA(b); v.SetPosition(V(x, y)); v.SetWidth(mm(VD)); v.SetDrill(mm(VDR)); v.SetNet(net); b.Add(v)
+                    vias.append((x, y)); added += 1; done = True
+                    break
+                if done:
+                    break
+            if not done:
+                skipped.append(f"{ref}.{p.GetNumber()}")
+    return added, skipped
+
+
+W_ = [32.0, 12.0]
+FANOUT_SKIP = set()           # skipping U1/U3/U4 routed worse (10 unconnected + 4 clearance vs 8 + 0), 2026-10-03
+
+
 def build(placement, netlist, W, H, inset=0.0, fanout=True):
+    W_[0], W_[1] = W, H
     for mod in (P, R1.P):                           # place_r1 loads its own copy of place.py
         mod.W, mod.H, mod.CORNER = W, H, 1.0
     comps, nets = P.parse_netlist(netlist)
@@ -64,6 +140,9 @@ def build(placement, netlist, W, H, inset=0.0, fanout=True):
     assert not missing, f"placement table and netlist disagree: {sorted(missing)}"
     b = pcbnew.BOARD()
     P.rules(b)
+    nc = b.GetDesignSettings().m_NetSettings.GetDefaultNetclass()
+    nc.SetViaDiameter(mm(VIA_D))                     # 0.30/0.15: JLC 4-layer minimum (annular 0.075); the 0.15 drill already pays the small-via fee
+    R1.VIA_D = VIA_D
     P.outline(b, inset)
     fps = {}
     for ref, fpid in comps.items():
@@ -88,9 +167,12 @@ def build(placement, netlist, W, H, inset=0.0, fanout=True):
     b.GetDesignSettings().SetBoardThickness(mm(0.8))
     if fanout:
         added, skipped = R1.gnd_fanout(b, fps, inset)
+        a3, s3 = net_fanout(b, fps, PWR_NET, inset)
+        added, skipped = added + a3, skipped + s3
     else:
         added, skipped = 0, []
     R1.gnd_plane(b)
+    pwr_plane(b, W, H)
     pcbnew.ZONE_FILLER(b).Fill(b.Zones())
     return b, fps, (added, skipped)
 
@@ -127,6 +209,8 @@ def check(b, fps, W, H, fan):
     # face
     for ref, f in fps.items():
         want_f = ref in F_ONLY
+        if ref in F_ALLOWED:
+            continue
         if f.IsFlipped() == want_f:
             v.append(f"face: {ref} on {'B' if f.IsFlipped() else 'F'} (want {'F' if want_f else 'B'})")
     # fit

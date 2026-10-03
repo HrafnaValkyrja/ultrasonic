@@ -1,0 +1,64 @@
+{
+ "placement": "hw/pod/draft_r2/placement.yaml",
+ "W": 30.0,
+ "H": 12.0,
+ "pass": true,
+ "violations": [],
+ "metrics": {
+  "port_xy": [
+   1.98,
+   6.0
+  ],
+  "ratsnest_mm": 410.7,
+  "board_mm2": 359.1,
+  "courtyard_B_mm2": 194.5,
+  "courtyard_F_mm2": 14.4,
+  "U_B": 0.541,
+  "gnd_vias": 75,
+  "gnd_fanout_skipped": [
+   "U2.3",
+   "C2.1",
+   "C3.1",
+   "U1.9"
+  ]
+ },
+ "route": {
+  "tracks": 505,
+  "vias": 130,
+  "drc_by_type": {},
+  "unconnected": [
+   [
+    "Pad 1 [NRST] of TP3 on F.Cu",
+    "Track [NRST] on B.Cu, length 0.1131 mm"
+   ],
+   [
+    "Pad 1 [VSYS] of TP6 on F.Cu",
+    "Track [VSYS] on B.Cu, length 1.2737 mm"
+   ],
+   [
+    "Pad 1 [SWDIO] of TP1 on F.Cu",
+    "Track [SWDIO] on B.Cu, length 0.7362 mm"
+   ],
+   [
+    "Track [BTN] on F.Cu, length 0.4767 mm",
+    "Pad 10 [BTN] of U1 on B.Cu"
+   ],
+   [
+    "Pad 1 [SWCLK] of TP2 on F.Cu",
+    "Track [SWCLK] on B.Cu, length 0.4141 mm"
+   ],
+   [
+    "Track [MDF_CCK] on B.Cu, length 0.5428 mm",
+    "Pad 45 [MDF_CCK] of U1 on B.Cu"
+   ],
+   [
+    "Track [VBUS_SENSE] on B.Cu, length 0.9051 mm",
+    "Pad 11 [VBUS_SENSE] of U1 on B.Cu"
+   ],
+   [
+    "Track [GB_P] on B.Cu, length 0.2496 mm",
+    "Pad 31 [GB_P] of U1 on B.Cu"
+   ]
+  ]
+ }
+}
