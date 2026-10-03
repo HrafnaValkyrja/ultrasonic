@@ -11,10 +11,10 @@
   },
   "INTEGRATION": {
    "by": "claude",
-   "date": "2026-10-02",
-   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
+   "date": "2026-10-03",
+   "note": "gen.py: Phase-2 package variant added (POD_PACKAGES=mz2); default Rev G netlist electrically identical (verified); ECR-0018",
    "stamp": {
-    "file:hw/pod/gen.py": "2aa23d38f299451d",
+    "file:hw/pod/gen.py": "f49ccb331b084acc",
     "file:hw/pod/system_map.py": "b7e4e9696bf44221"
    }
   },

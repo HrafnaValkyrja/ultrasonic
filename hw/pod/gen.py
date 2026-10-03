@@ -63,6 +63,7 @@ Change this file, never the generated netlist.
 from __future__ import annotations
 
 import builtins
+import os
 import csv
 import sys
 from pathlib import Path
@@ -80,6 +81,42 @@ skidl.set_default_tool(skidl.KICAD10)
 skidl.lib_search_paths[skidl.KICAD10].insert(0, str(REPO / "hw/lib/lcsc"))
 
 R0402, C0402, C0603 = "Resistor_SMD:R_0402_1005Metric", "Capacitor_SMD:C_0402_1005Metric", "Capacitor_SMD:C_0603_1608Metric"
+R0201, C0201 = "Resistor_SMD:R_0201_0603Metric", "Capacitor_SMD:C_0201_0603Metric"
+
+# Package set (Phase 2, owner O26; ECR-0018). Same circuit, smaller packages: env POD_PACKAGES=mz2 writes pod_mz2.net +
+# bom_jlc_mz2.csv beside the Rev G files; the default stays Rev G until the Phase-2 board replaces the draft.
+# Kept on purpose (docs/research/miniaturization-prelim.md MZ-2, mini/packages.md): R1/R20 0402 hand hooks (O18), C5/C15-C18
+# 0402 (DC bias / 25 V), C4/C7/C14/C21 0603 (ST/TI bulk rules), C8/C9 0402 10 V (SMPS loop; 0201 ESR at 3 MHz unproven),
+# L1 (ST DCR/ISAT rule), U1 QFN48, U6, D5/D6, U3, U4, Q1/Q2, U2, SW1. JLC parts API 2026-10-03T03:57Z (all in stock).
+PACKAGES = os.environ.get("POD_PACKAGES", "revG")
+MZ2 = {   # ref: (footprint, LCSC, value or None = keep)
+    "R2": (R0201, "C473457", None),                                   # 33R 0201WMF330JTEE
+    **{r: (R0201, "C270364", None) for r in ("R3", "R4", "R5", "R6", "R12", "R13")},   # 100k 0201WMF1003TEE
+    **{r: (R0201, "C473482", None) for r in ("R8", "R9")},             # 1M 0201WMF1004TEE
+    **{r: (R0201, "C473508", None) for r in ("R10", "R14")},           # 2k2 0201WMF2201TEE (R10 carries >= 1 mA: 2.2 mW of 50)
+    **{r: (R0201, "C473048", None) for r in ("R15", "R16")},           # 10k 0201WMF1002TEE
+    "R18": (R0201, "C270344", None),                                   # 5k1 0201WMF5101TEE (D6 now clamps the CC contact)
+    "R22": (R0201, "C270365", None),                                   # 1k 0201WMF1001TEE
+    "RT1": (R0201, "C98098", None),                                    # Murata NCP03XH103F05RL: same XH family/B as NCP15XH103
+    "R21": (R0402, "C409058", "0.1"),                                  # Panasonic ERJ2BSFR10X 0402 current sense (OUT-02)
+    **{c: (C0201, "C76934", None) for c in ("C1", "C2", "C3", "C6", "C10", "C13", "C19")},   # 100n 10 V X5R GRM033R61A104KE15D
+    **{c: (C0201, "C161441", "8p2") for c in ("C11", "C12")},          # C0G GRM0335C1H8R2BA01D for the 7 pF crystal (CL = C/2 + ~3 pF)
+    "C22": (C0201, "C85930", None),                                    # 10n X7R 25 V GRM033R71E103KE14D
+    "D4": ("Diode_SMD:D_SOD-882", "C282565", "PMEG3005EL"),            # Nexperia 30 V 0.5 A Schottky DFN1006-2 (~0.07 W)
+}
+
+
+def apply_packages():
+    """Swap footprints/LCSC/values to the Phase-2 set; nets untouched (logic frozen at Rev G)."""
+    if PACKAGES != "mz2":
+        return
+    by_ref = {p.ref: p for p in builtins.default_circuit.parts}
+    for ref, (fp, lcsc, val) in MZ2.items():
+        p = by_ref[ref]
+        p.footprint = fp
+        p.fields["LCSC"] = lcsc
+        if val:
+            p.value = val
 PAD = "TestPoint:TestPoint_Pad_D1.0mm"        # J wire pads (hand-soldered)
 PAD_TP = "pod:TestPoint_Pad_D0.7mm"            # TP probe / pogo pads
 PAD_DOT = "pod:TestDot_D0.5mm"                 # Rev F debug / fallback dots (tack a wire, touch a probe)
@@ -161,8 +198,12 @@ def build():
     r = R("R1", "10k", "R10k"); r[1] += u1["PH3"]; r[2] += gnd         # BOOT0 low: boot from flash (10k as AN5373)
     # Rev F: no separate VBAT cap (was C20): VBAT (pin 1) shares the VDD pin-48 100 nF, placed <= 1.5 mm from both (PER-06)
     # 32.768 kHz crystal, LSE high drive; never toggle PC13 (ES0499 2.2.1): left unconnected
-    y1 = Part("lcsc", "Q13FC1350000400", value="32.768k", ref="Y1", tag="Y1")
-    y1.fields["LCSC"] = "C32346"
+    if PACKAGES == "mz2":   # Epson FC-12M X1A0000610006: 2.05 x 1.2 mm, CL 7 pF, ESR 90k -> gmcrit ~0.98 uA/V (vs 2.16 for FC-135)
+        y1 = Part("Device", "Crystal", value="32.768k 7pF", footprint="Crystal:Crystal_SMD_2012-2Pin_2.0x1.2mm", ref="Y1", tag="Y1")
+        y1.fields["LCSC"] = "C99009"
+    else:
+        y1 = Part("lcsc", "Q13FC1350000400", value="32.768k", ref="Y1", tag="Y1")
+        y1.fields["LCSC"] = "C32346"
     osc_in, osc_out = Net("LSE_IN"), Net("LSE_OUT")
     osc_in += u1["PC14"], y1[1]; osc_out += u1["PC15"], y1[2]
     for ref, n in (("C11", osc_in), ("C12", osc_out)):
@@ -311,7 +352,7 @@ def bom():
         key = (p.value, p.footprint, p.fields.get("LCSC", ""))
         rows.setdefault(key, []).append(p.ref)
     lock = {r["lcsc"]: r for r in csv.DictReader(open(REPO / ".pcba-workflow/sourcing-lock.csv"))}
-    with open(HERE / "bom_jlc.csv", "w", newline="") as f:
+    with open(HERE / ("bom_jlc_mz2.csv" if PACKAGES == "mz2" else "bom_jlc.csv"), "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["Comment", "Designator", "Footprint", "LCSC Part #", "Qty", "In sourcing lock"])
         for (val, fp, lcsc), refs in sorted(rows.items(), key=lambda kv: kv[1][0]):
@@ -321,8 +362,9 @@ def bom():
 
 if __name__ == "__main__":
     build()
+    apply_packages()
     skidl.ERC()
-    generate_netlist(file_=str(HERE / "pod.net"))
+    generate_netlist(file_=str(HERE / ("pod_mz2.net" if PACKAGES == "mz2" else "pod.net")))
     lines, n = bom()
     missing = [p.ref for p in builtins.default_circuit.parts if "DNP_BOM" not in p.fields and not p.fields.get("LCSC")]
     print(f"BOM: {lines} lines, {n} placed parts; missing LCSC: {missing or 'none'}")

@@ -105,3 +105,5 @@
 - 2026-10-02 23:54 review R-SMPS-BOARD by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
 - 2026-10-02 23:54 review R-CLOCK-BOARD by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
 - 2026-10-02 23:54 review R-UI-BOARD by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:59 ECR-0018 raised by claude: Phase 2 package set MZ-2 Balanced (one-face, 0201 set, QFN48 kept)
+- 2026-10-03 00:00 review INTEGRATION by claude: gen.py: Phase-2 package variant added (POD_PACKAGES=mz2); default Rev G netlist electrically identical (verified); ECR-0018

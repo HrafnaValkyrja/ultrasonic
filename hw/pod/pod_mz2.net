@@ -46,14 +46,14 @@
       (ref "C1")
       (value "100n")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C1525")
+          (name "LCSC") "C76934")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -72,14 +72,14 @@
       (ref "C10")
       (value "100n")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C1525")
+          (name "LCSC") "C76934")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -96,16 +96,16 @@
       (tstamps "9ac3af44-dacb-5cab-9570-74696fc5614f"))
     (comp
       (ref "C11")
-      (value "15p")
+      (value "8p2")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C1548")
+          (name "LCSC") "C161441")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -122,16 +122,16 @@
       (tstamps "d4017ae0-ca40-581e-bf8a-e168323602ea"))
     (comp
       (ref "C12")
-      (value "15p")
+      (value "8p2")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C1548")
+          (name "LCSC") "C161441")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -150,14 +150,14 @@
       (ref "C13")
       (value "100n")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C1525")
+          (name "LCSC") "C76934")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -306,14 +306,14 @@
       (ref "C19")
       (value "100n")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C1525")
+          (name "LCSC") "C76934")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -332,14 +332,14 @@
       (ref "C2")
       (value "100n")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C1525")
+          (name "LCSC") "C76934")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -384,14 +384,14 @@
       (ref "C22")
       (value "10n")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C15195")
+          (name "LCSC") "C85930")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -410,14 +410,14 @@
       (ref "C3")
       (value "100n")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C1525")
+          (name "LCSC") "C76934")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -488,14 +488,14 @@
       (ref "C6")
       (value "100n")
       (description "Unpolarized capacitor")
-      (footprint "Capacitor_SMD:C_0402_1005Metric")
+      (footprint "Capacitor_SMD:C_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C1525")
+          (name "LCSC") "C76934")
         (field
           (name "Description") "Unpolarized capacitor")
         (field
-          (name "Footprint") "Capacitor_SMD:C_0402_1005Metric")
+          (name "Footprint") "Capacitor_SMD:C_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -590,16 +590,16 @@
       (tstamps "9ccc330f-2a4c-575c-9353-ad8096a286cf"))
     (comp
       (ref "D4")
-      (value "1N5819WS")
+      (value "PMEG3005EL")
       (description "Schottky diode")
-      (footprint "Diode_SMD:D_SOD-323")
+      (footprint "Diode_SMD:D_SOD-882")
       (fields
         (field
-          (name "LCSC") "C191023")
+          (name "LCSC") "C282565")
         (field
           (name "Description") "Schottky diode")
         (field
-          (name "Footprint") "Diode_SMD:D_SOD-323")
+          (name "Footprint") "Diode_SMD:D_SOD-882")
         (field
           (name "Datasheet"))
         (field
@@ -1060,14 +1060,14 @@
       (ref "R10")
       (value "2k2")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25879")
+          (name "LCSC") "C473508")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1086,14 +1086,14 @@
       (ref "R12")
       (value "100k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25741")
+          (name "LCSC") "C270364")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1112,14 +1112,14 @@
       (ref "R13")
       (value "100k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25741")
+          (name "LCSC") "C270364")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1138,14 +1138,14 @@
       (ref "R14")
       (value "2k2")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25879")
+          (name "LCSC") "C473508")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1164,14 +1164,14 @@
       (ref "R15")
       (value "10k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25744")
+          (name "LCSC") "C473048")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1190,14 +1190,14 @@
       (ref "R16")
       (value "10k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25744")
+          (name "LCSC") "C473048")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1216,14 +1216,14 @@
       (ref "R18")
       (value "5k1")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25905")
+          (name "LCSC") "C270344")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1242,14 +1242,14 @@
       (ref "R2")
       (value "33")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25105")
+          (name "LCSC") "C473457")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1294,14 +1294,14 @@
       (ref "R21")
       (value "0.1")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_1206_3216Metric")
+      (footprint "Resistor_SMD:R_0402_1005Metric")
       (fields
         (field
-          (name "LCSC") "C25334")
+          (name "LCSC") "C409058")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_1206_3216Metric")
+          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1320,14 +1320,14 @@
       (ref "R22")
       (value "1k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C11702")
+          (name "LCSC") "C270365")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1346,14 +1346,14 @@
       (ref "R3")
       (value "100k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25741")
+          (name "LCSC") "C270364")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1372,14 +1372,14 @@
       (ref "R4")
       (value "100k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25741")
+          (name "LCSC") "C270364")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1398,14 +1398,14 @@
       (ref "R5")
       (value "100k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25741")
+          (name "LCSC") "C270364")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1424,14 +1424,14 @@
       (ref "R6")
       (value "100k")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C25741")
+          (name "LCSC") "C270364")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1450,14 +1450,14 @@
       (ref "R8")
       (value "1M")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C26083")
+          (name "LCSC") "C473482")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1476,14 +1476,14 @@
       (ref "R9")
       (value "1M")
       (description "Resistor")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C26083")
+          (name "LCSC") "C473482")
         (field
           (name "Description") "Resistor")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1502,14 +1502,14 @@
       (ref "RT1")
       (value "10k B3435")
       (description "Temperature dependent resistor, negative temperature coefficient")
-      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
       (fields
         (field
-          (name "LCSC") "C77131")
+          (name "LCSC") "C98098")
         (field
           (name "Description") "Temperature dependent resistor, negative temperature coefficient")
         (field
-          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
         (field
           (name "Datasheet"))
         (field
@@ -1942,25 +1942,25 @@
       (tstamps "aee7dbbb-30a2-5780-a35b-54386b8e659f"))
     (comp
       (ref "Y1")
-      (value "32.768k")
-      (description "")
-      (footprint "lcsc:FC-135R_L3.2-W1.5")
+      (value "32.768k 7pF")
+      (description "Two pin crystal")
+      (footprint "Crystal:Crystal_SMD_2012-2Pin_2.0x1.2mm")
       (fields
         (field
-          (name "LCSC") "C32346")
+          (name "LCSC") "C99009")
         (field
-          (name "Description"))
+          (name "Description") "Two pin crystal")
         (field
-          (name "Footprint") "lcsc:FC-135R_L3.2-W1.5")
+          (name "Footprint") "Crystal:Crystal_SMD_2012-2Pin_2.0x1.2mm")
         (field
-          (name "Datasheet") "https://lcsc.com/product-detail/SMD-Crystals_EPSON_Q13FC1350000400_32-768KHz-20ppm-12-5pF_C32346.html")
+          (name "Datasheet"))
         (field
           (name "SKiDL Tag") "Y1")
         (field
-          (name "SKiDL Line") "gen.py:205"))
+          (name "SKiDL Line") "gen.py:202"))
       (libsource
-        (lib "lcsc")
-        (part "Q13FC1350000400"))
+        (lib "Device")
+        (part "Crystal"))
       (sheetpath
         (names "/")
         (tstamps "/"))
@@ -2522,7 +2522,7 @@
       (node
         (ref "Y1")
         (pin "1")
-        (pintype "UNSPECIFIED")))
+        (pintype "PASSIVE")))
     (net
       (code 20)
       (name "LSE_OUT")
@@ -2538,7 +2538,7 @@
       (node
         (ref "Y1")
         (pin "2")
-        (pintype "UNSPECIFIED")))
+        (pintype "PASSIVE")))
     (net
       (code 21)
       (name "MDF_CCK")
