@@ -73,7 +73,7 @@ def clusters(boxes, gap=1.6):
 def draw_face(ax, board, bottom, x0, y0, w, h, changed, port):
     X = lambda x: x - x0  # noqa: E731
     Y = lambda y: y - y0  # noqa: E731
-    ax.add_patch(FancyBboxPatch((0, 0), w, h, boxstyle="round,pad=0,rounding_size=1.0", fc="#2a1a3d", ec="#8d7ff0", lw=1.4, zorder=0))
+    ax.add_patch(FancyBboxPatch((0, 0), w, h, boxstyle="round,pad=0,rounding_size=1.0", fc="#1c1d21", ec="#8a8f98", lw=1.4, zorder=0))   # black mask (spec O23)
     layer = pcbnew.B_Cu if bottom else pcbnew.F_Cu
     for t in board.GetTracks():
         if t.GetClass() == "PCB_TRACK" and t.GetLayer() == layer:

@@ -29,6 +29,7 @@ SUBST = {   # library footprint model names with no file of that name in kicad-p
 }
 SILK_ON = {"White": "Black"}        # white mask takes black legend
 BG = (20, 21, 24)                   # #141518, render.sh dark background
+BG_FOR = {"Black": (58, 61, 68)}    # a black board vanishes on the dark page: lift its backdrop
 VIEWS = {"top": ["--side", "top"], "bottom": ["--side", "bottom"],
          "iso": ["--side", "top", "--rotate", "-38,0,-22", "--perspective"]}
 
@@ -73,11 +74,11 @@ def render(pcb: Path, view: str, png: Path, zoom: float):
     subprocess.run(cmd, check=True, env=env, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
-def on_dark(png: Path, pad: int = 40) -> Image.Image:
+def on_dark(png: Path, pad: int = 40, bg=BG) -> Image.Image:
     im = Image.open(png).convert("RGBA")
     box = im.getchannel("A").point(lambda a: 255 if a > 8 else 0).getbbox() or (0, 0, *im.size)
     im = im.crop((max(box[0] - pad, 0), max(box[1] - pad, 0), min(box[2] + pad, im.width), min(box[3] + pad, im.height)))
-    bg = Image.new("RGBA", im.size, BG + (255,))
+    bg = Image.new("RGBA", im.size, tuple(bg) + (255,))
     bg.alpha_composite(im)
     return bg.convert("RGB")
 
@@ -94,7 +95,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("board", nargs="?", default=str(REPO / "hw/pod/draft_r1/pod_r1_routed.kicad_pcb"))
     ap.add_argument("--out", default=str(REPO / "docs/diagrams/renders"))
-    ap.add_argument("--masks", default="Purple")      # owner 2026-10-02: Black or Purple
+    ap.add_argument("--masks", default="Black")       # owner 2026-10-02: black mask (spec O23)
     ap.add_argument("--views", default="top,bottom,iso")
     ap.add_argument("--zoom", type=float, default=1.8)
     ap.add_argument("--grid", action="store_true")
@@ -108,7 +109,7 @@ def main():
             for view in a.views.split(","):
                 raw = Path(td) / f"{mask}_{view}.png"
                 render(pcb, view, raw, a.zoom if view != "iso" else a.zoom * 0.8)
-                im = on_dark(raw)
+                im = on_dark(raw, bg=BG_FOR.get(mask, BG))
                 dst = out / f"{board.stem}_{mask.lower().replace(' ', '_')}_{view}.png"
                 im.save(dst)
                 print(dst)
