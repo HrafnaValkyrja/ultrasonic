@@ -1,68 +1,41 @@
 {
- "placement": "hw/pod/draft_r2/placement.yaml",
+ "placement": "/tmp/claude-1000/-home-hrafnavalkyrja-Desktop-ultrasonic/759e00a7-254c-4cd3-926a-efbece430ab6/scratchpad/route_closure/v6.yaml",
  "W": 30.0,
  "H": 12.0,
  "pass": true,
  "violations": [],
  "metrics": {
   "port_xy": [
-   1.98,
+   1.88,
    6.0
   ],
-  "ratsnest_mm": 410.7,
+  "ratsnest_mm": 382.5,
   "board_mm2": 359.1,
   "courtyard_B_mm2": 194.5,
   "courtyard_F_mm2": 14.4,
   "U_B": 0.541,
-  "gnd_vias": 75,
+  "gnd_vias": 78,
   "gnd_fanout_skipped": [
-   "U2.3",
-   "C2.1",
-   "C3.1",
-   "U1.9"
+   "U2.3"
   ]
  },
  "route": {
-  "tracks": 581,
-  "vias": 133,
+  "tracks": 594,
+  "vias": 134,
   "drc_by_type": {},
   "unconnected": [
    [
-    "Pad 1 [VSYS] of TP6 on F.Cu",
-    "Track [VSYS] on B.Cu, length 1.2227 mm"
-   ],
-   [
-    "Track [NRST] on F.Cu, length 0.9108 mm",
-    "Pad 7 [NRST] of U1 on B.Cu"
-   ],
-   [
-    "Pad 1 [SWDIO] of TP1 on F.Cu",
-    "Track [SWDIO] on B.Cu, length 1.2262 mm"
-   ],
-   [
-    "Pad 10 [BTN] of U1 on B.Cu",
-    "Track [BTN] on F.Cu, length 0.1113 mm"
-   ],
-   [
-    "Track [VBUS_SENSE] on B.Cu, length 0.2100 mm",
-    "Pad 11 [VBUS_SENSE] of U1 on B.Cu"
-   ],
-   [
-    "Pad 4 [LSE_OUT] of U1 on B.Cu",
-    "Pad 2 [LSE_OUT] of Y1 on B.Cu"
-   ],
-   [
-    "Pad 1 [MDF_CCK] of TP8 on B.Cu",
-    "Pad 45 [MDF_CCK] of U1 on B.Cu"
+    "Track [I2C_SCL] on F.Cu, length 1.5074 mm",
+    "Pad 26 [I2C_SCL] of U1 on B.Cu"
    ]
   ],
   "passes": {
    "first": [
-    8,
+    3,
     0
    ],
    "second": [
-    7,
+    1,
     0
    ],
    "kept": "second"
