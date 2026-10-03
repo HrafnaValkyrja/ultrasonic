@@ -48,3 +48,6 @@ hw/pod/draft_r1/baseline/
 hw/pod/draft_r1/*.kicad_prl
 hw/pod/draft_r1/pod_r1_view.kicad_pcb
 hw/pod/draft_r1/*.png
+
+# board renders: regenerate with tools/render_board.py (30 s)
+docs/diagrams/renders/

@@ -230,6 +230,8 @@ def main(route=True):
         b.GetDesignSettings().m_NetSettings.GetDefaultNetclass().SetClearance(mm(0.09))
         target = OUT / "pod_r1_routed.kicad_pcb"
         pcbnew.SaveBoard(str(target), b)
+        # silkscreen pass (refs to Fab, pin-1 dots, port motif, name; JLC legend rules): hw/pod/silk.py
+        subprocess.run([sys.executable, str(Path(__file__).with_name("silk.py")), str(target)], check=True, stdout=subprocess.DEVNULL)
         drc = OUT / "drc.json"
         subprocess.run(["kicad-cli", "pcb", "drc", "--format", "json", "--severity-error", "--output", str(drc), str(target)],
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
