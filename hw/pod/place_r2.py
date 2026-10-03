@@ -304,6 +304,30 @@ def route(placement, netlist, W, H, out):
     subprocess.run([os.environ["FREEROUTING_JAVA"], *os.environ.get("FREEROUTING_JAVA_OPTS", "-Xmx1g").split(),
                     "-jar", os.environ["FREEROUTING_JAR"], "-de", str(dsn), "-do", str(ses), "-mp", "200",
                     "--gui.enabled=false"], check=True, timeout=3000, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    b = _import(out, ses)
+    target = out / "routed.kicad_pcb"
+    pcbnew.SaveBoard(str(target), b)
+    # second pass: FreeRouting again from the routed board (existing wiring kept), keep it if it is better (2026-10-03: 8 -> 5)
+    first = _drc(target, out / "drc.json")
+    dsn2, ses2 = out / "board2.dsn", out / "board2.ses"
+    assert pcbnew.ExportSpecctraDSN(pcbnew.LoadBoard(str(target)), str(dsn2))
+    subprocess.run([os.environ["FREEROUTING_JAVA"], *os.environ.get("FREEROUTING_JAVA_OPTS", "-Xmx1g").split(),
+                    "-jar", os.environ["FREEROUTING_JAR"], "-de", str(dsn2), "-do", str(ses2), "-mp", "200",
+                    "--gui.enabled=false"], check=True, timeout=3000, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    b2 = _import(out, ses2)
+    t2 = out / "routed2.kicad_pcb"
+    pcbnew.SaveBoard(str(t2), b2)
+    second = _drc(t2, out / "drc2.json")
+    score = lambda r: (len(r["unconnected"]), sum(r["drc_by_type"].values()))  # noqa: E731
+    best, bb = (second, b2) if score(second) < score(first) else (first, None)
+    if bb is not None:
+        pcbnew.SaveBoard(str(target), bb)
+        (out / "drc.json").write_text((out / "drc2.json").read_text())
+    best["passes"] = {"first": score(first), "second": score(second), "kept": "second" if bb is not None else "first"}
+    return best
+
+
+def _import(out, ses):
     b = pcbnew.LoadBoard(str(out / "placed.kicad_pcb"))
     assert pcbnew.ImportSpecctraSES(b, str(ses))
     for t in b.GetTracks():
@@ -311,9 +335,11 @@ def route(placement, netlist, W, H, out):
             t.SetWidth(mm(0.1))
     pcbnew.ZONE_FILLER(b).Fill(b.Zones())
     b.GetDesignSettings().m_NetSettings.GetDefaultNetclass().SetClearance(mm(0.09))
-    target = out / "routed.kicad_pcb"
-    pcbnew.SaveBoard(str(target), b)
-    drc = out / "drc.json"
+    return b
+
+
+def _drc(target, drc):
+    b = pcbnew.LoadBoard(str(target))
     subprocess.run(["kicad-cli", "pcb", "drc", "--format", "json", "--severity-error", "--output", str(drc), str(target)],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     d = json.loads(drc.read_text())
