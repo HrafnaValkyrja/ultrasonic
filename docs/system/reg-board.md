@@ -1,6 +1,24 @@
 # REG-BOARD: the pod board (PCB region)
 Rev F 2026-10-02: Phase 1 logical simplification placed + routed (52 parts, J4/J6 merged, D5 at J3, debug dots, charger +2.5 mm, ECR-0003/0004/0011 in the board, 0.8 mm set); Rev E facts deleted.
 Status: **routed draft for the owner's board review, not the layout.** `place_r1.py` + one fenced FreeRouting pass on Rev F (commit 4b2c058, 2026-10-02 20:07): 2 unconnected, 19 DRC errors (courtyards only). Real layout = together with the owner (O14), after her review (two-phase plan: Phase 1 logic -> owner review -> Phase 2 miniaturization, which re-sizes the outline per O20). Updated 2026-10-02.
+Phase 2 2026-10-03 (ECR-0018, owner O25/O26): NEW BOARD hw/pod/draft_r2/ (WIP, not yet the default build). Rev G draft_r1 below stays the checked default until the switch.
+
+```yaml
+phase2_board:   # src: ECR-0018 implementation log; hw/pod/draft_r2/out/check.json; 2026-10-03
+  outline: {W: 30.0, H: 12.0, corner: 1.0, thickness: 0.8}          # Rev F/G 34 x 13
+  faces: {B: "every part (cell side)", F: "SW1 + bare TP1-TP6 (SWD/NRST/3V0/GND/VSYS) + mic-port silk motif"}
+  stackup: [F sig, In1 GND plane, In2 +3V0 plane, B sig]          # +3V0 plane: the 51 mm +3V0 net blocked FreeRouting
+  netlist: hw/pod/pod_mz2.net (gen.py POD_PACKAGES=mz2; nets == Rev G)
+  placement: {file: hw/pod/draft_r2/placement.yaml, origin: "judge panel wf_15c06049-5a5, strategy linear", U_B: 0.56, ratsnest_mm: 411, mic_port: [1.98, 6.0], SW1: [18.5, 6.0], noisy_to_port_mm: ">= 13 (L1, Q1, Q2)"}
+  rules: "hw/pod/place_r2.py check: face, fit, centre line, near (decoupling), escape ring (U1 0.6 mm), far (>= 10 mm from port), wire-pad gaps >= 0.8 mm"
+  vias: {d: 0.35, drill: 0.15}        # 0.30 broke the 0.2 mm hole clearance
+  route: {tool: "FreeRouting 2 passes, clearance 0.11", tracks: 581, vias: 133, drc_errors: 0, unconnected: 7, misses: "U1.4 LSE_OUT, U1.7 NRST, U1.10 BTN, U1.11 VBUS_SENSE, U1.45 MDF_CCK, TP1 SWDIO, TP6 VSYS (separate islands)"}
+  silk: "hw/pod/silk.py one-face mode: port motif + STEREO/ULTRASOUND/PHASE 2 on F; refs on Fab; pin-1 dots U1 U3 U4 U6"
+  noise_model: {LN-M02_db: 28.2, LN-M03_pct: 3.3, invalid: "LN-M01/M04/M06 (sim/noise models +3V0 as traces, not the In2 plane)"}
+  shell: "hw/mech/shell_r2.py: hung from the lid on full-face VHB, x-stop, duct D1.0, SW1 pocket + puck kit, 6211 mm3"
+  open: ["route the 7 misses", "noise model: In2 +3V0 plane", "acoustics re-run on the Phase-2 duct", "switch defaults (checks, sch, bom, docs) to draft_r2 + shell_r2", "silk.py re-run segfault"]
+```
+
 
 ```yaml
 abbrev: {F: F.Cu outer face (toward the lid), B: B.Cu inner face (toward the cell), In1/In2: inner copper layers 2/3, "J*": hand-soldered wire pads, "TP*": probe pads / test dots, DNP: footprint not fitted}
