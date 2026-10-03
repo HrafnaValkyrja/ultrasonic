@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1296" role="img" aria-label="Table of Rev E to Rev F changes: six parts removed, six swaps or changes, two additions, and three things kept on purpose, each with a plain-language reason." font-family="Helvetica, Arial, sans-serif">
+  <rect width="1200" height="1296" rx="14" fill="#fbfaf7"/>
+  <text x="36" y="44" font-size="22" font-weight="700" fill="#1f2328">Rev E → Rev F: what changed and why</text>
+  <text x="36" y="70" font-size="13.5" fill="#57606a">Phase 1 = logical simplification: same job, fewer ways to fail. 58 → 52 components (wire pads and test dots not counted), same 34 × 13 mm board. Every change passed the design checks.</text>
+  <rect x="36" y="110" width="1128" height="34" rx="7" fill="#f3f1ea" stroke="#e34948" stroke-width="1.6"/>
+  <text x="52" y="133" font-size="16" font-weight="700" fill="#e34948">Removed (6 parts gone)</text>
+  <line x1="36" y1="186" x2="1164" y2="186" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="170" font-size="14" font-weight="700" fill="#1f2328">R11 resistor</text>
+  <text x="330" y="170" font-size="14" fill="#1f2328">The brain's own start-up program already holds that pin in place; the resistor did nothing extra.</text>
+  <line x1="36" y1="248" x2="1164" y2="248" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="212" font-size="14" font-weight="700" fill="#1f2328">R17 resistor</text>
+  <text x="330" y="212" font-size="14" fill="#1f2328">The brain has a built-in resistor that does the same job. One pin (PB5) is now tied to ground so a</text>
+  <text x="330" y="232" font-size="14" fill="#1f2328">hidden USB-C feature can't interfere.</text>
+  <line x1="36" y1="310" x2="1164" y2="310" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="274" font-size="14" font-weight="700" fill="#1f2328">R19 resistor</text>
+  <text x="330" y="274" font-size="14" fill="#1f2328">It sensed how much current the dock can give. The USB connection itself now tells the pod, so the</text>
+  <text x="330" y="294" font-size="14" fill="#1f2328">part is redundant.</text>
+  <line x1="36" y1="372" x2="1164" y2="372" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="336" font-size="14" font-weight="700" fill="#1f2328">C20 capacitor</text>
+  <text x="330" y="336" font-size="14" fill="#1f2328">A separate filter for the brain's backup-power pin. It now shares its neighbour's filter, placed</text>
+  <text x="330" y="356" font-size="14" fill="#1f2328">within 1.5 mm of both pins.</text>
+  <line x1="36" y1="434" x2="1164" y2="434" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="398" font-size="14" font-weight="700" fill="#1f2328">D1, D2 (empty spots)</text>
+  <text x="330" y="398" font-size="14" fill="#1f2328">Spare places for optional protection diodes on the speaker wires. Analysis showed they're not</text>
+  <text x="330" y="418" font-size="14" fill="#1f2328">needed.</text>
+  <rect x="36" y="448" width="1128" height="34" rx="7" fill="#fff4ea" stroke="#b8520a" stroke-width="1.6"/>
+  <text x="52" y="471" font-size="16" font-weight="700" fill="#b8520a">Swapped or changed</text>
+  <line x1="36" y1="544" x2="1164" y2="544" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="508" font-size="14" font-weight="700" fill="#1f2328">Spark guard D3 → D5</text>
+  <text x="330" y="508" font-size="14" fill="#1f2328">Moved to the exposed charging contact itself, so a static zap is absorbed where it lands instead</text>
+  <text x="330" y="528" font-size="14" fill="#1f2328">of after travelling inside.</text>
+  <line x1="36" y1="606" x2="1164" y2="606" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="570" font-size="14" font-weight="700" fill="#1f2328">2 ground pads → 1 (J4)</text>
+  <text x="330" y="570" font-size="14" fill="#1f2328">Dock ground and battery minus now share one pad that sits between the 5 V and battery pads: a</text>
+  <text x="330" y="590" font-size="14" fill="#1f2328">stray solder blob can no longer short the battery onto an exposed contact.</text>
+  <line x1="36" y1="668" x2="1164" y2="668" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="632" font-size="14" font-weight="700" fill="#1f2328">C15: 10 V → 25 V part</text>
+  <text x="330" y="632" font-size="14" fill="#1f2328">The charger's datasheet recommends a 25 V-rated input capacitor; this one survives a dock power</text>
+  <text x="330" y="652" font-size="14" fill="#1f2328">spike.</text>
+  <line x1="36" y1="730" x2="1164" y2="730" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="694" font-size="14" font-weight="700" fill="#1f2328">Q1/Q2 copper pattern</text>
+  <text x="330" y="694" font-size="14" fill="#1f2328">Now the exact pad pattern the maker (Nexperia) specifies for these 1 mm transistors, for reliable</text>
+  <text x="330" y="714" font-size="14" fill="#1f2328">solder joints.</text>
+  <line x1="36" y1="792" x2="1164" y2="792" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="756" font-size="14" font-weight="700" fill="#1f2328">Speaker driver pins</text>
+  <text x="330" y="756" font-size="14" fill="#1f2328">Half of the driver moved to different brain pins. The old ones were boxed in so the wiring</text>
+  <text x="330" y="776" font-size="14" fill="#1f2328">couldn't get out, and the new pin starts up safely OFF.</text>
+  <line x1="36" y1="854" x2="1164" y2="854" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="818" font-size="14" font-weight="700" fill="#1f2328">Charger parts shift 2.5 mm</text>
+  <text x="330" y="818" font-size="14" fill="#1f2328">Opened a wiring path. Unfinished connections went from 7 to 2; we finish those together in the</text>
+  <text x="330" y="838" font-size="14" fill="#1f2328">layout session.</text>
+  <rect x="36" y="868" width="1128" height="34" rx="7" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1.6"/>
+  <text x="52" y="891" font-size="16" font-weight="700" fill="#1a7a55">Added</text>
+  <line x1="36" y1="964" x2="1164" y2="964" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="928" font-size="14" font-weight="700" fill="#1f2328">PB5 tied to ground</text>
+  <text x="330" y="928" font-size="14" fill="#1f2328">A copper link, not a part: switches off a hidden USB-C function that could jam the charger's alert</text>
+  <text x="330" y="948" font-size="14" fill="#1f2328">signal.</text>
+  <line x1="36" y1="1026" x2="1164" y2="1026" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="990" font-size="14" font-weight="700" fill="#1f2328">4 small test dots</text>
+  <text x="330" y="990" font-size="14" fill="#1f2328">TP7 lets the brain print text messages for debugging; TP8 to TP10 are a hand-wire backup route if</text>
+  <text x="330" y="1010" font-size="14" fill="#1f2328">the microphone's clock misbehaves.</text>
+  <rect x="36" y="1040" width="1128" height="34" rx="7" fill="#e8f0fb" stroke="#2a78d6" stroke-width="1.6"/>
+  <text x="52" y="1063" font-size="16" font-weight="700" fill="#2a78d6">Kept on purpose (could have been cut, weren't)</text>
+  <line x1="36" y1="1136" x2="1164" y2="1136" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="1100" font-size="14" font-weight="700" fill="#1f2328">Speaker-switch safety resistors</text>
+  <text x="330" y="1100" font-size="14" fill="#1f2328">R4/R6 hold the switches off if the program ever starts up wrong. The firmware will change for</text>
+  <text x="330" y="1120" font-size="14" fill="#1f2328">years, so they stay.</text>
+  <line x1="36" y1="1178" x2="1164" y2="1178" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="1162" font-size="14" font-weight="700" fill="#1f2328">Self-check sensor, 22 µF cap</text>
+  <text x="330" y="1162" font-size="14" fill="#1f2328">Removing them depends on a speaker clamp decision that's yours to make (Phase 2).</text>
+  <line x1="36" y1="1240" x2="1164" y2="1240" stroke="#c9c5b8" stroke-width="1"/>
+  <text x="52" y="1204" font-size="14" font-weight="700" fill="#1f2328">5-contact dock, light in the ear pad</text>
+  <text x="330" y="1204" font-size="14" fill="#1f2328">Changing these reverses earlier decisions of yours; they're on the Phase 2 list, not done</text>
+  <text x="330" y="1224" font-size="14" fill="#1f2328">silently.</text>
+  <text x="36" y="1270" font-size="13" fill="#57606a">Next: you review the board (Phase 1), then Phase 2 = making it smaller. Engineering record: hw/pod/gen.py header, ECR-0003/0004/0013.</text>
+</svg>
