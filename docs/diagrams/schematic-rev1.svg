@@ -1,84 +1,142 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 780" role="img" aria-label="Block schematic of one pod, rev 1. Dock contacts (VBUS, GND, D+, D-) through protection into a BQ25180 charger with power path; the charger feeds VSYS and charges the 175 mAh cell, with an NTC on the cell. VSYS feeds a 3.0 V LDO for the MCU, mic and bridge. The STM32U575 MCU on its internal switching regulator connects to the ultrasonic mic on ADF1, drives an H-bridge of two transistor pairs that feeds the bone-conduction transducer through the arm wires, drives the pad LED, reads the IP68 button, battery and USB sense dividers, talks to the charger over I2C, and does USB full speed for firmware updates." font-family="Helvetica, Arial, sans-serif">
-  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f2328"/></marker></defs>
-  <rect width="1200" height="780" rx="14" fill="#fbfaf7"/>
-  <text x="36" y="40" font-size="20" font-weight="700" fill="#1f2328">One pod, rev 1: block schematic (gen.py Rev E)</text>
-  <text x="36" y="62" font-size="13" fill="#57606a">Blue = in hw/pod/gen.py (Rev E, ERC clean, 58 placed parts + pads; board 34 × 13). Green = off-board (hand-wired).</text>
-  <g font-size="12" fill="#1f2328">
-    <!-- dock -->
-    <rect x="36" y="100" width="150" height="120" rx="8" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
-    <text x="48" y="122" font-weight="700">Magnetic dock contacts</text>
-    <text x="48" y="144">VBUS · GND</text><text x="48" y="162">D+ · D−</text>
-    <text x="48" y="184" fill="#57606a">pre-built pogo pair,</text><text x="48" y="200" fill="#57606a">USB-C space reserved</text>
-    <!-- protection -->
-    <rect x="216" y="100" width="180" height="120" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
-    <text x="226" y="122" font-weight="700">Protection</text>
-    <text x="226" y="144">D4 1N5819 (reverse dock)</text><text x="226" y="162">D3 ESD9X5 on VBUS</text><text x="226" y="180">U6 TPD2E2U06 on D±</text>
-    <text x="226" y="200" fill="#57606a">VBUS sense → PA1</text>
-    <!-- charger -->
-    <rect x="416" y="100" width="190" height="140" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
-    <text x="428" y="122" font-weight="700">U3 BQ25180 charger</text>
-    <text x="428" y="144">IN ← VBUS   SYS → VSYS</text><text x="428" y="162">BAT ↔ cell   TS ← NTC</text>
-    <text x="428" y="180">I2C: PB13/PB14, INT PA15</text>
-    <text x="428" y="200" fill="#57606a">power path, JEITA,</text><text x="428" y="216" fill="#57606a">~1C = 175 mA max</text>
-    <!-- cell -->
-    <rect x="416" y="270" width="190" height="80" rx="8" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
-    <text x="428" y="292" font-weight="700">Cell: Renata 175 mAh</text><text x="428" y="312">PCM inside · NTC taped on</text><text x="428" y="330" fill="#57606a">wires to J5/J6 (+ NTC)</text>
-    <!-- LDO -->
-    <rect x="646" y="100" width="160" height="80" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
-    <text x="658" y="122" font-weight="700">U4 TPS7A2030</text><text x="658" y="142">VSYS → 3.0 V rail</text><text x="658" y="160" fill="#57606a">R20 0 Ω link → 3V0 rail</text>
-    <!-- MCU -->
-    <rect x="646" y="230" width="260" height="250" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.5"/>
-    <text x="660" y="254" font-size="14" font-weight="700">U1 STM32U575 (Cortex-M33)</text>
-    <text x="660" y="276">internal SMPS: L1 2.2 µH + caps</text>
-    <text x="660" y="296">Y1 32.768 kHz (PC14/PC15)</text>
-    <text x="660" y="316">ADF1 ← mic: PB3 clk, PB4 data</text>
-    <text x="660" y="336">TIM1 → bridge: PA8/PA7, PA9/PB0</text>
-    <text x="660" y="356">USB FS: PA11 D−, PA12 D+</text>
-    <text x="660" y="376">ADC: VBAT PA4, VBUS PA1, TS PA2, I_br PA6</text>
-    <text x="660" y="396">button PA0 · LED PB7 · mic power PA5</text>
-    <text x="660" y="416">SWD PA13/PA14 (test pads)</text>
-    <text x="660" y="440" fill="#57606a">BOOT0 10k; ROM DFU via a boot stub</text>
-    <text x="660" y="458" fill="#57606a">CC sense PA3 · PA10 pull-up (bootloader)</text>
-    <!-- mic -->
-    <rect x="960" y="100" width="200" height="90" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
-    <text x="972" y="122" font-weight="700">U2 SPH0641LU4H-1 mic</text><text x="972" y="142">20–85 kHz, PDM 4 MHz</text><text x="972" y="160" fill="#57606a">ports through the board</text><text x="972" y="178" fill="#57606a">+ lid (mesh-covered)</text>
-    <!-- bridge -->
-    <rect x="960" y="230" width="200" height="100" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
-    <text x="972" y="252" font-weight="700">H-bridge Q1/Q2</text><text x="972" y="272">2× PMCXB290UE pairs</text><text x="972" y="290">200 kHz PWM, 100k pulls</text><text x="972" y="310" fill="#57606a">R21 0.33 Ω low-side shunt</text>
-    <!-- pad -->
-    <rect x="960" y="380" width="200" height="110" rx="8" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
-    <text x="972" y="402" font-weight="700">Pad (at the tragus)</text><text x="972" y="422">RC-BC02 transducer</text><text x="972" y="440">pad board: blue LED</text><text x="972" y="460" fill="#57606a">4 litz wires up the arm</text><text x="972" y="478" fill="#57606a">J1/J2 audio, J7/J8 LED</text>
-    <!-- button -->
-    <rect x="646" y="520" width="160" height="60" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
-    <text x="658" y="542" font-weight="700">SW1 IP68 switch</text><text x="658" y="562">C&amp;K KMT022 (1.6 N) → PA0</text>
-    <!-- test hooks -->
-    <rect x="36" y="420" width="560" height="160" rx="8" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
-    <text x="48" y="442" font-weight="700">Rev-1 test hooks (Rev E, in the schematic)</text>
-    <text x="48" y="464">• 0.7 mm test pads: SWD ×3, 3V0, GND, VSYS (VBAT/VBUS/outs on the J wire pads)</text>
-    <text x="48" y="484">• R20 0 Ω: lift it to meter the 3V0 rail or feed it from a bench supply</text>
-    <text x="48" y="504">• R21 0.33 Ω shunt → R22/C22 (16 kHz) → PA6: the pod measures its exciter |Z|; lift = bridge off</text>
-    <text x="48" y="524">• SWD pads + a snap-off test frame on the same JLC panel (spec O9)</text>
-    <text x="48" y="548" fill="#57606a">Self-test over USB: rails, clocks, mic stream to a PC spectrogram, PWM-noise A/B, charger log.</text>
-    <text x="48" y="566" fill="#57606a">(design started, research stopped; plan in spec O15)</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Flowchart of one pod, Rev F. Power: magnetic dock contacts, then a spark and wrong-way guard, then the battery charger (which charges the 175 mAh cell under the board), then a quiet 3.0 V regulator that feeds everything. Sound: the ultrasonic microphone feeds the microcontroller, which shifts ultrasound down into hearing range and drives the speaker driver, whose four wires run up the glasses arm to the bone-conduction speaker and status light in the ear pad. Control and data: USB data from the dock, battery level, the button and the test points reach the microcontroller; it drives the status light. Stars mark Rev F changes." font-family="Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="ao" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#b8520a"/></marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#2a78d6"/></marker>
+    <marker id="ag" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker>
+  </defs>
+  <rect width="1200" height="900" rx="14" fill="#fbfaf7"/>
+  <text x="30" y="40" font-size="22" font-weight="700" fill="#1f2328">One pod, Rev F: how it works (flowchart)</text>
+  <text x="30" y="66" font-size="13.5" fill="#57606a">Power comes in from the dock (orange); sound goes microphone → brain → speaker (blue). Blue boxes are on the board, green boxes are wired on by hand.</text>
+
+  <!-- ===== flows (drawn first, boxes on top) ===== -->
+  <g fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M270,195 H324" stroke="#b8520a" marker-end="url(#ao)"/>
+    <path d="M570,195 H624" stroke="#b8520a" marker-end="url(#ao)"/>
+    <path d="M870,195 H924" stroke="#b8520a" marker-end="url(#ao)"/>
+    <path d="M750,270 V300" stroke="#b8520a"/>
+    <path d="M1050,270 V432 H150" stroke="#b8520a"/>
+    <path d="M150,432 V449" stroke="#b8520a" marker-end="url(#ao)"/>
+    <path d="M600,432 V449" stroke="#b8520a" marker-end="url(#ao)"/>
+    <path d="M1050,432 V449" stroke="#b8520a" marker-end="url(#ao)"/>
+    <path d="M270,560 H324" stroke="#2a78d6" marker-end="url(#ab)"/>
+    <path d="M870,560 H924" stroke="#2a78d6" marker-end="url(#ab)"/>
+    <path d="M1050,665 V694" stroke="#2a78d6" marker-end="url(#ab)"/>
   </g>
-  <!-- wires -->
-  <g stroke="#1f2328" stroke-width="1.6" fill="none">
-    <line x1="186" y1="160" x2="216" y2="160" marker-end="url(#a)"/>
-    <line x1="396" y1="160" x2="416" y2="160" marker-end="url(#a)"/>
-    <line x1="606" y1="140" x2="646" y2="140" marker-end="url(#a)"/>
-    <line x1="511" y1="240" x2="511" y2="270"/>
-    <line x1="726" y1="180" x2="726" y2="230" marker-end="url(#a)"/>
-    <path d="M960,150 L930,150 L930,316 L906,316" marker-end="url(#a)"/>
-    <line x1="906" y1="280" x2="960" y2="280" marker-end="url(#a)"/>
-    <line x1="1060" y1="330" x2="1060" y2="380" marker-end="url(#a)"/>
-    <path d="M906,400 L940,400 L940,450 L960,450" marker-end="url(#a)"/>
-    <line x1="726" y1="480" x2="726" y2="520"/>
-    <path d="M396,190 L630,190 L630,350 L646,350" stroke-dasharray="5 3"/>
-    <path d="M606,180 L620,180 L620,300 L646,300" stroke-dasharray="5 3"/>
+  <g fill="none" stroke="#57606a" stroke-width="2" stroke-dasharray="6 4">
+    <path d="M450,270 V449" marker-end="url(#ag)"/>
+    <path d="M750,410 V449" marker-end="url(#ag)"/>
+    <path d="M270,755 H300 V620 H324" marker-end="url(#ag)"/>
+    <path d="M450,700 V671" marker-end="url(#ag)"/>
+    <path d="M850,665 V785 H924" marker-end="url(#ag)"/>
   </g>
-  <g font-size="11" fill="#57606a">
-    <text x="612" y="132">VSYS</text><text x="732" y="210">3.0 V</text><text x="912" y="272">PWM</text><text x="1066" y="360">wires</text>
-    <text x="634" y="214">D±</text><text x="596" y="298">I2C</text>
+  <g font-size="12" fill="#57606a">
+    <text x="760" y="290">charges / powers</text>
+    <text x="168" y="425" fill="#b8520a" font-weight="700">clean 3.0 V to everything</text>
+    <text x="298" y="552" text-anchor="middle" fill="#2a78d6">sound</text>
+    <text x="898" y="552" text-anchor="middle" fill="#2a78d6">sound</text>
+    <text x="1064" y="686" fill="#2a78d6">4 wires up the arm</text>
+    <text x="458" y="352">USB data</text>
+    <text x="758" y="446">level</text>
+    <text x="306" y="692">press</text>
+    <text x="458" y="692">debug</text>
+    <text x="864" y="778">light</text>
   </g>
-  <text x="36" y="620" font-size="13" fill="#1f2328">Full detail lives in hw/pod/gen.py (parts, pins, LCSC numbers). O16 changes are listed in docs/build/bom.md (status "O16").</text>
+
+  <!-- ===== row 1: power in ===== -->
+  <g font-size="13" fill="#1f2328">
+    <rect x="30" y="120" width="240" height="150" rx="9" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+    <text x="44" y="146" font-size="15" font-weight="700">Magnetic dock</text>
+    <text x="44" y="170">5 contacts: power, ground,</text>
+    <text x="44" y="190">2 USB data, 1 "I am a USB</text>
+    <text x="44" y="210">device" line</text>
+    <text x="44" y="254" font-size="12" fill="#57606a">wire pads J3 J4★ J10 J11 J12</text>
+
+    <rect x="330" y="120" width="240" height="150" rx="9" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+    <text x="344" y="146" font-size="15" font-weight="700">Spark + wrong-way guard ★</text>
+    <text x="344" y="170">Soaks up static zaps right at</text>
+    <text x="344" y="190">the exposed contact; blocks</text>
+    <text x="344" y="210">power if docked backwards;</text>
+    <text x="344" y="230">guards the USB data lines</text>
+    <text x="344" y="254" font-size="12" fill="#57606a">D5★ TPD1E10B06 · D4 · U6</text>
+
+    <rect x="630" y="120" width="240" height="150" rx="9" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+    <text x="644" y="146" font-size="15" font-weight="700">Battery charger ★</text>
+    <text x="644" y="170">Fills the battery safely; no</text>
+    <text x="644" y="190">charging when too hot or cold.</text>
+    <text x="644" y="210">Docked: runs the pod straight</text>
+    <text x="644" y="230">from the dock</text>
+    <text x="644" y="254" font-size="12" fill="#57606a">U3 BQ25180 · RT1 temp sensor</text>
+
+    <rect x="930" y="120" width="240" height="150" rx="9" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+    <text x="944" y="146" font-size="15" font-weight="700">Quiet power regulator</text>
+    <text x="944" y="170">Battery (3.0–4.2 V) in, steady</text>
+    <text x="944" y="190">clean 3.0 V out. No switching</text>
+    <text x="944" y="210">noise near the microphone</text>
+    <text x="944" y="254" font-size="12" fill="#57606a">U4 TPS7A2030</text>
+
+    <!-- row 2 -->
+    <rect x="630" y="300" width="240" height="110" rx="9" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+    <text x="644" y="326" font-size="15" font-weight="700">Battery</text>
+    <text x="644" y="350">175 mAh lithium cell with its</text>
+    <text x="644" y="370">own safety chip; aim 8–12 h</text>
+    <text x="644" y="394" font-size="12" fill="#57606a">Renata ICP501233PA-02, under board</text>
+
+    <!-- row 3: sound -->
+    <rect x="30" y="455" width="240" height="210" rx="9" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+    <text x="44" y="481" font-size="15" font-weight="700">Ultrasonic microphone</text>
+    <text x="44" y="505">Hears ~20–85 kHz through a</text>
+    <text x="44" y="525">0.6 mm pinhole in the board</text>
+    <text x="44" y="545">and a mesh-covered lid hole.</text>
+    <text x="44" y="565">Switched off when the pod</text>
+    <text x="44" y="585">is off</text>
+    <text x="44" y="649" font-size="12" fill="#57606a">U2 Knowles SPH0641LU4H-1</text>
+
+    <rect x="330" y="455" width="540" height="210" rx="11" fill="#e8f0fb" stroke="#2a78d6" stroke-width="3"/>
+    <text x="348" y="485" font-size="18" font-weight="700">The brain (microcontroller) ★</text>
+    <text x="348" y="513" font-size="14">Shifts ultrasound down into your hearing range:</text>
+    <text x="348" y="535" font-size="14">about 20–85 kHz in, 1.5–4 kHz out, separately in each ear.</text>
+    <text x="348" y="563" font-size="14">Also runs the button, the status light, the battery gauge</text>
+    <text x="348" y="585" font-size="14">and the speaker self-test; takes updates over the dock's USB.</text>
+    <text x="348" y="645" font-size="12" fill="#57606a">U1 STM32U575 + its own efficient core supply (L1) + timekeeping crystal (Y1)</text>
+
+    <rect x="930" y="455" width="240" height="210" rx="9" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+    <text x="944" y="481" font-size="14.5" font-weight="700">Speaker driver + self-check ★</text>
+    <text x="944" y="505">4 tiny switches flip the</text>
+    <text x="944" y="525">speaker's voltage 200,000</text>
+    <text x="944" y="545">times a second; the speaker</text>
+    <text x="944" y="565">only follows the slow sound.</text>
+    <text x="944" y="589">A tiny resistor measures the</text>
+    <text x="944" y="609">current: the pod tests itself</text>
+    <text x="944" y="649" font-size="12" fill="#57606a">Q1 Q2★ · R21 0.1 Ω sense</text>
+
+    <!-- row 4 -->
+    <rect x="30" y="700" width="240" height="110" rx="9" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+    <text x="44" y="726" font-size="15" font-weight="700">Button</text>
+    <text x="44" y="750">Press to wake or switch off;</text>
+    <text x="44" y="770">sealed (IP68) under silicone</text>
+    <text x="44" y="794" font-size="12" fill="#57606a">SW1 C&amp;K KMT022</text>
+
+    <rect x="330" y="700" width="240" height="110" rx="9" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+    <text x="344" y="726" font-size="15" font-weight="700">Test points ★</text>
+    <text x="344" y="750">Gold dots for a programmer or</text>
+    <text x="344" y="770">a probe, if anything needs fixing</text>
+    <text x="344" y="794" font-size="12" fill="#57606a">TP1–TP6 · new dots TP7–TP10</text>
+
+    <rect x="930" y="700" width="240" height="110" rx="9" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+    <text x="944" y="726" font-size="15" font-weight="700">Ear pad</text>
+    <text x="944" y="750">Bone-conduction speaker on</text>
+    <text x="944" y="770">the tragus + status light</text>
+    <text x="944" y="794" font-size="12" fill="#57606a">RC-BC02 exciter + LED</text>
+
+    <!-- legend -->
+    <g font-size="12.5" fill="#1f2328">
+      <line x1="636" y1="716" x2="676" y2="716" stroke="#b8520a" stroke-width="3"/><text x="686" y="720">power</text>
+      <line x1="636" y1="738" x2="676" y2="738" stroke="#2a78d6" stroke-width="3"/><text x="686" y="742">sound</text>
+      <line x1="636" y1="760" x2="676" y2="760" stroke="#57606a" stroke-width="2" stroke-dasharray="6 4"/><text x="686" y="764">control / data</text>
+      <rect x="640" y="774" width="32" height="14" rx="3" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1.5"/><text x="686" y="786">wired on by hand</text>
+      <text x="650" y="808" font-size="14">★</text><text x="686" y="807">changed in Rev F</text>
+    </g>
+  </g>
+  <text x="30" y="852" font-size="13" fill="#57606a">Rev F = Phase 1 "logical simplification": 52 parts on a 34 × 13 mm board. Wire-by-wire detail: the schematic pages; where parts sit: the board map.</text>
+  <text x="30" y="874" font-size="13" fill="#57606a">Not shown: the brain also sets the charger up over a 2-wire link, and its own clock and core-supply parts sit right beside it.</text>
 </svg>
