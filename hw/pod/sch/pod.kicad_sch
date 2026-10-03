@@ -1,0 +1,251 @@
+(kicad_sch
+	(version 20250114)
+	(generator "pod-sch.py")
+	(generator_version "10.0")
+	(uuid "46f56cb9-40b8-53c9-9ea1-5c731f397bba")
+	(paper "A4")
+	(title_block
+		(title "Pod board Rev F: schematic (generated from gen.py)")
+		(date "2026-10-02")
+		(rev "F")
+		(company "Stereo Ultrasound")
+	)
+	(lib_symbols)
+	(sheet
+		(at 25.4 40.64)
+		(size 76.2 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "a2aaa97b-438e-5f97-8bd8-ad6e32f4aee8")
+		(property "Sheetname" "1 Dock and USB protection"
+			(at 25.4 39.94 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "dock.kicad_sch"
+			(at 25.4 79.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "pod"
+				(path "/46f56cb9-40b8-53c9-9ea1-5c731f397bba"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 114.3 40.64)
+		(size 76.2 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "4bc0e25a-c0da-5268-b5b3-ecda7bc65689")
+		(property "Sheetname" "2 Charger, battery, 3.0 V"
+			(at 114.3 39.94 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power.kicad_sch"
+			(at 114.3 79.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "pod"
+				(path "/46f56cb9-40b8-53c9-9ea1-5c731f397bba"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 203.2 40.64)
+		(size 76.2 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "f1ac7190-4d3a-5d6b-9889-191d08a846b8")
+		(property "Sheetname" "3 Microcontroller"
+			(at 203.2 39.94 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "mcu.kicad_sch"
+			(at 203.2 79.34 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "pod"
+				(path "/46f56cb9-40b8-53c9-9ea1-5c731f397bba"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 25.4 104.14)
+		(size 76.2 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "253b1d4d-845e-5bbb-b17c-2d22e1c4b6f2")
+		(property "Sheetname" "4 Microphone"
+			(at 25.4 103.44 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "mic.kicad_sch"
+			(at 25.4 142.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "pod"
+				(path "/46f56cb9-40b8-53c9-9ea1-5c731f397bba"
+					(page "5")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 114.3 104.14)
+		(size 76.2 38.1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "0d146cbe-3b0c-5247-93c7-46dd075005f9")
+		(property "Sheetname" "5 Speaker driver and ear pad"
+			(at 114.3 103.44 0)
+			(effects
+				(font
+					(size 1.524 1.524)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "output.kicad_sch"
+			(at 114.3 142.84 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "pod"
+				(path "/46f56cb9-40b8-53c9-9ea1-5c731f397bba"
+					(page "6")
+				)
+			)
+		)
+	)
+	(text_box "HOW TO READ THIS\nEach box above is one page. Power arrives on page 1 (the dock), is stored and cleaned on page 2, and feeds the brain on page 3. Sound comes in on page 4 (the microphone) and goes out on page 5 (the speaker driver).\nFlag-shaped labels with the same name are the same wire, even on different pages. Arrow and bar symbols (+3V0, VSYS, VBAT, GND) are power rails. Yellow boxes explain each block in plain words."
+		(exclude_from_sim no)
+		(at 25.4 160 0)
+		(size 152.4 22.86)
+		(margins 0.9525 0.9525 0.9525 0.9525)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(fill
+			(type color)
+			(color 255 248 225 1)
+		)
+		(effects
+			(font
+				(size 1.524 1.524)
+			)
+			(justify left top)
+		)
+		(uuid "849c2913-a00e-5914-b48d-d4f650b1065c")
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)
