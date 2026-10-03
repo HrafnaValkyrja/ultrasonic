@@ -1,0 +1,125 @@
+# Declared aggressors and victims for sim/noise/budget.py. Layout-agnostic: pads are named by REF.PAD or REF@NET,
+# resolved on whatever board is loaded. Edit this file (not the code) when firmware, schematic or waveforms change.
+# wave kinds (amplitudes are PEAK of each harmonic k):
+#   pulse_train {f0, amp_a, duty, t_edge_s}  A_k = 2*amp*D*sinc(k*pi*D)*sinc(k*pi*f0*t_edge)
+#   sawtooth    {f0, amp_a}                  A_k = 2*amp/(k*pi)
+#   triangle    {f0, pp_a}                   odd k: A_k = (8/pi^2)*(pp/2)/k^2
+#   cap_square  {f0, c_f, v, t_edge_s}       odd k: A_k = 4*f0*C*V*sinc(k*pi*f0*t_edge)   (charging a pin/trace C from a square wave)
+#   band_noise  {f_lo, f_hi, i_rms_a}        flat current density between f_lo and f_hi
+# inject: current enters the network at `into` and leaves at `from` (the network closes the loop).
+# sync: true = frequency is an integer multiple of fs_out (200.02 kHz) or of the mic clock, so lines fold to 0 Hz (D14).
+# status: datasheet | derived | assumption (see params.yaml header).
+date: 2026-10-02
+aggressors:
+  - id: A01_SMPS_IN
+    desc: "core SMPS input current pulses (VDDSMPS pin pulled in 3 MHz bursts)"
+    inject: {from: U1.21, into: U1.22}
+    wave: {kind: pulse_train, f0: 3.0e+6, amp_a: 0.054, duty: 0.38, t_edge_s: 5.0e-9, nharm: 24}
+    sync: false
+    f_tol_frac: 0.2
+    status: derived/assumption
+    src: "f0 3 MHz typ, no min/max: DS13737 Rev10 Table 35 p.160. ripple 108 mA pp = Vout(1-D)/(L f) with 1.15 V, 2.2 uH, D=0.38 (sub-processing.md key numbers ~110 mA). amp = pp/2 as a rectangular pulse (conservative). t_edge 5 ns and f_tol 20 % are assumptions; whether the SMPS clock is locked to HCLK is unpublished"
+  - id: A02_SMPS_VDD11
+    desc: "L1 ripple current circulating in the VDD11 loop (C8, C9 and the die)"
+    inject: {from: U1.23, into: U1.24}
+    wave: {kind: triangle, f0: 3.0e+6, pp_a: 0.108, nharm: 24}
+    sync: false
+    f_tol_frac: 0.2
+    status: derived
+    src: "same ripple as A01 (VLXSMPS -> L1 -> VDD11)"
+  - id: A03_BRIDGE_CARRIER
+    desc: "bridge supply current at idle, AD modulation: +-ripple/2 sawtooth at 2x PWM (P source on +3V0 -> exciter -> N source -> R21)"
+    inject: {from: Q1.4, into: R21.1}
+    wave: {kind: sawtooth, f0: 400.045e+3, amp_a: 6.25e-3, nharm: 60}
+    sync: true
+    f_tol_frac: 0.0
+    status: derived
+    src: "spec D6: idle ripple Vbus/(4 L f) = 12.5 mA pp at 0.3 mH (L unmeasured, E1); supply current = +-i_L alternately in each state"
+  - id: A03b_BRIDGE_EDGES
+    desc: "P-FET/N-FET output-node charging spikes at every PWM edge (Coss of 4 FETs + trace C)"
+    inject: {from: Q1.4, into: R21.1}
+    wave: {kind: pulse_train, f0: 200.0225e+3, amp_a: 0.018, duty: 0.002, t_edge_s: 5.0e-9, nharm: 120}
+    sync: true
+    f_tol_frac: 0.0
+    status: assumption
+    src: "C_sw 60 pF (assumed; PMCXB290UE Coss not read) x 3 V / 10 ns = 18 mA; edges 10-30 ns (sub-output.md)"
+  - id: A04_BRIDGE_SHAPED_NOISE
+    desc: "noise-shaper residue in the coil current, 20-85 kHz (MP-01); not coherent with the carrier"
+    inject: {from: Q1.4, into: R21.1}
+    wave: {kind: band_noise, f_lo: 20000.0, f_hi: 85000.0, i_rms_a: 0.254e-3}
+    sync: false
+    status: derived
+    src: "coil-current noise -59 dB re FS-sine power (I_FS 0.32 A, so P_FS=0.0512 A^2): sqrt(0.0512*10^-5.9)=0.254 mA rms (spec D6 MP-01; pwm_ultrasonic_leak.py). Depends on L (E1) and on the shaper"
+  - id: A05_CPU_HOP
+    desc: "MCU supply current steps every DSP hop (0.64 ms): comb of lines at k*1562.5 Hz reaching the capture band"
+    inject: {from: U1.25, into: U1.24}
+    wave: {kind: pulse_train, f0: 1562.5, amp_a: 2.5e-3, duty: 0.68, t_edge_s: 1.0e-6, nharm: 120}
+    sync: false
+    f_tol_frac: 0.0
+    status: assumption
+    src: "hop 128 samples / 200.02 kS/s (sub-processing.md). dI = run 3.3 mA flat out minus ~0.8 mA waiting (A3 s5 interpolation, power.py); busy fraction 55-81 % (C2); 1 us edge assumed. Not a PWM-synchronous line: k*1562.5 Hz spans 20-96 kHz"
+  - id: A06_PDM_CLOCK_RETURN
+    desc: "4.0004 MHz mic clock edges charging the CLOCK pin and trace; return current runs through the mic GND pad and the plane back to the MCU"
+    inject: {from: U1.24, into: U2.3}
+    wave: {kind: cap_square, f0: 4.00045e+6, c_f: 8.0e-12, v: 3.0, t_edge_s: 3.0e-9, nharm: 25}
+    sync: true
+    f_tol_frac: 0.0
+    status: assumption
+    src: "C = ~5 pF pin + ~3 pF trace (assumed); tEDGE <= 3 ns is the mic's input limit (datasheet p.4), the GPIO edge is unknown"
+  - id: A07_USB_FS
+    desc: "USB full-speed D+/D- edges (docked only; the self-test and PWM-noise A/B run docked)"
+    inject: {from: U1.24, into: U6@GND}
+    wave: {kind: cap_square, f0: 6.0e+6, c_f: 20.0e-12, v: 3.3, t_edge_s: 10.0e-9, nharm: 12}
+    sync: false
+    f_tol_frac: 0.0003
+    states: [docked]
+    status: assumption
+    src: "12 Mb/s -> up to 6 MHz toggle; HSI48 + CRS, not locked to HCLK. 20 pF = ESD diode + traces + MCU pad (assumed)"
+  - id: A08_LED_PWM
+    desc: "power-LED PWM current on PB7 (return via MCU VSS and the plane to the cell). Frequency is a firmware choice (\"> 20 kHz\", sub-processing.md)"
+    inject: {from: J4.1, into: U1.24}   # Rev F: cell - lands on the shared GND pad J4
+    wave: {kind: pulse_train, f0: 25.0e+3, amp_a: 0.73e-3, duty: 0.5, t_edge_s: 100.0e-9, nharm: 8}
+    sync: false
+    f_tol_frac: 0.0
+    status: assumption
+    src: "LED current 0.14-0.73 mA on battery (sub-ui.md); f0 25 kHz is a placeholder INSIDE the capture band, to show why the plan must pick a multiple of fs_out or stay out of 20-96 kHz"
+victims:
+  - {id: V1_MIC_SUPPLY, probe: [U2.5, U2.3], class: mic_supply, desc: "mic VDD relative to its own GND pad: what the mic's PSRR sees"}
+  - {id: V2_MIC_GND_VS_MCU, probe: [U2.3, U1.24], class: ground_offset, desc: "mic GND relative to MCU VSS: PDM level reference and clock timing"}
+  - {id: V3_ADC_REF, probe: [U1.9, U1.8], class: adc_ref, desc: "VDDA relative to VSSA: ADC reference"}
+  - {id: V4_LDO_OUT, probe: [U4.1, U4.2], class: rail, desc: "LDO output at its own GND pin"}
+  - {id: V5_BRIDGE_RAIL, probe: [Q1.4, R21.2], class: bridge_rail, desc: "bridge P-source rail relative to the shunt's GND end: supply the legs see"}
+  - {id: V6_ISENSE_KELVIN, probe: [R21.2, U1.8], class: kelvin, desc: "plane drop between the shunt's GND end and MCU VSSA: adds to the PA6 reading"}
+# field-coupling declarations for couple.py (L2). voltage = swing on the net, current = declared current along the net (+1/-1 = direction along the net's drawn path, only the RELATIVE sign matters).
+field_aggressors:
+  - id: F01_BRIDGE_OUT
+    nets: {OUT_A: 1.0, OUT_B: -1.0}
+    current: {kind: triangle, f0: 200.0225e+3, pp_a: 0.0125, nharm: 40}
+    voltage: {kind: pulse_train, f0: 200.0225e+3, amp_a: 3.0, duty: 0.5, t_edge_s: 10.0e-9, nharm: 60}
+    sync: true
+    src: "coil ripple current and the 0-3 V OUT swing, 10-30 ns edges (sub-output.md); the two legs are driven as complements"
+  - id: F02_SMPS_LX
+    nets: {VLXSMPS: 1.0}
+    current: {kind: triangle, f0: 3.0e+6, pp_a: 0.108, nharm: 24}
+    voltage: {kind: pulse_train, f0: 3.0e+6, amp_a: 3.0, duty: 0.38, t_edge_s: 3.0e-9, nharm: 24}
+    sync: false
+    f_tol_frac: 0.2
+    src: "switch node; edge time assumed"
+  - id: F03_PDM_CLOCK
+    nets: {N$2: 1.0, MIC_CLK: 1.0}
+    current: {kind: cap_square, f0: 4.00045e+6, c_f: 8.0e-12, v: 3.0, t_edge_s: 3.0e-9, nharm: 25}
+    voltage: {kind: pulse_train, f0: 4.00045e+6, amp_a: 3.0, duty: 0.5, t_edge_s: 3.0e-9, nharm: 25}
+    sync: true
+    src: "PB3 -> R2 33R -> MIC_CLK; R2 sits at the mic end in the draft so the whole N$2 run carries the fast edge (sub-audio-in.md open issue 9)"
+roots:   # where the declared current enters each net (orients segments; OUT_B runs toward Q2 so its sign is -1 in F01)
+  OUT_A: Q1.3
+  OUT_B: Q2.3
+  VLXSMPS: U1.20
+  N$2: U1.39
+  MIC_CLK: R2.2
+  MIC_DATA: U2.1
+  MIC_VDD: U1.15
+field_victims:   # nets whose pickup is evaluated; `load_ohm` = Thevenin source/load for the unloaded-chain estimate
+  - {id: FV1_MIC_VDD, net: MIC_VDD, in_network: true, probe: V1_MIC_SUPPLY}
+  - {id: FV2_MIC_DATA, net: MIC_DATA, in_network: false, z_node_ohm: 150.0, c_node_pf: 10.0, src: "mic DATA drive: VOL/VOH 0.45 V at 2 mA = <= 225 ohm (datasheet p.4); load = MCU pin + trace (assumed 10 pF)"}
+  - {id: FV3_MIC_CLK, net: MIC_CLK, in_network: false, z_node_ohm: 33.0, c_node_pf: 8.0, src: "R2 33R drives the mic clock pin"}

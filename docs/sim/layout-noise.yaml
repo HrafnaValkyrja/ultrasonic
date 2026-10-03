@@ -1,0 +1,258 @@
+# SIM-LN: layout noise coupling simulation (the PCB as a noise path). Audience: other Claude instances.
+# Format rules (owner 2026-10-02): current state only; every fact carries src (file:symbol | spec Lnn | URL) + date; pointers not copies;
+# invariants are checkable thresholds; one 'why:' per non-obvious item. Dates ISO. Lnn = line in docs/spec.md as of 2026-10-02 (header says v0.14, content v0.15).
+# Thresholds below are READ BY sim/noise/budget.py --check-doc (drift = stale doc). Numbers in `results` belong to board sha in results.board_sha256; a different sha = stale.
+meta:
+  id: SIM-LN
+  date: 2026-10-02
+  scope: "ladder step C (O18 L644): bound, before the board order, how much of the pod's own noise the copper itself puts into the mic, the ADC and the bridge, in the bands that decide T6 L37 / R9 L602 / R21 L614 / D11 L210"
+  layout_agnostic: true   # reads any 4-layer .kicad_pcb with a filled In1 GND zone + hw/pod/bom_jlc.csv (values) + hw/pod/pod.net (stale-board check); the layout hold (simplification study) does not block it
+  code: [sim/noise/extract.py, sim/noise/budget.py, sim/noise/couple.py, sim/noise/lumped.py, sim/noise/plane.py, sim/noise/pcbgeom.py, sim/noise/alias.py, sim/noise/params.yaml, sim/noise/aggressors.yaml, sim/noise/smoke.sh]
+  outputs: "sim/noise/out/ (git-ignored by sim/noise/out/.gitignore): geometry.json, extract_report.txt, mic_vdd_path.sub, gnd_return.sub, l1_full.cir, budget.json, transimpedance.npz (freqs, aggressors, probes, Z[agg,probe,f] complex), noise_budget.png (dark), IF-MIC-VDD-NOISE.json"
+  last_run: {date: 2026-10-02, cmd: "sim/noise/smoke.sh", board: hw/pod/draft_r1/fanout/pod_r1_routed.kicad_pcb, board_sha256_16: 8712672846e0729d, wall_s: 4.1, peak_rss_mb: 316, fence: "systemd-run --user --scope -p MemoryMax=3G -p MemorySwapMax=0", sweep: {cmd: "budget.py --sweep", wall_s: 29, peak_rss_mb: 313}}
+  selfchecks_2026-10-02: {ngspice45_vs_internal_MNA_max_rel_err: 8.0e-07, L2_vs_closed_form: {grover_free_M: 0.0003, image_line_M: 0.027, image_wire_Cm: 0.080}, alias_pwm_and_mic_clock_fold_to_dc: pass, csv_period_import_vs_analytic_pulse_train_rel_err: 0.000, netlist_vs_board: "200/200 pads, 0 mismatches vs hw/pod/pod.net (2026-10-02)", plane_raster_area_mm2: {raster: 381.1, zone: 381.03}}
+  honesty: "The copper is the part of this model we can read from the board; the numbers that decide pass/fail (mic PSRR above 1 kHz, mic ultrasonic noise floor, MCU die and LDO small-signal impedance, SMPS clock tolerance) are unmeasured assumptions (section uncertainties). A pass here means 'the layout is not the limiting term under these assumptions', not 'quiet'."
+abbr:
+  PSRR: "mic power-supply rejection; the datasheet gives dBV/FS, read here as dBFS of output spur per 1 V rms of supply ripple"
+  FS: digital full scale; dBFS here = rms relative to a full-scale sine rms (datasheet convention for sensitivity and SNR)
+  PDM: pulse-density modulation, the mic's 1-bit output at the mic clock (4.00045 MHz)
+  CIC5: "5th-order cascaded integrator-comb decimator (sinc^5), first stage of ADF1 (STM32U575 audio digital filter), /5"
+  RSFLT: "ADF1 reshape filter after the CIC, /4; response unpublished (R18)"
+  fs_pdm / fs_out: "4.00045 MHz mic clock / 200.0225 kHz PCM and PWM rate (HCLK 80.009 MHz /20, /400; A3 plan s2)"
+  window: "frequency band n*fs_pdm +-(20..96 kHz) that the CIC does not attenuate (it nulls at multiples of 800 kHz that are not multiples of 4 MHz); anything there folds 1:1 into the capture band"
+  MNA: modified nodal analysis (the linear AC solver in lumped.py)
+  PEEC: partial-element equivalent circuit (own-code L3 option)
+  L1/L2/L3: "analysis layers: lumped R+L network + SPICE / filament mutual L and C / field or PEEC solve on a crop"
+  Kelvin error: "voltage that a shared copper path adds to a measurement made across a shunt"
+  T(f): "plane transmission 1/sqrt(1+(f/f_c)^2): fraction of magnetic flux that leaks through the 15 um In1 sheet"
+  IF-*: "interface contract with a sibling sim (docs/sim/e2e-chain.yaml interfaces)"
+  E/O/R/D/T-n: "owner measurement / owner decision / risk / decision / success test in docs/spec.md"
+run:
+  smoke: "sim/noise/smoke.sh [board.kicad_pcb]   # fenced, read-only on the board, ~4 s, ~0.3 GB"
+  full: "source tools/env.sh && systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 python3 sim/noise/extract.py [board] --selfcheck --budget   # budget.py alone: add --sweep for assumption sensitivity, --no-l2 to skip field coupling"
+  pythons: {venv: /opt/ultrasonic-tools/venv, python: 3.14, numpy: 2.5.3, scipy: 1.18.1, matplotlib: 3.11.2, PyYAML: 6.0.3, kicad: 10.0.6 (pcbnew), ngspice: 45.2, src: "pip list + apt-cache policy, 2026-10-02"}
+  never: [FreeRouting, hw/pod/place.py, hw/pod/place_r1.py, any autorouter, any run without the 3 GB fence]
+watch:   # re-run after any of these change; suggest a plm.py relation (lead adds, not this agent)
+  rerun_when: ["hw/pod/*.kicad_pcb (routing, stackup, zone fill, any component move)", "hw/pod/gen.py / pod.net (nets, values)", "hw/pod/bom_jlc.csv (cap/inductor values)", "spec D6/D11/D13/D14 numbers", "firmware: LED PWM f, hop rate, mic clock divider, SMPS range policy", "mic PSRR or noise-floor measurement (E3/S2)"]
+  plm_relation_proposal: {id: R-LAYOUT-NOISE, watches: [hw/pod/draft_r1/fanout/pod_r1_routed.kicad_pcb, hw/pod/pod.net, hw/pod/bom_jlc.csv, sim/noise/aggressors.yaml, sim/noise/params.yaml], items: [reg-board, sub-audio-in, sub-processing, sub-output]}
+
+# ------------------------------------------------------------------------------------------------ requirements chain
+inputs:   # all read-only
+  board: {what: ".kicad_pcb read with pcbnew 10.0.6: tracks (layer, width, ends), vias (drill, span, net), pads (ref.num, net, bbox), filled zones, footprint refs", must_have: "4 copper layers, filled In1 GND zone; unrouted nets are detected and flagged INVALID", src: sim/noise/pcbgeom.py:load}
+  stackup: {order: "board file (stackup) block, else DEFAULT_STACKUP: F 35 um, prepreg 0.0994 (er 4.05), In1 15.2, core 0.4804 (er 4.6), In2 15.2, prepreg 0.0994, B 35", src: "hw/pod/kicad-draft/pod.kicad_pcb:39-55 (the earlier draft); NOT in the draft_r1 board (board says 1.6 mm, reg-board open issue 2); JLC impedance page is JavaScript-rendered, not verifiable 2026-10-02", status: unverified}
+  values: {src: "hw/pod/bom_jlc.csv Comment column by ref (100n, 2u2, 0.1 ...)", model_params: sim/noise/params.yaml}
+  netlist: {src: hw/pod/pod.net, use: "pad->net comparison; mismatch = board is stale vs the schematic"}
+  aggressors: {src: sim/noise/aggressors.yaml, form: "waveform (pulse_train | sawtooth | triangle | cap_square | band_noise | csv_period {path, f0, nharm, t_col, i_col}: one period of a sim/spice CSV, FFT to harmonics) + injection pads + sync flag + frequency tolerance + status; replace analytic waveforms by sim/spice exports when they exist (IF-AGGRESSOR-I below)"}
+outputs:
+  per_net: "segments, length per layer, width, vias, pads (geometry.json)"
+  spice: "MIC_VDD_PATH (ports U1_15 PA5, C13_1, U2_5), GND_RETURN (49 pad ports), l1_full.cir (flat, node 0 = cell GND pad J4.1 (Rev F shared GND pad; was J6.1)); element = R, L (per segment/via/plane link), caps with ESR/ESL"
+  spectra: "victim-node ripple per aggressor line at 693 frequencies (budget.json rows, other)"
+  margins: "spur dBFS at the mic output vs the tone/band limits, nominal and pessimistic PSRR; ranked worst first (budget.json rows + l2_rows)"
+  features: "per top row: share of the transimpedance by trace segment / via / plane link / component (reciprocity), layout_share_pct (budget.json rows[].features)"
+  l2: "M and Cm between aggressor and victim nets with the two bounding models and the top piece pair (budget.json l2_pairs)"
+  if_e2e: "IF-MIC-VDD-NOISE.json (format in docs/sim/e2e-chain.yaml): z_rail(f), bridge-current-to-mic-VDD transfer, background lines and PSD"
+
+# ------------------------------------------------------------------------------------------------ threat model
+bands:
+  capture: {hz: [20000, 85000], scored_alias_band_hz: [20000, 96000], src: "spec L314 s5.1 usable ~20-85 kHz; MVP L29 says 20-96", note: "mic characterised only to 80 kHz (D13 L224)"}
+  output: {hz: [1500, 4000], src: "spec D9 L203"}
+  protect: {hz: [8000, 16000], src: "spec s6 L344: bone-conduction thresholds there track normal hearing, owner hears high; shaper zeros at 13 kHz (D6 L153)"}
+  below_capture: {removed_by: "band-floor high-pass at the D10 frequency (spec L207, s5.1 L314)", consequence: "a spur that lands under 20 kHz after the chain is not translated; one that lands in 20-96 kHz is"}
+chain:   # what an interference line at f_in becomes; implemented in sim/noise/alias.py (selftest passes)
+  rule_1: "PDM sampling at fs_pdm folds f_in to fold(f, fs_pdm); CIC5 /5 folds again at 800.09 kS/s; RSFLT /4 folds at fs_out; total attenuation = CIC5(f_in) + RSFLT(f2)"
+  rule_2: "a line that is an integer multiple of fs_out or fs_pdm lands at exactly 0 Hz and is removed (D14 L241 coherence); verified for harmonics 1-39 of the PWM and 1-9 of the mic clock"
+  rule_3: "unprotected windows: n*4.00045 MHz +-(20..96 kHz) pass the CIC at ~0 dB; elsewhere the CIC nulls give -70 .. -140 dB"
+  rsflt_assumption: {model: "0 dB to 88.8 kHz, -70 dB from 111.2 kHz, linear in dB between", status: unverified, src: "docs/research/A3-u575-plan.md s1.2; R18 L610 (response unpublished)"}
+  smps_coincidence: {fact: "the core SMPS runs 3 MHz typ (DS13737 Rev10 Table 35 p.160, no min/max, 1.5 MHz below VDD 1.9 V); its 4th harmonic 12.000 MHz sits 1.35 kHz from 3*fs_pdm = 12.00135 MHz, so harmonics 4, 8, 12 ... are always inside a window", consequence: "if the SMPS clock is free-running with tolerance t, harmonic 4 beats against the mic clock at 1.35 kHz +-12 MHz*t: a deviation of 0.17..0.8 % (either sign) puts it in 20-96 kHz as a whine that moves with load and temperature", src: "alias.py fs_pdm_scan / window_scan 2026-10-02; lock to HCLK unpublished (sub-processing open issue 9)", status: "coincidence derived; coupling amplitude is small (see results), tolerance unknown"}
+  fs_pdm_knob: {src: "alias.py fs_pdm_scan (3.0 MHz SMPS, harmonics k<=24 within 100 kHz of n*fs_pdm)", table: {"/18 4.44494 MHz": none, "/20 4.00045 MHz": "k=4,8,12,16,20,24 at -1350..-8100 Hz", "/22 3.63677 MHz": "k=17 (+85 kHz), 23 (-99 kHz)", "/24 3.33371 MHz": "k=10, 20 at -3375, -6750 Hz", "/26 3.07727 MHz": "k=1 at -77 kHz (fundamental in a window)"}, note: "divider must be even (D14); /18 is the A3 'band-edge' option (247 kS/s per spec L271); changes fs_out and the PWM tie, so a firmware/clock decision, not a layout one"}
+aggressors:   # full waveform tables: sim/noise/aggressors.yaml#<id>; every amplitude has a status there
+  A01_SMPS_IN: {what: "core SMPS input current pulses, VDDSMPS U1.21 -> VSS U1.22", f: "3.0 MHz +-20 % (assumed tolerance)", sync: false, src: "DS13737 Rev10 Table 35 p.160; ripple 108 mA pp derived L=2.2 uH Vout 1.15 V D=0.38; sub-processing.md key numbers"}
+  A02_SMPS_VDD11: {what: "L1 ripple current into C8/C9, VDD11 U1.23 -> U1.24", f: "3.0 MHz", sync: false}
+  A03_BRIDGE_CARRIER: {what: "idle AD ripple as bridge supply current, sawtooth +-6.25 mA at 400.045 kHz, Q1.4 (+3V0) -> R21.1", sync: true, src: "spec D6 L153: Vbus/(4 L f) = 12.5 mA pp at 0.3 mH; L unmeasured (E1)"}
+  A03b_BRIDGE_EDGES: {what: "FET output-node charging spikes at every PWM edge, 18 mA x 10 ns", f: "n*200.0225 kHz", sync: true, status: "assumption (C_sw 60 pF)"}
+  A04_BRIDGE_SHAPED_NOISE: {what: "noise-shaper residue in the coil current, 0.254 mA rms flat over 20-85 kHz", sync: false, src: "spec D6 MP-01 L153: -59 dB re FS current, I_FS 0.32 A; sub-output.md key numbers", why: "the only aggressor whose lines are not coherent with fs_out yet sits inside the capture band: shared rail/ground is its path"}
+  A05_CPU_HOP: {what: "MCU supply steps every 0.64 ms hop: comb at k*1562.5 Hz, 2.5 mA x duty 0.68", sync: false, status: "assumption (dI, 1 us edges)", src: "sub-processing.md firmware architecture; power.py; C2 busy 55-81 %", why: "not a PWM-coherent line and its harmonics 13-61 span 20-96 kHz"}
+  A06_PDM_CLOCK_RETURN: {what: "mic clock edges charging pin+trace C (8 pF), return through U2.3 -> plane -> U1.24", f: "4.00045 MHz odd harmonics", sync: true}
+  A07_USB_FS: {what: "D+/D- edges, docked only (self-test and PWM-noise A/B run docked)", f: "6 MHz toggle +-300 ppm", sync: false, states: [docked]}
+  A08_LED_PWM: {what: "PB7 open-drain LED current 0.73 mA; f is a firmware choice, '> 20 kHz' (sub-processing.md); placeholder 25 kHz INSIDE the capture band", sync: false, status: "placeholder"}
+  F01_BRIDGE_OUT: {what: "OUT_A/OUT_B coil ripple current and 0-3 V swing (field model, legs complementary, sign +1/-1)", sync: true}
+  F02_SMPS_LX: {what: "VLXSMPS switch node: 108 mA pp ripple current and 3 V swing", sync: false}
+  F03_PDM_CLOCK: {what: "N$2 + MIC_CLK: 3 V swing and C dV/dt current", sync: true}
+  not_modelled: ["charger: BQ25180 is linear (D11 L210), only DC 170 mA IR drops, see dc_rail_paths", "I2C 400 kHz: configuration bursts only, pull-ups ~0.3 mA", "exciter wires up the arm and the shell: not on the board", "ADC charge kicks: not rail-borne at these levels", "MLCC piezo singing (C14 22 uF X5R, spec s6 capacitor rule L344) and L1 magnetostriction (D11): mechanical self-hearing, owner listening E7/E11"]
+victims:   # probe pads resolve on any board; sim/noise/aggressors.yaml#victims
+  V1_MIC_SUPPLY: {probe: [U2.5, U2.3], mechanism: "mic PSRR sees VDD relative to its own GND pad", limit: LN-M01}
+  V2_MIC_GND_VS_MCU: {probe: [U2.3, U1.24], mechanism: "PDM level reference and clock timing; bits are digital (VOL <= 0.45 V, datasheet p.4) so ground shift matters only in the 100 mV class", limit: informational}
+  V3_ADC_REF: {probe: [U1.9, U1.8], mechanism: "VDDA is the ADC reference, no VREF+ pin (A3 s3)", limit: LN-M04}
+  V4_LDO_OUT: {probe: [U4.1, U4.2], limit: informational}
+  V5_BRIDGE_RAIL: {probe: [Q1.4, R21.2], mechanism: "AD output is (2d-1)*VDD: silence is exactly zero for balanced legs, rail ripple appears at (leg asymmetry) * ripple", limit: LN-M05}
+  V6_ISENSE_KELVIN: {probe: [R21.2, U1.8], mechanism: "PA6 reads V(R21.1)-V(U1.8) so the copper between R21.2 and U1.8 adds to the 0.1 ohm shunt", limit: LN-M03}
+  FV2_MIC_DATA: {net: MIC_DATA, mechanism: "pickup on the PDM data line (z 150 ohm, 10 pF)", limit: LN-M02}
+  FV3_MIC_CLK: {net: MIC_CLK, mechanism: "pickup on the clock into the mic (z 33 ohm, 8 pF)", limit: LN-M02}
+paths:
+  P1_shared_rail: {mech: "aggressor current x impedance of +3V0 (LDO Zout, 0.1 mm tracks, C14/C7 ...) -> MCU die VDD -> PA5 (R_out ~50 ohm) -> MIC_VDD, filtered by PA5 R x C13 (100 nF, ~90 nF after derating): pole ~35 kHz at 50 ohm, ~18 kHz at 100 ohm", controls: "track width/length U4.1 -> U1 VDD pins, C13 placement, PA5 pin R, decoupling placement", layer: L1}
+  P2_shared_ground: {mech: "return currents through In1 and the pad stubs/vias between aggressor and victim ground pads", controls: "GND stub length/width at the victim pad (0.1 mm tracks are 4.9 mohm/mm), via count, In1 cuts", layer: "L1 mesh; L3 if In1 is slotted near the mic", regime: "resistive below f_c ~1 MHz, inductive above"}
+  P3_magnetic: {mech: "mutual inductance between loop of aggressor trace+return and victim loop", controls: "parallel run length and separation, layer (cross-side screened above ~1 MHz), loop height to In1", layer: L2}
+  P4_electric: {mech: "mutual capacitance to a high-impedance victim", controls: "parallel run on the same layer; the plane screens E at every frequency", layer: L2}
+  P5_psrr: {mech: "mic converts supply ripple to output spur", status: "datasheet gives one point at 1 kHz; nothing above (S2 closes)"}
+  P6_alias: {mech: "folding of lines above fs_out by the decimation chain", layer: "alias.py"}
+  P7_bridge_asymmetry: {mech: "rail ripple x (leg mismatch) at the exciter; mismatch from OUT_A vs OUT_B route R and C, P vs N Rds(on) (0.88 vs 0.34 ohm typ, sub-output.md)", layer: "L1 + geometry compare"}
+  P8_mechanical: {status: "not in this sim (MLCC piezo, L1 magnetostriction, structure-borne exciter leak: IF-ACOUSTIC-LEAK of the e2e sim)"}
+
+# ------------------------------------------------------------------------------------------------ mic data and thresholds
+mic:   # SPH0641LU4H-1, Syntiant datasheet Rev B-1 (2 Dec 2024), local copy ~/Desktop/ultrasonic-scratch/sph0641_sq.pdf (page header carries a template error naming SPC18P8LM4H-1: docs/research/datasheet-provenance.md); no online copy opened (web search budget was exhausted 2026-10-02)
+  psrr: {ultrasonic_mode: "55 dBV/FS, 200 mVpp sine @1 kHz (p.3)", standard_mode: "55 dBV/FS (p.3)", low_power_mode: "59 dBV/FS (p.4)", psr_n: "-84 dBFS(A), 100 mVpp square @217 Hz (p.3)", above_1khz: "NOT SPECIFIED", reading: "output spur = -55 dBFS per 1 V rms ripple; cross-check 50 mV rms -> -81 dBFS unweighted, -84 A-weighted: consistent (derived 2026-10-02)", status: interpretation}
+  noise: {sens_dbfs_at_94spl: -26, snr_dba: 64.3, noise_dbfs_a: -90.3, ein_dbspl_a: 29.7, ultrasonic_floor: "NOT SPECIFIED (E3)", src: "datasheet p.3 ultrasonic table; derived: noise = -26 - 64.3"}
+  floor_model: {white_extrapolation: "A-weighted ENBW 12467 Hz (computed from the A curve, budget.py a_weight_enbw) -> -131.26 dBFS/rtHz; per 781.25 Hz bin -102.33 dBFS; over 20-85 kHz -83.13 dBFS", scenarios_db: {optimistic: -6, white: 0, pessimistic: 8}, status: "assumption: the audio-band density continues flat to 85 kHz"}
+  psrr_scenarios: {nominal: "flat -55 dBFS/V to 1 MHz", pessimistic: "20 dB worse above 20 kHz (ballpark of a -20 dB/dec roll-off from 10 kHz; the e2e sim's 'rolloff' case is -20 dB/dec from 1 kHz, harsher)"}
+  pins: {VDD: U2.5, GND: "U2.3 (+ U2.2 SELECT tied to GND)", CLOCK: U2.4, DATA: U2.1, supply_range_v: [1.62, 3.6], clock_edge_ns_max: 3, cload_pf_max: 140, src: "datasheet p.2, p.4, p.9"}
+thresholds:   # budget.py --check-doc compares these with its own derivation
+  tone_limit_dbfs: {value: -112.33, derive: "bin floor (white) -102.33 minus margin 10 dB: injected tone adds <= 0.41 dB to its FFT bin", applies: "each line that lands in 20-96 kHz after the chain, per 781.25 Hz bin (spec s5.2: 256-pt FFT)"}
+  band_limit_dbfs: {value: -93.13, derive: "20-85 kHz floor (white) -83.13 minus 10 dB", applies: "noise-like aggressors (A04) integrated over 20-85 kHz"}
+  margin_signoff_db: {pessimistic_psrr: 10, why: "model error on L/C ~ +-10 dB (section limits); LN-M01 >= 0 is pass, >= 10 is sign-off"}
+  digital_pickup_v_pk: {value: 0.1, derive: "VOL <= 0.45 V and VIL = 0.3 VDD (datasheet p.4): 100 mV pk (sum of harmonics) = 4.5x margin", margin_db_min: 12}
+  kelvin_pct_max: {value: 2.0, derive: "I_SENSE gain error budget: R21 0.1 ohm; 2 % = 2 mohm. Design choice: the error is systematic and can be calibrated out at E1/F4", owner: "decides whether to enforce or to calibrate"}
+  adc_ref_mv_pk_max: {value: 0.37, derive: "0.5 LSB of 12 bit at 3.0 V = 0.366 mV, lines <= 16 kHz (R22/C22 pole), PA6 self-test band"}
+  bridge_rail_uv_rms_max: {value: 50, derive: "shaper noise -93 dB re FS 0.2-8 kHz (spec D6 L153) x 3.0 V = ~50 uV rms; ripple x 10 % leg asymmetry (assumed) must stay under it", band_hz: [1500, 8000]}
+  e2e_ripple_mv_rms_max: {psrr_flat55: 10.0, psrr_rolloff: 0.3, src: "docs/sim/e2e-chain.yaml IF-MIC-VDD-NOISE.requirement_from_e2e (sweep 2026-10-02)"}
+metrics:
+  LN-M01: {name: "mic supply spur margin, worst line or band, pessimistic PSRR", pass: ">= 0 dB, sign-off >= 10 dB", covers: "A01-A08 conduction + F02 magnetic/electric into MIC_VDD"}
+  LN-M02: {name: "PDM line pickup margin (sum of harmonics vs 100 mV)", pass: ">= 12 dB", covers: "F01-F03 into MIC_DATA, MIC_CLK"}
+  LN-M03: {name: "I_SENSE Kelvin error, % of R21 at 5 kHz", pass: "<= 2 %"}
+  LN-M04: {name: "ADC reference ripple, lines <= 16 kHz, mV pk", pass: "<= 0.37"}
+  LN-M05: {name: "bridge rail ripple 1.5-8 kHz x 10 % leg asymmetry, uV rms", pass: "<= 50"}
+  LN-M06: {name: "ripple at mic VDD 1-100 kHz, background lines + noise, mV rms (excludes the bridge's own audio-band supply current)", pass: "<= 10 if PSRR flat, <= 0.3 if PSRR rolls off (e2e requirement)", why: "dominated by the 1.5625 kHz hop-rate fundamental, which the band-floor high-pass removes; the 20-100 kHz part is the one that is translated"}
+
+# ------------------------------------------------------------------------------------------------ method and limits
+layers:
+  L1:
+    what: "pcbgeom -> per-net R (rho l/(w t)) + loop L (Hammerstad microstrip Z0air/c over In1) per segment, via barrels, In1 as resistive mesh (0.1 mm pitch, Kron-reduced to the GND vias), component models, MNA solve; SPICE emitted from the same element list"
+    cost: "~1.5 s extract, ~2 s per 700 frequencies x 9 aggressors x 6 probes, 0.3 GB; ngspice 45 cross-check <1 s"
+    enough_when: "every LN-M01 line has >= 20 dB nominal and >= 10 dB pessimistic margin and no assumption flagged below can move a term by more than that margin (see sweep)"
+    code: [sim/noise/lumped.py, sim/noise/plane.py, sim/noise/budget.py]
+  L2:
+    what: "filament pieces (<= 0.25 mm) at layer heights over In1; M by Neumann sum, Cm by charge model; M(f) = M_img + T(f)(M_free - M_img); Cm always with plane image; uniform current along an aggressor net (upper bound on branches)"
+    cost: "~1.5 s, 0.3 GB"
+    enough_when: "digital-line pickup >= 12 dB under 100 mV and mic-VDD pickup >= 20 dB above the conduction rows"
+    validated_against: "Grover free-space M 0.03 %, image-line M' 2.7 %, image-wire Cm 8 % (couple.selftest, 2026-10-02)"
+    code: [sim/noise/couple.py]
+  L3:
+    what: "field or PEEC solve on a cropped region only"
+    cost: "see heavy_runs; <= 4 GB, one job at a time, owner-triggered after the research swarm"
+    gate: "run L3 only if ANY: (a) LN-M01 pessimistic margin < 12 dB for a line whose path is a copper feature; (b) a layout feature the filament/mesh model cannot represent sits within 3 mm of U2 or on a victim path (In1 slot/neck, plane cut by the port keep-out, antipad cluster, In2 pour); (c) bring-up spur exceeds the L1/L2 prediction by > 10 dB (model failed, LN-R12); (d) stackup change (In2 as plane, 1.6 mm board)"
+limits:   # quasi-static approximation on a 34 x 13 mm board, 15.2 um In1, 35 um outer copper; src: derived 2026-10-02 (rho 1.72e-8 ohm m)
+  electrical_size: "lambda/10 = 340 mm needs f < ~500 MHz in FR4: size is not the limit up to 100 MHz (board = lambda/50 there); component ESL/SRF and via models are: lines above 30 MHz are not scored (params model.f_max_net_hz), digital pickup scored to 100 MHz"
+  skin_depth_um: {"200 kHz": 148, "1 MHz": 66, "4 MHz": 33, "30 MHz": 12.1, "100 MHz": 6.6}
+  skin_effect: "35 um traces: R_ac/R_dc ~1.0 at 200 kHz, ~1.1-1.3 at 4 MHz (estimate; not modelled, within model error); In1 15.2 um: delta > t up to ~40 MHz, sheet R stays 1.13 mohm/sq"
+  plane_crossover: {f_c_hz: 955000, formula: "R_s/(pi mu0 d), R_s 1.132 mohm/sq, d 0.3 mm", T: {"200 kHz": 0.98, "1 MHz": 0.69, "4 MHz": 0.23, "30 MHz": 0.03}}
+  at_200_khz: "BELOW f_c: In1 is a resistive spreader, return current does not hug the trace; shared-ground noise = I x mesh R (L1 mesh is right); loop L from the image model over-states L (irrelevant: wL = 6 mohm on a 10 mm trace vs R 50 mohm); magnetic flux passes the sheet (T 0.98), so 'free' M applies and cross-side pairs are NOT screened"
+  at_4_mhz: "ABOVE f_c: return hugs the trace, image L' applies (0.37 nH/mm F.Cu, 0.69 nH/mm B.Cu, 0.1 mm wide); the sheet screens only 12.7 dB, so cross-side magnetic coupling is T = 0.23 of the free value, not zero"
+  crossover_decade: "0.3-3 MHz holds PWM harmonics 2-15: neither pure model holds, expect x2-3 on L; harmless for sync lines (they fold to 0 Hz), matters for A01/A02 (3 MHz)"
+  not_captured: ["pad joins use the pad's axis-aligned bounding box: custom-shape pads over-join (U2 pad 3 GND ring, bbox 1.6 x 1.6 mm)", "plane current detours around slots/necks at HF (mesh is resistive only)", "mutual L between series segments of one net and between GND stubs", "trace-to-plane C (only mutual C between nets, in L2)", "via pad C, antipad leakage of E field through the plane", "pad/solder and component body parasitics beyond ESL", "exciter wires (80 mm pair up the arm) and the shell"]
+  regime_error_budget: "judgement, unverified: R +-15 % (mesh pitch 0.2 -> 0.1 mm moved plane R 2.575 -> 2.290 mohm, 11 %), loop L x2, mutual L x2-3 near f_c, Cm +-30 %; hence the 10 dB sign-off margin"
+
+# ------------------------------------------------------------------------------------------------ tool survey (FOSS only; licences read from the repos 2026-10-02)
+tools:
+  - {name: ngspice 45.2, licence: BSD-3-Clause, installed: true, role: "runs the emitted decks; transient L3-lite (H4)", evidence: "/usr/share/doc/ngspice/copyright 'License: BSD-3-clause' (2026-10-02)"}
+  - {name: "KiCad 10.0.6 (pcbnew, kicad-cli)", licence: "GPL (Debian copyright lists GPL)", installed: true, role: "board read; kicad-cli pcb export step for L3 geometry", evidence: "/usr/share/doc/kicad/copyright"}
+  - {name: "numpy 2.5.3, scipy 1.18.1, matplotlib 3.11.2, PyYAML 6.0.3, scikit-fem 12.0.2", licence: "BSD-3-Clause / BSD-3-Clause / PSF-based / MIT / BSD", installed: true, role: "mesh solve (scipy.sparse splu), MNA, raster (matplotlib.path), config; scikit-fem unused so far (2-D cross-section E solve is the L2.5 option)", evidence: "importlib.metadata licence fields on this machine"}
+  - {name: "Elmer FEM (ElmerSolver, ElmerGrid)", licence: "GPL-2.0 (ElmerGrid, most solver modules) + LGPL-2.1 (ElmerSolver library)", installed: false, role: "L3 magnetodynamics / electrostatics on a cropped 3-D model", evidence: "https://github.com/ElmerCSC/elmerfem README badges + license_texts/ElmerLicensePolicy.md, read 2026-10-02", footprint: "no apt candidate in this machine's index (apt-cache policy elmerfem-csc empty 2026-10-02) -> build from source (cmake + gfortran + MPI); build tree ~1.5-2 GB, 30-60 min (unverified)", recommendation: "defer: install only if the L3 gate trips"}
+  - {name: "Gmsh 4.14.0", licence: "GPL-2.0-or-later with a linking exception", installed: false, role: "meshing for Elmer from kicad-cli STEP", evidence: "https://github.com/live-clones/gmsh LICENSE.txt, read 2026-10-02", footprint: "apt candidate 4.14.0+ds1-1build4; libgmsh4.14 installed size ~19 MB", install_needed: "sudo apt install gmsh (only with Elmer)"}
+  - {name: "openEMS + CSXCAD", licence: "GPL-3.0 / LGPL-3.0", installed: false, role: "FDTD full wave", evidence: "https://github.com/thliebig/openEMS COPYING (GPL v3), https://github.com/thliebig/CSXCAD COPYING (LGPL v3), read 2026-10-02", footprint: "no apt candidate here; source build ~1 GB (unverified)", recommendation: "NOT recommended below ~100 MHz: time-domain stiffness (15 um copper, 100 um dielectric) makes 20-60 M cells for a 34 mm board; use only for the arm-wire pair at >= 100 MHz if ever needed"}
+  - {name: "gerber2ems (antmicro)", licence: Apache-2.0, installed: false, role: "KiCad/Gerber -> openEMS S-parameter flow", evidence: "https://github.com/antmicro/gerber2ems LICENSE, read 2026-10-02", recommendation: "not needed"}
+  - {name: scikit-rf, licence: BSD-3-Clause, installed: false, role: "Touchstone post-processing if an L3 solver returns S-parameters", evidence: "https://github.com/scikit-rf/scikit-rf LICENSE.txt, read 2026-10-02", footprint: "pip, ~10 MB", recommendation: "not needed now"}
+  - {name: Qucs-S, licence: GPL-2.0, installed: false, role: "GUI lumped/S-parameter sim", evidence: "https://github.com/ra3xdh/qucs_s (GitHub licence GPL-2.0, COPYING), read 2026-10-02", recommendation: "redundant with ngspice; no"}
+  - {name: Magpylib, licence: BSD-2-Clause, installed: false, role: "magnet/loop fields", evidence: "GitHub API licence field 2026-10-02", recommendation: "not needed; own Neumann code validated to 0.03 %"}
+  - {name: "FastHenry (MIT original 3.0, ediloren/FastHenry2 master)", licence: "NOT FOSS: 1994 MIT agreement 'Permission to use, copy and modify for internal, noncommercial purposes ... Any distribution ... strictly prohibited without prior written consent of M.I.T.'", installed: false, role: "would be the PEEC reference", evidence: "header of src/fasthenry/induct.h and 17 more of 87 source files; no LICENSE file; GitHub licence field null; fastfieldsolvers.com/license.htm gave no terms (all read 2026-10-02)", recommendation: "excluded by owner rule 3; replacement = own PEEC (H1)"}
+  - {name: "FastCap2 (ediloren/FastCap2 master)", licence: "permissive MIT-style notice in all 42 source files ('License to use, copy, modify, sell and/or distribute ... for any purpose ... without royalty', 2003 MIT), but NO licence file and not an SPDX text; the 1992 user-guide agreement is noncommercial (commented out in doc/ug-license.tex)", installed: false, role: "capacitance extraction only", evidence: "src/zbufProj.c header and grep over 42 files, 2026-10-02", recommendation: "does not meet 'OSI licence verified from the licence file'; not needed (couple.py does Cm, validated to 8 %)"}
+  - {name: "own code (this scaffold)", licence: "repo", installed: true, role: "L1/L2 and the PEEC option", why: "a small custom extractor is allowed by the brief and is the only layout-agnostic option that needs no install"}
+
+# ------------------------------------------------------------------------------------------------ results on the draft board
+results:   # board hw/pod/draft_r1/fanout/pod_r1_routed.kicad_pcb; draft, NOT the layout (owner layout O14 on hold); src: sim/noise/out/*.json 2026-10-02
+  board_sha256: 8712672846e0729d
+  board: {size_mm: [34.05, 13.05], segments: 698, vias: 120, pads: 200, nets: 41, track_widths_mm: [0.1, 0.15], note: "every signal and rail track is 0.1 mm (0.15 on some GND stubs)", plane: {zone_mm2: 381.03, polygons: 1, sheet_mohm_sq: 1.132, gnd_vias: 47, mesh_cells: 38111}}
+  nets_mm: {MIC_VDD: {F: 2.48, B: 9.28, total: 11.76, vias: 1}, MIC_DATA: {F: 0.79, In2: 11.75, B: 1.16, total: 13.71}, N$2: {F: 1.74, In2: 14.29, B: 0.61, total: 16.64}, MIC_CLK: {B: 3.62}, VLXSMPS: {F: 6.84}, VDD11: {F: 17.35, In2: 29.21}, OUT_A: {F: 6.35, In2: 12.21, B: 2.33}, OUT_B: {F: 9.50, B: 12.11}, BRIDGE_RTN: {F: 0.66, In2: 8.80, B: 10.01}}
+  network_L1: {nodes: 861, elements: 1323, floating_pads: none, mic_vdd_path: {R_ohm: 0.054, L_nH: 6.9, from: "U1.15 PA5 to U2.5"}}
+  plane_dc_mohm: {mic_gnd_to_mcu_vss: 2.82, shunt_gnd_to_mcu_vssa: 2.752, mcu_vss_to_cell_neg: 3.543, mic_bypass_gnd_to_mcu_vss: 2.44, note: "plane only, nearest GND via of each pad; pad stubs and via barrels add (LN-M03)"}
+  rail_paths_dc_mohm: {"U4.1->Q1.4": 157.5, "U4.1->Q2.4": 183.9, "U4.1->U1.25": 72.7, "U4.1->U1.21": 107.1, "U1.15->U2.5": 55.3, "Q1.1->R21.1": 33.6, "U2.3->U1.24": 18.3, "C13.2->U2.3": 17.7, "C13.2->U1.24": 7.2, "R21.2->U1.8": 9.4, "U1.24->J6.1": 8.9, "C14.2->R21.2": 10.2, at_0p32_A_mv: {"U4.1->Q1.4": 50, "U4.1->Q2.4": 59}, note: "pad-to-pad copper incl. stubs, vias and the In1 mesh, inductors shorted, caps open; full-scale peak 0.32 A (sub-output.md); rails go to the power sim (rail capacity, ECR-0005)"}
+  metrics:
+    LN-M01: {value_db_pessimistic: 24.6, value_db_nominal: 44.6, ok: true, at: "A05_CPU_HOP line 21875 Hz (hop harmonic 14), 8.1 uV rms at U2.5, spur -156.9 dBFS nominal / -136.9 pessimistic vs -112.3", next: "A04 shaped noise 36.1 dB, A01 SMPS 49.3 dB (28 MHz alias window), A08 LED 51.6 dB, A02 83.5 dB (pessimistic)"}
+    LN-M02: {value_db: 16.8, ok: true, at: "F03 clock -> MIC_DATA electric, sum of harmonics 14.4 mV, Cm 183 fF (N$2 and MIC_DATA parallel on In2 ~10 mm, top piece (10.96, 3.67-4.14))"}
+    LN-M03: {value_pct: 5.18, ok: false, at: "FAIL vs 2 %: z = 5.18 mohm at 5 kHz; 64 % from the R21 pad-2 GND stub (B.Cu (21.6, 6.14)->(21.6, 5.04), 1.1 mm x 0.1 mm = 3.6 mohm), 18 % from its via barrels (1.0 mohm), ~18 % In1 links and other stubs"}
+    LN-M04: {value_mv_pk: 0.165, ok: true, at: "A05 1562 Hz; only 7 dB under 0.37", note: "firmware averaging of PA6 samples removes it (self-test only)"}
+    LN-M05: {value_uv_rms: 11.55, ok: true, at: "A05 1562 Hz x 10 %"}
+    LN-M06: {value_mv_rms: 0.140, of_which_20k_100k_mv: 0.0255, ok: "flat55 yes (10); rolloff yes only by 6.6 dB (0.3) and only because the 1.56 kHz line is below the band", dominant: "A05 hop fundamental 0.115 mV rms at U2.5"}
+  transimpedance_to_mic_vdd_mohm: {A05_CPU_HOP: {"1 kHz": 120.7, "20 kHz": 103.7, "85 kHz": 35.1, "200 kHz": 8.1, "4 MHz": 0.128, "12 MHz": 0.0385}, A03_BRIDGE: {"1 kHz": 139.4, "20 kHz": 119.6, "85 kHz": 40.2, "200 kHz": 9.6, "4 MHz": 0.151}, A06_CLOCK_RETURN: {"1 kHz": 14.7, "4 MHz": 58.6, "12 MHz": 171.0}}
+  l2_pairs_nH_fF: {"F03->MIC_VDD": {M_free: 1.09, M_image: 0.228, Cm_image: 72.9}, "F03->MIC_DATA": {M_free: -5.69, M_image: -1.33, Cm_image: 183.0}, "F03->MIC_CLK": {M_free: 3.12, M_image: 2.56, Cm_image: 132.0}, "F01->MIC_DATA": {M_free: -0.566, M_image: 0.0005, Cm_image: -0.12}, "F02->MIC_VDD": {M_free: -0.470, M_image: -0.0001, Cm_image: 0.078}}
+  sweep_worst_margin_db_nominal_pessimistic: {base: [44.6, 24.6], "LDO Zout x10": [35.8, 15.8], "LDO Zout x0.2": [48.0, 28.0], "PA5 R 25 ohm": [43.5, 23.5], "PA5 R 100 ohm": [47.2, 27.2], "die C x0.1": [44.6, 24.6], "all MLCC at 30 % C": [43.1, 23.1], "ESR x3": [44.6, 24.6], note: "no single copper/component assumption moves LN-M01 below 15 dB; the PSRR and floor assumptions (20 dB and -6..+8 dB scenarios) do"}
+  conclusion: "Under the stated assumptions the copper conduction and near-field paths into the mic are 24-100 dB below the limit; the layout-sensitive failure is the I_SENSE Kelvin error (LN-M03). The terms that can still fail are outside the PCB model: mic PSRR(f) above 1 kHz, mic ultrasonic floor, SMPS clock vs mic clock windows, firmware choices (LED PWM f, mic clock divider)."
+
+findings:
+  LF-1: {id: LF-1, sev: layout, text: "R21 (0.1 ohm shunt) pad 2 reaches In1 through a 1.1 mm x 0.1 mm B.Cu stub + via: 4.6 of the 5.2 mohm Kelvin error. Fix targets: via-in-pad or stub <= 0.3 mm and >= 0.3 mm wide; re-run LN-M03", src: "budget.json rows[].features / contributions(), 2026-10-02"}
+  LF-2: {id: LF-2, sev: layout, text: "all 698 tracks are 0.1 mm: U4.1 -> Q1.4/Q2.4 is 158/184 mohm of copper (50/59 mV at the 0.32 A full-scale peak, 1.7-2 % of 3.0 V) and the segment B.Cu (18.075, 11.4)->(22.89, 11.4) is shared by bridge, MCU and mic supply; widen the +3V0 trunk when the layout opens", src: "budget.json dc_rail_paths_mohm"}
+  LF-3: {id: LF-3, sev: layout, text: "stackup asymmetry: B.Cu is 0.595 mm from In1 (0.0994 + 0.0152 + 0.4804), F.Cu 0.099 mm: loop L' 0.69 vs 0.37 nH/mm. MIC_VDD is 79 % on B.Cu (9.28 of 11.76 mm). 35 of 56 parts sit on B. Decide the In2 policy (pour/plane vs signal) with these numbers when the stackup is set", src: "lumped.lprime_nH_per_mm on DEFAULT_STACKUP; reg-board open issues 2 and 7"}
+  LF-4: {id: LF-4, sev: layout, text: "N$2 (PDM clock, 16.6 mm, 14.3 mm on In2) and MIC_DATA (13.7 mm, 11.8 mm on In2) run parallel: Cm 183 fF; N$2 also passes within 0.06 mm of the MIC_VDD pad area at (6.3, 5.7) between In2 and B.Cu. Synchronous so harmless as noise; keep them apart or guard with GND when the route is redone", src: "budget.json l2_pairs"}
+  LF-5: {id: LF-5, sev: firmware, text: "SMPS harmonics 4, 8, 12 ... coincide with mic-clock harmonics 3, 6, 9 ... (12.000 vs 12.00135 MHz): an unlocked SMPS beats through the 20-96 kHz window as a drifting whine. Coupling is small here (A01 margin 49 dB pessimistic at 28 MHz) but unmeasured; /18 divider has no coincidence below k=24", src: "alias.py 2026-10-02; DS13737 Rev10 Table 35"}
+  LF-6: {id: LF-6, sev: firmware, text: "LED PWM frequency must be an integer multiple of fs_out (200.0225 kHz) or outside 20-96 kHz and its harmonics outside the windows; placeholder 25 kHz lands in the capture band (conduction margin 51.6 dB, but the LED pair also runs the arm beside the exciter wires, not modelled)", src: "sub-processing.md TIM4_CH2 '> 20 kHz'; aggressors.yaml#A08"}
+  LF-7: {id: LF-7, sev: model, text: "the MCU hop-rate fundamental (1562.5 Hz, 0.115 mV rms at U2.5) dominates mic-VDD ripple and sits 6.6 dB under the e2e 'rolloff' requirement; it is below the capture band, so it only matters if the e2e sim counts it", src: "IF-MIC-VDD-NOISE.json"}
+  LF-8: {id: LF-8, sev: model, text: "board file has no stackup block and says 1.6 mm; extractor uses the 0.8 mm JLC numbers of the earlier draft and says so (inputs.stackup)", src: "reg-board.md open issue 2"}
+  LF-10: {id: LF-10, sev: layout, text: "mic GND pad U2.3 (the custom GND ring round the port) has no via of its own: it reaches In1 through 0.3 + 0.75 + 1.38 mm of 0.1 mm B.Cu via pad U2.2 to a via at (4.675, 7.847): 18.3 mohm (~3 nH) to MCU VSS U1.24, and C13's ground returns 17.7 mohm away at (6.6, 3.985). A via on the ring edge conflicts with the 'no vias inside r1.6 of the port' rule (sub-audio-in issue 2): layout trade-off; also shorten the U1.24 F.Cu stub (3.2 mohm)", src: "budget.json dc_rail_paths_mohm + contributions(), 2026-10-02"}
+  LF-9: {id: LF-9, sev: info, text: "bridge legs: OUT_A 20.9 mm, OUT_B 21.6 mm of copper with 2 vs 3 vias: route asymmetry ~3 % in length; Rds(on) P vs N (0.88 vs 0.34 ohm) dominates leg mismatch, not the copper", src: "geometry.json; sub-output.md key numbers"}
+
+# ------------------------------------------------------------------------------------------------ requirements
+requirements:
+  - {id: LN-R01, text: "Read any 4-layer .kicad_pcb with a filled In1 GND zone plus bom_jlc.csv; never write inputs; stackup from the file, else a declared default that is named in every report", traces_to: [O14, O19, O20, "reg-board issue 2"], verification: "sim/noise/smoke.sh on draft_r1 routed, baseline, placed; sha256 of inputs unchanged"}
+  - {id: LN-R02, text: "Compare the board's pad->net map with hw/pod/pod.net and report stale boards", traces_to: [O19, R22], verification: "extract_report.txt 'netlist check' (200/200, 0 mismatches 2026-10-02)"}
+  - {id: LN-R03, text: "Flag unrouted nets: pads on extracted nets without copper path make results INVALID and print the pads", traces_to: [R22], verification: "budget.py on pod_r1_placed.kicad_pcb prints WARNING (49 pads) and valid=false"}
+  - {id: LN-R04, text: "Emit SPICE (MIC_VDD_PATH, GND_RETURN, flat deck) from the same element list as the internal solver; ngspice 45 must agree to < 1 %", traces_to: [O18], verification: "extract.py --selfcheck (max rel err 8e-7)"}
+  - {id: LN-R05, text: "All aggressor waveforms live in aggressors.yaml with status (datasheet|derived|assumption); replace analytic ones with sim/spice exports when available", traces_to: [D6, D11, D14], verification: "diff of aggressors.yaml statuses; IF-AGGRESSOR-I delivered by the bridge/SMPS sims"}
+  - {id: LN-R06, text: "Score every line through mic PSRR (nominal and pessimistic) and alias.chain; sync lines that fold to 0 Hz are dropped only when flagged sync; async lines are scanned over their frequency tolerance", traces_to: [T6, R9, R21, D14], verification: "budget.json rows; alias.selftest"}
+  - {id: LN-R07, text: "LN-M01 >= 0 dB under pessimistic PSRR, >= 10 dB for sign-off, per thresholds.*", traces_to: [T6, D11], verification: "budget.py --check-doc"}
+  - {id: LN-R08, text: "Rank paths worst first with the responsible geometry feature (segment xy+layer, via xy, plane link, component) and layout_share_pct", traces_to: [O14], verification: "rows[].features sum equals the direct transimpedance (check_vs_direct)"}
+  - {id: LN-R09, text: "Field coupling (L2) into MIC_VDD, MIC_DATA, MIC_CLK with both bounding models and the T(f) interpolation; PDM-line pickup >= 12 dB under 100 mV", traces_to: [D13, R14], verification: "l2_pairs, couple.selftest"}
+  - {id: LN-R10, text: "I_SENSE Kelvin error <= 2 % of R21, or the owner accepts firmware calibration at E1/F4", traces_to: [O15, O18], verification: "LN-M03; open/short and known-resistor calibration at bring-up"}
+  - {id: LN-R11, text: "Firmware frequency plan: LED PWM f = n*fs_out or outside 20-96 kHz; no async source harmonic inside a window without a measured margin; mic divider chosen with fs_pdm_scan", traces_to: [T6, R21, D14], verification: "alias.fs_pdm_scan / window_scan; spectrum capture at bring-up"}
+  - {id: LN-R12, text: "Rev 1 provides measurement access for the unknowns that set the thresholds: a MIC_VDD injection/probe point and the raw PDM stream over USB, to measure PSRR(f) 1 kHz-1 MHz and the 20-96 kHz floor (E3, S2); after measurement re-fit params.yaml and re-run; > 10 dB disagreement trips the L3 gate", traces_to: [O18, O20, R22], verification: "bring-up step; size cost of one 0.7 mm pad (O20: test access must not cost size)"}
+  - {id: LN-R13, text: "Every run fenced (MemoryMax 3 GB, no swap); heavy runs one at a time <= 4 GB, only on the owner's go-ahead after the research swarm", traces_to: ["CLAUDE.md memory discipline", "incident 2026-09-30"], verification: "smoke.sh uses systemd-run; heavy_runs below"}
+  - {id: LN-R14, text: "Provide IF-MIC-VDD-NOISE (z_rail, bridge-current-to-mic-VDD transfer, background lines/PSD) to the e2e sim", traces_to: [T6], verification: "sim/noise/out/IF-MIC-VDD-NOISE.json; LN-M06"}
+  - {id: LN-R15, text: "doc and code stay in sync: budget.py --check-doc compares thresholds and, for the same board sha, results", traces_to: ["README rule 5 staleness"], verification: "check-doc output in the smoke run"}
+
+# ------------------------------------------------------------------------------------------------ heavy runs (NOT run now)
+heavy_runs:
+  - {id: H1, what: "own PEEC of In1 + F/B/In2 traces on a crop (x 0-14 mm: mic, U1 west half), 0.25 mm plane cells, 100 kHz-30 MHz, 40 frequencies", memory_gb: "1-3 (N~8k filaments, dense complex Z 1 GB + LU copy)", time: "10-20 min with OMP_NUM_THREADS=8 (estimate, unverified)", fence: "MemoryMax=4G MemorySwapMax=0", blocked_on: ["layout freeze (simplification study)", "owner go-ahead after the research swarm", "PEEC code (~300 lines on couple.py; not written)", "L3 gate (section layers)"]}
+  - {id: H2, what: "Elmer magnetodynamics (A-V, harmonic) on an 8 x 8 x 3 mm crop around the mic with thin-sheet In1, 200 kHz / 1 / 4 / 12 MHz", memory_gb: "3-4 at <= 400k tets (estimate)", time: "30-90 min per frequency (estimate)", fence: "MemoryMax=4G", blocked_on: ["install permission: Elmer (source build) + Gmsh (apt)", "kicad-cli pcb export step of the frozen board", "layout freeze", "L3 gate"]}
+  - {id: H3, what: "openEMS full wave of board + arm wire pair + shell, >= 100 MHz", memory_gb: "4-12 (20-60 M cells; exceeds the fence, shrink or skip)", time: "hours", blocked_on: ["not recommended; only if an HF problem is measured"]}
+  - {id: H4, what: "ngspice transient of l1_full.cir with PWL aggressors from sim/checks/bridge_spice.py and an SMPS source, 100-200 us at <= 1 ns step, to check the spectral assumptions (shaper noise vs rail, edge spikes)", memory_gb: "< 1 (use TMPDIR on disk, never -r to tmpfs)", time: "5-20 min (estimate)", fence: "MemoryMax=3G", blocked_on: ["aggressor waveform export (IF-AGGRESSOR-I)", "owner go-ahead (> 60 s)"]}
+  - {id: H5, what: "Monte Carlo over the unmeasured parameters (PSRR scenario, floor scenario, LDO Zout, PA5 R, die C, SMPS tolerance, MLCC derating): 500 runs x 3.5 s", memory_gb: "0.3", time: "~30 min", blocked_on: ["parameter ranges agreed (owner or E-measurements)", "owner go-ahead (> 60 s)"]}
+
+interfaces:
+  IF-MIC-VDD-NOISE: {to: "sim/e2e (docs/sim/e2e-chain.yaml)", status: delivered, file: sim/noise/out/IF-MIC-VDD-NOISE.json, content: "z_rail(f) = Q1.4-R21.2 volts per ampere of bridge supply current (A03 pair); h_ibridge_to_micvdd(f); background lines 1-100 kHz and PSD", numbers_2026-10-02: {background_mv_rms_1k_100k: 0.140, background_mv_rms_20k_100k: 0.0255, z_rail_mohm: {"1 kHz": 195, "98 kHz": 141, "196 kHz": 99}, h_to_mic_mohm: {"1 kHz": 139, "98 kHz": 33, "196 kHz": 9.9}}, requirement_check: "<= 10 mV flat PSRR: pass; <= 0.3 mV rolloff PSRR: pass by 6.6 dB (dominated by the 1.56 kHz hop line below the capture band)"}
+  IF-AGGRESSOR-I: {from: "sim/checks/bridge_spice.py, deadtime_switching.py, a core-SMPS model (not existing), firmware emulation (hop timing, LED PWM f)", format: "CSV (time s, current A), >= 1 whole period at the stated f0, one file per aggressor id; consumed by aggressors.yaml wave kind csv_period", replaces: "analytic waveforms in aggressors.yaml", status: "hook implemented and self-tested; no producer yet"}
+  IF-ALIAS-PLAN: {to: "firmware / clock plan (sub-processing)", content: "alias.fs_pdm_scan table, LED PWM rule LN-R11, SMPS range policy (never Range 4 on SMPS, D11 L210)", status: proposal}
+  IF-RAIL-IR: {to: "power sim (rail capacity, ECR-0005, sub-power, docs/system/rail-budget.yaml)", content: "results.rail_paths_dc_mohm: copper resistance LDO -> bridge, MCU, mic; LDO Zout assumption 0.05 ohm + 100 nH", status: delivered}
+  IF-LAYOUT-FEATURES: {to: "layout session / simplification study (O14)", content: "LF-1..LF-4 with xy/layer; budget.json rows[].features after every re-route", status: delivered}
+  IF-MECH-NOISE: {to: "mechanical/acoustics sims", content: "C14, C7-C9 (MLCC piezo) and L1 (magnetostriction) locations and the PWM/SMPS spectra that excite them; not computed here", status: "out of scope, pointer only"}
+
+uncertainties:
+  - {id: UN-1, what: "mic PSRR above 1 kHz and the meaning of 'dBV/FS'", effect: "sets the whole mic-supply margin: +-20 dB scenario", retire: "S2 injection sweep on rev 1 (LN-R12); Syntiant SiSonic design guide (not fetched)"}
+  - {id: UN-2, what: "mic ultrasonic noise floor (E3)", effect: "-6..+8 dB on both limits", retire: "E3 capture on rev 1"}
+  - {id: UN-3, what: "ADF1 RSFLT response (R18)", effect: "chain attenuation of lines 100-400 kHz in the 800 kS/s domain", retire: "S1 swept tone"}
+  - {id: UN-4, what: "core SMPS clock: free-running or locked, tolerance, spread (DS gives 3 MHz typ only)", effect: "LF-5 whine risk", retire: "spectrum capture of the PDM stream at bring-up (E11)"}
+  - {id: UN-5, what: "MCU die capacitance and bond inductance, PA5 output impedance (<= 100 ohm), LDO Zout", effect: "sweep: <= 9 dB on LN-M01", retire: "bring-up impedance measurement; TPS7A20 data if TI publishes Zout"}
+  - {id: UN-6, what: "JLC 0.8 mm stackup numbers", effect: "L' x1-2 on B.Cu and In2", retire: "set the stackup in the board file from JLC's order page"}
+  - {id: UN-7, what: "MLCC DC-bias derating (no manufacturer curves on file)", effect: "sweep: 1.5 dB", retire: "Samsung curves for C59461 / C19702 / C12530"}
+  - {id: UN-8, what: "aggressor amplitudes: hop dI 2.5 mA, SMPS edge 5 ns, FET C_sw 60 pF, clock pin C 8 pF", effect: "each scales a row linearly (20 dB per decade of amplitude)", retire: "IF-AGGRESSOR-I from the sims, then bring-up"}
+  - {id: UN-9, what: "exciter L and R (E1)", effect: "A03/A04 amplitude", retire: "E1 LCR"}
+  - {id: UN-10, what: "arm wires, shell, battery leads and dock magnets not in the model", effect: "unknown", retire: "L3/H3 only if bring-up shows a spur no L1/L2 row explains"}
+  - {id: UN-11, what: "no online datasheet read: web search budget exhausted 2026-10-02; Syntiant Rev B-1 read from the local copy", effect: "PSRR unit interpretation", retire: "fetch Syntiant/Knowles design guide"}
+
+owner_inputs:
+  - {id: OI-1, ask: "Margin policy: 10 dB below the mic floor for injected tones, 12 dB on PDM-line pickup, Kelvin <= 2 % (or calibrate)", default: "as in thresholds"}
+  - {id: OI-2, ask: "One 0.7 mm probe pad on MIC_VDD (and access to the raw PDM stream) on rev 1 for the PSRR sweep (LN-R12): O18 diagnosability vs O20 size", recommend: yes}
+  - {id: OI-3, ask: "LED PWM frequency and mic clock divider (LN-R11): /20 (today) or /18", recommend: "decide with the firmware plan; sim says /18 has no SMPS coincidence"}
+  - {id: OI-4, ask: "Permission to install Gmsh (apt) and build Elmer ONLY if the L3 gate trips", recommend: "no install now"}
+  - {id: OI-5, ask: "Confirm the JLC 0.8 mm 4-layer stackup (or give the real one) and the In2 policy", recommend: "set a stackup block in the board before the layout session"}
+  - {id: OI-6, ask: "Go-ahead for heavy runs after the research swarm finishes (H4 first, H5 if ranges agreed)", recommend: "H4 only"}
+  - {id: OI-7, ask: "Does the owner have a function generator or sound-card output for a supply-injection sweep at bring-up?", why: "no bench rig (O18)"}
+
+change_log:
+  - "2026-10-02: created. Scaffold sim/noise/ (L1 extraction + SPICE, L2 field coupling, alias map, IF-MIC-VDD-NOISE export); first run on the draft_r1 fanout board; tool survey; heavy runs planned, none executed."
