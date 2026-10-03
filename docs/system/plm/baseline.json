@@ -76,10 +76,10 @@
   },
   "SPEC": {
    "by": "claude",
-   "date": "2026-10-02",
-   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
+   "date": "2026-10-03",
+   "note": "spec O24-O27 added (owner decisions); 00-whole unaffected in substance",
    "stamp": {
-    "file:docs/spec.md": "260bf4b6a132e15e"
+    "file:docs/spec.md": "55e87ab5e70b128b"
    }
   },
   "SUB-AUDIO-IN": {
@@ -155,10 +155,10 @@
   },
   "WHOLE": {
    "by": "claude",
-   "date": "2026-10-02",
-   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
+   "date": "2026-10-03",
+   "note": "spec O24-O27 added (owner decisions); 00-whole unaffected in substance",
    "stamp": {
-    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "b04db021d8e262be"
+    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "8109175ed2b59501"
    }
   }
  },
