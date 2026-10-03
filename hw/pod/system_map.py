@@ -31,7 +31,7 @@ BLOCKS = {
     "BRIDGE": "Q1 Q2 R3 R4 R5 R6 C14",
     "SELFTEST": "R21 R22 C22",
     "ARM_PADS": "J1 J2 J7 J8",
-    "DOCK_USB": "J3 J4 J10 J11 J12 D4 D5 U6 R18 R12 R13 C15",
+    "DOCK_USB": "J3 J4 J10 J11 J12 D4 D5 D6 U6 R18 R12 R13 C15",
     "CHARGER": "U3 C16 C21 RT1 J9 R15 R16",
     "CELL_PADS": "J5",
     "VBAT_SENSE": "R8 R9 C19",
@@ -68,7 +68,7 @@ FUNCTIONS = [
     ("F13 Charger link", "CHARGER, MCU", "I2C_SCL PB13, I2C_SDA PB14 (R15/R16 10k to 3V0); CHG_INT -> PA15 (internal pull-up; PB5 strapped to GND, ECR-0013 S1)", "-", "I2C2, charger IRQ"),
     ("F14 Debug / flash / test", "DEBUG, MCU", "TP1 SWDIO PA13, TP2 SWCLK PA14, TP3 NRST, TP4 3V0, TP5 GND, TP6 VSYS; BOOT0 (PH3) R1 10k low (R1 pad = DFU tack point); TP7 PB6 USART1_TX printf; TP8/TP9/TP10 MDF mic fallback dots; PA10 pulled up by the ROM loader itself (bootloader USART1_RX)",
      "0.7 mm pads in a 1.27 mm row on F, top edge; snap-off test frame (O9)", "SWD, ROM bootloader"),
-    ("F15 ESD at exposed contacts", "DOCK_USB", "D5 TPD1E10B06 at J3 DOCK_VBUS (bidirectional, 5.5 V working; D4 reverse block); U6 on D+/D-", "dock contacts are the only exposed metal", "-"),
+    ("F15 ESD at exposed contacts", "DOCK_USB", "D5 TPD1E10B06 at J3 DOCK_VBUS (bidirectional, 5.5 V working; D4 reverse block); D6 (same part) at J12 CC (Rev G); U6 on D+/D-", "dock contacts are the only exposed metal", "-"),
 ]
 
 RAILS = {

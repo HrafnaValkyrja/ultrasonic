@@ -55,6 +55,7 @@ PLACE = {
     # Rev F: D5 ESD at the J3 contact; TP7 printf dot by PB6 (pin 42), reachable with the lid off
     # C1 (100 nF) serves VDD pin 48 AND VBAT pin 1 (Rev F PER-06): +3V0 pad 0.42 mm from pin 48, 1.02 mm from pin 1 (both <= 1.5)
     "D5": (29.9, 3.2, 90, "F"), "TP7": (13.2, 1.5, 0, "F"),
+    "D6": (32.6, 6.2, 90, "B"),                          # Rev G: CC ESD right behind J12 (one via)
     # ================= B (inner face, toward the cell)
     # Rev F: MDF mic-fallback dots by the mic on B (TP8 PB8 -> R2's mic-side pad, TP9 PB1 -> TP10 MIC_DATA)
     "TP8": (8.7, 9.4, 0, "B"), "TP9": (8.7, 3.6, 0, "B"), "TP10": (7.3, 3.0, 0, "B"),

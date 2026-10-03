@@ -34,7 +34,7 @@ HSI48 (+ CRS trim) -> USB FS 48 MHz            internal SMPS 3 MHz: VLXSMPS -> L
 |---|---|---|---|---|
 | U1 | STM32U575CIU6Q: ST Cortex-M33 MCU, 160 MHz max, FPU+DSP, 2 MB flash, 786 KB SRAM; C=48 pins, I=2 MB, U=UFQFPN 7x7, 6=-40-85 C, Q=SMPS pinout | C5271013 · Ext | F (13.03, 6.53) | D5; ADF1; ~40-45 µA/MHz on SMPS (DS §7) |
 | L1 | DFE201610E-2R2M=P2: Murata 2.2 µH shielded metal-alloy, 2.0x1.6x1.0 mm, ~140 mΩ, 2.4 A | C337891 · Ext | F (20.42, 10.67) | SMPS coil; ST: 2.2 µH ±20 %, Isat > 0.5 A, DCR < 200 mΩ (B-parts-selection.md §3); differs from spec D5 L152 (issue 11) |
-| C8, C9 | 2.2 µF 0402 6.3 V X5R | C12530 · Basic | F (17.62, 11.53), (20.32, 8.60) | VDD11 COUT; DS asks >= 10 V (issue 1) |
+| C8, C9 | 2.2 µF 0402 10 V X5R CL05A225KP5NSNC (Rev G) | C107369 · Ext | F (17.62, 11.53), (20.32, 8.60) | VDD11 COUT; DS13737 Rev 10 p.153 rated >= 10 V: met since Rev G (ECR-0017, O24) |
 | C7 | 10 µF 10 V X5R 0603 (Samsung CL10A106KP8NNNC) | C19702 · Basic | F (18.02, 6.53) | VDDSMPS CIN (DS: 10 µF, >= 10 V, ESR < 10 mΩ) |
 | C1-C3 | 100 nF 16 V X7R 0402 (Samsung CL05B104KO5NNNC), one per VDD pin | C1525 · Basic | F; C1 (9.43, 1.88) | AN5373 Rev 7; C1 also serves VBAT pin 1 (PER-06: <= 1.5 mm from pins 1 and 48; probe 1.43 / 1.12 mm) |
 | C4 | 10 µF 0603 bulk on +3V0 | C19702 · Basic | F (18.82, 3.53) | AN5373: 10 µF typ, 4.7 µF min after DC bias |
@@ -155,7 +155,7 @@ FW-14: "frequency plan: LED PWM f = n x fs_out or outside 20-96 kHz; mic divider
 | noise, MCU aggressors on Rev F draft | LN-M01 worst = A05_CPU_HOP 21.875 kHz, 23.1 dB pessimistic (pass >= 0); SMPS A01, A02 margins [TBD]; LN-M04 ADC ref ripple 0.199 mV pk (<= 0.37) at hop 1562 Hz | `sim/noise/smoke.sh on hw/pod/draft_r1/pod_r1_routed.kicad_pcb (sha e159bccb, 2026-10-02 21:20)` | 2026-10-02 21:20 |
 
 ## Open issues (IDs kept stable; other docs cite them)
-1. C8/C9 6.3 V (C12530) vs DS §5.1.6 rated >= 10 V; `.pcba-workflow/sourcing-lock.csv` L9 still RECOMMENDED C107369 10 V. Options: (a) C107369 Extended 0402 10 V; (b) Basic 0603 16 V C23630 (2.5x area, conflicts O20); (c) keep, accept deviation. Recommend (a): explicit datasheet line, same footprint, ~$3/order for one more Extended type (`docs/build/bom.md`). Owner.
+1. CLOSED Rev G (ECR-0017, O24): C8/C9 now C107369 10 V. Was: C8/C9 6.3 V (C12530) vs DS §5.1.6 rated >= 10 V; `.pcba-workflow/sourcing-lock.csv` L9 still RECOMMENDED C107369 10 V. Options: (a) C107369 Extended 0402 10 V; (b) Basic 0603 16 V C23630 (2.5x area, conflicts O20); (c) keep, accept deviation. Recommend (a): explicit datasheet line, same footprint, ~$3/order for one more Extended type (`docs/build/bom.md`). Owner.
 2. MCU stock 8 at JLC (2026-10-01): reserve before order or plan U585 drop-in (15 in stock, +$3.59). ECR-0008.
 3. SMPS layout (draft): VDD11 pin 46 has no cap within 10 mm (LD-05); CIN 4.6 mm from VDDSMPS; switch node 6.7 mm. Closes: layout session (O14).
 4. Idle mode: 16 MHz Range 3 run (power.py) vs Stop 2 + ADF + LPDMA (A3 §1.3; Stop 2 makes the SMPS asynchronous while the mic listens). Closes: pick one; E11 listens, E4 measures. FWSIM variant IDLE_PLAN.

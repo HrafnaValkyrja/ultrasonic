@@ -1,3 +1,3 @@
-connectivity vs hw/pod/pod.net: PASS: connectivity matches exactly (193 net pin memberships).
-ERC: warning/lib_symbol_issues 2, warning/lib_symbol_mismatch 1, warning/pin_to_pin 28
+connectivity vs hw/pod/pod.net: PASS: connectivity matches exactly (195 net pin memberships).
+ERC: warning/lib_symbol_issues 2, warning/lib_symbol_mismatch 1, warning/pin_to_pin 30
 Known warnings: pin_to_pin = easyeda2kicad symbols (lcsc lib) mark pins 'unspecified'; lib_symbol_issues Q1/Q2 = PMCXB290UE is defined in gen.py (SKiDL), no library; lib_symbol_mismatch L1 = embedded copy of the lcsc inductor differs only in KiCad's arc normalisation.

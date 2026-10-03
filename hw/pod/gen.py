@@ -54,6 +54,10 @@ B on the owner-decision defaults; owner phases: Phase 1 logic, then her board re
   firmware changes for years; the study's OUT-01 would drop them), TP6 VSYS (owner-accepted test pad), R22/C22 and
   C14 22 uF (OUT-03/OUT-05 depend on the OUT-07 clamp, an owner decision), R21 1206 (OUT-02 is size-only: Phase 2),
   R18 + J12 + 5-contact dock (PER-01D needs a keying sample, O21), LED on the pad board (PER-07 reverses O8).
+Rev G (2026-10-02, owner O24 after the Phase-1 briefing): C8/C9 back to 10 V-rated 2.2 uF C107369 (ST DS13737 Rev 10
+p.153: VDD11 COUT rated >= 10 V; the 2026-10-01 swap to 6.3 V C12530 saved an Extended type, but Standard PCBA charges
+per BOM line either way); D6 TPD1E10B06 on CC at the exposed J12 contact (the last unprotected dock contact; same part
+and BOM line as D5).
 Change this file, never the generated netlist.
 """
 from __future__ import annotations
@@ -84,12 +88,14 @@ PAD_GND2 = "pod:WirePad_1.0x2.0mm"             # Rev F shared GND wire pad (dock
 # LCSC numbers (sourcing lock + dated lookups 2026-09-30); every placed part carries one.
 LCSC = {
     "R33": "C25105", "R2k2": "C25879", "R10k": "C25744", "R22k": "C25768", "R100k": "C25741", "R1M": "C26083",
-    "C15p": "C1548", "C100n": "C1525", "C1u": "C52923", "C2u2": "C12530", "C4u7": "C23733",
+    "C15p": "C1548", "C100n": "C1525", "C1u": "C52923", "C4u7": "C23733",
     "C10u_0603": "C19702", "C22u_0603": "C59461", "R5k1": "C25905",
     # Rev E, JLC parts API 2026-10-01T22:55Z
     "R0": "C17168", "R0R1_1206": "C25334", "R1k": "C11702", "C10n": "C15195",
     # Rev F, JLC parts API 2026-10-02T23:48-50Z
     "C4u7_25V": "C2858031", "ESD_VBUS": "C48260",
+    # Rev G (O24), JLC parts API 2026-09-30 (sourcing-lock row C_VDD11): ST wants >= 10 V on VDD11
+    "C2u2_10V": "C107369",
 }
 
 
@@ -148,8 +154,8 @@ def build():
     l1 = Part("lcsc", "DFE201610E-2R2M=P2", value="2u2", ref="L1", tag="L1")
     l1.fields["LCSC"] = "C337891"
     l1[1] += vlx; l1[2] += vdd11
-    for ref in ("C8", "C9"):                                           # 2 x 2.2 uF on VDD11 (DS13737 Rev 8)
-        c = C(ref, "2u2", "C2u2"); c[1] += vdd11; c[2] += gnd
+    for ref in ("C8", "C9"):                                           # 2 x 2.2 uF on VDD11: ESR < 20 mOhm @ 3 MHz, rated >= 10 V
+        c = C(ref, "2u2 10V", "C2u2_10V"); c[1] += vdd11; c[2] += gnd   # (DS13737 Rev 10 p.153; Rev G, O24: was 6.3 V C12530)
     nrst = Net("NRST"); nrst += u1["NRST"]
     c = C("C10", "100n", "C100n"); c[1] += nrst; c[2] += gnd
     r = R("R1", "10k", "R10k"); r[1] += u1["PH3"]; r[2] += gnd         # BOOT0 low: boot from flash (10k as AN5373)
@@ -246,6 +252,9 @@ def build():
         pin += NC
     dp += u1["PA12"]; dm += u1["PA11"]
     r = R("R18", "5k1", "R5k1"); r[1] += cc; r[2] += gnd               # Rd: a USB-C source only turns on VBUS for a sink
+    d6 = Part("lcsc", "TPD1E10B06DPYR", ref="D6", tag="D6", footprint="lcsc:X1SON-2_L1.0-W0.6-P0.65-BI-1")
+    d6.fields["LCSC"] = LCSC["ESD_VBUS"]                                # Rev G (O24): the CC contact is exposed metal too;
+    d6[1] += cc; d6[2] += gnd                                           # same part and BOM line as D5
     p = pad("J5", "BAT+"); p[1] += vbat                                 # cell - lands on the shared GND pad J4
     u4 = Part("lcsc", "TPS7A2030PDQNR", ref="U4", tag="U4"); u4.fields["LCSC"] = "C5220164"
     v3_ldo = Net("LDO_OUT")

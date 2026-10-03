@@ -5,9 +5,9 @@
 	(uuid "46f56cb9-40b8-53c9-9ea1-5c731f397bba")
 	(paper "A4")
 	(title_block
-		(title "Pod board Rev F: schematic (generated from gen.py)")
+		(title "Pod board Rev G: schematic (generated from gen.py)")
 		(date "2026-10-02")
-		(rev "F")
+		(rev "G")
 		(company "Stereo Ultrasound")
 	)
 	(lib_symbols)

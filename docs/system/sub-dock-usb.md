@@ -1,5 +1,5 @@
 # SUB-DOCK-USB: magnetic dock, USB FS, DFU, ESD, dock detect
-Rev F 2026-10-02: D3 (behind D4) -> D5 TPD1E10B06 at J3; R19/CC_SENSE and R11 removed; J4 = shared dock GND + cell − pad between J3 and J5; C15 25 V; pads re-placed in two rear columns (gen.py docstring L35-60).
+Rev G 2026-10-02: D6 TPD1E10B06 at J12 CC (ECR-0017). Rev F 2026-10-02: D3 (behind D4) -> D5 TPD1E10B06 at J3; R19/CC_SENSE and R11 removed; J4 = shared dock GND + cell − pad between J3 and J5; C15 25 V; pads re-placed in two rear columns (gen.py docstring L35-60).
 Status: schematic Rev F block DOCK_USB (gen.py, 2026-10-02); board autorouted 2026-10-02 (draft_r1/summary.json: 687 tracks, 118 vias, 2 unconnected, neither a dock net; DRC 19 courtyard overlaps: 18 J-pad ring pairs + 1 C1↔U1). Contact pin order, cable side, DFU firmware not designed. Updated 2026-10-02.
 abbr: DK-nn = this doc's open-issue ids (stable; external docs cite "sub-dock-usb issue nn" = DK-nn). pod x = board x + 30.6 (place_r1.py docstring). F = board face to lid, B = face to cell.
 src: `hw/pod/gen.py` (DOCK_USB L202-246), `hw/pod/place_r1.py` PLACE (L51-72), `hw/pod/draft_r1/pod_r1_routed.kicad_pcb`, `hw/mech/shell_r1.py` (`DOCK` L47, `BAY` L40, `USBC_KEEPOUT` L48, `CELL` L42), `docs/build/bom.md`, `docs/system/integration-map.md` (authoritative pins/nets)
@@ -69,7 +69,7 @@ rec: check magnet keying on a sample; if unkeyed, VBUS on centre pin 3 so a rota
 
 ## Constraints
 - O12(a) USB FS + ROM DFU via dock; O12(b) IPX4 min/IPX5 pref; O16(3) bought magnetic connector, USB-C space reserved; O16(5) one board both pods; O16(6) no housing screws; O10 bonded but cut-openable; O9/O15 rev 1 = prototype, testable.
-- F15: exposed metal = dock contacts only. ESD: J3 -> D5 (at contact); J10/J11 -> U6; J4 = GND; J12 CC -> R18 only, no clamp (CC reaches no MCU pin).
+- F15: exposed metal = dock contacts only. ESD: J3 -> D5 (at contact); J10/J11 -> U6; J4 = GND; J12 CC -> D6 TPD1E10B06 (Rev G, ECR-0017, O24; B behind J12 at (32.6, 6.2), one via) + R18.
 - USB FS: VDDUSB 3.0–3.6 V vs +3V0 2.955–3.045 V (TPS7A20 ±1.5 %, SBVS338H §5.5); functional to 2.7 V (DS13737 Rev 10 Table 150 fn 1, verified 2026-10-02). DK-06.
 - U3 needs VIN > VBAT + ~135 mV to leave sleep (SLUSE99C §7.5).
 

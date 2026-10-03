@@ -1567,7 +1567,7 @@ def selftest_cases(ctx):
         return Case(f"inside: {f.ref} hanging 1.5 mm past the rear edge", lambda: check_inside(sh, moved(brd, f.ref, dx=dx), table), FAIL, "past the rear edge")
 
     def clamp_body():
-        v = next(f for f in brd.fps.values() if not f.copper_only and f.courtyard)
+        v = next(f for f in brd.fps.values() if not f.copper_only and f.courtyard and not is_test_pad(f.ref))   # TPs are exempt by rule
         return Case(f"clamp-bands: {v.ref} dragged into the top band", lambda: check_clamp(sh, moved(brd, v.ref, dy=0.3 - (extent(v)[1] - oy0)), table), FAIL, "clamp bands")
 
     def clamp_tiny():

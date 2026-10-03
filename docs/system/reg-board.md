@@ -100,7 +100,7 @@ Arm pads: J1, J2, J8 outer column x 33.0; **J7 inner column x 31.4** (its wire c
 | Inside outline | [inside] PASS, closest J1 0.25 mm from an edge | interfaces.py 2026-10-02 |
 | Mic port | [mic-port] 0.000 mm from lid port; WARN = nominal only (board unlocated in cavity, reg-pod-body issue 2) | interfaces.py 2026-10-02 |
 | Switch | [switch] WARN: nominal 0.000 mm; worst-case stack exceeds 0.15 limit by 0.05 | interfaces.py 2026-10-02 |
-| Route | 687 track segments, 118 vias; track F.Cu 199.0 / In2 312.3 / B.Cu 175.5 mm; 2 unconnected | summary.json; board probe (2026-10-02) |
+| Route | Rev G (ECR-0017, D6 added, re-placed + FreeRouting 80 s, 2026-10-02 23:5x): 694 track segments, 118 vias; 1 unconnected (I2C_SDA, router variance); DRC 19 courtyard + 1 clearance 0.0892 vs 0.09 mm (router rounding). Rev F figures below: 687 segments, F.Cu 199.0 / In2 312.3 / B.Cu 175.5 mm; 2 unconnected | summary.json; board probe (2026-10-02) |
 | DRC | 19 errors, all courtyards_overlap: 18 J-pad ring pairs + 1 C1↔U1 | drc.json 2026-10-02T20:07:15 |
 | ERC | 0 errors / 311 warnings | hw/pod/gen.erc 2026-10-02 20:01 |
 | Distances | port -> nearest Q1 pad 11.6; -> L1 pad 16.0; -> U3 pad 15.4; RT1↔U3 centres 3.09 | board probe 2026-10-02 |

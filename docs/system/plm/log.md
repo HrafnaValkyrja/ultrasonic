@@ -91,3 +91,17 @@
 - 2026-10-02 23:37 review SUB-DEBUG-TEST by claude: Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F
 - 2026-10-02 23:37 review REG-BOARD by claude: Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F
 - 2026-10-02 23:37 review COST by claude: Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F
+- 2026-10-02 23:54 ECR-0017 raised by claude: Rev G: C8/C9 back to 10 V (C107369), D6 TPD1E10B06 ESD at the CC contact J12
+- 2026-10-02 23:54 review SPEC by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review WHOLE by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review INTEGRATION by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review SUB-PROCESSING by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review SUB-DOCK-USB by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review REG-BOARD by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review COST by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review R-PROC-DOCK by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review R-SPEC-POWER by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review R-COST-BOARD by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review R-SMPS-BOARD by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review R-CLOCK-BOARD by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit
+- 2026-10-02 23:54 review R-UI-BOARD by claude: Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit

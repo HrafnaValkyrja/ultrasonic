@@ -20,6 +20,12 @@
    "device": "lcsc:TPD1E10B06DPYR"
   },
   {
+   "ref": "D6",
+   "value": "TPD1E10B06DPYR",
+   "footprint": "lcsc:X1SON-2_L1.0-W0.6-P0.65-BI-1",
+   "device": "lcsc:TPD1E10B06DPYR"
+  },
+  {
    "ref": "J3",
    "value": "VBUS",
    "footprint": "TestPoint:TestPoint_Pad_D1.0mm",
@@ -207,13 +213,13 @@
   },
   {
    "ref": "C8",
-   "value": "2u2",
+   "value": "2u2 10V",
    "footprint": "Capacitor_SMD:C_0402_1005Metric",
    "device": "Device:C"
   },
   {
    "ref": "C9",
-   "value": "2u2",
+   "value": "2u2 10V",
    "footprint": "Capacitor_SMD:C_0402_1005Metric",
    "device": "Device:C"
   },
@@ -545,6 +551,10 @@
   {
    "name": "CC",
    "pins": [
+    {
+     "ref": "D6",
+     "pin": "1"
+    },
     {
      "ref": "J12",
      "pin": "1"
@@ -1044,6 +1054,10 @@
     },
     {
      "ref": "D5",
+     "pin": "2"
+    },
+    {
+     "ref": "D6",
      "pin": "2"
     },
     {

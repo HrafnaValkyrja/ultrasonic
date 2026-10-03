@@ -144,6 +144,21 @@ relations:
     what: self-test shunt R21 and filter R22/C22 (exciter |Z| over USB)
     watch: [net:BRIDGE_RTN, block:SELFTEST]
   # ---------------------------------------------------------------- electrical <-> physical
+  - id: R-SMPS-BOARD
+    a: SUB-PROCESSING
+    b: REG-BOARD
+    what: "MCU SMPS loop on U1's face, tight: VLXSMPS -> L1 (2.2 uH, DCR < 200 mohm, ISAT > 0.5 A) -> VDD11 C8/C9 (2x2.2 uF >= 10 V); C7 10 uF at VDDSMPS (DS13737 Rev 10 p.153; MZG-05/06); >= 10 mm from the mic (MZG-04)"
+    watch: ["sym:hw/pod/place_r1.py::PLACE[L1]", "sym:hw/pod/place_r1.py::PLACE[C7]", "sym:hw/pod/place_r1.py::PLACE[C8]", "sym:hw/pod/place_r1.py::PLACE[C9]", net:VLXSMPS, net:VDD11, ref:L1]
+  - id: R-CLOCK-BOARD
+    a: SUB-PROCESSING
+    b: REG-BOARD
+    what: "LSE crystal Y1 + C11/C12 beside PC14/PC15 on U1's face, short symmetric traces, no vias, guarded (A3 clock doc)"
+    watch: ["sym:hw/pod/place_r1.py::PLACE[Y1]", "sym:hw/pod/place_r1.py::PLACE[C11]", "sym:hw/pod/place_r1.py::PLACE[C12]", net:LSE_IN, net:LSE_OUT, ref:Y1]
+  - id: R-UI-BOARD
+    a: SUB-UI
+    b: REG-BOARD
+    what: "SW1 on F on the board centre line under the lid plunger (O16-5/7); board stiffness under the press; one-face Phase-2 layout keeps SW1 alone on F"
+    watch: ["sym:hw/pod/place_r1.py::PLACE[SW1]", ref:SW1, net:BTN]
   - id: R-AUDIO-BOARD
     a: SUB-AUDIO-IN
     b: REG-BOARD

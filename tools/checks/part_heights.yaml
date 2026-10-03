@@ -26,6 +26,10 @@ by_lcsc:
     part: Samsung CL05A105KA5NQNC, 1 uF 25 V X5R 0402
     max_mm: 0.60
     source: same catalogue, row CL05A105KA5NQN, Thickness Max. 0.60
+  C107369:
+    part: Samsung CL05A225KP5NSNC, 2.2 uF 10 V X5R 0402 (Rev G C8/C9)
+    max_mm: 0.57
+    source: Samsung MLCC catalogue row CL05A225MP5NSN (same 'P' 10 V code, thickness code 5), Thickness Max. 0.57; K vs M tolerance does not change the body
   C12530:
     part: Samsung CL05A225MQ5NSNC, 2.2 uF 6.3 V X5R 0402, soft termination
     max_mm: 0.57

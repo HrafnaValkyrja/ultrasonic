@@ -28,7 +28,7 @@ ITEMS = [
     ("Charger", "NTC 10k B3435 NCP15XH103F03RC", "RT1 (+ J9 pad for a cell NTC)", "C77131", 1, 0.0199, "rev D", ""),
     ("Power", "TPS7A2030 3.0 V LDO", "U4", "C5220164", 1, 0.2175, "rev C", "input moves to VSYS"),
     ("Protect", "1N5819WS (reverse docking)", "D4", "C191023", 1, 0.0137, "rev D", ""),
-    ("Protect", "TPD1E10B06DPYR (TI bidirectional ESD, 5.5 V working) at the J3 DOCK_VBUS contact", "D5", "C48260", 1, 0.0417, "rev F", "replaces D3 ESD9X5.0 (was behind D4); JLC API 2026-10-02T23:48Z, 299k stock"),
+    ("Protect", "TPD1E10B06DPYR (TI bidirectional ESD, 5.5 V working) at the J3 DOCK_VBUS contact", "D5, D6", "C48260", 2, 0.0417, "rev G", "D5 at J3 DOCK_VBUS replaces D3 (Rev F); D6 at J12 CC (Rev G, O24); JLC API 2026-10-02T23:48Z, 299k stock"),
     ("Protect", "PESD5V0S1BL (bridge outputs)", "D1, D2", "C84374", 0, 0.0334, "rev F removed", "Rev F: DNP footprints deleted (OUT-04)"),
     ("USB", "TPD2E2U06DRLR (D+/D- ESD)", "U6", "C1972959", 1, 0.3224, "rev D", "USB FS on PA11/PA12"),
     ("UI", "C&K KMT022NGJLHS IP68 switch, 1.6 N, 600k cycles", "SW1", "C221707", 1, 0.3902, "rev D", "replaces KXT321; 2.2k pull-down for >= 1 mA contact current"),
@@ -36,7 +36,8 @@ ITEMS = [
     ("Test", "0.1 ohm 1% 1206 bridge shunt 1206W4F100LT5E", "R21", "C25334", 1, 0.0055, "rev E", "Basic (was 0.33R Extended C23410); lift it to disconnect the bridge"),
     ("Test", "0 ohm 0402 link (LDO -> 3V0)", "R20", "C17168", 1, 0.0025, "rev E", "lift it to meter or inject the 3V0 rail"),
     # --- passives (approx. counts after O16)
-    ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 20, 0.012, "rev F", "20 parts (Rev F: C20 removed; C15 itemised below)"),
+    ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 18, 0.012, "rev G", "18 parts (Rev F: C20 removed; C15, C8/C9 itemised below)"),
+    ("Passives", "Samsung CL05A225KP5NSNC 2.2 uF 10 V X5R 0402 (VDD11; ST DS13737 Rev 10 p.153: rated >= 10 V)", "C8, C9", "C107369", 2, 0.0129, "rev G", "Extended; was 6.3 V C12530 (O24); sourcing-lock 2026-09-30, 878k stock"),
     ("Passives", "Murata GRM155R61E475ME15D 4.7 uF 25 V X5R 0402 (charger IN, TI 25 V recommendation)", "C15", "C2858031", 1, 0.0833, "rev F", "Extended; JLC API 2026-10-02T23:50Z, 135k stock"),
     ("Passives", "0402 resistors (Basic)", "R*", "various", 16, 0.003, "rev F", "16 parts (Rev F: R11, R17, R19 removed; R20 and R21 itemised under Test)"),
     # --- pad board (same panel)

@@ -3,19 +3,19 @@
   "COST": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
    "stamp": {
-    "file:docs/build/bom.py": "a30e7adc429c014c",
-    "file:hw/pod/bom_jlc.csv": "ddc0cb572b744af6"
+    "file:docs/build/bom.py": "4b8cba66b4f19187",
+    "file:hw/pod/bom_jlc.csv": "e05479f190cd148d"
    }
   },
   "INTEGRATION": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
    "stamp": {
-    "file:hw/pod/gen.py": "46d83dd26a8ef9e8",
-    "file:hw/pod/system_map.py": "a107d8eb1e7c48f4"
+    "file:hw/pod/gen.py": "2aa23d38f299451d",
+    "file:hw/pod/system_map.py": "b7e4e9696bf44221"
    }
   },
   "PHYSICAL": {
@@ -47,9 +47,9 @@
   "REG-BOARD": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
    "stamp": {
-    "file:hw/pod/place_r1.py": "b7796b807ed5c047",
+    "file:hw/pod/place_r1.py": "6586b4a2a174d804",
     "glob:hw/lib/pod.pretty/*.kicad_mod": "9fa247f977b33b6d",
     "sym:hw/pod/place.py::rules": "cf2bb252c4b5e5fa"
    }
@@ -77,9 +77,9 @@
   "SPEC": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
    "stamp": {
-    "file:docs/spec.md": "ab0e1eac986075de"
+    "file:docs/spec.md": "260bf4b6a132e15e"
    }
   },
   "SUB-AUDIO-IN": {
@@ -104,9 +104,9 @@
   "SUB-DOCK-USB": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
    "stamp": {
-    "block:DOCK_USB": "3df2b1e06050ea5b",
+    "block:DOCK_USB": "eb002351322e7340",
     "sym:hw/mech/shell_r1.py::DOCK": "360addc9267a5030",
     "sym:hw/mech/shell_r1.py::USBC_KEEPOUT": "dd58d48b346d5c4e"
    }
@@ -134,10 +134,10 @@
   "SUB-PROCESSING": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
    "stamp": {
     "block:CLOCK": "0736686412c688d7",
-    "block:CORE_SMPS": "35da7cf5ad91bbf8",
+    "block:CORE_SMPS": "c2e952ea730a4765",
     "block:MCU": "cfac741d1305da0b",
     "glob:sim/dsp/*.py": "621ccf694e2ee7fc"
    }
@@ -156,9 +156,9 @@
   "WHOLE": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
    "stamp": {
-    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "7fa56aa149ddfbe6"
+    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "b04db021d8e262be"
    }
   }
  },
@@ -244,13 +244,26 @@
     "sym:hw/mech/shell_r1.py::tub": "b9b4f10c110d01a3"
    }
   },
+  "R-CLOCK-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
+   "stamp": {
+    "net:LSE_IN": "8cd4fdf3c4179925",
+    "net:LSE_OUT": "e451842e847e6c7f",
+    "ref:Y1": "a1ba339059ee9128",
+    "sym:hw/pod/place_r1.py::PLACE[C11]": "cc55b6579d5bb022",
+    "sym:hw/pod/place_r1.py::PLACE[C12]": "0f0906afca8d72e7",
+    "sym:hw/pod/place_r1.py::PLACE[Y1]": "b91bc6c8060a271a"
+   }
+  },
   "R-COST-BOARD": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
    "stamp": {
-    "file:hw/pod/bom_jlc.csv": "ddc0cb572b744af6",
-    "sym:hw/pod/place_r1.py::PLACE": "17995b4414b9373a"
+    "file:hw/pod/bom_jlc.csv": "e05479f190cd148d",
+    "sym:hw/pod/place_r1.py::PLACE": "22885dca8d763c55"
    }
   },
   "R-DEBUG-BOARD": {
@@ -376,9 +389,9 @@
   "R-PROC-DOCK": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
    "stamp": {
-    "net:CC": "93d4231c5f4cbaa8",
+    "net:CC": "90ab0345f812ddb5",
     "net:USB_DM": "e24d0b9352c00b90",
     "net:USB_DP": "853a8084fd88f631",
     "net:VBUS_SENSE": "1c80a67291a9fe32",
@@ -484,6 +497,20 @@
     "ref:R14": "12274da9ee330976"
    }
   },
+  "R-SMPS-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
+   "stamp": {
+    "net:VDD11": "c95fface11d1e689",
+    "net:VLXSMPS": "1ccb3a18f1ede9ed",
+    "ref:L1": "fa1211ff28d7170b",
+    "sym:hw/pod/place_r1.py::PLACE[C7]": "f510c366ffeab30d",
+    "sym:hw/pod/place_r1.py::PLACE[C8]": "a859ac1488e1c8e2",
+    "sym:hw/pod/place_r1.py::PLACE[C9]": "f325f2db5390ef9f",
+    "sym:hw/pod/place_r1.py::PLACE[L1]": "16564e01d0fc3bd8"
+   }
+  },
   "R-SPEC-BODY": {
    "by": "claude",
    "date": "2026-10-02",
@@ -495,9 +522,9 @@
   "R-SPEC-POWER": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
    "stamp": {
-    "grep:docs/spec.md::D11": "752449d2a51feda6",
+    "grep:docs/spec.md::D11": "2e97b7d968dc4623",
     "grep:docs/spec.md::\\bO1[26]\\b": "1c43865ce9e22be6"
    }
   },
@@ -518,6 +545,16 @@
     "net:LED_A": "a7463c1e8bb60b81",
     "net:LED_K": "0443cd1bf2f94b91",
     "sym:hw/mech/heel.py::CH_D": "537ae252b28b7412"
+   }
+  },
+  "R-UI-BOARD": {
+   "by": "claude",
+   "date": "2026-10-02",
+   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
+   "stamp": {
+    "net:BTN": "0900cf1931215b5e",
+    "ref:SW1": "6a5226a0b24dd9c5",
+    "sym:hw/pod/place_r1.py::PLACE[SW1]": "14e7002148f277ac"
    }
   },
   "R-UI-BODY": {
