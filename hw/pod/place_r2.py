@@ -57,6 +57,7 @@ ESCAPE, ESCAPE_OK = 0.6, {"C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", 
 FAR_FROM_PORT = [("L1", 10.0), ("Q1", 10.0), ("Q2", 10.0)]
 
 
+ROUTE_CLEARANCE = 0.11          # FreeRouting rounds 45-degree segments ~8 um under target: 0.10 gave hole clearance 0.192 < 0.2
 VIA_D = 0.35                    # 0.30 broke the 0.2 mm hole clearance (107 DRC errors, 2026-10-03)
 PWR_NET = "+3V0"     # In2 is a +3V0 plane in Phase 2 (stack F sig / In1 GND / In2 +3V0 / B sig): F is almost empty, so it routes
 
@@ -139,7 +140,7 @@ def build(placement, netlist, W, H, inset=0.0, fanout=True):
     missing = set(placement) ^ set(comps)
     assert not missing, f"placement table and netlist disagree: {sorted(missing)}"
     b = pcbnew.BOARD()
-    P.rules(b)
+    P.rules(b, clearance=ROUTE_CLEARANCE if inset else 0.1)   # the routing copy asks FreeRouting for margin
     nc = b.GetDesignSettings().m_NetSettings.GetDefaultNetclass()
     nc.SetViaDiameter(mm(VIA_D))                     # 0.30/0.15: JLC 4-layer minimum (annular 0.075); the 0.15 drill already pays the small-via fee
     R1.VIA_D = VIA_D
@@ -310,7 +311,9 @@ def route(placement, netlist, W, H, out):
     # second pass: FreeRouting again from the routed board (existing wiring kept), keep it if it is better (2026-10-03: 8 -> 5)
     first = _drc(target, out / "drc.json")
     dsn2, ses2 = out / "board2.dsn", out / "board2.ses"
-    assert pcbnew.ExportSpecctraDSN(pcbnew.LoadBoard(str(target)), str(dsn2))
+    bt = pcbnew.LoadBoard(str(target))
+    bt.GetDesignSettings().m_NetSettings.GetDefaultNetclass().SetClearance(mm(ROUTE_CLEARANCE))   # same margin as pass 1
+    assert pcbnew.ExportSpecctraDSN(bt, str(dsn2))
     subprocess.run([os.environ["FREEROUTING_JAVA"], *os.environ.get("FREEROUTING_JAVA_OPTS", "-Xmx1g").split(),
                     "-jar", os.environ["FREEROUTING_JAR"], "-de", str(dsn2), "-do", str(ses2), "-mp", "200",
                     "--gui.enabled=false"], check=True, timeout=3000, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)

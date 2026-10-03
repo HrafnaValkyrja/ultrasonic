@@ -23,42 +23,49 @@
   ]
  },
  "route": {
-  "tracks": 505,
-  "vias": 130,
+  "tracks": 581,
+  "vias": 133,
   "drc_by_type": {},
   "unconnected": [
    [
-    "Pad 1 [NRST] of TP3 on F.Cu",
-    "Track [NRST] on B.Cu, length 0.1131 mm"
+    "Pad 1 [VSYS] of TP6 on F.Cu",
+    "Track [VSYS] on B.Cu, length 1.2227 mm"
    ],
    [
-    "Pad 1 [VSYS] of TP6 on F.Cu",
-    "Track [VSYS] on B.Cu, length 1.2737 mm"
+    "Track [NRST] on F.Cu, length 0.9108 mm",
+    "Pad 7 [NRST] of U1 on B.Cu"
    ],
    [
     "Pad 1 [SWDIO] of TP1 on F.Cu",
-    "Track [SWDIO] on B.Cu, length 0.7362 mm"
+    "Track [SWDIO] on B.Cu, length 1.2262 mm"
    ],
    [
-    "Track [BTN] on F.Cu, length 0.4767 mm",
-    "Pad 10 [BTN] of U1 on B.Cu"
+    "Pad 10 [BTN] of U1 on B.Cu",
+    "Track [BTN] on F.Cu, length 0.1113 mm"
    ],
    [
-    "Pad 1 [SWCLK] of TP2 on F.Cu",
-    "Track [SWCLK] on B.Cu, length 0.4141 mm"
-   ],
-   [
-    "Track [MDF_CCK] on B.Cu, length 0.5428 mm",
-    "Pad 45 [MDF_CCK] of U1 on B.Cu"
-   ],
-   [
-    "Track [VBUS_SENSE] on B.Cu, length 0.9051 mm",
+    "Track [VBUS_SENSE] on B.Cu, length 0.2100 mm",
     "Pad 11 [VBUS_SENSE] of U1 on B.Cu"
    ],
    [
-    "Track [GB_P] on B.Cu, length 0.2496 mm",
-    "Pad 31 [GB_P] of U1 on B.Cu"
+    "Pad 4 [LSE_OUT] of U1 on B.Cu",
+    "Pad 2 [LSE_OUT] of Y1 on B.Cu"
+   ],
+   [
+    "Pad 1 [MDF_CCK] of TP8 on B.Cu",
+    "Pad 45 [MDF_CCK] of U1 on B.Cu"
    ]
-  ]
+  ],
+  "passes": {
+   "first": [
+    8,
+    0
+   ],
+   "second": [
+    7,
+    0
+   ],
+   "kept": "second"
+  }
  }
 }
