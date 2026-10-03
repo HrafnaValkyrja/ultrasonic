@@ -3,19 +3,19 @@
   "COST": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
    "stamp": {
-    "file:docs/build/bom.py": "1ac4af4c8167cdcd",
-    "file:hw/pod/bom_jlc.csv": "d35b87918eabb110"
+    "file:docs/build/bom.py": "a30e7adc429c014c",
+    "file:hw/pod/bom_jlc.csv": "ddc0cb572b744af6"
    }
   },
   "INTEGRATION": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
    "stamp": {
-    "file:hw/pod/gen.py": "5a486628edd08a89",
-    "file:hw/pod/system_map.py": "9316eedc9788fe53"
+    "file:hw/pod/gen.py": "46d83dd26a8ef9e8",
+    "file:hw/pod/system_map.py": "a107d8eb1e7c48f4"
    }
   },
   "PHYSICAL": {
@@ -47,10 +47,10 @@
   "REG-BOARD": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
    "stamp": {
-    "file:hw/pod/place_r1.py": "577c4f15247a7ab5",
-    "glob:hw/lib/pod.pretty/*.kicad_mod": "09a0210144bdfc1f",
+    "file:hw/pod/place_r1.py": "b7796b807ed5c047",
+    "glob:hw/lib/pod.pretty/*.kicad_mod": "9fa247f977b33b6d",
     "sym:hw/pod/place.py::rules": "cf2bb252c4b5e5fa"
    }
   },
@@ -77,9 +77,9 @@
   "SPEC": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
    "stamp": {
-    "file:docs/spec.md": "2c286fc2d23109d0"
+    "file:docs/spec.md": "ab0e1eac986075de"
    }
   },
   "SUB-AUDIO-IN": {
@@ -94,9 +94,9 @@
   "SUB-DEBUG-TEST": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
    "stamp": {
-    "block:DEBUG": "b8b8b0d939203045",
+    "block:DEBUG": "eb54d1edb852e4fd",
     "block:SELFTEST": "b27227583df8ebd3",
     "ref:R20": "a5162c6335210bda"
    }
@@ -104,9 +104,9 @@
   "SUB-DOCK-USB": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
    "stamp": {
-    "block:DOCK_USB": "6594433d2bc4e20f",
+    "block:DOCK_USB": "3df2b1e06050ea5b",
     "sym:hw/mech/shell_r1.py::DOCK": "360addc9267a5030",
     "sym:hw/mech/shell_r1.py::USBC_KEEPOUT": "dd58d48b346d5c4e"
    }
@@ -114,19 +114,19 @@
   "SUB-OUTPUT": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
    "stamp": {
-    "block:BRIDGE": "649a2246617b132b",
+    "block:BRIDGE": "ec71d59af1a5989c",
     "block:SELFTEST": "b27227583df8ebd3"
    }
   },
   "SUB-POWER": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
    "stamp": {
-    "block:CELL_PADS": "b47de55fdcea40c9",
-    "block:CHARGER": "09b617628575f972",
+    "block:CELL_PADS": "0b9eba20ffd94920",
+    "block:CHARGER": "d7017d171741063b",
     "block:LDO": "a0fe95e66efd5197",
     "block:VBAT_SENSE": "abbd7e8cf9ea5820"
    }
@@ -134,11 +134,11 @@
   "SUB-PROCESSING": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
    "stamp": {
     "block:CLOCK": "0736686412c688d7",
     "block:CORE_SMPS": "35da7cf5ad91bbf8",
-    "block:MCU": "61ee9174fa8e0c1d",
+    "block:MCU": "cfac741d1305da0b",
     "glob:sim/dsp/*.py": "621ccf694e2ee7fc"
    }
   },
@@ -156,9 +156,9 @@
   "WHOLE": {
    "by": "claude",
    "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "note": "Rev F sync 2026-10-02: docs updated (7c17d3e doc-sync + cross-check fixes), BOM regenerated (no diff), spec O23 added; reviewed against gen.py/place_r1.py Rev F",
    "stamp": {
-    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "86211ef5c3c8431d"
+    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "7fa56aa149ddfbe6"
    }
   }
  },
