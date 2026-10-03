@@ -201,10 +201,18 @@ def build_l1(geom: dict, params: dict, bom: dict, pitch: float | None = None):
 
 
 # ---- analysis ----------------------------------------------------------------------------------------------
+def psrr_extra_db(f_in: float, params: dict, scen: str) -> float:
+    """dB of spur above the 1 kHz PSRR figure. Number = flat extra above 20 kHz; 'rolloff_1k' = the e2e sim's rolloff curve
+    (sim/e2e/stages.SupplyInject.psrr_db: PSRR 55 - 20 log10(f/1 kHz), floored at 5 dB), shared table docs/sim/shared-params.yaml#psrr."""
+    v = params["mic"]["psrr_scenarios"][scen]
+    if isinstance(v, str):
+        return min(20 * math.log10(max(f_in, 1e3) / 1e3), 50.0)
+    return float(v) if f_in >= 20e3 else 0.0
+
+
 def spur_dbfs(vrms: float, f_in: float, att_db: float, params: dict, scen: str) -> float:
     m = params["mic"]
-    extra = m["psrr_scenarios"][scen] if f_in >= 20e3 else 0.0
-    return m["psrr_dbfs_per_vrms_1k"] + extra + 20 * math.log10(max(vrms, 1e-18)) + att_db
+    return m["psrr_dbfs_per_vrms_1k"] + psrr_extra_db(f_in, params, scen) + 20 * math.log10(max(vrms, 1e-18)) + att_db
 
 
 def analyse(net, info, geom, params, agg, out_dir: Path, log=print, l2=True):
@@ -262,8 +270,9 @@ def analyse(net, info, geom, params, agg, out_dir: Path, log=print, l2=True):
                 zi = np.array([zt(ai, vi, f) for f in fb])
                 vr = math.sqrt(np.trapezoid(zi ** 2, fb) / (fb[-1] - fb[0])) * w["i_rms_a"]  # flat current density
                 s_nom, s_pes = spur_dbfs(vr, 50e3, 0.0, params, "nominal"), spur_dbfs(vr, 50e3, 0.0, params, "pessimistic")
+                s_w = spur_dbfs(vr, 85e3, 0.0, params, "worst")      # worst: rolloff evaluated at the band top (conservative)
                 best = dict(kind="band", f_hz=50e3, f_out_hz=50e3, v_rms=vr, spur_nom=s_nom, spur_pes=s_pes, limit=band_lim,
-                            margin_nom=band_lim - s_nom, margin_pes=band_lim - s_pes)
+                            margin_nom=band_lim - s_nom, margin_pes=band_lim - s_pes, spur_worst=s_w, margin_worst=band_lim - s_w)
             else:
                 for f, amp in lines(w):
                     fo, att, dc = alias.chain(f)
@@ -278,8 +287,10 @@ def analyse(net, info, geom, params, agg, out_dir: Path, log=print, l2=True):
                             continue
                         vr = amp / math.sqrt(2) * zt(ai, vi, fc if fc != f else f)
                         s_nom, s_pes = spur_dbfs(vr, fc, att_c, params, "nominal"), spur_dbfs(vr, fc, att_c, params, "pessimistic")
+                        s_w = spur_dbfs(vr, fc, att_c, params, "worst")
                         r = dict(kind="tone", f_hz=fc, f_k_nominal_hz=f, f_out_hz=fo_c, att_db=att_c, i_peak_a=amp, v_rms=vr,
-                                 spur_nom=s_nom, spur_pes=s_pes, limit=tone_lim, margin_nom=tone_lim - s_nom, margin_pes=tone_lim - s_pes)
+                                 spur_nom=s_nom, spur_pes=s_pes, limit=tone_lim, margin_nom=tone_lim - s_nom, margin_pes=tone_lim - s_pes,
+                                 spur_worst=s_w, margin_worst=tone_lim - s_w)
                         if best is None or r["margin_pes"] < best["margin_pes"]:
                             best = r
                     # lines that stay below 20 kHz or fold to DC are listed separately (band floor removes them)
@@ -316,6 +327,7 @@ def analyse(net, info, geom, params, agg, out_dir: Path, log=print, l2=True):
     vk = next(i for i, v in enumerate(victims) if v["class"] == "kelvin")
     kel["z_kelvin_5khz_mohm"] = zt(i3, vk, 5e3) * 1e3
     kel["z_kelvin_error_pct_of_r21"] = zt(i3, vk, 5e3) / 0.1 * 100
+    kel["features"] = contributions(net, pairs[i3], probes[vk], 5e3, top=5)   # which copper makes the Kelvin error (LF-1), any board
     # transfer impedance spectrum for the report (mic supply from each aggressor), a few decades
     zsum = {}
     for ai, a in enumerate(aggs):
@@ -370,12 +382,20 @@ def metrics(res: dict, agg: dict, limits: dict) -> list[dict]:
     out = []
     mic = [r for r in res["rows"] + res["l2_rows"] if r["victim"] in ("V1_MIC_SUPPLY", "FV1_MIC_VDD") and r["kind"] in ("tone", "band")]
     w = min(mic, key=lambda r: r["margin_pes"]) if mic else None
+    wn = min(mic, key=lambda r: r["margin_nom"]) if mic else None
+    ww = min(mic, key=lambda r: r.get("margin_worst", 1e9)) if mic else None
     out.append(dict(id="LN-M01", name="mic supply spur margin (worst line/band, pessimistic PSRR)", value_db=w and round(w["margin_pes"], 1),
-                    limit_db=">= 0", ok=bool(w and w["margin_pes"] >= 0), at=w and f"{w['aggressor']} {w['mechanism'] if 'mechanism' in w else ''} {w['f_hz']:.0f} Hz -> {w['f_out_hz']:.0f} Hz"))
+                    limit_db=">= 0 (sign-off >= 10)", ok=bool(w and w["margin_pes"] >= 0), signoff=bool(w and w["margin_pes"] >= 10),
+                    at=w and f"{w['aggressor']} {w['mechanism'] if 'mechanism' in w else ''} {w['f_hz']:.0f} Hz -> {w['f_out_hz']:.0f} Hz",
+                    value_db_nominal=wn and round(wn["margin_nom"], 1),
+                    value_db_worst=ww and round(ww.get("margin_worst", float("nan")), 1),
+                    at_worst=ww and f"{ww['aggressor']} {ww.get('mechanism', '')} {ww['f_hz']:.0f} Hz -> {ww['f_out_hz']:.0f} Hz",
+                    psrr_scenarios="nominal flat 55 dB | pessimistic 35 dB above 20 kHz | worst e2e rolloff 55-20log10(f/1k), floor 5 dB (docs/sim/shared-params.yaml#psrr)"))
     dig = [r for r in res["l2_rows"] if r["kind"] == "digital"]
     if dig:
         d = min(dig, key=lambda r: r["margin_pes"])
         out.append(dict(id="LN-M02", name="PDM line pickup, sum of harmonics vs 100 mV", value_db=round(d["margin_pes"], 1), limit_db=">= 12", ok=d["margin_pes"] >= 12,
+                        review=d["margin_pes"] < 12 + 10, review_why="margin inside the +-10 dB L2 model error (layout-noise.yaml limits.regime_error_budget): treat as REVIEW at the next re-route",
                         at=f"{d['aggressor']} -> {d['victim']} {d['mechanism']}"))
     k = res["kelvin"]["z_kelvin_error_pct_of_r21"]
     out.append(dict(id="LN-M03", name="I_SENSE Kelvin error (plane+stub drop shunt-GND to MCU VSSA, % of R21) at 5 kHz", value_pct=round(k, 2), limit_pct="<= 2", ok=k <= 2.0))
@@ -390,9 +410,10 @@ def metrics(res: dict, agg: dict, limits: dict) -> list[dict]:
         out.append(dict(id="LN-M05", name="bridge rail ripple 1.5-8 kHz x leg asymmetry 10 % vs 50 uV rms", value_uv=round(v * eps * 1e6, 3), limit_uv="<= 50", ok=v * eps * 1e6 <= 50, at=f"{a['aggressor']} {a['audio']['f_hz']:.0f} Hz"))
     e = res.get("e2e_if")
     if e:
-        out.append(dict(id="LN-M06", name="ripple at mic VDD 1-100 kHz (background lines + noise), mV rms", value_mv_rms=round(e["background_mv_rms"], 4),
-                        value_mv_rms_20k_100k=round(e["background_mv_rms_20k_100k"], 4), limit_mv_rms="<= 10 (PSRR flat) / <= 0.3 (PSRR rolls off)",
-                        ok=e["background_mv_rms"] <= 0.3, at=f"{e['dominant_line']['source']} {e['dominant_line']['f_hz']:.0f} Hz" if e.get("dominant_line") else None))
+        out.append(dict(id="LN-M06", name="INFORMATIONAL: ripple at mic VDD 1-100 kHz (background lines + noise), mV rms; the pass/fail form is LN-M01 (per line/band after PSRR, 20-96 kHz)",
+                        value_mv_rms=round(e["background_mv_rms"], 4), value_mv_rms_20k_100k=round(e["background_mv_rms_20k_100k"], 4),
+                        limit_mv_rms="none (retired 2026-10-02: a white-ripple rms limit is ill-posed for a line spectrum below the band)",
+                        ok=None, at=f"{e['dominant_line']['source']} {e['dominant_line']['f_hz']:.0f} Hz" if e.get("dominant_line") else None))
     return json.loads(json.dumps(out, default=lambda o: o.item() if hasattr(o, "item") else str(o)))
 
 
@@ -559,8 +580,10 @@ def plot(res, freqs, Zt, aggs, victims, out: Path):
 def check_doc(res: dict, doc_path: Path = DOC) -> list[str]:
     """Compare this run with docs/sim/layout-noise.yaml: thresholds always, `results` only when the board sha matches."""
     out = []
+    if not res.get("valid", True):
+        out.append("INVALID run (stale board vs netlist, or unrouted nets): results not comparable; " + "; ".join(res.get("warnings", [])[:2]))
     if not doc_path.exists():
-        return [f"doc missing: {doc_path}"]
+        return out + [f"doc missing: {doc_path}"]
     d = yaml.safe_load(doc_path.read_text())
     fl = res["floor"]["nominal"]
     th = d["thresholds"]
@@ -588,19 +611,22 @@ def check_doc(res: dict, doc_path: Path = DOC) -> list[str]:
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("board", nargs="?", default=str(REPO / "hw/pod/draft_r1/fanout/pod_r1_routed.kicad_pcb"))
+    ap.add_argument("board", nargs="?", default=None, help="default: newest routed board (pcbgeom.default_board; env NOISE_BOARD)")
     ap.add_argument("--out", default=str(HERE / "out"))
     ap.add_argument("--params", default=str(HERE / "params.yaml"))
+    ap.add_argument("--netlist", default=str(REPO / "hw/pod/pod.net"), help="schematic netlist for the stale-board check ('' to skip)")
     ap.add_argument("--aggressors", default=str(HERE / "aggressors.yaml"))
     ap.add_argument("--no-l2", action="store_true")
     ap.add_argument("--plot", action="store_true", help="write noise_budget.png (dark)")
     ap.add_argument("--check-doc", action="store_true", help="compare thresholds/results with docs/sim/layout-noise.yaml")
     ap.add_argument("--sweep", action="store_true", help="re-run L1 under perturbed assumptions (LDO Zout, PA5 R, die C, MLCC derating, ESR)")
     a = ap.parse_args(argv)
+    a.board = a.board or pcbgeom.default_board(REPO)
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     params, agg = load_yaml(a.params), load_yaml(a.aggressors)
     geom = pcbgeom.load(a.board)
+    nd = pcbgeom.netlist_diff(geom, a.netlist) if a.netlist and Path(a.netlist).exists() else None
     bom = lumped.read_bom(str(REPO / params["board"]["bom"]))
     t0 = time.time()
     net, info, mesh, red = build_l1(geom, params, bom)
@@ -609,7 +635,14 @@ def main(argv=None):
     res["e2e_if"] = export_if(res, freqs, Zt, pairs, probes, aggs_ok, victims_ok, out, geom["sha256"])
     res["dc_plane_mohm"] = dc_metrics(red, geom, info, params)
     res["dc_rail_paths_mohm"] = dc_rail_paths(net, info)
-    res["valid"] = not any("no copper path" in w for w in res["warnings"])
+    if nd is not None:
+        res["netlist_check"] = dict(netlist=a.netlist, pads_netlist=nd["pads_netlist"], pads_board=nd["pads_board"], mismatches=len(nd["mismatch"]),
+                                    first=[list(map(str, m)) for m in nd["mismatch"][:6]])
+        if nd["mismatch"]:
+            res["warnings"].insert(0, f"board is STALE vs {Path(a.netlist).name}: {len(nd['mismatch'])} pad->net mismatches (first {nd['mismatch'][:4]})")
+    else:
+        res["netlist_check"] = dict(skipped=True)
+    res["valid"] = not any("no copper path" in w or "STALE" in w for w in res["warnings"])
     res["metrics"] = metrics(res, agg, {})
     res["board"] = dict(path=a.board, sha256=geom["sha256"], stackup=geom["stackup"]["src"])
     np.savez_compressed(out / "transimpedance.npz", freqs=freqs, aggressors=[x["id"] for x in aggs_ok], probes=[v["id"] for v in victims_ok],
@@ -633,7 +666,7 @@ def main(argv=None):
     for w in res["warnings"]:
         print("WARNING:", w)
     if not res["valid"]:
-        print("RESULTS INVALID: the board is not routed on the extracted nets; fix routing before reading any number below")
+        print("RESULTS INVALID: stale board (pad->net map != schematic netlist) or nets without copper; fix before reading any number below")
     print("IF-MIC-VDD-NOISE written; background ripple at mic VDD (all declared non-bridge lines + noise, 1-100 kHz):", f"{res['e2e_if']['background_mv_rms']:.4f} mV rms, of which 20-100 kHz {res['e2e_if']['background_mv_rms_20k_100k']:.4f} mV rms")
     print("DC rail paths mOhm (copper only, pad to pad):", res["dc_rail_paths_mohm"])
     if a.check_doc:
@@ -646,5 +679,10 @@ def main(argv=None):
     return res
 
 
+def exit_code(res: dict) -> int:
+    """0 = valid run and (if checked) doc agrees; 1 = invalid run or doc drift/stale (the smoke run must fail loudly)."""
+    return 0 if res.get("valid", False) and not res.get("doc_check") else 1
+
+
 if __name__ == "__main__":
-    main()
+    sys.exit(exit_code(main()))

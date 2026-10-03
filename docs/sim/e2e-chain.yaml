@@ -1,0 +1,292 @@
+# SIM-E2E: end-to-end chain simulation, mic -> exciter -> audibility proxy. Audience: other Claude instances.
+# Format rules (owner 2026-10-02): current state only; every fact carries src (file:symbol | spec Lnn | URL) + date; pointers not copies;
+# invariants are checkable thresholds; one 'why:' per non-obvious item. Dates are ISO. Lnn = line in docs/spec.md as of 2026-10-02
+# (file header says v0.14, content is v0.15). Run: see run.cmd. Re-run after ANY change listed in watch. Catalogue: docs/sim/index.yaml.
+meta:
+  id: SIM-E2E
+  date: 2026-10-02
+  scope: "ladder step C (owner O18, spec L644): simulation + firmware tested before hardware; catches hardware-only failure classes before the board order"
+  layout_agnostic: true   # reads no .kicad_pcb/.kicad_sch/.net; design values enter only through design_binding + docs/sim/shared-params.yaml; geometry only through IF-* files from sibling sims
+  code: [sim/e2e/chain.py, sim/e2e/stages.py, sim/e2e/metrics.py]
+  shared: docs/sim/shared-params.yaml   # exciter, PSRR scenarios, thresholds (both conventions), clocks, ceiling definition: read at import
+  outputs: sim/out/e2e/   # <scenario>.json, <scenario>_spectrogram.png (dark, tools/plotstyle.py, 2.5 s window), summary.json, sweep_<name>.json
+  last_run: {date: 2026-10-02T21:25, cmd: "chain.py --scenario all --no-plot", wall_s: 14.0, peak_rss_mb: 672, pass: 5, warn: 28, open: 0, fail: 3, plus_spice: "1 OPEN (validation at 25 ns 3.6 dB > 3; 10.2 s, 537 MB)"}
+  honesty: "6 of 10 stages are stub or model with placeholder parameters, plus 3 pseudo-stage assumptions (mic_ein, fet_model, psrr); every audibility number (SL, loudness) is a stub-dependent proxy and prints WARN, never PASS"
+  status_words: {PASS: "threshold met, no stub in the way", WARN: "a stub or pseudo-stub decides it (line shows would pass/fail)", OPEN: "fails an ASSUMED threshold (owner confirms the number)", FAIL: "fails a spec or derived threshold with no stub in the way"}
+abbr:
+  ADF1: STM32U575 Audio Digital Filter (PDM->PCM hardware block, keeps running in Stop 2)
+  AD: 2-level PWM modulation, bridge legs complementary (spec D6 L166)
+  CCR: TIM1 capture/compare register, duty counts 0..ARR (ARR 200)
+  CIC5: 5th-order cascaded integrator-comb (sinc^5) decimator, first stage of ADF1
+  RSFLT: ADF1 reshape IIR filter after the CIC (coefficients unpublished, risk R18)
+  PDM: pulse-density modulation, 1-bit stream at the mic clock (4.00045 MHz)
+  PCM: pulse-code modulated samples (here 200 kS/s)
+  DT: dead time between the two FETs of a bridge leg
+  EIN: equivalent input noise of the mic (dB SPL)
+  PSRR: "power-supply rejection ratio (mic: dB below full scale per volt of supply ripple)"
+  FS: digital full scale; this repo's convention dBFS peak-ref = a sine of peak 1.0 is 0 dBFS (pipeline.dbfs)
+  ILD: interaural level difference (dB), the stereo cue (spec D2 L107)
+  TA: transcranial attenuation, isolation between the two ears' exciters (spec D1 L87-L88)
+  SL: sensation level = dB above the owner's threshold; proxy here, see proxy
+  RETFL: reference equivalent threshold force level, dB re 1 uN (ISO 389-3, mastoid)
+  FWIL: firmware-in-the-loop (firmware replaces the DSP stage)
+  stub: "placeholder where an INTERFACE or measurement is missing; model: new model with sourced params; real: existing repo model used as is"
+  pseudo-stage: "an assumption with no stage object (mic_ein, fet_model, psrr): metric deps name it so the metric prints WARN"
+  pre-roll: "seconds of steady scene before the measured window (6 s >= 2x the DSP floor tracker's 3 s rise)"
+  IF-*: interface contract with a sibling sim (section interfaces)
+  E/O/R/D-n: owner bench measurement / owner decision / risk / decision in docs/spec.md sections 12/12/11/4
+  S1-S4: "bench stages of spec section 10 (superseded in part by O9: rev 1 board is the prototype)"
+
+run:
+  cmd: "source tools/env.sh && systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 python3 sim/e2e/chain.py [--scenario T1|T2|T3|T6|D17|lat|pwr|selftest|spice|R15|all] [--dur S] [--preroll 6.0] [--seed 1] [--set k=v ...] [--sweep exciter|mic|port|supply] [--no-plot]"
+  smoke: "same fence, chain.py --scenario all --no-plot   # 14.0 s, 672 MB (2026-10-02 21:25)"
+  fence: {memory_max_gb: 3, why: "parallel-agent rule, CLAUDE.md 2026-10-02; never FreeRouting/place*.py"}
+  pythons: {venv: /opt/ultrasonic-tools/venv, python: 3.14.4, numpy: 2.5.3, scipy: 1.18.1, matplotlib: 3.11.2, PyYAML: 6.0.3, scikit-fem: 12.0.2, src: "pip list, 2026-10-02"}
+  measured_2026-10-02T21:25:   # wall = whole process incl. imports, one scenario per process, fenced 3 GB; src: /usr/bin/time; audio = pre-roll + measured
+    T1:       {audio_s: "6 + 2", wall_s: 2.5, rss_mb: 470, with_plot: {wall_s: 3.5, rss_mb: 643}}
+    T2:       {audio_s: "6 + 2", wall_s: 2.4, rss_mb: 471, with_plot: {wall_s: 3.4, rss_mb: 641}}
+    T6:       {audio_s: "10 + 5 x 0.6 power-ons", wall_s: 5.6, rss_mb: 505, with_plot: {wall_s: 6.8, rss_mb: 749}}
+    R15:      {audio_s: "6 + 4", wall_s: 4.2, rss_mb: 536, with_plot: {wall_s: 5.4, rss_mb: 761}}
+    D17:      {audio_s: 1.0, wall_s: 1.0, rss_mb: 189}
+    spice:    {wall_s: 10.2, rss_mb: 537, note: "2 ngspice cases x ~5 s x ~450 MB; not in all"}
+    all:      {no_plot: {wall_s: 14.0, rss_mb: 672}, with_plot: {wall_s: 19.6, rss_mb: 2161, note: "one process: RSS does not shrink between scenarios; plot per scenario instead"}}
+    sweeps:   {exciter: {wall_s: 1.3, rss_mb: 185}, supply: {wall_s: 3.0, rss_mb: 200}}
+  scaling: {time: "~0.25 s compute per second of audio (no plot)", memory: "~160 MB base + ~39 MB per second of audio (no plot); plotting is capped at PLOT_SPAN_S 2.5 s", max_single_run_s_at_3gb: "~60 s no-plot (estimate 2.5 GB: H1 runs now, chunking optional)", correction: "the 2026-10-02 01:22 figures (170 MB/s, 12 s limit) included plotting the whole run (skeptic re-measure, confirmed)"}
+
+# ------------------------------------------------------------------------------------------------ what exists
+inventory:   # src: file reads 2026-10-02
+  sim/dsp/pipeline.py:
+    models: [microphone, decimate_to_fs, algo_b, algo_a, idle_detector, idle_detector_fft, limiter, soft_ceiling, calibrate_noise]
+    rates: {FS_IN: 400000, FS: 200000, FS_OUT: 12500}
+    mic: {sens_dbfs_at_94spl: -26.0, ein_dbspl: 29.7, ein_basis: "94 - 64.3 dB(A) SNR, treated flat 0-100 kHz (ultrasonic floor unknown, E3)", response: sim/data/sph0641_ultrasonic_response.json, response_cond: "digitised Rev B sheet 7, 3.072 MHz, 1.8 V, 10-80 kHz (+14.7 dB at 25 kHz = test-fixture resonance, spec D13 L229-L232)"}
+    decimation: "D2 only: 31-tap half-band 400->200 kS/s; the plan of record is D1 (CIC5/5 + RSFLT/4, spec D14 L258, A3 plan s1.2); e2e adds D1"
+    algo_b: {nfft: 256, hop: 128, bands: 28, band_hz: [20000, 85000], out_hz: [1500, 4000], gain_db: 30, ceiling_dbfs: -12, gate_db: 6, floor_s: [3.0, 0.3], env_ms: [1.5, 15], eq: "inverse datasheet curve"}
+    limiter: {attack_ms: 0.5, release_ms: 60, backstop: "soft_ceiling(ceiling+3 dB): tanh asymptote = ceiling+3 dB = -9 dBFS"}
+    limits:
+      - "batch only (no streaming/hop ABI)"
+      - "algo_b stamps hop h output at the frame START; a causal firmware emits it 1.28 ms later (e2e lat budget adds it back)"
+      - "limiter works on 12.5 kS/s samples; true peak after x16 interpolation is higher (finding F1)"
+      - "mic EQ assumes the datasheet fixture curve, not the as-built acoustic path (finding F6)"
+    used: wrapped as stages mic, adf(D2), dsp
+  sim/dsp/corpus.py: {models: "synthetic Pa @400 kS/s: bats 70/62 dB SPL, katydid, whines 40/35, keys 65, HC-SR04 85, speech 60", used: "fm_call, db_spl_to_pa_rms, filters; scenes rebuilt in chain.py (corpus.scene windows are fixed to 6 s)"}
+  sim/dsp/run_phase1.py: {models: "scene -> mic -> B/A -> idle detector; writes sim/out/dsp/summary.json (2026-09-30: silence out -79.6 dBFS, whines-only window -90 dBFS)", used: "numbers cross-checked in T1/T6"}
+  sim/dsp/nature_demo.py: {models: "Port Meadow clips (Zenodo 22079773, CC-BY-4.0, dl 2026-09-30) scaled so loudest 10 ms ultrasonic window = 75 dB SPL; 'bone-conduction coloration and exciter response NOT modelled'", used: "same scaling in chain.port_meadow(); clips at ../ultrasonic-scratch/rec/extracts/"}
+  sim/checks/bridge_spice.py: {models: "ngspice 45.2 full bridge, DMC2400UV stand-in (Diodes model 2014-11-18; PMCXB290UE model behind Nexperia bot wall), R+L load, 100k gate pulls", cost: "4.6-5.2 s and ~450 MB per case (measured 2026-10-02)", used: "scenario spice validates Bridge"}
+  sim/checks/deadtime_switching.py: {models: "per-period switch-level AD/BD with diode clamp in DT, no R_on, no back-EMF", used: "leg_edges/leg_state imported by chain.switch_level"}
+  sim/checks/pwm_noise.py: {models: "quantiser + coil LPF, band noise", used: no}
+  sim/checks/ntf_compare.py: {models: "NTF variants, bands 0.2-8/8-20/20-40 kHz", used: "shaper design (3rd order, DC zero + pair at 13 kHz) reproduced in stages.PwmShaper"}
+  sim/checks/pwm_ultrasonic_leak.py: {models: "shaper noise in 20-85 kHz for 200/400/800 kHz PWM (-35/-45/-59 dB re FS, bridge V)", used: "MP-01 numbers; e2e computes the coil-force noise in 20-85 kHz (T6.info)"}
+  sim/checks/power.py: {models: "per-block mA low/nom/high, idle vs active, USABLE (0.9/0.85/0.75)", used: "imported by scenario pwr (ACTIVE, IDLE, USABLE)"}
+  sim/checks/idle_detector.py: {models: "wake detector rev 2, real Port Meadow 270 files: 95.5% of 10,024 calls within 10 ms (spec L411)", used: no}
+  sim/checks/bridge_fet_compare.py: {models: "B1 pair comparison: Qg, R_on at 3.0 V", used: "R_on values via sub-output Key numbers"}
+  sim/checks/[balance, tragus_spring, niti_arm_real, niti_closed_form, niti_preload, sot1216_footprint].py: {models: "mass balance; NiTi arm force; footprint land pattern", used: "no (mechanics/footprint; feed IF-BONE-TF force/contact inputs)"}
+  sim/spice/: {content: "DMC2400UV.lib, DMC2400UV_ng.lib (ngspice convergence copy), dmc2400uv_rds_qg.cir", defect: "dmc2400uv_rds_qg.cir has a stale absolute .include /home/user/ultrasonic/... (cloud-era path)"}
+  tools/spice.py: {api: "run(netlist) -> SpiceResult(.tran/.ac/.op/.meas); tavg, resample", src: "tools/spice.py docstring"}
+  sim/e2e/: {new: 2026-10-02, models: "chain composition, ADF D1, shaper, behavioural bridge, exciter RLC+motional (shared exciter), force proxy, audibility proxy (2 threshold conventions), 37 metrics + spice, 4 sweeps, IF loaders (port, mic VDD)"}
+
+
+# ------------------------------------------------------------------------------------------------ chain
+rates:   # hardware clocks: docs/sim/shared-params.yaml#clocks (HCLK 80.009 MHz; PDM 4,000,450 Hz; PCM/PWM 200,022.5 Hz)
+  acoustic: {fs: 400000, unit: Pa, shape: "[N]", why: "Nyquist 200 kHz covers the 200 kHz PWM carrier and the 20-96 kHz band; = pipeline.FS_IN"}
+  mic_pdm_clock: {hz: 4000450, src: "shared-params clocks.fs_pdm_hz = HCLK/20 (stages.FS_CLK_MIC; was 4,000,400 until 2026-10-02)", sim: "not run per bit in the chain (flat-EIN mic model + analytic ADF); stages.pdm_bitstream_selftest runs a true 1-bit 4.0 MHz stream for the CIC5 gain only"}
+  pcm: {fs: 200000, hardware: 200022.5, src: "shared-params clocks; the 112 ppm difference is ignored inside the e2e (all its rates scale together, D14 L249)", unit: "FS-peak, 1.0 = 0 dBFS", shape: "[N/2]"}
+  dsp_out: {fs: 12500, unit: "duty, 1.0 = full-scale differential", shape: "[N/32]", src: spec D14 L246}
+  pwm: {fs: 200000, unit: "duty after x16 interpolation + shaper, 201 levels", shape: "[N/2]", src: spec D6 L155}
+  coil_force: {fs: 200000, unit: "A, N", shape: "[N/2]", note: "per-PWM-period average; the 200 kHz carrier and ripple are not in the stream (ripple handled analytically: I_ripple_pk = Vdd/(4 L f), spec D6 L167)"}
+stages:   # order = chain order; status: real|model|stub; process(Sig, Ctx) -> Sig; swap by id
+  - {id: acoustic_path, cls: stages.AcousticPort, status: "stub (flat) | model (port_json given)", in: "Pa @400k", out: "Pa @400k", model: "flat, Lorentzian bands (port_bands), or IF-ACOUSTIC-PORT json (magnitude, 511-tap linear-phase FIR; np.interp holds the 1 kHz / 100 kHz edge values outside the provider's 1-100 kHz grid: affects only 100-120 kHz, which the ADF stub attenuates 0..70 dB)", src: "spec D13 L232, R14 L608"}
+  - {id: mic, cls: stages.Microphone, status: model, in: "Pa @400k", out: "FS @400k", model: "pipeline.microphone: -26 dBFS/94 dB SPL, datasheet response FIR, flat EIN; knobs mic_sens_db (+-1 dB, D13 L227), mic_noise_scale", src: "datasheet Rev B-1 p.3 (Syntiant, local ../ultrasonic-scratch/sph0641_sq.pdf.txt, read 2026-10-02)"}
+  - {id: supply_inject, cls: stages.SupplyInject, status: "stub | model (mic_vdd_json given)", in: "FS @400k (+ V @400k)", out: "FS @400k", model: "volts at mic VDD x PSRR(f), scenarios flat55|pess35|rolloff (shared-params#psrr); sources: ext_ripple_mv white 1-100 kHz; IF-MIC-VDD-NOISE background lines + PSD (mic_vdd_json); loopback = bridge supply current x |h_ibridge_to_micvdd(f)| FIR (json) or scalar h_mic_ohm (stub, renamed from z_rail_ohm)", src: "datasheet p.3; IF-MIC-VDD-NOISE"}
+  - {id: adf, cls: stages.AdfDecimator, status: "stub for D1 (RSFLT unpublished), real for D2", in: "FS @400k", out: "FS @200k", model: "D1 = CIC5 droop (exact, -0.777 dB at 85 kHz = A3 -0.78) x RSFLT stub (flat to 88.8 kHz, raised-cosine to -70 dB at 120 kHz); D2 = pipeline.decimate_to_fs; true 1-bit 2nd-order PDM + CIC5 only in selftest (tone gain -0.07 dB vs model)", src: "A3 plan s1.2; RM0456 Fig. 338 (figure only)"}
+  - {id: dsp, cls: stages.DspStage, status: real, in: "FS @200k", out: "duty @12.5k", model: "pipeline.algo_b (default) or algo_a; knobs transient_only, volume_db, ceiling_dbfs, noise_cal=matched|nominal; replace by FirmwareDspShaperStage (cosim)", src: "spec s5 L312-L334"}
+  - {id: shaper, cls: stages.PwmShaper, status: model, in: "duty @12.5k", out: "duty @200k", model: "x16 interpolation (interp=ideal(Kaiser b9)|linear|zoh), squelch (rms 5 ms < squelch_dbfs for 20 ms -> exact 0, dither off, shaper state reset), 3rd-order error feedback, TPDF dither, 201 levels; exports x_interp_peak (pre-quantiser true peak) and ccr_stream_peak", src: "spec D6 L155,L176-L181", unspecified_in_spec: [interpolator filter, squelch threshold, state reset]}
+  - {id: bridge, cls: stages.Bridge, status: model, in: "duty @200k", out: "V @200k", model: "V = Vdd*duty - Vdd*4*td_eff*f_pwm*clip(i/I_ripple_pk,-1,1), td_eff = max(td - 10.5 ns, 0); also outputs supply current", validated: {vs: "ngspice DMC2400UV, -12 dBFS, 0.3 mH, 2 kHz", date: 2026-10-02, fitted_12p5ns: {spice_db: -51.9, model_db: -51.0}, out_of_sample_25ns: {spice_db: -38.4, model_db: -34.8, delta_db: 3.6, status: "OPEN (> 3 dB)"}, limits: "fitted at 12.5 ns; no dead-time term at -40 dBFS (SPICE -61/-48/-44 dB at 12.5/25/37.5 ns); PMCXB290UE unmodelled (pseudo-stage fet_model)"}, src: "spec D6 L166-L175; C3 s5"}
+  - {id: exciter, cls: stages.Exciter, status: stub, in: "V @200k", out: "A @200k", model: "series R_tot = r_exc + 1.52 (pair, wire, shunt), L, motional parallel RLC from (bl, m_eff, f0, qm): Rm = Bl^2/c, Lm = Bl^2/k, Cm = m/Bl^2; bilinear at 200 kHz", params: "docs/sim/shared-params.yaml#exciter nominal (= sim/acoustics/bone.py): R 8 ohm, L 0.5 mH, Bl 1.0 N/A, m 0.45 g, f0 350 Hz, Q 3; D17 runs the peak-current corner R 8 ohm, L 0.3 mH (stages.PEAK_CORNER)", changed: "2026-10-02 21:20: was L 0.3 mH, f0 800, m 0.6 g, Rm 2 ohm -> Bl 1.41 (own stub); now one exciter for e2e, acoustics and layout-noise"}
+  - {id: mech_bone, cls: stages.MechBone, status: stub, in: "A @200k", out: "N @200k", model: "F = Bl*i*H; H = 1 (flat) or blocked-housing high-pass; no pad/skin/cartilage coupling (IF-BONE-TF replaces it 0.25-16 kHz)", src: "IF-BONE-TF"}
+  - {id: proxy, cls: metrics.sensation_level, status: "model, thresholds from shared-params#thresholds", in: "N @200k", out: "SL dB [frames,19 third-octave bands 250-16k], loudness_proxy", model: "8192-pt Hann spectrogram, 20 ms hop; thr convention retfl_minus_tragus (default: ARL-TR-4138 Table 8 RETFL - 20 dB) or front_measured (Surendran 2023); key SL metrics print the other convention in note; loudness = sum 2^((SL-40)/10) over SL>0 (Stevens-style, NOT ISO 532)"}
+pseudo_stages:   # stages.PSEUDO_STATUS; listed in metric deps so the metric prints WARN while the assumption stands
+  mic_ein: {status: stub, assumption: "mic ultrasonic noise floor = audio-band EIN extrapolated flat (29.7 dB SPL A)", retire: E3}
+  fet_model: {status: stub, assumption: "DMC2400UV stand-in; PMCXB290UE SPICE model behind the Nexperia bot wall (sub-output issue 7)", retire: "vendor model or E7 / S2 measurement"}
+  psrr: {status: stub, assumption: "mic PSRR above 1 kHz (shared-params#psrr scenarios)", retire: "S2 supply-injection sweep (layout-noise LN-R12)"}
+
+# ------------------------------------------------------------------------------------------------ interfaces
+interfaces:   # provider docs: docs/sim/acoustics.yaml, docs/sim/layout-noise.yaml, docs/sim/firmware-emulation.yaml; table: docs/sim/index.yaml interfaces
+  IF-ACOUSTIC-PORT:
+    provider: "sim/acoustics/run_port.py (docs/sim/acoustics.yaml interfaces)"
+    consumer: "stages.AcousticPort.curve_db (param port_json)"
+    files: {as_built: sim/acoustics/out/port_response.json, recommended: sim/acoustics/out/port_response_chimney_d1.0.json, fallback: sim/acoustics/out/port_response_gasket_id2.1.json}
+    format: "json {f_hz[500 log 1-100 kHz], mag_db, phase_deg, bands, cond, ...}; consumed: f_hz + mag_db (magnitude only)"
+    ref: "RATIO p_diaphragm(our path) / p_diaphragm(mic port flush in a baffle): multiply with the datasheet curve (stages.Microphone does, AcousticPort sits before it); NOT free-field-to-diaphragm, which would count the mic's 25 kHz peak twice"
+    results_2026-10-02: {as_built: {T1.event_out_dbfs: -39.4, T1.event_sl_p90_db: 59.9, T2.call_recall_20ms: 0.43, T1.background_sl_max_db: -209.5}, chimney_d1.0: {T1.event_out_dbfs: -18.9, T1.event_sl_p90_db: 79.7, T2.call_recall_20ms: 1.00, T1.background_sl_max_db: 28.9, T2.comfort_sl_p99_db: 80.0}, reading: "the open gap loses the bats (recall 0.43) AND hides the self-noise breakthrough (F12); the sealed duct restores both"}
+  IF-ACOUSTIC-LEAK:
+    provider: "sim/acoustics (air path only; structure path has no provider)"
+    consumer: T6 requirement check
+    format: "json {f_hz, mag_db_pa_per_n}, ref 'pressure at the mic port per newton of COIL force Bl*i (the force driving the housing)'"
+    requirement_from_e2e: {nominal_exciter: "<= 472 Pa/N", loud_corner: "<= 46 Pa/N (Bl 2.0, L 0.3 mH, R 8 ohm: max shaped-noise force 12 uN rms in 20-85 kHz)", basis: "shaped-noise force must stay 6 dB below the mic floor (1.10 mPa rms in 20-85 kHz)", src: "sim/out/e2e/T6.json info + corner run 2026-10-02 21:30"}
+    provider_value: "0.27 Pa/N at the lid; x port ratio (chimney +20.2 dB peak at 84.7 kHz) -> <= ~2.7 Pa/N at the diaphragm: ~25 dB margin vs the loud corner"
+  IF-MIC-VDD-NOISE:
+    provider: "sim/noise/budget.py export_if (docs/sim/layout-noise.yaml interfaces); Rev F board sha e159bccb65b756d9"
+    consumer: "stages.SupplyInject (param mic_vdd_json) + chain.run_chain loopback"
+    format: "f_hz 1-196 kHz (323); h_ibridge_to_micvdd_ohm {re,im} (THIS is the mic transfer); z_rail_ohm {re,im} (the BRIDGE rail Q1.4-R21.2: not used here); background_lines_1k_100k [{f_hz, v_rms}]; background_noise [{f_hz[], psd_v2_per_hz[]}]"
+    use: "background lines (random phase) + PSD -> V(t) at 400 kS/s; loopback: |h(f)| as 511-tap linear-phase FIR on ctx.side['i_sup'] (phase ignored: single path)"
+    check_2026-10-02: {cmd: "chain.py --scenario T6 --dur 3 --no-plot --set mic_vdd_json=\"'sim/noise/out/IF-MIC-VDD-NOISE.json'\" loopback=True psrr_mode=\"'rolloff'\"", mic_vdd_noise_mv_rms: 0.1665, provider_mv_rms: 0.1666, squelch_margin_db: 7.34, without_supply_db: 7.80, reading: "Rev F copper costs 0.46 dB of squelch margin under the worst PSRR"}
+    requirement_from_e2e: "per line / per band AFTER PSRR in 20-96 kHz (layout-noise LN-M01 form: tone <= -112.3 dBFS per 781 Hz bin, band <= -93.1 dBFS over 20-85 kHz); the old '<= 0.3 / 10 mV rms over 1-100 kHz' is RETIRED (white-ripple derivation, ill-posed for a line spectrum)"
+    sweep_supply_2026-10-02: "white ripple at which the idle output rises by >= 1 dB: flat55 10 mV; pess35 1 mV; rolloff 0.3 mV (sweep_supply.json)"
+  IF-BONE-TF:
+    provider: "sim/acoustics/bone.py (sim/acoustics/out/bone_tf.json), later E2"
+    consumer: "stages.MechBone (loader not written: F = 10^(mag_db_n_per_a/20) * i over 0.25-16 kHz)"
+    consistency: "exciter parameters now shared (shared-params#exciter): current from stages.Exciter and force from bone.py use the same Bl, L, f0, m; above 16 kHz keep F = Bl*i (the leak requirement is per newton of coil force)"
+    need: "absolute level to +-6 dB; sets whether T2 is loud enough and T6 silent (same unknown on both)"
+  IF-EXCITER-Z: {provider: "E1 (LCR) + F4 self-test |Z| sweep (firmware FWSIM-R59)", consumer: "docs/sim/shared-params.yaml#exciter (then every sim)", format: "json {r_dc, l_mh, zsweep:{f_hz,|Z|,phase_deg}}"}
+  IF-HEAD-SHADOW: {provider: "acoustics sim (not provided: plate = infinite baffle)", consumer: "scn_T3 (level offset applied directly)", format: "json {az_deg, f_hz, ild_db} at 25-60 kHz"}
+  IF-OWNER-HEARING: {provider: "E5 (hearing sweep, spec C5) and E11 (quiet-room ambient)", consumer: "metrics.threshold_db owner_offset_db; ambient comparator not implemented", format: "json {f_hz, thr_db_spl_air, thr_db_re_1un_bone_tragus}, ambient third-octave dB SPL"}
+  IF-FW-DSP:
+    provider: "firmware harness (docs/sim/firmware-emulation.yaml FWSIM-R9/R10)"
+    consumer: stages.FirmwareDspShaperStage(hop_fn)
+    abi: "in int32[128] ADF1 DR words (24-bit left-aligned DR[31:8], 200.02 kS/s, 0.64 ms/hop); out uint16[128] TIM1 CCR (0..200, one per 5 us period at 200 kHz); V_diff/Vdd = 2*CCR/ARR - 1 = leg A high fraction minus leg B (leg B on TIM1_CH3/CH3N since Rev F: the firmware writes CCR1 and CCR3 = ARR - CCR1, the ABI carries one value)"
+    replaces: [dsp, shaper]
+    selftest: "fw_abi.roundtrip_lsb 0.15 LSB24, fw_abi.centre_ccr_duty 0 (2026-10-02)"
+    missing: "firmware must also export the DSP-out tap and the pre-quantiser true peak for metrics T1/T2/D17 (FWSIM-R10)"
+
+# ------------------------------------------------------------------------------------------------ scenarios
+scenarios:   # pre-roll: steady scene before the measured window; metrics read only the measured window (or the settled pre-roll tail where named)
+  S-T1:   {id: T1, spec: "T1 L38, D12 L220", source: "house_walk: steady whines 25+50 kHz @40, 33.3 kHz @35 + speech-band noise @60 dB SPL (3 Hz modulated) from t=0; HC-SR04 40 kHz x8 every 60 ms at P+0.2..0.9 s @85; keys P+1.2..1.5 s @65", config: "algo B, transient_only", preroll_s: 6.0, dur_s: 2.0, windows: "background = 3-6 s (settled pre-roll tail), hc P+0.2-0.9, keys P+1.2-1.5, post P+1.6-end (info only: 0.35 s is too short for steady state)"}
+  S-T2:   {id: T2, spec: "T2 L39, D9 L203", source: "Port Meadow clip 20251021_172626/receiver_3.wav (3.0 s) tiled to pre-roll + dur, scaled to 75 dB SPL peak window; calls det_prob >= 0.5 inside the measured window (23); fallback synthetic big-brown train 70 dB SPL", config: "algo B", preroll_s: 6.0, dur_s: 2.0}
+  S-T3:   {id: T3, spec: "T3 L40, D2 L107-L117, R7 L600", source: "40 kHz x8 bursts every 60 ms; two independent chains: left mic +1 dB / R_exc 7.2, right -1 dB / 8.8 (worst-case unit spread, assumed); ILD_in 0/6/12 dB @70 dB SPL loud side, 6 dB @90; crosstalk TA 10/20/30 dB, random relative phase (4000 draws)", dur_s: 0.6, chains: 8}
+  S-T6:   {id: T6, spec: "T6 L43, D6 L178-L181, D11 L211, R21 L614", source: "zeros at the lid; mic self-noise only", dur_s: 10.0, windows: "startup 0-0.3 s (worst of 6 power-ons: 1 main + 5 x 0.6 s), body 0.3-end, steady 6 s-end"}
+  S-D17:  {id: D17, spec: "D17 L293-L295, D6 L166-L181, s6 L348", source: "40 kHz bursts @105 dB SPL (HC-SR04 at ~10 cm; mic AOP 120 dB SPL); tone tests 2.4 kHz at -12/-40 dBFS; ceiling tone through interpolation + shaper + bridge for 8-16 kHz content; switch-level start at counter 0 vs a quarter period late", dur_s: 1.0, corner: "R 8 ohm, L 0.3 mH (peak current)"}
+  S-R15:  {id: R15, spec: "R15 L609, T1 L38", source: "own speech 200-6000 Hz @75 dB SPL (4 Hz syllables), fricative bursts 20-45 kHz @40 (2/s), chewing clicks 20-90 kHz @55 (3/s), hair rustle 20-90 kHz @35 (0.7 Hz modulated); ALL ASSUMED (S1 recordings retire); knobs r15_us_db, r15_speech_db, r15_chew_db, r15_hair_db (-200 drops a part)", preroll_s: 6.0, dur_s: 4.0}
+  S-lat:  {id: lat, spec: "s5.3 L337", source: "40 kHz tone, 80 dB SPL, onset 0.25 s, full mode", dur_s: 0.6, budget_ms: {frame_complete: 1.28, dma_hop: 0.64, compute: 0.64, ccr_fifo: 0.64, basis: "derived from hop/frame sizes (spec L337, sub-processing.md); compute and FIFO unmeasured (S3)"}}
+  S-pwr:  {id: pwr, spec: "s7 L408, D18 L297-L298", source: "T1 scene incl. pre-roll: sim bridge+exciter supply current replaces the bridge, gate-pull and transducer lines of sim/checks/power.py ACTIVE; 175 mAh (O16, spec L642)"}
+  S-spice: {id: spice, spec: "C3 s5", source: "behavioural Bridge vs ngspice at 12.5 (fitted) and 25 ns (out of sample)", cost: "10 s, 537 MB"}
+  S-selftest: {id: selftest, source: "true 1-bit 4 MHz modulator + CIC5/5 vs the analytic ADF model; FWIL ABI round trip", cost: "<1 s"}
+
+# ------------------------------------------------------------------------------------------------ metrics
+# basis: spec = number is in the spec; derived = computed from spec/note numbers (incl. invariants of configured values); assumed = no number exists, proposed here, owner to confirm
+# last = 2026-10-02 21:25 run (seed 1 defaults, flat port, shared exciter); would = result if the stubs were exact; alt = SL under front_measured
+metrics:
+  - {id: T1.background_suppression_db, op: ">=", thr: 20, basis: assumed, src: "spec D12 L220, T1 L38", deps: [], last: 47.39, status: PASS, renamed_from: T1.whine_suppression_db}
+  - {id: T1.event_out_dbfs, op: ">=", thr: -35, basis: assumed, src: "spec T1 L38; D3 fixed volume", deps: [acoustic_path], last: -22.27, status: WARN}
+  - {id: T1.event_sl_p90_db, op: ">=", thr: 10, basis: assumed, src: "spec T1 L38", deps: [acoustic_path, exciter, mech_bone], last: 77.15, status: WARN}
+  - {id: T1.background_sl_max_db, op: "<=", thr: 0, basis: assumed, src: "spec D12 L220, T1 L38, R15 L609", deps: [acoustic_path, mic_ein, exciter, mech_bone], last: 27.39, alt: 11.3, status: WARN, would: fail, renamed_from: T1.whine_sl_max_db}
+  - {id: T2.call_recall_20ms, op: ">=", thr: 0.80, basis: assumed, src: "spec T2 L39; idle-detector 0.955 (L411)", deps: [acoustic_path], last: 0.83, status: WARN}
+  - {id: T2.out_band_frac_1.2_4.5k, op: ">=", thr: 0.95, basis: derived, src: "spec D9 L203", deps: [], last: 1.00, status: PASS}
+  - {id: T2.ceiling_true_peak_dbfs, op: "<=", thr: "ceiling_dbfs + 0.5 (-11.5)", basis: derived, src: "spec D17 L294; invariant: the configured ceiling holds as a true peak", deps: [], last: -10.14, status: FAIL}
+  - {id: T2.protect_band_sl_p99_db, op: "<=", thr: 0, basis: derived, src: "spec s6 L348 (8-16 kHz protected)", deps: [exciter, mech_bone], last: 13.16, alt: 3.2, per_band: {8000: 13.2, 10000: -14.8, 12500: 3.3, 16000: -10.0}, status: WARN, would: fail, replaces: "T2.interp_image_rejection_db (ratio mixed images with SNR; threshold did not trace)"}
+  - {id: T2.out_centroid_hz, op: "<=", thr: 4000, basis: derived, src: "spec D9 L203-L205, T2 L39", deps: [exciter], last: 2581, status: WARN}
+  - {id: T2.comfort_sl_p99_db, op: "<=", thr: 60, basis: assumed, src: "spec T2 L39 (comfortable); 60 dB SL proposed", deps: [acoustic_path, exciter, mech_bone], last: 77.78, alt: 52.8, status: WARN, would: "fail (retfl) / pass (front): convention-dependent"}
+  - {id: T3.ild_sign_agree_ta20, op: ">=", thr: 0.95, basis: derived, src: "spec D2 L113-L115; bone-conduction.md s2", deps: [exciter, mech_bone], last: 1.00, status: WARN}
+  - {id: T3.ild_sign_agree_ta10, op: ">=", thr: 0.95, basis: derived, src: "spec D2 L112-L114 (fallback site)", deps: [exciter, mech_bone], last: 1.00, status: WARN}
+  - {id: T3.ild_bias_matched_db, op: "<=", thr: 3.0, basis: assumed, src: "spec R7 L600; D3 L122-L125", deps: [exciter, mech_bone], last: 3.07, status: WARN, would: fail}
+  - {id: T3.ild_compression_err_db, op: "<=", thr: 1.5, basis: assumed, src: "spec T3 L40", deps: [exciter, mech_bone], last: 0.21, status: WARN}
+  - {id: T3.ild_kept_at_ceiling_db, op: ">=", thr: 3.0, basis: assumed, src: "spec D17 L294 vs T3 L40", deps: [exciter, mech_bone], last: 1.90, status: WARN, would: fail}
+  - {id: T6.shaper_inband_dbfs, op: "<=", thr: -90, basis: spec, src: "spec s6 L346, D6 L177", deps: [], last: -99.46, status: PASS}
+  - {id: T6.squelched_frac, op: ">=", thr: 0.95, basis: assumed, src: "spec D6 L178-L181", deps: [mic_ein, adf], last: 1.00, status: WARN}
+  - {id: T6.squelch_margin_db, op: ">=", thr: 6.0, basis: assumed, src: "spec T6 L43, R21 L614", deps: [mic_ein, adf], last: 7.80, status: WARN, note: "+3 dB mic noise -> 4.7 dB (F3)"}
+  - {id: T6.idle_sl_max_db, op: "<=", thr: 0, basis: spec, src: "spec T6 L43, D11 L211", deps: [mic_ein, exciter, mech_bone], last: -209.5, alt: -228.3, status: WARN}
+  - {id: T6.startup_sl_max_db, op: "<=", thr: 0, basis: spec, src: "spec T6 L43, D17 L295", deps: [mic_ein, exciter, mech_bone], last: 0.56, per_power_on: [-21.3, -5.4, -5.1, -0.8, 0.6, 0.2], status: WARN, would: fail}
+  - {id: D17.ceiling_sample_peak_dbfs, op: "<=", thr: "ceiling_dbfs + 0.5 (-11.5)", basis: derived, src: "spec D17 L294; invariant", deps: [], last: -9.08, status: FAIL}
+  - {id: D17.ceiling_true_peak_dbfs, op: "<=", thr: "ceiling_dbfs + 0.5 (-11.5)", basis: derived, src: "spec D17 L294; shared-params#ceiling definition", deps: [], last: -6.32, status: FAIL}
+  - {id: D17.peak_coil_ma, op: "<=", thr: 300, basis: derived, src: "sub-power.md U4 300 mA, ECR-0005; peak-current corner", deps: [exciter], last: 130.98, status: WARN}
+  - {id: D17.bridge_only_thdn_m12_db, op: "<=", thr: -46, basis: derived, src: "spec D6 L173 (-52 dB), C3 s5; model fitted here", deps: [fet_model], last: -55.12, status: WARN}
+  - {id: D17.bridge_only_thdn_m12_25ns_db, op: "<=", thr: -46, basis: derived, src: "spec D6 L170 (1-2 ticks), L173 (SPICE -38 dB at 25 ns)", deps: [fet_model], last: -37.51, status: WARN, would: fail}
+  - {id: D17.chain_thdn_m40_db, op: "<=", thr: -45, basis: derived, src: "spec D6 L173 (-61 dB bridge only) + shaper floor", deps: [fet_model], last: -49.25, status: WARN}
+  - {id: D17.tone_hf_sl_max_db, op: "<=", thr: 0, basis: derived, src: "spec s6 L348, R9 L602", deps: [exciter, mech_bone, fet_model], last: 18.40, status: WARN, would: fail, split: {no_deadtime_sl: -6.5, image_rejection_kaiser_db: 103.8, linear_interp: {rejection_db: 24.9, sl: 42.0}, interp_need_db: 67}}
+  - {id: D17.pop_clean_start_sl_db, op: "<=", thr: 0, basis: spec, src: "spec D17 L295, D6 L180-L181", deps: [exciter, mech_bone], last: -105.2, status: WARN, info: "quarter-period-late start: -70.8 dB SL, 10.4 mA peak"}
+  - {id: lat.total_ms, op: "<=", thr: 20, basis: spec, src: "spec s5.3 L337", deps: [exciter], last: 3.08, status: WARN}
+  - {id: pwr.bridge_exciter_ma, op: "<=", thr: 3.56, basis: derived, src: "sim/checks/power.py high column; spec L408", deps: [exciter, mech_bone], last: 0.80, status: WARN}
+  - {id: pwr.runtime_h_pessimistic, op: ">=", thr: 8, basis: spec, src: "spec D18 L297-L298; O16 L642", deps: [exciter], last: 18.7, status: WARN, info: "low/nominal/high 32.6/26.4/18.7 h always awake; idle current is power.py's"}
+  - {id: mic.pdm_cic5_tone_err_db, op: "<=", thr: 1.0, basis: assumed, src: "A3 plan s1.2", deps: [adf], last: 0.07, status: WARN}
+  - {id: fw_abi.roundtrip_lsb, op: "<=", thr: 0.5, basis: derived, src: "A3 plan s1.1", deps: [], last: 0.15, status: PASS}
+  - {id: fw_abi.centre_ccr_duty, op: "<=", thr: 1.0e-9, basis: spec, src: "spec D6 L166", deps: [], last: 0.0, status: PASS}
+  - {id: R15.active_frac, op: "<=", thr: 0.10, basis: assumed, src: "spec R15 L609", deps: [acoustic_path, mic_ein], last: 0.67, status: WARN, would: fail}
+  - {id: R15.sl_p90_db, op: "<=", thr: 0, basis: assumed, src: "spec R15 L609, T1 L38", deps: [acoustic_path, mic_ein, exciter, mech_bone], last: 52.3, alt: 30.5, status: WARN, would: fail}
+  - {id: spice.validation_delta_25ns_db, op: "<=", thr: 3.0, basis: assumed, src: "C3 s5; bridge_spice.py; out-of-sample point", deps: [fet_model], last: 3.60, status: OPEN, info: "calibration residual at the fitted 12.5 ns point 0.90 dB (not a validation; was the metric before 2026-10-02)"}
+
+sweeps:   # python3 sim/e2e/chain.py --sweep <name>
+  exciter: {date: "2026-10-02T21:24", grid: "R 8/10/12 ohm x L 0.3/1.26 mH, loud-burst scene 0.5 s, shared exciter otherwise", out: "peak coil mA | ripple_pk mA | THD+N(-12 dBFS) dB | supply avg mA",
+            result: "0.3 mH: 138/119/104 mA, ripple 12.5 mA, -55 dB, 2.54/2.36/2.22 mA; 1.26 mH: 75/69/65 mA, ripple 2.98 mA, -60 dB, 1.10/1.15/1.18 mA", reading: "L halves the peak and the supply draw; R 8->12 cuts the peak ~25%; none reaches U4's 300 mA"}
+  mic:     {date: "2026-10-02T01:22 (DSP-domain only: unaffected by the exciter change)", grid: "mic_sens_db -1/0/+1 on T1 (2 s, no pre-roll)", result: "event out -22.9/-22.2/-21.6 dBFS; fixed gain tracks sensitivity 1:1", reading: "L/R mic spread passes straight to the level cue (T3 bias)"}
+  port:    {date: "2026-10-02T01:22 (DSP-domain only)", grid: "5 port profiles x tones 25/40/60/80 kHz @55 dB SPL, full mode", result: "flat: -28.0/-28.4/-28.0/-28.8 dBFS; 25k +10 dB Q5: 25 kHz +9.3 dB; 25k -10 dB: -9.5 dB; 60k +6 dB Q3: +5.9 dB at 60 kHz; 40k -12 dB Q8 notch: -11.2 dB at 40 kHz", reading: "the firmware EQ is the datasheet fixture curve, so every port deviation reaches the output 1:1 (finding F6)"}
+  supply:  {date: "2026-10-02T21:24", grid: "ext ripple 0/0.1/0.3/1/3/10 mV rms x PSRR flat55|pess35|rolloff, idle", result: "idle out (dBFS) flat55 -82.3..-81.1; pess35 -82.3/-82.3/-82.2/-81.1/-74.8/-59.3 (squelch lost at 10 mV); rolloff -82.3/-82.1/-80.6/-67.9/-54.9/-43.7 (squelch lost at 3 mV)", reading: "white-ripple tolerance 10 / 1 / 0.3 mV by scenario: informational; the gate is the LN-M01 per-line form"}
+  planned_not_run: ["full factorial (heavy_runs H2)", "tragus_gain_db 10/20/40 and owner_offset_db 0/-10/-20 on T1/T2/T6 (SL scale)", "mic_noise_scale 1/1.41/2/3.16 x noise_cal matched|nominal on the 10 s T6", "R15 levels 20-50 dB SPL per part once S1 recordings exist"]
+  r15_parts_2026-10-02: {each_part_alone_active_frac: {speech75_skirt: 0.48, fricatives40: 0.22, chewing55: 0.19, hair35: 0.51}, sl_p90_db: {speech75_skirt: 42.0, fricatives40: 49.1, chewing55: 46.4, hair35: 43.3}, fricative_level_20_30_40: "active 0.66/0.68/0.67 with all parts", reading: "every self-noise part alone keeps transient mode busy; slowly modulated sub-floor content opens the gate (F12, F14)"}
+
+# ------------------------------------------------------------------------------------------------ cosim
+cosim:
+  orchestrator: "chain.run_chain(src_pa, params, seed) -> (taps{id:Sig}, Ctx, status{id:status} incl. pseudo-stages); loopback=True re-runs once with bridge supply current x h(f) injected at the mic (2nd pass, same rng seeds)"
+  plugin_interface: "class Stage {id, status, process(Sig, Ctx)->Sig}; Sig{x ndarray [N], fs Hz, unit str, meta}; Ctx{p params, rng, side dict (cross-stage outputs), inject}; replace a stage by returning a different object with the same id from default_chain"
+  replace_points:
+    firmware_in_the_loop: {replaces: [dsp, shaper], stage: stages.FirmwareDspShaperStage, abi: IF-FW-DSP, harness: "host gcc -shared + ctypes, or an emulator, behind hop_fn", compare_against: "pipeline.algo_b + PwmShaper outputs: duty rms error, band-energy error, true peak, squelch behaviour", status: "ABI + stage + selftest done; harness and tap export not written"}
+    acoustics: {replaces: [acoustic_path], via: "IF-ACOUSTIC-PORT json (--set port_json=...)"}
+    noise: {replaces: [supply_inject], via: "IF-MIC-VDD-NOISE json (--set mic_vdd_json=... loopback=True)"}
+    exciter_measured: {replaces: [exciter, mech_bone], via: "IF-EXCITER-Z -> shared-params#exciter; IF-BONE-TF loader (not written)"}
+    bridge_spice: {replaces: [bridge], via: "bridge_spice.run_case (4.6 s per 1.9 ms)", use: "short validation windows only, never the full scenario (1 s = 200k periods)"}
+  determinism: "seeded numpy Generator per run; mic seed drawn first, then ripple, then shaper dither; DspStage caches per-unit noise calibration; T6 power-on uses seeds seed+101.."
+
+# ------------------------------------------------------------------------------------------------ findings
+findings:   # each: evidence (file, date) -> consequence -> owner doc to update
+  - {id: F1, text: "The DSP does not enforce its own ceiling: pipeline.limiter's tanh backstop sits at ceiling+3 dB (sample peak -9.08 dBFS) and the x16 interpolation adds inter-sample peaks (true peak -6.32 dBFS, +5.7 dB over the configured -12); coil peak 131 mA at the peak corner. FAIL is against the configured ceiling (derived invariant), whatever number the owner picks", evidence: "sim/out/e2e/D17.json 2026-10-02 21:25", action: "true-peak limit on the pre-quantiser interpolated stream (shared-params#ceiling); owner supplies the number with E2 V_mcl; update sub-output, ECR-0005", docs: [sub-output, sub-processing]}
+  - {id: F2, text: "Zero-input limit cycle: with squelch forcing x=0 but the 3rd-order shaper state NOT reset, 74% of PWM samples in the whines-only window stay non-zero", evidence: "chain.py --scenario T1 --set squelch_reset=False, 2026-10-02 01:xx; stages.PwmShaper", action: "firmware must zero e1..e3 on squelch (FWSIM-R14)", docs: [sub-processing, sub-output]}
+  - {id: F3, text: "T6 depends on the mic's ultrasonic noise (E3): squelch margin 7.80 dB at -68 dBFS (10 s run); per-unit matched calibration: +3 dB noise -> 4.7 dB, +6 dB -> 1.6 dB, +10 dB -> -2.4 dB; with calibration on the nominal mic, +3 dB already loses squelch", evidence: "T6 runs 2026-10-02", action: "firmware sets squelch from the measured idle output at boot or production test; E3 before the order", docs: [sub-audio-in, sub-processing]}
+  - {id: F4, text: "Power-on burst: the DSP floor tracker initialises on the first frame; the first 0.3 s output depends on the noise realisation: -21..+0.6 dB SL over 6 power-ons (shared exciter, retfl-20 threshold); bridge start pop is NOT the problem (-70.8 dB SL quarter-period-late start)", evidence: "T6.startup_sl_max_db per_power_on, 2026-10-02 21:25", action: "hold the output squelched until the floor tracker has 0.3 s of data", docs: [sub-processing]}
+  - {id: F5, text: "x16 interpolator filter is unspecified: a ceiling tone's images into 8-16 kHz are 104 dB down with Kaiser b=9 (negligible) but 24.9 dB down with linear interpolation (+42 dB SL); the interpolator needs >= 67 dB image rejection at this proxy (retfl-20)", evidence: "D17.tone_hf_sl_max_db split, 2026-10-02 21:25", action: "FWSIM-R14 interpolator >= 67 dB (was 55, which did not trace)", docs: [sub-processing]}
+  - {id: F6, text: "Mic EQ is the datasheet fixture curve: a port deviation of +-10 dB at 25 kHz or a -12 dB notch at 40 kHz reaches the output 1:1; acoustics also calibrates against that curve (shared hidden assumption, shared-params#mic.response_25khz_peak)", evidence: "sweep port 2026-10-02", action: "EQ table from IF-ACOUSTIC-PORT / coupon measurement (spec C8 L681); flash knob (O18)", docs: [sub-audio-in]}
+  - {id: F7, text: "The ceiling erases the level cue: 6 dB ILD at the input becomes 1.9 dB at 90 dB SPL loud side (bias-removed); unit spread alone (mic +-1 dB, R +-10%) biases ILD by 3.1 dB", evidence: "T3 2026-10-02 21:25", action: "owner decides: per-side trim (D3, R7) and whether T3 holds near the ceiling", docs: [sub-processing]}
+  - {id: F8, text: "Supply ripple at the mic VDD: the Rev F copper background (0.167 mV rms, mostly the 1.56 kHz hop line) costs 0.46 dB of squelch margin under the worst PSRR; requirement now in LN-M01 form", evidence: "IF-MIC-VDD-NOISE loopback run 2026-10-02", action: "none now; S2 measures PSRR(f)", docs: [sub-audio-in]}
+  - {id: F9, text: "pipeline.algo_b stamps output at frame start: causal latency adds 1.28 ms frame + hop/DMA terms; total 3.08 ms vs 20 ms limit", evidence: "lat 2026-10-02", action: "none for the limit; keep the budget in S3 measurements", docs: [sub-processing]}
+  - {id: F10, text: "Algorithm A with the default 38 kHz LO outputs nothing on the Port Meadow pipistrelle clip (calls 45-60 kHz)", evidence: "T2 --set algo=A 2026-10-02 01:xx", action: "A is fallback only (D12 L222); its LO needs per-site tuning", docs: [sub-processing]}
+  - {id: F11, text: "8-16 kHz audibility of the output (R9): see F13; idle-mode current not covered (power.py's)", evidence: "T2.protect_band_sl_p99_db", action: "-", docs: [sub-output]}
+  - {id: F12, text: "Steady-state breakthrough the 2 s windows hid: once the floor tracker settles (~3 s) the transient gate opens on slowly modulated content BELOW the mic floor (the >15 kHz skirt of 60 dB SPL speech-band noise, 3 Hz modulation): background window -69.7 dBFS, 22 % active, +27.4 dB SL (+11.3 front convention); whines alone stay suppressed", evidence: "T1 background window 3-6 s, 2026-10-02 21:25; skeptic probes 2026-10-02", action: "DSP gate rule (pipeline.py, not this sim's file): minimum hold count or per-band margin sized to the chi-square spread of 1-2-bin bands; firmware FWSIM-R14; test with S-T1 and S-R15", docs: [sub-processing]}
+  - {id: F13, text: "Bridge dead-time harmonics of a ceiling-level tone land in the protected 8-16 kHz band: +18.4 dB SL (retfl-20; +8.4 front) at 12.5 ns, -6.5 dB SL without the dead-time error; T2 p99 +13.2 dB SL at 8 kHz. 25 ns gives -37.5 dB THD+N (SPICE -38): 2 ticks needs dead-time compensation", evidence: "D17 hf_split, T2.protect_band 2026-10-02 21:25", action: "firmware dead-time compensation knob (S2) or a lower ceiling; owner E2 decides audibility", docs: [sub-output, sub-processing]}
+  - {id: F14, text: "R15 self-noise keeps transient mode busy: own speech 75 dB SPL + fricatives 40 + chewing 55 + hair 35 (all ASSUMED) -> output active 67 %, +52 dB SL p90 (+30.5 front); each part alone 19-51 % active", evidence: "S-R15 2026-10-02 21:25", action: "S1 recordings of the owner set the levels; gate rule (F12); possibly a self-voice detector", docs: [sub-processing, sub-audio-in]}
+  - {id: F15, text: "IF-ACOUSTIC-PORT changes the verdicts: as built (open gap) T2 recall 0.43 (bats lost), T1 events -39 dBFS; sealed duct recall 1.00 but the F12 breakthrough becomes audible (+28.9 dB SL)", evidence: "port_json runs 2026-10-02 21:30", action: "decide the port (acoustics option B) and the gate rule together", docs: [sub-audio-in]}
+
+# ------------------------------------------------------------------------------------------------ uncertainties
+uncertainties_top5:   # ranked by effect on pass/fail of the owner's tests x how little the current sim can narrow it
+  - {id: U1, what: "exciter electromechanics and tragus coupling (Bl, f0, L, R 8|12, pad/cartilage path) + threshold convention", effect: "scales every SL by ~+-20 dB; the two threshold conventions differ by 20-24 dB at 1.5-4 kHz (T2 comfort flips); peak coil current 65-138 mA over R/L", retire: "E1, E2, IF-BONE-TF; ECR-0007 (buy exciters now)"}
+  - {id: U2, what: "acoustic path 20-96 kHz (open gap vs sealed duct, 84.7 kHz duct mode, alignment) and the mic's own 25 kHz peak", effect: "recall 0.43 vs 1.00 between port options; +-10 dB at resonances reaches the output 1:1 (EQ is fixture-based)", retire: "acoustics option decision, E3 + S1 coupons"}
+  - {id: U3, what: "self-noise: mic ultrasonic EIN, PSRR above 1 kHz, own speech/chewing/hair ultrasonic levels (R15)", effect: "T6 squelch margin 7.8 dB -> 4.7 dB at +3 dB mic noise; R15 active 67 % at assumed levels", retire: "E3, S2, S1 recordings of the owner"}
+  - {id: U4, what: "firmware behaviours the spec leaves open: true-peak ceiling, interpolator, gate rule, squelch policy and state reset, power-on hold, dead-time compensation, CPU fit (R3)", effect: "F1-F5, F12, F13", retire: "firmware host build in the FWIL harness (IF-FW-DSP), S3, E4"}
+  - {id: U5, what: "mic clock and decimation hardware: CCK duty 48-52% (R13), RSFLT response (R18), PB4 NJTRST back-feed", effect: "binary: wrong duty or a droop at 80 kHz kills the ultrasonic band", retire: "E6 scope + S1 swept tone; no simulation can retire it"}
+uncertainties_next: [{id: U6, what: "owner's hearing threshold above 8 kHz and ambient level", retire: "E5, E11"}, {id: U7, what: "ILD cue under unlinked clocks and head shadow", retire: "E8/S4 + IF-HEAD-SHADOW"}]
+
+# ------------------------------------------------------------------------------------------------ binding / watch
+design_binding:   # value -> source of truth; refresh when the source changes. No coordinates used anywhere.
+  vdd_3v0: {val: 3.0, src: "hw/pod/gen.py U4 TPS7A2030 (+3V0); sub-power Key numbers (2.955-3.045 V)"}
+  r_pair_ohm: {val: 1.22, src: "sub-output Key numbers: Rds(on) N 0.34 + P 0.88 ohm at Vgs 3.0 V"}
+  r_shunt_ohm: {val: 0.1, src: "hw/pod/gen.py R21"}
+  r_wire_ohm: {val: 0.2, src: "sub-output Interfaces (reg-arm): ~0.1 ohm per conductor, derived"}
+  exciter: {val: "docs/sim/shared-params.yaml#exciter (nominal + corners)", src: "spec D7 L191-L192; bone.py anchors"}
+  pwm: {val: "200 kHz, ARR 200, 201 levels, AD", src: "spec D6 L155, L166"}
+  dead_time_ns: {val: 12.5, src: "spec D6 L170 (1 tick at 80.009 MHz); 25 ns scored too"}
+  shaper: {val: "3rd order, DC zero + pair 13 kHz, TPDF", src: "spec D6 L176"}
+  mic: {val: "-26 dBFS @94 dB SPL, EIN 29.7 dB SPL flat, response json", src: "datasheet Rev B-1 p.3; sim/data/sph0641_ultrasonic_response.json"}
+  adf: {val: "CIC5/5 + RSFLT/4, 200.02 kS/s", src: "A3 plan s1.2 (D1)"}
+  clocks: {val: "docs/sim/shared-params.yaml#clocks", src: "A3 plan s2"}
+  ceiling_dbfs: {val: -12, src: "shared-params#ceiling (assumed number, defined as pre-quantiser true peak)", status: "assumed (F1)"}
+  squelch_dbfs: {val: -68, src: "e2e knob; no spec number", status: "assumed (F3)"}
+  tragus_gain_db: {val: 20, src: "bone-conduction.md s3 (Surendran 2023)"}
+  thresholds: {val: "shared-params#thresholds (both conventions)", src: "ARL-TR-4138 Table 8; Surendran 2023 Fig 4A"}
+watch:   # register as PLM watches (tools/plm.py) so a change re-flags this sim
+  - "hw/pod/gen.py blocks BRIDGE, MIC, SELFTEST, LDO"
+  - "docs/system/integration-map.md sections 1, 3, 5"
+  - "docs/spec.md D6, D7, D13, D14, D17, s5, s6, s7 (R-items R1, R9, R12, R14, R15, R21)"
+  - "docs/research/A3-u575-plan.md s1.2, s2"
+  - "docs/sim/shared-params.yaml (any key)"
+  - "sim/dsp/pipeline.py (algo_b, limiter, microphone)"
+  - "sim/acoustics/out/port_response*.json, sim/noise/out/IF-MIC-VDD-NOISE.json (IF files)"
+rerun_when: [exciter measured, acoustics or noise sim re-delivers an IF file, firmware host build exists, spec D6/D17 number added, schematic change to bridge/mic/LDO, pipeline.py gate or limiter change, shared-params change]
+
+heavy_runs:   # none executed now (owner rule); each fenced <= 4 GB, one heavy job at a time
+  - {id: H1, what: "60 s house-walk and nature scenes (long-form S-T1/S-T2/S-R15)", needs: "nothing: --no-plot memory ~160 MB + 39 MB/s -> ~2.5 GB at 60 s", est: "~15 s wall, ~2.5 GB", fence: "MemoryMax=3G (or 4G heavy)", blocked_on: "owner go-ahead (> 60 s smoke rule is about time, this is ~15 s; listed here for memory)"}
+  - {id: H2, what: "full-factorial sweep, 3 R x 3 L x 3 mic x 3 port x 3 PSRR x 2 convention, 8 s runs", est: "486 runs x ~2.5 s = ~20 min serial, <= 0.6 GB", fence: "MemoryMax=3G, one process", blocked_on: "owner decides which sweeps matter after stubs are replaced"}
+  - {id: H3, what: "SPICE bridge validation grid: L 0.3/1.26 mH x td 12.5/25/37.5 ns x -12/-40 dBFS (out-of-sample points for the behavioural bridge)", est: "12 cases x 5 s = 60 s, 450 MB each", blocked_on: "none (PMCXB290UE model still unavailable, sub-output issue 7)"}
+  - {id: H4, what: "full 4 MHz PDM chain with a representative modulator", est: "8 M samples/2 s ~ 1-2 s python, ~0.5 GB", blocked_on: "modulator NTF unpublished; a stable 4th-order NTF gave only -57 dBFS in-band vs mic noise ~-83 dBFS: needs vendor data or E3"}
+  - {id: H5, what: "coupled run with all IF-* files + firmware host build", blocked_on: "firmware host build (port and noise IF files already load)"}
+
+tools_needed: "none for the scaffold (numpy, scipy, matplotlib, PyYAML installed). optional_not_installed: MoSQITo 1.2.1 (Apache-2.0 per its repo LICENSE read 2026-10-02 by the e2e agent; pyuff dependency licence NOT read; Python 3.14 compatibility unverified) for ISO 532-1 loudness of the AIR-conducted ambient comparator; numba (repo LICENSE is BSD-2-Clause 'Copyright (c) 2012, Anaconda, Inc.', corrected 2026-10-02: earlier text said BSD-3) not needed."
+change_log:
+  - "2026-10-02 01:22: created (scaffold, 32 metrics, 2 s scenarios)."
+  - "2026-10-02 21:30 (integrator, skeptic findings): 6 s pre-roll (T1/T2/R15) and 10 s T6 so metrics read steady state; T1.whine_* -> T1.background_* scored on the settled pre-roll tail (F12 found); T2.interp_image_rejection_db -> T2.protect_band_sl_p99_db + D17.tone_hf_sl_max_db with an images-vs-harmonics split (F5, F13); pseudo-stages mic_ein/fet_model/psrr in deps; OPEN status; ceiling metrics as derived invariants; D17 at the peak-current corner + 25 ns THD+N; spice metric = out-of-sample 25 ns; exciter, PSRR, thresholds, clocks from docs/sim/shared-params.yaml (FS_CLK_MIC 4,000,450); IF-MIC-VDD-NOISE loader (complex h -> |h| FIR, background lines/PSD), z_rail_ohm -> h_mic_ohm; R15 scenario; T6 startup = worst of 6 power-ons; plots capped at 2.5 s; memory re-measured; pwr standalone bug (scn_T1(1.0)) fixed."
+  - "2026-10-02 23:35 (integrator): --set accepts bare words and paths (psrr_mode=rolloff, port_json=sim/...; python literals still parsed); coupled check with all three IF files (chimney port + Rev F mic VDD + loopback, T6 3 s): squelch margin 7.34 dB, startup +2.38 dB SL (WARN); catalogue and run order in docs/sim/index.yaml."

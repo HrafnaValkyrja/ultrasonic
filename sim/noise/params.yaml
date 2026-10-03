@@ -1,0 +1,56 @@
+# Model parameters for sim/noise (layout noise coupling). Every value has src and a status:
+#   datasheet = read from a document we hold | derived = computed from datasheet/spec numbers | assumption = engineering
+#   guess, NOT measured. Assumptions are the things the bring-up measurements (docs/sim/layout-noise.yaml, LN-V*) retire.
+# Dated 2026-10-02. Units: SI unless the key says otherwise.
+board:
+  default_path: auto   # pcbgeom.default_board: env NOISE_BOARD, else newest of pcbgeom.ROUTED_CANDIDATES (2026-10-02: draft_r1/pod_r1_routed = Rev F); read only
+  bom: hw/pod/bom_jlc.csv                                          # ref -> value ("100n", "2u2", "0.1")
+  ground_net: GND
+  plane_layer: In1.Cu
+  plane_pitch_mm: 0.1          # mesh pitch; 0.2 gives the same R within ~15 % (smoke run reports both)
+  nets: [GND, +3V0, MIC_VDD, BRIDGE_RTN, LDO_OUT, VDD11, VLXSMPS]   # nets put in the L1 network
+model:
+  f_max_net_hz: 3.0e+7         # lumped component/via models are not trusted above this (ESL, SRF, pad inductance); lines above are not scored
+  f_max_field_hz: 1.0e+8       # filament field model (couple.py): board is lambda/88 at 100 MHz; digital-line pickup is scored up to here
+materials:
+  rho_cu_ohm_m: 1.72e-8        # annealed Cu 20 C; status: textbook, model error +-10 %
+  t_plate_um: 20.0             # via barrel plating; status: assumption (JLC minimum quoted 20 um, unverified)
+components:                    # BOM comment -> model. status: assumption (typical MLCC, not a manufacturer fit)
+  esl_nh: {"0402": 0.35, "0603": 0.45, "1206": 0.75}     # chip body only; mounting loop L comes from the extracted geometry
+  esr_ohm: {"100n": 0.03, "10n": 0.08, "15p": 0.5, "1u": 0.02, "2u2": 0.015, "4u7": 0.012, "10u": 0.01, "22u": 0.008}
+  dc_bias_keep: {"22u": 0.35, "10u": 0.55, "4u7": 0.6, "2u2": 0.65, "1u": 0.85, "100n": 0.9, "10n": 0.9, "15p": 1.0}
+  # ^ fraction of nominal C left at the rail's DC bias (X5R/X7R). status: assumption; spec provenance note says no
+  #   manufacturer DC-bias curve is on file (docs/research/datasheet-provenance.md). Refs on the 1.2 V rail see less loss.
+  resistor_esl_nh: 0.4
+  r_zero_ohm: 0.01             # 0R link (R20) resistance; status: assumption (0402 jumper <= 50 mohm)
+  l1: {l_uh: 2.2, dcr_ohm: 0.14, c_par_pf: 1.0}   # DFE201610E-2R2M: L, DCR from B-parts-selection.md s3; c_par assumption
+die:                           # the MCU as seen from its pins; status: assumption unless noted
+  r_pin_ohm: 0.1               # bond wire + lead resistance per supply pin
+  l_pin_nh: 1.0                # bond wire + lead inductance per supply pin
+  c_die_nf: 5.0                # on-die decoupling on VDD (STM32U5: not published)
+  esr_die_ohm: 0.1
+  r_pa5_ohm: 50.0              # PA5 GPIO high output impedance; datasheet bound: VOH >= VDD-0.4 V at 4 mA => <= 100 ohm (DS13737 Rev 10 Table 94 p.232)
+  r_pa5_range_ohm: [25.0, 100.0]
+  r_vlx_ohm: 0.3               # SMPS switch node held to a rail by the switch while running
+ldo:
+  r_out_ohm: 0.05              # TPS7A2030 small-signal output impedance model Zout = R + sL; status: assumption, not in the datasheet
+  l_out_nh: 100.0              # (loop-gain roll-off ~ 0.2 ohm at 300 kHz). Sensitivity: results scale ~ with |Zout| below 1 MHz
+  src: "TPS7A20 SBVS338H gives PSRR 95 dB @1kHz / noise 7 uVrms only; no Zout curve (docs/system/sub-power.md key numbers)"
+mic:                           # SPH0641LU4H-1, Syntiant datasheet Rev B-1 (2 Dec 2024), local copy ~/Desktop/ultrasonic-scratch/sph0641_sq.pdf
+  r_load_ohm: 2200.0           # VDD pin small-signal load = 3.0 V / 1.35 mA (power.py rev 2 nominal); status: derived
+  sens_dbfs_at_94spl: -26.0    # datasheet p.3, ultrasonic mode table
+  snr_dba: 64.3                # datasheet p.3 (audio band, A-weighted)
+  psrr_dbfs_per_vrms_1k: -55.0 # datasheet p.3 "PSRR 55 dBV/FS, 200 mVpp sine @1 kHz"; the unit is not defined in the sheet.
+  #   Read as: output spur = -55 dBFS per 1 V rms of supply ripple. Cross-check: PSR+N -84 dBFS(A) for 100 mVpp square @217 Hz
+  #   (50 mV rms => -55-26 = -81 dBFS unweighted, -84 A-weighted: consistent). status: interpretation, flagged
+  psrr_scenarios: {nominal: 0.0, pessimistic: 20.0, worst: rolloff_1k}   # extra dB of spur vs the 1 kHz figure: numbers apply above 20 kHz; rolloff_1k = e2e stages.SupplyInject rolloff (55-20log10(f/1k), floor 5 dB). The sheet gives nothing above 1 kHz. Shared table: docs/sim/shared-params.yaml#psrr
+  noise_scenarios_db: {optimistic: -6.0, white: 0.0, pessimistic: 8.0}  # in-band floor relative to a white extrapolation of the audio-band noise (E3 measures it)
+  bin_hz: 781.25               # algorithm B FFT bin = 200.02 kS/s / 256 (spec s5.2)
+  band_hz: [20000.0, 85000.0]  # capture band (spec s5.1 usable band; MVP says 20-96 kHz)
+  margin_below_floor_db: 10.0  # design margin: injected power <= floor - 10 dB adds <= 0.41 dB. status: design choice, owner may change
+bridge:
+  vfs_v: 3.0                   # differential full-scale amplitude (3.0 V rail)
+  shaped_noise_band_db: -35.0  # dB re FS-sine power, bridge VOLTAGE, 20-85 kHz, 200 kHz PWM (sim/checks/pwm_ultrasonic_leak.py, spec D6 MP-01)
+  coil_current_noise_band_db: -59.0   # same for coil CURRENT (8 ohm + 0.3 mH placeholder), spec D6 MP-01
+  i_fs_a: 0.32                 # 3.0 V / (8 + 1.22 + 0.1) ohm (sub-output.md key numbers)
+  ripple_pp_a: 0.0125          # Vbus/(4 L f) at 0.3 mH (spec D6)

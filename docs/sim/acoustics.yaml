@@ -1,0 +1,235 @@
+# SIM-ACO: acoustic simulation, mic port path (item 4A) and bone/cartilage-conduction path (item 4B). Audience: other Claude instances.
+# Rules (owner 2026-10-02): current state only; every fact has src (file:symbol | spec Lnn | URL) + date; pointers not copies; thresholds checkable.
+# Lnn = line in docs/spec.md as of 2026-10-02 20:30 (header v0.14, content v0.15 + O21/O22). Numbers in results_* belong to meta.last_run; re-run after anything in watch.
+meta:
+  id: SIM-ACO
+  date: 2026-10-02
+  scope: "ladder step C (O18 L644): before the board order predict (A) how lid window / lid bore / lid-board gap / board hole / mic port shape the 20-96 kHz capture (R14 L608, s8 L509-L511, E3 L700) and (B) force + perceived level at the pre-tragal skin per volt, and which unknowns dominate (R1 L594, R19 L612, R21 L614, T2 L39, T6 L43; E1 L698, E2 L699)"
+  layout_agnostic: "lid read from hw/mech/shell_r1.py by AST (never executed); board = --board | env ACO_BOARD | newest mtime of hw/pod/draft_r1/{pod_r1_routed,pod_r1_placed,fanout/pod_r1_routed}.kicad_pcb, read-only via pcbnew; fall-backs flagged in port_results.json warnings"
+  code: [sim/acoustics/geometry.py, narrow.py, gap.py, port.py, run_port.py, fem_axisym.py, selfcheck.py, bone.py, headline.py, smoke.sh]
+  outputs: "sim/acoustics/out/: port_response.json, port_response_chimney_d1.0.json, port_response_gasket_id2.1.json, port_results.json, bone_tf.json, bone_results.json, selfcheck.json; PNG (dark, tools/plotstyle.py): port_path.png (to-scale cross-section, plain labels), port_response.png, port_sweeps.png, bone_force.png, bone_sensitivity.png. git: out/.gitignore keeps the interface json only"
+  last_run: {date: 2026-10-02T21:25, cmd: sim/acoustics/smoke.sh, fence: "systemd-run --user --scope -p MemoryMax=3G -p MemorySwapMax=0, timeout 60", wall_s: 23.7, peak_rss_mb: 373, board: "hw/pod/draft_r1/pod_r1_routed.kicad_pcb (Rev F routed, mtime 2026-10-02 20:23)", changed_by_integrator: "R14 ripple window 20-80 -> 20-85 kHz (processed band) + 20-96 info; sealed-duct alignment tolerance stack (S8-duct-alignment-stack); board slide read from shell CAV vs PCB"}
+  honesty: "A: lumped transmission line + modal gap model; checked against an axisymmetric FEM (aligned designs, <= 1.5 dB below 60 kHz, <= 3.2 dB above) and an independent modal sum (4e-4). NOT modelled: parts in the gap (44 % of the F face), mesh mass, 3-D offset inside a sealed duct, the mic's internals (2-parameter calibration to the datasheet curve). B: no measured exciter (Bl, moving mass, f0, pad stiffness are ranges); skin load and thresholds are published. Absolute B levels +-8 dB (5-95 %) until E1/E2."
+abbr:
+  ABCD: "two-port transfer matrix [p_in;U_in] = T [p_out;U_out]; U = volume velocity m^3/s"
+  ratio: "p_diaphragm(our path) / p_diaphragm(mic port flush in a baffle), same free-field pressure; 0 dB = no change vs the datasheet condition"
+  in-pod: "datasheet curve (sim/data/sph0641_ultrasonic_response.json, 10-80 kHz, re 1 kHz; held at its 80 kHz value above 80 kHz: ASSUMED) + ratio, dB: what the mic delivers in the pod"
+  matched / channel: "open-gap limits: matched = infinite plates (walls absorb, smooth); channel = rigid empty rectangle between the lid lip and the clamp ribs (walls reflect, resonant)"
+  sealed duct: "gasket / printed boss joining the lid bore exit to the board hole; chimney_d1.0 = ID 1.0 (no side volume); gasket_id2.1 = ID 2.1 ring (4.0 mm3 side volume)"
+  FL / SL: "force level dB re 1 uN / sensation level = FL - threshold FL"
+  RETFL: "reference equivalent threshold force level, ISO 389-3 = ANSI S3.6 mastoid values"
+  front: "Surendran 2023 'frontal' site = in front of the ear-canal opening = our pre-tragal pad site"
+  ERB: "equivalent rectangular bandwidth 24.7 (4.37 f/kHz + 1) Hz, Glasberg & Moore, Hear Res 47:103 (1990) (recalled)"
+  MC / SRRC: "Monte Carlo over parameter ranges / standardised rank regression coefficient"
+run:
+  smoke: "sim/acoustics/smoke.sh [board.kicad_pcb]   # fenced; prints headline.py"
+  parts: {geometry: "python3 sim/acoustics/geometry.py", selfcheck: "python3 sim/acoustics/selfcheck.py [--fem-n 10]", port: "python3 sim/acoustics/run_port.py [--board b] [--mc 40] [--no-plot]", bone: "python3 sim/acoustics/bone.py", headline: "python3 sim/acoustics/headline.py"}
+  e2e_use: "python3 sim/e2e/chain.py ... --set port_json=sim/acoustics/out/port_response.json   # stages.AcousticPort.curve_db reads f_hz + mag_db (load verified 2026-10-02 20:33 for all 3 files)"
+  threads: "OMP/OPENBLAS/MKL_NUM_THREADS default 2 inside the code"
+  never: [FreeRouting, hw/pod/place.py, hw/pod/place_r1.py, any autorouter, any run without the 3 GB fence]
+watch:
+  rerun_when: ["hw/mech/shell_r1.py: MIC, Y_SPLIT, Y_OUT, PCB, CAV, lid_base() bore / hex window / lip / clamp ribs", "board: U2 position or NPTH drill, thickness setting, F-side parts near the port, vias/tracks within r 1.6 of the port", "hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod", "spec s8 L509-L511, D1 L85, D6 L176-L178, D7 L189-L193, D13 L232, R14 L608", "mesh part (task D2 L690)", "E1 / E2 / E3 results", "pad material (reg-pad open issue 1)", "simplification pick (size.md s7 S1/S2 ducts are scenarios here)"]
+  plm_relation_proposal: {id: R-ACOUSTICS, watches: [hw/mech/shell_r1.py, hw/pod/draft_r1/pod_r1_routed.kicad_pcb, hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod, sim/acoustics/port.py, sim/acoustics/bone.py], items: [sub-audio-in, reg-pod-body, reg-pad, sub-output], note: "lead adds it; this agent does not edit plm"}
+
+# ------------------------------------------------------------------------------------------------ inputs (read 2026-10-02 20:32)
+inputs:
+  lid: {src: "hw/mech/shell_r1.py:lid_base (AST)", read: {bore: "D1.0, 0.9 long (Y_SPLIT 14.4 -> window floor 15.3)", window: "hex circumradius 1.9 (equal-area circle r 1.728), 0.8 deep at the outer face", gap: "1.5 (Y_SPLIT 14.4 - PCB y1 12.9)", lip: "lip_i x 30.95..66.05, hangs 0.8 into the gap", clamp_ribs: "inner faces z -8.0..3.8, full gap height", channel: "35.1 x 11.8 x 1.5 mm, bore at (3.55, 5.90) in it"}}
+  board: {src: "pcbnew read-only hw/pod/draft_r1/pod_r1_routed.kicad_pcb", read: {u2: "origin (4.67, 6.5) rot 90 B.Cu; NPTH D0.6 at (3.9, 6.5) = pod x 34.5 = lid bore axis: offset 0.00 mm (ECR-0011 fixed in the Rev F placement)", thickness_setting_mm: 0.8, f_side_parts: "bbox area 193 of 444 mm2 (44 %); nearest Y1 crystal FC-135R 1.84 mm from the port centre, then 0402s at 3.9 mm", gasket_seat: "no F track and no via within r 1.6 of the port; nearest via GND at 2.05 mm"}}
+  mic: {src: "Syntiant SPH0641LU4H-1 datasheet Rev B-1 (2024-12-02) p.9 (local ../ultrasonic-scratch/sph0641_sq.pdf.txt L811) + sim/data/sph0641_ultrasonic_response.json (Rev B sheet 7, 1.8 V, 3.072 MHz, 10-80 kHz)", read: "acoustic port D0.325 +-0.05; curve +14.7 dB at 25 kHz, ~+8 dB 35-65 kHz, +12.7 dB at 80 kHz re 1 kHz", assumed: {port_len_mm: "0.25 (0.15-0.35)", standoff_mm: "0.06 (0.03-0.10)", ring_id_mm: "1.025 (footprint copper ring)"}}
+  mesh: {status: "none designed (task D2 L690)", model: "series specific resistance r_s (rayl) over the covered area; no mass/stiffness", nominal_rayl: 24, derived_from: "brief: Saati Acoustex B042HY ~0.25 dB one-way at 80-85 kHz per TDK AN-000221 -> r_s = 2 rho c (10^(0.25/20) - 1)", status_of_source: "UNVERIFIED: neither document opened (WebFetch 404 on invensense.tdk.com and saati.com guesses, WebSearch budget spent, 2026-10-02)", swept_rayl: [5, 300]}
+  exciter: {src: "vendor pages local ../ultrasonic-scratch (fetched 2026-09-30); spec D7 L189-L193", read: "8 ohm 12.5x5x3.5 | 12 ohm 12.6x6x4; 300-19000 Hz; 0.3 W / 0.8 W", unknown: [Bl, moving mass, f0, Q_m, inductance]}
+  pad_and_arm: {src: "docs/system/reg-pad.md (pad assembly 2.19 g, exciter 1.2 g [Low], contact D8 silicone/Sugru); docs/research/tragus-arm.md (NiTi ~250 N/m, 1 N); spec D1 L100 (>= 1 N)"}
+  skin_load: {src: "Surendran, Prodanovic, Stenfelt, Trends in Hearing 27 (2023), PMC10126703 (local ../ultrasonic-scratch/surendran.xml, opened 2026-10-02)", read: "frontal point impedance (2 N, 175 mm2): 1.1 g mass above 2 kHz, low-f compliance 40 um/N, min |Z| ~8-10 N s/m near 0.7-1 kHz (Fig 2A, read off)", also: "Henry & Letowski ARL-TR-4138 (2007) s3.4: Flottorp & Solberg 1976 skin M_S 0.6 g, C_S 4.7e-6 m/N, R_S 20 N s/m (local henry2007.txt L2783-L2784, re-read 2026-10-02)"}
+  thresholds: {retfl: "ANSI S3.6-1996 = ISO 389-3 mastoid via ARL-TR-4138 Table 8 (henry2007.txt L3750+, re-read 2026-10-02): 250 Hz 67.0, 1 kHz 42.5, 1.5 kHz 36.5, 2 kHz 31.0, 3 kHz 30.0, 4 kHz 35.5, 8 kHz 40.0 dB re 1 uN", front: "Surendran 2023 Fig 4A (n 21, median, ~2 N) digitised +-2 dB, SD 6-9 dB: 31.7/29.2/33.7/34.5/30.0/29.5/28.3 dB re 1 uN at 0.5/1/2/2.5/3.15/4/5 kHz; table ends 12.5 kHz", note: "that study's mastoid thresholds sit ~19 dB above ISO RETFL at 2 kHz: its force scale is not ISO-calibrated; both conventions carried"}
+  not_opened: ["ISO 389-3, IEC 60318-6 (paywalled)", "TDK AN-000221, Saati Acoustex datasheet", "Zwikker-Kosten 1949, Tijdeman 1975, Stinson 1991, Karal 1953 (forms recalled; limits self-checked)", "Glasberg & Moore 1990 (ERB formula recalled)"]
+
+# ------------------------------------------------------------------------------------------------ model A: mic port
+model_a:
+  chain: "free field --(plate, blocked pressure)--> hex window (tube r 1.728 x 0.8, flanged radiation) --step mass--> lid bore (tube) --> [open gap: two-port Z11/Z12/Z22 = 3-D parallel-plate modal sum (n=0..63) + finite-channel n=0 correction | sealed duct: tube + step masses] --> board hole (tube) --> standoff ring (shunt 0.05 mm3) --> mic port (tube D0.325 x 0.25) --> front volume (shunt, calibrated)"
+  tubes: "full Kirchhoff (Bessel) visco-thermal effective density/compressibility (narrow.tube_eff); shear number s 27-200 for r 0.3-1.0 mm at 20-96 kHz = thin boundary layer; the low-reduced-frequency (Poiseuille, s < ~3) form is INVALID here and not used; plane wave valid to ka 1.84 (r 1.0 mm at 96 kHz: ka 1.76); window r 1.73 exceeds it above ~59 kHz (FEM +-3 dB there)"
+  gap_matched: "gap.gap_z: discs on opposite rigid plates, Graf addition for offset; n = 0 carries the slit rho_e; pole panels +-0.1 % (n=0 integral within 1.7e-4 of a 32-pt reference)"
+  gap_channel: "gap.rect_n0_dz: n = 0 field of the rigid 35.1 x 11.8 mm channel minus the infinite one (Neumann modal sum, disc-averaged, same smooth window on both, high modes as k^2 moments); validated vs a brute-force modal sum to 3.5e-4, compliance limit at 100 Hz to 1.4e-3, window convergence 4e-6"
+  mic_calibration: {what: "V_f, loss tangent eta so the flush reference peaks at 25 kHz / +14.7 dB re 1 kHz", result: {V_f_mm3: 0.761, eta: 0.111}, assumption: "the datasheet 25 kHz peak is the mic's own port/front-volume Helmholtz resonance (spec D13 L232 calls it a fixture resonance: unresolved); MC round-robins 3 reference assumptions (ideal flush, 0.8 mm PCB + D0.5, 1.6 mm PCB + D0.8)"}
+  fem_crosscheck: {code: "sim/acoustics/fem_axisym.py", method: "axisymmetric Helmholtz, bilinear quads h 25 um, absorbing outer boundary, same effective fluids", errors_db_lumped_minus_fem_2026-10-02: {chimney_d1.0: {rms_lt60k: 0.33, max_lt60k: 0.71, rms_gt60k: 2.36, max_gt60k: 3.21}, gasket_id2.1: {rms_lt60k: 0.48, max_lt60k: 1.04, rms_gt60k: 2.29, max_gt60k: 2.91}, open_aligned_matched: {rms_lt60k: 0.78, max_lt60k: 1.48, rms_gt60k: 1.80, max_gt60k: 2.36}}, criteria: {rms_lt60k: 1.5, max_lt60k: 2.5, rms_gt60k: 3.0}, verdict: PASS, note: "open_aligned IS the as-built design now (offset 0)"}
+  selfcheck_verdict_2026-10-02: {narrow: true, gap: true, channel: true, fem: true, src: sim/acoustics/out/selfcheck.json}
+  not_modelled: ["F-side parts in the gap (Y1 at 1.84 mm; 44 % of the face)", "lip under-slot 0.7 mm and board-edge leaks to the cell side", "bore-hole offset INSIDE a sealed duct (lumped tube)", "mesh mass/stiffness, water on the mesh", "lid bore roughness, 3-D hex shape", "baffle gain (flat 0..+6 dB, level_offset_db)"]
+
+results_a:   # src sim/acoustics/out/port_results.json 2026-10-02 21:25; ratio band 20-96 kHz; in-pod R14 ripple rules 20-85 kHz (processed band, run_port.R14_BAND_HZ); in_pod below = [deepest, highest] re median 20-85 kHz
+  designs:   # mean ratio dB | MC p05..p95 | in-pod deepest / highest re its median | ratio resonances (f kHz, dB, Q)
+    as_built:          {what: "Rev F board + rev-1 lid: open 1.5 mm gap, offset 0", mean: -15.4, mc: [-23.5, -10.9], in_pod: [-5.2, +20.8], in_pod_20_80k: [-4.7, +15.8], peaks: "92.0 +9.6 Q10", dip: "-27.4 @ 26.2"}
+    as_built_channel:  {what: "same, rigid empty channel (resonant limit)", mean: -15.1, mc: [-22.4, -11.3], in_pod: [-26.2, +19.9], note: "channel modes every few kHz, dips to -42 dB @ 36.6 kHz; real gap lies between matched and channel"}
+    chimney_d1.0:      {what: "sealed straight D1.0 duct lid->board, hole D0.6", mean: +5.4, mc: [-0.2, +7.8], in_pod: [-5.8, +19.3], in_pod_20_80k: [-5.4, +11.6], peaks: "16.1 +15.9 Q6; 35.9 +13.7 Q5; 84.7 +20.2 Q16 (inside the 20-85 kHz processed band: FAILS R14-peak by 4.3 dB)"}
+    chimney_d1.0_hole1.0: {mean: +5.0, in_pod: [-5.5, +14.7], peaks: "top resonance moves to 76.5 kHz", note: "passes all R14 rules over 20-85 kHz but needs duct ID >= 1.4 (R-ACO-P4) and zero lateral tolerance"}
+    chimney_id1.4:     {what: "ring volume 1.1 mm3", mean: +2.4}
+    gasket_id2.1:      {what: "ring ID 2.1, 4.0 mm3 side volume", mean: -4.5, mc: [-12.7, -1.3], in_pod: [-3.6, +15.1], peaks: "13.7 +21.8 Q8; 92.0 +17.1 Q18"}
+    size_s1:           {what: "simplify/size.md s7 S1: window 0.8 + bore 0.7 + sealed 1.15 + board 0.8", mean: +5.5, in_pod: [-7.1, +9.3], peaks: "17.0 +14.3; 42.4 +15.1; 94.6 +21.1 (top resonance above the 85 kHz processed edge)", note: "the only sealed stack passing every R14 rule over 20-85 kHz (2026-10-02 21:25)"}
+    size_s2:           {what: "S2: no plate, bore 1.0 + sealed 1.15 + board 0.8, no window", mean: +2.8, in_pod: [-6.0, +16.5], peaks: "16.5 +14.1; 38.3 +13.7; 87.1 +16.1 (skirt reaches 84.7 kHz: FAILS R14-peak by 1.5 dB)"}
+  r14_mc_all_pass_fraction: {window: "20-85 kHz", as_built: 0.0, as_built_channel: 0.0, chimney_d1.0: 0.40, gasket_id2.1: 0.35, window_20_80k: {chimney_d1.0: 0.55, gasket_id2.1: 0.35}, rule: "mean >= -6 AND in-pod notch >= -10 AND in-pod peak <= +15 dB", why: "chimney misses: the 84.7 kHz Q16 duct resonance (in-pod peak p95 +20.1 dB re median), the 1.6 mm-PCB reference assumption and +-0.2 mm holes"}
+  alignment_stack:   # run_port.spec_checks S8-duct-alignment-stack; board slide from hw/mech/shell_r1.py CAV vs PCB (AST)
+    board_slide_mm: {x_minus: 0.3, x_plus: 2.1, z_minus: 0.3, z_plus: 0.3, src: "shell_r1.py CAV x 30.3-66.7, PCB x 30.6-64.6 (no x stop: docs/system/00-whole.md risk 8)"}
+    print_tol_mm: {val: 0.1, basis: assumed}
+    worst_offset_mm: 2.22
+    allowed_mm: {chimney_d1.0: 0.20, gasket_id2.1: 0.75, chimney_d1.0_hole1.0: 0.0}
+    verdict: "FAIL for every sealed option: a sealed duct is only as good as the board's lateral location. Precondition for B (and C): a board x-stop (or a duct-locating feature that registers the board) holding offset <= 0.2 mm incl. print tolerance; even registering on the -x wall leaves 0.3 mm today (nominal gap), so the stop must be a designed feature"
+  quarter_wave_check:   # brief: 'a ~3 mm, ~1 mm tube ahead of the mic may resonate in band (c/4L ~27 kHz)'
+    rows: {"4.0 mm sealed (today's stack)": {c_4L: 21.5, model_khz: [16.2, 35.0, 84.4]}, "3.45 mm (S1)": {c_4L: 24.9, model_khz: [17.2, 40.6, 94.6]}, "2.95 mm (S2)": {c_4L: 29.1, model_khz: [16.7, 37.8, 87.1]}, "3.0 mm uniform D1.0": {c_4L: 28.6, model_khz: [17.0, 35.6, 77.3]}}
+    verdict: "brief right in kind for any SEALED duct: resonances at 35-42 kHz (Q 4-9) and 77-95 kHz (Q 9-18) are inside the band. The first one is not c/4L: it is a Helmholtz resonance (board hole + mic port air mass on the mic front volume) at 16-17 kHz, +19..+20 dB re 1 kHz, nearly independent of duct length; its skirt lifts 20-25 kHz. The open gap has no duct resonance (lossy), only channel modes"
+    caveat: "the 16 kHz Helmholtz frequency scales with the ASSUMED mic front volume (UA2)"
+  offset_sweep_open_gap: {offset_mm: [0, 0.4, 0.8, 1.2], mean_db: [-15.4, -15.7, -16.6, -17.7], reading: "misalignment costs ~1 dB per 0.8 mm in the open gap; the gap itself costs ~16 dB (bore exit sees the gap as a near pressure-release end: the hole samples a 10-20 % near field)"}
+  sealed_offset_rule: {text: "hole fully inside the duct: offset <= r_duct - r_hole = 0.2 mm (ID 1.0 / hole 0.6), 0.1 (hole 0.8), 0 (hole 1.0)", basis: geometric, why: "the lumped duct model cannot see offset; H-A4 plans the 3-D check"}
+  chimney_id_x_hole_mean_db: {rows: "duct ID 1.0/1.4/1.8/2.1/3.0/4.0 mm x hole 0.6/0.8/1.0", "1.0": [5.4, 5.7, 5.0], "1.4": [2.4, 3.4, 3.2], "1.8": [-1.6, -0.1, 0.1], "2.1": [-4.6, -2.7, -2.2], "3.0": [-11.6, -9.2, -8.3], "4.0": [-17.1, -14.5, -13.3], reading: "side volume round the bore costs ~2.7 dB per mm3 at first (ID 1.4), ~1.3 dB per mm3 at 18 mm3; spec s8 L511 'no gasket cavity' quantified"}
+  mesh_db_at_82khz: {sealed_d1.0_mouth_5_12_24_60_120_300_rayl: [-0.08, -0.18, -0.36, -0.87, -1.66, -3.69], sealed_d1.0_bore_floor: [-0.25, -0.6, -1.19, -2.84, -5.16, -10.0], rule: "mouth (9.4 mm2) <= 60 rayl costs <= 0.9 dB; on the bore floor (0.79 mm2) keep <= 12 rayl"}
+  tornado_mean_db_lo_hi:
+    as_built: {hole_D_0.4_0.8: [-6.0, 2.4], bore_D_0.8_1.2: [-3.4, 2.6], board_t_1.6: [0, -1.3], offset_1.0: [0, -1.7], mic_port_len_ASSUMED: [-1.3, 0.8], gap_1.3_1.7: [1.1, -0.8], window_0.4_1.2: [-0.9, 0.3]}
+    chimney_d1.0: {hole_D_0.4_0.8: [-3.2, 0.3], bore_D_0.8_1.2: [-2.5, 1.5], mic_port_len_ASSUMED: [-1.3, 1.1], window_0.4_1.2: [-0.9, 0.3], others: "<= 0.3 dB (bore L, duct L, board t, standoff, 0-35 C)"}
+    ranking: "hole D > bore D > mic port length (assumed) > window; spec s8 L510 'short and wide' confirmed; the D0.6 hole at the spec's lower edge is the most sensitive dimension"
+  reference_assumption_mean_db: {as_built: [-15.4, -14.1, -17.6], chimney_d1.0: [5.4, 6.6, 3.1], gasket_id2.1: [-4.5, -4.0, -7.1], order: "ideal flush | pcb 0.8 + D0.5 | pcb 1.6 + D0.8", reading: "band mean robust to +-2 dB; 80-96 kHz mean moves up to 10 dB: fine structure above 60 kHz is coupon territory"}
+  spec_checks:   # basis spec = number in the spec; assumed = threshold proposed here (owner confirms)
+    as_built: {S8-board: PASS, S8-hole: "PASS (0.6 = lower edge)", S8-nogasketcavity: "FAIL (port opens into a 621 mm3 channel, parts not subtracted)", S8-opening-over-hole: "PASS (offset 0, Rev F)", S8-mesh: "FAIL (none)", R14-level: "FAIL -15.4 (p05 -23.5)", R14-notch: "PASS -5.2", R14-peak: "FAIL +20.8 @ 84.7 kHz"}
+    chimney_d1.0: {S8-nogasketcavity: PASS, R14-level: "PASS +5.4 (p05 -0.2)", R14-notch: "PASS -5.8", R14-peak: "FAIL +19.3 @ 84.7 kHz (20-80 kHz alone: +11.6)", S8-duct-alignment-stack: "FAIL 2.22 vs 0.20 mm", S8-mesh: "FAIL until D2"}
+    chimney_d1.0+mesh_mouth: {R14-peak: "FAIL +19.4 @ 84.7 kHz: a 24 rayl mouth mesh does not damp the Q16 mode"}
+    size_s1: {R14-level: "PASS +5.5", R14-notch: "PASS -7.1", R14-peak: "PASS +9.3 @ 42.8 kHz", S8-duct-alignment-stack: "FAIL 2.22 vs 0.20 mm"}
+    gasket_id2.1: {S8-nogasketcavity: "FAIL (4.0 mm3)", R14-level: "FAIL -4.6", R14-peak: "PASS +14.7 @ 23.3 kHz", S8-duct-alignment-stack: "FAIL 2.22 vs 0.75 mm"}
+    src: "port_results.json spec_checks; s8 L509-L511, R14 L608, R8 L601, C8 L683"
+  options:   # owner decides (CLAUDE.md s0); all layout-agnostic: lid + gasket parts, board only needs a clear seat
+    A: {name: "keep the open gap (as built)", numbers: "-15.4 dB mean; R14 0 % of MC draws", cost: none, verdict: "fails R14-level by ~10 dB; throws away the 8-15 dB ultrasonic bonus R8 L601 counts on; open water path to the MCU (O12 L638)"}
+    B: {name: "sealed straight duct ID 1.0 (gasket or printed boss, OD <= 3.4 so it clears Y1 and the GND via), hole D0.6-0.8, mesh at the window mouth <= 60 rayl", numbers: "+5.4 dB (p05 -0.2); in-pod ripple 20-85 kHz -5.8/+19.3 dB (84.7 kHz Q16 duct mode); R14 40 % of draws (55 % if judged on 20-80 kHz only)", cost: "one gasket/boss; bore-to-hole alignment <= 0.2 mm (nominal 0.00 on Rev F, but 2.22 mm worst with today's free board slide)", preconditions: ["board x-stop or duct-locating feature (alignment_stack)", "firmware EQ cut ~-19 dB, Q ~16 at ~84.7 kHz as a flash-loadable knob (C8, O18), or the S1 duct stack (passes 20-85 kHz) from the simplification study"], verdict: "RECOMMENDED with both preconditions: still the only family that clears R14-level by ~10 dB and closes the water path; without the x-stop it is not buildable to tolerance"}
+    C: {name: "gasket ring ID 2.1 (tolerant of misalignment)", numbers: "-4.5 dB (p05 -12.7); in-pod peak +15.1; R14 35 %", cost: "gasket only", verdict: "fallback only; ~10 dB worse than B and it also needs the x-stop (2.22 mm worst offset vs 0.75 mm allowed)"}
+
+# ------------------------------------------------------------------------------------------------ interface files
+interfaces:
+  IF-ACOUSTIC-PORT:
+    provider: sim/acoustics/run_port.py
+    files: {as_built: sim/acoustics/out/port_response.json, recommended: sim/acoustics/out/port_response_chimney_d1.0.json, fallback: sim/acoustics/out/port_response_gasket_id2.1.json}
+    format: "json {f_hz[500 log 1-100k], mag_db, phase_deg, mag_db_min/max (+_tight), mag_db_p05/p95, mag_db_abs_re_1khz (informational), mag_db_channel (open gap only), cond{design, gasket, board_mm, port_offset_mm, bore_mm, window_depth_mm, gap_or_chimney_mm, hole_mm, geometry_src}, valid_from_hz, validity, level_offset_db, bands, ref}"
+    values_db_at_25_40_60_80_90k: {as_built: [-26.3, -18.6, -14.5, -4.8, +7.8], as_built_min: [-37.9, -40.2, -40.7, -30.9, -24.8], as_built_max: [-6.3, -5.1, +1.0, +5.1, +20.9], chimney_d1.0: [-6.7, +10.5, +2.9, +13.1, +13.1], gasket_id2.1: [-2.3, -8.2, -9.7, -2.1, +14.6]}
+    consume: "stages.AcousticPort.curve_db uses f_hz + mag_db; multiply with the DATASHEET curve (stages.Microphone), never with mag_db_abs_re_1khz"
+    warnings: ["open gap below 15 kHz: indicative only", "above 60 kHz: +3.5 dB model error and up to 10 dB reference ambiguity: EQ there must be a firmware table (O18) from coupons", "np.interp clamps outside 1-100 kHz"]
+  IF-BONE-TF:
+    provider: sim/acoustics/bone.py
+    file: sim/acoustics/out/bone_tf.json
+    format: "json {f_hz[160, 250-16000 log], mag_db_n_per_a (+_p05/_p95/_min/_max), phase_deg, mag_db_n_per_v (per volt of BRIDGE drive, +bands), thr_front_measured_db_re_1uN, thr_front_norm_minus20_db_re_1uN, cond{force_n, per_volt, pad, site, nominal, ranges}}"
+    consume: "stages.MechBone: replace F = Bl*i*H by F = 10^(mag_db_n_per_a/20) * i over 0.25-16 kHz (sensation level only); the e2e exciter now takes Bl/m/f0/Q/L from docs/sim/shared-params.yaml#exciter (same nominal as bone.py: Bl 1.0 N/A, L 0.5 mH, f0 350 Hz) so current and force come from one model. Above 16 kHz the e2e keeps F = Bl*i (blocked force on the housing), the quantity IF-ACOUSTIC-LEAK is defined per"
+  IF-ACOUSTIC-LEAK:
+    status: "PARTIAL: air path bound only"
+    air_path: {pa_per_n: 0.27, ref: "free-field pressure at the lid per newton of COIL force (Bl*i, the force driving the housing) - same force definition as the e2e T6 leak requirement", how: "pad housing mass-controlled v = F/(w M_h), M_h 1.74 g; baffled piston S 1.1e-4 m2 on-axis far field at d 45 mm: |p|/F = 2 rho c |sin(k(sqrt(d^2+a^2)-d)/2)| / (w M_h) = 0.27 Pa/N at 20 kHz and 0.26 at 85 kHz", requirement_from_e2e: "<= 93 Pa/N at the mic port (docs/sim/e2e-chain.yaml IF-ACOUSTIC-LEAK)", margin_db: "51 at the lid; ~31 at the diaphragm after the port ratio (chimney_d1.0 peaks +20.2 dB at 84.7 kHz; as built +9.6 at 92 kHz)", basis: derived}
+    structure_path: "NOT modelled (NiTi arm -> pod -> board -> MEMS vibration sensitivity unpublished)"
+  IF-EXCITER-Z: {role: "consumer; bone.py publishes the priors E1 fits against (results_b.e1_expectation)"}
+  IF-HEAD-SHADOW: {status: "not provided: plate treated as infinite baffle (level_offset_db 0..+6)"}
+  owner_visuals: "port_path.png (to-scale cross-section today vs recommended, plain labels) and port_response.png are ready for the A-PHASE1-VISUALS board sheet (docs/brief/queue.yaml)"
+
+# ------------------------------------------------------------------------------------------------ model B: bone/cartilage path
+model_b:
+  network: "coil I -> force Bl*I between moving mass m_m (suspension k_s, c_s from f0, Q_m) and housing M_h; housing -> pad K_p(1+j eta_p) in series with skin Z_L = R_L + jw M_L + K_L/jw -> rigid skull; arm z_arm + k_arm/jw to ground; back-EMF Bl (v_m - v_h); electrical R_e + 1.52 ohm (bridge+wire+shunt) + jw L_e"
+  params:   # nominal | range | status | src (code: bone.py PARAMS)
+    r_e: [8, "8|12", vendor disputed, "spec D7 L191"]
+    l_e: [0.5e-3, "0.3e-3..1.3e-3 H", assumed, "spec D7 L192; Adafruit 1674 1.26 mH"]
+    bl: [1.0, "0.5..2.0 N/A", assumed, "anchor Aeropex 102 dB re 1 uN/V < 2 kHz (Surendran 2023 Fig 2B)"]
+    m_m: [0.45e-3, "0.25..0.7 g", assumed, "exciter 1.2 g [Low]"]
+    f0: [350, "200..800 Hz", assumed, "vendor low edge 290-300 Hz"]
+    q_m: [3, "1.5..8", assumed, "-"]
+    m_h: [1.74e-3, "1.2..2.2 g", CAD, "reg-pad.md 2.19 g - m_m"]
+    k_p: [1.0e6, "1e5..1e7 N/m", assumed, "1 mm silicone/Sugru, E 0.7-3 MPa, 50-150 mm2, shape factor x3-9"]
+    eta_p: [0.2, "0.05..0.5", assumed, "-"]
+    k_l: [2.5e4, "1.2e4..6e4 N/m", measured, "Surendran 2023 40 um/N frontal at 2 N"]
+    m_l: [1.1e-3, "0.6..1.5 g", measured, "Surendran 2023; Flottorp 0.6 g"]
+    r_l: [10, "4..25 N s/m", read off figure, "Surendran Fig 2A; Flottorp 20"]
+    z_arm: [1.0, "0.3..3 N s/m", "derived [Low]", "NiTi 0.85 mm infinite-beam 0.74 at 3 kHz"]
+    k_arm: [250, "100..600 N/m", derived, tragus-arm.md]
+  load_check: "Z_L 11.0/10.4/15.5/21.8/28.5 N s/m at 0.5/1/2/3/4 kHz vs pure 1.1 g mass 3.5/6.9/13.8/20.7/27.6: mass-like above 2 kHz within 12 % (Surendran)"
+  can_predict: ["F_L(f) shape 0.25-16 kHz for a parameter set", "which parameter dominates and by how much", "pad stiffness / housing mass trade", "E1 |Z| sweep priors", "static force 0.5-2 N moves the level < 0.4 dB", "shaped PWM noise per ERB vs thresholds (T6)"]
+  cannot_predict: ["absolute N/V (+-8 dB 5-95 %, +-14 dB min-max) until E1", "pad material stiffness before it is chosen and measured", "the owner's tissue (several dB between people; measured at 2 N, we run 1 N)", "the cartilage-conduction ear-canal radiation itself (only inside the thresholds); Nishimura 2014 PMID 25199744: stray airborne sound can dominate in an open ear at high f", "contact loss (never reached: 31-38 mN peak at the ceiling vs 1 N)", "hair, sweat, tilt"]
+
+results_b:   # src sim/acoustics/out/bone_results.json, bone_tf.json 2026-10-02 20:32, MC n 2000
+  force_per_volt_bridge_db_re_1uN:   # nominal, p05, p95, min, max
+    1500: [94.1, 85.5, 101.4, 79.9, 108.8]
+    2000: [92.9, 84.2, 100.1, 78.9, 105.9]
+    2500: [92.2, 83.1, 99.2, 77.2, 106.8]
+    3000: [91.9, 81.5, 98.8, 72.5, 108.3]
+    4000: [92.1, 77.1, 97.4, 64.9, 106.4]
+  headline_1V: "1 V rms bridge drive at 2.5 kHz: 40.8 mN rms nominal; 5-95 % 14-91 mN; min-max 7-218 mN. Per volt across the exciter terminals: 45.0 mN (93.1 dB re 1 uN)"
+  anchor: {aeropex_db_re_1uN_per_V: {500: 101.5, 1000: 102.5, 2000: 100.5, 3000: 96.0, 4000: 91.0}, src: "Surendran 2023 Fig 2B read off +-1.5 dB, B&K 4930", ours: "-8 dB at 2 kHz, -4 at 3 kHz, +1 at 4 kHz"}
+  sensitivity:
+    srrc_2k: {bl: 0.75, r_l: 0.31, k_p: -0.26, l_e: -0.25, r_e: -0.20, m_l: 0.18, m_h: -0.16}
+    srrc_4k: {bl: 0.57, l_e: -0.38, m_l: 0.17, k_p: 0.17, m_h: -0.16, r_e: -0.10}
+    tornado_db_2k: {bl: [-6.1, 6.2], l_e: [0.9, -4.4], r_l: [-1.5, 3.7], r_e: [0, -2.4], k_p: [2.3, -0.8], m_h: [1.6, -1.2], m_l: [-1.4, 1.1], f0: [-0.2, 1.2], rest: "< 0.7 dB"}
+    tornado_db_3k: {k_p: [-6.5, -1.8], bl: [-6.1, 6.2], l_e: [1.6, -5.9], m_l: [-3.0, 1.8], r_l: [-0.6, 2.6], r_e: [0, -1.8]}
+    ranking: "Bl >> L_e > pad stiffness > skin R_L, M_L > R_e > housing mass; f0, Q_m, m_m, K_L, arm barely matter"
+    why: "1.5-4 kHz is far above f0: the exciter is a force source Bl*I; only the split between housing inertia and skin is left"
+  pad_stiffness_db_re_1uN_per_V_at_1.5_2_3_4k: {"1e5": [96.9, 95.1, 85.4, 77.5], "3e5": [95.1, 94.8, 96.2, 91.7], "1e6": [94.0, 92.8, 91.9, 92.1], "1e7": [93.6, 92.1, 90.1, 88.5], reading: "soft 1e5 N/m resonates ~1.9 kHz and loses 15 dB by 4 kHz; 3e5-1e6 is flat +-2 dB"}
+  ceiling: {v_rms_bridge: 0.533, def: "3.0 V x 10^(-12/20) / sqrt 2 (D17 L293-L295 has no number; -12 dBFS assumed)", FL_db_re_1uN: {1500: 88.6, 2000: 87.4, 2500: 86.7, 3000: 86.4, 4000: 86.7}, peak_force_mN: "30-38", SL_front_measured: {1500: 57.5, 2000: 53.7, 2500: 52.2, 3000: 55.5, 4000: 57.2}, SL_norm_minus20: {1500: 72.1, 2000: 76.4, 2500: 77.2, 3000: 76.4, 4000: 71.2}, reading: "loudness is plentiful (>= 45 dB SL at p05 force); T2 comfort and D17 are about the ceiling being too HIGH; R1 'transducer quiet' (L594) is not supported at the pre-tragal site"}
+  t6_shaped_noise:   # bone.py shaped_noise_v_psd: matches sim/checks/ntf_compare.py band powers within 0.4 dB (-92.7/-90.2/-70.6 vs -92.7/-90.6/-71.4 dB re FS)
+    what: "TPDF-dithered 3rd-order shaper noise (output running, no signal), force inside one ERB vs pure-tone threshold; > 0 dB = audible"
+    max_SL_db: {front_measured: {nominal: {1.5-4k: -32.2, 4-12.5k: -25.8}, p95_exciter: {1.5-4k: -27.0, 4-12.5k: -24.0}}, norm_minus20: {nominal: {1.5-4k: -15.8, 4-12.5k: -15.8}, p95_exciter: {1.5-4k: -9.0, 4-12.5k: -12.6, 12.5-16k: -12.2}}}
+    reading: "FINDING (output running only): shaped noise is >= 9 dB below threshold in every convention up to 16 kHz (12.5-16 kHz uses thresholds held at the last table value: unverified). Per-ERB is the right comparison (assumed critical-band summation). T6 as a whole is NOT closed here: squelch exactness (D6 L178), the DSP gate and the floor tracker (e2e F3, F4, F12) decide idle silence"
+  e1_expectation: {motional_bump_ohm_p05_p50_p95: [0.52, 3.39, 19.84], at_hz: [263, 507, 927], loaded_on_skin_peak_hz: [205, 394, 758], reading: "bump < 1 ohm -> Bl < ~0.5 (quiet); > 10 ohm -> Bl > ~1.7", files: "bone_results.json zin{e1_expectation, free_p05/50/95, clamped_p50, on_skin_p05/50/95}"}
+
+# ------------------------------------------------------------------------------------------------ measurements that collapse the uncertainty (blocked by O21 L647 until parts exist)
+measurements:
+  E1:   # spec L698; extended
+    do: ["DCR (4-wire if possible), 3+ samples from 2 listings", "L and R_s at 1, 2.5, 4, 10 kHz (L_e is frequency dependent)", "|Z|(f) 50 Hz-20 kHz in 3 states (sound card + series R, or the F4 self-test): free on its leads; clamped to >= 100 g; pad on the pre-tragal site at ~1 N", "weigh the exciter; open ONE sample and weigh the moving magnet (m_m)"]
+    gives: "R_e, L_e(f) (2nd-largest term, -5.9/+1.6 dB at 3 kHz); f0, Q_m, motional bump -> Bl = sqrt(bump * 2 pi f0 m_m / Q_m) (largest term, +-6 dB); loaded resonance"
+    pass_if: "bump 0.5-20 ohm (model 5-95 %); otherwise widen PARAMS and re-run bone.py"
+  E2:   # spec L699; as a threshold-in-volts audiogram
+    do: ["final pad material, 1 N (kitchen scale), pre-tragal site, Ear (open) in place", "pure tones 1.5/2/2.5/3/4 kHz and 8/10/12.5/16 kHz: V_rms ACROSS THE EXCITER TERMINALS at threshold (up-down 2AFC, 3 runs, re-seat) -> V_thr(f)", "same tones: comfortable-loud and uncomfortable -> V_mcl(f), V_ucl(f) (gives D17 its number)", "repeat at 0.5 and 2 N, mouth open, chewing", "then the translated nature files (sim/out/nature) at the ceiling (R19)"]
+    gives: "one number per frequency holding Bl, pad, skin, anatomy AND the threshold convention"
+    model_expects_V_thr_terminal_mV: {front_measured_nominal: {1500: 0.62, 2000: 0.98, 2500: 1.18, 3000: 0.83, 4000: 0.70}, norm_minus20_nominal: "~10x lower (0.06-0.12)", full_range: "0.03-4 mV"}
+    pass_if: "V_thr <= 3 mV at 1.5-4 kHz (>= 45 dB SL at the 0.533 V ceiling) and shaped-noise voltage per ERB <= V_thr - 10 dB"
+  E3_coupons:   # spec L700, L571; rev-1 board + printed lid variants (sub-audio-in issue 4 option b)
+    do: ["same mic, same board: lid variants open gap / sealed ID 1.0 / ID 1.4 / ID 2.1 ring, mesh 0 / 24 / 60 rayl at the mouth, vs the bare board (no lid) in the same fixture position", "any stable 20-96 kHz emitter (cancels in the ratio): chirp or 1 kHz steps", "R(f) = |S_variant| / |S_bare| from the USB stream"]
+    gives: "the quantity mag_db predicts, directly; a miss means recalibrate the mic internals (calibrate_mic) or the reference"
+    pass_if: "R(f) inside mag_db_min..max for >= 90 % of 20-96 kHz points; band mean within +-6 dB"
+
+# ------------------------------------------------------------------------------------------------ requirements
+requirements:
+  R-ACO-P1: {text: "path band mean 20-96 kHz >= -6 dB re a flush port nominal; MC p05 >= -9 dB", basis: assumed, traces: "R14 L608; R8 L601; T2 L39", status: "as_built FAIL -15.4 (p05 -23.5); chimney_d1.0 PASS +5.4 (p05 -0.2); gasket_id2.1 FAIL -4.5 (p05 -12.7)"}
+  R-ACO-P2: {text: "in-pod response over the processed band 20-85 kHz (datasheet held flat above 80 kHz): no notch deeper than -10 dB and no peak above +15 dB re its median; 20-96 kHz reported", basis: assumed, traces: "R14 L608; C8 L683; sim/dsp/pipeline.py algo_b band_hz", status: "as_built FAIL (+20.8 @ 84.7); chimney_d1.0 FAIL (+19.3 @ 84.7); size_s1 PASS (+9.3); gasket_id2.1 PASS (+14.7) (2026-10-02 21:25)"}
+  R-ACO-P3: {text: "lid bore exit and board hole joined by a sealed duct with no side volume (< 1 mm3), not an open gap", basis: derived, traces: "s8 L511; O12 L638", verification: "E3 coupon open vs sealed ratio >= 10 dB"}
+  R-ACO-P4: {text: "board fab thickness 0.8 mm; NPTH D0.6-0.8 (D1.0 only with a duct ID >= 1.4)", basis: spec, traces: "s8 L509-L510", status: "PASS (Rev F file 0.8, D0.6)"}
+  R-ACO-P5: {text: "bore-to-hole offset <= r_duct - r_hole (0.2 mm for ID 1.0 / D0.6) INCLUDING free board slide and print tolerance; bore D1.0 +-0.1 mm", basis: geometric, traces: "s8 L511; ECR-0011; 00-whole risks 8, 12, 20", status: "nominal PASS (Rev F offset 0.00); tolerance stack FAIL (2.22 mm worst, no x stop)", verification: "run_port.py S8-duct-alignment-stack on every run; H-A4"}
+  R-ACO-P6: {text: "gasket seat: no via and no F-side track within r 1.6 mm of the port; duct OD <= 3.4 mm (Y1 at 1.84 mm)", basis: derived, traces: "sub-audio-in issue 2", status: "PASS (Rev F: none; nearest via 2.05 mm)"}
+  R-ACO-P7: {text: "mesh <= 60 rayl at the window mouth (<= 0.9 dB at 82 kHz) or <= 12 rayl on the bore floor; foam never", basis: derived, traces: "s8 L511; D2 L690"}
+  R-ACO-P8: {text: "self-checks pass (selfcheck.json verdict all true)", basis: derived, status: "PASS 2026-10-02"}
+  R-ACO-B1: {text: "pad + contact face stiffness K_p 3e5-1e6 N/m (force/V flat +-3 dB over 1.5-4 kHz)", basis: derived, traces: "D1 L100; D9 L203; reg-pad issue 1"}
+  R-ACO-B2: {text: "E1 returns R_e, L_e(f), Bl (motional bump + m_m), f0, Q_m; E2 returns V_thr(f), V_mcl(f) at the terminals", basis: derived, traces: "R1 L594; R19 L612; T2 L39; T6 L43"}
+  R-ACO-B3: {text: "SL at the D17 ceiling >= 30 dB at 1.5-4 kHz (front threshold + 9 dB SD, p05 force)", basis: assumed, traces: "T2 L39; D17 L293", status: "PASS (36 dB at 2 kHz)"}
+  R-ACO-B4: {text: "shaped-noise force per ERB <= threshold - 6 dB, 0.25-16 kHz, p95 exciter, both conventions", basis: derived, traces: "T6 L43; R21 L614; D6 L176-L178", status: "PASS (worst -9.0 dB at 3 kHz, norm-20)"}
+  R-ACO-B5: {text: "peak vibration force < 0.5 x static force", basis: derived, traces: "D1 L100", status: "PASS (30-38 mN vs 1 N)"}
+
+findings:
+  - {id: FA1, text: "The open 1.5 mm gap costs ~16 dB across 20-96 kHz even with the Rev F alignment fix; R14 fails in 100 % of tolerance draws. A sealed straight D1.0 duct gains ~21 dB (+5.4 dB vs flush) and passes R14 nominally.", action: "reg-pod-body / sub-audio-in issues 1-2: add the duct (gasket or printed boss) to the lid design; the board side is already clear (R-ACO-P6)", docs: [sub-audio-in, reg-pod-body, physical]}
+  - {id: FA2, text: "The finite lid-board channel turns the open gap resonant: dips to -42 dB at channel modes (35.1 x 11.8 mm, modes every few kHz). The open gap is not just lossy but unpredictable; parts (44 % of the face) make it worse to predict.", evidence: "as_built_channel", docs: [sub-audio-in]}
+  - {id: FA3, text: "Sealed ducts of 2.95-4.0 mm all show a 16-17 kHz Helmholtz resonance (+19..+20 dB re 1 kHz), 35-42 kHz and 77-95 kHz duct resonances: the 'c/4L ~ 27 kHz' estimate is the wrong mechanism for the first one. Shortening the duct (S1/S2) does not move the first resonance; it moves the 2nd/3rd.", action: "EQ (C8 L683) as a flash-loadable table; coupons mandatory", docs: [sub-processing, research/simplify/size.md]}
+  - {id: FA4, text: "R8 L601 '[Low]' rests on the 8-15 dB ultrasonic sensitivity bonus; the open gap takes ~16 dB of it back. Keep R8 raised until the duct is sealed and coupon-tested.", docs: [spec]}
+  - {id: FB1, text: "Shaped PWM noise DURING OUTPUT is >= 9 dB below threshold per ERB in every convention (E2 confirms). This does NOT close T6: T6 sign-off belongs to the e2e sim (DSP gate / squelch F3, floor-tracker start-up F4, gate opening on sub-noise modulated content F12) with the shared threshold file.", docs: [sub-output, sub-processing]}
+  - {id: FA5, text: "The recommended sealed D1.0 duct puts a Q16 resonance at 84.7 kHz, inside the 20-85 kHz band the DSP processes: in-pod peak +19.3 dB re median fails the +15 dB R14 rule (the old 20-80 kHz window hid it). A 24 rayl mouth mesh does not damp it. The S1 stack (simplify/size.md s7) passes every R14 rule over 20-85 kHz. Either a firmware EQ cut (Q ~16, ~-19 dB at ~84.7 kHz, flash knob) or the S1 geometry.", evidence: "port_results.json spec_checks 2026-10-02 21:25", docs: [sub-audio-in, sub-processing]}
+  - {id: FA6, text: "Every sealed option needs a board x-stop: free slide x -0.3/+2.1 mm, z +-0.3 mm (shell_r1.py CAV vs PCB) gives a worst bore-to-hole offset of 2.22 mm vs 0.20 mm allowed for ID 1.0 / D0.6 (0.75 mm for the ID 2.1 gasket).", evidence: "S8-duct-alignment-stack, 2026-10-02", docs: [reg-pod-body, sub-audio-in, physical]}
+  - {id: FB2, text: "Loudness is plentiful (52-77 dB SL at the -12 dBFS ceiling); D17 needs a number from E2 V_mcl; R1 'quiet' is not supported at the pre-tragal site.", docs: [sub-output, spec]}
+  - {id: FB3, text: "Pad stiffness shapes 1.5-4 kHz by up to 15 dB: pick the contact material by K_p >= 3e5 N/m.", docs: [reg-pad]}
+  - {id: FB4, text: "e2e proxy threshold (RETFL - 20 dB) sits 20-24 dB below the only front-site measurement; the RETFL table itself is verified (ARL-TR-4138 Table 8). Both conventions now live in docs/sim/shared-params.yaml#thresholds and the e2e reports SL under both.", docs: [sim/e2e]}
+
+uncertainties:
+  - {id: UA1, what: "parts / lip slot / edge leaks in the open gap (matched..channel bracket + 1.5 dB)", effect: "open-gap fine structure +-10..20 dB; band mean +-2 dB", retire: "H-A1; irrelevant if option B is taken"}
+  - {id: UA2, what: "mic internals (front volume, port length) and whether the 25 kHz datasheet peak is mic or fixture", effect: "16 kHz Helmholtz position, 80-96 kHz mean +-10 dB; CROSS-SIM: the e2e firmware EQ is the inverse datasheet curve, so if spec D13 L232 is right (fixture peak) this calibration AND the e2e EQ are wrong together", retire: "Syntiant SiSonic design data (owner input), E3 coupons"}
+  - {id: UA3, what: "mesh part, r_s, wet behaviour", effect: "0.1-4 dB dry; wet unknown", retire: "D2 part + vendor curve"}
+  - {id: UA4, what: "offset inside a sealed duct (lumped model blind to it)", retire: "H-A4"}
+  - {id: UB1, what: "Bl, moving mass", effect: "+-6 dB", retire: "E1 extended"}
+  - {id: UB2, what: "threshold convention + owner anatomy", effect: "20-24 dB on every SL", retire: "E2 V_thr(f)"}
+  - {id: UB3, what: "pad stiffness", effect: "up to 15 dB at 3-4 kHz", retire: "material pick + E1 state 3"}
+
+heavy_runs:   # NOT run now; one at a time; fence shown
+  - {id: H-A1, what: "2-D thin-gap Helmholtz FEM of the lid-board channel with variable gap height h(x,z) from the F-side parts (board footprints + package-height table), replacing the matched/channel bracket", memory_gb: "0.5 (est: h 0.1 mm, ~41 k dof, sparse LU)", time_estimate: "~60-120 s (500 frequencies x ~0.15 s)", fence: "MemoryMax=3G MemorySwapMax=0", blocked_on: "layout settled after the simplification pick; only needed if option A stays", tools: "scikit-fem (installed)"}
+  - {id: H-A2, what: "3-D finite cavity with parts as rigid blocks, near-field included (validates H-A1 and the 3-D near field round Y1)", memory_gb: "1.5-3 (extrapolated: scipy ILU+GMRES 27 KB/dof measured on 59.5 k dof; AMG ~1 KB/dof unmeasured)", time_estimate: "40-80 min (40 frequencies)", fence: "MemoryMax=4G MemorySwapMax=0", blocked_on: "research swarm done; geometry settled; pyamg optional (not installed)"}
+  - {id: H-A4, what: "3-D FEM of window + bore + sealed duct + hole with lateral offset 0 / 0.2 / 0.5 / 1.0 mm (the lumped duct cannot see offset; the free board slide reaches 2.2 mm, alignment_stack)", memory_gb: "~1.6 (h 0.05 mm locally, ~60 k dof, ILU-GMRES)", time_estimate: "~14 min (15 frequencies x 4 offsets)", fence: "MemoryMax=3G MemorySwapMax=0", blocked_on: "owner run window; option B chosen"}
+  - {id: H-A3, what: "linearised Navier-Stokes (visco-thermal) FEM of the 0.325 mm port + standoff + hole", memory_gb: "2-4", time_estimate: hours, blocked_on: "only if coupons disagree; solver licence (Elmer / openCFS) NOT verified"}
+  - {id: H-B1, what: "none: bone model is lumped (1 s); head FEM not useful before E2"}
+
+tools:
+  installed_and_used:   # licence from the installed dist-info file / Debian copyright, read 2026-10-02
+    numpy: {version: 2.5.3, licence: "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0", evidence: "METADATA License-Expression"}
+    scipy: {version: 1.18.1, licence: BSD-3-Clause, evidence: "scipy-1.18.1.dist-info/LICENSE.txt"}
+    scikit-fem: {version: 12.0.2, licence: BSD-3-Clause, evidence: "scikit_fem-12.0.2.dist-info/licenses/LICENSE"}
+    matplotlib: {version: 3.11.2, licence: "matplotlib licence (PSF-style, BSD-compatible)", evidence: "matplotlib-3.11.2.dist-info/LICENSE"}
+    pcbnew: {version: 10.0.6, licence: "GPL (Debian /usr/share/doc/kicad/copyright: GPL v2 text; upstream states GPL-3.0-or-later: unverified)", role: "read-only board probe"}
+  not_installed_proposed:
+    pyamg: {version: 5.3.0, licence: MIT, evidence: "LICENSE.txt of the sdist read by the 2026-10-02 02:xx session (file no longer on disk: re-read before install)", install: "source tools/env.sh && pip install pyamg==5.3.0 (sdist builds with g++/cmake)", footprint: "~5-10 MB (unverified)", needed_for: "H-A2 only, optional"}

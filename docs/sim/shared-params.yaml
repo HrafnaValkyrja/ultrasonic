@@ -1,0 +1,74 @@
+# SIM-SHARED: one source for parameters that more than one stage-C sim uses. Audience: other Claude instances.
+# Rule (integrator 2026-10-02): a value used by two sims lives here, the sims read it (or check against it), never retype it.
+# Readers: sim/e2e/stages.py + metrics.py (exciter, psrr, thresholds, clocks), sim/acoustics/bone.py (exciter, thresholds),
+# sim/noise/params.yaml + aggressors.yaml (psrr scenario names, exciter corner by pointer). Change here -> re-run every reader
+# (docs/sim/index.yaml run_order). Dates ISO; Lnn = docs/spec.md line as of 2026-10-02.
+meta: {id: SIM-SHARED, date: 2026-10-02, why: "skeptic 2026-10-02: three exciter models, two PSRR models, two threshold conventions, two clock constants across the sims"}
+abbr:
+  RETFL: "reference equivalent threshold force level, dB re 1 uN (ISO 389-3 = ANSI S3.6-1996 mastoid)"
+  front: "Surendran 2023 frontal site = in front of the ear-canal opening = the pre-tragal pad site"
+  dBFS: "rms re the rms of a full-scale sine (= sim/dsp/pipeline.dbfs peak-ref convention; layout-noise uses the same)"
+  corner: "which end of a range a question must use (worst case for that question), not a second nominal"
+
+clocks:   # src: docs/research/A3-u575-plan.md s2 (HCLK 80.009 MHz, /20 mic clock, /400 PCM and PWM); spec D14 L246-L258
+  hclk_hz: 80009000
+  fs_pdm_hz: 4000450        # HCLK/20 (A3 rounds to 4.0004 MHz); the e2e used 4,000,400 before 2026-10-02 (fixed)
+  fs_pcm_hz: 200022.5       # HCLK/400; e2e runs at 200,000 internally (all its rates scale together; harmless inside the e2e)
+  fs_pwm_hz: 200022.5       # TIM1 centre-aligned, ARR 200: one period = 2*ARR HCLK ticks
+  hop_samples: 128
+  hop_cycles_at_hclk: 51200 # 128 * HCLK/fs_pcm; independent of ARR (FWSIM-R46)
+  hop_ms: 0.63993
+  pwm_variants: {"200 kHz": {arr: 200, levels: 201}, "400 kHz": {arr: 100, levels: 101}, "800 kHz": {arr: 50, levels: 51}, src: "spec D6 MP-01 table L157-L163"}
+
+exciter:   # RC-BC02 bone-conduction exciter; nominal | lo | hi | basis | src. Nominal = sim/acoustics/bone.py PARAMS (the better-anchored set)
+  r_e_ohm:   {nom: 8.0,     lo: 8.0,     hi: 12.0,   basis: "vendor, disputed", src: "spec D7 L191 (8 vs 12 ohm listings); E1"}
+  l_e_h:     {nom: 0.5e-3,  lo: 0.3e-3,  hi: 1.3e-3, basis: assumed, src: "spec D7 L192 (0.3 mH placeholder); 1.26 mH Adafruit 1674 (larger part); E1"}
+  bl_n_per_a: {nom: 1.0,    lo: 0.5,     hi: 2.0,    basis: assumed, src: "Aeropex 102 dB re 1 uN/V < 2 kHz (Surendran 2023 Fig 2B) -> ~1 N/A at 8 ohm"}
+  m_m_kg:    {nom: 0.45e-3, lo: 0.25e-3, hi: 0.7e-3, basis: assumed, src: "exciter 1.2 g [Low] (reg-pad.md); moving magnet share guessed"}
+  f0_hz:     {nom: 350.0,   lo: 200.0,   hi: 800.0,  basis: assumed, src: "vendor low edge 290-300 Hz"}
+  q_m:       {nom: 3.0,     lo: 1.5,     hi: 8.0,    basis: assumed, src: "guess"}
+  r_loop_ohm: {nom: 1.52, parts: "r_pair 1.22 (Rds(on) N 0.34 + P 0.88 at Vgs 3.0 V) + r_wire 0.2 + r_shunt 0.1", src: "sub-output.md Key numbers; hw/pod/gen.py R21"}
+  corners:   # question -> which values; every sim states the corner it uses
+    peak_current_and_ripple: {r_e_ohm: 8.0, l_e_h: 0.3e-3, users: ["e2e D17.peak_coil_ma (sweep exciter covers 0.3-1.26 mH)", "layout-noise aggressors A03/A04 (12.5 mA pp ripple, -59 dB re FS current)"], why: "lowest R and L give the highest peak and ripple (rail capacity, ECR-0005; U4 300 mA)"}
+    audibility: "nominal for SL, Monte Carlo over lo..hi in bone.py; T6 uses the p95 (loudest) exciter"
+  e2e_mapping: "stages.Exciter derives the motional parallel RLC from (bl, m_m, f0, q_m): c = m w0/Q, k = m w0^2, Rm = Bl^2/c, Lm = Bl^2/k, Cm = m/Bl^2"
+  retire: "E1 (LCR, |Z| sweep, weigh the moving magnet) -> replace nom/lo/hi here, re-run e2e, acoustics, layout-noise"
+
+psrr:   # SPH0641LU4H-1 datasheet Rev B-1 p.3 gives ONE point: 55 dBV/FS, 200 mVpp sine @1 kHz; read as -55 dBFS per 1 V rms (interpretation)
+  scenarios:
+    nominal:     {curve: "flat 55 dB to 1 MHz", e2e_psrr_mode: flat55, noise_key: nominal}
+    pessimistic: {curve: "55 dB below 20 kHz, 35 dB above", e2e_psrr_mode: pess35, noise_key: pessimistic}
+    worst:       {curve: "55 - 20 log10(f / 1 kHz) dB for f >= 1 kHz, floor 5 dB (21 dB @50 kHz, 16 @85 kHz, 5 above 178 kHz)", e2e_psrr_mode: rolloff, noise_key: worst}
+  gate: "pass/fail on pessimistic; worst reported and must stay >= 0 dB margin"
+  retire: "S2 supply-injection sweep 1 kHz-1 MHz on rev 1 (layout-noise LN-R12; needs a MIC_VDD probe pad, owner OI-2)"
+
+mic:   # src: datasheet Rev B-1 p.3 (local ../ultrasonic-scratch/sph0641_sq.pdf.txt); sim/dsp/pipeline.py
+  sens_dbfs_at_94spl: -26.0
+  ein_dbspl_a: 29.7          # 94 - 64.3 dB(A) SNR; audio-band, A-weighted
+  ultrasonic_floor: "UNKNOWN (E3); both sims extrapolate the audio-band density flat to 85-100 kHz"
+  floor_scenarios_db: {optimistic: -6, white: 0, pessimistic: 8, e2e_mic_noise_scale: {"-6": 0.5, "0": 1.0, "+3": 1.41, "+6": 2.0, "+8": 2.51, "+10": 3.16}}
+  response_25khz_peak: {fact: "+14.7 dB at 25 kHz on the datasheet curve (Rev B sheet 7)", hidden_shared_assumption: "acoustics calibrates the mic front volume as if the peak were the mic's own Helmholtz resonance; the e2e firmware EQ is the inverse datasheet curve; spec D13 L232 calls the peak a TEST-FIXTURE resonance. If the spec is right both sims and the EQ are wrong together (16-17 kHz duct resonance and 80-96 kHz level move up to 10 dB)", retire: "Syntiant SiSonic design data or E3 coupons"}
+
+thresholds:   # bone-conduction force thresholds, dB re 1 uN; f_hz and values index-aligned
+  retfl_mastoid:
+    src: "ANSI S3.6-1996 = ISO 389-3 mastoid (B-71, IEC 60318-6 coupler) via Henry & Letowski ARL-TR-4138 (2007) Table 8, opened 2026-10-02 (sim/acoustics/bone.py _RETFL_*)"
+    f_hz: [250, 315, 400, 500, 630, 750, 800, 1000, 1250, 1500, 1600, 2000, 2500, 3000, 3150, 4000, 5000, 6000, 6300, 8000]
+    db:   [67.0, 64.0, 61.0, 58.0, 52.5, 48.5, 47.0, 42.5, 39.0, 36.5, 35.5, 31.0, 29.5, 30.0, 31.0, 35.5, 40.0, 40.0, 40.0, 40.0]
+    above_8k: "held at 40.0 (assumption: Popelka 2010 says 8-16 kHz bone thresholds track air conduction; docs/research/bone-conduction.md s5)"
+  front_measured:
+    src: "Surendran, Prodanovic, Stenfelt, Trends in Hearing 27 (2023), PMC10126703, Fig 4A median (n 21, ~2 N), digitised +-2 dB, SD 6-9 dB (sim/acoustics/bone.py _FRONT_*)"
+    f_hz: [250, 315, 400, 500, 630, 800, 1000, 1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500]
+    db:   [36.0, 36.5, 34.0, 31.7, 31.0, 30.6, 29.2, 29.8, 31.6, 33.7, 34.5, 30.0, 29.5, 28.3, 30.5, 30.0, 33.0, 47.0]
+    above_12k5: "held at 47.0 (unverified)"
+  conventions:
+    retfl_minus_tragus: {formula: "retfl_mastoid - tragus_gain_db (20, range 10-40; Surendran 2023 via bone-conduction.md s3)", role: "LOW threshold: conservative for T6/D11 (silence), optimistic for T2 comfort", default_in: [e2e]}
+    front_measured: {formula: "front_measured", role: "the only measurement at our site; 20-24 dB above retfl_minus_tragus at 1.5-4 kHz", default_in: []}
+    rule: "a WARN 'would fail' that flips between conventions is reported as convention-dependent; E2 (V_thr(f) at the terminals) replaces both"
+  owner_offset: "E5 (her hearing sweep) adds owner_offset_db above 8 kHz; not yet measured"
+
+ceiling:   # spec D17 L293-L295 gives no number
+  dbfs: -12.0
+  basis: assumed
+  definition: "true peak of the PRE-QUANTISER x16-interpolated duty stream (e2e ctx.side['x_interp_peak'], firmware tap FWSIM-R10) <= 10^(dbfs/20)"
+  ccr_stream_bound: "the shaped CCR stream adds the noise-shaper excursion: |2*CCR/ARR-1| <= 10^(dbfs/20) + sum|ntf| * 1.5 LSB / (ARR/2) = 0.251 + 7.67*1.5/100 = 0.366 at ARR 200 (bound); measured 0.320 on a -12 dBFS 2.4 kHz tone (stages.PwmShaper, 2026-10-02)"
+  retire: "owner number with E2 V_mcl(f) (acoustics R-ACO-B2)"
