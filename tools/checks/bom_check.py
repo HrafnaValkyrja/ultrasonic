@@ -1274,7 +1274,7 @@ def selftest_cases():
         ("a fitted part marked DNP", [("jlc-bom", F, "R3 is fitted in the schematic but")], flags(DNP=True)),
         ("a fitted part excluded from position files", [("jlc-bom", F, "R3 is fitted in the schematic but")], flags(ExcludedFromPosFiles=True)),
         ("a fitted part with no SMD/THT type", [("jlc-bom", F, "R3 is fitted but its footprint type")], lambda w: w.fp("R3").SetAttributes(0)),
-        ("known-bad footprint, ECR-0004 open", [("footprints", W, "ECR-0004 proposed")], known_bad_fp),
+        ("known-bad footprint, ECR-0004 open", [("footprints", W, "ECR-0004 proposed")], ecr_fp("Status: proposed")),   # fixture pins the status: the live ECR moves on
         ("known-bad footprint, ECR-0004 'closed.'", [("footprints", F, "ECR-0004 closed")], ecr_fp("Status: closed.")),
         ("wrong LCSC in field 'Vendor PN'", [("identity", F, "Q1 Vendor PN C552750")], lambda w: w.set_field("Q1", "Vendor PN", "C552750")),
         ("wrong LCSC in field 'PN'", [("identity", F, "SW1 PN C221708")], lambda w: w.set_field("SW1", "PN", "C221708")),
@@ -1283,7 +1283,7 @@ def selftest_cases():
         ("wrong 'LCSC' field on a resistor", [("identity", F, "R3 LCSC C25744")], lambda w: w.set_field("R3", "LCSC", "C25744")),
         ("correct 'LCSC Part' written back by the placer", [("identity", OK)], lambda w: w.set_field("R3", "LCSC Part", w.sch["R3"]["lcsc"])),
         ("JLC rotation offset field (not identity)", [("identity", OK)], lambda w: (w.set_field("U2", "JLCPCB Rotation Offset", "180"), w.set_field("U3", "JLCPCB Position Offset", "0.1,0"))),
-        ("pre-cleanup 'LCSC Part', ECR-0012 proposed", [("identity", W, "ECR-0012 proposed")], stale_q1),
+        ("pre-cleanup 'LCSC Part', ECR-0012 proposed", [("identity", W, "ECR-0012 proposed")], ecr("ECR-0012", "Status: proposed")),   # pinned status
         ("pre-cleanup 'LCSC Part', ECR-0012 implemented", [("identity", W, "ECR-0012 implemented")], ecr("ECR-0012", "Status: implemented (awaiting owner review)")),
         ("pre-cleanup 'LCSC Part', ECR-0012 'closed.'", [("identity", F, "ECR-0012 closed")], ecr("ECR-0012", "Status: closed.")),
         ("pre-cleanup 'LCSC Part', ECR-0012 'verified, 2026-10-03'", [("identity", F, "ECR-0012 verified")], ecr("ECR-0012", "Status: verified, 2026-10-03")),
