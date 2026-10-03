@@ -11,7 +11,8 @@ The check encodes the Phase-2 rules (docs/research/miniaturization-prelim.md MZG
   face      every part on B except SW1 (F): the one-face strategy (MZD-1)
   fit       courtyards inside the outline; copper >= 0.3 mm from the edge; no courtyard overlap; pads >= 0.12 mm apart
   axis      mic port (U2 NPTH) and SW1 on the centre line (O16-5: one board for both pods)
-  near      decoupling / support parts within a set distance of the pins they serve (ST/TI layout rules)
+  near      decoupling / support parts within a set distance of the pins they serve (ST/TI layout rules); I_SENSE filter tight
+  escape    only U1's own support parts within 0.6 mm of its pads (QFN fan-out room)
   far       L1 and the bridge FETs >= 10 mm from the mic port (MZG-04)
   pads      wire pads of different nets >= 0.8 mm copper gap (Phase-1 lesson: J4-J5 0.60 mm = cell short)
   density   courtyard utilization per face (the area model's U)
@@ -47,8 +48,11 @@ NEAR = [
     ("C15", "U3", 2.0), ("C16", "U3", 2.0), ("C21", "U3", 2.5), ("C17", "U4", 2.0), ("C18", "U4", 2.0),
     ("C13", "U2", 2.0), ("R3", "Q1", 3.0), ("R4", "Q1", 3.0), ("R5", "Q2", 3.0), ("R6", "Q2", 3.0), ("C14", "Q1", 4.0),
     ("C14", "Q2", 4.0), ("D5", "J3", 3.0), ("D6", "J12", 3.0), ("U6", "J10", 5.0), ("U6", "J11", 5.0),
-    ("R21", "Q1", 5.0), ("R21", "Q2", 5.0), ("C22", "U1", 5.0), ("R22", "U1", 6.0),
+    ("R21", "Q1", 5.0), ("R21", "Q2", 5.0), ("C22", "U1.16", 2.0), ("R22", "U1.16", 2.5), ("R22", "R21", 6.0),
 ]
+# only U1's own support parts may sit within ESCAPE mm (courtyard) of its pads: the QFN needs room to fan out (judge 2026-10-03)
+ESCAPE, ESCAPE_OK = 0.6, {"C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "Y1", "R2", "L1", "R1",
+                          "C22", "R22"}
 FAR_FROM_PORT = [("L1", 10.0), ("Q1", 10.0), ("Q2", 10.0)]
 
 
@@ -158,6 +162,19 @@ def check(b, fps, W, H, fan):
             v.append(f"near: {part} shares no net with {anchor}")
         elif d > lim:
             v.append(f"near: {part} {d:.2f} mm from {anchor} (max {lim})")
+    # QFN escape ring
+    upads = [r for _, r in _pads(fps["U1"])]
+    ring = [min(upads, key=lambda r: r[0])[0] - ESCAPE, min(upads, key=lambda r: r[1])[1] - ESCAPE,
+            max(upads, key=lambda r: r[2])[2] + ESCAPE, max(upads, key=lambda r: r[3])[3] + ESCAPE]
+    for ref, f in fps.items():
+        if ref == "U1" or ref in ESCAPE_OK or f.IsFlipped() != fps["U1"].IsFlipped():
+            continue
+        cy = f.GetCourtyard(pcbnew.B_CrtYd if f.IsFlipped() else pcbnew.F_CrtYd)
+        bb = cy.BBox() if cy.OutlineCount() else f.GetBoundingBox(False)
+        r = [MM(x) for x in (bb.GetLeft(), bb.GetTop(), bb.GetRight(), bb.GetBottom())]
+        near_pad = any(_gap(r, u) < ESCAPE for u in upads)
+        if near_pad and r[0] < ring[2] and r[2] > ring[0] and r[1] < ring[3] and r[3] > ring[1]:
+            v.append(f"escape: {ref} within {ESCAPE} mm of U1's pads (only U1's support parts may sit there)")
     # far
     for ref, lim in FAR_FROM_PORT:
         x, y = (MM(c) for c in (fps[ref].GetPosition().x, fps[ref].GetPosition().y))
