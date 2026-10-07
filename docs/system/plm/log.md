@@ -495,3 +495,6 @@
 - 2026-10-07 15:58 review SUB-UI by backlog-agent: UI-4: skin options with ELASTOSIL Film 2030 TDS; owner-confirm; docs only
 - 2026-10-07 15:58 review R-UI-BODY by backlog-agent: UI-4: skin options with ELASTOSIL Film 2030 TDS; owner-confirm; docs only
 - 2026-10-07 15:58 checkin SUB-UI by backlog-agent
+- 2026-10-07 16:00 checkout SUB-AUDIO-IN by backlog-agent: SAI-12 duct section
+- 2026-10-07 16:00 review SUB-AUDIO-IN by backlog-agent: SAI-12 duct-section.svg generated from dims_r2; docs only
+- 2026-10-07 16:00 checkin SUB-AUDIO-IN by backlog-agent
