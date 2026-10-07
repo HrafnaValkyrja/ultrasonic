@@ -162,6 +162,8 @@ def lid_base():
 def puck(length=None):
     L = PUCK_L if length is None else length
     y_sw = Y_F + SW1["h"]
+    if L <= NUB_H + 0.02:          # K1-thin (lid 0.6): no room for a puck; keep the nub so the checks still run (flagged in SW1_pocket)
+        return ycyl(SW[0], SW[1], NUB_D, y_sw, y_sw + NUB_H + 0.01)
     return ycyl(SW[0], SW[1], NUB_D, y_sw, y_sw + NUB_H + 0.01) + ycyl(SW[0], SW[1], PUCK_D, y_sw + NUB_H, y_sw + L)
 
 
@@ -244,7 +246,9 @@ def main():
     c["F_gap"] = dict(gap=round(Y_LID_IN - Y_F, 3), vhb=VHB_T, slack=round(Y_LID_IN - Y_F - VHB_T, 3), ok=Y_LID_IN - Y_F >= VHB_T)
     # 3 SW1 in its pocket
     c["SW1_pocket"] = dict(pocket=[POCKET["dx"], POCKET["dz"]], need_skeptic=[4.1, 2.9], pads=list(SW1["pads"]),
-                           ok=POCKET["dx"] >= 4.1 and POCKET["dz"] >= 2.9, **switch_stack())
+                           ok=POCKET["dx"] >= 4.1 and POCKET["dz"] >= 2.9, **switch_stack(),
+                           puck_feasible=PUCK_L > NUB_H + 0.02, puck_guide_bore=round(SKIN_FLOOR - POCKET["top"], 3),
+                           pocket_breaks_outer_face=POCKET["top"] >= Y_TOP - 1e-6)
     # 4 duct axis vs board hole
     c["duct"] = duct_offsets()
     # 5 stowage
@@ -278,7 +282,7 @@ def main():
     for k, (s, m) in parts.items():
         export_stl(s, str(OUT / f"{k}.stl"), tolerance=0.01, angular_tolerance=0.1)
         info[k] = {"mat": m, "explode": expl[k]}
-    for L in PUCK_KIT:                       # selective-fit kit: exported, not part of the assembly list
+    for L in (PUCK_KIT if PUCK_L > NUB_H + 0.02 else ()):   # selective-fit kit: exported, not part of the assembly list
         export_stl(puck(L), str(OUT / f"puck_L{L:.2f}.stl"), tolerance=0.01, angular_tolerance=0.1)
     (OUT / "parts.json").write_text(json.dumps(info, indent=1))
     section_png({"tub": t, "lid": lid, "pcb": ph["pcb"], "cell": ph["cell"], "dock": ph["dock"], "vhb": ph["vhb"], "sw1": ph["sw1"], "puck": pk,

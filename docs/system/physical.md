@@ -5,6 +5,9 @@ Status: Phase-2 shell `hw/mech/shell_r2.py` / `dims_r2.py` (checks.json all clas
 
 > 2026-10-07 (round 10, packet Q1): dims_r2.py / heel.py / dock_route.py / shell_r2.py / blade.py now take a NON-DEFAULT variant (ULTRASONIC_DESIGN=k1|k1p via hw/current.yaml blocks + hw/mech/dims.py). Phase-2 values are byte-identical (74-name dims snapshot; shell, heel, dock_route, board_in_pod, mass and interfaces outputs unchanged apart from new info fields). K1 facts: reg-pod-body.md Variants.
 
+
+> 2026-10-07 round 11 (NON-DEFAULT, packet Q1/Q2): K1 duct options (K1_DUCT, sim/acoustics/duct_options.py), k1t (walls/lid 0.6), 0.6 wall coupon (hw/mech/coupon_wall06.py). Phase 2 unchanged (dims snapshot: only new names REAR_GAP; shell checks add info fields puck_feasible / puck_guide_bore / pocket_breaks_outer_face). Facts: reg-pod-body.md Variants.
+
 ## Purpose
 Keeps every region (pod body, board, cell, arm, pad) in one coordinate frame, so a change in one can be checked against the others: what sits where, what touches what, how water gets in, and in what order it all goes together. It carries no F-row of its own; it is the mechanical counterpart of every F-row in [integration-map.md](integration-map.md) §1 and the keep-outs in §7.
 

@@ -27,14 +27,18 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import Circle, Rectangle  # noqa: E402
 
-DESIGNS = [("phase2", "dims_r2.py", "r2", "Phase 2 (today): 175 mAh, lid 0.8 + plate 0.7"),
-           ("k1", "dims_k1.py", "k1", "K1: 130 mAh, plate OFF, lid 1.0"),
-           ("k1p", "dims_k1.py", "k1p", "K1p: 130 mAh, plate kept (lid 0.8 + 0.7)")]
+# (design, dims file, out folder, title, K1_DUCT, duct_options row (lid, option))
+DESIGNS = [("phase2", "dims_r2.py", "r2", "Phase 2 (today): 175 mAh, lid 0.8 + plate 0.7", "", ("ref_phase2_lid1.5", "as_k1")),
+           ("k1", "dims_k1.py", "k1_rec", "K1 'rec': 130 mAh, plate OFF, lid 1.0, seat 0.3", "rec", ("lid1.0", "seat0.3")),
+           ("k1p", "dims_k1.py", "k1p", "K1p: 130 mAh, plate kept (lid 0.8 + 0.7)", "", ("ref_phase2_lid1.5", "as_k1")),
+           ("k1t", "dims_k1.py", "k1t", "K1t: walls 0.6 + lid 0.6 (T 8.5 study)", "", ("lid0.6", "flush0.1"))]
+DUCT_ROWS = {(r["lid"], r["option"]): r for r in json.loads((ROOT / "sim/out/mech/duct_options.json").read_text())["rows"] if r.get("feasible")}
 
 
-def load(design, fname):
+def load(design, fname, duct=""):
     os.environ["ULTRASONIC_DESIGN"] = design
-    spec = importlib.util.spec_from_file_location(f"cmp_{design}", HERE / fname)
+    os.environ["K1_DUCT"] = duct
+    spec = importlib.util.spec_from_file_location(f"cmp_{design}{duct}", HERE / fname)
     m = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(m)
     return m
@@ -45,13 +49,11 @@ def jload(p):
     return json.loads(p.read_text()) if p.exists() else None
 
 
-def facts(d, D, out):
+def facts(d, D, out, duct_row):
     c = jload(f"hw/mech/out/{out}/checks.json")
     heel = jload(f"hw/mech/out/parts/{'heel' if d == 'phase2' else 'heel_' + d}/checks.json")
     mass = jload(f"sim/out/mech/{'pod_mass.json' if d == 'phase2' else 'pod_mass_' + d + '.json'}")
-    aco = jload(f"sim/out/aco_{'k1' if d == 'k1' else 'phase2'}/port_results.json")   # k1p: same duct stack as phase2
-    sc = aco["scenarios"]["phase2_r2"]["feat"] if aco else {}
-    r14 = [x["status"] for x in (aco["spec_checks"]["phase2_r2"] if aco else []) if x.get("id") == "R14-peak"]
+    ar = DUCT_ROWS[duct_row]["nomesh"]          # sim/acoustics/duct_options.py (same model + MC as run_port.py)
     env = c["envelope"]
     clashes = sum(1 for k, v in c.items() if k.startswith(("clash", "corridor")) and v > 1e-3)
     w = heel["wire_route"]["bundle"] if heel else {}
@@ -65,8 +67,10 @@ def facts(d, D, out):
                 mic_bore_len=round(D.Y_TOP - D.Y_LID_IN - D.HEX_DEPTH, 2),
                 wire_pass=heel["wire_route"]["pass_0.3"] and heel["wire_route_left_pod"]["pass_0.3"] if heel else None,
                 wire_bend_R=w.get("bend_radii"), strand_strain_pct=w.get("strand_bend_strain_pct"), fan_room=w.get("fan_room_behind_board"),
-                duct_peak=dict(f_khz=round(sc.get("f_max_hz", 0) / 1e3, 1), db=sc.get("max_20_96_db"), mean_20_96=sc.get("mean_20_96_db"),
-                               r14=r14[0] if r14 else None),
+                duct_peak=dict(f_khz=ar["f_peak_khz"], db=ar["peak_db"], mean_20_96=ar["mean_20_96_db"], r14=ar["R14_peak"],
+                               mc_r14_all_pass=ar["mc_r14_all_pass"], mc_peak_p95=ar["mc_in_pod_peak_p95"],
+                               mesh_mc_r14_all_pass=DUCT_ROWS[duct_row]["mesh_floor"]["mc_r14_all_pass"]),
+                puck_feasible=c["SW1_pocket"].get("puck_feasible", True), pocket_breaks_outer_face=c["SW1_pocket"].get("pocket_breaks_outer_face", False),
                 off_temple=round(1.8 + env["T"], 2))
 
 
@@ -119,18 +123,19 @@ def plan(ax, D, f):
 
 def main():
     mods, F = {}, {}
-    for d, fname, out, _ in DESIGNS:
-        mods[d] = load(d, fname)
-        F[d] = facts(d, mods[d], out)
+    for d, fname, out, _, duct, row in DESIGNS:
+        mods[d] = load(d, fname, duct)
+        F[d] = facts(d, mods[d], out, row)
     os.environ.pop("ULTRASONIC_DESIGN", None)
+    os.environ.pop("K1_DUCT", None)
     for d in F:
         F[d]["vs_phase2_pct"] = round(100 * (F[d]["volume_mm3"] / F["phase2"]["volume_mm3"] - 1), 1)
     from size_budget import scenario
     thin = scenario("K1-thin (walls + lid 0.6, no plate; synthesis K1)", cell_L=31.0, cell_T=4.5, cell_H=12.7, cell_g=3.5, board_H=12.0,
                     board_L=30.0, y_bgap=1.4, y_fgap=0.30, lid_wall=0.6, wall=0.6, plate=0.0, s_fixed=0.8, dock="flat_tails")
-    fig = plt.figure(figsize=(16, 10.5))
-    gs = fig.add_gridspec(2, 3, height_ratios=[1.15, 1.0])
-    for i, (d, _, _, title) in enumerate(DESIGNS):
+    fig = plt.figure(figsize=(21, 10.5))
+    gs = fig.add_gridspec(2, 4, height_ratios=[1.15, 1.0])
+    for i, (d, _, _, title, _, _) in enumerate(DESIGNS):
         f, D = F[d], mods[d]
         ax = fig.add_subplot(gs[0, i])
         end_section(ax, D, title)
@@ -143,13 +148,13 @@ def main():
         txt = (f"{f['volume_mm3']:.0f} mm3 ({f['vs_phase2_pct']:+.0f} %) | {f['mass_worn_g'][0]:.1f}-{f['mass_worn_g'][1]:.1f} g worn | "
                f"{f['off_temple']} mm off temple\nclash {f['clashes']} | print {ok(f['printable'])} | wires {ok(f['wire_pass'])} "
                f"(R {min(f['wire_bend_R'])}, strain {f['strand_strain_pct']} %) | duct pin {f['duct_worst']}/{f['duct_limit']}\n"
-               f"mic duct peak {f['duct_peak']['f_khz']} kHz {f['duct_peak']['db']:+.1f} dB (R14 {f['duct_peak']['r14']}) | "
-               f"bore under mesh {f['mic_bore_len']} | puck bore {f['puck_bore_len']}")
+               f"duct peak {f['duct_peak']['f_khz']} kHz {f['duct_peak']['db']:+.1f} dB, R14 {f['duct_peak']['r14']}, MC pass {f['duct_peak']['mc_r14_all_pass']} | "
+               f"mic bore {f['mic_bore_len']} | puck guide {f['puck_bore_len']}" + ("" if f["puck_feasible"] else " -> NO PUCK, pocket breaks the lid"))
         ax2.set_title(txt, fontsize=7.5, loc="left")
         if i == 0:
             ax2.set_ylabel("z (mm, up)")
-    fig.suptitle(f"Packet Q1: Phase 2 vs K1, same board, to scale (end section through the cell; plan through the lid). "
-                 f"Synthesis' T 8.5 needs 0.6 walls + lid 0.6 too (size model: T {thin['T']}, {thin['v_env']} mm3)", fontsize=11)
+    fig.suptitle("Packet Q1/Q2: Phase 2 vs K1 variants, same board, to scale (end section through the cell; plan through the lid). "
+                 f"T 8.5 = K1t: 0.6 walls + 0.6 lid (needs the coupon, and the SW1 button does not fit a 0.6 lid)", fontsize=11)
     fig.tight_layout(rect=(0, 0, 1, 0.97))
     od = ROOT / "docs/diagrams"
     fig.savefig(od / "k1-vs-phase2.png", dpi=130)

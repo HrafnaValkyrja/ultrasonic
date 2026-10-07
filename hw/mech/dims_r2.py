@@ -35,7 +35,9 @@ def _o(name, default):
 W = _o("W", 0.8)
 CELL_L, CELL_W = _o("CELL_L", 35.0), _o("CELL_W", 12.0)     # Renata ICP501233PA-02 envelope 35 x 12 (x 5.3)
 X1 = 67.5                              # rear face: fixed to the frame (heel E, rail, strut relief); a shorter cell shortens the FRONT
-X0 = X1 - (2 * W + 0.3 + CELL_L + 1.1)  # 29.5: L 38.0 = 2 x 0.8 + 0.3 + cell 35 + rear gap 1.1 (size model)
+REAR_GAP = 1.1 + (0.8 - W)             # 1.1; the cell's rear end stays at x 65.6 (heel exit hole 65.8-66.6 is frame-fixed), so a
+                                       # thinner rear wall widens the gap instead of pushing the cell onto the exit (k1t, 2026-10-07)
+X0 = X1 - (2 * W + 0.3 + CELL_L + REAR_GAP)  # 29.5: L 38.0 = 2 x 0.8 + 0.3 + cell 35 + rear gap 1.1 (size model)
 Y_IN = F.Y_IN                          # 4.3 inner face on the adapter (frame.py)
 TAPE = 0.3                             # cell VHB gap (0.25 tape)
 CELL_T, B_GAP, PCB_T, F_GAP = _o("CELL_T", 5.3), 1.4, 0.8, 0.30
@@ -111,10 +113,10 @@ TP_PAD_D, TP_CUT_MARGIN = 1.0, 0.4     # [A] test-pad copper D1.0; VHB kept 0.4 
 
 # ---------------------------------------------------------------- lid features
 DUCT_D = 1.0                           # O24: ID 1.0; bore printed undersize and reamed with a 1.0 drill
-HEX_R, HEX_DEPTH = 1.9, 0.8            # r1 window (mesh seat), cut down from the plate top
+HEX_R, HEX_DEPTH = _o("HEX_R", 1.9), _o("HEX_DEPTH", 0.8)   # r1 window (mesh seat), cut down from the plate top (variant hook: duct options)
 POCKET = dict(dx=4.3, dz=3.1, top=Y_LID_IN + 0.6)     # SW1 pocket: 4.3 x 3.1, ceiling at y 13.8
 BORE_D, PUCK_D, NUB_D, NUB_H = 2.6, 2.3, 1.0, 0.10
-SKIN_D, SKIN_T = 4.6, 0.25
+SKIN_D, SKIN_T = 4.6, _o("SKIN_T", 0.25)   # SKIN_T = recess depth (= skin thickness in Phase 2; a K1 option sinks a 0.25 skin only 0.1)
 SKIN_FLOOR = Y_TOP - SKIN_T            # 14.45
 PRE_GAP = 0.07                         # nominal puck top -> skin underside (selective fit keeps it in 0.005..0.135)
 PUCK_L = SKIN_FLOOR - PRE_GAP - (Y_F + SW1["h"])        # 0.83 nominal

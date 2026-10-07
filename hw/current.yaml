@@ -71,3 +71,20 @@ k1p:                                            # NON-DEFAULT: K1 with the armou
   shell_dims: hw/mech/dims_k1.py
   shell_out: hw/mech/out/k1p
   acoustic_scenario: phase2_r2
+
+k1t:                                            # NON-DEFAULT study: what synthesis' T 8.5 really takes (walls 0.6 + lid 0.6, mesh ~flush)
+  id: k1t
+  name: "K1-thin study: Phase-2 board + 130 mAh cell, walls 0.6, lid 0.6, no plate (needs the 0.6 wall coupon)"
+  ecr: null
+  owner_decision: "open: packet Q1/Q2"
+  packages: mz2
+  generate: "POD_PACKAGES=mz2 python3 hw/pod/gen.py"
+  board: hw/pod/draft_r2/out/routed.kicad_pcb
+  board_placed: hw/pod/draft_r2/out/placed.kicad_pcb
+  placement: hw/pod/draft_r2/placement.yaml
+  netlist: hw/pod/pod_mz2.net
+  bom: hw/pod/bom_jlc_mz2.csv
+  shell: hw/mech/shell_r2.py
+  shell_dims: hw/mech/dims_k1.py
+  shell_out: hw/mech/out/k1t
+  acoustic_scenario: phase2_r2

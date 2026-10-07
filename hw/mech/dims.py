@@ -19,4 +19,4 @@ _path = DESIGN.shell_dims
 MODULE = _path.stem if _path.stem.startswith("dims_") else "dims_r2"
 _m = importlib.import_module(MODULE)
 globals().update({k: v for k, v in vars(_m).items() if not k.startswith("__")})
-OUT_DIR = DESIGN.shell_out          # per-design output folder (phase2: hw/mech/out/r2)
+OUT_DIR = DESIGN.shell_out.with_name(DESIGN.shell_out.name + getattr(_m, "OUT_TAG", ""))   # phase2: out/r2; k1 + K1_DUCT=x: out/k1_x

@@ -128,7 +128,14 @@ phase2: {T: 10.4, H: 14.5, L: 38.0, env_mm3: 6211, worn_g: [11.2, 13.2], duct_pe
 k1:  {lid: "1.0, no plate", T: 9.1, H: 15.2, L: 34.0, env_mm3: 5216 (-16 %), worn_g: [10.1, 12.0], duct_peak: "78.7 kHz +21.1 dB, R14 FAIL (mic bore under the mesh 0.7 -> 0.2)", puck_bore: "0.65 -> 0.15 (puck guidance)", stowage_mm3: 144 (need 107-142)}
 k1p: {lid: "0.8 + plate 0.7", T: 9.6, H: 15.2, L: 34.0, env_mm3: 5410 (-13 %), worn_g: [10.3, 12.3], duct: "= phase2", stowage_mm3: 144}
 both: "0 clashes, printable (1 solid each), interfaces.py 7 PASS / 4 WARN (= phase2), heel 2 known flags (= phase2), arm wires pass 0.3 both pods but fan bends R1.0 -> R0.5 (strand strain 3.1 -> 5.0 %), dock ribbon clearances = phase2"
-k1_thin_size_model: "synthesis T 8.5 needs walls 0.6 + lid 0.6 as well (size model T 8.5, H 14.8, L 33.6, 4754 mm3); not built (0.6 walls need a coupon, lid 0.6 < HEX_DEPTH 0.8)"
+k1_thin_size_model: "superseded 2026-10-07 round 11 by k1t below"
+duct_fix_round11: {src: "sim/acoustics/duct_options.py -> sim/out/mech/duct_options.json, docs/diagrams/duct-options.svg (MC60, run_port.spec_checks)", applies_to: "any lid 1.0 without the plate (k1 and phase2-plate-off: same duct stack)",
+  phase2_ref: "lid 1.5: R14 PASS, MC all-pass 0.63", k1_as_built: "seat 0.8, bore 0.2: R14 FAIL (78.7 kHz), MC 0.38",
+  passing: "seat0.3 (bore 0.7) MC 0.75 | seatR1.2_0.3 MC 0.75, nominal +10.0 | flush0.1 MC 0.68, level -1.9 dB | boss0.5 outer bump MC 0.63 | seat0.5 0.62 | bore0.8_seat0.3 0.65 but gauge-pin limit 0.075 < 0.14 FAIL",
+  recommended: "K1_DUCT=rec: R1.9 seat 0.3 deep (mesh 46 um + PSA leaves a 0.2 guard; same mesh piece) + skin recess 0.1 (0.25 skin 0.15 proud): mic bore 0.7 (= Phase-2 gauge-pin guidance), puck guide 0.15 -> 0.30; shell checks: 0 clashes, printable, interfaces 7/4/0"}
+k1t: {what: "walls 0.6 + lid 0.6, no plate, mesh seat 0.1 (ULTRASONIC_DESIGN=k1t)", T: 8.5, H: 14.8, L: "33.8 (not 33.6: the cell's rear end is pinned by the heel exit, so the thinner rear wall widens the rear gap; dims_r2 REAR_GAP)", env_mm3: "4779 (-23 %)", worn_g: [9.6, 11.5],
+  blockers: ["SW1 button: pocket 0.6 tall = the whole lid -> pocket breaks the outer face (lid prints as 2 solids), no puck (needs a new button stack, e.g. skin straight over SW1 through a window)", "duct: lid 0.6 fails R14 nominally in every option; flush0.1 MC 0.63 / 0.70 with the mesh", "0.6 walls: corner under the 1.0 chamfer 0.14 mm, lid groove lip 0.2, rebate wall 0.4 (all < resin min 0.6): coupon hw/mech/coupon_wall06.py + notes/coupon_wall06.md"],
+  passes: "0 clashes, heel = phase2 flags, wires 0.3 both pods, interfaces 7/4/0, stowage 164"}
 ```
 
 ## Open issues (IDs stable; gaps = closed)

@@ -581,3 +581,20 @@
 - 2026-10-07 17:19 review SUB-DOCK-USB by claude-backlog: round 10: K1 variant hook; phase2 values identical (regressions 0 diffs); docs carry the variant note; K1 facts in reg-pod-body Variants
 - 2026-10-07 17:19 review REG-POD-BODY by claude-backlog: round 10: K1 variant hook; phase2 values identical (regressions 0 diffs); docs carry the variant note; K1 facts in reg-pod-body Variants
 - 2026-10-07 17:19 review REG-ARM by claude-backlog: round 10: K1 variant hook; phase2 values identical (regressions 0 diffs); docs carry the variant note; K1 facts in reg-pod-body Variants
+- 2026-10-07 17:32 checkout REG-POD-BODY by claude-backlog: round 11: duct options, K1t, 0.6 coupon (non-default)
+- 2026-10-07 17:32 checkout SUB-AUDIO-IN by claude-backlog: round 11: duct options, K1t, 0.6 coupon (non-default)
+- 2026-10-07 17:32 checkout PHYSICAL by claude-backlog: round 11: duct options, K1t, 0.6 coupon (non-default)
+- 2026-10-07 17:32 checkout REG-ARM by claude-backlog: round 11: duct options, K1t, 0.6 coupon (non-default)
+- 2026-10-07 17:32 checkout INTEGRATION by claude-backlog: round 11: duct options, K1t, 0.6 coupon (non-default)
+- 2026-10-07 17:32 checkout SUB-UI by claude-backlog: round 11: duct options, K1t, 0.6 coupon (non-default)
+- 2026-10-07 17:32 checkin REG-POD-BODY by claude-backlog
+- 2026-10-07 17:32 checkin SUB-AUDIO-IN by claude-backlog
+- 2026-10-07 17:32 checkin PHYSICAL by claude-backlog
+- 2026-10-07 17:32 checkin REG-ARM by claude-backlog
+- 2026-10-07 17:32 checkin INTEGRATION by claude-backlog
+- 2026-10-07 17:32 checkin SUB-UI by claude-backlog
+- 2026-10-07 17:32 review R-UI-BODY by claude-backlog: round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks
+- 2026-10-07 17:32 review INTEGRATION by claude-backlog: round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks
+- 2026-10-07 17:32 review PHYSICAL by claude-backlog: round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks
+- 2026-10-07 17:32 review SUB-UI by claude-backlog: round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks
+- 2026-10-07 17:32 review REG-POD-BODY by claude-backlog: round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks

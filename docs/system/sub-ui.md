@@ -4,6 +4,9 @@ Status: schematic = Rev G nets, MZ-2 packages (`hw/pod/pod_mz2.net`, bom_check n
 · Source of truth: `hw/pod/gen.py` (UI block; MZ2 table R10/R14), the routed board, `hw/mech/dims_r2.py` (SW, SW1, POCKET, BORE_D/PUCK_D/NUB_D/NUB_H, SKIN_D/SKIN_T, PRE_GAP, PUCK_L/PUCK_KIT, `switch_stack()`), `hw/mech/shell_r2.py::lid_base, puck`, `hw/padboard/gen.py` (LED D1), `docs/spec.md` D3, D12, §5.4
 · Owner decisions: O8 (solid LED in the pad), O16(5) (switch on the board centre line), O16(7) (IP68 switch), O12(b) (sealing), O18 (rev 1 fails informatively), O26/O27 (Phase 2) · Open ECRs: ECR-0018 (Phase 2); ECR-0001 touches frame.py's stale `BUTTON`
 
+
+> 2026-10-07 round 11 (NON-DEFAULT, packet Q1/Q2): K1 duct options (K1_DUCT, sim/acoustics/duct_options.py), k1t (walls/lid 0.6), 0.6 wall coupon (hw/mech/coupon_wall06.py). Phase 2 unchanged (dims snapshot: only new names REAR_GAP; shell checks add info fields puck_feasible / puck_guide_bore / pocket_breaks_outer_face). Facts: reg-pod-body.md Variants.
+
 ## Purpose
 - Carries **F11** Wake / button and **F12** Power LED (solid) (`integration-map.md` §1).
 - **One button does everything (D3, §5.4):** modes, volume, reset, and wake from Off. The wearer's only feedback is **ticks played through the exciter** (D3). The LED faces outward, so she never sees it while wearing the pod (`pad-led.md` L63). It tells other people, and her with the pod in her hand, that the pod is on (O8).

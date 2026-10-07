@@ -7,6 +7,9 @@ Status: CAD rev 1, not built. `heel.py` checks.json and `pad.py` strut from 2026
 
 > 2026-10-07 (round 10, packet Q1): dims_r2.py / heel.py / dock_route.py / shell_r2.py / blade.py now take a NON-DEFAULT variant (ULTRASONIC_DESIGN=k1|k1p via hw/current.yaml blocks + hw/mech/dims.py). Phase-2 values are byte-identical (74-name dims snapshot; shell, heel, dock_route, board_in_pod, mass and interfaces outputs unchanged apart from new info fields). K1 facts: reg-pod-body.md Variants.
 
+
+> 2026-10-07 round 11 (NON-DEFAULT, packet Q1/Q2): K1 duct options (K1_DUCT, sim/acoustics/duct_options.py), k1t (walls/lid 0.6), 0.6 wall coupon (hw/mech/coupon_wall06.py). Phase 2 unchanged (dims snapshot: only new names REAR_GAP; shell checks add info fields puck_feasible / puck_guide_bore / pocket_breaks_outer_face). Facts: reg-pod-body.md Variants.
+
 ## Purpose
 - Presses the pad **inward** (into the head, never backward) on the skin just in front of the tragus with **≥ 1 N**, through jaw motion (D1, T5). It is the mechanical half of **F3**.
 - Carries the 4 pad wires: OUT_A, OUT_B (F3), LED_A, LED_K (**F12**). No pinch points (O17).

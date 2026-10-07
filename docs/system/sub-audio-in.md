@@ -3,6 +3,9 @@ Rev MZ-2 2026-10-07: body rewritten to the Phase-2 design (`hw/current.yaml`, EC
 Status: schematic = Rev G nets with the MZ-2 package set (`POD_PACKAGES=mz2 python3 hw/pod/gen.py` -> `hw/pod/pod_mz2.net`; bom_check netlist/nets PASS, 195 pin-net assignments, 2026-10-07); board `hw/pod/draft_r2/out/routed.kicad_pcb` routed, DRC 0, 0 unconnected (ECR-0018 log 2026-10-07); shell `hw/mech/shell_r2.py` (constants `hw/mech/dims_r2.py`); interfaces.py [mic-port] PASS 2026-10-07. Updated 2026-10-07.
 · Source of truth: `hw/pod/gen.py` (mic block; MZ2 table L93-112), the routed board above, `hw/mech/dims_r2.py` (MIC, DUCT_D, HEX_R/HEX_DEPTH, `board_mic()`, `duct_offsets()`), `hw/mech/shell_r2.py::lid_base` (bore + hex window) · Owner decisions: O9, O12, O16-5, O19, O24 (sealed duct ID 1.0 + x-stop/locating feature + EQ notch), O26/O27 (Phase 2) · Open ECRs: ECR-0008 (supply: add U2 to the reservation list), ECR-0018 (Phase 2, approved, owner review pending)
 
+
+> 2026-10-07 round 11 (NON-DEFAULT, packet Q1/Q2): K1 duct options (K1_DUCT, sim/acoustics/duct_options.py), k1t (walls/lid 0.6), 0.6 wall coupon (hw/mech/coupon_wall06.py). Phase 2 unchanged (dims snapshot: only new names REAR_GAP; shell checks add info fields puck_feasible / puck_guide_bore / pocket_breaks_outer_face). Facts: reg-pod-body.md Variants.
+
 ## Purpose
 - Carries **F1 Hear 20-85 kHz** (`integration-map.md` §1) from air to PCM samples in RAM. Everything after that is `sub-processing.md` (F2).
 - Must be **off in Off mode** (D12, `docs/spec.md` line 221): no mic current when the pod is "off".
