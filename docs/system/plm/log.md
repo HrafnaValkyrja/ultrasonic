@@ -189,3 +189,11 @@
 - 2026-10-07 07:43 checkin REG-BOARD by docs-phase2-rewrite
 - 2026-10-07 07:43 checkin REG-ARM by docs-phase2-rewrite
 - 2026-10-07 07:43 checkin REG-PAD by docs-phase2-rewrite
+- 2026-10-07 08:50 review R-CLOCK-BOARD by claude: B-DOC-AUDIT-0007 (20bd842): Y1 (3.9,1.7), C11/C12 x 2.01; LSE pre-routed on B, 0 vias, 7.72/7.43 mm (place_r2 --probe); In1 GND under the run; sub-processing issue 14 + reg-board issue 17 closed
+- 2026-10-07 08:50 review R-PROC-BOARD by claude: B-DOC-AUDIT-0007 (20bd842): Y1 (3.9,1.7), C11/C12 x 2.01; LSE pre-routed on B, 0 vias, 7.72/7.43 mm (place_r2 --probe); In1 GND under the run; sub-processing issue 14 + reg-board issue 17 closed
+- 2026-10-07 08:50 review R-DOCK-BOARD by claude: B-DOC-AUDIT-0007 (20bd842): J3 DOCK_VBUS (25.1,1.7) / J4 GND (27.0,1.9) swapped, J4 between J3 and J5 (ASM-09), J3-J5 2.85 mm, all wire-pad gaps >= 0.90; D5 1.0 mm from J3; sub-dock-usb, sub-power PWR-I17, reg-board, physical, sub-debug-test updated
+- 2026-10-07 08:50 review R-OUT-BOARD by claude: B-DOC-AUDIT-0007 local re-route (20bd842): R21 unchanged mid-board (19.45,6.45) with the two Kelvin vias; LN-M03 1.29 % unchanged; MZD-4 edge position tried and rejected (2.48 % / unroutable BRIDGE_RTN), reg-board issue 20, sub-output updated
+- 2026-10-07 08:50 review R-COST-BOARD by claude: B-DOC-AUDIT-0007 (20bd842): placements moved, no BOM line or part added/removed; bom_check jlc-bom/assembly-tier PASS (31 lines, 53 parts, double-sided Standard)
+- 2026-10-07 08:51 checkout REG-BOARD by claude: B-DOC-AUDIT-0007 doc update after the 20bd842 local re-route
+- 2026-10-07 08:51 checkin REG-BOARD by claude
+- 2026-10-07 08:51 review REG-BOARD by claude: reg-board.md updated for the B-DOC-AUDIT-0007 local re-route (20bd842): J3/J4, keep-out, LSE, VDDA caps, issues 16/17 closed, issue 20 (R21/MZD-4) added

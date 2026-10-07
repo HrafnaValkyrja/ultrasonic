@@ -114,7 +114,7 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
 - {path: seam straight runs, design: "tongue 0.35 x 0.5 / groove +0.05 + bond line (MS-polymer or neutral RTV, product TBD)", state: "designed, untested"}
 - {path: seam corners, design: "tongue stops 1.4 short of each convex corner: plain butt joint there", state: "weak (issue 13)"}
 - {path: belly step (z -8.9, x < 55), design: "0.35 key, no rebate", state: "weak + no cut line (issues 12, 13)"}
-- {path: mic duct, design: "D1.0 bore + D1.0 VHB hole sealed onto the board F face round the D0.6 hole (VHB annulus is the seal); hex mesh seat", state: "duct sealed to the cavity by design; mesh part TBD. R-ACO-P6 keep-out (no via / F track within r 1.6 of the port, docs/sim/acoustics.yaml) is BROKEN on the routed board: F track MDF_SDI copper edge 1.35 mm from the port centre, nearest via (GND) 1.87 (pcbnew probe of routed.kicad_pcb, 2026-10-07). The VHB hole is r 0.5, so the 35 um step lies under the tape 0.85 out: likely harmless for VHB, but the rule says FAIL (issue 19)"}
+- {path: mic duct, design: "D1.0 bore + D1.0 VHB hole sealed onto the board F face round the D0.6 hole (VHB annulus is the seal); hex mesh seat", state: "duct sealed to the cavity by design; mesh part TBD. R-ACO-P6 keep-out (no via / F track within r 1.6 of the port, docs/sim/acoustics.yaml) HOLDS: F.Cu rule area r 1.6 on the board (place_r2 port_keepout), nearest F copper / via 1.87 mm (place_r2 --probe, 20bd842, 2026-10-07; was MDF_SDI 1.35 mm, issue 19 closed)"}
 - {path: SW1 puck bore, design: "silicone skin bonded in the D4.6 recess; KMT022 itself IP68", state: "skin material TBD"}
 - {path: dock window, design: "target glued in, back potted", state: "potting compound TBD"}
 - {path: heel channel / arm, design: "RTV at the land opening and the exit (reg-arm)", state: "per reg-arm"}
@@ -141,7 +141,7 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
 17. **SW1 press loads the F VHB in tension** with no B back-stop (option A); 2 N on ~314 mm² [A ~0.5 MPa → >100× margin]. Closes: coupon 600k presses + drop (MZD-7).
 18. **[A] tolerances unverified:** JLC outline ±0.2 and NPTH ±0.05, VHB thickness, resin ±0.05, KMT022 height; `docs/build/tolerances.md` has no Phase-2 rows. Closes: dated sources, then a tolerances.md Phase-2 section.
 
-19. **R-ACO-P6 duct-seat keep-out violated on the routed board** (MDF_SDI F track 1.35 mm from the port; acoustics.yaml still records the Rev F PASS). Closes: re-route MDF_SDI off F near the port or re-state P6 for a VHB annulus (owner of reg-board / sub-audio-in).
+19. (closed 2026-10-07, 20bd842) R-ACO-P6 duct-seat keep-out: MDF_SDI re-routed; an F.Cu rule area r 1.6 now keeps every F track and via out (DRC-enforced); nearest 1.87 mm.
 
 ## Before you change this, check
 - **Duct, SW1 pocket, lid/plate thickness:** board positions (mic (1.88, 6.0), SW1 (18.5, 6.0)) in **both** pods; duct length + acoustics scenario `phase2_r2` ([sub-audio-in](sub-audio-in.md)); puck kit + switch stack ([sub-ui](sub-ui.md)); `interfaces.py` [mic-port] [switch].

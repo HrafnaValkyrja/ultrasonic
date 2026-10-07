@@ -47,12 +47,12 @@
    }
   },
   "REG-BOARD": {
-   "by": "docs-phase2-rewrite",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "reg-board.md updated for the B-DOC-AUDIT-0007 local re-route (20bd842): J3/J4, keep-out, LSE, VDDA caps, issues 16/17 closed, issue 20 (R21/MZD-4) added",
    "stamp": {
-    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "da4e8b132b895741",
-    "file:hw/pod/draft_r2/placement.yaml": "4e1e955e4f95106b",
+    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "9e7627860783b952",
+    "file:hw/pod/draft_r2/placement.yaml": "568be76a2d8a482d",
     "glob:hw/lib/pod.pretty/*.kicad_mod": "9fa247f977b33b6d",
     "sym:hw/pod/place.py::rules": "cf2bb252c4b5e5fa"
    }
@@ -263,25 +263,25 @@
    }
   },
   "R-CLOCK-BOARD": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/pod/place_r1.py PLACE (Rev F reference) to the current design (yaml: hw/pod/draft_r2/placement.yaml keys, routed board, bom_jlc_mz2.csv); 'what' rewritten from placement.yaml; routed board checked: interfaces.py board-nets/inside/heights PASS, bom_check refs/nets/jlc-bom PASS, LN-M03 1.29 %; Y1 now FC-12M (C99009, MPN field added)",
+   "note": "B-DOC-AUDIT-0007 (20bd842): Y1 (3.9,1.7), C11/C12 x 2.01; LSE pre-routed on B, 0 vias, 7.72/7.43 mm (place_r2 --probe); In1 GND under the run; sub-processing issue 14 + reg-board issue 17 closed",
    "stamp": {
     "net:LSE_IN": "8cd4fdf3c4179925",
     "net:LSE_OUT": "e451842e847e6c7f",
     "ref:Y1": "47c426b79b33975d",
-    "yaml:hw/pod/draft_r2/placement.yaml::C11": "0acf4d7ed3f9f11e",
-    "yaml:hw/pod/draft_r2/placement.yaml::C12": "c3dfe3b00478da31",
-    "yaml:hw/pod/draft_r2/placement.yaml::Y1": "583ada58ae68efb0"
+    "yaml:hw/pod/draft_r2/placement.yaml::C11": "f93a6d24ed2cc753",
+    "yaml:hw/pod/draft_r2/placement.yaml::C12": "a551c30487cff07b",
+    "yaml:hw/pod/draft_r2/placement.yaml::Y1": "4407364e37774c10"
    }
   },
   "R-COST-BOARD": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/pod/place_r1.py PLACE (Rev F reference) to the current design (yaml: hw/pod/draft_r2/placement.yaml keys, routed board, bom_jlc_mz2.csv); 'what' rewritten from placement.yaml; routed board checked: interfaces.py board-nets/inside/heights PASS, bom_check refs/nets/jlc-bom PASS, LN-M03 1.29 %; Y1 now FC-12M (C99009, MPN field added)",
+   "note": "B-DOC-AUDIT-0007 (20bd842): placements moved, no BOM line or part added/removed; bom_check jlc-bom/assembly-tier PASS (31 lines, 53 parts, double-sided Standard)",
    "stamp": {
     "file:hw/pod/bom_jlc_mz2.csv": "1d51558c1881a4fe",
-    "file:hw/pod/draft_r2/placement.yaml": "4e1e955e4f95106b"
+    "file:hw/pod/draft_r2/placement.yaml": "568be76a2d8a482d"
    }
   },
   "R-DEBUG-BOARD": {
@@ -305,9 +305,9 @@
    }
   },
   "R-DOCK-BOARD": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/pod/place_r1.py PLACE (Rev F reference) to the current design (yaml: hw/pod/draft_r2/placement.yaml keys, routed board, bom_jlc_mz2.csv); 'what' rewritten from placement.yaml; routed board checked: interfaces.py board-nets/inside/heights PASS, bom_check refs/nets/jlc-bom PASS, LN-M03 1.29 %; Y1 now FC-12M (C99009, MPN field added)",
+   "note": "B-DOC-AUDIT-0007 (20bd842): J3 DOCK_VBUS (25.1,1.7) / J4 GND (27.0,1.9) swapped, J4 between J3 and J5 (ASM-09), J3-J5 2.85 mm, all wire-pad gaps >= 0.90; D5 1.0 mm from J3; sub-dock-usb, sub-power PWR-I17, reg-board, physical, sub-debug-test updated",
    "stamp": {
     "yaml:hw/pod/draft_r2/placement.yaml::D4": "26c4340c270a1106",
     "yaml:hw/pod/draft_r2/placement.yaml::D5": "336d59a8a0dc39ec",
@@ -315,8 +315,8 @@
     "yaml:hw/pod/draft_r2/placement.yaml::J10": "fdadb7bbd07b9d0c",
     "yaml:hw/pod/draft_r2/placement.yaml::J11": "aa3cbb864e0d49b5",
     "yaml:hw/pod/draft_r2/placement.yaml::J12": "f84cbcf1f75f50bc",
-    "yaml:hw/pod/draft_r2/placement.yaml::J3": "536f19f2b5999bb0",
-    "yaml:hw/pod/draft_r2/placement.yaml::J4": "916abdcb55663694",
+    "yaml:hw/pod/draft_r2/placement.yaml::J3": "916abdcb55663694",
+    "yaml:hw/pod/draft_r2/placement.yaml::J4": "5f6034bc5f64ca99",
     "yaml:hw/pod/draft_r2/placement.yaml::J5": "4509c712e260ba28",
     "yaml:hw/pod/draft_r2/placement.yaml::U6": "43e16c74c87633ea"
    }
@@ -344,11 +344,11 @@
    }
   },
   "R-OUT-BOARD": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/pod/place_r1.py PLACE (Rev F reference) to the current design (yaml: hw/pod/draft_r2/placement.yaml keys, routed board, bom_jlc_mz2.csv); 'what' rewritten from placement.yaml; routed board checked: interfaces.py board-nets/inside/heights PASS, bom_check refs/nets/jlc-bom PASS, LN-M03 1.29 %; Y1 now FC-12M (C99009, MPN field added)",
+   "note": "B-DOC-AUDIT-0007 local re-route (20bd842): R21 unchanged mid-board (19.45,6.45) with the two Kelvin vias; LN-M03 1.29 % unchanged; MZD-4 edge position tried and rejected (2.48 % / unroutable BRIDGE_RTN), reg-board issue 20, sub-output updated",
    "stamp": {
-    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "da4e8b132b895741",
+    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "9e7627860783b952",
     "ref:Q1": "9e9cfa60e1e11081",
     "ref:R21": "a66fda4215076577",
     "yaml:hw/pod/draft_r2/placement.yaml::Q1": "f320227ba3fc460a",
@@ -389,14 +389,14 @@
    }
   },
   "R-PROC-BOARD": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/pod/place_r1.py PLACE (Rev F reference) to the current design (yaml: hw/pod/draft_r2/placement.yaml keys, routed board, bom_jlc_mz2.csv); 'what' rewritten from placement.yaml; routed board checked: interfaces.py board-nets/inside/heights PASS, bom_check refs/nets/jlc-bom PASS, LN-M03 1.29 %; Y1 now FC-12M (C99009, MPN field added)",
+   "note": "B-DOC-AUDIT-0007 (20bd842): Y1 (3.9,1.7), C11/C12 x 2.01; LSE pre-routed on B, 0 vias, 7.72/7.43 mm (place_r2 --probe); In1 GND under the run; sub-processing issue 14 + reg-board issue 17 closed",
    "stamp": {
     "yaml:hw/pod/draft_r2/placement.yaml::C7": "00ee3db3b644c038",
     "yaml:hw/pod/draft_r2/placement.yaml::L1": "585efc231ce7185e",
     "yaml:hw/pod/draft_r2/placement.yaml::U1": "c8c8d8c73aa7707b",
-    "yaml:hw/pod/draft_r2/placement.yaml::Y1": "583ada58ae68efb0"
+    "yaml:hw/pod/draft_r2/placement.yaml::Y1": "4407364e37774c10"
    }
   },
   "R-PROC-DEBUG": {

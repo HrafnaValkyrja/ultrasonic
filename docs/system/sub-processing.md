@@ -36,12 +36,12 @@ HSI48 (+ CRS trim) -> USB FS 48 MHz            internal SMPS 3 MHz: VLXSMPS -> L
 | L1 | DFE201610E-2R2M=P2: Murata 2.2 µH shielded metal-alloy, 2.0x1.6x1.0 mm, ~140 mΩ, 2.4 A | C337891 · Ext | (15.65, 7.0) r-90 | SMPS coil; ST: 2.2 µH ±20 %, Isat > 0.5 A, DCR < 200 mΩ; differs from spec D5 L152 (issue 11); kept in MZ-2 (gen.py L91) |
 | C8, C9 | 2.2 µF 0402 10 V X5R Samsung CL05A225KP5NSNC | C107369 · Ext | (15.4, 9.15), (4.9, 3.86) | VDD11 COUT pins 23 / 46; DS p.153 rated >= 10 V (O24); stay 0402 in MZ-2 (0201 ESR at 3 MHz unproven, gen.py L90) |
 | C7 | 10 µF 10 V X5R 0603 Samsung CL10A106KP8NNNC | C19702 · Basic | (15.6, 10.6) | VDDSMPS CIN (DS: 10 µF, >= 10 V, ESR < 10 mΩ); 0603 kept (ST bulk rule) |
-| C1, C2, C3 | 100 nF 10 V X5R 0201 Murata GRM033R61A104KE15D, one per VDD pin | C76934 · Basic | (6.6, 0.83), (11.97, 10.95), (13.55, 0.83) | AN5373 Rev 7; C1 also serves VBAT pin 1 (PER-06) |
+| C1, C2, C3 | 100 nF 10 V X5R 0201 Murata GRM033R61A104KE15D, one per VDD pin | C76934 · Basic | (5.48, 2.2) r90, (11.97, 10.95), (5.37, 9.5) r90 (pins 48+1 / 25 / 36) | AN5373 Rev 7; C1 also serves VBAT pin 1 (PER-06) |
 | C4 | 10 µF 0603 bulk on +3V0 | C19702 · Basic | (9.95, 11.2) | AN5373: 10 µF typ |
-| C5, C6 | 1 µF 25 V X5R 0402 (C52923, Basic, kept for DC bias) + 100 nF 0201 (C76934) on VDDA | Basic | (5.37, 9.5), (13.2, 10.6) | AN5373; both > 8.7 mm from VDDA pin 9 (issue 13) |
-| C10 | 100 nF 0201 on NRST | C76934 · Basic | (9.9, 0.83) | AN5373 |
-| Y1 | X1A0000610006: Epson FC-12M 32.768 kHz, 2.05 x 1.2 mm, CL 7 pF, ESR 90 kΩ (generic Device:Crystal symbol, MPN field) | C99009 · Ext | (4.73, 1.7) r90 | D16: pitch matched between unlinked pods; gm_crit ~0.98 µA/V (ECR-0018 MZV-08) |
-| C11, C12 | 8.2 pF C0G 0201 Murata GRM0335C1H8R2BA01D | C161441 · Basic | (2.84, 2.6), (2.84, 1.0) | LSE load for CL 7 pF assuming ~3 pF stray (CL = C/2 + Cs); ±2 pF stray = ±46 ppm, inside RTC calibration ±487 ppm (MZV-08) |
+| C5, C6 | 1 µF 25 V X5R 0402 (C52923, Basic, kept for DC bias) + 100 nF 0201 (C76934) on VDDA | Basic | (13.75, 0.73), (11.05, 0.83) | AN5373; C6 1.13 mm / C5 2.32 mm from VDDA pin 9; C6 tied straight to pins 9/8 (pre-route; issue 13 closed) |
+| C10 | 100 nF 0201 on NRST | C76934 · Basic | (9.55, 0.83) r180 | AN5373; pin 7 -> C10 -> via -> TP3 pre-routed |
+| Y1 | X1A0000610006: Epson FC-12M 32.768 kHz, 2.05 x 1.2 mm, CL 7 pF, ESR 90 kΩ (generic Device:Crystal symbol, MPN field) | C99009 · Ext | (3.9, 1.7) r90 | D16: pitch matched between unlinked pods; gm_crit ~0.98 µA/V (ECR-0018 MZV-08) |
+| C11, C12 | 8.2 pF C0G 0201 Murata GRM0335C1H8R2BA01D | C161441 · Basic | (2.01, 2.4), (2.01, 1.0) | LSE load for CL 7 pF assuming ~3 pF stray (CL = C/2 + Cs); ±2 pF stray = ±46 ppm, inside RTC calibration ±487 ppm (MZV-08) |
 | R1 | 10 k 0402, PH3-BOOT0 to GND; pad = DFU tack point | C25744 · Basic | (2.07, 3.85) | boot from flash (AN5373); 0402 kept as a hand hook (O18) |
 - drop_in_alt: STM32U585CIU6Q (same die + crypto), C5271021, 15 in stock, $12.52 (spec D5, 2026-09-30).
 - not_fitted_by_design: VBAT cap (shares C1), PA10 pull-up (ROM loader + R5, see pins), CHG_INT pull-up (PA15 internal), CC sense divider (gen.py L37-41).
@@ -119,7 +119,7 @@ FW-14: "frequency plan: LED PWM f = n x fs_out or outside 20-96 kHz; mic divider
 | sub-dock-usb | USB_DP PA12, USB_DM PA11, VBUS_SENSE PA1; CC not sensed (R18 Rd + J12 stay; ILIM by enumeration) | USB FS on HSI48 + CRS (DS §3.12 p.51); ROM DFU; boot stub (FW-11, FW-13) | R-PROC-DOCK |
 | sub-ui | BTN PA0, LED_K PB7 | WKUP1/EXTI0; TIM4_CH2 open-drain PWM (FW-14) | R-PROC-UI |
 | sub-debug-test | SWDIO PA13 (TP1), SWCLK PA14 (TP2), NRST (TP3), BOOT0 N$1 (R1 pad), DBG_TX PB6 (TP7), MDF_CCK PB8 (TP8), MDF_SDI PB1 (TP9), MIC_DATA (TP10) | SWD, ROM bootloader, USART1_TX printf, USB self-test (O15) | R-PROC-DEBUG |
-| reg-board | U1, SMPS loop (L1, C7, C8/C9), Y1 + C11/C12 all on B; EP GND vias to In1; +3V0 from the In2 plane; I2C_SCL (pin 26) leaves on an 8.98 mm In2 bridge | SMPS loop, decoupling distances (Key numbers); LSE no-via rule broken (issue 14) | R-PROC-BOARD, R-SMPS-BOARD, R-CLOCK-BOARD |
+| reg-board | U1, SMPS loop (L1, C7, C8/C9), Y1 + C11/C12 all on B; EP GND vias to In1; +3V0 from the In2 plane; I2C_SCL (pin 26) leaves on an 8.98 mm In2 bridge | SMPS loop, decoupling distances (Key numbers); LSE B only, 0 vias (issue 14 closed) | R-PROC-BOARD, R-SMPS-BOARD, R-CLOCK-BOARD |
 
 ## Constraints
 - D5 L131: STM32U575CIU6Q. D11 L210: only the core SMPS switches; fixed frequency; owner listening test E11 (full chain, 16 MHz idle, Stop 2); L214: shielded, low-magnetostriction inductor.
@@ -148,11 +148,11 @@ FW-14: "frequency plan: LED PWM f = n x fs_out or outside 20-96 kHz; mic divider
 | latency target | <= 20 ms end to end | spec §5.3 | 2026-09-30 |
 | VDD11 pin 46 / pin 23 to nearest 2.2 µF | 1.25 mm (C9) / 2.07 mm (C8) | pcbnew probe of board, pad centres | 2026-10-07 |
 | VDDSMPS pin 21 to C7 / VLXSMPS copper | 4.17 mm / 2.22 mm, B only, no via | same probe | 2026-10-07 |
-| VDD pin 48 / VBAT pin 1 to C1 (+3V0 pad) | 1.85 / 1.19 mm centre-to-centre; PER-06 rule (pad edge-to-edge <= 1.5, place_r2.py `_gap`) PASS in hw/pod/draft_r2/out/check.json | same probe; place_r2.py L46 | 2026-10-07 |
-| VDD pin 25 / pin 36 to nearest cap | 1.98 mm (C2) / 3.02 mm (C4 10 µF; C2 4.99) | same probe | 2026-10-07 |
-| VDDA pin 9 to C5 / C6 | 9.22 / 8.78 mm (nearest cap C3 2.22 mm; all on the In2 +3V0 plane) | same probe | 2026-10-07 |
-| LSE copper | LSE_IN F 4.53 + B 3.41 mm, 2 vias; LSE_OUT F 3.34 + B 3.54 mm, 2 vias | same probe | 2026-10-07 |
-| L1 to mic U2 / to the mic port | 13.04 mm centre-centre, same face (B) / 13.77 mm nearest pad | same probe | 2026-10-07 |
+| VDD pin 48 / VBAT pin 1 to C1 (+3V0 pad) | 1.14 / 1.90 mm centre-to-centre (C1 +3V0 pad tied to pin 48, both pins to one corner via); PER-06 rule (pad edge-to-edge <= 1.5, place_r2.py `_gap`) PASS in hw/pod/draft_r2/out/check.json | board probe 2026-10-07 (20bd842); place_r2.py NEAR | 2026-10-07 |
+| VDD pin 25 / pin 36 to nearest cap | 1.98 mm (C2) / 2.17 mm (C3) | same probe | 2026-10-07 |
+| VDDA pin 9 to C5 / C6 | 2.32 / 1.13 mm (+3V0 pad centres; was 9.22 / 8.78 before 20bd842) | place_r2 --probe | 2026-10-07 |
+| LSE copper | LSE_IN B 7.72 mm, LSE_OUT B 7.43 mm, 0 vias (pre-routed; was F+B with 2 vias each) | place_r2 --probe | 2026-10-07 |
+| L1 to mic U2 / to the mic port | 13.04 mm centre-centre, same face (B) / 12.87 mm nearest pad edge | same probe | 2026-10-07 |
 | I2C_SCL route | F 9.89 + B 7.18 + In2 8.98 mm, 5 vias (inner bridge 2026-10-07) | same probe; ECR-0018 log | 2026-10-07 |
 | noise, MCU aggressors (Phase-2 board, both planes modelled) | LN-M01 mic supply: A05_CPU_HOP 21.875 kHz 46.5 nominal / 26.5 pessimistic dB (PASS, sign-off >= 10); worst-PSRR case A01_SMPS_IN 28.04 MHz -> 38.96 kHz 14.0 dB; A02_SMPS_VDD11 >= 96 dB; LN-M04 ADC ref ripple 0.127 mV pk (<= 0.37) at hop 1562 Hz | `sim/noise/out_r2/budget.json` (board sha da4e8b13, valid, 195/195 pads) | 2026-10-07 |
 
@@ -170,8 +170,8 @@ FW-14: "frequency plan: LED PWM f = n x fs_out or outside 20-96 kHz; mic divider
 11. SMPS inductor differs from spec: D5 L152 names Murata LQM21PN2R2MGHL (0805, C341781); Rev F/G and MZ-2 use DFE201610E-2R2M=P2 (C337891); D11 L214 asks low-magnetostriction, DFE magnetostriction unpublished (sourcing lock). Closes: owner (spec or schematic); E11 listens for whine incl. dock magnets near L1 (`sub-dock-usb.md`; 00-whole.md risk 7).
 12. O18 "spare pins to pads": PC13, PH0, PH1, PA3, PA9, PB0 are NC with no copper (gen.py L343-345). PA3 = ADC1_IN8 could read VSYS or MIC_VDD (FWSIM HWC-9). Trade-off vs O20 size; not decided [TBD].
 
-13. VDDA (pin 9) caps C5/C6 sit 8.8-9.2 mm from the pin; the nearest cap is C3 (VDD) at 2.2 mm, and all share the In2 +3V0 plane. place_r2.py `near` rule (L46) measures to any U1 pad on the net, so it does not see this. LN-M04 ADC-ref ripple 0.127 mV PASS on the model. Closes: owner review (O25): move C6 next to pin 9 or accept with the LN-M04 evidence; tighten the rule to `U1.9`.
-14. LSE traces change layer (2 vias each net) and run on F as well as B; A3 clock doc / R-CLOCK-BOARD say "short symmetric traces, no vias, guarded". Lengths 7.9 / 6.9 mm. Closes: re-route Y1 beside pins 3/4 on B only, or accept with a measured LSE start-up + ppm on board 1 (MZV-08 says load error is firmware-trimmable).
+13. (closed 2026-10-07, 20bd842) VDDA caps: C6 100 nF sits over pins 8/9 with straight stubs (1.13 mm), C5 1 µF 2.32 mm; C3 moved to VDD pin 36. place_r2 NEAR is per pin now (C6/C5 `U1.9`, C2 `U1.25`, C3 `U1.36`). LN-M04 0.127 mV unchanged.
+14. (closed 2026-10-07, 20bd842) LSE: Y1 at (3.9, 1.7), C11/C12 at x 2.01; pins 3/4 pre-routed along the top strip on B, 0 vias, 7.72 / 7.43 mm (was 7.9 / 6.9 mm with 2 vias each). Guard: In1 GND plane under the whole run; nothing else in the strip between Y1 and pin 4. Load-error residue stays firmware-trimmable (MZV-08).
 
 ## Before you change this, check
 - pin moves: integration-map §4 (one job per pin); `tools/checks/interfaces.py pins` (AF per pin-contract); ADF only PB3/PB4; TIM1 complementary pairs; ADC4 pins for Stop 2; WKUP1 = PA0; USB fixed PA11/PA12; pin-contract hazards (PA15, PB15, PB4, PA2); ROM loader pin states (AN2606 Table 199); related docs sub-audio-in, sub-output, sub-power, sub-dock-usb, sub-ui, sub-debug-test.

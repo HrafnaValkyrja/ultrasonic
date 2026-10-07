@@ -36,20 +36,20 @@ Positions: routed board probe 2026-10-07 (board mm), all on B. LCSC from `hw/pod
 |---|---|---|---|
 | target | Xinyangze YZT0675-20048-05025-01: 5-pos magnetic connector, pod side; PA9T, brass 3 µ″ Au/Ni, 2 NdFeB magnets, −20…70 °C | C5126848 · Ext · 51 · $2.38 (JLC API 2026-10-02T00:02Z) | hand-installed: glued in the belly window of the tub, back potted; not JLC-placed |
 | head | YZP0048-20048-05025-01: 5-pin cable-side pogo head | C5126847 · Ext · 0 · $1.39 (JLC API 2026-10-02T00:03Z) | bom.md still lists C5126845 = 4-pin head (2026-10-07): DK-01 |
-| D5 | TI TPD1E10B06DPYR: 1-ch bidirectional ESD diode, 5.5 V working, X1SON-2 1.0×0.6 | C48260 · Ext · 299k · $0.0417 (bom.md, JLC API 2026-10-02T23:48Z) | (25.0, 3.5) B: DOCK_VBUS pad (25.5, 3.5), 2.0 mm from J3 centre (27.0, 2.15) (derived). 12 pF, 100 nA max leak (sourcing-lock.csv). clamp V [TBD: tpd1e10b06.pdf not read]. bom_check stock-lock WARN: C48260 only ALTERNATE in the lock (2026-10-07) |
+| D5 | TI TPD1E10B06DPYR: 1-ch bidirectional ESD diode, 5.5 V working, X1SON-2 1.0×0.6 | C48260 · Ext · 299k · $0.0417 (bom.md, JLC API 2026-10-02T23:48Z) | (25.0, 3.5) B: DOCK_VBUS pad (25.5, 3.5), 1.84 mm from J3 centre (25.1, 1.7); pad edge gap 1.0 (probe 2026-10-07). 12 pF, 100 nA max leak (sourcing-lock.csv). clamp V [TBD: tpd1e10b06.pdf not read]. bom_check stock-lock WARN: C48260 only ALTERNATE in the lock (2026-10-07) |
 | D6 | same part as D5, on J12 CC (ECR-0017, O24) | C48260 | (25.0, 4.35) B: CC pad (25.5, 4.35), 1.5 mm from J12 centre (27.0, 4.35) |
 | D4 | Nexperia PMEG3005EL: 30 V 0.5 A Schottky, SOD-882 (DFN1006-2), 0.50 mm max height; series DOCK_VBUS->VBUS (reverse-dock block) | C282565 · Ext · 43,342 · $0.115 (bom.md, JLC API 2026-10-07T11:31Z) | (22.9, 1.0) B. VF 295 / 430 mV typ at 100 / 500 mA; ~0.07 W, Tj ~71 °C at the ~0.2 A docked load (ECR-0018 MZV-06, PASS) |
 | U6 | TI TPD2E2U06DRLR: 2-ch low-C USB ESD clamp, SOT-553 | C1972959 · Ext · 7,653 · $0.32 (JLC API 2026-10-02T00:02Z) | (25.1, 6.8) B; pins 3 USB_DP (25.8, 7.3), 5 USB_DM (24.4, 6.3), 4 GND. 1.5 pF, 10 nA, 5.5 A 8/20 µs (listing). shunt only |
 | R18 | 5.1 kΩ 0201 (0201WMF5101TEE): USB-C Rd (sink identity on CC) | C270344 | (25.0, 5.25) B |
 | R12, R13 | 100 kΩ / 100 kΩ 0201: VBUS/2 -> PA1 | C270364 | (17.4, 4.4 / 3.55) B. 25 µA docked |
 | C15 | Murata GRM155R61E475ME15D 4.7 µF 25 V X5R 0402 on VBUS (charger IN) | C2858031 · Ext · 135k · $0.0833 (bom.md, JLC API 2026-10-02T23:50Z) | (20.9, 3.4) B beside U3 A2. ≤ 10 µF USB attach limit; 25 V per TI SLUSE99C §9.2.2.1 |
-| J3 | 1.0 mm round wire pad, DOCK_VBUS | – | (27.0, 2.15) B = pod x 57.55 |
-| J4 | 1.0×2.0 mm wire pad `pod:WirePad_1.0x2.0mm`, GND: dock GND + cell − | – | (25.1, 1.7) B, long axis along y |
+| J3 | 1.0 mm round wire pad, DOCK_VBUS | – | (25.1, 1.7) B = pod x 55.65 |
+| J4 | 1.0×2.0 mm wire pad `pod:WirePad_1.0x2.0mm`, GND: dock GND + cell − | – | (27.0, 1.9) B, long axis along y, between J3 and J5 (ASM-09) |
 | J10, J11, J12 | 1.0 mm wire pads USB_DP, USB_DM, CC | – | J10 (28.9, 5.5), J11 (27.0, 6.55), J12 (27.0, 4.35) B |
 | R1 (MCU block) | 10 kΩ 0402 BOOT0 (PH3) pull-down (0402 kept as a hand hook, O18) | C25744 | (2.07, 3.85) B; R1 pad = DFU tack point (integration-map F14) |
 | USB-C fallback | Same Sky UJ32-C-H-G-MSMT: IP68 USB-C receptacle 6.75×8.55×2.76 mm | not fitted; price TBD (bom.md) | not carried into shell_r2 (R-DOCK-BODY; DK-10) |
 
-Neighbour wire pads (copper edge gap, routed board probe 2026-10-07; all ≥ 0.8 mm = MZD-10 holds): J3 DOCK_VBUS–J4 GND 0.90; J3–J5 VBAT 1.17 (**dock 5 V straight onto the cell, bypassing U3**: sub-power PWR-I17; Rev F kept J4 between them, ASM-09); J10 USB_DP–J11 USB_DM 1.17; J12 CC–J9 TS 1.17; J12 CC–J3 DOCK_VBUS 1.20. Worst: J3–J5. Check: bring-up step 1 meters neighbours (sub-debug-test).
+Neighbour wire pads (copper edge gap, routed board probe 2026-10-07, after the J3/J4 swap 20bd842; all ≥ 0.8 mm = MZD-10 holds): J3 DOCK_VBUS–J4 GND 0.90 (dock supply short); J3–J5 VBAT 2.85 (J4 between them, ASM-09; PWR-I17 closed); J4 GND–J5 VBAT 0.90; J4–J12 CC 0.95; J4–J9 TS 0.96; J10 USB_DP–J11 USB_DM 1.17; J12 CC–J9 TS 1.17. J4 GND to D5's DOCK_VBUS pad 0.76. Check: bring-up step 1 meters neighbours (sub-debug-test).
 
 ### Contact map (target pin order TBD, not recorded: DK-02)
 | Target pos | Pad | Net | If head mates rotated 180° (1↔5, 2↔4) |
@@ -67,7 +67,7 @@ rec: check magnet keying on a sample; if unkeyed, VBUS on centre pin 3 so a rota
 | sub-processing (R-PROC-DOCK) | USB_DP PA12, USB_DM PA11 (AF10, HSI48 + CRS); VBUS_SENSE PA1; CHG_INT PA15; N$1 PH3 BOOT0 (R1) | VDDUSB 3.0–3.6 V bonded to VDD on QFN48 (A3-u575-plan §3). PA1 ~2.2–2.5 V docked: ADC input; wake on CHG_INT, not PA1 (digital-high margin unverified). PA3, PA10 not dock signals |
 | sub-ui | BTN PA0 | proposed DFU gesture: button held at reset with VBUS present (DK-04) |
 | sub-debug-test | TP1 SWDIO, TP2 SWCLK, TP3 NRST | SWD = only recovery from a broken app. Phase 2: TP1–TP6 are bare pads on F in per-pad VHB cut-outs, reachable only before the lid is bonded (field recovery = ROM DFU via the R1/PH3 tack pad + dock USB, ECR-0018 log 2026-10-03) |
-| reg-board (R-DOCK-BOARD) | B face, rear pad zone x 25–30 (dims_r2 PAD_ZONE): J3 (27.0, 2.15), J4 (25.1, 1.7), J10 (28.9, 5.5), J11 (27.0, 6.55), J12 (27.0, 4.35); D5/D6 x 25.0 beside J3/J12; U6 (25.1, 6.8); D4 (22.9, 1.0); R18 (25.0, 5.25); R12/R13 (17.4, 4.4/3.55); C15 (20.9, 3.4) | Wire-pad gaps ≥ 0.8 mm (MZD-10; min J3–J4 0.90); J3–J5 adjacency open (PWR-I17). Routed USB: DP 23.4 mm / 2 vias, DM 23.2 mm / 2 vias, 0.1 mm, not a coupled pair (FS 12 Mb/s, mismatch irrelevant); DOCK_VBUS 6.1 mm / 0 vias; CC 2.5 mm / 0 vias (routed board probe 2026-10-07) |
+| reg-board (R-DOCK-BOARD) | B face, rear pad zone x 25–30 (dims_r2 PAD_ZONE): J3 (25.1, 1.7), J4 (27.0, 1.9), J10 (28.9, 5.5), J11 (27.0, 6.55), J12 (27.0, 4.35); D5/D6 x 25.0 beside J3/J12; U6 (25.1, 6.8); D4 (22.9, 1.0); R18 (25.0, 5.25); R12/R13 (17.4, 4.4/3.55); C15 (20.9, 3.4) | Wire-pad gaps ≥ 0.8 mm (MZD-10; min J3–J4 0.90); J4 GND between J3 and J5 (ASM-09). Routed USB: DP 23.4 mm / 2 vias, DM 23.2 mm / 2 vias, 0.1 mm, not a coupled pair (FS 12 Mb/s, mismatch irrelevant); DOCK_VBUS 4.1 mm / 0 vias; CC 2.5 mm / 0 vias (routed board probe 2026-10-07) |
 | reg-pod-body (R-DOCK-BODY) | `DOCK` x 31.5–52.7, y 5.72–12.58, z −11.75…−8.95 (YZT0675 21.2 × 6.86 × 2.8); window +0.1/side cut through the belly (shell_r2 tub()); `BAY` x 30.3–54.2, z −10.95…−8.9; seam steps so the whole belly is tub (shell_r2 docstring) | target flush in the belly floor, glued, potted. Belly depth 2.05 assumes flat (bent) tails (dims_r2 BELLY_D). No USB-C keep-out in shell_r2 (DK-10) |
 | physical / reg-board | 5 wires target -> J3/J4/J10/J11/J12 | route belly (x ≤ 54.2) -> past the cell (cell x 30.6–65.6, 1.1 mm rear gap to the wall at 66.7) -> stowage space behind the board (pod x 60.55–66.7) -> B pads at pod x 55.55–60.55, soldered before the board is hung on the lid; not drawn (DK-05) |
 
@@ -118,7 +118,7 @@ rec: check magnet keying on a sample; if unkeyed, VBUS on centre pin 3 so a rota
 - connector part / pin order: contact map (rotated-mate harm), bom.py, CAD window + tab, cell clearance over tails, sealing coupon (DK-07).
 - D4/D5/U6/R18: sub-power VBUS limits; F15 ESD on every exposed contact; C15 ≤ 10 µF.
 - USB pins, BOOT0, PA10, rail voltage: sub-processing pin map, DFU path, DK-06.
-- pad positions (reg-board): wire route + rear-gap count (physical, reg-arm); wire-pad gaps ≥ 0.8 mm (MZD-10) and J3 kept away from J5 VBAT (PWR-I17, ASM-09); D5/D6 stay beside J3/J12; D+/D− together.
+- pad positions (reg-board): wire route + rear-gap count (physical, reg-arm); wire-pad gaps ≥ 0.8 mm (MZD-10) and J4 GND kept between J3 and J5 VBAT (ASM-09; place_r2 NOT_NEIGHBOURS); D5/D6 stay beside J3/J12; D+/D− together.
 - belly bay/window (reg-pod-body, dims_r2 DOCK/BAY), flat-tail belly depth: O12(b), O16(6), NiTi strut clearance.
 - always: integration-map §10, `python3 tools/plm.py impact SUB-DOCK-USB`, `python3 tools/checks/interfaces.py`.
 

@@ -184,7 +184,7 @@ relations:
   - id: R-DOCK-BOARD
     a: SUB-DOCK-USB
     b: REG-BOARD
-    what: "Phase 2: dock wire pads J3/J4 (shared GND with cell -)/J10/J11/J12 in the two rear columns on B (board x 25-29, PAD_ZONE); D5/D6 ESD at J3/J12, U6 and D4 on B at the rear"
+    what: "Phase 2: dock wire pads J3/J4 (shared GND with cell -)/J10/J11/J12 in the two rear columns on B (board x 25-29, PAD_ZONE), J4 GND between J3 DOCK_VBUS and J5 VBAT (ASM-09); D5/D6 ESD at J3/J12, U6 and D4 on B at the rear"
     watch: ["yaml:hw/pod/draft_r2/placement.yaml::J3", "yaml:hw/pod/draft_r2/placement.yaml::J4", "yaml:hw/pod/draft_r2/placement.yaml::J5", "yaml:hw/pod/draft_r2/placement.yaml::J10", "yaml:hw/pod/draft_r2/placement.yaml::J11", "yaml:hw/pod/draft_r2/placement.yaml::J12", "yaml:hw/pod/draft_r2/placement.yaml::D5", "yaml:hw/pod/draft_r2/placement.yaml::D6", "yaml:hw/pod/draft_r2/placement.yaml::U6", "yaml:hw/pod/draft_r2/placement.yaml::D4"]
   - id: R-PWR-BOARD
     a: SUB-POWER
@@ -209,7 +209,7 @@ relations:
   - id: R-PROC-BOARD
     a: SUB-PROCESSING
     b: REG-BOARD
-    what: "Phase 2: MCU U1 on B at board (10.05, 5.4), SMPS loop (L1, C7, C8/C9), crystal Y1 at the front (4.73, 1.7); GND to In1, +3V0 plane on In2"
+    what: "Phase 2: MCU U1 on B at board (10.05, 5.4), SMPS loop (L1, C7, C8/C9), crystal Y1 at the front (3.9, 1.7), LSE pre-routed on B with no vias; GND to In1, +3V0 plane on In2"
     watch: ["yaml:hw/pod/draft_r2/placement.yaml::U1", "yaml:hw/pod/draft_r2/placement.yaml::L1", "yaml:hw/pod/draft_r2/placement.yaml::C7", "yaml:hw/pod/draft_r2/placement.yaml::Y1"]
   # ---------------------------------------------------------------- off-board wiring
   - id: R-OUT-ARM

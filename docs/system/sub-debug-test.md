@@ -41,7 +41,7 @@ elements:
 - {ref: TP9, part: "Ø0.5 dot", net: "MDF_SDI = PB1(19) MDF1_SDI0 AF6", at: "(2.05, 8.25) B"}
 - {ref: TP10, part: "Ø0.5 dot", net: "MIC_DATA (PB4(40), U2 DATA)", at: "(3.1, 8.25) B"}
 - {ref: R1, part: "10k 1% 0402 BOOT0 pull-down (hand hook, kept 0402)", net: "N$1 = PH3-BOOT0(44)", at: "(2.07, 3.85) B; PH3 pad R1.1 (2.58, 3.85)", lcsc: "C25744 (bom_jlc_mz2.csv 'dated lookup')"}
-- {ref: C10, part: "100nF 0201 X5R NRST filter", net: NRST, at: "(9.9, 0.83) B", lcsc: "C76934"}
+- {ref: C10, part: "100nF 0201 X5R NRST filter", net: NRST, at: "(9.55, 0.83) B", lcsc: "C76934"}
 - {ref: R20, part: "0R 0402 link LDO_OUT->+3V0 (hand hook)", at: "(23.0, 11.0) B; LDO pad R20.1 (23.51, 11.0)", lcsc: "C17168"}
 - {ref: R21, part: "ERJ2BSFR10X Panasonic 0.1R 1% 0402 current-sense (166 mW per docs/research/simplify/output.md L86)", net: "BRIDGE_RTN->GND", at: "(19.45, 6.45) B; GND pad R21.2 (18.94, 6.45) with two pad-hugging GND vias (hw/pod/kelvin_r21.py)", lcsc: "C409058 Extended"}
 - {ref: "R22, C22", part: "1k 0201 / 10nF X7R 0201 low-pass 15.9 kHz", net: "BRIDGE_RTN->I_SENSE->PA6(16) ADC1_IN11", at: "(15.4, 3.55) / (15.4, 4.4) B", lcsc: "C270365 / C85930"}
@@ -54,7 +54,7 @@ free_pins_no_pad: "PC13(2), PH0(5), PH1(6), PA3(13), PB0(18), PA9(30)  # integra
 VBAT: "J5 (28.9, 1.1)"
 "+3V0": "TP4 (3.1, 11.3) F; C1.1 (6.92, 0.83); C3.1 (13.23, 0.83); R5.2 (20.68, 10.8)"
 VDD11: "C9.1 (5.38, 3.86); C8.1 (14.92, 9.15)"
-DOCK_VBUS: "J3 (27.0, 2.15) or D5.1 (25.5, 3.5)"
+DOCK_VBUS: "J3 (25.1, 1.7) or D5.1 (25.5, 3.5)"
 VBUS: "C15.1 (20.42, 3.4) or R12.1 (17.72, 4.4)"
 VSYS: "TP6 (24.0, 10.9) F; C21.1 (19.43, 0.9)"
 LDO_OUT_alone: "R20.1 (23.51, 11.0) or C18.1 (23.48, 6.5) (R20 lifted)"
@@ -119,9 +119,9 @@ local_copy: "scratchpad boot/an2606.pdf, fetched 2026-09-30, SHA-256 b0ed4c4839c
 - {n: 0, stage: bare board, do: "loupe: U3 balls, U1, Q1/Q2 (Nexperia land pattern, ECR-0004), SW1, D5/D6, 0201 tombstones, pad-board LED cathode mark", fail: "photograph, stop"}
 - n: 1
   stage: bare board
-  do: "meter, unpowered: TP4-TP5, TP6-TP5, J5-J4, J3-J4, then every J-pad neighbour (copper gaps 1.17-1.22 mm, board probe 2026-10-07): J3-J5 (dock 5 V onto the cell, bypassing U3), J4-D5.1 (J4 GND pad edge 0.5 mm from DOCK_VBUS), J3-J12, J12-J9, J12-J11, J10-J11, J10-J12, J9-J5, J9-J3, J9-J10, J1-J2, J1-J7, J1-J8, J7-J8, J7-J10, J7-J11, J8-J2, J8-J11; pad board J2-J4, J1-J3 (reg-pad issue 13); TP row TP5-TP4 (GND-+3V0, 0.8 mm)"
+  do: "meter, unpowered: TP4-TP5, TP6-TP5, J5-J4, J3-J4, then every J-pad neighbour (copper gaps 0.90-1.22 mm, board probe 2026-10-07 after the J3/J4 swap): J3-J4 (dock supply short), J4-J5 (cell short), J4-D5.1 (J4 GND pad edge 0.76 mm from DOCK_VBUS), J4-J12, J4-J9, J12-J9, J12-J11, J10-J11, J10-J12, J9-J5, J9-J3, J9-J10, J1-J2, J1-J7, J1-J8, J7-J8, J7-J10, J7-J11, J8-J2, J8-J11; pad board J2-J4, J1-J3 (reg-pad issue 13); TP row TP5-TP4 (GND-+3V0, 0.8 mm)"
   expect: "no short; record board 1 as reference"
-  fail: "J3-J5 = dock 5 V straight onto VBAT. J3-J4 / J4-D5.1 = dock supply short. J12-J9 = CC on TS. J8-J2 / pad-board J2-J4 = bridge output into PB7. J1-J2 = exciter shorted across the bridge"
+  fail: "J4-J5 = cell short (PCM cuts it). J3-J4 / J4-D5.1 = dock supply short. J12-J9 = CC on TS. J8-J2 / pad-board J2-J4 = bridge output into PB7. J1-J2 = exciter shorted across the bridge"
 - {n: 2, stage: bare board, do: "bench 3.7 V, 50 mA limit, J5(+)/J4(-)", expect: "TP6 ~3.7 V; TP4 2.955-3.045 V; record blank-chip current (no reference)", fail: "lift R20 -> LDO_OUT alone at R20.1 -> 3.0 V into TP4 (30 mA limit) to split LDO side from load side"}
 - {n: 3, stage: bare board, do: "first flash AP-DFU1: tack R1.1 PH3 (2.58, 3.85) B to +3V0 C1.1 (6.92, 0.83) B (5.3 mm wire; TP4 on F also works before the bond); 5 V current-limited on J3/J4, USB D+/D- on J10/J11; power-cycle; flash; remove tack. Then SWD on TP1/TP2/TP3/TP5 once, while F is still reachable", expect: "ROM DFU enumerates; image runs after tack removed; SWD attaches", fail: "AP-SWD if DFU fails (DBG-1); TP4 = Vref sense only, never drive a probe's 3.3 V into it; check NRST idles high"}
 - {n: 4, stage: bare board, do: "clocks: LSE, MSI lock, PLL; scope MIC_CLK at R2.2 (B)", expect: "duty 48-52 % above 2.4 MHz (D13)", fail: "E6/R13: MDF fallback via TP8/TP9/TP10 (mdf_fallback above)"}

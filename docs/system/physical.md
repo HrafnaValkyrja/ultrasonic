@@ -90,7 +90,7 @@ Total T 10.4 (Rev F 11.8; O27 thin first). The heel sits under the temple and ad
 |---|---|---|---|---|
 | Seam, straight runs | tongue/groove + bond line | taped | MS-polymer or neutral RTV (TBD) | designed, untested |
 | Seam, corners + belly step | butt joint (tongue stops 1.4 short of corners); 0.35 key on the step | taped | bonded | **weak** (reg-pod-body issue 13) |
-| Mic | board hole D0.6 → VHB hole D1.0 (tape annulus seals onto the F mask) → reamed bore D1.0 → hex mesh seat | – | mesh part TBD | duct sealed by design; R-ACO-P6 keep-out broken by an F track (reg-pod-body issue 19) |
+| Mic | board hole D0.6 → VHB hole D1.0 (tape annulus seals onto the F mask) → reamed bore D1.0 → hex mesh seat | – | mesh part TBD | duct sealed by design; R-ACO-P6 keep-out holds (nearest F copper / via 1.87 mm, rule area on the board, 2026-10-07) |
 | SW1 | puck in D2.6 bore; skin in D4.6 recess; KMT022 IP68 | TBD | bonded silicone skin (TBD) | partly designed |
 | Dock window | target glued in, back potted | TBD | same | designed |
 | Arm entry | heel channel D1.0 through the tub's inner wall; blind NiTi sockets | RTV at land opening and exit | same | designed (reg-arm) |
@@ -138,7 +138,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 | 3 | [reg-pad](reg-pad.md) ↔ [reg-arm](reg-arm.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) ([sub-output](sub-output.md), [sub-ui](sub-ui.md)) | 4 litz wires | strut bore Ø1.2 → tube → heel Ø1.0 → exit (65.75, 5.30, −5.62) → 1.1 gap behind the cell → stowage → B pads J1/J2 (board 28.9/27.0) and J7/J8 | F3: OUT_A/OUT_B → J1/J2 · F12: LED_A/LED_K → J7/J8 |
 | 4 | [reg-pod-body](reg-pod-body.md) (heel) ↔ [reg-arm](reg-arm.md) ↔ [reg-pad](reg-pad.md) | spring force (≥ 1 N) | NiTi Ø0.80; sockets 4.0 / 3.5 deep; M1.4 set screws (unchanged) | – |
 | 5 | [sub-dock-usb](sub-dock-usb.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) | charge + USB | YZT0675 flush in the belly; 5 wires under the cell (0.8) to the rear gap, up to J3/J4/J10/J11/J12 (B, board x 25.1-28.9) | F5, F9, F10, F15 |
-| 6 | [sub-power](sub-power.md) (cell) ↔ [reg-board](reg-board.md) | battery | leads to J5 (28.9, 1.1) / J4 (25.1, 1.7); optional NTC to J9 (28.9, 3.3) | F5-F8 |
+| 6 | [sub-power](sub-power.md) (cell) ↔ [reg-board](reg-board.md) | battery | leads to J5 (28.9, 1.1) / J4 (27.0, 1.9); optional NTC to J9 (28.9, 3.3) | F5-F8 |
 | 7 | [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) | retention | full-face VHB on F (91 % bonded), x-stop 0.25, long edges free 0.45 | – |
 | 8 | [reg-pod-body](reg-pod-body.md) (tub ↔ lid) | seal + access | seam y 12.1, tongue/groove, belly all tub, rebate tub-only | – |
 | 9 | [reg-pod-body](reg-pod-body.md) ↔ glasses | mounting | `blade.py` dovetail + snap tab, centred on pod.py −2.0 (body −2.45) | §1.2.1 |
@@ -166,7 +166,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 ```
 
 ## Open issues (IDs stable; gaps = closed)
-1. (closed in Phase 2) Mic port unsealed: sealed D1.0 duct (O24); 1b board port vs lid bore: nominal 0.000, gauge pin worst 0.115 (dims_r2.duct_offsets, 2026-10-07). Residual: R-ACO-P6 keep-out broken by an F track (reg-pod-body issue 19).
+1. (closed in Phase 2) Mic port unsealed: sealed D1.0 duct (O24); 1b board port vs lid bore: nominal 0.000, gauge pin worst 0.115 (dims_r2.duct_offsets, 2026-10-07). R-ACO-P6 keep-out holds since 2026-10-07 (reg-pod-body issue 19 closed).
 2. **Heel wire exit vs the cell.** Exit x 65.25-66.25 vs cell end 65.6 (unchanged in Phase 2); heel.py's exit check still uses frame.py's old cell. Close: re-run against dims_r2 CELL or move the exit; dry-fit the pouch.
 3. **Dock wire route not designed.** 5 wires from the belly to the B pads at board x 25-29: 0.8 under the cell beside the flat tails (0.85 tail-to-cell) or the rear gap; OD ≤ 0.6 needed under the cell (notes/shell_r2.md).
 4. **`frame.py` / `pod.py` stale** (8 of 10 facts, ECR-0001; rail/adapter 0.45 off the body centre).
@@ -180,7 +180,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 12. (closed in Phase 2) Foam strips: none.
 13. **Seam:** 0.2 × 0.3 tub-only rebate (may fuse), belly step unmarked, butt joints at corners (reg-pod-body issues 12, 13).
 14. **Service** costs one seam cut per cell or arm swap; a board swap or SWD also destroys the board bond (Service table).
-15. **Wire stowage fill** is volume-checked (277 vs 107-142 mm³) but not routed: 12 loops, wires enter the 1.4 B gap to reach pads at board x 25-29 (up to 4.9 mm in front of the board's rear edge, J4 at board x 25.1). Close: a wire-route sketch with gauges (sub-dock-usb, sub-power).
+15. **Wire stowage fill** is volume-checked (277 vs 107-142 mm³) but not routed: 12 loops, wires enter the 1.4 B gap to reach pads at board x 25-29 (up to 4.9 mm in front of the board's rear edge, J3 at board x 25.1). Close: a wire-route sketch with gauges (sub-dock-usb, sub-power).
 16. (closed in Phase 2) USB-C fallback: keep-out not carried into shell_r2 (R-DOCK-BODY).
 17. **Three frame sources** (`frame.py`, `dims_r2.py`, `pod.py`/`blade.py`): see issue 4.
 18. **Phase-2 tolerances unverified [A]** (JLC outline ±0.2 / NPTH ±0.05, VHB thickness, resin ±0.05, KMT022 height); `docs/build/tolerances.md` is Rev-1 only.

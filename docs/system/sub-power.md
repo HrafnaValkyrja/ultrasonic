@@ -58,7 +58,7 @@ U4: {part: "TI TPS7A2030PDQNR 300 mA ultra-low-noise 3.0 V LDO, X2SON-4 1 x 1 mm
 RT1: {part: "Murata NCP03XH103F05RL 10 kΩ B3435 NTC 0201 (same XH family/B as the Rev G NCP15XH103)", lcsc: "C98098 · Extended · stock 175,122 · $0.0166 (bom.md, 2026-10-07T11:31Z)", xy: "(17.4, 2.7)", note: "fitted by default; measures BOARD temperature 1.8 mm (centres) from U3, not the cell (PWR-I4)"}
 J9: {part: "1.0 mm wire pad (TS)", xy: "(28.9, 3.3)", note: "optional NTC taped to the cell, other lead to GND; if used RT1 is not fitted"}
 J5: {part: "1.0 mm wire pad, VBAT (cell +)", xy: "(28.9, 1.1)"}
-J4: {part: "1.0 x 2.0 mm wire pad pod:WirePad_1.0x2.0mm, GND = dock GND + cell -", xy: "(25.1, 1.7), long axis along y", note: "Phase 2: J4 no longer sits between J3 DOCK_VBUS and J5 VBAT; J3-J5 are direct neighbours at 1.17 mm (PWR-I17)"}
+J4: {part: "1.0 x 2.0 mm wire pad pod:WirePad_1.0x2.0mm, GND = dock GND + cell -", xy: "(27.0, 1.9), long axis along y", note: "between J3 DOCK_VBUS (25.1, 1.7) and J5 VBAT (ASM-09, restored 2026-10-07 20bd842; J3-J5 2.85 mm; J4-J5 0.90 = cell short if bridged, PCM-limited)"}
 R20: {part: "0 Ω 0402 link LDO_OUT -> +3V0 (kept 0402 as a hand hook, gen.py MZ2 comment)", lcsc: C17168 · Basic, xy: "(23.0, 11.0)", note: "test hook (O9/O15); carries every +3V0 mA, bridge peaks included (PWR-I6)"}
 R8_R9_C19: {part: "1 MΩ / 1 MΩ divider 0201 + 100 nF 0201", lcsc: "C473482 (R8/R9), C76934 (C19)", xy: "R9 (15.4, 1.0), R8 (15.4, 1.85), C19 (15.4, 2.7)", note: "VBAT/2 -> PA4; always connected, 2.1 µA at 4.2 V"}
 R15_R16: {part: "10 kΩ 0201 pull-ups to +3V0 on I2C_SCL / I2C_SDA", lcsc: C473048, xy: "R15 (17.4, 1.0), R16 (17.4, 1.85)", src: "TI asks 10 kΩ on SCL/SDA (SLUSE99C Table 6-1)"}
@@ -105,10 +105,10 @@ D4: {part: "Nexperia PMEG3005EL 30 V 0.5 A Schottky, SOD-882 (DFN1006-2), DOCK_V
   charger: {U3: "(19.2, 2.6) r90; balls column x 19.0 = /INT SCL SDA TS, x 19.4 = IN SYS BAT GND (y 3.2 -> 2.0)", C15: "(20.9, 3.4) east of A2 IN", C16: "(20.9, 2.3) east of C2 BAT", C21: "(20.2, 0.9) VSYS", RT1: "(17.4, 2.7)", R15_R16: "(17.4, 1.0 / 1.85)", R12_R13: "(17.4, 4.4 / 3.55)", R8_R9_C19: "x 15.4, y 1.85 / 1.0 / 2.7"}
   ldo: {U4: "(23.0, 8.0)", C17: "(23.0, 9.6)", C18: "(23.0, 6.5)", R20: "(23.0, 11.0)"}
   dock_side: {D4: "(22.9, 1.0)", D5: "(25.0, 3.5)", R14: "(25.0, 8.3)"}
-  pads_B: {J3: "(27.0, 2.15) DOCK_VBUS", J4: "(25.1, 1.7) 1.0 x 2.0 GND", J5: "(28.9, 1.1) VBAT", J9: "(28.9, 3.3) TS"}
+  pads_B: {J3: "(25.1, 1.7) DOCK_VBUS", J4: "(27.0, 1.9) 1.0 x 2.0 GND", J5: "(28.9, 1.1) VBAT", J9: "(28.9, 3.3) TS"}
   pads_F: {TP4: "(3.1, 11.3) +3V0", TP6: "(24.0, 10.9) VSYS"}
   rule: "U3 0.4 mm DSBGA: no track between balls, every ball escapes outward (reg-board)"
-  routing: "all power nets routed; DRC 0, 0 unconnected (ECR-0018 log 2026-10-07); wire-pad copper gaps >= 0.90 mm (MZD-10 >= 0.8 holds) but J3-J5 adjacency is new (PWR-I17)"
+  routing: "all power nets routed; DRC 0, 0 unconnected (ECR-0018 log 2026-10-07); wire-pad copper gaps >= 0.90 mm (MZD-10 >= 0.8 holds); J4 GND between J3 and J5 (ASM-09, PWR-I17 closed 2026-10-07)"
 - to: reg-pod-body / physical   # relation R-PWR-BODY
   envelope: "cell x 30.6-65.6, y 5.4-10.7, z -8.1..3.9 (dims_r2.CELL, pod mm), on 0.25 VHB in a 0.3 gap on the inner wall; board B face 1.4 mm above it (dims_r2 B_GAP, Y_B 12.1)"
   notes: ["the board hangs from the lid on VHB: no foam strips, nothing presses on the cell (reg-pod-body)",
@@ -227,7 +227,7 @@ PWR-I12: {what: "R23 thermal placement: U3 (~0.3 W at start of CC) on the B face
 PWR-I13: {what: "ILIM vs dock cable: CC-less USB-A cable on an unenumerated PC port = 100 mA (USB 2.0); Rev F has no CC sense", closes: "firmware holds ILIM 100 mA until enumeration (register plan; sub-dock-usb issue 9; FI-11)"}
 PWR-I14: {what: "C21 (VSYS) is a 10 V part; TI recommends 25 V on SYS (SLUSE99C 9.2.2.1); derated value must stay > 1 µF", status: "still 10 V in MZ-2 (bom_jlc_mz2.csv C21 = C19702, 2026-10-07; only C15 moved to 25 V); ECR-0013 S3 text names C17 too, but C17 is already 25 V (sourcing-lock.csv C52923)", closes: "DC-bias check of C19702 at 4.5 V (Samsung curves, layout-noise UN-7) or 16/25 V Basic swap"}
 PWR-I15: {what: "Off-mode current hazards: PB3/PB4 mic back-feed ~60 µA (ECR-0013 F5); watchdog-on Iq untabulated (audit row e)", closes: "firmware Off sequence + bench Off-current measurement"}
-PWR-I17: {what: "J3 DOCK_VBUS and J5 VBAT are direct neighbours (copper gap 1.17 mm, routed board 2026-10-07): a bridge puts dock 5 V straight on the cell, bypassing U3 CC/CV (PCM over-charge cut-off is the only limit). Rev F kept J4 GND between them (ASM-09); MZD-10 checks gaps >= 0.8 mm, not this pairing. Other dock-side pairs: J3-J4 0.90 (dock 5 V to GND), J3-J12 1.20", closes: "swap pads so J4 (or a harmless net) separates J3 and J5 (layout item, owner review O25), or accept with a bring-up meter check (sub-debug-test step 1)"}
+PWR-I17: {status: "CLOSED 2026-10-07 (20bd842): J3/J4 swapped; J3 (25.1, 1.7), J4 (27.0, 1.9) between J3 and J5; J3-J5 2.85 mm, J3-J4 0.90, J4-J5 0.90; place_r2 check NOT_NEIGHBOURS J3-J5 >= 2.0", what: "(was) J3 DOCK_VBUS and J5 VBAT are direct neighbours (copper gap 1.17 mm, routed board 2026-10-07): a bridge puts dock 5 V straight on the cell, bypassing U3 CC/CV (PCM over-charge cut-off is the only limit). Rev F kept J4 GND between them (ASM-09); MZD-10 checks gaps >= 0.8 mm, not this pairing. Other dock-side pairs: J3-J4 0.90 (dock 5 V to GND), J3-J12 1.20", closes: "swap pads so J4 (or a harmless net) separates J3 and J5 (layout item, owner review O25), or accept with a bring-up meter check (sub-debug-test step 1)"}
 ```
 
 ## Before you change this, check
@@ -239,7 +239,7 @@ CHG_INT: [firmware enables the PA15 internal pull-up, PB5 stays tied to GND]
 U3_cluster_moves (reg-board): [0.4 mm ball escape, RT1 distance to U3 (PWR-I4), C15 beside A2 / C16 beside C2, I2C_SCL already routes through In2 (ECR-0018 log 2026-10-07)]
 VBAT_SENSE: "PA4 < VDDA (VBATREG max 4.65 V -> 2.33 V OK)"
 VSYS_loads: [LED brightens docked (sub-ui), U4 input <= 6 V]
-cell_envelope_or_pads: [reg-pod-body, physical, B_GAP 1.4 vs B part heights, dock target under the cell (sub-dock-usb), J3-J5 adjacency (PWR-I17), wire-pad gaps >= 0.8 mm (MZD-10)]
+cell_envelope_or_pads: [reg-pod-body, physical, B_GAP 1.4 vs B part heights, dock target under the cell (sub-dock-usb), J3-J5 kept apart by J4 (ASM-09, PWR-I17 closed), wire-pad gaps >= 0.8 mm (MZD-10)]
 always: "walk the change through integration-map.md §10 and python3 tools/plm.py impact SUB-POWER"
 ```
 
