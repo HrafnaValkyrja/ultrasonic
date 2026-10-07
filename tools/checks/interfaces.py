@@ -334,7 +334,8 @@ def read_dims(path):
     if missing:
         raise ValueError(f"{Path(path).name}: interface_facts() lacks {', '.join(missing)}")
     do = mod.duct_offsets()
-    sh.update(name=Path(path).name, design="phase2", env=dict(sh), clamp_band=None,
+    sh.update(name=Path(path).name, design=(DESIGN.id if DESIGN and not DESIGN.is_reference else "phase2"),   # dims module = phase2 or a variant (k1)
+                env=dict(sh), clamp_band=None,
               cavity_clearance=do["tolerances"]["outline_to_hole"], cavity_clearance_src=f"{Path(path).name}:duct_offsets outline_to_hole (walls never fight the gauge pin)",
               locating=dict(method="stepped gauge pin through the reamed bore into the board hole while bonding", worst=do["worst_with_gauge_pin"],
                             limit=do["limit_R_ACO_P5"], ok=bool(do["worst_with_gauge_pin_pass"]), src=f"{Path(path).name}:duct_offsets ([A] tolerances)"))

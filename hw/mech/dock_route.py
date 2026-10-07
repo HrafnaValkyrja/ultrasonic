@@ -24,10 +24,10 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
-import dims_r2 as D  # noqa: E402
+import dims as D  # noqa: E402  (selected design: dims_r2 | dims_k1)
 
 PCB, CELL, CAV = D.PCB, D.CELL, D.CAV
-EDGE_Y = 11.55
+EDGE_Y = PCB["y0"] - 0.55              # phase2 11.55 (B face 12.1); relative since 2026-10-07 (K1 variant)
 DOCK_PADS = {"J3": ("DOCK_VBUS", 25.1, 1.7, 0.249), "J4": ("GND", 27.0, 1.9, 0.249), "J12": ("CC", 27.0, 4.35, 0.160),
              "J10": ("USB_DP", 28.9, 5.5, 0.160), "J11": ("USB_DN", 27.0, 6.55, 0.160)}      # placement.yaml 2026-10-07
 ARM_PADS = {"J1": 9.9, "J7": 7.7, "J2": 10.95, "J8": 8.75}                                   # placement.yaml 2026-10-07 (info only; routes come from heel.wire_route)
@@ -36,9 +36,12 @@ BUNDLE_D, ARM_WIRE_OD = 0.51, 0.21
 CH_EXIT = np.array([66.20, 5.15, -5.50])
 X_DOCK_GAP = 65.85                    # dock ribbon in the rear gap, cell side (cell rear face 65.6)
 X_ARM_GAP = 66.40                     # arm bundle against the rear wall (heel.py)
-TAIL = np.array([52.9, 9.15, -8.5])   # [A] tails end, 5-pin row centre
-Y_HI = 12.55                          # ribbon level in the stowage behind the board (cell top 10.7, lid inner 13.2)
-X_UP = 64.6                           # first wire's climb line (x), behind the board's rear edge 60.55
+TAIL = np.array([round(D.DOCK["x1"] + 0.2, 3), 9.15, -8.5])   # [A] tails end, 5-pin row centre (phase2 52.9)
+Y_HI = PCB["y0"] + 0.45               # ribbon level in the stowage behind the board (phase2 12.55: cell top 10.7, lid inner 13.2)
+S_BEHIND = min(1.0, (X_DOCK_GAP - PCB["x1"]) / 5.3)   # 1 in phase2; a shorter pod (K1) compresses the climb zone
+X_UP = PCB["x1"] + max(4.05 * S_BEHIND, 1.5)   # first wire's climb line (x), behind the board's rear edge (phase2 64.6 vs 60.55);
+# K1: 5 wires at the fixed 0.3 pitch need 1.2 + edge clearance -> x1 + 1.5 (over the cell's rear edge, above the cell top)
+SUFFIX = "" if D.DESIGN.id in ("phase2", "revg") else f"_{D.DESIGN.id}"   # NON-DEFAULT variants write their own outputs
 
 
 def pz(by, pod):
@@ -148,7 +151,7 @@ def main():
                         arm_pads_z=[round(pz(by, pod), 2) for by in ARM_PADS.values()])
         curves[(pod, "bundle")] = bundle
     (HERE / "out").mkdir(exist_ok=True)
-    (HERE / "out" / "dock_route.json").write_text(json.dumps(res, indent=1))
+    (HERE / "out" / f"dock_route{SUFFIX}.json").write_text(json.dumps(res, indent=1))
     print(json.dumps(res, indent=1))
     try:
         sys.path.insert(0, str(ROOT / "tools"))
@@ -178,7 +181,7 @@ def main():
         fig.tight_layout()
         od = ROOT / "sim/out/mech"
         od.mkdir(parents=True, exist_ok=True)
-        fig.savefig(od / "dock_route.png", dpi=130)
+        fig.savefig(od / f"dock_route{SUFFIX}.png", dpi=130)
     except Exception as e:  # noqa: BLE001
         print("plot skipped:", e)
 

@@ -121,6 +121,16 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
 - {path: test, design: none, state: TBD}
 ```
 
+## Variants (NON-DEFAULT; default design stays phase2)
+K1 for packet Q1 (owner decision open), built 2026-10-07. Select it with `ULTRASONIC_DESIGN=k1|k1p`, using the blocks in `hw/current.yaml`. Dimensions are in `hw/mech/dims_k1.py`: dims_r2 with only the cell (ICP401230UPR 4.5 x 12.7 x 31 max) and the lid stack overridden. `hw/mech/dims.py` selects the dims for every consumer. The rear stays fixed to the frame (heel E, rail, strut relief at X1 67.5), so the shorter cell moves the front back (X0 33.5, behind the vision limit). Compare in `docs/diagrams/k1-vs-phase2.png`; numbers are in `sim/out/mech/k1_compare.json` (`hw/mech/k1_compare.py`).
+```yaml
+phase2: {T: 10.4, H: 14.5, L: 38.0, env_mm3: 6211, worn_g: [11.2, 13.2], duct_peak: "61 kHz +18.4 dB, R14 PASS", stowage_mm3: 277}
+k1:  {lid: "1.0, no plate", T: 9.1, H: 15.2, L: 34.0, env_mm3: 5216 (-16 %), worn_g: [10.1, 12.0], duct_peak: "78.7 kHz +21.1 dB, R14 FAIL (mic bore under the mesh 0.7 -> 0.2)", puck_bore: "0.65 -> 0.15 (puck guidance)", stowage_mm3: 144 (need 107-142)}
+k1p: {lid: "0.8 + plate 0.7", T: 9.6, H: 15.2, L: 34.0, env_mm3: 5410 (-13 %), worn_g: [10.3, 12.3], duct: "= phase2", stowage_mm3: 144}
+both: "0 clashes, printable (1 solid each), interfaces.py 7 PASS / 4 WARN (= phase2), heel 2 known flags (= phase2), arm wires pass 0.3 both pods but fan bends R1.0 -> R0.5 (strand strain 3.1 -> 5.0 %), dock ribbon clearances = phase2"
+k1_thin_size_model: "synthesis T 8.5 needs walls 0.6 + lid 0.6 as well (size model T 8.5, H 14.8, L 33.6, 4754 mm3); not built (0.6 walls need a coupon, lid 0.6 < HEX_DEPTH 0.8)"
+```
+
 ## Open issues (IDs stable; gaps = closed)
 1. (closed in Phase 2) Spine top floating: unioned into the lid, lid prints as 1 valid solid (checks.json printable, 2026-10-07).
 2. (closed in Phase 2) Board x location: x-stop 0.25 + gauge pin + VHB bond (checks.json duct with_gauge_pin PASS).

@@ -42,7 +42,15 @@ sys.path.insert(0, str(HERE))
 import frame as F  # noqa: E402
 import blade  # noqa: E402  (prism helpers, adapter(), shell())
 
-OUT = HERE / "out" / "parts" / "heel"
+def _out_dir():
+    """Phase 2 (default): out/parts/heel; a NON-DEFAULT variant (ULTRASONIC_DESIGN=k1/k1p): out/parts/heel_<id>."""
+    sys.path.insert(0, str(HERE.parents[1] / "tools"))
+    from current import current
+    d = current().id
+    return HERE / "out" / "parts" / ("heel" if d in ("phase2", "revg") else f"heel_{d}")
+
+
+OUT = _out_dir()
 
 # ----------------------------------------------------------------------------- local frame at the mouth E
 E = F.E.astype(float)
@@ -352,8 +360,15 @@ def channel_cut(path=None, r=CH_D / 2, neck=True):
 # ----------------------------------------------------------------------------- wires in the cavity (rear gap -> stowage -> pads)
 WIRE_OD, BUNDLE_D = 0.21, 0.51       # 7/44 served litz; 4 of them as a loose round bundle (reg-arm Conductors)
 ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN = 2.0, 1.0, 1.0   # centreline bend radii (static; see notes/heel.md wire_route)
-FAN = np.array([62.3, 11.60, 0.80])  # bundle ends, the 4 wires fan out (behind the board's rear edge x 60.55)
-EDGE_Y = 11.55                       # each wire passes under the board's rear edge at this y (B face 12.1)
+R_MIN_K = 0.5                        # K1 compression floor (strand strain 0.05 / (2 R) = 5 % at 0.5: flagged in route_checks)
+# Route anchors are RELATIVE to the board's rear edge (x1) and B face (y0) since 2026-10-07 (K1 variant): Phase 2 values
+# unchanged (x1 60.55, y0 12.1). A shorter pod (K1: x1 64.55) compresses the fan-out between the board edge and the rear
+# gap (x 66.40) by S_BEHIND = room / 5.85 and the fan bend radii with it (not below R_MIN_K).
+_X1, _YB = F.PCB["x1"], F.PCB["y0"]
+S_BEHIND = min(1.0, (66.40 - _X1) / 5.85)
+FAN = np.array([_X1 + 1.75 * S_BEHIND, _YB - 0.50, 0.80])  # bundle ends, the 4 wires fan out (phase2: 62.3, behind x1 60.55)
+EDGE_Y = _YB - 0.55                  # each wire passes under the board's rear edge at this y (phase2 11.55, B face 12.1)
+X_TURN, X_MID = _X1 + 3.45 * S_BEHIND, _X1 + 0.85 * S_BEHIND     # phase2 64.0 / 61.4
 
 
 def _pads(pod="right"):
@@ -397,7 +412,12 @@ def _fillet_poly(wps, R):
     return pts
 
 
-FAN_LEFT = np.array([62.3, 11.60, -5.25])   # left pod: arm pads sit low (z -7.4..-4.15), the bundle stays at the exit height
+FAN_LEFT = np.array([FAN[0], FAN[1], -5.25])   # left pod: arm pads sit low (z -7.4..-4.15), the bundle stays at the exit height
+
+
+def _rk(r):
+    """Bend radius in the fan-out zone: Phase 2 as drawn; compressed with S_BEHIND for a shorter pod (K1), floor R_MIN_K."""
+    return r if S_BEHIND >= 1.0 else max(R_MIN_K, r * S_BEHIND)
 
 
 def wire_route(pod="right"):
@@ -408,21 +428,21 @@ def wire_route(pod="right"):
     if pod == "right":
         fan = FAN
         bundle = _fillet_poly([np.array([CH_EXIT[0], F.CAV["y0"], CH_EXIT[2]]), np.array([66.40, 6.30, CH_EXIT[2]]),
-                               np.array([66.40, 11.55, 0.80]), np.array([64.0, 11.60, 0.80]), FAN],
-                              [ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN])
+                               np.array([66.40, EDGE_Y, 0.80]), np.array([X_TURN, FAN[1], 0.80]), FAN],
+                              [ROUTE_R_GAP, _rk(ROUTE_R_TOP), _rk(ROUTE_R_FAN)])
     else:   # left pod (2026-10-07, ARM-LEFT): straight up the wall side of the rear gap at the exit height, then forward
         fan = FAN_LEFT
         bundle = _fillet_poly([np.array([CH_EXIT[0], F.CAV["y0"], CH_EXIT[2]]), np.array([66.40, 6.30, CH_EXIT[2]]),
-                               np.array([66.40, 11.55, CH_EXIT[2]]), np.array([64.0, 11.60, FAN_LEFT[2]]), FAN_LEFT],
-                              [ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN])
+                               np.array([66.40, EDGE_Y, CH_EXIT[2]]), np.array([X_TURN, FAN[1], FAN_LEFT[2]]), FAN_LEFT],
+                              [ROUTE_R_GAP, _rk(ROUTE_R_TOP), _rk(ROUTE_R_FAN)])
     wires = {}
     for ref, p in _pads(pod).items():
         pad = p["pod"]
         z = pad[2]
         # pass the neighbouring pad column at the pad's own height: J2 above J1, J8 between J1 and J7
-        wps = [fan, np.array([61.4, 11.58, (fan[2] + z) / 2]), np.array([F.PCB["x1"], EDGE_Y, z]),
+        wps = [fan, np.array([X_MID, _YB - 0.52, (fan[2] + z) / 2]), np.array([F.PCB["x1"], EDGE_Y, z]),
                np.array([pad[0] + 0.5, y_pad, z]), np.array([pad[0], y_pad, z])]
-        wires[ref] = dict(net=p["net"], pts=_fillet_poly(wps, [ROUTE_R_FAN, ROUTE_R_FAN, 0.5]), pad=pad)
+        wires[ref] = dict(net=p["net"], pts=_fillet_poly(wps, [_rk(ROUTE_R_FAN), _rk(ROUTE_R_FAN), 0.5]), pad=pad)
     return bundle, wires
 
 
@@ -461,8 +481,8 @@ def route_checks(pod="right"):
                      "to_rear_seam": round(min(seam(p) for p in bp) - rb, 3),
                      "to_rear_wall": round(min(cav["x1"] - p[0] for p in bp) - rb, 3),
                      "to_cavity_top": round(min(cav["z1"] - p[2] for p in bp) - rb, 3),
-                     "bend_radii": [ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN],
-                     "strand_bend_strain_pct": round(100 * 0.05 / (2 * min(ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN, 0.8)), 2)}
+                     "bend_radii": [ROUTE_R_GAP, _rk(ROUTE_R_TOP), _rk(ROUTE_R_FAN)], "fan_room_behind_board": round(66.40 - _X1, 2),
+                     "strand_bend_strain_pct": round(100 * 0.05 / (2 * min(ROUTE_R_GAP, _rk(ROUTE_R_TOP), _rk(ROUTE_R_FAN), 0.8)), 2)}
     pads = _pads(pod)
     wres = {}
     for ref, w in wires.items():

@@ -32,7 +32,7 @@ from skfem.helpers import dd, ddot, eye, trace
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "hw/mech"))
-import dims_r2 as D  # noqa: E402
+import dims as D  # noqa: E402  (selected design: dims_r2 | dims_k1)
 
 BW, BH, T = 30.0, 12.0, D.PCB_T if hasattr(D, "PCB_T") else 0.8
 E_PCB, NU = 20e3, 0.15            # N/mm2

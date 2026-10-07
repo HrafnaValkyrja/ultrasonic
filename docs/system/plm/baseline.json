@@ -189,9 +189,9 @@
    }
   },
   "R-AUDIO-BODY": {
-   "by": "backlog-agent",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 8 router batch (ECR-0018 log): R23 1M I_SENSE offset (OUT-1B), TP2/TP4 swap (DBG-2), mic NPTH D0.65 at (1.90, 6.0) Port0.65 footprint (SAI-15D), local re-route of BTN/I_SENSE/SWCLK; DK-17D (R24/PA9) not routable locally, backed out (reg-board 22). DRC 0/0/0 all severities, place_r2 check PASS, noise smoke PASS (M03 1.32 %), acoustics MC60 mean +5.93 dB / R14 all-pass 0.63, interfaces/bom_check no FAIL, shell_r2 valid",
+   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
    "stamp": {
     "file:hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod": "fd075bbf72c0acf7",
     "grep:hw/pod/gen.py::Knowles_LGA-5": "73caaeee4d912b22",
@@ -200,7 +200,7 @@
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
     "sym:hw/mech/dims_r2.py::board_mic": "77fd09bdb9b1c0b8",
     "sym:hw/mech/dims_r2.py::duct_offsets": "30a50ae64b7249cf",
-    "sym:hw/mech/shell_r2.py::lid_base": "856ca309404e120b",
+    "sym:hw/mech/shell_r2.py::lid_base": "6b2515fec8f3bc33",
     "yaml:hw/pod/draft_r2/placement.yaml::U2": "dcd1bfdae196d15e"
    }
   },
@@ -217,11 +217,11 @@
    }
   },
   "R-BOARD-ARM": {
-   "by": "backlog-agent",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it",
+   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
    "stamp": {
-    "sym:hw/mech/dims_r2.py::CELL": "77243a4be17c6775",
+    "sym:hw/mech/dims_r2.py::CELL": "03fd244d058457f0",
     "sym:hw/mech/dims_r2.py::PAD_ZONE": "729ca0d2e54ea911",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
     "sym:hw/mech/heel.py::CH_EXIT": "80b98145b1a497a8",
@@ -232,16 +232,16 @@
    }
   },
   "R-BOARD-BODY": {
-   "by": "backlog-agent",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 8 router batch (ECR-0018 log): R23 1M I_SENSE offset (OUT-1B), TP2/TP4 swap (DBG-2), mic NPTH D0.65 at (1.90, 6.0) Port0.65 footprint (SAI-15D), local re-route of BTN/I_SENSE/SWCLK; DK-17D (R24/PA9) not routable locally, backed out (reg-board 22). DRC 0/0/0 all severities, place_r2 check PASS, noise smoke PASS (M03 1.32 %), acoustics MC60 mean +5.93 dB / R14 all-pass 0.63, interfaces/bom_check no FAIL, shell_r2 valid",
+   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
    "stamp": {
-    "sym:hw/mech/dims_r2.py::B_GAP": "9e0415c00f9dc49a",
+    "sym:hw/mech/dims_r2.py::B_GAP": "1e9c268f1cee6301",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
     "sym:hw/mech/dims_r2.py::POCKET": "75123b323bc1f0df",
     "sym:hw/mech/dims_r2.py::VHB_T": "64d2b9d2ed88b422",
     "sym:hw/mech/dims_r2.py::X_STOP_GAP": "bf5c979b74f48fe8",
-    "sym:hw/mech/shell_r2.py::lid_base": "856ca309404e120b",
+    "sym:hw/mech/shell_r2.py::lid_base": "6b2515fec8f3bc33",
     "sym:hw/mech/shell_r2.py::vhb": "aea744df4a11fad9",
     "yaml:hw/pod/draft_r2/placement.yaml::TP1": "8a363c7933bedfb6",
     "yaml:hw/pod/draft_r2/placement.yaml::TP2": "9634ad1c945b1616",
@@ -252,14 +252,14 @@
    }
   },
   "R-BODY-ARM": {
-   "by": "backlog-agent",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it",
+   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
    "stamp": {
     "sym:hw/mech/frame.py::E": "e41a5d539abd8437",
     "sym:hw/mech/heel.py::heel_add": "f10d6b9f6e8fecbf",
     "sym:hw/mech/heel.py::heel_cut": "438d7b8d3da63352",
-    "sym:hw/mech/shell_r2.py::tub": "7c44fecec9f2e5e2"
+    "sym:hw/mech/shell_r2.py::tub": "7f3d2ef68fbc2f95"
    }
   },
   "R-CLOCK-BOARD": {
@@ -322,13 +322,13 @@
    }
   },
   "R-DOCK-BODY": {
-   "by": "backlog-agent",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "RPB-14/DBG-17: lid-lift wire slack computed (dock_route.py lid_open_extra_mm; arm from heel); stale mass + interface rows refreshed",
+   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
    "stamp": {
     "sym:hw/mech/dims_r2.py::BAY": "d933f8dc8c3634dd",
-    "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9",
-    "sym:hw/mech/shell_r2.py::tub": "7c44fecec9f2e5e2"
+    "sym:hw/mech/dims_r2.py::DOCK": "9f3e8ca2743ae3a7",
+    "sym:hw/mech/shell_r2.py::tub": "7f3d2ef68fbc2f95"
    }
   },
   "R-OUT-ARM": {
@@ -376,11 +376,11 @@
    }
   },
   "R-PHYS-FRAME": {
-   "by": "claude-ecr0001",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "ECR-0001: frame.py pod names now from dims_r2 via pod_facts(); interfaces frame PASS 10/10 (phase2 and revg); pod.POD_ZC -2.45 so blade rail/adapter default = body centre; shell_r1 pins -2.0; CAD diff: shell_r2/shell_r1 identical",
+   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
    "stamp": {
-    "sym:hw/mech/dims_r2.py::CELL": "77243a4be17c6775",
+    "sym:hw/mech/dims_r2.py::CELL": "03fd244d058457f0",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
     "sym:hw/mech/frame.py::POD_NAMES": "3389037a1ca45bed",
     "sym:hw/mech/frame.py::pod_facts": "f6b16a293e6b5a79",
@@ -459,12 +459,12 @@
    }
   },
   "R-PWR-BODY": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/mech/shell_r1.py (reference) to hw/mech/dims_r2.py (CAD-free constants, values identical to shell_r2 before the split) + shell_r2.py solids; checked with interfaces.py on the routed board: mic-port PASS 0.000 mm (gauge pin 0.115 <= 0.20), switch WARN stack 0.20 vs 0.15, outline PASS, heights PASS (B 1.4, F 0.30, SW1 pocket 0.90), clamp-bands WARN (VHB 31 % bonded, open), frame WARN ECR-0001; USB-C keep-out not in shell_r2",
+   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
    "stamp": {
-    "sym:hw/mech/dims_r2.py::B_GAP": "9e0415c00f9dc49a",
-    "sym:hw/mech/dims_r2.py::CELL": "77243a4be17c6775",
+    "sym:hw/mech/dims_r2.py::B_GAP": "1e9c268f1cee6301",
+    "sym:hw/mech/dims_r2.py::CELL": "03fd244d058457f0",
     "sym:hw/mech/shell_r2.py::placeholders": "21b6f62d7f29b304"
    }
   },

@@ -37,7 +37,7 @@ RAIL_H, RAIL_W0, RAIL_W1 = 1.0, 5.0, 6.4   # dovetail: height, width at the pod 
 RAIL_X = (36.0, 62.0)               # rail runs along x on the pod's inner face
 FIT = 0.15                          # sliding clearance per side (MJF/resin; FDM wants ~0.25)
 
-X0, X1 = pod.VISION_X, pod.VISION_X + pod.POD_L
+X0, X1 = pod.F.X0, pod.F.X1         # the selected design body (phase2: VISION_X 29.5 .. 67.5; K1 starts behind the limit)
 ZC = pod.POD_ZC
 Z0, Z1 = ZC - pod.POD_H / 2, ZC + pod.POD_H / 2
 Y_IN = pod.TEMPLE_T + ADAPT_T       # pod inner face (4.3)
@@ -73,7 +73,7 @@ def prism_xy(pts, z0, z1):
 
 
 LATCH_Z = (-8.9, -8.0)              # tooth/bump band, below the adapter plate, on the pod's inner face
-BUMP_X = (31.4, 32.9)               # ramp faces the front (adapter slides on front -> rear)
+BUMP_X = (X0 + 1.9, X0 + 3.4)       # ramp faces the front (adapter slides on front -> rear); phase2 31.4-32.9, follows the pod front (K1)
 
 
 def catch_bump():

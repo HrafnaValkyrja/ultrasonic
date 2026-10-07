@@ -40,11 +40,11 @@ import blade  # noqa: E402
 import frame as F  # noqa: E402
 from styles import plate, slot  # noqa: E402
 
-OUT = HERE / "out" / "r2"
 
 # ---------------------------------------------------------------- dimensions: hw/mech/dims_r2.py (CAD-free, 2026-10-07)
-from dims_r2 import *  # noqa: E402,F401,F403  (every upper-case constant, bpt, board_mic, duct_offsets, switch_stack)
-from dims_r2 import _f_pads  # noqa: E402,F401
+from dims import *  # noqa: E402,F401,F403  (selected design's dims: dims_r2 | dims_k1 (ULTRASONIC_DESIGN=k1/k1p); every upper-case constant, bpt, ...)
+from dims import _f_pads, OUT_DIR, DESIGN  # noqa: E402,F401
+OUT = OUT_DIR                          # hw/mech/out/r2 (phase2) | out/k1 | out/k1p
 
 def box(x0, x1, y0, y1, z0, z1):
     return Pos((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2) * Box(x1 - x0, y1 - y0, z1 - z0)
@@ -116,9 +116,20 @@ def tub(heel_mod=None):
     t = t + blade.prism_yz([(CAV["y0"], cz), (CAV["y0"] + 1.0, cz), (CAV["y0"], cz + 1.0)], 62.0, CAV["x1"])
     t = t - blade.prism_yz([(3.9, -12.5), (3.9, -3.65 - 3.9), (-3.65 + 12.5, -12.5)], 62.0, 68.5)
     t = t + (tongue() & outer_body())
-    t = t + (plate(PLATE_PTS, Y_OUT, PLATE_T, 0.3) & tub_region())      # armour plate below the belly step
+    if PLATE_T > 0:
+        t = t + (_plate(Y_OUT, PLATE_T, 0.3) & tub_region())             # armour plate below the belly step
     t = t - slot(TRACE, Y_TOP, 0.7, 0.45)                                 # trace continues across the step
     return t - seam_rebate()
+
+
+def _xmap(x):
+    """Phase-2 plate/trace x -> the selected design (identity for phase2; a shorter cell moves X0 rearward, X1 fixed)."""
+    return X0 + (x - 29.5) * (X1 - X0) / (67.5 - 29.5)
+
+
+def _plate(y0, t, r):
+    """Armour plate, or nothing when the design has none (K1: PLATE_T 0)."""
+    return plate(PLATE_PTS, y0, t, r) if PLATE_T > 0 else None
 
 
 def _zmap(z):
@@ -126,14 +137,15 @@ def _zmap(z):
     return Z_BELLY + (z + 13.2) * (Z1 - Z_BELLY) / (5.5 + 13.2)
 
 
-PLATE_PTS = [(x, _zmap(z)) for x, z in [(31.8, 4.0), (46.0, 4.0), (47.8, 5.0), (66.2, 5.0), (66.2, -8.2), (61.0, -9.3),
+PLATE_PTS = [(_xmap(x), _zmap(z)) for x, z in [(31.8, 4.0), (46.0, 4.0), (47.8, 5.0), (66.2, 5.0), (66.2, -8.2), (61.0, -9.3),
                                          (55.0, -9.3), (53.5, -12.4), (34.5, -12.4), (31.8, -10.0)]]
-TRACE = [(x, _zmap(z)) for x, z in [(36.5, -11.0), (51.0, -11.0), (55.5, -6.0), (63.8, -6.0), (63.8, 2.6)]]
+TRACE = [(_xmap(x), _zmap(z)) for x, z in [(36.5, -11.0), (51.0, -11.0), (55.5, -6.0), (63.8, -6.0), (63.8, 2.6)]]
 
 
 def lid_base():
     l = outer_body() - tub_region()
-    l = l + (plate(PLATE_PTS, Y_OUT, PLATE_T, 0.3) - tub_region())
+    if PLATE_T > 0:
+        l = l + (_plate(Y_OUT, PLATE_T, 0.3) - tub_region())
     l = l - slot(TRACE, Y_TOP, 0.7, 0.45)
     l = l - cavity()
     l = l - tongue(GROOVE_CL)
@@ -244,12 +256,14 @@ def main():
                         ok=free_b + free_c >= 142)
     # 6 envelope vs the size model
     body_v = outer_body().volume
-    plate_v = plate(PLATE_PTS, Y_OUT, PLATE_T, 0.3).volume
+    plate_v = _plate(Y_OUT, PLATE_T, 0.3).volume if PLATE_T > 0 else 0.0
     top_v = top_concept().volume
-    pred = scenario("MZ-2", board_H=12.0, board_L=PCB_L, y_bgap=B_GAP, y_fgap=F_GAP, lid_wall=LID_T, s_fixed=0.8, dock="flat_tails")
+    cell_kw = {} if DESIGN.id == "phase2" else dict(cell_L=CELL_L, cell_T=CELL_T, cell_H=CELL_W, cell_g=CELL_SPEC["g"])
+    pred = scenario(DESIGN.id, board_H=12.0, board_L=PCB_L, y_bgap=B_GAP, y_fgap=F_GAP, lid_wall=LID_T, s_fixed=0.8, dock="flat_tails",
+                    plate=PLATE_T, wall=W, **cell_kw)
     env = body_v + plate_v + top_v
     c["envelope"] = dict(body_mm3=round(body_v, 1), plate_mm3=round(plate_v, 1), top_spine_mm3=round(top_v, 1), total_mm3=round(env, 1),
-                         size_model_live=pred["v_env"], size_model_doc=6259, delta_mm3=round(env - 6259, 1),
+                         size_model_live=pred["v_env"], size_model_doc=6259, design=DESIGN.id, size_model_T=pred["T"], size_model_mass_g=pred["mass_g"], delta_mm3=round(env - 6259, 1),
                          T=round(Y_TOP - Y_IN, 2), L=X1 - X0, H=round(H, 2), belly=round(BELLY_D, 2), model_body=pred["v_body"])
     c["volumes"] = dict(tub=round(t.volume, 1), lid=round(lid.volume, 1), puck=round(pk.volume, 2))
     c["printable"] = {n: dict(solids=len(s.solids()), valid=bool(s.is_valid)) for n, s in (("tub", t), ("lid", lid), ("puck", pk))}
@@ -345,7 +359,7 @@ def section_png(solids, c):
     axes[2].annotate(f"puck {sw['puck_L']} (kit {sw['puck_kit'][0]}-{sw['puck_kit'][-1]}); gap: fixed worst {sw['fixed_worst']}, selective fit {sw['selective_fit']}",
                      xy=(SW[0] - 3.1, 10.0), fontsize=7, color=plotstyle.TEXT, bbox=box_kw)
     e = c["envelope"]
-    fig.suptitle(f"Pod shell r2 (MZ-2): envelope {e['total_mm3']:.0f} mm3 vs size model {e['size_model_doc']} | T {e['T']} | board 30x12 hung from the lid on VHB",
+    fig.suptitle(f"Pod shell r2 [{DESIGN.id}]: envelope {e['total_mm3']:.0f} mm3 vs size model {e['size_model_doc']} | T {e['T']} | board 30x12 hung from the lid on VHB",
                  fontsize=11, color=plotstyle.TEXT)
     fig.tight_layout(rect=(0, 0.03, 1, 1))
     fig.savefig(OUT / "section.png", dpi=160)

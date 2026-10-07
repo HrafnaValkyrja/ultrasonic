@@ -18,12 +18,28 @@ if str(HERE) not in sys.path:
     sys.path.insert(0, str(HERE))
 import frame as F  # noqa: E402
 
+# Variant hook (2026-10-07, K1 for packet Q1): a variant module (hw/mech/dims_k1.py) execs THIS file with a dict
+# _OVERRIDES in its namespace; only the names below can be overridden and every derived value follows. Phase 2: empty.
+_OVR = dict(globals().get("_OVERRIDES") or {})
+_USED = set()
+
+
+def _o(name, default):
+    if name in _OVR:
+        _USED.add(name)
+        return _OVR[name]
+    return default
+
+
 # ---------------------------------------------------------------- stack-up (pod frame, mm; x fwd->rear, y out, z up)
-X0, X1 = 29.5, 67.5                    # L 38.0 = 2 x 0.8 + 0.3 + cell 35 + rear gap 1.1 (size model)
-W = 0.8
+W = _o("W", 0.8)
+CELL_L, CELL_W = _o("CELL_L", 35.0), _o("CELL_W", 12.0)     # Renata ICP501233PA-02 envelope 35 x 12 (x 5.3)
+X1 = 67.5                              # rear face: fixed to the frame (heel E, rail, strut relief); a shorter cell shortens the FRONT
+X0 = X1 - (2 * W + 0.3 + CELL_L + 1.1)  # 29.5: L 38.0 = 2 x 0.8 + 0.3 + cell 35 + rear gap 1.1 (size model)
 Y_IN = F.Y_IN                          # 4.3 inner face on the adapter (frame.py)
 TAPE = 0.3                             # cell VHB gap (0.25 tape)
-CELL_T, B_GAP, PCB_T, F_GAP, LID_T, PLATE_T = 5.3, 1.4, 0.8, 0.30, 0.8, 0.7
+CELL_T, B_GAP, PCB_T, F_GAP = _o("CELL_T", 5.3), 1.4, 0.8, 0.30
+LID_T, PLATE_T = _o("LID_T", 0.8), _o("PLATE_T", 0.7)
 Y_CELL0 = Y_IN + W + TAPE              # 5.4
 Y_CELL1 = Y_CELL0 + CELL_T             # 10.7
 Y_B = Y_CELL1 + B_GAP                  # 12.1 board B face
@@ -34,14 +50,14 @@ Y_TOP = Y_OUT + PLATE_T                # 14.7 armour plate top
 Y_SPLIT = Y_B                          # seam: tub | lid, at the board's B face
 VHB_T = 0.25                           # 3M VHB 4914 nominal (physical.md row 5.1-5.4)
 Z0 = -9.7                              # bottom kept from r1 (heel, strut relief and NiTi clearances unchanged)
-H = 2 * W + 12.0 + 0.8 + 0.1           # 14.5: cell 12 + s_fixed 0.8 under + 0.1 over (size model)
+H = 2 * W + CELL_W + 0.8 + 0.1         # 14.5: cell 12 + s_fixed 0.8 under + 0.1 over (size model)
 Z1 = Z0 + H                            # 4.8
 BELLY_D = 2.8 + 0.85 - (W + 0.8)       # 2.05: target 2.8 + flat tails 0.85 - (wall + slack under the cell)
 Z_BELLY = Z0 - BELLY_D                 # -11.75
 X_BELLY = X0 + 25.5                    # 55.0 (DOCKS['flat_tails'].L)
 CAV = dict(x0=X0 + W, x1=X1 - W, y0=Y_IN + W, y1=Y_LID_IN, z0=Z0 + W, z1=Z1 - W)
 BAY = dict(x0=X0 + W, x1=X_BELLY - W, z0=Z_BELLY + W, z1=CAV["z0"])
-CELL = dict(x0=CAV["x0"] + 0.3, x1=CAV["x0"] + 0.3 + 35.0, y0=Y_CELL0, y1=Y_CELL1, z0=CAV["z0"] + 0.8, z1=CAV["z0"] + 12.8)
+CELL = dict(x0=CAV["x0"] + 0.3, x1=CAV["x0"] + 0.3 + CELL_L, y0=Y_CELL0, y1=Y_CELL1, z0=CAV["z0"] + 0.8, z1=CAV["z0"] + 0.8 + CELL_W)
 
 # ---------------------------------------------------------------- board (hw/pod/draft_r2/placement.yaml)
 PCB_L, PCB_H, PCB_R = 30.0, 12.0, 1.0
@@ -106,7 +122,7 @@ PUCK_STEP = 0.05
 PUCK_KIT = tuple(round(PUCK_L + k * PUCK_STEP, 2) for k in (-2, -1, 0, 1, 2))   # print all 5, measure, fit one
 
 Y_MID = (Y_IN + Y_OUT) / 2
-DOCK = dict(x0=31.5, x1=52.7, y0=Y_MID - 3.43, y1=Y_MID + 3.43, z0=Z_BELLY, z1=Z_BELLY + 2.8)   # YZT0675 21.2 x 6.86 x 2.8
+DOCK = dict(x0=X0 + 2.0, x1=X0 + 23.2, y0=Y_MID - 3.43, y1=Y_MID + 3.43, z0=Z_BELLY, z1=Z_BELLY + 2.8)   # YZT0675 21.2 x 6.86 x 2.8
 TONGUE_W, TONGUE_H, GROOVE_CL, CORNER_KEEP = 0.35, 0.5, 0.05, 1.4
 STEP_H = 0.35                          # belly-step key: its top must stay below the hanging board's lower edge (sweep)
 
@@ -164,3 +180,8 @@ def interface_facts():
                 bands=dict(B=B_GAP, F=F_GAP), pocket=dict(ref="SW1", centre=SW, dx=POCKET["dx"], dz=POCKET["dz"], band=POCKET["top"] - Y_F),
                 vhb=dict(t=VHB_T, inset=0.2, duct_d=DUCT_D, tp_cut_r=TP_PAD_D / 2 + TP_CUT_MARGIN, f_pads=dict(F_PADS)),
                 x_stop_gap=X_STOP_GAP)
+
+
+_unused = set(_OVR) - _USED
+if _unused:
+    raise ValueError(f"dims_r2: unknown override(s) {sorted(_unused)}")

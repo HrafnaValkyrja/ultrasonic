@@ -33,7 +33,7 @@ ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(ROOT / "tools"))
 import blade  # noqa: E402
-import dims_r2 as D  # noqa: E402
+import dims as D  # noqa: E402  (selected design: dims_r2 | dims_k1)
 
 OUT = HERE / "out" / "dummies"
 PNG = ROOT / "docs" / "diagrams" / "size-dummies.png"

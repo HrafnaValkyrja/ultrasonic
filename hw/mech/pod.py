@@ -37,7 +37,8 @@ VISION_X = 29.5                   # pod may not start forward of this (spec §8 
 # Phase 2: 38.0 x 9.7 x 14.5, centre z -2.45 (was the rev-2 sketch's 38 x 10 x 15 at -2.0, still used by build() below).
 POD_L, POD_W, POD_H = F.X1 - F.X0, F.Y_OUT - F.Y_IN, F.Z1 - F.Z0
 POD_ZC = (F.Z0 + F.Z1) / 2        # body centre (Phase 2 = the board/cavity centre line)
-assert abs(F.X0 - VISION_X) < 1e-9, "the pod front moved off the vision limit: re-check blade.py X0"
+# Phase 2 starts exactly at the limit; a shorter variant (K1, 2026-10-07) keeps the rear (heel, rail) and starts BEHIND it.
+assert F.X0 >= VISION_X - 1e-9, "the pod front moved forward of the vision limit (spec s8): re-check blade.py X0"
 
 # ---- rev-2 sketch (2026-09-30, pre-rev-1): build() below is kept as the historical arm-variant study and keeps its own
 # envelope and contents. NOT the current pod (cell, board and body come from frame.pod_facts()).

@@ -559,3 +559,20 @@
 - 2026-10-07 16:52 checkin SUB-POWER by backlog-agent
 - 2026-10-07 17:01 checkout SUB-DEBUG-TEST by claude-backlog: ECR-0010: bring-up plan pointer to docs/build/bringup.md
 - 2026-10-07 17:01 checkin SUB-DEBUG-TEST by claude-backlog
+- 2026-10-07 17:18 checkout REG-POD-BODY by claude-backlog: K1 non-default variant (packet Q1): dims_k1 + selector; facts table
+- 2026-10-07 17:18 checkin REG-POD-BODY by claude-backlog
+- 2026-10-07 17:19 checkout PHYSICAL by claude-backlog: K1 variant hook note (phase2 unchanged)
+- 2026-10-07 17:19 checkout SUB-DOCK-USB by claude-backlog: K1 variant hook note (phase2 unchanged)
+- 2026-10-07 17:19 checkout REG-ARM by claude-backlog: K1 variant hook note (phase2 unchanged)
+- 2026-10-07 17:19 checkout INTEGRATION by claude-backlog: K1 variant hook note (phase2 unchanged)
+- 2026-10-07 17:19 checkin PHYSICAL by claude-backlog
+- 2026-10-07 17:19 checkin SUB-DOCK-USB by claude-backlog
+- 2026-10-07 17:19 checkin REG-ARM by claude-backlog
+- 2026-10-07 17:19 checkin INTEGRATION by claude-backlog
+- 2026-10-07 17:19 review R-AUDIO-BODY by claude-backlog: round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)
+- 2026-10-07 17:19 review R-DOCK-BODY by claude-backlog: round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)
+- 2026-10-07 17:19 review R-PWR-BODY by claude-backlog: round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)
+- 2026-10-07 17:19 review R-BOARD-BODY by claude-backlog: round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)
+- 2026-10-07 17:19 review R-BOARD-ARM by claude-backlog: round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)
+- 2026-10-07 17:19 review R-BODY-ARM by claude-backlog: round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)
+- 2026-10-07 17:19 review R-PHYS-FRAME by claude-backlog: round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)

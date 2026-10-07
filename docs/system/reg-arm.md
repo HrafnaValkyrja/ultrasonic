@@ -4,6 +4,9 @@ Status: CAD rev 1, not built. `heel.py` checks.json and `pad.py` strut from 2026
 · Source of truth: `hw/mech/frame.py` (arm and pad interface), `hw/mech/heel.py`, `hw/mech/pad.py` (strut, pad socket), `sim/checks/niti_arm_real.py`, `sim/checks/niti_preload.py`, `docs/build/tolerances.md` (arm joint)
 · Owner decisions: O7 (NiTi), O7b (20 mm, 30°, wiring A), O11 (printed strut, inward preload), O16(6) (set screws OK), O17 (pinch-free joint wiring), O19 (durable wiring, owner repairs) · ECR-0001 (frame.py constants) implemented 2026-10-07 · Open ECRs: ECR-0006 (printed dummy pair: 2 h wear test + ~1000× joint flex with a dummy litz bundle; R20, R24)
 
+
+> 2026-10-07 (round 10, packet Q1): dims_r2.py / heel.py / dock_route.py / shell_r2.py / blade.py now take a NON-DEFAULT variant (ULTRASONIC_DESIGN=k1|k1p via hw/current.yaml blocks + hw/mech/dims.py). Phase-2 values are byte-identical (74-name dims snapshot; shell, heel, dock_route, board_in_pod, mass and interfaces outputs unchanged apart from new info fields). K1 facts: reg-pod-body.md Variants.
+
 ## Purpose
 - Presses the pad **inward** (into the head, never backward) on the skin just in front of the tragus with **≥ 1 N**, through jaw motion (D1, T5). It is the mechanical half of **F3**.
 - Carries the 4 pad wires: OUT_A, OUT_B (F3), LED_A, LED_K (**F12**). No pinch points (O17).

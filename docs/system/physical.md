@@ -2,6 +2,9 @@
 Rev MZ-2 2026-10-07: body rewritten to the Phase-2 build (`hw/current.yaml`, ECR-0018): one-face 30 × 12 board hung from the lid on per-pad-cut VHB, seam at the board's B face, sealed D1.0 duct + gauge pin, SW1 pocket + puck, B-face rear wire pads + stowage zone; Rev F/G stack moved to the reference section.
 Status: Phase-2 shell `hw/mech/shell_r2.py` / `dims_r2.py` (checks.json all clashes 0, rebuilt for c348661 2026-10-07) + routed board `hw/pod/draft_r2/out/routed.kicad_pcb` (DRC 0, 0 unconnected, 2026-10-07). Not printed, not built; owner review pending (O25). Updated 2026-10-07. · Source of truth: `hw/mech/dims_r2.py` (Phase-2 numbers), `hw/mech/notes/shell_r2.md` (decisions, assembly sequence), `hw/mech/frame.py` (axes, arm, pad, fasteners), `hw/mech/pod.py` + `hw/mech/blade.py` (rail, catch, adapter), `hw/mech/heel.py`, `hw/mech/pad.py`, `hw/pod/draft_r2/placement.yaml` + routed board, `docs/build/tolerances.md` (Rev-1 fits) · Owner decisions: O9, O10, O11, O12(b), O16(5)(6), O17, O19, O24, O25/O26, O27 · ECR-0001 (frame constants) implemented 2026-10-07, awaiting owner review · Open ECRs: ECR-0006 (weighted dummy pair; R20, R24), ECR-0018 (Phase 2)
 
+
+> 2026-10-07 (round 10, packet Q1): dims_r2.py / heel.py / dock_route.py / shell_r2.py / blade.py now take a NON-DEFAULT variant (ULTRASONIC_DESIGN=k1|k1p via hw/current.yaml blocks + hw/mech/dims.py). Phase-2 values are byte-identical (74-name dims snapshot; shell, heel, dock_route, board_in_pod, mass and interfaces outputs unchanged apart from new info fields). K1 facts: reg-pod-body.md Variants.
+
 ## Purpose
 Keeps every region (pod body, board, cell, arm, pad) in one coordinate frame, so a change in one can be checked against the others: what sits where, what touches what, how water gets in, and in what order it all goes together. It carries no F-row of its own; it is the mechanical counterpart of every F-row in [integration-map.md](integration-map.md) §1 and the keep-outs in §7.
 

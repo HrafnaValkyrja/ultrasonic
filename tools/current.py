@@ -31,8 +31,9 @@ def _load(path=POINTER):
     data = yaml.safe_load(Path(path).read_text())
     if not isinstance(data, dict) or "reference" not in data:
         raise ValueError(f"{path}: needs the current design's keys and a `reference` block")
-    top = {k: v for k, v in data.items() if k != "reference"}
-    return top, data["reference"]
+    variants = {k: v for k, v in data.items() if k != "reference" and isinstance(v, dict) and v.get("id")}
+    top = {k: v for k, v in data.items() if k != "reference" and k not in variants}
+    return top, data["reference"], variants
 
 
 def current(design=None, root=None):
@@ -41,14 +42,17 @@ def current(design=None, root=None):
     Also: .rel (repo-relative strings of the path keys), .is_reference (bool), .root.
     Raises ValueError for an unknown design name or a missing key (a broken pointer must fail loudly, never fall back)."""
     root = Path(root or REPO).resolve()
-    top, ref = _load(root / "hw/current.yaml" if (root / "hw/current.yaml").exists() else POINTER)
+    top, ref, variants = _load(root / "hw/current.yaml" if (root / "hw/current.yaml").exists() else POINTER)
     want = (design or os.environ.get(ENV) or "").strip().lower()
     if want in ("", "current", str(top.get("id", "")).lower()):
         block, is_ref = top, False
     elif want in ("reference", "revf", str(ref.get("id", "")).lower()):
         block, is_ref = ref, True
+    elif want in {str(v["id"]).lower() for v in variants.values()}:      # NON-DEFAULT variants (e.g. k1, 2026-10-07)
+        block, is_ref = next(v for v in variants.values() if str(v["id"]).lower() == want), False
     else:
-        raise ValueError(f"{ENV}={want!r}: unknown design (use {top.get('id')!r}/current or {ref.get('id')!r}/reference)")
+        raise ValueError(f"{ENV}={want!r}: unknown design (use {top.get('id')!r}/current, {ref.get('id')!r}/reference"
+                         f" or a variant: {', '.join(str(v['id']) for v in variants.values())})")
     missing = [k for k in PATH_KEYS if not block.get(k)]
     if missing:
         raise ValueError(f"hw/current.yaml ({block.get('id')}): missing {', '.join(missing)}")

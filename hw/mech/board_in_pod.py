@@ -21,9 +21,9 @@ import numpy as np
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
 sys.path.insert(0, str(HERE))
-import dims_r2 as D  # noqa: E402
+import dims as D  # noqa: E402  (selected design: dims_r2 | dims_k1)
 
-OUT = HERE / "out" / "board3d"
+OUT = HERE / "out" / ("board3d" if D.DESIGN.id in ("phase2", "revg") else f"board3d_{D.DESIGN.id}")   # K1 etc.: own folder
 BOARD = ROOT / "hw/pod/draft_r2/out/routed.kicad_pcb"
 CU = 0.045
 
@@ -130,7 +130,7 @@ def main():
         fig.tight_layout()
         od = ROOT / "sim/out/mech"
         od.mkdir(parents=True, exist_ok=True)
-        fig.savefig(od / "board_in_pod.png", dpi=120)
+        fig.savefig(od / ("board_in_pod.png" if OUT.name == "board3d" else f"board_in_pod_{D.DESIGN.id}.png"), dpi=120)
     except Exception as e:  # noqa: BLE001
         print("plot skipped:", e)
 

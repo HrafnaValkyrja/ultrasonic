@@ -5,6 +5,9 @@ abbr: DK-nn = this doc's open-issue ids (stable; external docs cite "sub-dock-us
 src: `hw/current.yaml`, `hw/pod/gen.py` (block DOCK_USB; MZ2 table L93), `hw/pod/draft_r2/out/routed.kicad_pcb` (probe 2026-10-07), `hw/mech/dims_r2.py` (`DOCK`, `BAY`, `CELL`, `PCB`), `hw/mech/shell_r2.py` (tub(): dock window), `docs/build/bom.md`, `docs/system/integration-map.md` (authoritative pins/nets)
 owner: O12(a)(b), O16(3)(5)(6), O10, O9/O15, O18, O19, O21, O26 · ECRs open: ECR-0008 (connector stock), ECR-0009 (no exciter output while VBUS present), ECR-0015 PER-01D/SIZ-06 (4-contact dock, USB-C fallback; not adopted), ECR-0018 (Phase 2) · relations: R-PWR-DOCK, R-PROC-DOCK, R-DOCK-BODY, R-DOCK-BOARD (tools/plm.py)
 
+
+> 2026-10-07 (round 10, packet Q1): dims_r2.py / heel.py / dock_route.py / shell_r2.py / blade.py now take a NON-DEFAULT variant (ULTRASONIC_DESIGN=k1|k1p via hw/current.yaml blocks + hw/mech/dims.py). Phase-2 values are byte-identical (74-name dims snapshot; shell, heel, dock_route, board_in_pod, mass and interfaces outputs unchanged apart from new info fields). K1 facts: reg-pod-body.md Variants.
+
 ## Purpose
 - functions: F9 dock detect, F10 USB data/DFU, F15 ESD at exposed contacts, input half of F5 charge (integration-map §1).
 - O12a: one magnetic cable = charge + firmware (USB FS, ST ROM DFU). O10: bonded build updatable without cutting. O12b: IPX4 min, IPX5 preferred. O16(3): bought magnetic connector, no connector board; sealed USB-C space reserved.

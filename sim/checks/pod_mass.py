@@ -15,8 +15,12 @@ from pathlib import Path
 import numpy as np
 
 ROOT = Path(__file__).resolve().parents[2]
-R2 = ROOT / "hw/mech/out/r2"
 sys.path.insert(0, str(ROOT / "hw/mech"))
+import dims as D  # noqa: E402  (selected design: phase2 -> out/r2; ULTRASONIC_DESIGN=k1/k1p -> out/k1, out/k1p)
+R2 = D.OUT_DIR
+CELL_PART = getattr(D, "CELL_SPEC", dict(part="Renata ICP501233PA-02", g=4.2, L=35.0, W=12.0))   # V03 08/2019 (sub-power cell block)
+CELL_PART.setdefault("L", D.CELL_L)
+CELL_PART.setdefault("W", D.CELL_W)
 
 
 def stl_volume(p: Path) -> float:
@@ -45,7 +49,6 @@ def rng(v_mm3, dens):
 def main():
     v = {k: stl_volume(R2 / f"{k}.stl") for k in ("tub", "lid", "puck", "skin", "vhb", "pcb", "dock", "parts_B", "cell")}
     import blade  # build123d
-    import dims_r2 as D
     v["adapter"] = blade.adapter(zc=(D.Z0 + D.Z1) / 2).volume
     pad = json.loads((ROOT / "hw/mech/out/parts/pad/checks.json").read_text())
     pad_mass = next(c["value"] for c in pad["checks"] if c["name"].startswith("mass estimate"))
@@ -57,9 +60,9 @@ def main():
         "puck (resin)": rng(v["puck"], RESIN),
         "skin (silicone) [A density]": rng(v["skin"], SILICONE),
         "VHB board tape (shell_r2.vhb) [A density]": rng(v["vhb"], VHB),
-        "VHB cell tape 35 x 12 x 0.25 [A density]": rng(35.0 * 12.0 * 0.25, VHB),
+        f"VHB cell tape {CELL_PART['L']:g} x {CELL_PART['W']:g} x 0.25 [A density]": rng(CELL_PART["L"] * CELL_PART["W"] * 0.25, VHB),
         "adapter clip (resin)": rng(v["adapter"], RESIN),
-        "cell Renata ICP501233PA-02": (4.2, 4.2),                            # Renata V03 08/2019 (sub-power cell block)
+        f"cell {CELL_PART['part']}": (CELL_PART["g"], CELL_PART["g"]),       # datasheet weight (phase2: V03 08/2019; K1: V2-cells.yaml)
         "bare board FR-4 30x12x0.8 [A density]": rng(v["pcb"], FR4),
         "board copper (4 layers 35/15/15/35 um, 50-80 % fill) [A]": (pcb_area * 0.100 * 0.5 * 8.96 / 1000, pcb_area * 0.100 * 0.8 * 8.96 / 1000),
         "components (74 parts; QFN48, L1, mic, crystal, passives) [A]": (0.20, 0.40),
@@ -73,14 +76,14 @@ def main():
     lo = sum(a for a, _ in items.values())
     hi = sum(b for _, b in items.values())
     pod_only = [k for k in items if not k.startswith(("pad", "exciter", "NiTi", "adapter"))]
-    out = dict(src="sim/checks/pod_mass.py", date="2026-10-07", volumes_mm3={k: round(x, 1) for k, x in v.items()},
+    out = dict(src="sim/checks/pod_mass.py", date="2026-10-07", design=D.DESIGN.id, volumes_mm3={k: round(x, 1) for k, x in v.items()},
                items_g={k: [round(a, 3), round(b, 3)] for k, (a, b) in items.items()},
                total_worn_g=[round(lo, 2), round(hi, 2)],
                pod_body_only_g=[round(sum(items[k][0] for k in pod_only), 2), round(sum(items[k][1] for k in pod_only), 2)],
                target_g=8.0, hurts_g=15.0, note="per pod; one pair = 2x. [A] items are assumed ranges; cell is the only sourced heavy item")
     od = ROOT / "sim/out/mech"
     od.mkdir(parents=True, exist_ok=True)
-    (od / "pod_mass.json").write_text(json.dumps(out, indent=1))
+    (od / ("pod_mass.json" if D.DESIGN.id == "phase2" else f"pod_mass_{D.DESIGN.id}.json")).write_text(json.dumps(out, indent=1))
     for k, (a, b) in items.items():
         print(f"{a:6.3f} - {b:6.3f} g  {k}")
     print("TOTAL worn per side:", out["total_worn_g"], "g; pod body only:", out["pod_body_only_g"], "g; target ~8, hurts ~15")
