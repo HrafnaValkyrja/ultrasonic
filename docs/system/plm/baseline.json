@@ -39,10 +39,10 @@
   "REG-ARM": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DIAG: arm-wiring.svg redrawn, button-stack.svg added (generated from dims_r2); docs only",
+   "note": "text fix: left-pod arm pads z -7.4..-4.15 (J2/J8 from placement), comment only in heel.py",
    "stamp": {
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
-    "file:hw/mech/heel.py": "9f6115b83b778544",
+    "file:hw/mech/heel.py": "11da6d8d9fff06e1",
     "file:sim/checks/niti_arm_real.py": "62944f12dde4e774"
    }
   },

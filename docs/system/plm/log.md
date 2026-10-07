@@ -510,3 +510,4 @@
 - 2026-10-07 16:06 review SUB-DEBUG-TEST by backlog-agent: PHYS-11 phase2-overview.svg + DBG-11 test-access-map.svg (generated); dock_route ARM_PADS info constants corrected
 - 2026-10-07 16:06 checkin PHYSICAL by backlog-agent
 - 2026-10-07 16:06 checkin SUB-DEBUG-TEST by backlog-agent
+- 2026-10-07 16:07 review REG-ARM by backlog-agent: text fix: left-pod arm pads z -7.4..-4.15 (J2/J8 from placement), comment only in heel.py

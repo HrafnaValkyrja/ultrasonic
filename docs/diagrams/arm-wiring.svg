@@ -73,7 +73,7 @@
   <text x="760" y="352" fill="#2a78d6">right pod</text><text x="885" y="352" fill="#2a78d6">21.0</text><text x="962" y="352" fill="#2a78d6">21.5</text><text x="1037" y="352" fill="#2a78d6">23.4</text><text x="1112" y="352" fill="#2a78d6">22.8</text>
   <text x="760" y="378" fill="#b8520a">left pod</text><text x="885" y="378" fill="#b8520a">19.4</text><text x="962" y="378" fill="#b8520a">19.4</text><text x="1037" y="378" fill="#b8520a">21.9</text><text x="1112" y="378" fill="#b8520a">21.0</text><text x="760" y="396" fill="#57606a" font-size="12">+ ~2 mm strip/tin each end</text>
   <text x="760" y="422" fill="#57606a" font-size="12">Left pod: the same board sits flipped in the mirrored shell,</text>
-  <text x="760" y="440" fill="#57606a" font-size="12">so its arm pads are LOW (z −6.35 / −4.15) and the bundle runs</text>
+  <text x="760" y="440" fill="#57606a" font-size="12">so its arm pads are LOW (z −7.4 … −4.15) and the bundle runs</text>
   <text x="760" y="458" fill="#57606a" font-size="12">up the rear gap at the exit height; right pod: pads high.</text>
   <text x="760" y="482" fill="#57606a" font-size="12">Source: heel.py route_checks('right'|'left'), notes/heel.md</text>
 

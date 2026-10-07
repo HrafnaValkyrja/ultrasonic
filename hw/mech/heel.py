@@ -397,7 +397,7 @@ def _fillet_poly(wps, R):
     return pts
 
 
-FAN_LEFT = np.array([62.3, 11.60, -5.25])   # left pod: arm pads sit low (z -6.35/-4.15), the bundle stays at the exit height
+FAN_LEFT = np.array([62.3, 11.60, -5.25])   # left pod: arm pads sit low (z -7.4..-4.15), the bundle stays at the exit height
 
 
 def wire_route(pod="right"):
