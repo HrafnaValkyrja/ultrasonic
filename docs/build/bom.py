@@ -18,22 +18,22 @@ ITEMS = [
     # --- MCU, mic, clock
     ("MCU", "STM32U575CIU6Q", "U1", "C5271013", 1, 8.9281, "rev C", "ONLY 8 IN STOCK at JLC 2026-10-01: buy/reserve early"),
     ("Mic", "SPH0641LU4H-1", "U2", "C2879853", 1, 1.9915, "rev C", "ultrasonic PDM mic"),
-    ("Clock", "32.768 kHz crystal", "Y1", "C32346", 1, 0.1717, "rev C", ""),
+    ("Clock", "32.768 kHz crystal 2012 7 pF X1A0000610006", "Y1", "C99009", 1, 0.2125, "phase 2", "MZ-2 (ECR-0018); Rev G C32346 $0.1717; JLC API 2026-10-07T11:31Z, Extended, stock 23426"),
     ("MCU", "2.2 uH inductor DFE201610E", "L1 (SMPS)", "C337891", 1, 0.1366, "rev C", ""),
     # --- output stage
     ("Bridge", "PMCXB290UE N+P pair", "Q1, Q2", "C19654206", 2, 0.1706, "rev C", "footprint must be redrawn (Nexperia Fig. 32)"),
     # --- power (O16)
     ("Charger", "BQ25180YBGR (NTC/JEITA, power path, I2C)", "U3", "C3682423", 1, 2.0419, "rev D", "replaces MCP73832"),
     ("Charger", "MCP73832-2-OT", "U3 (old)", "C38066", 0, 0.9492, "rev C (removed)", "qty 0 after O16"),
-    ("Charger", "NTC 10k B3435 NCP15XH103F03RC", "RT1 (+ J9 pad for a cell NTC)", "C77131", 1, 0.0199, "rev D", ""),
+    ("Charger", "NTC 10k B3435 0201 NCP03XH103F05RL", "RT1 (+ J9 pad for a cell NTC)", "C98098", 1, 0.0166, "phase 2", "MZ-2 (ECR-0018); Rev G C77131 $0.0199; JLC API 2026-10-07T11:31Z, Extended, stock 175122"),
     ("Power", "TPS7A2030 3.0 V LDO", "U4", "C5220164", 1, 0.2175, "rev C", "input moves to VSYS"),
-    ("Protect", "1N5819WS (reverse docking)", "D4", "C191023", 1, 0.0137, "rev D", ""),
+    ("Protect", "PMEG3005EL SOD-882 (reverse docking)", "D4", "C282565", 1, 0.1150, "phase 2", "MZ-2 (ECR-0018); Rev G 1N5819WS C191023 $0.0137; JLC API 2026-10-07T11:31Z, Extended, stock 43342"),
     ("Protect", "TPD1E10B06DPYR (TI bidirectional ESD, 5.5 V working) at the J3 DOCK_VBUS contact", "D5, D6", "C48260", 2, 0.0417, "rev G", "D5 at J3 DOCK_VBUS replaces D3 (Rev F); D6 at J12 CC (Rev G, O24); JLC API 2026-10-02T23:48Z, 299k stock"),
     ("Protect", "PESD5V0S1BL (bridge outputs)", "D1, D2", "C84374", 0, 0.0334, "rev F removed", "Rev F: DNP footprints deleted (OUT-04)"),
     ("USB", "TPD2E2U06DRLR (D+/D- ESD)", "U6", "C1972959", 1, 0.3224, "rev D", "USB FS on PA11/PA12"),
     ("UI", "C&K KMT022NGJLHS IP68 switch, 1.6 N, 600k cycles", "SW1", "C221707", 1, 0.3902, "rev D", "replaces KXT321; 2.2k pull-down for >= 1 mA contact current"),
     # --- rev-1 test hooks (Rev E)
-    ("Test", "0.1 ohm 1% 1206 bridge shunt 1206W4F100LT5E", "R21", "C25334", 1, 0.0055, "rev E", "Basic (was 0.33R Extended C23410); lift it to disconnect the bridge"),
+    ("Test", "0.1 ohm 1% 0402 bridge shunt ERJ2BSFR10X", "R21", "C409058", 1, 0.0732, "phase 2", "MZ-2 (ECR-0018); Rev G 1206 C25334 $0.0055 Basic; JLC API 2026-10-07T11:31Z, Extended, stock 15878; lift it to disconnect the bridge"),
     ("Test", "0 ohm 0402 link (LDO -> 3V0)", "R20", "C17168", 1, 0.0025, "rev E", "lift it to meter or inject the 3V0 rail"),
     # --- passives (approx. counts after O16)
     ("Passives", "0402/0603 capacitors (Basic)", "C*", "various", 18, 0.012, "rev G", "18 parts (Rev F: C20 removed; C15, C8/C9 itemised below)"),
