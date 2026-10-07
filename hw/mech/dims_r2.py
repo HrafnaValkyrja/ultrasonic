@@ -115,8 +115,9 @@ def duct_offsets():
         print_bore_pos=0.05,          # [A] resin print, bore position vs any lid feature (frame.RESIN class)
         bore_ream=(1.00, 1.02),       # reamed with a 1.0 drill, +0.02 [A]
         pin_body=0.98, pin_tip=0.50, pin_runout=0.02,   # stepped gauge pin [A] (turned brass)
-        hole=(0.55, 0.65),            # NPTH D0.6 +-0.05 [A: JLC capability, verify]
-        outline_to_hole=0.20,         # [A] JLC routed outline +-0.2 (verify), sets the edge-stop error
+        hole=(0.52, 0.73),            # D0.6 drilled: JLC hole size +0.13/-0.08 (their example: 0.6 -> 0.52-0.73); press-fit option +-0.05
+        outline_to_hole=0.20,         # JLC CNC routed outline +-0.2 regular (+-0.1 precision); hole position +-0.075
+        # src: jlcpcb.com/capabilities/pcb-capabilities fetched 2026-10-07 (HTML SHA-256 62ffae95727c8b4e); board 0.8 +-0.1
     )
     pin_r = (tol["bore_ream"][1] - tol["pin_body"]) / 2 + (tol["hole"][1] - tol["pin_tip"]) / 2 + tol["pin_runout"]
     stop_dx = X_STOP_GAP + tol["outline_to_hole"] + tol["print_bore_pos"]

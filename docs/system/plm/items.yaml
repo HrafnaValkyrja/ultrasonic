@@ -169,7 +169,7 @@ relations:
   - id: R-AUDIO-BODY
     a: SUB-AUDIO-IN
     b: REG-POD-BODY
-    what: "Phase 2 sealed duct (O24 option B): reamed D1.0 lid bore + D1.0 VHB hole across the 0.30 F gap onto the board's D0.6 port NPTH (board 1.88 = pod 32.43; dims_r2 MIC is read from the routed board, gauge pin locates at bonding: worst 0.115 <= 0.20 mm); interfaces.py mic-port offset 0.000 mm; acoustics phase2_r2 (docs/sim/acoustics.yaml)"
+    what: "Phase 2 sealed duct (O24 option B): reamed D1.0 lid bore + D1.0 VHB hole across the 0.30 F gap onto the board's D0.6 port NPTH (board 1.88 = pod 32.43; dims_r2 MIC is read from the routed board, gauge pin locates at bonding: worst 0.155 <= 0.20 mm (JLC hole +0.13/-0.08, 2026-10-07)); interfaces.py mic-port offset 0.000 mm; acoustics phase2_r2 (docs/sim/acoustics.yaml)"
     watch: ["sym:hw/mech/dims_r2.py::MIC", "sym:hw/mech/dims_r2.py::PCB", "sym:hw/mech/dims_r2.py::DUCT_D", "sym:hw/mech/dims_r2.py::board_mic", "sym:hw/mech/dims_r2.py::duct_offsets", "yaml:hw/pod/draft_r2/placement.yaml::U2", "sym:hw/mech/shell_r2.py::lid_base", "grep:hw/pod/gen.py::Knowles_LGA-5", "file:hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod"]
   - id: R-UI-BODY
     a: SUB-UI

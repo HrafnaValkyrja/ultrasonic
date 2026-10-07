@@ -304,3 +304,20 @@
 - 2026-10-07 12:54 checkout SUB-PROCESSING by backlog-agent: PROC-9: SMPS clocking read
 - 2026-10-07 12:54 review SUB-PROCESSING by backlog-agent: PROC-9: SMPS has no clock/sync control in RM0456 Rev 7 (free-running 3 MHz typ); lever REGSEL; docs only
 - 2026-10-07 12:54 checkin SUB-PROCESSING by backlog-agent
+- 2026-10-07 12:55 checkout REG-POD-BODY by backlog-agent: RB-TOL: JLC capability tolerances (2026-10-07) into dims_r2.duct_offsets + tolerances.md Phase-2 rows
+- 2026-10-07 12:55 checkout PHYSICAL by backlog-agent: RB-TOL: JLC capability tolerances (2026-10-07) into dims_r2.duct_offsets + tolerances.md Phase-2 rows
+- 2026-10-07 12:55 checkout SUB-AUDIO-IN by backlog-agent: RB-TOL: JLC capability tolerances (2026-10-07) into dims_r2.duct_offsets + tolerances.md Phase-2 rows
+- 2026-10-07 12:56 checkout WHOLE by backlog-agent: RB-TOL duct number
+- 2026-10-07 12:56 checkout REG-BOARD by backlog-agent: RB-TOL duct number
+- 2026-10-07 12:56 review R-AUDIO-BODY by backlog-agent: RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D
+- 2026-10-07 12:56 review PHYSICAL by backlog-agent: RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D
+- 2026-10-07 12:56 review REG-POD-BODY by backlog-agent: RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D
+- 2026-10-07 12:56 review SUB-AUDIO-IN by backlog-agent: RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D
+- 2026-10-07 12:56 review WHOLE by backlog-agent: RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D
+- 2026-10-07 12:56 review REG-BOARD by backlog-agent: RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D
+- 2026-10-07 12:56 review R-AUDIO-BOARD by backlog-agent: RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D
+- 2026-10-07 12:56 checkin REG-POD-BODY by backlog-agent
+- 2026-10-07 12:56 checkin PHYSICAL by backlog-agent
+- 2026-10-07 12:56 checkin SUB-AUDIO-IN by backlog-agent
+- 2026-10-07 12:56 checkin WHOLE by backlog-agent
+- 2026-10-07 12:56 checkin REG-BOARD by backlog-agent

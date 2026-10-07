@@ -105,7 +105,7 @@ All wire-pad edge gaps >= 0.90 mm (MZD-10 asks >= 0.8 between pads whose bridge 
 | Heights | [heights] PASS: F tightest SW1 0.65 (band 0.90, margin 0.25); B tightest U2 1.08 (band 1.40, margin 0.32) | interfaces.py + part_heights.yaml (2026-10-07) |
 | VHB face | [clamp-bands] PASS: no clamp ribs; all 7 F parts in VHB cut-outs (TP cut r 0.9 = 1.8 mm); 91 % of the VHB bonded | interfaces.py 2026-10-07 (commit c348661) |
 | Inside outline | [inside] PASS, closest C4 at 0.07 mm (courtyard) from an edge | interfaces.py 2026-10-07 |
-| Mic port | [mic-port] PASS: hole (1.88, 6.0) = pod (32.43, -2.45), 0.000 mm from the lid duct D1.0; gauge pin worst 0.115 <= 0.20 | interfaces.py; dims_r2.py duct_offsets (2026-10-07) |
+| Mic port | [mic-port] PASS: hole (1.88, 6.0) = pod (32.43, -2.45), 0.000 mm from the lid duct D1.0; gauge pin worst 0.155 <= 0.20 (JLC hole tolerance, 2026-10-07) | interfaces.py; dims_r2.py duct_offsets (2026-10-07) |
 | Switch | [switch] WARN: nominal 0.000 mm; worst-case stack 0.20 exceeds the 0.15 limit by 0.05 (owned by sub-ui / reg-pod-body) | interfaces.py 2026-10-07 |
 | Route | DRC 0, unconnected 0 | kicad-cli 10.0.6 2026-10-07; commits e9bb863, f6291e6 |
 | ERC / nets | 195 pins on 42 nets == gen.py; 203 numbered pads on circuit nets | bom_check [nets]; interfaces [board-nets] 2026-10-07 |

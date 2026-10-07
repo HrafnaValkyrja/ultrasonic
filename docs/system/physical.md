@@ -77,7 +77,7 @@ Total T 10.4 (Rev F 11.8; O27 thin first). The heel sits under the temple and ad
 | F face ↔ lid | 0.30 for VHB 0.25 | 0.05 slack nominal, 0.0125 at the thickest tape (VHB 4914 ±15 % = ±0.0375, 3M TDS 2024-09) | checks.json F_gap |
 | SW1 ↔ pocket ceiling | 0.25 nominal, 0.082 worst | OK | dims_r2.switch_stack |
 | Puck top ↔ skin underside | selective fit 0.005-0.135 (fixed puck worst −0.198 = pre-pressed) | OK with the kit | dims_r2.switch_stack |
-| Duct axis ↔ board hole | 0.000 nominal; 0.115 worst with the gauge pin; 0.86 walls-only | PASS with pin (limit 0.20) | dims_r2.duct_offsets |
+| Duct axis ↔ board hole | 0.000 nominal; 0.155 worst with the gauge pin; 0.86 walls-only | PASS with pin (limit 0.20) | dims_r2.duct_offsets |
 | Cell ↔ tub | 0.3 tape side; 0.1 top; 0.8 bottom (dock tails); 1.1 rear; ~0.07 at the strut-relief fill | tight: dry-fit | dims_r2 CAV/CELL; tolerances L16 |
 | Dock target top ↔ cell bottom | 0.85 (z −8.95 → −8.1) for flat tails + wires | tight (issue 3) | dims_r2 DOCK, CELL |
 | Lid groove ↔ tub tongue | 0.05 | – | dims_r2 GROOVE_CL |
@@ -166,7 +166,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 ```
 
 ## Open issues (IDs stable; gaps = closed)
-1. (closed in Phase 2) Mic port unsealed: sealed D1.0 duct (O24); 1b board port vs lid bore: nominal 0.000, gauge pin worst 0.115 (dims_r2.duct_offsets, 2026-10-07). R-ACO-P6 keep-out holds since 2026-10-07 (reg-pod-body issue 19 closed).
+1. (closed in Phase 2) Mic port unsealed: sealed D1.0 duct (O24); 1b board port vs lid bore: nominal 0.000, gauge pin worst 0.155 (dims_r2.duct_offsets, 2026-10-07). R-ACO-P6 keep-out holds since 2026-10-07 (reg-pod-body issue 19 closed).
 2. (closed 2026-10-07 in CAD) **Heel wire exit vs the cell.** Exit moved to x 66.20 with a Ø0.8 neck (hole 65.80-66.60, 0.20 behind the cell end 65.6, rim-corner 0.36); arm wires 0.39 from the cell; build order in notes/heel.md. Remains: dry fit with the real pouch ([reg-arm](reg-arm.md) issue 1).
 3. **Dock wire route not designed.** 5 wires from the belly to the B pads at board x 25-29: 0.8 under the cell beside the flat tails (0.85 tail-to-cell) or the rear gap; OD ≤ 0.6 needed under the cell (notes/shell_r2.md).
 4. (closed 2026-10-07, ECR-0001) `frame.py` / `pod.py` derive the pod from the current dims; rail and adapter default to the body centre.
@@ -183,7 +183,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 15. **Wire stowage fill** is volume-checked (277 vs 107-142 mm³) but not routed: 12 loops, wires enter the 1.4 B gap to reach pads at board x 25-29 (up to 4.9 mm in front of the board's rear edge, J3 at board x 25.1). Close: a wire-route sketch with gauges (sub-dock-usb, sub-power).
 16. (closed in Phase 2) USB-C fallback: keep-out not carried into shell_r2 (R-DOCK-BODY).
 17. (closed 2026-10-07, ECR-0001) One pod source: `dims_r2.py` (via `frame.pod_facts()`); `frame.py` owns axes, adapter, arm and pad only.
-18. **Phase-2 tolerances unverified [A]** (JLC outline ±0.2 / NPTH ±0.05, VHB thickness, resin ±0.05, KMT022 height); `docs/build/tolerances.md` is Rev-1 only.
+18. **Phase-2 tolerances sourced 2026-10-07** (`docs/build/tolerances.md` Phase-2 section: JLC outline ±0.2, hole +0.13/−0.08, position ±0.075, board ±0.1; VHB ±15 %). Still [A]: resin ±0.05, KMT022 height.
 
 ## Before you change this, check
 - Mic or SW1 off the board centre line y 6.0: breaks one board for both pods (O16-5) and moves lid features. See [sub-audio-in](sub-audio-in.md), [sub-ui](sub-ui.md).

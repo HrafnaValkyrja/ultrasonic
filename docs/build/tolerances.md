@@ -47,6 +47,16 @@ Legend: ✅ fine · ⚠️ tight, with a note on what to do · ❌ not yet desig
 | Hex collar | Grown from 5.9 to 7.4 mm across flats, to wall the rear wire bore | ✅ Slightly bulkier pad top. **Check the Ear (open) clearance on your photos (E9).** |
 | Cup closure | One M1.2 self-tapping screw, pilot Ø1.0 | ✅ |
 
+## Phase 2 (shell_r2 + 30 x 12 board), sourced rows (2026-10-07)
+| Item | Value | Source | Used in |
+|---|---|---|---|
+| Board outline (CNC) | ±0.2 regular, ±0.1 precision option | JLC capabilities page fetched 2026-10-07, HTML SHA-256 62ffae95727c8b4e | dims_r2.duct_offsets outline_to_hole; x-stop 0.25 > 0.2 so the walls never fight the gauge pin |
+| Drilled hole size | +0.13 / −0.08 (D0.6 → 0.52-0.73); "press-fit" option ±0.05 for 0.55-2.0 mm round holes on multilayer ENIG (ask in the PCB remark) | same | duct_offsets hole; gauge-pin worst 0.155 ≤ 0.20 ✅; spec §8 hole 0.6-1.0 ⚠️ (0.52 possible, sub-audio-in issue 15) |
+| Hole position | ±0.075 | same | pin registers to the hole itself, so it drops out of the duct stack |
+| Board thickness 0.8 | ±0.1 (0.7-0.9) | same | B gap margin 0.32 → 0.22 worst ✅; port-hole length 0.7-0.9 (acoustics) |
+| VHB 4914 thickness | 0.25 ±15 % (±0.0375) | 3M TDS rev 2024-09, SHA-256 2fc355523c5e5dff | switch_stack ✅ selective fit unchanged; F-gap slack 0.0125 worst ✅ |
+| Resin print ±0.05, KMT022 height | still [A] | – | switch_stack (C&K gives 0.65 nominal only) |
+
 ## Two things to measure before printing for real
 1. Print a **tolerance coupon** with the actual resin and printer: holes of Ø0.8/0.85/1.0/1.2/1.6 mm, slots of 0.3/0.4/0.5 mm, and a 0.15 mm slide fit. Adjust the numbers above to what really happens.
 2. **Dry-fit the real cell and board** before bonding anything. The CAD uses the cell datasheet's *maximum* envelope.
