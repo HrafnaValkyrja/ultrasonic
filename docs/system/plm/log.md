@@ -431,3 +431,6 @@
 - 2026-10-07 13:22 checkin PHYSICAL by backlog-agent
 - 2026-10-07 13:22 checkin SUB-DEBUG-TEST by backlog-agent
 - 2026-10-07 13:22 checkin REG-POD-BODY by backlog-agent
+- 2026-10-07 13:24 checkout SUB-DOCK-USB by backlog-agent: DK-09 cable note + diagram
+- 2026-10-07 13:24 review SUB-DOCK-USB by backlog-agent: DK-09 cable note + dock-cable.svg; docs only
+- 2026-10-07 13:24 checkin SUB-DOCK-USB by backlog-agent

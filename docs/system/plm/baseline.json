@@ -109,7 +109,7 @@
   "SUB-DOCK-USB": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "dock route v2 (y-first, climb above the cell behind the board): worst 0.58 to the arm bundle (was 0.11); hold + check step 11",
+   "note": "DK-09 cable note + dock-cable.svg; docs only",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"

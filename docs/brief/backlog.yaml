@@ -47,7 +47,7 @@ unblocked:   # value order; rank 1 = do first
   - {id: ARM-7, rank: 29, cls: hygiene, src: reg-arm.md#7, dup: [PAD-10, UI-9, DK-13, DBG-10], t: "stale build notes (heel.md/pad.md/hardware.md/electronics.md/pcb-mech-interface.md/padboard gen.py docstring/learn scripts)", close: "update notes", blk: none, st: open}
   - {id: DIAG, rank: 30, cls: hygiene, src: "RB-10, PHYS-11, ARM-11, PAD-12, UI-10, SAI-12, DK-14, DBG-11, PROC-10", t: "stale/missing diagrams (Rev E pictures, arm-wiring, button stack, belly bay, test-access map, clock tree, pin map)", close: "redraw (render.sh, dark)", blk: none, st: open}
   - {id: RB-9, rank: 31, cls: hygiene, src: reg-board.md#9, dup: [PHYS-5], t: "which pod has which edge up is derived, not checked", close: "KiCad 3D render placed in the CAD for both pods", blk: none, st: open}
-  - {id: DK-09, rank: 32, cls: hygiene, src: sub-dock-usb.md DK-09, t: "cable side undocumented (plug, CC, length, strain relief)", close: "dock/cable note + diagram", blk: none, st: open}
+  - {id: DK-09, rank: 32, cls: hygiene, src: sub-dock-usb.md DK-09, t: "cable side undocumented (plug, CC, length, strain relief)", close: "dock/cable note + diagram", blk: none, st: "done 2026-10-07 (sub-dock-usb DK-09 + docs/diagrams/dock-cable.svg: USB-C plug with CC wired, rec; USB-A = 100 mA until enumeration)"}
 
   # decided by the coordinator 2026-10-07, doc parts done (moved from owner)
   - {id: RB-20, cls: decision, t: "R21 mid-board vs MZD-4 edge", opts: "accept (rec) / 0603 shunt at edge + wider Kelvin pour (router)", st: "decided 2026-10-07 (coordinator, decisions-log 9330d9c); accepted; doc updated (reg-board issue 20)", commit: "b73598d"}

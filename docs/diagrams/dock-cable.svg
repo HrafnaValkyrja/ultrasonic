@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1160 560" font-family="DejaVu Sans, Arial, sans-serif" font-size="15">
+  <rect width="1160" height="560" fill="#fbfaf7"/>
+  <text x="30" y="36" font-size="22" font-weight="bold" fill="#1f2328">Dock cable (DK-09): PC/charger → magnetic head → pod</text>
+  <text x="30" y="60" fill="#57606a">2026-10-07 · pod side: YZT0675 5-pin target · cable side: YZP0048-20048-05025-01 5-pin pogo head (C5126847)</text><text x="30" y="80" fill="#57606a">pin order unknown until a sample is in hand (DK-02)</text>
+
+  <!-- option A: USB-C plug -->
+  <rect x="30" y="90" width="170" height="150" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+  <text x="115" y="120" text-anchor="middle" font-weight="bold" fill="#2a78d6">A (rec): USB-C plug</text>
+  <text x="45" y="148" fill="#1f2328">VBUS</text><text x="45" y="170" fill="#1f2328">GND</text>
+  <text x="45" y="192" fill="#1f2328">D+  D−</text><text x="45" y="214" fill="#1f2328">CC (one line)</text>
+  <!-- option B: USB-A plug -->
+  <rect x="30" y="290" width="170" height="130" rx="10" fill="#f3f1ea" stroke="#57606a" stroke-width="2"/>
+  <text x="115" y="320" text-anchor="middle" font-weight="bold" fill="#57606a">B: USB-A plug</text>
+  <text x="45" y="348" fill="#1f2328">VBUS</text><text x="45" y="370" fill="#1f2328">GND</text>
+  <text x="45" y="392" fill="#1f2328">D+  D−</text><text x="45" y="412" fill="#e34948">no CC</text>
+
+  <!-- cable -->
+  <line x1="200" y1="165" x2="560" y2="230" stroke="#2a78d6" stroke-width="6"/>
+  <line x1="200" y1="355" x2="560" y2="250" stroke="#57606a" stroke-width="6" stroke-dasharray="10 8"/>
+  <text x="300" y="180" fill="#2a78d6">~1 m, 5 conductors (USB-C) / 4 (USB-A)</text>
+  <text x="300" y="345" fill="#57606a">D+/D− twisted pair</text>
+
+  <!-- head + strain relief -->
+  <rect x="560" y="200" width="150" height="80" rx="8" fill="#fff4ea" stroke="#b8520a" stroke-width="2"/>
+  <text x="635" y="232" text-anchor="middle" font-weight="bold" fill="#b8520a">pogo head</text>
+  <text x="635" y="254" text-anchor="middle" fill="#b8520a">5 pins, magnets</text>
+  <rect x="520" y="212" width="40" height="56" fill="#f3f1ea" stroke="#57606a"/>
+  <text x="540" y="300" text-anchor="middle" font-size="13" fill="#57606a">strain relief:</text>
+  <text x="540" y="316" text-anchor="middle" font-size="13" fill="#57606a">heat-shrink over</text>
+  <text x="540" y="332" text-anchor="middle" font-size="13" fill="#57606a">jacket + solder cups,</text>
+  <text x="540" y="348" text-anchor="middle" font-size="13" fill="#57606a">hot-melt fill</text>
+
+  <!-- pod -->
+  <rect x="790" y="150" width="350" height="200" rx="14" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+  <text x="965" y="180" text-anchor="middle" font-weight="bold" fill="#1a7a55">pod (belly target)</text>
+  <text x="805" y="208" fill="#1f2328">J3 DOCK_VBUS → D5 ESD, D4 → U3</text>
+  <text x="805" y="230" fill="#1f2328">J4 GND</text>
+  <text x="805" y="252" fill="#1f2328">J10/J11 USB D+/D− → U1 PA12/PA11</text>
+  <text x="805" y="274" fill="#1f2328">J12 CC → R18 5k1 (Rd) + D6 ESD</text>
+  <text x="805" y="304" fill="#57606a" font-size="13">ILIM 100 mA until USB enumerates,</text>
+  <text x="805" y="320" fill="#57606a" font-size="13">then 500 mA (PWR-I13, firmware)</text>
+  <line x1="710" y1="240" x2="790" y2="240" stroke="#b8520a" stroke-width="4"/>
+
+  <!-- why box -->
+  <rect x="30" y="450" width="1110" height="92" rx="8" fill="#f3f1ea" stroke="#e34948" stroke-width="1.5"/>
+  <text x="45" y="476" fill="#e34948" font-weight="bold">Why CC must be wired with a USB-C plug:</text>
+  <text x="45" y="500" fill="#e34948">a USB-C charger switches VBUS on only after it sees Rd (5.1 kΩ) on CC. Without CC to pin J12, a C-to-C charger gives 0 V.</text><text x="45" y="524" fill="#e34948">USB-A ports have VBUS always on, but carry no CC: the pod then charges at 100 mA until USB enumerates.</text>
+</svg>
