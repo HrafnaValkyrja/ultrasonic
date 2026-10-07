@@ -3,10 +3,10 @@
   "COST": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-01: bom.py dock head line -> 5-pin C5126847; bom.md/bom.csv regenerated (per pod 23.18 -> 22.50)",
+   "note": "CHK-STOCK: lock rows dated for all used parts; bom_jlc_mz2.csv sourcing column regenerated (dated lookup -> yes); no part changed",
    "stamp": {
     "file:docs/build/bom.py": "33a3ab79321badf9",
-    "file:hw/pod/bom_jlc_mz2.csv": "1d51558c1881a4fe"
+    "file:hw/pod/bom_jlc_mz2.csv": "6ae2be8b76f05833"
    }
   },
   "INTEGRATION": {
@@ -276,11 +276,11 @@
    }
   },
   "R-COST-BOARD": {
-   "by": "claude",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "B-DOC-AUDIT-0007 (20bd842): placements moved, no BOM line or part added/removed; bom_check jlc-bom/assembly-tier PASS (31 lines, 53 parts, double-sided Standard)",
+   "note": "CHK-STOCK: lock rows dated for all used parts; bom_jlc_mz2.csv sourcing column regenerated (dated lookup -> yes); no part changed",
    "stamp": {
-    "file:hw/pod/bom_jlc_mz2.csv": "1d51558c1881a4fe",
+    "file:hw/pod/bom_jlc_mz2.csv": "6ae2be8b76f05833",
     "file:hw/pod/draft_r2/placement.yaml": "568be76a2d8a482d"
    }
   },

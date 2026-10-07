@@ -477,3 +477,5 @@
 - 2026-10-07 13:34 review R-AUDIO-BOARD by backlog-agent: RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model
 - 2026-10-07 13:34 checkin REG-BOARD by backlog-agent
 - 2026-10-07 13:34 checkin PHYSICAL by backlog-agent
+- 2026-10-07 13:36 review R-COST-BOARD by backlog-agent: CHK-STOCK: lock rows dated for all used parts; bom_jlc_mz2.csv sourcing column regenerated (dated lookup -> yes); no part changed
+- 2026-10-07 13:36 review COST by backlog-agent: CHK-STOCK: lock rows dated for all used parts; bom_jlc_mz2.csv sourcing column regenerated (dated lookup -> yes); no part changed
