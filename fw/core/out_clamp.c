@@ -54,14 +54,24 @@ float fw_db_to_amp(int32_t cdb)
     return db_table[i];
 }
 
-uint16_t fw_arr_for_khz(int32_t pwm_khz)
+static const uint32_t plan_hz[8] = {80009000u, 160018000u, 64007000u, 48005000u, 112012000u, 104011000u, 72008000u, 52006000u};
+static const uint16_t plan_b[8] = {200u, 400u, 160u, 120u, 280u, 260u, 180u, 130u};   /* HCLK / 400 kHz (MSIS 48.005 / 3 x N / R) */
+
+uint32_t fw_plan_hclk_hz(uint32_t plan) { return plan_hz[plan < 8u ? plan : 0u]; }
+
+uint16_t fw_arr_for_khz(int32_t pwm_khz, uint32_t plan, int32_t *eff_khz)
 {
-    switch (pwm_khz) {
-    case 400:
-        return 100u;
-    case 800:
-        return 50u;
-    default:
-        return 200u;
-    }
+    uint32_t b = plan_b[plan < 8u ? plan : 0u];
+    uint32_t r = pwm_khz == 800 ? 4u : (pwm_khz == 400 ? 2u : 1u);
+    while (r > 1u && (b % r != 0u || b / r < HC_ARR_MIN))
+        r /= 2u;
+    if (eff_khz)
+        *eff_khz = (int32_t)(200u * r);
+    return (uint16_t)(b / r);
+}
+
+uint32_t fw_dead_ticks(uint32_t ticks_p80, uint32_t plan)
+{
+    uint64_t t = ((uint64_t)ticks_p80 * fw_plan_hclk_hz(plan) + plan_hz[0] - 1u) / plan_hz[0];   /* ceil */
+    return (uint32_t)t;
 }

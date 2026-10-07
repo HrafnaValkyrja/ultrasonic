@@ -2,7 +2,7 @@
 #define FW_TEST_TESTS_H
 /* name, requirement: the list fw/test/test_main.c runs (fwsim maps results to FWSIM-R ids) */
 #define FW_TESTS(T) \
-    T(test_abi_hop_lengths, "FWSIM-R9") T(test_abi_pure, "FWSIM-R3") T(test_abi_power_on_hold, "FWSIM-R3") \
+    T(test_abi_hop_lengths, "FWSIM-R9") T(test_pwm_per_plan, "FWSIM-R25") T(test_abi_pure, "FWSIM-R3") T(test_abi_power_on_hold, "FWSIM-R3") \
     T(test_clamp_property, "FWSIM-R64") T(test_clamp_hard_limits, "FWSIM-R64") T(test_clamp_level_matches_amp, "FWSIM-R64") T(test_clamp_db_table, "FWSIM-R6") \
     T(test_knobs_table, "FWSIM-R6") T(test_knobs_enum_and_clamps, "FWSIM-R6") \
     T(test_store_roundtrip, "FWSIM-R6") T(test_store_power_fail_every_step, "FWSIM-R6") T(test_store_corruption, "FWSIM-R6") \

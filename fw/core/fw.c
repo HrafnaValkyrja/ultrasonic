@@ -10,7 +10,11 @@
 
 static void apply_knobs(fw_state_t *st)
 {
-    st->arr = fw_arr_for_khz(st->knobs.pwm_khz);
+    int32_t eff = 200;
+    st->arr = fw_arr_for_khz(st->knobs.pwm_khz, (uint32_t)st->knobs.clock_plan, &eff);
+    st->pwm_reps = (uint32_t)eff / 200u;
+    st->dt_rise = fw_dead_ticks((uint32_t)st->knobs.dead_time_rise_ticks, (uint32_t)st->knobs.clock_plan);
+    st->dt_fall = fw_dead_ticks((uint32_t)st->knobs.dead_time_fall_ticks, (uint32_t)st->knobs.clock_plan);
     st->amp_max_ppm = fw_out_amp_max_ppm(&st->knobs);
 }
 
@@ -24,7 +28,7 @@ void fw_init(fw_state_t *st, const fw_knobs_t *knobs, uint64_t now_us)
     st->boot_us = now_us;
     st->squelched = 1u;
     apply_knobs(st);
-    fw_dsp_init(&st->dsp, &st->knobs, st->arr);
+    fw_dsp_init(&st->dsp, &st->knobs, st->arr, st->pwm_reps);
     fw_sys_init(&st->sys, &st->knobs, now_us);
     fw_idle_init(&st->idle);
 }
@@ -139,7 +143,7 @@ static size_t hop_pcm(fw_state_t *st, const float pcm[FW_HOP_N], uint16_t *ccr, 
 
 size_t fw_hop(fw_state_t *st, const int32_t in[FW_HOP_N], uint16_t *ccr, size_t ccr_cap, fw_taps_t *taps)
 {
-    size_t n = (size_t)FW_HOP_N * 200u / st->arr;
+    size_t n = (size_t)FW_HOP_N * st->pwm_reps;
     if (in == NULL || ccr == NULL || ccr_cap < n)
         return 0u;
     float pcm[FW_HOP_N];
@@ -150,7 +154,7 @@ size_t fw_hop(fw_state_t *st, const int32_t in[FW_HOP_N], uint16_t *ccr, size_t 
 
 size_t fw_hop_d2(fw_state_t *st, const int32_t in400[2u * FW_HOP_N], uint16_t *ccr, size_t ccr_cap, fw_taps_t *taps)
 {
-    size_t n = (size_t)FW_HOP_N * 200u / st->arr;
+    size_t n = (size_t)FW_HOP_N * st->pwm_reps;
     if (in400 == NULL || ccr == NULL || ccr_cap < n)
         return 0u;
     float pcm[FW_HOP_N];
@@ -179,7 +183,7 @@ void fw_poll(fw_state_t *st, uint64_t now_us)
 size_t fw_selftest_hop(fw_state_t *st, float y8[FW_DSP_OUT_N], const fw_ccr_bounds_t *b, uint16_t *ccr, uint32_t *hits)
 {
     fw_sys_t *s = &st->sys;
-    size_t n = (size_t)FW_HOP_N * 200u / st->arr;
+    size_t n = (size_t)FW_HOP_N * st->pwm_reps;
     *hits = 0u;
     if (s->st_raw_active) {
         float a = (float)s->st_raw_q15 * 0x1p-15f;

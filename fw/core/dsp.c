@@ -59,7 +59,7 @@ static float map_freq(const fw_dsp_t *d, float f)   /* pipeline.map_freq: log co
     return d->out_lo * fw_exp2f(d->k_map * fw_log2f(f / d->f_lo));
 }
 
-void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr)
+void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr, uint32_t reps)
 {
     memset(d, 0, sizeof *d);
     d->algo = k->algo == 1 ? (uint32_t)FW_ALGO_A : (uint32_t)FW_ALGO_B;
@@ -69,7 +69,7 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr)
     d->ramp_shift = d->slim ? 4u : 3u;
     d->transient = k->transient_only ? 1u : 0u;
     d->arr = arr;
-    d->reps = 200u / arr;
+    d->reps = reps;
     d->dither_on = k->dither_on ? 1u : 0u;
     d->hold_samples = (uint32_t)k->squelch_hold_ms * 25u / 2u;   /* 12.5 samples per ms */
     float frame_s = (float)(d->slim ? 2u * HOP : HOP) / FS_HZ;
@@ -158,7 +158,7 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr)
     d->sq_quiet = d->hold_samples;                                  /* start squelched: silence is an exact 50 % square wave */
     d->step = 2.0f / (float)arr;
     d->inv_step = (float)arr * 0.5f;
-    uint32_t ri = arr == 100u ? 1u : (arr == 50u ? 2u : 0u);
+    uint32_t ri = reps == 2u ? 1u : (reps == 4u ? 2u : 0u);   /* NTF zero tuned per PWM rate, not per ARR */
     d->h1 = -(ntf_2cos[ri] + 1.0f);                                 /* ntf = (1 - z^-1)(1 - 2c z^-1 + z^-2): h = ntf[1:] */
     d->h2 = ntf_2cos[ri] + 1.0f;
     d->dither = 22695477u;                                          /* xorshift32 seed (determinism rules: fixed) */

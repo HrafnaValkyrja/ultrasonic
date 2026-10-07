@@ -56,5 +56,12 @@ static inline uint16_t fw_ccr_from_level(int32_t qi, const fw_ccr_bounds_t *b, u
     return c;
 }
 float fw_db_to_amp(int32_t cdb);                                   /* table lookup, 0.1 dB steps, -80..0 dB; > 0 dB -> 1 */
-uint16_t fw_arr_for_khz(int32_t pwm_khz);                          /* 200 -> 200, 400 -> 100, 800 -> 50 (else 200) */
+/* PWM timing per clock plan (FWSIM-R25, R46). TIM1 is centre-aligned on HCLK: f_pwm = HCLK / (2 ARR). Every plan has HCLK = B x 400 kHz
+ * exactly (B integer: P80 200, P160 400, P64 160, P48 120, P112 280, P104 260, P72 180, P52 130), and fs_pcm = HCLK / 400, so the PWM rate
+ * is an exact integer multiple R of the PCM rate when ARR = B / R (R = pwm_khz / 200). A rate is legal at a plan only when B is divisible by
+ * R and ARR >= HC_ARR_MIN (amplitude resolution, spec D6 MP-01); otherwise the rate is halved until it is (nearest lower legal rate:
+ * P52 800 -> 400 kHz, P64 800 -> 400, P48 800 -> 400). *eff_khz receives the rate actually used. */
+uint32_t fw_plan_hclk_hz(uint32_t plan);                                    /* exact plan HCLK (= hal_clock_hclk_hz after set_plan) */
+uint16_t fw_arr_for_khz(int32_t pwm_khz, uint32_t plan, int32_t *eff_khz);
+uint32_t fw_dead_ticks(uint32_t ticks_p80, uint32_t plan);                 /* knob ticks are 12.5 ns P80 ticks: never shorter at a faster plan */
 #endif

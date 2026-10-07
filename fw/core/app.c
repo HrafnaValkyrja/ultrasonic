@@ -15,7 +15,7 @@ void fw_app_boot(fw_app_t *app)
     if (app->store.events & FW_STORE_EV_CLAMPED)
         fw_event(&app->st, FW_EV_KNOBS_CLAMPED, 0, hal_time_us());
     hal_power_ucpd_dbdis();                     /* ECR-0013: release PB15/PA15 dead-battery pull-downs before PWM */
-    hal_pwm_cfg_t cfg = {(uint16_t)app->st.arr, 1u, (uint8_t)app->st.knobs.dead_time_rise_ticks, (uint8_t)app->st.knobs.dead_time_fall_ticks};
+    hal_pwm_cfg_t cfg = {(uint16_t)app->st.arr, 1u, (uint8_t)app->st.dt_rise, (uint8_t)app->st.dt_fall};
     (void)hal_pwm_config(&cfg);
     (void)hal_wdt_start((uint32_t)app->st.knobs.iwdg_ms);
     app->hops = 0u;

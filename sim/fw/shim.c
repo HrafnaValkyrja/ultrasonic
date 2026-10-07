@@ -42,7 +42,7 @@ int32_t shim_init(fw_state_t *st, const int32_t *ids, const int32_t *vals, int32
 
 int32_t shim_set_noise(fw_state_t *st, const float *nb, uint32_t n) { return fw_set_noise_cal(st, nb, n); }
 uint32_t shim_hash(const fw_state_t *st) { return fw_state_hash(st); }
-uint32_t shim_ccr_per_hop(const fw_state_t *st) { return FW_HOP_N * 200u / st->arr; }
+uint32_t shim_ccr_per_hop(const fw_state_t *st) { return FW_HOP_N * st->pwm_reps; }
 
 /* n_hops hops of words (128 per hop for D1, 256 for D2). Outputs (each may be NULL): ccr[n_hops * ccr_per_hop],
  * dsp[n_hops * 8], band[n_hops * 28], floor_[n_hops * 28], peak[n_hops], sq[n_hops], norm[n_hops * 3], sq_periods[n_hops] */
@@ -79,7 +79,7 @@ int32_t shim_run(fw_state_t *st, const int32_t *words, uint32_t n_hops, int32_t 
 int32_t shim_out(fw_state_t *st, const float *y, uint32_t n_hops, uint16_t *ccr, float *peak, uint32_t *sqp)
 {
     fw_ccr_bounds_t b = fw_ccr_bounds((uint16_t)st->arr, st->amp_max_ppm);
-    uint32_t per = FW_HOP_N * 200u / st->arr;
+    uint32_t per = FW_HOP_N * st->pwm_reps;
     FTZ_ON();
     for (uint32_t h = 0; h < n_hops; h++) {
         fw_out_info_t oi;
