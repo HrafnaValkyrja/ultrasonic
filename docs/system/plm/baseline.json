@@ -68,9 +68,9 @@
    }
   },
   "REG-POD-BODY": {
-   "by": "claude-ecr0001",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell",
+   "note": "sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change",
    "stamp": {
     "file:hw/mech/blade.py": "20e890c775848522",
     "file:hw/mech/dims_r2.py": "2e56e5d5e9675ad1",
@@ -147,9 +147,9 @@
    }
   },
   "SUB-UI": {
-   "by": "docs-phase2-rewrite",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change",
    "stamp": {
     "block:UI": "2e30cc3f141e491d",
     "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
@@ -575,9 +575,9 @@
    }
   },
   "R-UI-BOARD": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/pod/place_r1.py PLACE (Rev F reference) to the current design (yaml: hw/pod/draft_r2/placement.yaml keys, routed board, bom_jlc_mz2.csv); 'what' rewritten from placement.yaml; routed board checked: interfaces.py board-nets/inside/heights PASS, bom_check refs/nets/jlc-bom PASS, LN-M03 1.29 %; Y1 now FC-12M (C99009, MPN field added)",
+   "note": "sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change",
    "stamp": {
     "net:BTN": "0900cf1931215b5e",
     "ref:SW1": "6a5226a0b24dd9c5",
@@ -585,9 +585,9 @@
    }
   },
   "R-UI-BODY": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/mech/shell_r1.py (reference) to hw/mech/dims_r2.py (CAD-free constants, values identical to shell_r2 before the split) + shell_r2.py solids; checked with interfaces.py on the routed board: mic-port PASS 0.000 mm (gauge pin 0.115 <= 0.20), switch WARN stack 0.20 vs 0.15, outline PASS, heights PASS (B 1.4, F 0.30, SW1 pocket 0.90), clamp-bands WARN (VHB 31 % bonded, open), frame WARN ECR-0001; USB-C keep-out not in shell_r2",
+   "note": "sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change",
    "stamp": {
     "ref:SW1": "6a5226a0b24dd9c5",
     "sym:hw/mech/dims_r2.py::POCKET": "75123b323bc1f0df",

@@ -14,7 +14,7 @@ date: 2026-10-07
 counts: {total: 105, unblocked: 32, stale_closed: 2, owner: 25, hardware: 34, router: 1, fw_agent: 7, item_dep: 4}   # entries (dups folded into one entry); update on every close
 
 unblocked:   # value order; rank 1 = do first
-  - {id: UI-2, rank: 1, cls: risk, src: sub-ui.md#2, dup: [RPB-17, 00-whole risk 12], t: "SW1 press (1.2-2.0 N) reacted only by the 0.8 mm board + VHB; board deflection, VHB stress and whether the KMT022 stroke (0.15+-0.1) survives are uncomputed", close: "scikit-fem plate model of the bonded board under 2.0 N at board (18.5, 6.0)", blk: none, st: open}
+  - {id: UI-2, rank: 1, cls: risk, src: sub-ui.md#2, dup: [RPB-17, 00-whole risk 12], t: "SW1 press (1.2-2.0 N) reacted only by the 0.8 mm board + VHB; board deflection, VHB stress and whether the KMT022 stroke (0.15+-0.1) survives are uncomputed", close: "scikit-fem plate model of the bonded board under 2.0 N at board (18.5, 6.0)", blk: none, st: "done 2026-10-07 (analysis; sim/checks/sw1_press_fem.py: 2 N -> SW1 1.4-20 um, VHB 12-52 kPa vs 85 kPa 3M dynamic factor; bench press test stays in hardware RPB-17)"}
   - {id: PWR-I14, rank: 2, cls: risk, src: sub-power.md PWR-I14, t: "C21 (VSYS) 10 V class-2 cap vs TI's 25 V recommendation; derated value must stay > 1 uF at 4.5 V", close: "DC-bias of C19702 at 4.5 V from the maker's curve, or a 16/25 V Basic swap", blk: none, st: open}
   - {id: PWR-I6, rank: 3, cls: risk, src: sub-power.md PWR-I6, dup: [DBG-9], t: "R20 0402 0R jumper carries the whole +3V0 rail (326 mA peak); rating unsourced", close: "read the jumper's rated current in the maker datasheet", blk: none, st: open}
   - {id: DK-18, rank: 4, cls: risk, src: sub-dock-usb.md DK-18, t: "D5 TPD1E10B06 working voltage 5.5 V vs worst-case dock VBUS; leakage near 5.5 V unknown", close: "datasheet I_leak vs V", blk: none, st: open}
@@ -26,6 +26,7 @@ unblocked:   # value order; rank 1 = do first
   - {id: PROC-6R, rank: 10, cls: evidence, src: sub-processing.md#6, dup: [OUT-6], t: "research half of the fault cut-off question: can COMP/ADC watchdog reach TIM1 break internally on U575 (RM0456 TIM1 break sources [TBD])", close: "RM0456 read, options into the backlog for the owner", blk: none, st: open}
   - {id: DK-17, rank: 11, cls: evidence, src: sub-dock-usb.md DK-17, t: "does the U5 ROM DFU need VBUS sensing on QFN48 (no OTG VBUS pin)?", close: "AN2606 read", blk: none, st: open}
   - {id: PROC-9, rank: 12, cls: evidence, src: sub-processing.md#9, t: "SMPS 3 MHz synchronous or free-running (whine risk with /20 mic divider) unverified", close: "RM0456/DS read", blk: none, st: open}
+  - {id: VHB-TOL, rank: 1.5, cls: risk, src: "3M VHB 4914 TDS 2024-09 (found during UI-2)", t: "VHB 4914 thickness tolerance is +-15 % = +-0.0375 mm (TDS), but dims_r2.switch_stack() assumes +-0.025 [A]: the switch stack and pocket clearance are computed on a tolerance 1.5x too tight", close: "set the TDS value in dims_r2, re-run switch_stack + interfaces", blk: none, st: open}
   - {id: RB-TOL, rank: 13, cls: evidence, src: reg-pod-body.md#18, dup: [PHYS-18, SAI-15], t: "Phase-2 [A] tolerances (JLC outline +-0.2, NPTH +-0.05, VHB, resin, KMT022) undated; tolerances.md Rev-1 only", close: "dated sources, tolerances.md Phase-2 section", blk: none, st: open}
   - {id: SAI-3, rank: 14, cls: evidence, src: sub-audio-in.md#3, t: "no acoustic mesh chosen (S8-mesh FAIL)", close: "pick a mesh with ultrasonic transmission data", blk: none, st: open}
   - {id: DK-16, rank: 15, cls: evidence, src: sub-dock-usb.md DK-16, t: "dock wire gauge/type unchosen (only OD 0.8 specified; under-cell slack 0.8)", close: "pick <= 0.4 mm OD, record, fill check", blk: none, st: open}
@@ -101,7 +102,7 @@ hardware:   # parts / bench / built board (O21: nothing ordered before freeze)
   - {id: SAI-13, t: "63 kHz EQ notch constant from a bench sweep"}
   - {id: DBG-8, t: "ROM DFU pauses charging: check with a cell"}
   - {id: RB-4, dup: [OUT-9 J-pad, 00-whole risk 1], t: "meter adjacent J pads in bring-up step 1"}
-  - {id: RPB-17, t: "600k-press + drop coupon (MZD-7)", note: "analysis half = UI-2"}
+  - {id: RPB-17, t: "600k-press + drop coupon (MZD-7) + 1.6 N kitchen-scale press test (UI-2 bench half)", note: "analysis done (UI-2)"}
   - {id: UI-7, t: "LED VF at 0.1-1 mA"}
   - {id: ARM-1R, t: "heel exit dry fit with the real cell"}
   - {id: ARM-2, t: "pad force dip on jaw opening; option pick after E12", opts: "A ~5 mm set (rec if k_t <= 5 N/mm) / B 0.85 wire / C deeper + saddle"}

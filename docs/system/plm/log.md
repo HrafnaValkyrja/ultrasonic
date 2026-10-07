@@ -228,3 +228,11 @@
 - 2026-10-07 12:21 checkin REG-POD-BODY by heel-exit-agent
 - 2026-10-07 12:21 checkin PHYSICAL by heel-exit-agent
 - 2026-10-07 12:21 checkin WHOLE by heel-exit-agent
+- 2026-10-07 12:30 checkout SUB-UI by backlog-agent: close sub-ui issue 2 analysis half (sw1_press_fem)
+- 2026-10-07 12:30 checkout REG-POD-BODY by backlog-agent: reg-pod-body issue 17 margin from sw1_press_fem
+- 2026-10-07 12:30 review R-UI-BODY by backlog-agent: sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change
+- 2026-10-07 12:30 review R-UI-BOARD by backlog-agent: sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change
+- 2026-10-07 12:30 review SUB-UI by backlog-agent: sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change
+- 2026-10-07 12:30 review REG-POD-BODY by backlog-agent: sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change
+- 2026-10-07 12:30 checkin SUB-UI by backlog-agent
+- 2026-10-07 12:30 checkin REG-POD-BODY by backlog-agent
