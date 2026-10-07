@@ -537,6 +537,32 @@ def route(placement, netlist, W, H, out):
     return best
 
 
+def prune_dangling_vias(b):
+    """Post-route cleanup (2026-10-07, CHK-DRCWARN): delete every via that touches copper on at most ONE layer (no track
+    end on it, no pad over it, and at most one filled zone of its net). FreeRouting can leave such vias, and the locked
+    NRST pre-via from preroute() stays unused when the router reaches TP3 another way; DRC flags them via_dangling.
+    Zones must be filled before the call. Returns [(net, x, y)] deleted."""
+    gone = []
+    tracks = [t for t in b.GetTracks() if t.GetClass() == "PCB_TRACK"]
+    pads = [p for fp in b.GetFootprints() for p in fp.Pads()]
+    for v in [t for t in b.GetTracks() if t.GetClass() == "PCB_VIA"]:
+        pos, r, net = v.GetPosition(), v.GetWidth(pcbnew.F_Cu) / 2, v.GetNetCode()
+        layers = set()
+        for t in tracks:
+            if t.GetNetCode() == net and any((e - pos).EuclideanNorm() <= r for e in (t.GetStart(), t.GetEnd())):
+                layers.add(t.GetLayer())
+        for p in pads:
+            if p.GetNetCode() == net and p.HitTest(pos):
+                layers.update(l for l in (pcbnew.F_Cu, pcbnew.B_Cu) if p.IsOnLayer(l))
+        for z in b.Zones():
+            if z.GetNetCode() == net:
+                layers.update(l for l in z.GetLayerSet().Seq() if z.HitTestFilledArea(l, pos))
+        if len(layers) <= 1:
+            gone.append((v.GetNetname(), round(pcbnew.ToMM(pos.x), 3), round(pcbnew.ToMM(pos.y), 3)))
+            b.Delete(v)
+    return gone
+
+
 def _import(out, ses):
     b = pcbnew.LoadBoard(str(out / "placed.kicad_pcb"))
     assert pcbnew.ImportSpecctraSES(b, str(ses))
@@ -544,6 +570,8 @@ def _import(out, ses):
         if t.GetClass() == "PCB_TRACK" and t.GetWidth() < mm(0.1):
             t.SetWidth(mm(0.1))
     pcbnew.ZONE_FILLER(b).Fill(b.Zones())
+    if prune_dangling_vias(b):                     # e.g. the unused NRST pre-via; refill so thermals follow
+        pcbnew.ZONE_FILLER(b).Fill(b.Zones())
     b.GetDesignSettings().m_NetSettings.GetDefaultNetclass().SetClearance(mm(0.09))
     return b
 
