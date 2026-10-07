@@ -1,5 +1,7 @@
 # Pod PCB ↔ mechanics: what the KiCad layout must respect (2026-09-30)
 
+> **Superseded in parts (banner 2026-10-07, reg-arm 7 / DK-13 / UI-9 / DBG-10):** lid-screw charging (MCP7383x), the SWD header scheme (§7-8) and the 20 x 11.5 board are Rev E; the current board is the one-face 30 x 12 MZ-2 (reg-board.md). Current truth: `hw/current.yaml` and `docs/system/`. Kept as history; do not build from the superseded parts.
+
 **Scope.** This note turns `hw/mech/frame.py` (the shared mechanical interface, 2026-09-30) into rules for the owner's KiCad layout of the pod board. It is reconciled with the shell agent's **proposed** tub + lid (`hw/mech/shell.py`, status USER_REVIEW), which holds the board differently from the frame's plan (§0 item 8). It also covers the new pad board (`hw/padboard/`), the JLC panel they share, and an electrical check of the lid-screw charge contacts and the pad LED against `hw/pod/gen.py` (schematic Rev C).
 
 **Pictures** (dark, in `hw/mech/out/parts/electronics/`):

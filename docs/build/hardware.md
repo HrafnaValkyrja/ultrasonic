@@ -364,6 +364,8 @@ Sources: siraya.tech product table, store.anycubic.com, us.elegoo.com, liqcreate
 
 ## 6. Charging dock: pogo pins onto the two lid screw heads
 
+> **Superseded (banner 2026-10-07):** O12a/O16 replaced lid-screw charging with the 5-pin magnetic dock (sub-dock-usb.md, dock-cable.svg) and Phase 2 has no housing screws (O16-6). Items 6-7 above and this section are history.
+
 The lid screws (`frame.LID_SCREWS`, at z = +2.7 and −6.4, 9.1 mm apart) carry VBUS and GND_CHG through the captured brass nuts to the board.
 
 | | **A. Mill-Max 0906-1-15-20-75-14-11-0** (through-hole solder-tail spring pin, radius tip, standard spring) | B. Adafruit P75-A2 "cupped head" pogo (10-pack, product 2428) |

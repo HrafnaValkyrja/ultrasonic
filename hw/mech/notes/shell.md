@@ -1,5 +1,7 @@
 # Pod shell: tub + lid (two resin prints)
 
+> **Superseded in parts (banner 2026-10-07, reg-arm 7 / DK-13 / UI-9 / DBG-10):** this is the pre-rev-1 shell (shell.py, frozen as PRE_R1); the current shell is shell_r2 (notes/shell_r2.md). Current truth: `hw/current.yaml` and `docs/system/`. Kept as history; do not build from the superseded parts.
+
 2026-09-30 · source `hw/mech/shell.py` · interface `hw/mech/frame.py` · numbers `hw/mech/out/parts/shell/checks.json`
 
 ![sections](../out/parts/shell/shell_sections.png)

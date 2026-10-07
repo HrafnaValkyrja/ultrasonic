@@ -110,7 +110,7 @@ Solder each arm wire on the **top half** of its pad: the cap's epoxy dam (r 3.25
 7. **The collar stands 10.6 mm off the skin,** ~1.4 mm higher than rev 2 toward the Ear (open). pad.md option B2 (lower T by 1.5 mm) gets ~9.1 mm but re-solves the frame. **Closes:** E9 clearance at true scale.
 8. **LED polarity:** KiCad's LED footprint has pad 1 = cathode, while Everlight numbers the anode "1". **Closes:** check the cathode mark in JLC's placement preview (operate-jlcpcb-order).
 9. **Pad-board fabrication:** layout.py makes a 2-layer board, while pad.md and electronics.md put it on the pod board's panel. The pod board is 4-layer, so a shared panel makes the pad board 4-layer (derived), and JLC charges a different-design fee (electronics.md item 10). **Closes:** the JLC quote; decide panel vs separate order (O13).
-10. **Stale text:** pad.md fixed 2026-10-07 (route, bores, pilot; reg-arm issue 7); padboard gen.py docstring and pad.py PADBOARD_REQUESTED still open.
+10. **Stale text:** pad.md fixed 2026-10-07 (route, bores, pilot; reg-arm issue 7); padboard gen.py docstring and pad.py PADBOARD_REQUESTED still open. Closed 2026-10-07 (padboard gen.py, pad.md L64 VSYS; PADBOARD_REQUESTED kept on purpose: pad.py draws it dashed as the 2026-09-30 request vs the live layout).
     - pad.md predates 2026-10-01: front conductor channel, set screw from the rear flat, Ø1.0 channel, "LED+ goes to VBAT".
     - hw/padboard/gen.py docstring says "R14 2k2 from VBAT"; it's been VSYS since Rev D.
     - pad.py's `PADBOARD_REQUESTED` still holds the old J5/J6 spot (electronics.md item 8).

@@ -21,7 +21,7 @@
 | L1 | Murata DFE201610E | yes: `dfe201610e.pdf` (f85e5012098480dc) | Murata "Reference Only" spec, file dated 2017 | not checked on murata.com | unknown |
 | D1, D2 | PESD5V0S1BL | **NO.** The sourcing lock records an LCSC URL, but it returns an HTML viewer page, not the PDF, and was never downloaded | – | – | **values quoted (35 pF, 5 nA) come from listings, not a datasheet** |
 | D3 | ESD9X5.0ST5G | **NO** (same) | – | – | **not from a datasheet** |
-| SW1 | C&K KXT321LHS | **NO** (same) | – | – | **not from a datasheet** |
+| SW1 | C&K KXT321LHS (Rev E; **now KMT022NGJLHS**, MZ-2) | KMT0 sheet in ultrasonic-scratch/ds/kmt0.pdf (mod 2018-03-21, a7791d9888a26610) | – | – | KMT022 read 2026-10-07 (UI-3: Ø1.0 minimum actuator, full flat surface recommended) |
 | R1–R10, C1–C19 | 12 passive lines (Samsung, Uni-Royal, FH) | **NO** | – | – | ratings from JLC/LCSC listings. The capacitor DC-bias derating statements aren't backed by a manufacturer curve |
 
 **Count:** 9 of 21 BOM lines have a downloaded datasheet. After the owner's ST documents, all MCU documents are current. The ESD diodes, switch and passives are still missing.

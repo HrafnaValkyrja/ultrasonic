@@ -444,3 +444,21 @@
 - 2026-10-07 13:25 checkin REG-PAD by backlog-agent
 - 2026-10-07 13:26 review SUB-UI by backlog-agent: padboard gen.py docstring only (R14 from VSYS); no circuit change
 - 2026-10-07 13:27 review SUB-PROCESSING by ultrasonic-lead: 2026-10-07: sim/dsp algo A two-stage decimator (9bb9f30) recorded in reference_models
+- 2026-10-07 13:28 checkout REG-ARM by backlog-agent: stale notes cleanup (ARM-7 rest)
+- 2026-10-07 13:28 checkout REG-PAD by backlog-agent: stale notes cleanup (ARM-7 rest)
+- 2026-10-07 13:28 checkout SUB-UI by backlog-agent: stale notes cleanup (ARM-7 rest)
+- 2026-10-07 13:28 checkout SUB-DOCK-USB by backlog-agent: stale notes cleanup (ARM-7 rest)
+- 2026-10-07 13:28 checkout SUB-DEBUG-TEST by backlog-agent: stale notes cleanup (ARM-7 rest)
+- 2026-10-07 13:28 checkout INTEGRATION by backlog-agent: stale notes cleanup (ARM-7 rest)
+- 2026-10-07 13:29 review INTEGRATION by backlog-agent: Stale notes cleanup (ARM-7 rest, DK-13, UI-9, DBG-10, PAD-10): learn script values, gen.py/pad.md VSYS comments, provenance SW1 row, superseded banners on electronics.md, shell.md, pcb-mech-interface.md, B-parts-selection.md, hardware.md s6; no circuit/geometry change
+- 2026-10-07 13:29 review REG-ARM by backlog-agent: Stale notes cleanup (ARM-7 rest, DK-13, UI-9, DBG-10, PAD-10): learn script values, gen.py/pad.md VSYS comments, provenance SW1 row, superseded banners on electronics.md, shell.md, pcb-mech-interface.md, B-parts-selection.md, hardware.md s6; no circuit/geometry change
+- 2026-10-07 13:29 review REG-PAD by backlog-agent: Stale notes cleanup (ARM-7 rest, DK-13, UI-9, DBG-10, PAD-10): learn script values, gen.py/pad.md VSYS comments, provenance SW1 row, superseded banners on electronics.md, shell.md, pcb-mech-interface.md, B-parts-selection.md, hardware.md s6; no circuit/geometry change
+- 2026-10-07 13:29 review SUB-UI by backlog-agent: Stale notes cleanup (ARM-7 rest, DK-13, UI-9, DBG-10, PAD-10): learn script values, gen.py/pad.md VSYS comments, provenance SW1 row, superseded banners on electronics.md, shell.md, pcb-mech-interface.md, B-parts-selection.md, hardware.md s6; no circuit/geometry change
+- 2026-10-07 13:29 review SUB-DOCK-USB by backlog-agent: Stale notes cleanup (ARM-7 rest, DK-13, UI-9, DBG-10, PAD-10): learn script values, gen.py/pad.md VSYS comments, provenance SW1 row, superseded banners on electronics.md, shell.md, pcb-mech-interface.md, B-parts-selection.md, hardware.md s6; no circuit/geometry change
+- 2026-10-07 13:29 review SUB-DEBUG-TEST by backlog-agent: Stale notes cleanup (ARM-7 rest, DK-13, UI-9, DBG-10, PAD-10): learn script values, gen.py/pad.md VSYS comments, provenance SW1 row, superseded banners on electronics.md, shell.md, pcb-mech-interface.md, B-parts-selection.md, hardware.md s6; no circuit/geometry change
+- 2026-10-07 13:29 checkin REG-ARM by backlog-agent
+- 2026-10-07 13:29 checkin REG-PAD by backlog-agent
+- 2026-10-07 13:29 checkin SUB-UI by backlog-agent
+- 2026-10-07 13:29 checkin SUB-DOCK-USB by backlog-agent
+- 2026-10-07 13:29 checkin SUB-DEBUG-TEST by backlog-agent
+- 2026-10-07 13:29 checkin INTEGRATION by backlog-agent

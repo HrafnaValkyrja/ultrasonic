@@ -16,7 +16,7 @@ Rev B (2026-09-30, audit fixes): MCP73832 instead of MCP73831 (NM-1), VBUS sense
 C4 10 uF 0603 (NM-7), R1 10k (NM-11), C20 at VBAT (NM-5).
 Rev C (2026-09-30, owner O8): power-indicator LED in the pad housing, solid while on:
 VBAT -> R14 2k2 -> J7 (LED+) ~wire~ LED ~wire~ J8 (LED-) -> PB7 (open-drain, TIM4_CH2).
-~0.35-0.75 mA over the battery range; firmware holds it steady with a >20 kHz duty set from VBAT.
+~0.35-0.75 mA over the battery range; firmware holds it steady with a >20 kHz duty set from VSYS (sub-ui issue 7).
 Rev D (2026-10-01, owner O12/O16): BQ25180 power-path charger (I2C PB13/PB14, /INT PA15, NTC on TS,
 TS also on PA2 for the firmware's 20 C rule) replaces the MCP73832; the LDO and LED now run from VSYS;
 magnetic USB dock contacts J3 VBUS / J4 GND / J10 D+ / J11 D- / J12 CC (Rd 5.1k in the pod, CC
@@ -318,7 +318,7 @@ def build():
     btn = Net("BTN")
     v3 += sw[1], sw[2]; btn += sw[3], sw[4]; btn += u1["PA0"]          # WKUP1, active high
     r = R("R10", "2k2", "R2k2"); r[1] += btn; r[2] += gnd             # >= 1 mA through the contact when pressed
-    # power-indicator LED, off-board in the pad housing (docs/research/pad-led.md). Fed from VBAT:
+    # power-indicator LED, off-board in the pad housing (docs/research/pad-led.md). Fed from VSYS (R14):
     # a blue LED needs ~2.7 V, too close to the 3.0 V rail. PB7 is 5 V tolerant (FT, DS13737 Rev 8).
     led_a, led_k = Net("LED_A"), Net("LED_K")
     r = R("R14", "2k2", "R2k2"); r[1] += vsys; r[2] += led_a

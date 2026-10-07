@@ -215,6 +215,7 @@ option_bytes: "set nSWBOOT0=0, nBOOT0=1 only once a write-protected boot stub wo
   t: "R20 current rating unknown (sub-power); never feed TP4 with R20 fitted (back-drives U4 output; TI behaviour unsourced)"
 - id: DBG-10
   t: "stale round-1 SWD scheme (1x5 header, front-edge column, lid-screw charging) in hw/mech/notes/electronics.md §A, docs/research/pcb-mech-interface.md §7-§8, docs/build/hardware.md §7"
+  status: "banners added 2026-10-07 (electronics.md, pcb-mech-interface.md); hardware.md lid-screw charging section 6 bannered too; the SWD header scheme lives only in those bannered notes now"
 - id: DBG-11
   t: "no test-access map (TPs, dots, probe points, lift links, both faces, per build stage) or bring-up flow PNG; board-map-phase2.png covers part"
 - id: DBG-12

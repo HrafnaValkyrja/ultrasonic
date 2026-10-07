@@ -1,5 +1,7 @@
 # B — Parts selection for the product board (B1–B6, B8)
 
+> **Superseded in parts (banner 2026-10-07, reg-arm 7 / DK-13 / UI-9 / DBG-10):** SW1 is now KMT022NGJLHS (not KXT321LHS), the charger BQ25180 (not MCP73831): MZ-2 BOM hw/pod/bom_jlc_mz2.csv. Current truth: `hw/current.yaml` and `docs/system/`. Kept as history; do not build from the superseded parts.
+
 **Date:** 2026-09-30 (Claude Code session). **Status:** recommendations only. The owner decides every line (spec §0 rule 4).
 **Machine-readable lock:** `.pcba-workflow/sourcing-lock.csv` has one row per option, with LCSC number, library class, stock, price and query time.
 **Stock and price:** from the JLC parts API (`tools/jlc.py`), queried 2026-09-30 between 06:29 and 06:49 UTC. Prices are qty-1 USD. Stock changes daily, so re-check before ordering.

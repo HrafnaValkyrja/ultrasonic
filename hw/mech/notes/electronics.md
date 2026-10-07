@@ -1,5 +1,7 @@
 # Electronics side of the build: boards, wires, contacts (rev 1 = the prototype)
 
+> **Superseded in parts (banner 2026-10-07, reg-arm 7 / DK-13 / UI-9 / DBG-10):** lid-screw charge contacts, the 1x5 SWD header/front-edge column and the pad-board spot (PADBOARD_REQUESTED) are Rev E (2026-09-30). Current truth: `hw/current.yaml` and `docs/system/`. Kept as history; do not build from the superseded parts.
+
 **What this covers:** how the two circuit boards, their wires, the lid-screw charge contacts and the programming access are mounted, fixed, wired, assembled and taken apart at a bench.
 
 **Where the reasoning lives:**

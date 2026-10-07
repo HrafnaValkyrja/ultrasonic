@@ -61,7 +61,7 @@ This is the layout in `hw/padboard/layout.py` as of 23:37, read live by pad.py. 
   - From front to rear: OUT_B, LED−, LED+, OUT_A.
   - They connect 1:1 to the pod board's wire pads of the same names (`frame.WIRE_PADS`).
   - OUT_A/B are the bridge outputs.
-  - LED+ goes to VBAT through R14; LED− goes to PB7 (PWM), as in `docs/research/pad-led.md`.
+  - LED+ goes to VSYS through R14 (VBAT before Rev D); LED− goes to PB7 (PWM), as in `docs/research/pad-led.md`.
 - **Bottom end:** two plated through-holes, a Ø0.45 drill in a Ø0.85 pad, at (±1.775, 3.275) in KiCad coordinates. They take the transducer's two leads (XDCR_A/B).
 - **Solder each arm wire on the TOP half of its pad,** toward the board's top edge.
   - The cap's printed dam (r 3.25 around the LED: the ring's outer wall that presses the PE film) covers the lower 0.1 mm of the pads.
