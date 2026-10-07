@@ -138,7 +138,7 @@
   "SUB-PROCESSING": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "PROC-6R: RM0456 Rev 7 TIM1 break sources read: ADC1(PA6)->MDF1 out-of-limit->mdf1_break0->TIM1 BKCMP7E is a CPU-independent fault break with no board change; COMP excluded (PA6 not a COMP input); ocref_clr path rejected (ES0499 2.16.2); ADC1 dedicated while guarding (VBAT to ADC4). Docs only, decision stays with owner",
+   "note": "PROC-9: SMPS has no clock/sync control in RM0456 Rev 7 (free-running 3 MHz typ); lever REGSEL; docs only",
    "stamp": {
     "block:CLOCK": "2ac3a525f62269dc",
     "block:CORE_SMPS": "c2e952ea730a4765",

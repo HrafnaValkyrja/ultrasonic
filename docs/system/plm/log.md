@@ -301,3 +301,6 @@
 - 2026-10-07 12:53 review SUB-DOCK-USB by backlog-agent: DK-17 corrected: PA9 is USB_OTG_FS_VBUS on QFN48 (left NC); RM0456 B-session override exists; ROM USB path unproven; options DK-17D (A add series R, rec)
 - 2026-10-07 12:53 review R-PROC-DOCK by backlog-agent: DK-17 corrected: PA9 is USB_OTG_FS_VBUS on QFN48 (left NC); RM0456 B-session override exists; ROM USB path unproven; options DK-17D (A add series R, rec)
 - 2026-10-07 12:53 checkin SUB-DOCK-USB by backlog-agent
+- 2026-10-07 12:54 checkout SUB-PROCESSING by backlog-agent: PROC-9: SMPS clocking read
+- 2026-10-07 12:54 review SUB-PROCESSING by backlog-agent: PROC-9: SMPS has no clock/sync control in RM0456 Rev 7 (free-running 3 MHz typ); lever REGSEL; docs only
+- 2026-10-07 12:54 checkin SUB-PROCESSING by backlog-agent
