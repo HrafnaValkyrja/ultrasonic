@@ -10,39 +10,39 @@
    }
   },
   "INTEGRATION": {
-   "by": "backlog-agent",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 8 router batch (ECR-0018 log): R23 1M I_SENSE offset (OUT-1B), TP2/TP4 swap (DBG-2), mic NPTH D0.65 at (1.90, 6.0) Port0.65 footprint (SAI-15D), local re-route of BTN/I_SENSE/SWCLK; DK-17D (R24/PA9) not routable locally, backed out (reg-board 22). DRC 0/0/0 all severities, place_r2 check PASS, noise smoke PASS (M03 1.32 %), acoustics MC60 mean +5.93 dB / R14 all-pass 0.63, interfaces/bom_check no FAIL, shell_r2 valid",
+   "note": "round 10: K1 variant hook; phase2 values identical (regressions 0 diffs); docs carry the variant note; K1 facts in reg-pod-body Variants",
    "stamp": {
-    "file:hw/current.yaml": "2ec18d3a41117431",
+    "file:hw/current.yaml": "c9a18deee18510ed",
     "file:hw/pod/gen.py": "3ed3676e85fb73eb",
     "file:hw/pod/system_map.py": "14c172c853e5844f"
    }
   },
   "PHYSICAL": {
-   "by": "backlog-agent",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 8 router batch (ECR-0018 log): R23 1M I_SENSE offset (OUT-1B), TP2/TP4 swap (DBG-2), mic NPTH D0.65 at (1.90, 6.0) Port0.65 footprint (SAI-15D), local re-route of BTN/I_SENSE/SWCLK; DK-17D (R24/PA9) not routable locally, backed out (reg-board 22). DRC 0/0/0 all severities, place_r2 check PASS, noise smoke PASS (M03 1.32 %), acoustics MC60 mean +5.93 dB / R14 all-pass 0.63, interfaces/bom_check no FAIL, shell_r2 valid",
+   "note": "round 10: K1 variant hook; phase2 values identical (regressions 0 diffs); docs carry the variant note; K1 facts in reg-pod-body Variants",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
-    "sym:hw/mech/dims_r2.py::B_GAP": "9e0415c00f9dc49a",
+    "sym:hw/mech/dims_r2.py::B_GAP": "1e9c268f1cee6301",
     "sym:hw/mech/dims_r2.py::CAV": "57e979455ac943d6",
-    "sym:hw/mech/dims_r2.py::CELL": "77243a4be17c6775",
+    "sym:hw/mech/dims_r2.py::CELL": "03fd244d058457f0",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
     "sym:hw/mech/dims_r2.py::VHB_T": "64d2b9d2ed88b422",
-    "sym:hw/mech/dims_r2.py::X0": "73cb98e9e9dee1bd",
+    "sym:hw/mech/dims_r2.py::X0": "6d87623f1f82792f",
     "sym:hw/mech/dims_r2.py::Y_IN": "90f906aa99df70d9",
     "sym:hw/mech/dims_r2.py::Z1": "00a5cb419102d033"
    }
   },
   "REG-ARM": {
-   "by": "backlog-agent",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "text fix: left-pod arm pads z -7.4..-4.15 (J2/J8 from placement), comment only in heel.py",
+   "note": "round 10: K1 variant hook; phase2 values identical (regressions 0 diffs); docs carry the variant note; K1 facts in reg-pod-body Variants",
    "stamp": {
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
-    "file:hw/mech/heel.py": "11da6d8d9fff06e1",
+    "file:hw/mech/heel.py": "7d4d3eb0aaa25d99",
     "file:sim/checks/niti_arm_real.py": "62944f12dde4e774"
    }
   },
@@ -68,13 +68,13 @@
    }
   },
   "REG-POD-BODY": {
-   "by": "backlog-agent",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 8 router batch (ECR-0018 log): R23 1M I_SENSE offset (OUT-1B), TP2/TP4 swap (DBG-2), mic NPTH D0.65 at (1.90, 6.0) Port0.65 footprint (SAI-15D), local re-route of BTN/I_SENSE/SWCLK; DK-17D (R24/PA9) not routable locally, backed out (reg-board 22). DRC 0/0/0 all severities, place_r2 check PASS, noise smoke PASS (M03 1.32 %), acoustics MC60 mean +5.93 dB / R14 all-pass 0.63, interfaces/bom_check no FAIL, shell_r2 valid",
+   "note": "round 10: K1 variant hook; phase2 values identical (regressions 0 diffs); docs carry the variant note; K1 facts in reg-pod-body Variants",
    "stamp": {
-    "file:hw/mech/blade.py": "20e890c775848522",
-    "file:hw/mech/dims_r2.py": "4b1e8a2ae720a784",
-    "file:hw/mech/shell_r2.py": "b99f349c130b4ba8",
+    "file:hw/mech/blade.py": "ad6b4d86e46c5d84",
+    "file:hw/mech/dims_r2.py": "daef0bc7a437916e",
+    "file:hw/mech/shell_r2.py": "f10694457b866e37",
     "file:hw/mech/styles.py": "23dcb6bfe495f82f"
    }
   },
@@ -107,12 +107,12 @@
    }
   },
   "SUB-DOCK-USB": {
-   "by": "backlog-agent",
+   "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 8 router batch (ECR-0018 log): R23 1M I_SENSE offset (OUT-1B), TP2/TP4 swap (DBG-2), mic NPTH D0.65 at (1.90, 6.0) Port0.65 footprint (SAI-15D), local re-route of BTN/I_SENSE/SWCLK; DK-17D (R24/PA9) not routable locally, backed out (reg-board 22). DRC 0/0/0 all severities, place_r2 check PASS, noise smoke PASS (M03 1.32 %), acoustics MC60 mean +5.93 dB / R14 all-pass 0.63, interfaces/bom_check no FAIL, shell_r2 valid",
+   "note": "round 10: K1 variant hook; phase2 values identical (regressions 0 diffs); docs carry the variant note; K1 facts in reg-pod-body Variants",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
-    "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"
+    "sym:hw/mech/dims_r2.py::DOCK": "9f3e8ca2743ae3a7"
    }
   },
   "SUB-OUTPUT": {
