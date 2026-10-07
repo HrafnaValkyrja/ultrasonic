@@ -49,9 +49,9 @@
   "REG-BOARD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "CHK-MODELS: only the 3D model path changed in the Knowles/KMT022 library footprints (pads, hole unchanged); interfaces mic-port/heights PASS",
+   "note": "via pair: redundant +3V0 via d5fef857 + 0.86 stub deleted (U1.9-C6 island keeps the C6 via); DRC 0/0/0; noise metrics identical",
    "stamp": {
-    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "36d088d48e70d239",
+    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "21bbe68f2cbd09db",
     "file:hw/pod/draft_r2/placement.yaml": "568be76a2d8a482d",
     "glob:hw/lib/pod.pretty/*.kicad_mod": "9fa247f977b33b6d",
     "sym:hw/pod/place.py::rules": "cf2bb252c4b5e5fa"
@@ -346,9 +346,9 @@
   "R-OUT-BOARD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "CHK-DRCWARN: 2 dangling vias deleted (GND In1-only, NRST unused pre-via); DRC 0 errors/0 unconnected/1 warning (hole_to_hole +3V0 pair, real, router); noise smoke 6 metrics identical, LN-M03 1.29 %",
+   "note": "via pair: redundant +3V0 via d5fef857 + 0.86 stub deleted (U1.9-C6 island keeps the C6 via); DRC 0/0/0; noise metrics identical",
    "stamp": {
-    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "36d088d48e70d239",
+    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "21bbe68f2cbd09db",
     "ref:Q1": "9e9cfa60e1e11081",
     "ref:R21": "a66fda4215076577",
     "yaml:hw/pod/draft_r2/placement.yaml::Q1": "f320227ba3fc460a",
@@ -525,9 +525,9 @@
    }
   },
   "R-SMPS-BOARD": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/pod/place_r1.py PLACE (Rev F reference) to the current design (yaml: hw/pod/draft_r2/placement.yaml keys, routed board, bom_jlc_mz2.csv); 'what' rewritten from placement.yaml; routed board checked: interfaces.py board-nets/inside/heights PASS, bom_check refs/nets/jlc-bom PASS, LN-M03 1.29 %; Y1 now FC-12M (C99009, MPN field added)",
+   "note": "via pair: redundant +3V0 via d5fef857 + 0.86 stub deleted (U1.9-C6 island keeps the C6 via); DRC 0/0/0; noise metrics identical",
    "stamp": {
     "net:VDD11": "c95fface11d1e689",
     "net:VLXSMPS": "1ccb3a18f1ede9ed",

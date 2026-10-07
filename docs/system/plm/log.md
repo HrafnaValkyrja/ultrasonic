@@ -498,3 +498,8 @@
 - 2026-10-07 16:00 checkout SUB-AUDIO-IN by backlog-agent: SAI-12 duct section
 - 2026-10-07 16:00 review SUB-AUDIO-IN by backlog-agent: SAI-12 duct-section.svg generated from dims_r2; docs only
 - 2026-10-07 16:00 checkin SUB-AUDIO-IN by backlog-agent
+- 2026-10-07 16:01 checkout REG-BOARD by backlog-agent: delete redundant +3V0 via d5fe + its stub (coordinator-authorised)
+- 2026-10-07 16:02 review REG-BOARD by backlog-agent: via pair: redundant +3V0 via d5fef857 + 0.86 stub deleted (U1.9-C6 island keeps the C6 via); DRC 0/0/0; noise metrics identical
+- 2026-10-07 16:02 review R-OUT-BOARD by backlog-agent: via pair: redundant +3V0 via d5fef857 + 0.86 stub deleted (U1.9-C6 island keeps the C6 via); DRC 0/0/0; noise metrics identical
+- 2026-10-07 16:02 review R-SMPS-BOARD by backlog-agent: via pair: redundant +3V0 via d5fef857 + 0.86 stub deleted (U1.9-C6 island keeps the C6 via); DRC 0/0/0; noise metrics identical
+- 2026-10-07 16:02 checkin REG-BOARD by backlog-agent

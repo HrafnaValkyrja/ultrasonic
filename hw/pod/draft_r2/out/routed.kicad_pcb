@@ -12688,14 +12688,6 @@
 		(uuid "b478727f-7555-49b5-b66c-e56e7723bc21")
 	)
 	(via
-		(at 11.5948 1.1519)
-		(size 0.35)
-		(drill 0.15)
-		(layers "F.Cu" "B.Cu")
-		(net "+3V0")
-		(uuid "d5fef857-65bf-4180-9f7f-dafea7a99928")
-	)
-	(via
 		(at 19.45 7.525)
 		(size 0.35)
 		(drill 0.15)
@@ -12798,14 +12790,6 @@
 		(layer "B.Cu")
 		(net "+3V0")
 		(uuid "43bdc41a-e493-4f94-86ee-f5903f0349d5")
-	)
-	(segment
-		(start 11.3 1.9625)
-		(end 11.5948 1.1519)
-		(width 0.15)
-		(layer "B.Cu")
-		(net "+3V0")
-		(uuid "53ddb795-98d6-443a-9679-2b027ee9b9c3")
 	)
 	(segment
 		(start 7.3 1.9625)
