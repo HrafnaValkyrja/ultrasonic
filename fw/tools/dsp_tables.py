@@ -8,8 +8,7 @@ Called by fw/tools/gen.py (output dsp_tables.h). Every filter is designed here, 
   fft               bit-reverse pairs + twiddles of the 256-pt real FFT (128-pt complex radix-2 + real split)
   interp            x16 polyphase interpolator (remez, 16*TPP-1 taps + 1 zero), pass 0-4.25 kHz, stop 8.25-100 kHz (e2e F5: >= 67 dB)
   hb                pipeline.decimate_to_fs 31-tap half-band (D2 front end)
-  a_*               algorithm A = pipeline.algo_a mix -> firwin(255) -> butter(2) HP -> resample_poly(1, 16), reordered (LTI) as
-                    HP at 200 kS/s -> one 575-tap decimating FIR c = h_rp (x) b255 (symmetric: 288 folded taps)
+  a_*               algorithm A = pipeline.algo_a_base: mix -> 16-tap /4 -> 40-tap /4 -> butter(2) HP at 12.5 kS/s (lead decision 2026-10-07)
   ntf               3rd-order error-feedback shaper: (1 - z^-1)(1 - 2cos(wz) z^-1 + z^-2), zero pair at 13 kHz (stages.PwmShaper), per PWM rate
 """
 import math
@@ -53,12 +52,10 @@ def interp_proto(tpp):
 
 def a_filters():
     sys.path.insert(0, str(REPO / "sim/dsp"))
-    b = signal.firwin(255, 2750.0 + 3000.0 / 2, fs=FS)                  # pipeline.algo_a: out_center + bw/2
-    hp = signal.butter(2, max(2750.0 - 3000.0 / 2, 300), "hp", fs=FS, output="sos")[0]
-    h_rp = signal.firwin(2 * 160 + 1, 1.0 / 16, window=("kaiser", 5.0))  # scipy resample_poly(1, 16) default filter
-    c = np.convolve(h_rp, b)                                            # 575 taps, centre 287
-    assert len(c) == 575 and np.allclose(c, c[::-1])
-    return hp, c
+    import pipeline as pl                                               # noqa: E402
+    h1, h2 = pl.a_decimators()
+    hp = signal.butter(2, 1250.0, "hp", fs=FS_OUT, output="sos")[0]     # pipeline.algo_a_base HP at 12.5 kS/s
+    return hp, h1, h2
 
 
 def noise_bands():
@@ -78,11 +75,7 @@ def a_noise_sm():
     sys.path.insert(0, str(REPO / "sim/dsp"))
     import pipeline as pl                                               # noqa: E402
     x = pl.decimate_to_fs(pl.microphone(np.zeros(int(0.5 * pl.FS_IN)), seed=99, noise_scale=1.0))
-    t = np.arange(len(x)) / FS
-    b = signal.firwin(255, 2750.0 + 1500.0, fs=FS)
-    base = signal.fftconvolve(x * np.cos(2 * np.pi * 38e3 * t) * 2, b, mode="same")
-    base = signal.sosfilt(signal.butter(2, 1250.0, "hp", fs=FS, output="sos"), base)
-    y = signal.resample_poly(base, 1, 16)
+    y = pl.algo_a_base(x)
     sm = signal.lfilter([0.02], [1, -0.98], np.abs(y) * np.pi / 2)
     return float(np.mean(sm[len(sm) // 4:]))
 
@@ -102,6 +95,15 @@ def generate(hdr):
     o.append("/* mic self-noise band energy (stages.DspStage calibration: nominal EIN, seed 99, 0.5 s); default until a unit calibration is loaded */")
     o += arr("FW_DSP_NOISE_SPEC", nbt["SPEC"])
     o += arr("FW_DSP_NOISE_SLIM", nbt["SLIM"])
+    o.append("/* default-knob band centres sqrt(e_b e_b+1) and pipeline.map_freq of them, float64 -> float32 (runtime math has ~1e-7 error,\n"
+             " * which drifts the phase of steady tones; the tables are used when band_lo/hi and out_lo/hi are at their defaults) */")
+    for name, nb in (("SPEC", 28), ("SLIM", 16)):
+        cfg = pl.BConfig(n_bands=nb)
+        e = pl.band_edges(cfg)
+        g = np.sqrt(e[:-1] * e[1:])
+        o += arr(f"FW_DSP_GEO_{name}", g)
+        o += arr(f"FW_DSP_MAPGEO_{name}", pl.map_freq(g, cfg))
+    o.append("#define FW_DSP_MAP_DEFAULTS(lo, hi, olo, ohi) ((lo) == %d && (hi) == %d && (olo) == %d && (ohi) == %d)" % (20000, 85000, 1500, 4000))
     o.append("/* sin(2 pi i / 1024), i = 0..1024 (guard) */")
     o += arr("FW_DSP_SIN", np.sin(2 * np.pi * np.arange(1025) / 1024))
     # FFT tables: 128-pt complex, bit-reversal pairs (i < rev(i))
@@ -132,11 +134,12 @@ def generate(hdr):
     hb = signal.remez(31, [0, 80e3, 120e3, 200e3], [1, 0], fs=400e3)
     o.append("/* D2 front end: pipeline.decimate_to_fs remez(31, [0, 80k, 120k, 200k]) at 400 kS/s */")
     o += arr("FW_DSP_HB", hb)
-    hp, c = a_filters()
-    o.append("/* algorithm A HP: butter(2, 1250 Hz, hp, fs 200k) sos b0 b1 b2 a1 a2 (a0 = 1) */")
+    hp, h1, h2 = a_filters()
+    o.append("/* algorithm A HP: butter(2, 1250 Hz, hp, fs 12.5k) sos b0 b1 b2 a1 a2 (a0 = 1), pipeline.algo_a_base */")
     o += arr("FW_DSP_A_HP", [hp[0], hp[1], hp[2], hp[4], hp[5]])
-    o.append("/* algorithm A decimating FIR c = firwin(321, 1/16, kaiser 5) (x) firwin(255, 4250 Hz), taps 0..287 (c symmetric, centre 287) */")
-    o += arr("FW_DSP_A_C", c[:288])
+    o.append("/* algorithm A decimators (pipeline.a_decimators): 16-tap /4 at 200k, 40-tap /4 at 50k */")
+    o += arr("FW_DSP_A_H1", h1)
+    o += arr("FW_DSP_A_H2", h2)
     o.append("/* algorithm A: mean gate envelope of the mic self-noise (nominal mic, LO 38 kHz), pre-gain FS units */")
     o += arr("FW_DSP_A_NOISE_SM", [a_noise_sm()])
     o.append("/* shaper NTF zero pair at 13 kHz: 2 cos(2 pi 13000 / f_pwm) for 200, 400, 800 kHz */")

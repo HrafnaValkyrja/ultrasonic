@@ -2,7 +2,7 @@
  * (B spec, B slim, A) -> x16 polyphase interpolation -> true-peak limiter at the ceiling -> squelch -> 3rd-order error-feedback
  * shaper + TPDF dither -> CCR through the FWSIM-R64 clamp (fw_ccr_from_amp).
  * Numeric reference: sim/dsp/pipeline.py algo_b / algo_a, sim/e2e/stages.py PwmShaper (float64). Alignment (e2e F9): firmware
- * 12.5 kS/s output sample n = reference sample n - 8 for B (both variants), n - 17 for A (causal 575-tap decimator).
+ * 12.5 kS/s output sample n = reference sample n - 8 for B (both variants), n for A (reference and firmware both causal).
  * Pure: state in fw_dsp_t only, no statics, no HAL. Every loop has a data-independent trip count per variant (fw/tools/cycles.py). */
 #ifndef FW_CORE_DSP_H
 #define FW_CORE_DSP_H
@@ -15,8 +15,6 @@
 
 #define FW_DSP_NFFT 256u
 #define FW_DSP_NB_MAX 28u
-#define FW_DSP_A_NC 575u                         /* algorithm-A decimating FIR length */
-#define FW_DSP_A_RING 768u                      /* >= 575 - 1 + 128, multiple of 128 */
 #define FW_DSP_HB_HIST (31u - 1u + 256u)
 
 typedef enum { FW_ALGO_A = 1, FW_ALGO_B = 2 } fw_algo_t;
@@ -30,6 +28,7 @@ typedef struct {
     uint8_t band_start[FW_DSP_NB_MAX + 4u];       /* first bin of band b; [nb] = bin_hi */
     float a_up, om_up, a_dn, om_dn, gate_lin, margin_lin, gain_lin, a_att, a_rel, k_map, out_lo, f_lo, f_hi;
     float geo[FW_DSP_NB_MAX];                     /* geometric band centres (centroid of an empty band) */
+    float map_geo[FW_DSP_NB_MAX], inv_geo[FW_DSP_NB_MAX], mk[5];   /* frequency map series around each band centre */
     float noise[FW_DSP_NB_MAX];                   /* mic self-noise band energy (calibration) */
     float lim_c, lim_rel, sq_thr2, sq_a, step, inv_step, h1, h2;   /* h3 = -1 */
     /* ---- front end + algorithm B */
@@ -38,8 +37,8 @@ typedef struct {
     float E[FW_DSP_NB_MAX], floor_[FW_DSP_NB_MAX], env[FW_DSP_NB_MAX], amp_prev[FW_DSP_NB_MAX], amp_new[FW_DSP_NB_MAX];
     uint32_t inc_prev[FW_DSP_NB_MAX], inc_new[FW_DSP_NB_MAX], phase[FW_DSP_NB_MAX];
     /* ---- algorithm A */
-    float a_ring[2u * FW_DSP_A_RING];             /* doubled ring (window always contiguous) */
-    uint32_t a_pos;                               /* window start of the current hop */
+    float a_x1[15u + 128u];                       /* stage-1 input: 15 history + 128 mixed */
+    float a_x2[39u + 32u];                        /* stage-2 input: 39 history + 32 at 50 kS/s */
     float a_z1, a_z2, a_sm, a_floor, a_gate_lin, a_noise_thr, a_up_s, a_dn_s;
     uint32_t a_lo_ph, a_lo_inc, a_floor_init;
     /* ---- D2 half-band */

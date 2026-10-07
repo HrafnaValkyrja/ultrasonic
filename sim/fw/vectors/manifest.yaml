@@ -3,8 +3,8 @@ meta:
   generated: '2026-10-07'
   sim_commit: 42fb891 2026-10-02
   chain: 'sim/e2e AcousticPort -> Microphone -> SupplyInject -> AdfDecimator D1 stub (D2: 400 kS/s words) -> stages.pcm_to_adf_words'
-  reference: 'sim/dsp/pipeline.py algo_b (B: 28 bands hop 128; slim: 16 bands hop 256; ceiling +100 dBFS = pre-limiter), algo_a pre-gate x 10^1.5'
-  alignment: firmware 12.5 kS/s sample n = reference n - 8 (B, slim) or n - 17 (A); fw hop k = ref frame k-1 (B), fw hop 2h+1 = ref frame h (slim)
+  reference: 'sim/dsp/pipeline.py algo_b (B: 28 bands hop 128; slim: 16 bands hop 256; ceiling +100 dBFS = pre-limiter), pipeline.algo_a_base (pre-gate) x 10^1.5'
+  alignment: 'firmware 12.5 kS/s sample n = reference n - 8 (B, slim) or n (A: reference and firmware causal, identical decimators); fw hop k = ref frame k-1 (B), fw hop 2h+1 = ref frame h (slim)'
 vectors:
   sweep:
     scenario: sweep
@@ -24,7 +24,7 @@ vectors:
       slim_y: fa0112cf4f57055afee20e09db1b29f152e2c1b4cc56f6af24b95ae69e62110f
       slim_band: 70592a36af83f75b6801a4700d64c87566e75b72a7d6dcde91a6603aeb0493c0
       slim_floor: f3c9c51d285315ea5ba0255bc95700062304a37b0c83d23ea5292965545db3fe
-      A_y: 1b611a2ec99d161f565a21389bf975e7e45cc85d149602d4ece992f9bb94f8ae
+      A_y: a019ac1624e202b093e8e25130285df920c305ccc82fa28758ea0c87c4519153
   bats:
     scenario: bats
     seed: 2

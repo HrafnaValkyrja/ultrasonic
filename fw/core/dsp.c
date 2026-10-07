@@ -25,12 +25,17 @@ static const float twr256[FW_DSP_TWR256_N] = FW_DSP_TWR256_INIT;
 static const float interp[FW_DSP_INTERP_N] = FW_DSP_INTERP_INIT;   /* [16][TPP] */
 static const float hb[FW_DSP_HB_N] = FW_DSP_HB_INIT;
 static const float a_hp[FW_DSP_A_HP_N] = FW_DSP_A_HP_INIT;
-static const float a_c[FW_DSP_A_C_N] = FW_DSP_A_C_INIT;
+static const float a_h1[FW_DSP_A_H1_N] = FW_DSP_A_H1_INIT;
+static const float a_h2[FW_DSP_A_H2_N] = FW_DSP_A_H2_INIT;
 static const float ntf_2cos[FW_DSP_NTF_2COS_N] = FW_DSP_NTF_2COS_INIT;
+static const float geo_spec[FW_DSP_GEO_SPEC_N] = FW_DSP_GEO_SPEC_INIT;
+static const float geo_slim[FW_DSP_GEO_SLIM_N] = FW_DSP_GEO_SLIM_INIT;
+static const float mapgeo_spec[FW_DSP_MAPGEO_SPEC_N] = FW_DSP_MAPGEO_SPEC_INIT;
+static const float mapgeo_slim[FW_DSP_MAPGEO_SLIM_N] = FW_DSP_MAPGEO_SLIM_INIT;
 static const float a_noise_sm[FW_DSP_A_NOISE_SM_N] = FW_DSP_A_NOISE_SM_INIT;
 
 _Static_assert(FW_DSP_INTERP_N == 16u * FW_INTERP_TPP, "interpolator table shape");
-_Static_assert(FW_DSP_A_C_N * 2u - 1u == FW_DSP_A_NC, "algorithm A FIR is symmetric, 288 folded taps");
+_Static_assert(FW_DSP_A_H1_N == 16u && FW_DSP_A_H2_N == 40u, "algorithm A decimators 16 + 40 taps (pipeline.a_decimators)");
 _Static_assert(FW_DSP_NOISE_SPEC_N == FW_DSP_NB_MAX, "spec B has 28 bands (FWSIM-R10 taps)");
 _Static_assert(FW_INTERP_REJ_DB_X10 >= 670, "interpolator image rejection >= 67 dB into 8-16 kHz (FWSIM-R14 F5)");
 
@@ -81,6 +86,11 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr)
     d->out_lo = (float)k->out_lo_hz;
     float lr = fw_log2f(d->f_hi / d->f_lo);
     d->k_map = fw_log2f((float)k->out_hi_hz / d->out_lo) / lr;
+    float bc = 1.0f;                                              /* binomial coefficients C(k_map, n), n = 1..5 */
+    for (uint32_t i = 0; i < 5u; i++) {
+        bc = bc * (d->k_map - (float)i) / (float)(i + 1u);
+        d->mk[i] = bc;
+    }
     /* band edges f_lo * (f_hi/f_lo)^(i/nb) (np.geomspace); bin k is in band b if edge[b] <= k*781.25 < edge[b+1] (np.digitize) */
     float edge[FW_DSP_NB_MAX + 1u];
     for (uint32_t i = 0; i <= d->nb; i++)
@@ -117,6 +127,13 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr)
         d->geo[b] = sqrtf(edge[b] * edge[b + 1u]);
         d->noise[b] = d->slim ? noise_slim[b] : noise_spec[b];
         d->inc_prev[b] = hz_to_inc(map_freq(d, d->geo[b]));      /* pipeline: f_prev = map_freq(geometric centres) */
+        d->map_geo[b] = map_freq(d, d->geo[b]);
+        if (FW_DSP_MAP_DEFAULTS(k->band_lo_hz, k->band_hi_hz, k->out_lo_hz, k->out_hi_hz)) {   /* exact tables (dsp_tables.h) */
+            d->geo[b] = d->slim ? geo_slim[b] : geo_spec[b];
+            d->map_geo[b] = d->slim ? mapgeo_slim[b] : mapgeo_spec[b];
+            d->inc_prev[b] = hz_to_inc(d->map_geo[b]);
+        }
+        d->inv_geo[b] = 1.0f / d->geo[b];
     }
     /* algorithm A */
     d->a_lo_inc = (uint32_t)((((uint64_t)(uint32_t)k->a_lo_hz << 32) + 100000u) / 200000u);   /* round(f 2^32 / 200 kHz), exact */
@@ -189,11 +206,24 @@ NOINL static void fft_pack(const fw_dsp_t *d, float *z)
         (a)[1] = ai_ + ti_;                                                                           \
     } while (0)
 
-/* 128-pt complex FFT, input bit-reversed: radix-2 stages fused in pairs (lengths 2+4, 8+16, 32+64: one pass over memory per
- * pair, same arithmetic as the plain radix-2 order, so results are bit-identical to it), then the length-128 stage. */
+/* 128-pt complex FFT, input bit-reversed: radix-2 stages fused in pairs (lengths 2+4 without multiplies, 8+16, 32+64: one pass over
+ * memory per pair, same arithmetic order as plain radix-2), then the length-128 stage. */
 NOINL static void fft_cfft128(float *z)
 {
-    for (uint32_t q = 1u; q <= 16u; q <<= 2) {                 /* q = quarter of the fused group: 1, 4, 16 */
+    for (uint32_t g = 0; g < 128u; g += 4u) {                    /* lengths 2 + 4: twiddles 1, 1, -j: no multiplies */
+        float *a = &z[2u * g];
+        float r0 = a[0] + a[2], i0 = a[1] + a[3], r1 = a[0] - a[2], i1 = a[1] - a[3];
+        float r2 = a[4] + a[6], i2 = a[5] + a[7], r3 = a[4] - a[6], i3 = a[5] - a[7];
+        a[0] = r0 + r2;
+        a[1] = i0 + i2;
+        a[4] = r0 - r2;
+        a[5] = i0 - i2;
+        a[2] = r1 + i3;                                          /* r1 + (-j)(r3 + j i3) = (r1 + i3) + j(i1 - r3) */
+        a[3] = i1 - r3;
+        a[6] = r1 - i3;
+        a[7] = i1 + r3;
+    }
+    for (uint32_t q = 4u; q <= 16u; q <<= 2) {                 /* q = quarter of the fused group: 1, 4, 16 */
         uint32_t ts1 = 64u / q, ts2 = 32u / q;                  /* twiddle strides of the stages of length 2q and 4q */
         for (uint32_t j = 0; j < q; j++) {
             float w1r = tw128[2u * j * ts1], w1i = tw128[2u * j * ts1 + 1u];
@@ -268,7 +298,11 @@ NOINL static void b_update(fw_dsp_t *d, const float *fc)
         d->env[b] = env;
         d->amp_new[b] = env;
         float cen = e > 0.0f ? fc[b] / e : d->geo[b];
-        d->inc_new[b] = hz_to_inc(map_freq(d, cen));
+        /* map_freq(cen) = out_lo (cen/f_lo)^k as a 5th-order binomial series around the band centre: the centroid lies inside the
+         * band (|x| <= 4.6 % for slim B), truncation <= 2e-10; replaces a log2 + exp2 pair per band */
+        float x = (cen - d->geo[b]) * d->inv_geo[b];                 /* cen - geo exact (Sterbenz): x carries no 1-ulp offset */
+        float m = d->map_geo[b] * (1.0f + x * (d->mk[0] + x * (d->mk[1] + x * (d->mk[2] + x * (d->mk[3] + x * d->mk[4])))));
+        d->inc_new[b] = hz_to_inc(m);
     }
 }
 
@@ -335,41 +369,45 @@ static void algo_b(fw_dsp_t *d, float y8[8], float *band_energy, float *floor_ta
 }
 
 /* ------------------------------------------------------------------ algorithm A (fallback) */
+/* LO mix: 2 x FS-scaled x cos(2 pi f_lo t) into the stage-1 buffer [15 history | 128 new] */
 NOINL static void a_mix(fw_dsp_t *d, const float *pcm)
 {
-    /* ring of FW_DSP_A_RING samples stored twice (x[i] at i and i + RING): the 575-sample window ending at the newest sample
-     * is always contiguous. Window start for this hop = a_pos; new samples land at a_pos + 574 .. + 701. */
-    uint32_t w0 = d->a_pos + FW_DSP_A_NC - 1u;
-    float z1 = d->a_z1, z2 = d->a_z2;
+    float *x1 = &d->a_x1[15];
     uint32_t ph = d->a_lo_ph;
     for (uint32_t i = 0; i < HOP; i++) {
-        float x = pcm[i] * 0x1p-30f * fw_sin_turns(ph + (1u << 30));   /* 2 x FS-scaled x cos(2 pi f_lo t) */
+        x1[i] = pcm[i] * 0x1p-30f * FW_SIN_TURNS(ph + (1u << 30));
         ph += d->a_lo_inc;
-        float y = a_hp[0] * x + z1;                              /* butter(2) HP, transposed direct form II */
-        z1 = a_hp[1] * x - a_hp[3] * y + z2;
-        z2 = a_hp[2] * x - a_hp[4] * y;
-        uint32_t w = w0 + i >= FW_DSP_A_RING ? w0 + i - FW_DSP_A_RING : w0 + i;
-        d->a_ring[w] = y;
-        d->a_ring[w + FW_DSP_A_RING] = y;
     }
-    d->a_z1 = z1;
-    d->a_z2 = z2;
     d->a_lo_ph = ph;
 }
 
-/* 575-tap symmetric decimating FIR, folded (288 MACs per output), 7 tap pairs per source line (287 = 41 x 7), the same
- * summation order as one pair per iteration. History is a doubled ring: no 574-sample shift per hop. */
-#define APAIR(j) a_c[j] * (x[574u - (j)] + x[j])
+/* pipeline.algo_a_base decimators, causal, outputs at input index 4k+3: 16-tap /4 (200k -> 50k), 40-tap /4 (50k -> 12.5k),
+ * then butter(2) HP (transposed direct form II = scipy sosfilt) at 12.5 kS/s. Taps written out (one source line per 8). */
+#define T8(h, x, o) (h)[o] * (x)[-(o)] + (h)[(o) + 1] * (x)[-(o) - 1] + (h)[(o) + 2] * (x)[-(o) - 2] + (h)[(o) + 3] * (x)[-(o) - 3] + \
+                    (h)[(o) + 4] * (x)[-(o) - 4] + (h)[(o) + 5] * (x)[-(o) - 5] + (h)[(o) + 6] * (x)[-(o) - 6] + (h)[(o) + 7] * (x)[-(o) - 7]
 NOINL static void a_decim(fw_dsp_t *d, float *y8)
 {
-    for (uint32_t q = 0; q < 8u; q++) {
-        const float *x = &d->a_ring[d->a_pos + 16u * q + 15u];   /* oldest tap of output q: x[0..574] */
-        float acc = a_c[287] * x[287];
-        for (uint32_t j = 0; j < 287u; j += 7u)
-            acc = acc + APAIR(j) + APAIR(j + 1u) + APAIR(j + 2u) + APAIR(j + 3u) + APAIR(j + 4u) + APAIR(j + 5u) + APAIR(j + 6u);
-        y8[q] = acc;
+    float *x2 = &d->a_x2[39];
+    for (uint32_t k = 0; k < 32u; k++) {
+        const float *x = &d->a_x1[15u + 4u * k + 3u];            /* newest input of output k */
+        x2[k] = T8(a_h1, x, 0) + T8(a_h1, x, 8);
     }
-    d->a_pos = d->a_pos + HOP >= FW_DSP_A_RING ? d->a_pos + HOP - FW_DSP_A_RING : d->a_pos + HOP;
+    for (uint32_t i = 0; i < 15u; i++)
+        d->a_x1[i] = d->a_x1[HOP + i];
+    float z1 = d->a_z1, z2 = d->a_z2;
+    for (uint32_t q = 0; q < 8u; q++) {
+        const float *x = &x2[4u * q + 3u];
+        float acc = T8(a_h2, x, 0) + T8(a_h2, x, 8) + T8(a_h2, x, 16);
+        acc = acc + T8(a_h2, x, 24) + T8(a_h2, x, 32);
+        float y = a_hp[0] * acc + z1;
+        z1 = a_hp[1] * acc - a_hp[3] * y + z2;
+        z2 = a_hp[2] * acc - a_hp[4] * y;
+        y8[q] = y;
+    }
+    d->a_z1 = z1;
+    d->a_z2 = z2;
+    for (uint32_t i = 0; i < 39u; i++)
+        d->a_x2[i] = d->a_x2[32u + i];
 }
 
 NOINL static void a_post(fw_dsp_t *d, float *y8)

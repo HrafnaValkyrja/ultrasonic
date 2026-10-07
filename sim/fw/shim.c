@@ -2,8 +2,20 @@
  * points (fw_init, fw_poll, fw_hop, fw_hop_d2) so Python can run whole scenes in one call. Time is injected: hop k at k * 640 us
  * + t0_us (sim rate 200 kS/s; hardware 200.02 kS/s). t0_us >= 300000 = powered on long before the scene (hold over). */
 #include <string.h>
+#if defined(__SSE__)
+#include <xmmintrin.h>
+#endif
 
 #include "fw.h"
+
+/* FTZ|DAZ while firmware code runs, as FPSCR.FZ on the MCU (determinism rules); the caller's MXCSR is restored */
+#if defined(__SSE__)
+#define FTZ_ON() unsigned int mx_ = _mm_getcsr(); _mm_setcsr(mx_ | 0x8040u)
+#define FTZ_OFF() _mm_setcsr(mx_)
+#else
+#define FTZ_ON() do {} while (0)
+#define FTZ_OFF() do {} while (0)
+#endif
 
 size_t shim_state_size(void) { return sizeof(fw_state_t); }
 uint32_t shim_abi(void) { return FW_ABI_VERSION; }
@@ -39,12 +51,15 @@ int32_t shim_run(fw_state_t *st, const int32_t *words, uint32_t n_hops, int32_t 
 {
     fw_taps_t t;
     uint16_t buf[FW_CCR_MAX_PER_HOP];
+    FTZ_ON();
     for (uint32_t h = 0; h < n_hops; h++) {
         fw_poll(st, t0_us + (uint64_t)st->hop_count * 640u);   /* t0_us: time since power-on at the first hop */
         size_t n = d2 ? fw_hop_d2(st, &words[(size_t)h * 256u], buf, FW_CCR_MAX_PER_HOP, &t)
                       : fw_hop(st, &words[(size_t)h * 128u], buf, FW_CCR_MAX_PER_HOP, &t);
-        if (n == 0u)
+        if (n == 0u) {
+            FTZ_OFF();
             return -1;
+        }
         if (ccr) memcpy(&ccr[(size_t)h * n], buf, n * sizeof buf[0]);
         if (dsp) memcpy(&dsp[(size_t)h * 8u], t.dsp_out, sizeof t.dsp_out);
         if (band) memcpy(&band[(size_t)h * 28u], t.band_energy, sizeof t.band_energy);
@@ -54,6 +69,7 @@ int32_t shim_run(fw_state_t *st, const int32_t *words, uint32_t n_hops, int32_t 
         if (norm) memcpy(&norm[(size_t)h * 3u], t.shaper_norm, sizeof t.shaper_norm);
         if (clamp) clamp[h] = t.clamp_hits;
     }
+    FTZ_OFF();
     return 0;
 }
 
@@ -63,11 +79,13 @@ int32_t shim_out(fw_state_t *st, const float *y, uint32_t n_hops, uint16_t *ccr,
 {
     fw_ccr_bounds_t b = fw_ccr_bounds((uint16_t)st->arr, st->amp_max_ppm);
     uint32_t per = FW_HOP_N * 200u / st->arr;
+    FTZ_ON();
     for (uint32_t h = 0; h < n_hops; h++) {
         fw_out_info_t oi;
         (void)fw_dsp_out(&st->dsp, &y[(size_t)h * 8u], 0u, &b, &ccr[(size_t)h * per], &oi);
         if (peak) peak[h] = oi.true_peak;
         if (sqp) sqp[h] = oi.squelched_periods;
     }
+    FTZ_OFF();
     return 0;
 }

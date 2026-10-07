@@ -3,7 +3,7 @@
 
 Vectors are generated from the numeric reference only: sim/e2e sources (chain.house_walk, chain.bats, chain.burst_train, tones)
 -> sim/e2e stages AcousticPort, Microphone, SupplyInject, AdfDecimator (D1 stub) -> stages.pcm_to_adf_words (PDM-free) ->
-int32 ADF1 words; reference taps from sim/dsp/pipeline.py algo_b (spec B, slim B) and algo_a's pre-gate signal. Stored in
+int32 ADF1 words; reference taps from sim/dsp/pipeline.py algo_b (spec B, slim B) and pipeline.algo_a_base (algorithm A pre-gate). Stored in
 sim/fw/vectors/<name>.npz with sha256 per array + scenario + seed + sim commit in sim/fw/vectors/manifest.yaml.
 
   gen_vectors.py            check: regenerate in memory, FAIL on any sha drift (no rewrite); then L1 (firmware vs reference taps,
@@ -42,7 +42,7 @@ THRESH = REPO / "fw/test/l1_thresholds.yaml"
 OUTJ = REPO / "sim/out/fw/l1.json"
 SWEEP_F = np.geomspace(22e3, 83e3, 12)
 SEG_S = 0.06
-DELAY = {"B": 8, "slim": 8, "A": 17}          # firmware 12.5 kS/s sample n = reference n - DELAY (dsp.h)
+DELAY = {"B": 8, "slim": 8, "A": 0}          # firmware 12.5 kS/s sample n = reference n - DELAY (dsp.h)
 FW_KNOBS = {"B": {"algo": 2, "b_variant": 0}, "slim": {"algo": 2, "b_variant": 1}, "A": {"algo": 1, "transient_only": 0}}
 SQ_LAG = 125                                   # 10 ms at 12.5 kS/s: half the reference's centred 20 ms hold window
 HOLD_HOPS = 470                                # power-on hold 300 ms = 469 hops of 0.64 ms (squelch forced; excluded from squelch agreement)
@@ -117,17 +117,6 @@ def floor_of(E, cfg):
     return out
 
 
-def algo_a_base(x, f_lo=38e3, bw=3000.0, out_center=2750.0):
-    """pipeline.algo_a up to the gate, verbatim (algo_a exports no pre-gate tap)."""
-    t = np.arange(len(x)) / pl.FS
-    mixed = x * np.cos(2 * np.pi * f_lo * t) * 2
-    b = signal.firwin(255, out_center + bw / 2, fs=pl.FS)
-    base = signal.fftconvolve(mixed, b, mode="same")
-    hp = signal.butter(2, max(out_center - bw / 2, 300), "hp", fs=pl.FS, output="sos")
-    base = signal.sosfilt(hp, base)
-    return signal.resample_poly(base, 1, 16)
-
-
 def reference(words, front_end, transient, variants):
     if front_end == "D2":
         pcm = pl.decimate_to_fs(sg.adf_words_to_pcm(words))
@@ -137,7 +126,7 @@ def reference(words, front_end, transient, variants):
     ref = {}
     for v in variants:
         if v == "A":
-            ref["A_y"] = (algo_a_base(pcm) * 10 ** 1.5).astype(np.float32)
+            ref["A_y"] = (pl.algo_a_base(pcm) * 10 ** 1.5).astype(np.float32)
             continue
         nb, hop = (16, 256) if v == "slim" else (28, 128)
         cfg = pl.BConfig(n_bands=nb, hop=hop, transient_only=bool(transient), ceiling_dbfs=100.0, noise_band=noise_band(nb, hop))
@@ -189,7 +178,7 @@ def l1_one(arrays, meta, v, fw_res):
     y = fw_res["dsp"].astype(float)
     ref_y = arrays[f"{v}_y"].astype(float)
     n = min(len(y) - d, len(ref_y))
-    skip = 600 if v == "A" else 0                                 # A: the reference's zero-phase filters start non-causally
+    skip = 0
     err = y[d + skip:d + n] - ref_y[skip:n]
     rms = np.sqrt(np.mean(ref_y[skip:n] ** 2)) + 1e-30
     r = {"dsp_out_err_db": float(20 * np.log10(np.sqrt(np.mean(err ** 2)) / rms + 1e-30)), "ref_rms_dbfs": float(20 * np.log10(rms * np.sqrt(2)))}
@@ -335,7 +324,7 @@ def main(argv=None):
                 drift.append(f"{name}.{k}: sha256 {om['sha256'].get(k, 'missing')[:12]} -> {h[:12]}")
     drift += [f"{n}: vector removed" for n in man["vectors"] if n not in fresh]
     if a.bless:
-        l1_old = l1_all(old) if old else {}
+        l1_old = json.loads(OUTJ.read_text()).get("l1", {}) if OUTJ.exists() else {}   # last check's metrics (refs are not stored)
         VEC.mkdir(parents=True, exist_ok=True)
         for f in VEC.glob("*.npz"):
             if f.stem not in fresh:
@@ -347,8 +336,8 @@ def main(argv=None):
         doc = {"meta": {"what": "FWSIM-R8 golden vectors: inputs (ADF1 words) + reference taps; regenerate with sim/fw/gen_vectors.py --bless",
                         "generated": str(datetime.date.today()), "sim_commit": sim_commit(),
                         "chain": "sim/e2e AcousticPort -> Microphone -> SupplyInject -> AdfDecimator D1 stub (D2: 400 kS/s words) -> stages.pcm_to_adf_words",
-                        "reference": "sim/dsp/pipeline.py algo_b (B: 28 bands hop 128; slim: 16 bands hop 256; ceiling +100 dBFS = pre-limiter), algo_a pre-gate x 10^1.5",
-                        "alignment": "firmware 12.5 kS/s sample n = reference n - 8 (B, slim) or n - 17 (A); fw hop k = ref frame k-1 (B), fw hop 2h+1 = ref frame h (slim)"},
+                        "reference": "sim/dsp/pipeline.py algo_b (B: 28 bands hop 128; slim: 16 bands hop 256; ceiling +100 dBFS = pre-limiter), pipeline.algo_a_base (pre-gate) x 10^1.5",
+                        "alignment": "firmware 12.5 kS/s sample n = reference n - 8 (B, slim) or n (A: reference and firmware causal, identical decimators); fw hop k = ref frame k-1 (B), fw hop 2h+1 = ref frame h (slim)"},
                "vectors": {n: m for n, (_, m) in fresh.items()}}
         MANIFEST.write_text(yaml.safe_dump(doc, sort_keys=False, width=200))
         vecs = {n: (arr, m) for n, (arr, m) in fresh.items()}

@@ -17,7 +17,8 @@ Stages (each a row in fw/out/summary.json, schema {id, op, thr, last, status, ba
   no_malloc  no allocator symbol in the ARM ELF or in core/port objects; no libm transcendental in core  FWSIM-R11, R4 (part)
   stack      worst-case stack from -fstack-usage + -fcallgraph-info <= 50 % of the linker stack region   FWSIM-R11
   dsp        golden vectors sha-pinned (R8), L1 vs sim/dsp per variant (R7, R13), L0 gcc/clang/-O0 bit-exact (R7),
-             ceiling property 1.36e6 hops (R15), static cycles_hop per variant (R10, R47)                FWSIM-R7, R8, R13, R15
+             ceiling property 1.36e6 hops (R15), static cycles_hop per variant (R10, R47),
+             L0 ARM (QEMU mps2-an505 Cortex-M33) vs host bit-exact                                       FWSIM-R7, R8, R13, R15
 Exit 0 only if every row is PASS.  Subcommands: all | host | arm | lint | gen  (host/arm/lint/gen run a subset).
 """
 import argparse
@@ -298,6 +299,16 @@ def stage_dsp(cfg):
                     src="FWSIM-R7, FWSIM-R13", detail="\n".join(bad) or None, wall=w))
     if rc not in (0, 1) and not res["rows"]:
         rows.append(row("dsp.vectors", "FAIL", f"exit {rc}", "exit 0", src="FWSIM-R8", detail=tail(se + so, 15)))
+    # L0 ARM vs host: product-flag ARM objects on QEMU mps2-an505 (Cortex-M33) vs the host build, every CCR word and tap
+    j = OUT / "dsp_l0_arm.json"
+    rc, so, se, w = run([sys.executable, REPO / "sim/fw/l0_arm.py", "--json", j], timeout=1800)
+    if j.exists() and rc in (0, 1):
+        r = json.loads(j.read_text())
+        rows.append(row("dsp.L0.arm_qemu_vs_host", r["status"], f"{r['runs'] - len(r['mismatches'])}/{r['runs']} runs bit-exact ({r['qemu']})", "all bit-exact",
+                        basis="sim/fw/l0_arm.py: fw/core (fwsim ARM_FLAGS) + fw/port_qemu on qemu-system-arm -M mps2-an505 (semihosting) vs sim/fw/fwlib host gcc",
+                        src="FWSIM-R7, FWSIM-R4", detail="\n".join(r["mismatches"]) or None, wall=w))
+    else:
+        rows.append(row("dsp.L0.arm_qemu_vs_host", "FAIL", f"exit {rc}", "all bit-exact", src="FWSIM-R7", detail=tail(se + so, 15), wall=w))
     # FWSIM-R15 ceiling property
     d = OUT / "prop"
     d.mkdir(parents=True, exist_ok=True)
@@ -391,7 +402,7 @@ def main(argv=None):
     summary = {"id": "FWSIM", "cmd": cfg.cmd, "status": status, "rows": rows, "requirements": requirement_status(rows, tests),
                "tests": tests.get("host_gcc", []), "arm": {k: arm[k] for k in ("flash", "ram_static", "stack_region", "sections") if k in arm},
                "tools": versions(), "wall_s": round(wall, 1),
-               "scope": "tier S + H: foundation (group a) + DSP chain host behaviour (group b: R7 L0-host/L1, R8, R13, R14, R15); no emulator (L0 ARM, tier E open); port_u575 HAL is stubs (HAL_ENOTIMPL)"}
+               "scope": "tier S + H: foundation (group a) + DSP chain host behaviour (group b: R7 L0-host/L1, R8, R13, R14, R15); L0 ARM vs host on QEMU mps2-an505 (no STM32 peripheral model: tier E open); port_u575 HAL is stubs (HAL_ENOTIMPL)"}
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, default=str) + "\n")
     for r in rows:
         print(f"{r['status']:4} {r['id']:<34} {r['last']}  [{r['src']}]")

@@ -158,16 +158,40 @@ def calibrate_noise(cfg: BConfig, seconds=0.5, seed=99):
 
 
 # ---------------------------------------------------------------- algorithm A (fallback)
-def algo_a(x, f_lo=38e3, bw=3000.0, out_center=2750.0, gate_db=6.0, ceiling_dbfs=-12.0, gain_db=30.0):
-    """Heterodyne: shift [f_lo+out_center-bw/2, ...] down so f_lo+out_center -> out_center."""
+def _firls_lp(n, fs, stop, f_pass=4250.0):
+    """least-squares linear-phase low-pass, pass 0-f_pass, zero on `stop` bands; even n = odd design + one zero tap
+    (fw/bench/filters.py design(), V4-cycles.yaml)"""
+    bands, des = [0, f_pass], [1, 1]
+    for a, b in stop:
+        bands += [a, min(b, fs / 2)]
+        des += [0, 0]
+    h = signal.firls(n - 1 if n % 2 == 0 else n, bands, des, fs=fs)
+    return np.append(h, 0.0) if n % 2 == 0 else h
+
+
+def a_decimators():
+    """Algorithm A decimation 200k -> 50k -> 12.5 kS/s: 16-tap /4 (stop 45.75-54.25 and 95.75-100 kHz: what folds onto 0-4.25 kHz)
+    then 40-tap /4 (stop 8.25-25 kHz). Lead decision 2026-10-07 (docs/brief/decisions-log.yaml): the reference uses the firmware's
+    cheap cascade (V4-cycles.yaml A_spec) so the two stay identical; was firwin(255) + resample_poly(1, 16) (575 taps)."""
+    return _firls_lp(16, FS, [(45750, 54250), (95750, FS / 2)]), _firls_lp(40, FS / 4, [(8250, FS / 8)])
+
+
+def algo_a_base(x, f_lo=38e3, bw=3000.0, out_center=2750.0):
+    """Heterodyne + decimation, causal (the firmware's order and phase): mix with 2 cos(2 pi f_lo t), 16-tap FIR keeping every 4th
+    output (input index 4k+3), 40-tap FIR keeping every 4th (index 4j+3), then butter(2) HP at out_center - bw/2 at 12.5 kS/s.
+    Shifts [f_lo + out_center - bw/2, ...] down so f_lo + out_center -> out_center. Returns the pre-gate signal at 12.5 kS/s."""
     t = np.arange(len(x)) / FS
-    lo = np.cos(2 * np.pi * f_lo * t)
-    mixed = x * lo * 2
-    b = signal.firwin(255, out_center + bw / 2, fs=FS)
-    base = signal.fftconvolve(mixed, b, mode="same")
-    hp = signal.butter(2, max(out_center - bw / 2, 300), "hp", fs=FS, output="sos")
-    base = signal.sosfilt(hp, base)
-    y = signal.resample_poly(base, 1, 16)
+    mixed = x * np.cos(2 * np.pi * f_lo * t) * 2
+    h1, h2 = a_decimators()
+    s1 = signal.lfilter(h1, 1.0, mixed)[3::4]
+    s2 = signal.lfilter(h2, 1.0, s1)[3::4]
+    hp = signal.butter(2, max(out_center - bw / 2, 300), "hp", fs=FS_OUT, output="sos")
+    return signal.sosfilt(hp, s2)
+
+
+def algo_a(x, f_lo=38e3, bw=3000.0, out_center=2750.0, gate_db=6.0, ceiling_dbfs=-12.0, gain_db=30.0):
+    """Heterodyne fallback: algo_a_base, then an envelope squelch with a slow floor, fixed gain, ceiling."""
+    y = algo_a_base(x, f_lo, bw, out_center)
     # envelope squelch with a slow floor
     env = np.abs(signal.hilbert(y))
     sm = signal.lfilter([0.02], [1, -0.98], env)
