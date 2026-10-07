@@ -14,9 +14,10 @@ phase2_board:   # src: ECR-0018 implementation log; hw/pod/draft_r2/out/check.js
   vias: {d: 0.35, drill: 0.15}        # 0.30 broke the 0.2 mm hole clearance
   route: {tool: "FreeRouting 2 passes, clearance 0.11 + close_gaps.py + inner_bridge.py", drc_errors: 0, unconnected: 0, closed: "2026-10-07: I2C_SCL U1.26 via In2 (8.97 mm, 14 segments, via 12.46/9.42 -> 18.58/3.35); In2 +3V0 plane stays 1 island, 286.2 -> 282.2 mm2"}
   silk: "hw/pod/silk.py one-face mode: port motif + STEREO/ULTRASOUND/PHASE 2 on F; refs on Fab; pin-1 dots U1 U3 U4 U6"
+  acoustics: {scenario: phase2_r2, mean_20_96_db_p50: 4.51, peak: "63 kHz Q6.4 (EQ notch target)", r14_pass_fraction: 0.70}
   noise_model: {date: 2026-10-07, out: sim/noise/out_r2/budget.json, planes: "In1 GND + In2 +3V0", LN-M01_db: 26.5, LN-M01_worst_db: 14.0, LN-M02_db: 20.1, LN-M03_pct: 1.29 (PASS after hw/pod/kelvin_r21.py; was 3.31), LN-M04_mv: 0.127, LN-M05_uv: 8.7}
   shell: "hw/mech/shell_r2.py: hung from the lid on full-face VHB, x-stop, duct D1.0, SW1 pocket + puck kit, 6211 mm3"
-  open: ["acoustics MC on phase2_r2 (nominal done: peak 63 kHz Q6.4 -> EQ notch target ~63 kHz)", "switch defaults (checks, sch, bom, docs) to draft_r2 + shell_r2"]
+  open: ["switch defaults (checks, sch, bom, docs) to draft_r2 + shell_r2"]
 ```
 
 

@@ -46,7 +46,7 @@ def in_pod_db(f, H):
     return np.interp(f / 1e3, DS["f_khz"], DS["db_re_1k"]) + db(H)
 
 
-MC_DESIGNS = ("as_built", "as_built_channel", "chimney_d1.0", "gasket_id2.1")
+MC_DESIGNS = ("as_built", "as_built_channel", "chimney_d1.0", "gasket_id2.1", "phase2_r2")
 IF_FILES = {"as_built": "port_response.json", "chimney_d1.0": "port_response_chimney_d1.0.json", "gasket_id2.1": "port_response_gasket_id2.1.json"}
 
 
