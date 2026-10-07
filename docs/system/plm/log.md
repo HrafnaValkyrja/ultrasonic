@@ -386,3 +386,8 @@
 - 2026-10-07 13:09 checkin SUB-DOCK-USB by backlog-agent
 - 2026-10-07 13:09 checkin PHYSICAL by backlog-agent
 - 2026-10-07 13:09 checkin REG-BOARD by backlog-agent
+- 2026-10-07 13:10 checkout REG-ARM by backlog-agent: ARM-LEFT: left-pod arm route in heel.py
+- 2026-10-07 13:11 review REG-ARM by backlog-agent: ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it
+- 2026-10-07 13:11 review R-BOARD-ARM by backlog-agent: ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it
+- 2026-10-07 13:11 review R-BODY-ARM by backlog-agent: ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it
+- 2026-10-07 13:11 checkin REG-ARM by backlog-agent

@@ -69,9 +69,9 @@ def dock_wire(ref, k, pod):
 
 
 def arm_route(pod):
-    if pod == "right":
+    if True:   # heel.py models both pods since 2026-10-07 (ARM-LEFT)
         import heel   # noqa: F401  (build123d import; only the polylines are used)
-        b, w = heel.wire_route()
+        b, w = heel.wire_route(pod)
         return np.array(b), {k: np.array(v["pts"]) for k, v in w.items()}
     fan = np.array([62.3, 11.60, -4.6])
     bundle = [CH_EXIT, np.array([X_ARM_GAP, 6.3, CH_EXIT[2]]), np.array([X_ARM_GAP, 11.55, CH_EXIT[2]]), fan]
@@ -105,7 +105,7 @@ def box_clear(P, b):
 
 def main():
     res = {"date": "2026-10-07", "assumptions": {"tail_end": TAIL.tolist(), "ribbon_pitch": 0.2, "x_dock_gap": X_DOCK_GAP,
-                                                 "left_arm_route": "derived sketch (heel.py models the right pod only)"}}
+                                                 "arm_route": "heel.wire_route(pod), both pods"}}
     curves = {}
     for pod in ("right", "left"):
         bundle, arms = arm_route(pod)

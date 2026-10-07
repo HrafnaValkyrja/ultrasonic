@@ -39,10 +39,10 @@
   "REG-ARM": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
+   "note": "ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it",
    "stamp": {
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
-    "file:hw/mech/heel.py": "343c7dac129c06c9",
+    "file:hw/mech/heel.py": "9f6115b83b778544",
     "file:sim/checks/niti_arm_real.py": "62944f12dde4e774"
    }
   },
@@ -217,9 +217,9 @@
    }
   },
   "R-BOARD-ARM": {
-   "by": "heel-exit-agent",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)",
+   "note": "ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it",
    "stamp": {
     "sym:hw/mech/dims_r2.py::CELL": "77243a4be17c6775",
     "sym:hw/mech/dims_r2.py::PAD_ZONE": "729ca0d2e54ea911",
@@ -254,7 +254,7 @@
   "R-BODY-ARM": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "ARM-6/PAD-6: heel.py checks + exports the real shell_r2 tub; pad.py cross-check uses it (geometry unchanged): strut to tub worn 1.176 / free 1.303 / jaw 1.29-1.34 vs 1.4 (was 0.79 on the plain preview); owner decision ARM-6D",
+   "note": "ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it",
    "stamp": {
     "sym:hw/mech/frame.py::E": "e41a5d539abd8437",
     "sym:hw/mech/heel.py::heel_add": "f10d6b9f6e8fecbf",

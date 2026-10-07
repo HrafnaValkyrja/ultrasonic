@@ -356,8 +356,9 @@ FAN = np.array([62.3, 11.60, 0.80])  # bundle ends, the 4 wires fan out (behind 
 EDGE_Y = 11.55                       # each wire passes under the board's rear edge at this y (B face 12.1)
 
 
-def _pads():
-    """J1/J7/J2/J8 centres on the board's B face (pod frame), from the routed board via dims_r2/frame.PCB."""
+def _pads(pod="right"):
+    """J1/J7/J2/J8 centres on the board's B face (pod frame), from the routed board via dims_r2/frame.PCB.
+    pod 'left': the same board flipped in the mirrored shell (pod z = z0 + 12 - board y; physical.md risk 7)."""
     import re
     f = HERE.parents[1] / "hw/pod/draft_r2/out/routed.kicad_pcb"
     txt = f.read_text()
@@ -366,7 +367,8 @@ def _pads():
         i = txt.index(f'"Reference" "{ref}"')
         blk = txt[txt.rfind("(footprint ", 0, i):i]
         bx, by = (float(v) for v in re.search(r"\(at ([\d.\-]+) ([\d.\-]+)", blk).groups())
-        out[ref] = dict(net=net, board=(bx, by), pod=np.array([F.PCB["x0"] + bx, F.PCB["y0"], F.PCB["z0"] + by]))
+        bz = by if pod == "right" else 12.0 - by
+        out[ref] = dict(net=net, board=(bx, by), pod=np.array([F.PCB["x0"] + bx, F.PCB["y0"], F.PCB["z0"] + bz]))
     return out
 
 
@@ -395,20 +397,30 @@ def _fillet_poly(wps, R):
     return pts
 
 
-def wire_route():
+FAN_LEFT = np.array([62.3, 11.60, -5.25])   # left pod: arm pads sit low (z -6.35/-4.15), the bundle stays at the exit height
+
+
+def wire_route(pod="right"):
     """Centrelines in the cavity, pod frame. 'bundle': exit -> diagonal up the rear gap (against the rear wall,
     x 66.40) -> turn forward over the cell's rear-top edge at the board-B level -> FAN. One per pad: FAN -> pad,
     dropping under the board edge (EDGE_Y at x 60.55) and lying on the pad at the end. Closed-lid geometry."""
     y_pad = F.PCB["y0"] - WIRE_OD / 2
-    bundle = _fillet_poly([np.array([CH_EXIT[0], F.CAV["y0"], CH_EXIT[2]]), np.array([66.40, 6.30, CH_EXIT[2]]),
-                           np.array([66.40, 11.55, 0.80]), np.array([64.0, 11.60, 0.80]), FAN],
-                          [ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN])
+    if pod == "right":
+        fan = FAN
+        bundle = _fillet_poly([np.array([CH_EXIT[0], F.CAV["y0"], CH_EXIT[2]]), np.array([66.40, 6.30, CH_EXIT[2]]),
+                               np.array([66.40, 11.55, 0.80]), np.array([64.0, 11.60, 0.80]), FAN],
+                              [ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN])
+    else:   # left pod (2026-10-07, ARM-LEFT): straight up the wall side of the rear gap at the exit height, then forward
+        fan = FAN_LEFT
+        bundle = _fillet_poly([np.array([CH_EXIT[0], F.CAV["y0"], CH_EXIT[2]]), np.array([66.40, 6.30, CH_EXIT[2]]),
+                               np.array([66.40, 11.55, CH_EXIT[2]]), np.array([64.0, 11.60, FAN_LEFT[2]]), FAN_LEFT],
+                              [ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN])
     wires = {}
-    for ref, p in _pads().items():
+    for ref, p in _pads(pod).items():
         pad = p["pod"]
         z = pad[2]
         # pass the neighbouring pad column at the pad's own height: J2 above J1, J8 between J1 and J7
-        wps = [FAN, np.array([61.4, 11.58, (FAN[2] + z) / 2]), np.array([F.PCB["x1"], EDGE_Y, z]),
+        wps = [fan, np.array([61.4, 11.58, (fan[2] + z) / 2]), np.array([F.PCB["x1"], EDGE_Y, z]),
                np.array([pad[0] + 0.5, y_pad, z]), np.array([pad[0], y_pad, z])]
         wires[ref] = dict(net=p["net"], pts=_fillet_poly(wps, [ROUTE_R_FAN, ROUTE_R_FAN, 0.5]), pad=pad)
     return bundle, wires
@@ -418,10 +430,10 @@ def _plen(pts):
     return float(sum(np.linalg.norm(b - a) for a, b in zip(pts[:-1], pts[1:])))
 
 
-def route_checks():
+def route_checks(pod="right"):
     """Clearances (mm, surface to surface) of the wires in the cavity, closed lid. The bundle may touch the tub's
     rear wall (it is laid against it); the wire ends touch their own pads (soldered)."""
-    bundle, wires = wire_route()
+    bundle, wires = wire_route(pod)
     rb, rw = BUNDLE_D / 2, WIRE_OD / 2
     cell, pcb, cav = F.CELL, F.PCB, F.CAV
 
@@ -451,7 +463,7 @@ def route_checks():
                      "to_cavity_top": round(min(cav["z1"] - p[2] for p in bp) - rb, 3),
                      "bend_radii": [ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN],
                      "strand_bend_strain_pct": round(100 * 0.05 / (2 * min(ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN, 0.8)), 2)}
-    pads = _pads()
+    pads = _pads(pod)
     wres = {}
     for ref, w in wires.items():
         pts = dense(w["pts"])
@@ -718,6 +730,7 @@ def checks():
                       "bundle_fill": round(4 * 0.3 ** 2 / CH_D ** 2, 3)}
     res["channel"]["pass_clear_of_cell_pcb"] = all(g >= 0.2 for g in res["channel"]["gap_to"].values())
     res["wire_route"] = route_checks()
+    res["wire_route_left_pod"] = route_checks("left")   # ARM-LEFT 2026-10-07: same board flipped in the mirrored shell
 
     # 5. shroud / boss / land vs the strut top, all states: generic boxes (two centrings, two
     #    orientations), pad.py's section as a box, and pad.py's actual lofted strut when it imports.
