@@ -163,6 +163,9 @@ def chain(*Ts):
     return out
 
 
-def mesh_series(f, r_s, S_mesh):
-    """Thin acoustic-resistance screen: specific resistance r_s (rayl = Pa s/m) over area S_mesh -> series R."""
-    return series_z_abcd(np.full(np.shape(f), r_s / S_mesh, complex))
+def mesh_series(f, r_s, S_mesh, m_s=0.0):
+    """Thin acoustic screen: specific resistance r_s (rayl = Pa s/m) and optional specific inertance m_s (kg/m2,
+    ~ rho * (t + end corrections) / open-area fraction) over area S_mesh -> series R + j w M. m_s = 0 keeps the
+    original resistance-only model (all results before 2026-10-07)."""
+    w = 2 * np.pi * np.asarray(f, float)
+    return series_z_abcd((r_s + 1j * w * m_s) / S_mesh + 0j * w)

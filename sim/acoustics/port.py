@@ -52,6 +52,7 @@ class Opt:
     a_chim: float = 1.05e-3      # chimney / gasket inner radius (sealed duct from the lid bore exit to the board hole)
     mesh: str = "none"           # none | mouth | floor
     r_mesh: float = 24.0         # rayl; 24 = 0.25 dB one-way infinite-tube insertion loss (brief: AN-000221, unverified)
+    m_mesh: float = 0.0          # kg/m2 specific inertance of the mesh (0 = resistance-only, the pre-2026-10-07 model)
     recess: bool = True          # hex window present
     cavity_patch: bool = True
 
@@ -111,15 +112,15 @@ def transfer(f, g: Geom, opt: Opt, mic: Mic, air: Air = AIR, *, ref: str | None 
     if opt.recess and g.d_recess > 0:
         Zs = flanged_piston_z(f, g.a_recess, air)
         if opt.mesh == "mouth":
-            els.append(mesh_series(f, opt.r_mesh, math.pi * g.a_recess ** 2))
+            els.append(mesh_series(f, opt.r_mesh, math.pi * g.a_recess ** 2, opt.m_mesh))
         els.append(tube_abcd(f, g.a_recess, g.d_recess, air))
         els.append(series_mass_abcd(f, g.a_bore, step_delta(g.a_bore, g.a_recess), air))
     else:
         Zs = flanged_piston_z(f, g.a_bore, air)
         if opt.mesh == "mouth":
-            els.append(mesh_series(f, opt.r_mesh, math.pi * g.a_bore ** 2))
+            els.append(mesh_series(f, opt.r_mesh, math.pi * g.a_bore ** 2, opt.m_mesh))
     if opt.mesh == "floor":
-        els.append(mesh_series(f, opt.r_mesh, math.pi * g.a_bore ** 2))
+        els.append(mesh_series(f, opt.r_mesh, math.pi * g.a_bore ** 2, opt.m_mesh))
     els.append(tube_abcd(f, g.a_bore, g.l_bore, air))
     if opt.gap == "open":
         els.append(_gap_two_port(f, g, opt, air))

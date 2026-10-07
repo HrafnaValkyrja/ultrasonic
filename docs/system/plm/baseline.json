@@ -89,7 +89,7 @@
   "SUB-AUDIO-IN": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
+   "note": "SAI-3: mesh picked (Acoustex 042 at the hex-seat floor; mesh_pick.py with mesh inertance); model option m_mesh default 0 keeps earlier results",
    "stamp": {
     "block:MIC": "3b3b0512fc8e5584",
     "sym:hw/mech/dims_r2.py::DUCT_D": "3fbb6d185c33173c",
@@ -191,7 +191,7 @@
   "R-AUDIO-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D",
+   "note": "SAI-3: mesh picked (Acoustex 042 at the hex-seat floor; mesh_pick.py with mesh inertance); model option m_mesh default 0 keeps earlier results",
    "stamp": {
     "file:hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod": "889862c5c23dd5ca",
     "grep:hw/pod/gen.py::Knowles_LGA-5": "191992f13ef883bf",

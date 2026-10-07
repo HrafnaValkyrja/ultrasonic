@@ -363,3 +363,7 @@
 - 2026-10-07 13:03 checkin REG-ARM by backlog-agent
 - 2026-10-07 13:03 checkin REG-PAD by backlog-agent
 - 2026-10-07 13:03 checkin REG-POD-BODY by backlog-agent
+- 2026-10-07 13:04 checkout SUB-AUDIO-IN by backlog-agent: SAI-3 mesh pick (sim/checks/mesh_pick.py; narrow.mesh_series inertance option)
+- 2026-10-07 13:05 review SUB-AUDIO-IN by backlog-agent: SAI-3: mesh picked (Acoustex 042 at the hex-seat floor; mesh_pick.py with mesh inertance); model option m_mesh default 0 keeps earlier results
+- 2026-10-07 13:05 review R-AUDIO-BODY by backlog-agent: SAI-3: mesh picked (Acoustex 042 at the hex-seat floor; mesh_pick.py with mesh inertance); model option m_mesh default 0 keeps earlier results
+- 2026-10-07 13:05 checkin SUB-AUDIO-IN by backlog-agent
