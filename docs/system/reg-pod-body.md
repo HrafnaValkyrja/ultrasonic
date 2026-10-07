@@ -1,163 +1,156 @@
-# Pod body: tub, lid, spine top, retention, dock bay
-**Current design (2026-10-07): Phase 2, `hw/current.yaml` (ECR-0018); every tool and check defaults to it.** Shell `hw/mech/shell_r2.py` (constants `hw/mech/dims_r2.py`, outputs `hw/mech/out/r2/`): board hangs from the lid on full-face VHB, seam at the board's B face (y 12.1), sealed duct ID 1.0 with gauge-pin locating, SW1 pocket + puck kit, coarse x-stop 0.25; one 1.8 mm VHB cut-out per test pad keeps 91 % of the tape bonded (2026-10-07; the earlier single 6-pad box kept 31 %). The body below is the Rev F/G reference design (`ULTRASONIC_DESIGN=revg`) unless it says Phase 2; its Phase-2 rewrite is open.
-Status: rev-1 shell CAD (`shell_r1.py`, last changed 2026-10-01 19:16 when the board grew to 34 mm), "Spine" top chosen (O17). Not printed yet. `checks.json`: every placeholder overlap is 0 mm³. **But the spine top is not attached to anything (open issue 1), nothing locates the board front-to-back (open issue 2), and the foam strips that are the board's only spring have almost no floor (open issue 11).** O20 (2026-10-01): the shell was grown under O15 and must be re-sized. Updated 2026-10-01.
-· Source of truth: `hw/mech/shell_r1.py` (tub, lid, plunger, spine, placeholders, checks); `hw/mech/blade.py` (dovetail rail, frame adapter); `hw/mech/heel.py` (heel unioned into the tub, see [reg-arm](reg-arm.md)); `docs/build/tolerances.md` (fits)
-· Owner decisions: O5, O10, O12(b), O16(3)(5)(6)(7), O17, O19 (serviceability: cell swap, owner repairs), O20 (re-size) · Open ECRs: ECR-0001 (`frame.py` still holds the pre-rev-1 pod), ECR-0006 (weighted printed dummy pair: 2 h wear test, 1000× joint flex; R20, R24)
+# Pod body: tub, lid, retention, duct, switch pocket, dock bay
+Rev MZ-2 2026-10-07: body rewritten to the Phase-2 shell (`hw/current.yaml`, ECR-0018): seam at the board's B face, board hung from the lid on per-pad-cut VHB, sealed D1.0 duct + gauge pin, SW1 pocket + selective-fit puck, no ribs/foam; Rev F/G shell moved to the reference section.
+Status: Phase-2 shell CAD `hw/mech/shell_r2.py` (constants `hw/mech/dims_r2.py`), last rebuilt for commit c348661 (2026-10-07 07:30): `hw/mech/out/r2/checks.json` every clash 0 mm³, tub/lid/puck each 1 valid solid. Not printed, not owner-reviewed (O25: review in 1-2 weeks). Updated 2026-10-07.
+· Source of truth: `hw/mech/dims_r2.py` (every number), `hw/mech/shell_r2.py` (solids, checks), `hw/mech/notes/shell_r2.md` (decisions D1-D8, retention options, assembly), `hw/mech/blade.py` (rail, adapter), `hw/mech/heel.py` (heel unioned into the tub, [reg-arm](reg-arm.md)), `docs/build/tolerances.md` (Rev-1 fits; no Phase-2 rows yet, issue 18)
+· Owner decisions: O5, O10, O12(b), O16(3)(5)(6)(7), O17, O19, O24 (sealed duct D1.0 + locating), O25/O26 (Phase 2, Claude lays out), O27 (thin > short > long) · Open ECRs: ECR-0001 (`frame.py`/`pod.py` constants), ECR-0006 (weighted dummy pair, wear + joint flex), ECR-0018 (Phase 2, approved, implementation in progress)
 
 ## Purpose
-- Holds and protects the board, the cell and the dock target. Clamps the board **without screws** (O16-6).
-- Carries the mechanical half of several functions (`integration-map.md` §1):
-  - **F1:** the mic port in the lid.
-  - **F11:** the switch plunger and its skin.
-  - **F5/F9/F10/F15:** the dock window in the belly.
-  - **F3/F12:** the rear wire gap, the heel and the wire channel.
-- Mounts to the glasses through a removable frame adapter (spec §8, v0.14).
-- **Two-stage build (O10):** the test build is taped shut; the final build is bonded and must still be cut-openable for firmware work. Sealing target **IPX4 minimum, IPX5 preferred** (O12b).
-- Exterior: the "Spine" top (O17), carried through the design.
+- Holds and protects the board, the cell and the dock target, **without screws** (O16-6).
+- Mechanical half of: **F1** sealed mic duct in the lid; **F11** SW1 pocket, puck and skin; **F5/F9/F10/F15** dock window in the belly; **F3/F12** stowage zone + heel + wire channel (`integration-map.md` §1).
+- Mounts to the glasses through a removable frame adapter (spec §8; adapter work deferred, O26).
+- Two-stage build (O10): taped test build, bonded final build that can be cut open. Sealing IPX4 min, IPX5 preferred (O12b).
+- Exterior: "Spine" top (O17), carried over from r1 onto the Phase-2 top.
 
 ## Big picture
-![Rev-1 pod exploded: tub, cell, board, lid with spine and hex mic window, arm and pad](../../hw/mech/out/r1/spine/exploded.png)
-![Rev-1 pod with the lid off: board on the cell, switch, dock bay below](../../hw/mech/out/r1/spine/open.png)
-*Renders of the right pod (frame.py axes), 2026-10-01 19:25. The y stack-up through the mic is Panel B of `docs/diagrams/system-overview-physical.png` ([physical.md](physical.md)). The board's own map is `docs/diagrams/board-regions.png` ([reg-board](reg-board.md)).*
+Renders (build outputs, gitignored; `shell_r2.py` writes them): `hw/mech/out/r2/section.png` (y-z section through mic and SW1), `hw/mech/out/r2/plan.png` (x-z plan through the lid: board, mic, SW1 pocket, dock, stowage, seam keys). No 3D render dump of r2 yet (issue 9).
 
-1. **Two prints.** The **tub** is the inner half, from the adapter face (y 4.3) to the seam (y 14.4). It includes the heel, the dovetail rail and the belly bay. The **lid** is the outer half, from the seam to the plate top (y 16.1). It includes the armour plate, mic port, plunger bore and clamp ribs. Plus a printed **plunger**.
-2. **Stack, inside out:** cell on 0.25 mm VHB 4914 in the 0.3 mm gap against the inner wall → 1.5 mm foam strips → board (B face down) → the lid's two ribs press the board's F-face edge bands. The foam is the only spring, and **it has almost no floor:** the board is 13 wide and the cell 12, so each 0.6 mm strip at the board's edge overlaps the cell by only 0.1 mm (open issue 11).
-3. **Locating and bonding:** the lid locates on a 0.5 mm lip inside the main cavity's opening (not round the belly bay, where the seam is a plain butt joint: open issue 13). It's taped for testing, then bonded (MS-polymer or neutral RTV). The cut line for reopening is a 0.2 × 0.4 mm rebate on the tub only (open issue 12).
-4. **Belly bay:** a 3.5 mm-deep bay under the front 25.5 mm holds the magnetic dock target flush in the floor. A USB-C fallback keep-out is reserved at its rear step.
-5. **Rear:** a 2.1 mm gap behind the board is the wire path up from the heel channel. A strut relief at the inner-bottom-rear corner keeps the NiTi strut clear.
+1. **Two prints + a puck.** The **tub** is everything below the seam y 12.1 (the board's B face) **plus the whole belly** (x < 55.0, z < −8.9), so the dock window lies in one part. It carries the heel, the dovetail rail and the strut relief. The **lid** is a shallow cap y 12.1-14.7: skirt walls round the board, lid face 0.8, armour plate 0.7, spine top. Printed **puck** in the SW1 bore (5 lengths, selective fit).
+2. **Stack, inside out (pod y):** wall 4.3-5.1 → cell VHB gap 0.3 → cell 5.4-10.7 → **B gap 1.4** (B parts, tallest U2 1.08) → board 12.1-12.9 → **F gap 0.30 = VHB 4914 0.25 + 0.05** → lid face 13.2-14.0 → plate 14.0-14.7. Thickness T 10.4 (dims_r2.py, 2026-10-07).
+3. **Retention:** the board **hangs from the lid** on full-face 3M VHB 4914, die-cut at the duct (D1.0), the SW1 pocket (4.3 × 3.1) and one 1.8 mm square per F test pad (TP1-TP6): 91 % of the tape outline bonded, ~314 mm² (interfaces.py [clamp-bands] PASS; checks.json `vhb_area_mm2` 313.9; 2026-10-07). Nothing touches the board's long edges (0.45 free each side). Lifting the lid lifts the board on its wires and exposes the cell.
+4. **Locating:** the lid's D1.0 duct bore is the datum. While the VHB grabs, a stepped gauge pin (D0.98 body in the bore / D0.50 tip in the board's D0.6 hole) registers tape and board to the bore; then it is pulled. The front skirt wall is a coarse x-stop 0.25 ahead of the board and never touches within tolerance (so it can't fight the pin).
+5. **Seam:** tub tongue 0.35 × 0.5 / lid groove +0.05 on the straight wall runs, stopped 1.4 mm short of every convex corner; a 0.35 × 0.35 key on the belly step. Cut line: 0.2 × 0.3 tub-only rebate on the y 12.1 runs; the belly step has none (issue 12).
+6. **Rear:** stowage zone behind the board (pod x 60.55-66.7, cell top → lid face) + 1.1 mm behind the cell: 277 mm³ for the 12 wire loops (need 107-142).
 
 ## Elements
-| Feature | Geometry (pod mm: x rearward, y outward, z up) | Source |
-|---|---|---|
-| Outer body | box x 29.5–67.5, y 4.3–15.4, z −9.7…5.5; all edges chamfered 1.0. Wall 0.8 | `shell_r1.py` L35–38, L55–58 |
-| Cavity | x 30.3–66.7, y 5.1–14.4, z −8.9…4.7; board centre line ZC = −2.1 | L39, L41, L61–63 |
-| Belly bay | outer x 29.5–55.0 down to z −13.2; bay x 30.3–54.2, z −12.4…−8.9; floor 0.8 | L37, L40, L57 |
-| **Tub** | outer body below the seam y 14.4 + dovetail rail + heel − cavity − dock window − strut relief − seam groove | L72–88 |
-| Dovetail rail + catch | male dovetail on the inner face, x 36–62, 1.0 tall, 5.0 → 6.4 wide; ramp bump x 31.4–32.9, z −8.9…−8.0 | `blade.py` L35–38, L75–82, L111–115 |
-| Frame adapter | separate print: a 1.8 mm plate with temple clip lips and a female dovetail (0.15 fit per side, closed at the rear as an end stop), and a snap tab (~1.6 % strain at release). Reprint it for new frames | `blade.py` L118–142; spec §8 v0.14 |
-| Strut relief | inside: fill the inner-bottom corner (1.0 legs, x 62–66.7). Outside: cut back to the plane y + z = −3.65 (x 62–68.5), keeping a 0.6 wall. The NiTi strut passed 0.65 mm away before the relief | L81–87 |
-| Dock window | through the 0.8 floor, 21.4 × 7.06 (+0.1 per side) for the Xinyangze **YZT0675** (5-pin magnetic pogo target, 21.2 × 6.86 × 2.8, LCSC C5126848) at x 31.5–52.7, y 6.32–13.18, z −13.2…−10.4 | L47, L80; `tolerances.md` |
-| USB-C keep-out | x 47.9–55.0, y 5.45–14.05, z −12.4…−9.6, for a sealed Same Sky **UJ32** (IP68 USB-C receptacle, 6.75 × 8.55 × 2.76). It overlaps the dock target's rear 4.8 mm: **either/or** | L48; `sub-dock-usb.md` |
-| **Lid** | outer body above y 14.4: 1.0 thick, plus the armour plate (0.7, 0.3 chamfer, y 15.4–16.1) and a circuit-trace groove (0.7 wide, 0.45 deep) | L91–101 |
-| Locating lip | ring 0.5 wall × 0.8 deep (y 13.6–14.4), 0.15 clearance per side, round the **main cavity only** (x 30.45–66.55, z −8.75…4.55). Its lower wall spans the belly bay's opening; round the bay (x 29.5–55.0, z −13.2…−8.9) the seam is a butt joint with a ~0.4 mm tub land after the rebate | L93–95, L39–40, L61–63; `tolerances.md` |
-| Seam groove | `seam_groove()` is a band y 14.2–14.6, 0.4 in from the outer faces, but **only the tub subtracts it** and the tub stops at y 14.4. Real cut line: a **0.2 (y) × 0.4 mm rebate on the tub's top edge**, below the 0.4 mm resin recess minimum, so it may fuse. `lid_base()` and `main()` never cut the lid (O10 cut line) | L66–69, L73, L88, L91–110, L213 |
-| Mic port | Ø1.0 bore through the lid at (34.5, ZC) = board x 3.9; the board's port NPTH is also at board 3.9 = pod 34.5 (ECR-0011: U2 origin moved to x 4.67; interfaces.py [mic-port] 0.000 mm, 2026-10-02), **aligned**. Hex window (circumradius 1.9, 0.8 deep) at the outer face. **No mesh, no seal to the board** | L45, L102–103; [sub-audio-in](sub-audio-in.md) |
-| Plunger bore + skin recess | Ø3.2 bore through the lid at (52.6, ZC) = board x 22.0. Recess Ø5.2 × 0.25 in the plate for a bonded silicone skin (material TBD) | L46, L104–105 |
-| Plunger | printed; head Ø2.9 × 0.9, stem Ø1.2 × 1.2, no shoulder. CAD draws it at y 14.2–16.1; seated on the switch it sits at 13.55–15.45. Presses **KMT022** (C&K IP68 SMD tact switch, 1.6 N, travel 0.15 ± 0.1, height 0.65 nominal) | L113–116; `tolerances.md`; C&K KMT0 p.B-9 |
-| Clamp ribs | 2 ribs on the lid, x 31.1–64.1, 0.6 wide (z 3.8–4.4 and −8.6…−8.0), reaching y 12.95: **0.05 mm** above the board's F face | L106–109 |
-| Foam strips | 1.5 mm closed-cell PE foam, compressed to 1.4 (y 10.7–12.1). **Rev-1 CAD size 0.6 × 32 mm** (x 31.6–63.6; z 3.8–4.4 and −8.6…−8.0), under the board's B-face bands. Meant to sit on the cell, but the cell spans z −8.1…3.9: **each strip has 0.1 mm of cell under it** (less with the pouch's rounded edges) and overhangs empty space to the wall. The cut size in `docs/build/hardware.md` L67 and `hw/mech/notes/hardware.md` L47 (1.1 × 17.5) is the round-1 size: stale | L42–43, L176–178 |
-| Cell bed | Renata ICP501233PA-02 envelope x 30.6–65.6, y 5.4–10.7, z −8.1…3.9. 0.25 mm **VHB 4914** (3M acrylic foam tape) in the 0.3 gap to the inner wall | L42; `hardware.md` §4; `tolerances.md` |
-| **Spine top (O17)** | base x 44.0–66.8, y 10.5–14.6, 0.6 tall; 6 segments 2.4 long at x 46.0 + 3.4k, y 10.2–14.9, 0.9 → 2.5 tall; top at z 8.6. Unioned into `lid.stl` | L123–132, L213 |
+```yaml
+# pod mm: x rearward, y outward, z up (right pod = CAD; left = mirror). src hw/mech/dims_r2.py unless noted; 2026-10-07
+outer_body: {x: [29.5, 67.5], y: [4.3, 14.0], plate_to: 14.7, z: [-9.7, 4.8], chamfer: 1.0, wall: 0.8}
+belly: {x: [29.5, 55.0], z_to: -11.75, depth: 2.05, why: "flat-tail dock target 2.8 + tails 0.85 - (wall + 0.8 under-cell slack)"}
+cavity: {x: [30.3, 66.7], y: [5.1, 13.2], z: [-8.9, 4.0]}
+bay: {x: [30.3, 54.2], z: [-10.95, -8.9]}
+tub: "outer_body & (y < 12.1, + belly x < 55 / z < -8.9) + blade.rail + heel.heel_add - cavity - heel.heel_cut - dock window - strut relief + tongue + plate below the belly step - seam rebate (shell_r2.py tub())"
+lid: "outer_body - tub region + plate - cavity - groove - duct bore - hex window - SW1 pocket/bore/skin recess + spine top (shell_r2.py lid_base(), top_concept())"
+seam: {y: 12.1, tongue: "0.35 x 0.5, groove clearance 0.05, stops 1.4 short of convex corners (1 mm chamfer leaves 0.42 wall)", belly_step_key: "0.35 high (the hanging board's lower edge sweeps past it, 0.10 clear)", rebate: "0.2 x 0.3, tub only, y 12.1 runs; belly step unmarked"}
+board_pocket: {board: "30 x 12 x 0.8 R1.0 at x 30.55-60.55, y 12.1-12.9, z -8.45..3.55", x_stop: 0.25, long_edges_free: 0.45, rear_to_wall: 6.15}
+vhb: {part: "3M VHB 4914 (0.25 mm acrylic foam tape)", outline: "board inset 0.2", cut_outs: ["D1.0 duct", "4.3 x 3.1 SW1 pocket", "1.8 mm square per TP1-TP6 (TP_PAD_D 1.0 [A] + 0.4 margin; real TP copper D0.7)"], bonded: "~314 mm2, 91 % (interfaces.py clamp-bands PASS)"}
+mic_duct: {axis: "pod (32.43, z -2.45) = board (1.88, 6.0), read live from the routed board (dims_r2.board_mic)", bore: "D1.0, printed undersize + reamed, lid face y 13.2 -> hex floor 13.9 (0.7)", vhb_hole: "D1.0 across the 0.30 F gap", board_hole: "NPTH D0.6", length: "1.0 total (notes/shell_r2.md D4)", hex_window: "R1.9 x 0.8 deep from the plate top = mesh seat (mesh part TBD)"}
+gauge_pin: {body: 0.98, tip: 0.50, runout: 0.02, material: "turned brass [A]", state: "to source or turn (issue 16)"}
+sw1_pocket: {centre: "pod (49.05, -2.45) = board (18.5, 6.0)", pocket: "4.3 x 3.1, ceiling y 13.8 (0.25 over SW1 nominal)", bore: 2.6, puck: "D2.3 + nub D1.0 x 0.10", skin: "silicone D4.6 x 0.25 recess, floor y 14.45, flush with the plate", puck_kit: [0.73, 0.78, 0.83, 0.88, 0.93]}
+dock: {part: "Xinyangze YZT0675 (5-pin magnetic pogo target, 21.2 x 6.86 x 2.8, LCSC C5126848)", box: "x 31.5-52.7, y 5.72-12.58, z -11.75..-8.95", window: "+0.1 per side through the belly floor", tails: "flat, in the 0.8 under-cell slack"}
+usb_c_keepout: "not carried into shell_r2 (R-DOCK-BODY)"
+cell_bed: {cell: "Renata ICP501233PA-02 envelope x 30.6-65.6, y 5.4-10.7, z -8.1..3.9", tape: "VHB 4914 0.25 in the 0.3 gap to the inner wall"}
+strut_relief: "identical to r1 (same Z0, CAV y0/z0): fill 1.0 legs in the inner-bottom rear corner x 62-66.7; outside cut to y + z = -3.65"
+rail_adapter: "blade.rail() + adapter, centred on pod.py POD_ZC -2.0 (body centre now -2.45: issue 8)"
+spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unioned into the lid (159.6 mm3)"
+```
 
 ## Interfaces
-| To | What crosses | Invariant / state |
-|---|---|---|
-| [reg-board](reg-board.md) | Pocket 34 × 13 × 0.8 at x 30.6–64.6, y 12.1–12.9, z −8.6…4.4; 0.3 mm to the front/top/bottom walls, 2.1 behind; ribs on F bands, foam on B bands; part bands B y 10.9–12.1, F y 12.9–14.1 | No parts within 0.6 of the top/bottom edges, either face. R-BOARD-BODY |
-| [sub-audio-in](sub-audio-in.md) | lid bore Ø1.0 + hex window over board (3.9, 6.5) | Board port is at x 3.9: **aligned** (ECR-0011). 1.5 mm open gap board ↔ lid. R-AUDIO-BODY |
-| [sub-ui](sub-ui.md) | plunger bore over SW1 at board (22.0, 6.5) | KMT0 travel 0.15 ± 0.1 vs the stack tolerance. R-UI-BODY |
-| [sub-dock-usb](sub-dock-usb.md) | DOCK box, window, BAY, USBC_KEEPOUT; 5 wires target → J3/J4/J10/J11/J12 | Wire route belly → rear pads not designed. R-DOCK-BODY |
-| [sub-power](sub-power.md) | CELL envelope, VHB, foam on the cell's outer face | Cell clears the strut-relief fill by ~0.07 mm (L82). R-PWR-BODY |
-| [reg-arm](reg-arm.md) | heel unioned into the tub (`heel.heel_add/heel_cut`); wire channel exit at (65.75, 5.30, −5.62), Ø1.0; strut relief | Channel x 65.25–66.25 overlaps the cell's rear end (x 65.6) ([physical.md](physical.md) open issue 2). R-BODY-ARM |
-| [physical](physical.md) | frame axes; `frame.py` vs `shell_r1.py` constants; assembly order (test vs bonded) | ECR-0001. R-PHYS-FRAME |
-| [sub-debug-test](sub-debug-test.md) | TP row and SWD under the lid | In the bonded build SWD means cutting the seam (O10), so DFU through the dock is proven first; the 0.2 mm rebate is the cut line (issue 12) |
-| [reg-pad](reg-pad.md) | no direct contact: pad pose via the arm (`frame.pad_pose`), styling | Ear (open) clearance re-check (E9); pad styling is still Blade, O17 asks for the Spine theme |
-| spec | O10 (two-stage, cut-openable), O12b (IPX4/5), O16-6 (no screws), O17 (spine) | R-SPEC-BODY |
-| Nets / firmware | none directly. The body only routes the dock contacts, the arm wires and the button press | — |
+```yaml
+- to: reg-board
+  crosses: "board 30 x 12 x 0.8 at x 30.55-60.55, y 12.1-12.9, z -8.45..3.55; F face on VHB; B band 1.4 (tallest U2 1.08, margin 0.32); F band 0.30 (SW1 pocket 0.90, SW1 0.65 margin 0.25); F parts only in VHB cut-outs; x-stop 0.25"
+  invariant: "no F part outside a cut-out; nothing on the long edges; interfaces.py outline/inside/heights/clamp-bands PASS 2026-10-07"
+  rel: R-BOARD-BODY
+- to: sub-audio-in
+  crosses: "duct bore D1.0 + VHB hole D1.0 over the board's D0.6 NPTH at board (1.88, 6.0) = pod 32.43"
+  invariant: "nominal offset 0.000 (interfaces.py mic-port PASS); worst 0.115 <= 0.20 with the gauge pin, 0.86 FAIL walls-only (checks.json duct)"
+  rel: R-AUDIO-BODY
+- to: sub-ui
+  crosses: "SW1 pocket 4.3 x 3.1 + D2.6 bore + puck + skin over board (18.5, 6.0) = pod 49.05"
+  invariant: "selective fit puck top -> skin 0.005..0.135 (PASS); fixed puck worst -0.185 pre-presses (FAIL, why the kit exists); interfaces.py switch WARN: lateral stack 0.20 vs 0.15 limit"
+  rel: R-UI-BODY
+- to: sub-dock-usb
+  crosses: "DOCK box + window in the tub belly, BAY; 5 dock wires target -> J3/J4/J10/J11/J12 (B, board x 25-29)"
+  invariant: "wire route under the cell (0.8) undesigned (issue 7)"
+  rel: R-DOCK-BODY
+- to: sub-power
+  crosses: "CELL envelope on 0.25 VHB in the 0.3 gap; 1.4 B gap to the hanging board"
+  invariant: "B parts never touch the cell (checks.json clash parts_B/cell 0)"
+  rel: R-PWR-BODY
+- to: reg-arm
+  crosses: "heel unioned into the tub (heel.heel_add/heel_cut, unchanged); channel exit (65.75, 5.30, -5.62) D1.0 into the 1.1 gap behind the cell; strut relief"
+  invariant: "exit x 65.25-66.25 overlaps the cell's rear end 65.6 (issue 6)"
+  rel: R-BODY-ARM
+- to: physical
+  crosses: "frame axes; frame.py/pod.py vs dims_r2.py; assembly order"
+  invariant: "interfaces.py frame WARN: 8 of 10 shared facts differ (ECR-0001)"
+  rel: R-PHYS-FRAME
+- to: sub-debug-test
+  crosses: "TP1-TP6 bare pads on F under the VHB cut-outs, facing the lid 0.30 away"
+  invariant: "reachable only before the lid bond (checks.json F_face_pads reachable_assembled false); after it SWD = peel the board off the lid (issue 15)"
+- to: reg-pad
+  crosses: "no direct contact: pad pose via the arm (frame.pad_pose)"
+- to: spec
+  crosses: "O10, O12b, O16-6, O17, O24 (duct), O27 (thin first)"
+  rel: R-SPEC-BODY
+```
 
 ## Constraints
-- **O16-6:** no screws in the housing. Screws are fine on the transducer cup and the NiTi set screws. **O10:** taped test build, then a bonded final build that can still be cut open.
-- **O12b:** IPX4 minimum, IPX5 preferred, for outdoor wear in light rain. **O16-3:** a pre-built magnetic connector, with space reserved for a sealed USB-C. **O16-7:** an IP68 switch, not a printed flexure.
-- **O16-5:** one board for both pods, so the left shell is the mirror image and the mic + switch sit on the board centre line ZC. **O17:** Spine top; arm-joint wiring must never pinch. **O5:** growth is acceptable if it's clearance.
-- **O19** (spec L645): serviceability is a goal: the cell is replaced as it ages and the owner repairs. **R20** (wearability) and **R24** (joint fatigue), via ECR-0006: a weighted printed dummy pair worn 2 h and a 1000× joint flex test before the board order. **O20** (L646): rev 1 is the final device; the shell must be re-sized.
-- **Spec §8:**
-  - the mic port opens directly over the board hole;
-  - no gasket cavity;
-  - thin mesh, never foam (`spec.md` L508–512);
-  - nothing visible with the eyes straight ahead (vision line, pod x ≥ 29.5).
-- **Resin** (`tolerances.md`, `hardware.md` §5):
-  - holes under ~0.8 mm may close; recesses under 0.4 may fuse;
-  - print critical holes undersize and drill to size;
-  - tough/ABS-like resin.
+- **O16-6** no screws in the housing (cup screw and NiTi set screws allowed). **O10** taped test build, bonded cut-openable final build.
+- **O12b** IPX4 min, IPX5 preferred. **O16-3** pre-built magnetic connector. **O16-7** IP68 switch (KMT022), not a printed flexure.
+- **O16-5** one board for both pods: mic and SW1 on the board centre line y 6.0 = pod z −2.45; left shell = mirror.
+- **O24(1)** sealed straight duct ID 1.0 between lid bore and board hole + a board locating feature (x-stop + gauge pin here) + firmware EQ notch (target moved to ~63 kHz, sub-audio-in).
+- **O27** thin first, then short, then long: T 10.4 (Rev F 11.8), H 14.5 (Rev F 15.2), L 38.0 unchanged.
+- **O19** serviceability: cell swap must not destroy the board bond (lid lifts the board; met by D1 seam). **R20/R24** via ECR-0006.
+- **Spec §8:** port opens over the board hole, no gasket cavity, thin mesh never foam; nothing visible with the eyes straight ahead (pod x ≥ 29.5).
+- **Resin** (`tolerances.md`, `hardware.md` §5): holes < ~0.8 mm may close, recesses < 0.4 may fuse; ream critical holes.
 
 ## Key numbers
-| Quantity | Value | Source (date) |
-|---|---|---|
-| Envelope | 38.0 × 11.8 (y 4.3–16.1) × 15.2 (z −9.7…5.5); belly adds 3.5 under x 29.5–55.0; spine adds 3.1 on top (z 8.6) | `shell_r1.py` L35–37, L126–129 (2026-10-01) |
-| Part bounding boxes | tub x 29.5–67.5, y 3.3–14.4, z −13.2…5.5; lid + spine x 29.5–67.5, y 10.2–16.1, z −13.2…8.6 | build123d probe of `tub()`/`lid_base()`+`concept_spine()` (2026-10-01) |
-| Volumes / mass | tub (no heel) 1289 mm³ ≈ 1.52 g; lid 1023 mm³ ≈ 1.21 g; spine 160 mm³ ≈ 0.19 g (at 1.18 g/cm³; 1.48 / 1.18 / 0.18 g at pad.py's 1.15). Heel 0.26 g; adapter not included. The resin density differs between sources (1.18 here, `hw/mech/notes/shell.md` [Low]; 1.15 in `pad.py`): pick one | same probe; heel checks.json |
-| Pod mass, lower bound **[derived]** | **≥ ~10.2 g** before parts, dock target, adapter and wires: shell 2.92 + heel 0.26 + cell ~4.2 + pad 2.19 + bare FR4 board ~0.65 (34 × 13 × 0.8 at 1.85 g/cm³). Spec target ~8 g; ~15 g is where glasses start to hurt (D18, R20) | this row; sub-power; pad checks.json |
-| Clearances | board ↔ walls 0.3 front/top/bottom, 2.1 rear; cell ↔ walls 0.8 top/bottom, 0.3 inner (tape), 1.1 rear; lid ↔ F parts 0.3; B parts ↔ cell 0.2 | `shell_r1.py` L39–44 (derived) |
-| Fits | lid lip 0.15/side; rib ↔ board 0.05; plunger head ↔ bore 0.15/side; dock window +0.1/side; dovetail 0.15/side | `tolerances.md` (2026-10-01) |
-| Plunger stack | no shoulder, so the plunger rests on SW1: head top 15.45 vs skin recess floor 15.85 = **0.40 mm the skin must span**. (The CAD's 0.65 mm stem-to-switch gap assumes the plunger floats.) | `shell_r1.py` L105, L113–116, L174 (derived) |
-| Lid thickness | 1.0 + 0.7 plate = 1.7 at the plunger and mic | L36, L99 |
-| Interference checks | tub/lid vs cell, pcb, parts_in, parts_out, switch, foam_top, foam_bot, lid vs dock, tub vs lid: **all 0 mm³** | `hw/mech/out/r1/checks.json` (2026-10-01 19:16) |
-| Extra probe | plunger ∩ lid 0 mm³; **lid + spine = 2 separate solids** | build123d probe (2026-10-01, this doc) |
+```yaml
+- {q: envelope T x L x H, v: "10.4 x 38.0 x 14.5 (+ belly 2.05 under x < 55; + spine)", src: "checks.json envelope; dims_r2.py; 2026-10-07"}
+- {q: envelope volume, v: "6211 mm3 (body 5720.9 + plate 330.5 + spine 159.6) vs size model MZ-2 6259; Rev F 7801 (-20 %)", src: "checks.json envelope; ECR-0018 log 2026-10-03"}
+- {q: print volumes, v: "tub (with heel) 1321.5, lid (with spine) 863.3, puck 3.11 mm3", src: "checks.json volumes 2026-10-07"}
+- {q: shell mass, v: "~2.58 g at 1.18 g/cm3 (tub 1.56, lid 1.02)", src: derived}
+- {q: pod mass lower bound, v: ">= ~9.5 g before parts, dock target, adapter, wires: shell 2.58 + cell ~4.2 + pad 2.19 + bare board 0.53 (30 x 12 x 0.8 at 1.85 g/cm3); target ~8 g", src: "derived; pad checks.json; sub-power"}
+- {q: clearances, v: "board: front 0.25 (x-stop), long edges 0.45, rear 6.15 (stowage); cell: inner 0.3 (tape), top 0.1, bottom 0.8 (dock tails), rear 1.1; B gap 1.4 (margin 0.32 over U2 1.08); F gap 0.30 (VHB 0.25 + 0.05)", src: "checks.json board_in_cavity/B_gap/F_gap; dims_r2 CAV/CELL"}
+- {q: duct offset, v: "nominal 0.000; gauge pin worst 0.115 PASS (limit 0.20 = (1.0-0.6)/2); walls-only 0.86 FAIL", src: "dims_r2.duct_offsets(); checks.json duct"}
+- {q: switch stack, v: "puck 0.83 nominal, kit 0.73-0.93; selective fit 0.005..0.135 PASS; fixed worst -0.185..0.275 (pre-press); pocket ceiling clear 0.25 nom / 0.095 worst", src: "dims_r2.switch_stack(); checks.json SW1_pocket"}
+- {q: stowage, v: "277.3 mm3 (198.3 behind board + 78.9 behind cell), zone 6.15 long, need 107-142", src: "checks.json stowage"}
+- {q: interference, v: "tub/lid x {pcb, parts_B, u2_mic, sw1, cell, vhb, dock}, tub/lid, parts_B/cell, puck/lid, puck/sw1: all 0 mm3; drop-in corridors (cell, lid+board) 0", src: "checks.json 2026-10-07"}
+- {q: lid thickness at duct/puck, v: "0.8 + 0.7 plate = 1.5", src: dims_r2 LID_T, PLATE_T}
+```
 
 ### Sealing paths (O12b)
-| Path | Rev-1 design | Status |
-|---|---|---|
-| Seam, main cavity | lip + bond line 0.15–0.3 mm (MS-polymer / neutral RTV; product TBD) | designed; untested |
-| Seam, round the belly bay | **plain butt joint, no lip**, ~0.4 mm tub land after the rebate | **weak path** (open issue 13) |
-| Mic port | open Ø1.0 bore; the board-to-lid gap is open to the cavity | **not sealed**: no mesh, no chimney (`sub-audio-in` issues 2–3) |
-| Plunger | silicone skin bonded in the Ø5.2 recess; KMT022 itself is IP68 | skin material and thickness TBD |
-| Dock window | target glued in, back potted | potting compound TBD |
-| Heel channel / arm | RTV at the land opening and the rear gap (`hardware.md` §0.5 table) | per [reg-arm](reg-arm.md) |
-| Test | none planned | TBD |
+```yaml
+- {path: seam straight runs, design: "tongue 0.35 x 0.5 / groove +0.05 + bond line (MS-polymer or neutral RTV, product TBD)", state: "designed, untested"}
+- {path: seam corners, design: "tongue stops 1.4 short of each convex corner: plain butt joint there", state: "weak (issue 13)"}
+- {path: belly step (z -8.9, x < 55), design: "0.35 key, no rebate", state: "weak + no cut line (issues 12, 13)"}
+- {path: mic duct, design: "D1.0 bore + D1.0 VHB hole sealed onto the board F face round the D0.6 hole (VHB annulus is the seal); hex mesh seat", state: "duct sealed to the cavity by design; mesh part TBD. R-ACO-P6 keep-out (no via / F track within r 1.6 of the port, docs/sim/acoustics.yaml) is BROKEN on the routed board: F track MDF_SDI copper edge 1.35 mm from the port centre, nearest via (GND) 1.87 (pcbnew probe of routed.kicad_pcb, 2026-10-07). The VHB hole is r 0.5, so the 35 um step lies under the tape 0.85 out: likely harmless for VHB, but the rule says FAIL (issue 19)"}
+- {path: SW1 puck bore, design: "silicone skin bonded in the D4.6 recess; KMT022 itself IP68", state: "skin material TBD"}
+- {path: dock window, design: "target glued in, back potted", state: "potting compound TBD"}
+- {path: heel channel / arm, design: "RTV at the land opening and the exit (reg-arm)", state: "per reg-arm"}
+- {path: test, design: none, state: TBD}
+```
 
-## Open issues
-1. **The spine top is a floating solid.** It sits on the **tub's** top face (y 10.2–14.4) and touches the lid only along the line y 14.4, z 5.5, where the lid's top edge is the 1.0 chamfer. `lid.stl` therefore holds two disjoint bodies, and the exploded render shows the spine moving with the lid. Options (owner, O17):
-   - **(A, recommended)** Make it part of the tub print. Trim it to y ≤ 14.0 so the top seam groove stays open for cutting.
-   - (B) Make it a lid feature: extend its base onto the plate (y 15.4–16.1). The spine then overhangs the tub and covers the top seam.
-   - (C) Print it separately and bond it on after closing.
-   - **Closes:** pick one; re-run `checks.json` plus a solid-count check.
-2. **Nothing locates the board front-to-back.** The rev-1 shell has no front or rear stops (the round-1 shell had both). The board can slide ~2.4 mm in x (0.3 front gap + 2.1 rear gap), held only by rib/foam friction, which moves the mic port and SW1 off their lid holes. Options:
-   - **(A, recommended)** Two short rear-stop ribs on the lid at x ≈ 64.7, inside the clamp bands, so the wires still pass between them.
-   - (B) Push the board against the front wall and tape it.
-   - (C) Add a front stop on the tub.
-   - **Closes:** a CAD change + check.
-3. **Mic acoustic path** (body side): the lid bore is aligned with the board port since ECR-0011; the 1.5 mm gap is unsealed; there's no mesh. **Closes:** see `sub-audio-in` issues 1–3 (chimney/boss + mesh seat in the lid).
-4. **The plunger floats.** The bore is a straight Ø3.2 hole with no shoulder, so the plunger rests on SW1 and its head top sits 0.40 mm below the skin recess floor (Key numbers). The quantity that sets pre-press or no-click is head top ↔ skin underside; no doc or CAD sets it (`tolerances.md` says "stem 0.2 mm long, sand to a light touch"). The KMT022 height is 0.65 mm nominal (C&K KMT0 datasheet p.B-9, 21 Mar 2018, fetched 2026-10-01; sub-ui); **its tolerance is unknown**. **Closes:** set the head length so that "skin just touching the head = SW1 just not pressed", add a retaining shoulder or rely on the skin, and say which (sub-ui issue 1).
-5. **Sealing is undesigned past the seam** (table above). The spec cites `docs/research/sealing-and-service.md` (O10), but it doesn't exist. **Closes:** the sealing note + an IPX4 spray test plan.
-6. **Heel wire-channel exit overlaps the cell's rear end** (x 65.25–66.25 vs 65.6): heel.py still checks against the old cell ([physical.md](physical.md) open issue 2). **Closes:** [reg-arm](reg-arm.md).
-7. **Dock:** the wire route from the belly to the rear pads isn't designed. The USB-C keep-out overlaps the target (either/or). **Closes:** [sub-dock-usb](sub-dock-usb.md) issue 5.
-8. **Stale sources.**
-   - `frame.py` holds the pre-rev-1 pod (ECR-0001).
-   - `hw/mech/notes/shell.md` and `notes/electronics.md` describe the round-1 **screwed** lid with screw charge contacts and a 20 × 11.5 board.
-   - There's no rev-1 shell note, so no owner build sheet for this shell. The assembly order is only in [physical.md](physical.md).
-   - **Closes:** ECR-0001 + a `notes/shell_r1.md`.
-9. **Outdated outputs.**
-   - `assembled.png` (01:32) and `top.png` (00:53) predate the 34 mm board (19:25).
-   - `pod_rev1_shell.step` / `.FCStd` and `concepts_r1.png` (00:22) predate the retention ribs and the 34 mm board.
-   - Missing diagram: a dark-mode section through the ribs, foam, lip, seam and plunger.
-   - **Closes:** re-export and render once issues 1–2 are fixed.
-10. **Unknowns:**
-    - foam spring force on the board (foam stiffness unmeasured);
-    - bond strength and how many cut/rebond cycles the seam survives;
-    - pod mass and centre of mass for rev 1 (D18 balance; `sim/checks/balance.py` was run for older pods). The known parts already sum to ≥ ~10.2 g (Key numbers) against the ~8 g target; ECR-0006 needs the full figure for its ballast.
-    - **Closes:** bench + CAD mass run.
-11. **The foam strips have almost no floor.** The board (z −8.6…4.4) is 1 mm wider than the cell (z −8.1…3.9), so each 0.6 mm strip under the B clamp bands overlaps the cell by only 0.1 mm and overhangs empty space to the inner wall (`shell_r1.py` L42–43, L177–178). In round 1 the board was narrower than the cell and the strips sat on it (`frame.py` L39/L41; `notes/shell.md` L104). `checks.json` only tests for zero overlap, not for support. Consequences: the button press (sub-ui issue 2) and any mic gasket load push the board ~0.2 mm down until B parts (R21 under SW1, Q1/Q2, U3's DSBGA) land on the pouch. Options (owner):
-    - **(A, recommended)** Two ledges on the tub's top and bottom cavity walls, z 3.9–4.7 and −8.9…−8.1, y 5.1–10.7, flush with the cell's outer face, as foam floors. The bottom ledge needs a gap for the dock-wire route under the cell (sub-dock-usb issue 5).
-    - (B) Wider strips moved inboard (≤ 0.95 mm wide, clearing B parts: R14 ends at board y 12.05).
-    - (C) One cell-width foam pad.
-    - **Closes:** the choice, then a "foam ∩ support" check in `shell_r1.py` `main()`, then the rev-1 cut size here and in physical's assembly order.
-12. **The seam cut line is a 0.2 mm rebate on the tub only.** `seam_groove()` is never subtracted from the lid, and the tub stops at y 14.4, so the "0.4 × 0.4 groove" is really 0.2 (y) × 0.4: below the 0.4 mm resin recess minimum (tolerances.md L5), so it may fuse. **Closes:** subtract `seam_groove()` in `lid_base()` too, or widen the tub rebate to 0.4; re-run checks.
-13. **No lip round the belly bay.** The lip follows the main cavity only; round the bay (x 29.5–55.0, z −13.2…−8.9) the seam is a butt joint with ~0.4 mm of tub land after the rebate. **Closes:** extend the lip into the bay outline (or add a bay-perimeter lip), re-run checks, then the sealing test (issue 5).
-14. **Service (O19, R24) costs a cut-and-rebond cycle every time.** A cell swap means cutting the seam, lifting the board on its 12 wires and sawing the VHB (permanent; dental floss, `hardware.md` L298). An arm swap (the joint fatigue R24 predicts) means cutting the seam to desolder 4 conductors at J1/J2/J7/J8. No connector or service seam exists outside the sealed volume. **Closes:** physical.md "Service" sequences; the cycle count the bond survives (issue 10); a decision on whether rev 1 needs a service joint.
+## Open issues (IDs stable; gaps = closed)
+1. (closed in Phase 2) Spine top floating: unioned into the lid, lid prints as 1 valid solid (checks.json printable, 2026-10-07).
+2. (closed in Phase 2) Board x location: x-stop 0.25 + gauge pin + VHB bond (checks.json duct with_gauge_pin PASS).
+3. **Mic acoustic path (body side):** duct sealed and aligned; mesh product and the EQ notch (~63 kHz) open; Monte Carlo R14 all-pass 0.70 (ECR-0018 log 2026-10-07). Closes: sub-audio-in issues.
+4. **Switch stack:** fixed puck pre-presses at worst case, so the kit is selective fit (PASS); lateral stack WARN in interfaces.py (0.20 worst vs 0.15 limit, 2026-10-07). KMT022 height tolerance unknown (C&K gives 0.65 nominal only). Closes: tighten lid/board position tolerance or accept, owner review; sub-ui.
+5. **Sealing undesigned past the seam** (table above); `docs/research/sealing-and-service.md` (cited by O10) doesn't exist. Closes: sealing note + IPX4 spray test plan.
+6. **Heel wire-channel exit overlaps the cell's rear end** (x 65.25-66.25 vs 65.6; cell position unchanged in Phase 2). heel.py still checks against frame.py's old cell. Closes: [reg-arm](reg-arm.md) issue 1.
+7. **Dock wire route** belly → rear pads undesigned: 5 wires in the 0.8 under-cell slack beside the flat tails; OD 0.8 won't lie flat, needs OD ≤ 0.6 or the rear-gap route (notes/shell_r2.md open items). Closes: [sub-dock-usb](sub-dock-usb.md).
+8. **Stale frame sources:** frame.py/pod.py disagree with dims_r2.py on 8 of 10 shared facts (interfaces.py frame WARN 2026-10-07; ECR-0001). blade.py's rail/adapter centre on pod.POD_ZC −2.0, the r2 body centre is −2.45 (0.45 off; r1 was 0.1). `notes/shell_r2.md` x_stack still says mic_axis_x 32.53 (now 32.43). Closes: ECR-0001 extended to pod.py; refresh the note.
+9. **No 3D render dump of r2** (section.png/plan.png only); STEP not exported. Closes: render dump (memory rule) after the owner review edits.
+10. **Unknowns:** VHB 4914 thickness tolerance and normal tensile (TDS not read [A]); bond and peel cycles; pod mass and CoM (D18; ≥ ~9.5 g lower bound vs ~8 g). Closes: TDS read + bench + CAD mass run.
+11. (closed in Phase 2) Foam strips without a floor: no foam; the board hangs from the lid.
+12. **Seam cut line:** 0.2 × 0.3 tub-only rebate (below the 0.4 resin recess minimum: may fuse); belly step has none. Closes: widen to 0.4 and mark the step; define the reopening procedure.
+13. **Butt joints at the seam corners and the belly step** (tongue stops 1.4 short of convex corners). Closes: corner sealant bead in the bond procedure or a corner key; spray test (issue 5).
+14. **Service (O19, R24):** cell swap = cut the seam, lift lid + hanging board on its wires, desolder J5/J4 (J9), saw the cell VHB, reverse (board bond untouched). Arm swap = cut the seam, desolder J1/J2/J7/J8 on B, heel set screw. Board swap = warm 60-80 °C, saw the board VHB from the rear, accept a lid reprint (notes/shell_r2.md retention_options A). Closes: physical.md Service; cycle count the seam survives.
+15. **SWD after the lid bond needs a peel:** TP1-TP6 face the lid (checks.json F_face_pads reachable_assembled false). Field recovery = ROM DFU via the dock (sub-debug-test). Closes: owner decision at review (accept, or TPs back on B).
+16. **Gauge pin** (D0.98/D0.50 stepped, turned) not sourced; alternative = 2 NPTH + 2 lid pins (board change). Closes: source/turn one; else ECR.
+17. **SW1 press loads the F VHB in tension** with no B back-stop (option A); 2 N on ~314 mm² [A ~0.5 MPa → >100× margin]. Closes: coupon 600k presses + drop (MZD-7).
+18. **[A] tolerances unverified:** JLC outline ±0.2 and NPTH ±0.05, VHB thickness, resin ±0.05, KMT022 height; `docs/build/tolerances.md` has no Phase-2 rows. Closes: dated sources, then a tolerances.md Phase-2 section.
+
+19. **R-ACO-P6 duct-seat keep-out violated on the routed board** (MDF_SDI F track 1.35 mm from the port; acoustics.yaml still records the Rev F PASS). Closes: re-route MDF_SDI off F near the port or re-state P6 for a VHB annulus (owner of reg-board / sub-audio-in).
 
 ## Before you change this, check
-- **Mic port, plunger bore or lid thickness:** the board positions in **both** pods ([reg-board](reg-board.md), centre line); the duct length and §8 rules ([sub-audio-in](sub-audio-in.md)); the plunger stack ([sub-ui](sub-ui.md)).
-- **Ribs, foam or cavity size:** the board's clamp bands and height bands; the cell fit; the button feel (foam is the spring, and it needs a floor: issue 11).
-- **Belly, window or keep-out:** [sub-dock-usb](sub-dock-usb.md); O12b sealing; the strut clearance (the rear stays shallow).
-- **Rear wall, strut relief or heel:** [reg-arm](reg-arm.md), the wire gap, the cell's rear end.
-- **Seam or adhesive:** O10 (cut-openable), O16-6 (no screws).
-- **Spine or exterior:** O17; that the part prints as one solid.
-- After any change: re-run `python3 hw/mech/shell_r1.py` (checks.json) and render; walk `integration-map.md` §10; run `python3 tools/plm.py impact file:hw/mech/shell_r1.py`.
+- **Duct, SW1 pocket, lid/plate thickness:** board positions (mic (1.88, 6.0), SW1 (18.5, 6.0)) in **both** pods; duct length + acoustics scenario `phase2_r2` ([sub-audio-in](sub-audio-in.md)); puck kit + switch stack ([sub-ui](sub-ui.md)); `interfaces.py` [mic-port] [switch].
+- **F gap / VHB:** F band 0.30, cut-outs for every F part (reads placement.yaml live), duct seal annulus; `interfaces.py` [clamp-bands] [heights].
+- **Cavity, cell or B gap:** tallest B part (U2 1.08), cell fit, stowage volume, heel exit.
+- **Belly, window:** [sub-dock-usb](sub-dock-usb.md); O12b; strut clearance (rear stays shallow).
+- **Rear wall, strut relief, heel:** [reg-arm](reg-arm.md), stowage, cell rear end.
+- **Seam or adhesive:** O10 (cut-openable), O16-6 (no screws), O19 (cell swap leaves the board bond intact).
+- After any change: `systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 python3 hw/mech/shell_r2.py` (checks.json), `python3 tools/checks/interfaces.py`, `python3 sim/acoustics/port.py` if the duct moved; walk `integration-map.md` §10; `python3 tools/plm.py impact file:hw/mech/dims_r2.py`.
 
-## Change log
-- 2026-10-01: created from `shell_r1.py` (19:16), `blade.py`, `heel.py`, `tolerances.md`, `checks.json`. New findings:
-  - the spine is a separate solid;
-  - the board has no x location;
-  - the plunger leaves a 0.65 mm CAD gap;
-  - volumes and mass;
-  - stale notes and renders.
-- 2026-10-01 (editor pass): issues 11 (foam strips have 0.1 mm of cell under them), 12 (seam rebate tub-only, 0.2 mm), 13 (no lip round the belly), 14 (service cycles, O19/R24); plunger stack restated as seated (0.40 mm skin span); KMT022 height cited from C&K; mic bore vs board port 0.77 mm; mass lower bound ≥ ~10.2 g; O19/O20/ECR-0006 in the status line.
+## Reference design (Rev F/G)
+`hw/mech/shell_r1.py` (env `ULTRASONIC_DESIGN=revg`), last changed 2026-10-01: seam at y 14.4 with a 0.5 lid lip round the main cavity only (butt joint round the belly); board 34 × 13 clamped by two lid ribs on 0.6 mm F edge bands over 1.5 mm foam strips with 0.1 mm of cell under each; open D1.0 lid bore over a 1.5 mm unsealed gap (no mesh, no duct); floating printed plunger Ø2.9 in a Ø3.2 bore over SW1 at board (22.0, 6.5); USB-C keep-out behind a 3.5 mm belly; spine top a separate floating solid; envelope 38.0 × 11.8 × 15.2, 7801 mm³; tub 1289 / lid 1023 / spine 160 mm³. Full text: git history of this file (before 2026-10-07).

@@ -1,4 +1,5 @@
 # Pad: transducer cup, contact face, pad board and LED
+Rev MZ-2 2026-10-07: pad region unchanged by Phase 2 (ECR-0018 touches the pod board and shell only); reg-board row points at the Phase-2 BOM and the B-face pod-board pads.
 Status: CAD rev 1, not built. `pad.py` build 2026-10-01 00:54: checks.json `all_pass` false, 2 known items (open issue 6). Pad board draft `hw/padboard/layout.py` 2026-09-30 23:37, DRC 0 violations / 0 unconnected. Exciter not measured (E1). Updated 2026-10-01.
 · Source of truth: `hw/mech/pad.py`, `hw/mech/frame.py` (`PAD_*`, `TRANSDUCER`, `pad_pose`), `hw/padboard/gen.py` (pad-board schematic), `hw/padboard/layout.py` (pad positions), `hw/padboard/mech.py`, `docs/build/tolerances.md` (transducer pod)
 · Owner decisions: O8 (LED, solid), O10 (test/final build), O11 (Sugru contact, swappable inserts), O12(b) (IPX4–5), O16(4) (larger near-flat pad), O16(6) (cup screw OK), O19 (serviceable by the owner) · Open ECRs: ECR-0006 (weighted printed dummy pair, 2 h wear test; R20), ECR-0007 (buy exciters now, E1/E2; R19)
@@ -61,7 +62,7 @@ Solder each arm wire on the **top half** of its pad: the cap's epoxy dam (r 3.25
 | [sub-ui](sub-ui.md) | LED_A, LED_K → D1 | VSYS → R14 2k2 (pod board) → LED → PB7 open-drain; 0.14–0.73 mA on battery, 0.82–0.86 mA docked (sub-ui basis; `integration-map.md` §5 still says 0.35–0.75); duty set from VSYS (VBAT on battery, 4.5 V docked); Vf 2.7–3.7 V at 5 mA (pad-led.md). **J4 LED_K is 0.45 mm from J2 OUT_B** (issue 13) |
 | [reg-arm](reg-arm.md) | Pad socket Ø0.85 × 3.5 at T (66.8, 5.2, −18.42), 19.3° to the pad axis; set screw at 2.0 mm; strut rear bore Ø1.2 + Ø1.6 counterbore → rear riser → J1–J4 | Lock the pad end **after** the heel end (heel.md step 5). The strut never touches the wire (≥ 0.135 mm) |
 | [reg-pod-body](reg-pod-body.md) / [physical](physical.md) | `frame.pad_pose(state)`; PAD_CONTACT (70.6, −3.0, −25.0); pad body top z −17.24 (Ear (open) side), collar max z −14.92 | Ear (open) clearance to re-check on the real STEP (E9). Styling is still Blade (hex bezel, armour plate); O17 asks to carry the Spine theme |
-| [reg-board](reg-board.md) | (separate PCB) | Same JLC order as the pod board; see open issue 9. The pad-board LED C131223 is the 11th Extended part type per JLC order (reg-board Interfaces, Cost) |
+| [reg-board](reg-board.md) | (separate PCB) | Same JLC order as the pod board; see open issue 9. The pad-board LED C131223 adds one Extended part type to the JLC order (count with the Phase-2 BOM `hw/pod/bom_jlc_mz2.csv`: [bom.md](../build/bom.md), reg-board Cost). Pod-board ends of the 4 wires: J1/J2/J7/J8 on the B face at board x 27.0-28.9 (Phase 2, [reg-arm](reg-arm.md)) |
 
 ## Constraints
 - **D1:** ≥ 1 N inward; compliant pad ~8 mm Ø or 8 × 10 mm oval ≈ 17–20 kPa. **O16(4) (later) supersedes the size:** ~100–150 mm², near-flat, 2 mm edge radius; pre-made pads first, else Sugru.
