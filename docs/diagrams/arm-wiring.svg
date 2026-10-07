@@ -1,63 +1,81 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" role="img" aria-label="Where the transducer wires go. Two fine flexible wires leave the board through a service loop, exit the pod through a grommet in the arm's anchor, run inside the arm's silicone sleeve beside the NiTi spring, and are soldered to the transducer inside the pad housing. Three cross-section options are compared; option A, two litz wires beside the NiTi in the sleeve, is recommended." font-family="Helvetica, Arial, sans-serif">
-  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f2328"/></marker></defs>
-  <rect width="1000" height="600" rx="14" fill="#fbfaf7"/>
-  <text x="40" y="40" font-size="18" font-weight="700" fill="#1f2328">Where the transducer wires go</text>
-  <text x="40" y="62" font-size="13" fill="#57606a">Two wires carry the bridge output (OUT+ / OUT−, ~0.3 A peaks) from the board to the transducer in the pad.</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" role="img" aria-label="Arm wiring, Phase 2: four litz wires run from the board's rear B pads through the stowage zone, the heel exit and channel, a shrink tube across the flex zone on the rear side of the NiTi, the strut bore, to the pad board." font-family="DejaVu Sans, Helvetica, Arial, sans-serif" font-size="14">
+  <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#57606a"/></marker></defs>
+  <rect width="1200" height="650" fill="#fbfaf7"/>
+  <text x="30" y="38" font-size="22" font-weight="bold" fill="#1f2328">Arm wiring (Phase 2): 4 wires, rear side of the NiTi, end to end</text>
+  <text x="30" y="62" fill="#57606a">redrawn 2026-10-07 from reg-arm.md, heel.py wire_route (both pods), pad.py · not to scale · 4 × 7/44 served litz, ~0.21 mm OD, ~1.25 Ω/m</text>
 
-  <!-- pod outline -->
-  <rect x="60" y="90" width="430" height="170" rx="8" fill="#ffffff" stroke="#1f2328" stroke-width="2"/>
-  <text x="75" y="112" font-size="13" font-weight="700" fill="#1f2328">pod (side view, face to the left)</text>
-  <rect x="90" y="130" width="220" height="80" rx="4" fill="#e8f0fb" stroke="#2a78d6" stroke-width="1.5"/>
-  <text x="200" y="175" font-size="12" fill="#2a78d6" text-anchor="middle">board: bridge → 2 solder pads</text>
-  <!-- service loop -->
-  <path d="M310,190 C360,190 380,150 400,170 C420,190 380,225 420,232 L440,245" fill="none" stroke="#e34948" stroke-width="3"/>
-  <path d="M310,196 C360,196 385,158 405,176 C425,196 386,230 426,236 L446,249" fill="none" stroke="#2a78d6" stroke-width="3"/>
-  <text x="505" y="130" font-size="12" fill="#1f2328">① service loop inside the pod:</text>
-  <text x="505" y="145" font-size="12" fill="#57606a">slack, so the arm's flex never</text>
-  <text x="505" y="160" font-size="12" fill="#57606a">pulls on the solder joints</text>
-  <!-- anchor + grommet -->
-  <rect x="425" y="240" width="40" height="26" rx="4" fill="#ddd4b4" stroke="#1f2328" stroke-width="1.5"/>
-  <text x="505" y="250" font-size="12" fill="#1f2328">② anchor boss + silicone grommet:</text>
-  <text x="505" y="265" font-size="12" fill="#57606a">NiTi clamped here; wires pass through a sealed hole</text>
-  <text x="505" y="280" font-size="12" fill="#57606a">and the curved root support keeps them from kinking</text>
-  <!-- arm -->
-  <line x1="445" y1="266" x2="560" y2="400" stroke="#2f2f33" stroke-width="16" stroke-linecap="round"/>
-  <line x1="445" y1="266" x2="560" y2="400" stroke="#8a8676" stroke-width="4"/>
-  <line x1="450" y1="266" x2="565" y2="400" stroke="#e34948" stroke-width="1.6"/>
-  <line x1="440" y1="268" x2="555" y2="402" stroke="#2a78d6" stroke-width="1.6"/>
-  <text x="585" y="330" font-size="12" fill="#1f2328">③ inside the arm's silicone sleeve (Ø1.8 mm),</text>
-  <text x="585" y="345" font-size="12" fill="#57606a">beside the Ø0.75 NiTi spring; 20 mm, 30° sweep</text>
-  <!-- pad -->
-  <rect x="530" y="395" width="70" height="95" rx="10" fill="#ffffff" stroke="#1f2328" stroke-width="2" transform="rotate(-30 565 442)"/>
-  <rect x="545" y="415" width="40" height="55" rx="3" fill="#f3f1ea" stroke="#8a8676" stroke-width="1.2" transform="rotate(-30 565 442)"/>
-  <text x="620" y="445" font-size="12" fill="#1f2328">④ pad housing: wires soldered to the transducer's</text>
-  <text x="620" y="460" font-size="12" fill="#57606a">tabs, NiTi end crimped or glued into a pocket; potted</text>
+  <!-- chain of stations -->
+  <g>
+    <rect x="30" y="95" width="190" height="120" rx="10" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+    <text x="125" y="122" text-anchor="middle" font-weight="bold" fill="#2a78d6">board, B face</text>
+    <text x="45" y="146" fill="#1f2328">J1 OUT_A · J7 LED_A</text>
+    <text x="45" y="166" fill="#1f2328">J2 OUT_B · J8 LED_K</text>
+    <text x="45" y="190" fill="#57606a" font-size="12">rear pad zone, board x 27-29</text>
+    <text x="45" y="206" fill="#57606a" font-size="12">solder before the shell</text>
 
-  <!-- cross sections -->
-  <text x="40" y="520" font-size="14" font-weight="700" fill="#1f2328">Arm cross-section options</text>
-  <g>
-    <circle cx="110" cy="560" r="26" fill="#2f2f33" stroke="#1a7a55" stroke-width="3"/>
-    <circle cx="104" cy="560" r="11" fill="#8a8676"/>
-    <circle cx="124" cy="552" r="5" fill="#e34948"/>
-    <circle cx="124" cy="568" r="5" fill="#2a78d6"/>
-    <text x="150" y="548" font-size="13" font-weight="700" fill="#1a7a55">A: NiTi + 2 litz wires in the sleeve (recommended)</text>
-    <text x="150" y="565" font-size="12" fill="#57606a">how hearing-aid receiver cables work; plain soldering;</text>
-    <text x="150" y="580" font-size="12" fill="#57606a">the spring carries no current</text>
+    <rect x="250" y="95" width="190" height="120" rx="10" fill="#f3f1ea" stroke="#57606a" stroke-width="2"/>
+    <text x="345" y="122" text-anchor="middle" font-weight="bold" fill="#1f2328">stowage zone</text>
+    <text x="265" y="146" fill="#1f2328">behind the board</text>
+    <text x="265" y="166" fill="#1f2328">pod x 60.55-66.7</text>
+    <text x="265" y="190" fill="#57606a" font-size="12">5 mm service loop</text>
+    <text x="265" y="206" fill="#57606a" font-size="12">(lid lift: 2.65 / 3.04 mm)</text>
+
+    <rect x="470" y="95" width="190" height="120" rx="10" fill="#f3f1ea" stroke="#57606a" stroke-width="2"/>
+    <text x="565" y="122" text-anchor="middle" font-weight="bold" fill="#1f2328">heel exit Ø0.8</text>
+    <text x="485" y="146" fill="#1f2328">(66.20, 5.15, −5.50)</text>
+    <text x="485" y="166" fill="#1f2328">into the 1.1 gap</text>
+    <text x="485" y="190" fill="#57606a" font-size="12">behind the cell; RTV dot</text>
+    <text x="485" y="206" fill="#57606a" font-size="12">ream: 0.8 pin-vise drill</text>
+
+    <rect x="690" y="95" width="230" height="120" rx="10" fill="#fff4ea" stroke="#b8520a" stroke-width="2"/>
+    <text x="805" y="122" text-anchor="middle" font-weight="bold" fill="#b8520a">heel channel Ø1.0</text>
+    <text x="705" y="146" fill="#1f2328">7.6 mm, two R0.8 bends</text>
+    <text x="705" y="166" fill="#1f2328">Ø1.6 counterbore, 1.0 deep,</text>
+    <text x="705" y="186" fill="#1f2328">on the land (tube end seats)</text>
+    <text x="705" y="206" fill="#57606a" font-size="12">fish with the tub EMPTY</text>
+
+    <rect x="950" y="95" width="220" height="120" rx="10" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+    <text x="1060" y="122" text-anchor="middle" font-weight="bold" fill="#1a7a55">pad</text>
+    <text x="965" y="146" fill="#1f2328">strut bore Ø1.2, REAR side</text>
+    <text x="965" y="166" fill="#1f2328">Ø1.6 × 1.7 cbore at top</text>
+    <text x="965" y="186" fill="#1f2328">→ riser → pad board J1-J4</text>
+    <text x="965" y="206" fill="#57606a" font-size="12">RTV dab at the strut exit</text>
+
+    <line x1="220" y1="155" x2="248" y2="155" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <line x1="440" y1="155" x2="468" y2="155" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <line x1="660" y1="155" x2="688" y2="155" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
+    <line x1="920" y1="155" x2="948" y2="155" stroke="#57606a" stroke-width="2" marker-end="url(#a)"/>
   </g>
-  <g>
-    <circle cx="520" cy="560" r="22" fill="#2f2f33" stroke="#8a8676" stroke-width="2"/>
-    <circle cx="514" cy="560" r="11" fill="#b8520a"/>
-    <circle cx="532" cy="560" r="5" fill="#2a78d6"/>
-    <text x="555" y="548" font-size="13" font-weight="700" fill="#1f2328">B: NiTi is one conductor</text>
-    <text x="555" y="565" font-size="12" fill="#57606a">one wire fewer, but NiTi won't</text>
-    <text x="555" y="580" font-size="12" fill="#57606a">solder: crimped at both ends</text>
-  </g>
-  <g>
-    <circle cx="810" cy="560" r="24" fill="#2f2f33" stroke="#8a8676" stroke-width="2"/>
-    <circle cx="820" cy="560" r="9" fill="#b8520a"/>
-    <circle cx="800" cy="560" r="9" fill="#b8520a"/>
-    <text x="842" y="548" font-size="13" font-weight="700" fill="#1f2328">C: twin NiTi conductors</text>
-    <text x="842" y="565" font-size="12" fill="#57606a">pad can't twist; 4 crimps,</text>
-    <text x="842" y="580" font-size="12" fill="#57606a">two wires to heat-set alike</text>
-  </g>
+
+  <!-- flex zone cross-section -->
+  <text x="30" y="252" font-size="17" font-weight="bold" fill="#1f2328">The 3 mm flex zone between heel land and strut top (side view)</text>
+  <rect x="60" y="300" width="160" height="190" fill="#fff4ea" stroke="#b8520a" stroke-width="2"/>
+  <text x="140" y="325" text-anchor="middle" font-weight="bold" fill="#b8520a">heel</text>
+  <rect x="520" y="300" width="160" height="190" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+  <text x="600" y="325" text-anchor="middle" font-weight="bold" fill="#1a7a55">strut</text>
+  <!-- NiTi -->
+  <line x1="140" y1="370" x2="600" y2="370" stroke="#1f2328" stroke-width="7"/>
+  <text x="370" y="282" text-anchor="middle" fill="#1f2328" font-weight="bold">NiTi Ø0.80 (sockets 4.0 / 3.5 deep, M1.4 set screws)</text><line x1="370" y1="288" x2="370" y2="362" stroke="#57606a" stroke-width="1" marker-end="url(#a)"/>
+  <!-- counterbores -->
+  <rect x="200" y="402" width="20" height="26" fill="#fbfaf7" stroke="#b8520a"/>
+  <rect x="520" y="402" width="34" height="26" fill="#fbfaf7" stroke="#1a7a55"/>
+  <!-- shrink tube S -->
+  <path d="M205,415 C300,415 300,455 370,455 C440,455 440,415 545,415" fill="none" stroke="#2a78d6" stroke-width="9"/>
+  <path d="M205,415 C300,415 300,455 370,455 C440,455 440,415 545,415" fill="none" stroke="#e34948" stroke-width="2"/>
+  <text x="370" y="520" text-anchor="middle" fill="#2a78d6">pre-shrunk tube ≤ 1.1 OD, ~5 mm, loose S with ~2 mm slack</text>
+  <text x="370" y="540" text-anchor="middle" fill="#57606a" font-size="12">tube ends seated in the two Ø1.6 counterbores · REAR side (below the NiTi here) · never crosses over it</text>
+  <text x="60" y="568" fill="#e34948" font-weight="bold">Order matters: the tube goes on BEFORE fishing (it cannot pass the Ø1.0 / Ø1.2 bores). Never heat it on the arm.</text>
+
+  <!-- cut lengths -->
+  <rect x="740" y="270" width="430" height="230" rx="10" fill="#f3f1ea" stroke="#57606a" stroke-width="1.5"/>
+  <text x="760" y="298" font-weight="bold" fill="#1f2328">Cut lengths, heel exit → pad (mm)</text>
+  <text x="870" y="326" fill="#1f2328" font-size="13">J1 OUT_A</text><text x="947" y="326" fill="#1f2328" font-size="13">J7 LED_A</text><text x="1022" y="326" fill="#1f2328" font-size="13">J2 OUT_B</text><text x="1097" y="326" fill="#1f2328" font-size="13">J8 LED_K</text>
+  <text x="760" y="352" fill="#2a78d6">right pod</text><text x="885" y="352" fill="#2a78d6">21.0</text><text x="962" y="352" fill="#2a78d6">21.5</text><text x="1037" y="352" fill="#2a78d6">23.4</text><text x="1112" y="352" fill="#2a78d6">22.8</text>
+  <text x="760" y="378" fill="#b8520a">left pod</text><text x="885" y="378" fill="#b8520a">19.4</text><text x="962" y="378" fill="#b8520a">19.4</text><text x="1037" y="378" fill="#b8520a">21.9</text><text x="1112" y="378" fill="#b8520a">21.0</text><text x="760" y="396" fill="#57606a" font-size="12">+ ~2 mm strip/tin each end</text>
+  <text x="760" y="422" fill="#57606a" font-size="12">Left pod: the same board sits flipped in the mirrored shell,</text>
+  <text x="760" y="440" fill="#57606a" font-size="12">so its arm pads are LOW (z −6.35 / −4.15) and the bundle runs</text>
+  <text x="760" y="458" fill="#57606a" font-size="12">up the rear gap at the exit height; right pod: pads high.</text>
+  <text x="760" y="482" fill="#57606a" font-size="12">Source: heel.py route_checks('right'|'left'), notes/heel.md</text>
+
+  <text x="30" y="625" fill="#57606a" font-size="12">Supersedes the 2026-09-30 drawing (2 wires, Ø1.8 silicone sleeve, anchor boss + grommet). Assembly order: physical.md steps 2-6; notes/heel.md last section.</text>
 </svg>

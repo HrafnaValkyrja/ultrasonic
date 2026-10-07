@@ -462,3 +462,9 @@
 - 2026-10-07 13:29 checkin SUB-DOCK-USB by backlog-agent
 - 2026-10-07 13:29 checkin SUB-DEBUG-TEST by backlog-agent
 - 2026-10-07 13:29 checkin INTEGRATION by backlog-agent
+- 2026-10-07 13:32 checkout REG-ARM by backlog-agent: DIAG redraws
+- 2026-10-07 13:32 checkout SUB-UI by backlog-agent: DIAG redraws
+- 2026-10-07 13:32 review REG-ARM by backlog-agent: DIAG: arm-wiring.svg redrawn, button-stack.svg added (generated from dims_r2); docs only
+- 2026-10-07 13:32 review SUB-UI by backlog-agent: DIAG: arm-wiring.svg redrawn, button-stack.svg added (generated from dims_r2); docs only
+- 2026-10-07 13:32 checkin REG-ARM by backlog-agent
+- 2026-10-07 13:32 checkin SUB-UI by backlog-agent
