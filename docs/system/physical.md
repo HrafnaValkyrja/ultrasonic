@@ -173,7 +173,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 5. **Which pod the CAD is**, and board orientation per pod, are stated two ways (pcb-mech-interface §1 "right"; dims_r2/notes "right = mirror"). Close: one statement in dims_r2 + a KiCad 3D render placed in the CAD for both pods.
 6. **Sealing unverified.** No IP test plan; mesh, skin, tape and adhesive products not chosen.
 7. (closed in Phase 2) Plunger reach: selective-fit puck kit (switch_stack PASS); residual lateral WARN in sub-ui / reg-pod-body issue 4.
-8. **Mass ≥ ~9.5 g vs ~8 g** (two resin densities in sources: 1.18 shell, 1.15 pad). Compute from the r2 STLs with one density plus parts, dock target, adapter, wires (D18, R20, ECR-0006).
+8. **Mass 11.2–13.2 g per side worn vs ~8 g** (computed 2026-10-07, `sim/checks/pod_mass.py`, resin 1.15–1.18 as one range; pod body 8.7–10.1, cell 4.2 of it). Remaining unknowns are weighed, not computed: dock target [A 0.8–1.6 g] and exciter [Low 1.0–1.5 g]. The gap to 8 g is an owner call (backlog PHYS-8D; A-TODAY-MASS-TARGET wear test).
 9. **Contact face** Ø8 (≈ 50 mm²) vs O16(4)'s 100-150 mm².
 10. **Cell lead exit and PCM position** in the Renata pouch unknown, so the J5/J4 lead route is unknown.
 11. **Diagrams stale:** `system-overview-physical.png` (Rev F stack, ribs, foam, open gap); `arm-wiring.png`; `hardware-map.png`. No Phase-2 physical overview yet.

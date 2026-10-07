@@ -22,7 +22,7 @@
   "PHYSICAL": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RPB-12: seam rebate 0.2x0.3 -> 0.2x0.4 (shell_r2.REBATE_D/H; tolerances.md recess min 0.4; wall 0.6 = RESIN min_wall); shell_r2 rebuilt: tub 1 valid solid, 1318.9 -> 1317.4 mm3, all other checks unchanged; belly step still unmarked",
+   "note": "PHYS-8: pod mass roll-up sim/checks/pod_mass.py: 11.2-13.2 g per side worn (pod body 8.7-10.1) vs ~8 g target; owner decision PHYS-8D",
    "stamp": {
     "file:docs/build/tolerances.md": "13099f559e727c93",
     "file:hw/mech/frame.py": "c7981bfec8a45660",
@@ -70,7 +70,7 @@
   "REG-POD-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RPB-12: seam rebate 0.2x0.3 -> 0.2x0.4 (shell_r2.REBATE_D/H; tolerances.md recess min 0.4; wall 0.6 = RESIN min_wall); shell_r2 rebuilt: tub 1 valid solid, 1318.9 -> 1317.4 mm3, all other checks unchanged; belly step still unmarked",
+   "note": "PHYS-8: pod mass roll-up sim/checks/pod_mass.py: 11.2-13.2 g per side worn (pod body 8.7-10.1) vs ~8 g target; owner decision PHYS-8D",
    "stamp": {
     "file:hw/mech/blade.py": "20e890c775848522",
     "file:hw/mech/dims_r2.py": "e5863607c701dddf",
@@ -159,9 +159,9 @@
    }
   },
   "WHOLE": {
-   "by": "docs-phase2-rewrite",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "PHYS-8: pod mass roll-up sim/checks/pod_mass.py: 11.2-13.2 g per side worn (pod body 8.7-10.1) vs ~8 g target; owner decision PHYS-8D",
    "stamp": {
     "grep:docs/spec.md::\\b[DO][0-9]+\\b": "8109175ed2b59501"
    }

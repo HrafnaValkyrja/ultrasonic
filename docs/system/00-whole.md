@@ -71,7 +71,7 @@ Phase-2 views are build outputs (gitignored): `python3 hw/mech/shell_r2.py` → 
 | Cell | Renata ICP501233PA-02 (Li-ion pouch with its protection circuit inside), 175 mAh, 35 × 12 × 5.3 mm | spec O16(1); `dims_r2.py` CELL |
 | Arm | NiTi (superelastic nickel-titanium) wire Ø0.80, 20 mm, 30° sweep | `frame.py`; spec O7b |
 | Pad force target | ≥ 1 N inward at the tragus | spec D1 |
-| Mass per pod | **≥ ~9.5 g lower bound [derived]**: shell 2.52–2.58 (tub 1321.5 + lid 863.3 + puck 3.1 mm³ at 1.15–1.18 g/cm³) + cell ~4.2 + pad 2.19 + bare board ~0.53 (288 mm³ FR-4 at ~1.85 g/cm³ [A]); before parts, dock target, adapter, wires. Target ~8 g, ~15 g hurts (D18, R20) | checks.json volumes (2026-10-07); pad checks.json (2026-10-01); derived 2026-10-07 |
+| Mass per pod | **11.2–13.2 g per side, worn [derived 2026-10-07, `sim/checks/pod_mass.py`]**: pod body 8.7–10.1 g (cell 4.2 sourced; tub 1.52–1.56, lid + plate 0.99–1.02, board + copper + parts 0.89–1.22, dock target 0.81–1.63 [A], tapes, wires, solder) + adapter 0.50 + pad 0.99–1.02 + exciter 1.0–1.5 [Low] + NiTi 0.08. Widest unknowns: dock target (magnets) and exciter. Target ~8 g (not met by ~3–5 g), ~15 g hurts (D18, R20) | sim/out/mech/pod_mass.json from the shell_r2 STLs + pad checks.json, 2026-10-07 |
 | Current, full chain awake | 5.0 / 6.8 / 9.8 mA (low / nominal / high) | spec §7; `sim/checks/power.py` rev 2 (circuit unchanged since Rev G) |
 | Current, idle listening | 1.7 / 2.2 / 3.4 mA | same |
 | Pad LED (O8) | +0.14–0.73 mA on battery, 0.82–0.86 mA docked; not in `power.py` | [sub-ui](sub-ui.md) |
@@ -176,7 +176,7 @@ IDs kept from the Rev F list; a gap = closed by Phase 2 (reason in the Reference
 | 15 | **Heel exit checked against the wrong cell** (`frame.py`; ECR-0001, interfaces.py [frame] 8 of 10 facts differ) | reg-arm, physical, sub-power, reg-pod-body |
 | 16 | **Serviceability (O19) vs the bonded build:** the board is bonded to the lid, the cell to the tub; TP1–TP6 are reachable only before the lid bond or after a peel (checks.json F_face_pads); field recovery = ROM DFU via the R1 tack pad + dock USB | physical, reg-pod-body, reg-arm, sub-power, sub-debug-test |
 | 17 | **No dielectric stack-up in the board file;** sim/noise uses the Rev E draft stack (budget.json board.stackup "unverified vs JLC page"); y fits (duct, puck) assume 0.8 mm | reg-board, physical, sub-audio-in |
-| 18 | **Mass ≥ ~9.5 g before parts vs the ~8 g target** | 00-whole, physical, reg-pod-body, reg-pad, sub-power |
+| 18 | **Mass 11.2–13.2 g per side worn vs the ~8 g target** (pod_mass.py 2026-10-07; owner tests ~12 g in A-TODAY-MASS-TARGET) | 00-whole, physical, reg-pod-body, reg-pad, sub-power |
 | 20 | **Mic acoustics and sealing:** the sealed duct raises the 20–96 kHz mean (+5.6 dB) but puts a 63 kHz Q6.4 peak in band; it needs the firmware EQ notch (O24) and a measured coupon. The duct-seat keep-out R-ACO-P6 (nothing within 1.6 mm of the port) holds since 2026-10-07: F.Cu rule area, nearest F copper / via 1.87 mm | sub-audio-in, reg-pod-body, sub-processing |
 | 21 | **I2C_SCL runs 8.97 mm inside the In2 +3V0 plane** (hw/pod/inner_bridge.py): the plane stays one island (−4 mm², 1.4 %); modelled in sim/noise (LN metrics pass). Any re-route near U1 pin 26 or a plane cut must keep it | reg-board, sub-power, sub-processing |
 

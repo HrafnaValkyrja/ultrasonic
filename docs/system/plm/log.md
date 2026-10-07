@@ -284,3 +284,12 @@
 - 2026-10-07 12:47 review REG-PAD by backlog-agent: ARM-6/PAD-6: heel.py checks + exports the real shell_r2 tub; pad.py cross-check uses it (geometry unchanged): strut to tub worn 1.176 / free 1.303 / jaw 1.29-1.34 vs 1.4 (was 0.79 on the plain preview); owner decision ARM-6D
 - 2026-10-07 12:47 checkin REG-ARM by backlog-agent
 - 2026-10-07 12:47 checkin REG-PAD by backlog-agent
+- 2026-10-07 12:49 checkout PHYSICAL by backlog-agent: PHYS-8: pod mass roll-up (sim/checks/pod_mass.py)
+- 2026-10-07 12:49 checkout REG-POD-BODY by backlog-agent: PHYS-8: pod mass roll-up (sim/checks/pod_mass.py)
+- 2026-10-07 12:49 checkout WHOLE by backlog-agent: PHYS-8 mass row
+- 2026-10-07 12:50 review PHYSICAL by backlog-agent: PHYS-8: pod mass roll-up sim/checks/pod_mass.py: 11.2-13.2 g per side worn (pod body 8.7-10.1) vs ~8 g target; owner decision PHYS-8D
+- 2026-10-07 12:50 review REG-POD-BODY by backlog-agent: PHYS-8: pod mass roll-up sim/checks/pod_mass.py: 11.2-13.2 g per side worn (pod body 8.7-10.1) vs ~8 g target; owner decision PHYS-8D
+- 2026-10-07 12:50 review WHOLE by backlog-agent: PHYS-8: pod mass roll-up sim/checks/pod_mass.py: 11.2-13.2 g per side worn (pod body 8.7-10.1) vs ~8 g target; owner decision PHYS-8D
+- 2026-10-07 12:50 checkin PHYSICAL by backlog-agent
+- 2026-10-07 12:50 checkin REG-POD-BODY by backlog-agent
+- 2026-10-07 12:50 checkin WHOLE by backlog-agent
