@@ -595,15 +595,17 @@ def load_table():
 
 
 # ------------------------------------------------------------------------------------------- [mic-port]
-def fit_stack(nominal, limit):
+def fit_stack(nominal, limit, stack=None):
     """(status, short, long) of a lateral fit: the nominal offset plus the project's tolerance stack against the geometric limit.
 
     PASS needs nominal + stack <= limit; WARN when only the nominal fits (`long` says by how much the stack overshoots); FAIL when even the nominal does not.
     """
-    worst_case = nominal + STACK_MM
+    st = STACK_MM if stack is None else stack           # 2026-10-07: a located board (gauge pin) uses its own worst residual
+    src = "board 0.1 + lid 0.1, tolerances.md" if stack is None else "gauge-pin locating residual, dims_r2.duct_offsets"
+    worst_case = nominal + st
     margin = limit - worst_case
-    short = f"margin {margin:+.3f} mm at the worst-case stack ({nominal:.3f} + {STACK_MM:.2f} board 0.1 + lid 0.1, tolerances.md)" if margin < -EPS \
-        else f"margin {max(margin, 0.0):.2f} mm at the worst-case stack ({nominal:.3f} + {STACK_MM:.2f})"
+    short = f"margin {margin:+.3f} mm at the worst-case stack ({nominal:.3f} + {st:.2f} {src})" if margin < -EPS \
+        else f"margin {max(margin, 0.0):.2f} mm at the worst-case stack ({nominal:.3f} + {st:.2f} {src})"
     if nominal > limit + EPS:
         return FAIL, short, f"{nominal:.2f} mm off (limit {limit:.2f})"
     if margin < -EPS:
@@ -657,7 +659,8 @@ def check_mic(sh, brd, table, sch):
         fails.append(f"lid port D{lid_d:.1f} is smaller than the board hole D{hole.drill:.1f}: the lid is the restriction")
         status, short, long = FAIL, "", ""
     else:
-        status, short, long = fit_stack(bad, tol)
+        lo = sh.get("locating")
+        status, short, long = fit_stack(bad, tol, stack=lo["worst"] if lo else None)
         if status == FAIL:
             fails.append(f"port hole is {bad:.2f} mm off the lid port (limit {tol:.2f} = (D{lid_d:.1f} - D{hole.drill:.1f}) / 2): the holes no longer overlap fully")
         elif status == WARN:
@@ -1266,6 +1269,9 @@ def assumption_findings(F, rid, row, sch):
 
 def load_row(ld, totals, rows, sch, F, rid):
     """(avg low, avg high, peak) mA of one declared load."""
+    refs = ld.get("refs") or []
+    if refs and not any(r in sch.parts for r in refs):     # 2026-10-07: a load of parts this design does not have (Phase-2-only
+        return 0.0, 0.0, 0.0                                #   R23 on the frozen Rev G reference) is not part of this design's budget
     assumption_findings(F, rid, ld, sch)
     if "from_rail" in ld:
         t = totals[ld["from_rail"]]
@@ -1319,6 +1325,8 @@ def topology_findings(F, rail, sch):
     declared = set(rail.get("source_refs", []))
     for ld in rail.get("loads", []):
         declared |= set(ld.get("refs", []))
+        if ld.get("refs") and not any(r in sch.parts for r in ld["refs"]):
+            continue                                        # load of parts this design does not have (see load_row)
         gone = [r for r in ld.get("refs", []) if r not in on_net and "via" not in ld]
         if gone:
             F.add(FAIL, f"{rid}: load '{ld['name'][:40]}' declares {refs_str(gone)} which are not on net {net} (add `via` if they reach it another way)")

@@ -98,6 +98,8 @@ MZ2 = {   # ref: (footprint, LCSC, value or None = keep)
     **{r: (R0201, "C473048", None) for r in ("R15", "R16")},           # 10k 0201WMF1002TEE
     "R18": (R0201, "C270344", None),                                   # 5k1 0201WMF5101TEE (D6 now clamps the CC contact)
     "R22": (R0201, "C270365", None),                                   # 1k 0201WMF1001TEE
+    "R23": (R0201, "C473482", None),                                   # 1M 0201WMF1004TEE: I_SENSE offset (OUT-1B, 2026-10-07)
+    "U2": ("lcsc:Knowles_LGA-5_3.5x2.65mm_Port0.65", None, None),       # SAI-15D: port hole D0.65 at (0, 0.75), 0.2075 to pad 3; order press-fit
     "RT1": (R0201, "C98098", None),                                    # Murata NCP03XH103F05RL: same XH family/B as NCP15XH103
     "R21": (R0402, "C409058", "0.1"),                                  # Panasonic ERJ2BSFR10X 0402 current sense (OUT-02)
     **{c: (C0201, "C76934", None) for c in ("C1", "C2", "C3", "C6", "C10", "C13", "C19")},   # 100n 10 V X5R GRM033R61A104KE15D
@@ -113,9 +115,12 @@ def apply_packages():
         return
     by_ref = {p.ref: p for p in builtins.default_circuit.parts}
     for ref, (fp, lcsc, val) in MZ2.items():
+        if ref not in by_ref:                  # Phase-2-only parts (R23) are created directly
+            continue
         p = by_ref[ref]
         p.footprint = fp
-        p.fields["LCSC"] = lcsc
+        if lcsc:
+            p.fields["LCSC"] = lcsc
         if val:
             p.value = val
 PAD = "TestPoint:TestPoint_Pad_D1.0mm"        # J wire pads (hand-soldered)
@@ -248,6 +253,10 @@ def build():
     r = R("R22", "1k", "R1k"); r[1] += brt; r[2] += isns
     c = C("C22", "10n", "C10n"); c[1] += isns; c[2] += gnd             # 16 kHz: passes 1.5-4 kHz tones, not the PWM
     isns += u1["PA6"]                                                   # ADC1_IN11
+    # OUT-1 option (B), verified 2026-10-07 (sim/checks/selftest_lockin.py, R_OFF=1e6): +3.0 mV offset so the single-ended ADC
+    # never clips the negative half of i*(2d-1) (min 2.7 mV); 3.0 uA from +3V0 always (+3V0 stays up in Off)
+    if PACKAGES == "mz2":                                               # Phase-2 only: the Rev G reference stays frozen
+        r = R("R23", "1M", "R1M"); r[1] += v3; r[2] += isns       # 1M: 3.0 mV offset, 3.0 uA (100k drew 29.7 uA, > the Off budget)
 
     # ------------------------------------------------------------ power + magnetic USB dock (Rev D)
     vsys, dock_vbus = Net("VSYS"), Net("DOCK_VBUS")
@@ -260,6 +269,8 @@ def build():
     d4 = Part("Device", "D_Schottky", value="1N5819WS", footprint="Diode_SMD:D_SOD-323", ref="D4", tag="D4")
     d4.fields["LCSC"] = "C191023"
     d4["A"] += dock_vbus; d4["K"] += vbus                               # upside-down docking can't feed the board
+    # DK-17D (PA9 OTG VBUS sense via R24 1k from DOCK_VBUS): designed but NOT routable locally on the MZ-2 board
+    # (2026-10-07: U1 bottom-row fan-out has no free lane for pin 30; docs/system/reg-board.md issue 22). Needs a full re-route.
     # BQ25180 (TI SLUSE99C): linear charger with power path. IN from the dock, SYS feeds the board,
     # BAT is the cell. Firmware sets ICHG 170 mA (code 44) at 20-45 C and 50 mA (code 32) below 20 C over I2C
     # (register plan: docs/system/sub-power.md).
@@ -341,7 +352,7 @@ def build():
     p = pad("TP10", "MIC_DATA", PAD_DOT); p[1] += mic_dat
     # spare pins, left free on purpose; PC13 stays static next to the crystal (ES0499 2.2.1); PB15 carries the UCPD
     # PA3 freed in Rev F; PA9/PB0 freed when leg B moved to PA10/PB15 (ECR-0003)
-    for pin in ("PC13", "PH0", "PH1", "PA3", "PA9", "PB0"):
+    for pin in ("PC13", "PH0", "PH1", "PA3", "PA9", "PB0"):       # PA9: see DK-17D note above
         u1[pin] += NC
     return u1
 

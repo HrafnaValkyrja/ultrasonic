@@ -172,19 +172,19 @@ tools:
 
 # ------------------------------------------------------------------------------------------------ results on the draft board
 results:   # READ BY budget.py --check-doc. Board hw/pod/draft_r2/out/routed.kicad_pcb (Phase 2 = hw/current.yaml); src: sim/noise/out/budget.json 2026-10-07 re-run after the B-DOC-AUDIT-0007 re-route (== sim/noise/out_r2/budget.json)
-  board_sha256: 21bbe68f2cbd09db   # 2026-10-07: 9e762786 -> 36d088d4 (RB-19 values, 2 dangling vias deleted) -> 21bbe68f (redundant +3V0 via d5fef857 at U1.9 + its 0.86 stub deleted, DRC 0/0/0); all 6 metrics identical at every step
-  board: {size_mm: [30.05, 12.05], segments: 595, vias: 129, pads: 195, nets: 42, track_widths_mm: [0.1, 0.15, 0.25], planes: {GND: {layer: In1.Cu, area_mm2: 298.9, ports: 49}, "+3V0": {layer: In2.Cu, area_mm2: 282.69, ports: 23}}}
+  board_sha256: db9136df8bc9b089   # 2026-10-07 round 8 (+U2 footprint id Port0.65, R23 1M) (router batch): R23 100k I_SENSE offset (OUT-1B), TP2/TP4 swapped (DBG-2), mic NPTH D0.65 at x 1.90 (SAI-15D); local re-route of BTN/I_SENSE/SWCLK; was 21bbe68f (all metrics within 0.03)
+  board: {size_mm: [30.05, 12.05], segments: 613, vias: 132, pads: 197, nets: 42, track_widths_mm: [0.1, 0.15, 0.25], planes: {GND: {layer: In1.Cu, area_mm2: 298.9, ports: 49}, "+3V0": {layer: In2.Cu, area_mm2: 282.69, ports: 23}}}
   nets_mm: {MIC_VDD: {F: 12.05, B: 5.52, total: 17.57, vias: 2}, MIC_DATA: {B: 4.58}, VDD11: {F: 10.31, B: 6.45, total: 16.76, vias: 2}, BRIDGE_RTN: {B: 11.80}, VLXSMPS: {B: 2.23}}
   network_L1: {nodes: 825, elements: 1401, floating_pads: none}
   plane_dc_mohm: {mic_gnd_to_mcu_vss: 2.384, shunt_gnd_to_mcu_vssa: 2.818, mcu_vss_to_cell_neg: 3.621, shunt_gnd_to_cell_neg: 2.563, mic_bypass_gnd_to_mcu_vss: 1.914}
   rail_paths_dc_mohm: {"U4.1->Q1.4": 40.41, "U4.1->Q2.4": 39.51, "U4.1->U1.25": 42.51, "U4.1->U1.21": 44.7, "U1.15->U2.5": 82.47, "Q1.1->R21.1": 25.18, "U2.3->U1.24": 18.18, "C13.2->U2.3": 17.85, "C13.2->U1.24": 7.76, "R21.2->U1.8": 4.9, "U1.24->J4.1": 11.71, "C14.2->R21.2": 6.0}
   metrics:
-    LN-M01: {value_db_pessimistic: 26.5, value_db_nominal: 46.5, value_db_worst: 15.3, ok: true, signoff: true, at: "A05_CPU_HOP conduction 21875 Hz", at_worst: "A01_SMPS_IN conduction 28.04 MHz -> 38955 Hz"}
+    LN-M01: {value_db_pessimistic: 26.5, value_db_nominal: 46.5, value_db_worst: 15.5, ok: true, signoff: true, at: "A05_CPU_HOP conduction 21875 Hz", at_worst: "A01_SMPS_IN conduction 28.04 MHz -> 38955 Hz"}
     LN-M02: {value_db: 20.1, ok: true, review: true, at: "F03_PDM_CLOCK -> FV3_MIC_CLK magnetic", note: "inside the +-10 dB L2 model error: REVIEW at the next re-route"}
-    LN-M03: {value_pct: 1.29, ok: true, at: "z 1.288 mohm at 5 kHz, R21 two-via Kelvin (hw/pod/kelvin_r21.py); top features: GND vias (18.55, 6.45) 12.2 %, (18.94, 6.01) 11.2 %, B.Cu stubs 12.2 % + 11.7 %; layout share 96.8 %. R21 at the bottom edge (MZD-4) scored 2.48 % FAIL / 3.62 % with one via (ECR-0018 log 2026-10-07)"}
-    LN-M04: {value_mv_pk: 0.1267, ok: true, at: "A05_CPU_HOP 1562 Hz"}
+    LN-M03: {value_pct: 1.32, ok: true, at: "z 1.322 mohm at 5 kHz (round 8; was 1.29 / 1.288), R21 two-via Kelvin (hw/pod/kelvin_r21.py); top features: GND vias (18.55, 6.45) 12.2 %, (18.94, 6.01) 11.2 %, B.Cu stubs 12.2 % + 11.7 %; layout share 96.8 %. R21 at the bottom edge (MZD-4) scored 2.48 % FAIL / 3.62 % with one via (ECR-0018 log 2026-10-07)"}
+    LN-M04: {value_mv_pk: 0.1269, ok: true, at: "A05_CPU_HOP 1562 Hz"}
     LN-M05: {value_uv_rms: 8.72, ok: true, at: "A05_CPU_HOP 1562 Hz x 10 %"}
-    LN-M06: {value_mv_rms: 0.1074, of_which_20k_100k_mv: 0.0199, ok: informational}
+    LN-M06: {value_mv_rms: 0.1076, of_which_20k_100k_mv: 0.0199, ok: informational}
   conclusion: "Phase 2 routed board (B-DOC-AUDIT-0007 re-route), stated assumptions: all scored metrics pass (LN-M02 REVIEW inside model error). Rail copper 4-5x lower than Rev F (In2 +3V0 plane)."
 
 results_revf_reference:   # NOT read by --check-doc. Board hw/pod/draft_r1/pod_r1_routed.kicad_pcb (Rev F routed draft, reference design); src: sim/noise/out/*.json 2026-10-02 21:20

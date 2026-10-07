@@ -89,6 +89,11 @@ rails:
         avg_ma: [0.0, 0.0]
         calc: {volts: 3.0, parallel: [R15, R16], into: peak}
         source: "computed from the schematic values: 3.0 V over each pull-up (0.60 mA at 2 x 10k); lines idle high"
+      - name: "R23 1M I_SENSE offset pull-up (OUT-1B, 2026-10-07): +3V0 -> R23 -> I_SENSE -> R22 1k -> BRIDGE_RTN/R21 -> GND"
+        refs: [R23]
+        avg_ma: [0.0030, 0.0030]
+        calc: {volts: 3.0, series: [R23, R22]}
+        source: "computed from the schematic values: 3.0 V over R23 + R22 (1.001M) = 3.0 uA, always on (+3V0 stays up in Off); 100k would draw 29.7 uA (sim/checks/selftest_lockin.py R_OFF sweep)"
       - name: "SW1 contact into the R10 2k2 pull-down while the button is pressed"
         refs: [SW1]
         avg_ma: [0.0, 0.0]

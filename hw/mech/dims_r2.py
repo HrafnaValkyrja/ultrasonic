@@ -55,7 +55,7 @@ def bpt(bx, by):
     return PCB["x0"] + bx, PCB["z0"] + by
 
 
-MIC_HOLE_D = 0.6
+MIC_HOLE_D = 0.65                      # SAI-15D (decided 2026-10-07): D0.65 + JLC press-fit tolerance (0.60-0.70) meets spec s8 0.6-1.0
 def board_mic():
     """U2 centre and its port hole (board mm) read from the routed Phase-2 board, so the duct follows the layout."""
     import re
@@ -65,7 +65,10 @@ def board_mic():
     blk = s[s.rfind("(footprint ", 0, i):i]
     x, y, rot = (float(v) for v in re.search(r"\(at ([\d.\-]+) ([\d.\-]+) ([\d.\-]+)\)", blk).groups())
     assert abs(rot - 90) < 1e-6, "port-hole offset below assumes U2 at rot 90"
-    return (x, y), (x - 0.77, y)      # Knowles LGA port hole at local (0, -0.77)
+    # 2026-10-07 (SAI-15D): read the NPTH's own local offset (0.75 since the hole moved +0.02 to clear pad 3 by 0.2075)
+    j = s.index("np_thru_hole", i)
+    off = float(re.search(r"\(at ([\d.\-]+) ([\d.\-]+)", s[j:j + 200]).group(2))
+    return (x, y), (round(x + off, 4), y)    # board file stores the B-side local offset as (0, -0.75): hole = x + off
 
 
 U2_XY, MIC_XY = board_mic()            # 2026-10-07: (2.65, 6.0) / (1.88, 6.0) after route closure v6
@@ -115,7 +118,7 @@ def duct_offsets():
         print_bore_pos=0.05,          # [A] resin print, bore position vs any lid feature (frame.RESIN class)
         bore_ream=(1.00, 1.02),       # reamed with a 1.0 drill, +0.02 [A]
         pin_body=0.98, pin_tip=0.50, pin_runout=0.02,   # stepped gauge pin [A] (turned brass)
-        hole=(0.52, 0.73),            # D0.6 drilled: JLC hole size +0.13/-0.08 (their example: 0.6 -> 0.52-0.73); press-fit option +-0.05
+        hole=(0.60, 0.70),            # D0.65 ordered with JLC's press-fit tolerance +-0.05 (PCB remark); regular +0.13/-0.08 would give 0.57-0.78
         outline_to_hole=0.20,         # JLC CNC routed outline +-0.2 regular (+-0.1 precision); hole position +-0.075
         # src: jlcpcb.com/capabilities/pcb-capabilities fetched 2026-10-07 (HTML SHA-256 62ffae95727c8b4e); board 0.8 +-0.1
     )
