@@ -12,11 +12,11 @@ phase2_board:   # src: ECR-0018 implementation log; hw/pod/draft_r2/out/check.js
   placement: {file: hw/pod/draft_r2/placement.yaml, origin: "judge panel wf_15c06049-5a5, strategy linear", U_B: 0.56, ratsnest_mm: 411, mic_port: [1.98, 6.0], SW1: [18.5, 6.0], noisy_to_port_mm: ">= 13 (L1, Q1, Q2)"}
   rules: "hw/pod/place_r2.py check: face, fit, centre line, near (decoupling), escape ring (U1 0.6 mm), far (>= 10 mm from port), wire-pad gaps >= 0.8 mm"
   vias: {d: 0.35, drill: 0.15}        # 0.30 broke the 0.2 mm hole clearance
-  route: {tool: "FreeRouting 2 passes, clearance 0.11", tracks: 581, vias: 133, drc_errors: 0, unconnected: 7, misses: "U1.4 LSE_OUT, U1.7 NRST, U1.10 BTN, U1.11 VBUS_SENSE, U1.45 MDF_CCK, TP1 SWDIO, TP6 VSYS (separate islands)"}
+  route: {tool: "FreeRouting 2 passes, clearance 0.11 + close_gaps.py + inner_bridge.py", drc_errors: 0, unconnected: 0, closed: "2026-10-07: I2C_SCL U1.26 via In2 (8.97 mm, 14 segments, via 12.46/9.42 -> 18.58/3.35); In2 +3V0 plane stays 1 island, 286.2 -> 282.2 mm2"}
   silk: "hw/pod/silk.py one-face mode: port motif + STEREO/ULTRASOUND/PHASE 2 on F; refs on Fab; pin-1 dots U1 U3 U4 U6"
   noise_model: {LN-M02_db: 28.2, LN-M03_pct: 3.3, invalid: "LN-M01/M04/M06 (sim/noise models +3V0 as traces, not the In2 plane)"}
   shell: "hw/mech/shell_r2.py: hung from the lid on full-face VHB, x-stop, duct D1.0, SW1 pocket + puck kit, 6211 mm3"
-  open: ["route the 7 misses", "noise model: In2 +3V0 plane", "acoustics re-run on the Phase-2 duct", "switch defaults (checks, sch, bom, docs) to draft_r2 + shell_r2", "silk.py re-run segfault"]
+  open: ["noise model: In2 +3V0 plane (and the SCL run inside it)", "acoustics re-run on the Phase-2 duct", "switch defaults (checks, sch, bom, docs) to draft_r2 + shell_r2"]
 ```
 
 
