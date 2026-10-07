@@ -1,0 +1,105 @@
+# V3 verification: STM32U3 (U375/U385). AI-facing. Read 2026-10-07 by Claude (Sonnet 5.5 subagent).
+# SOURCE STATUS: st.com is UNREACHABLE from this machine 2026-10-07 (curl: HTTP/2 INTERNAL_ERROR / timeout on www.st.com and st.com.cn, product pages and PDFs; WebFetch timed out 60 s). 
+# Used instead [secondary]: the full ST datasheet PDF mirrored by Farnell, https://www.farnell.com/datasheets/4515112.pdf
+#   = "STM32U385xx Datasheet DS14830 - Rev 2 - February 2025" (ST document, distributor copy, 224 pp). Saved ~/Desktop/ultrasonic-scratch/datasheets/stm32u385-farnell4515112.pdf (+ u3.txt).
+#   A web-search snippet of st.com indicates a Rev 3 exists on st.com; not read. 
+# STM32U375 datasheet itself NOT read. U375 = same family without TrustZone/crypto (L inference); headline power figures (9.5/13/16 uA/MHz, 3.8/4.5 uA Stop 2) are identical in a search snippet for U375 [secondary, L-M].
+# AN2606 (STM32 system-memory boot mode) NOT fetched (st.com down). DFU facts below come from datasheet DS14830 section 2 (boot modes).
+# Confidence: H = read from the datasheet text; M = derived; L = inference/snippet.
+meta:
+  task: "synthesis.md section 3 item V3"
+  read_date: 2026-10-07
+  doc: {id: DS14830, rev: 2, date: 2025-02, part_family: "STM32U385xx (G = 1 MB flash, 256 KB SRAM)", via: "Farnell mirror [secondary-host, primary-content]"}
+  glossary:
+    STM32U3: "ST ultra-low-power Arm Cortex-M33 MCU family; U375 = no crypto, U385 = TrustZone + crypto"
+    UFQFPN32: "32-pin thin QFN 5 x 5 mm, exposed pad"
+    SMPS: "on-chip step-down switching regulator for the core supply (needs external 2.2 uH coil); alternative to the on-chip LDO"
+    ADF: "audio digital filter: decimation filter for sigma-delta/PDM microphones"
+    PDM: "pulse density modulation, 1-bit digital mic stream"
+    DFU: "USB device firmware upgrade via ST ROM bootloader"
+    WLCSP: "wafer-level chip-scale package (bumps)"
+verdict:
+  qfn32_carries_the_signals: "YES by pin count and alternate-function mapping (details below), with three caveats: (1) UFQFPN32 has NO SMPS (LDO only) -> run ~48 uA/MHz, Stop 2 ~13 uA; the quoted 16 uA/MHz and 3.8 uA need an SMPS package (UFQFPN48-SMPS, WLCSP52); (2) I2C pins collide with BOOT0/ADF/TIM1 so I2C must use PB6 + (PB7 shared with BOOT0, or I3C1_SDA on PA1/PA6); (3) ADF has ONE filter / one serial input."
+  smps_package_without_wlcsp: "UFQFPN48 SMPS (7x7) and LQFP48 SMPS exist per datasheet package/pin tables -> K3 without WLCSP is possible via QFN48, at 37/33 GPIOs. conf M (read from table headers; QFN48 pin-by-pin not checked)"
+packages:
+  list_family: {v: "LQFP48 7x7, UFQFPN32 5x5, LQFP64 10x10, UFQFPN48 7x7, LQFP100 14x14, UFBGA64 5x5, UFBGA100 7x7, WLCSP52, WLCSP68 (3.17 x 3.11 mm)", src: "DS14830 p1", conf: H}
+  ordering_parts: {v: "STM32U385CG/KG/RG/VG (product summary)", conf: H}
+  qfn32:
+    package: UFQFPN32 (5 x 5 mm)
+    smps: {v: false, evidence: "table: 'GPIOs (legacy/SMPS package) 25/NA' for the UFQFPN32 column; pinout has VCAP pin 31, no VDDSMPS/VLXSMPS/VDD11 pins; DS14830 sec 3.x: 'SMPS power pins available only on specific SMPS packages'", conf: H}
+    gpio_count: {v: 25, includes: "PC14/PC15 (LSE)", conf: H}
+    pins: "1 VDD, 2 PC14-OSC32_IN, 3 PC15-OSC32_OUT, 4 NRST, 5 VDDA, 6 PA0, 7 PA1, 8 PA2, 9 PA3, 10 PA4, 11 PA5, 12 PA6, 13 PA7, 14 PB0, 15 PB1, 16 VSS, 17 VDD, 18 PA8, 19 PA9, 20 PA10, 21 PA11, 22 PA12, 23 PA13, 24 PA14, 25 PA15, 26 PB3, 27 PB4, 28 PB5, 29 PB6, 30 PB7-BOOT0, 31 VCAP, 32 VSS (+ exposed pad)"
+    note_boot0: "On UFQFPN32, PB7 is internally tied to the BOOT0 pin (datasheet footnote 7). Boot source also selectable by nBOOT0/nSWBOOT0 option bits (DS14830 sec 2) so PB7 can be freed after option-byte programming. conf H"
+    note_no_vbat: "no VBAT pin on UFQFPN32 (RTC backup domain powered from VDD). conf H (pin list)"
+    thermal: {RthJA_C_per_W: 36, src: "DS14830 package thermal table, UFQFPN32 5x5 = 36 (first of three rows listed 36/17.7/13.9 - row meaning not disambiguated)", conf: L}
+  qfn48_smps: "UFQFPN48 SMPS version exists (columns 'UFQFPN48 SMPS' in pin table); GPIO 37/33 (legacy/SMPS)"
+signal_map_qfn32:
+  # AF = alternate-function number from Table 22/23 (DS14830 pp 79-)
+  TIM1_CH1:  {pin: "PA8 (18)",  af: 1, conf: H}
+  TIM1_CH1N: {pin: "PA7 (13)",  af: 1, conf: H}
+  TIM1_CH3:  {pin: "PA10 (20)", af: 1, conf: H}
+  TIM1_CH3N: {pin: "PB1 (15)",  af: 1, conf: H}
+  note_tim1: "All four complementary-PWM pins fall on QFN32 pins; TIM1 is the single 16-bit advanced motor-control timer (dead-time + break). TIM1_BKIN is PA6. Other QFN32 TIM1 pins: CH2 PA9, CH2N PB0, CH4 PA11, BKIN2 PA11, ETR PA12. conf H"
+  USB_FS: {DM: "PA11 (21)", DP: "PA12 (22)", conf: H, note: "USB pins are dedicated analog-ish FT_u pins; embedded DP pull-up; no external series resistors needed (datasheet USB section). One USB 2.0 FS device controller, crystal-less with internal 48 MHz + CRS."}
+  ADF_PDM: {CCK0: "PB3 (26) AF3", SDI0: "PB4 (27) AF3", conf: H, note: "PB3 is also JTDO/SWO and PB4 NJTRST; fine with SWD. CCK1 only on PC10 (not on QFN32)."}
+  SWD: {SWDIO: "PA13 (23)", SWCLK: "PA14 (24)", conf: H}
+  LSE: {pins: "PC14/PC15 (2, 3)", conf: H}
+  NRST: {pin: 4, conf: H}
+  I2C:
+    options: "I2C1_SCL PB6 AF4; I2C1_SDA PB7 AF4 or PB3 AF4; I2C2_SDA PA6 AF4 (I2C2_SCL not on QFN32 pins); I2C3_SCL PA7 AF4; I2C3_SDA PB4 AF4; I3C1_SCL PB6/PA7, I3C1_SDA PA1 AF6 / PA6 (I3C blocks support I2C FM+ mode)"
+    recommended: "I2C1_SCL=PB6 + I3C1_SDA(I2C mode)=PA1, or I2C1_SDA=PB7 only if BOOT0 handled (pulled up I2C line would hold BOOT0 high at reset = enter ROM bootloader; use nBOOT0 option bit). conf M (derived from AF table; I3C-in-I2C-mode behaviour needs RM0487, not read)"
+  ADC_3_inputs: {pins: "PA0..PA7, PB0, PB1 carry ADC1 channels on the 64-pin parts; QFN32 channel mapping not verified; plenty of free analog-capable pins (PA0-PA5)", conf: L}
+  UART_TX: {pins: "PA9 USART1_TX AF7, PB6 USART1_TX AF7, PA7 USART3_TX AF7", conf: H}
+  button_LED_charger_int: "any free GPIO; wake pins WKUPx on QFN32 not enumerated here (PA0.. likely) - conf L"
+  pin_budget:
+    fixed_pins_used: 12  # PA7 PA8 PA10 PB1 PA11 PA12 PB3 PB4 PA13 PA14 PC14 PC15
+    free_gpio_after_fixed: 13  # PA0-PA6, PA9, PA15, PB0, PB5, PB6, PB7
+    needed_extra: 9  # I2C 2, ADC 3, wake button, LED, UART TX, charger INT
+    spare: 4
+    conf: M
+  adf_limit: "DS14830: ADF has ONE serial interface (SITF0) and ONE digital filter (DFLT0). In PDM mode one SDI line can carry two mics (L/R clock edges) but a single filter path processes one stream: stereo from one PDM line likely needs either 2 filters (not present) or time-slicing/ separate ADC mics. This is a spec question, not a pin question. Resolve against RM0487 ADF chapter. conf L (inference)"
+power:
+  # Run mode, CoreMark, flash, ICACHE on, all peripherals disabled. DS14830 Tables 31-34, 49, 52. Voltage ranges on U3 are Range 1 (up to 96 MHz) and Range 2 (up to 48 MHz) only; no Range 3/4. conf H
+  ranges: {range1: "up to 96 MHz", range2: "up to 48 MHz", ranges_3_4: "do not exist on U3 per DS14830 (only 2 ranges)", conf: H}
+  headline_smps_3p3V: {while1: "9.5 uA/MHz", coremark_48MHz: "13 uA/MHz", coremark_96MHz: "16 uA/MHz", src: "DS14830 p1", conf: H}
+  smps_typ_3V_coremark_mA:  # Table 33, 25 C
+    range1_96MHz: {mA: 1.65, uA_per_MHz: 17.2, conf: M}
+    range1_48MHz_msi: {mA: 0.66, uA_per_MHz: 13.8, note: "range assignment of the 48 and 24 MHz rows is ambiguous in the extracted table layout", conf: M}
+    24MHz: {mA: 0.38, uA_per_MHz: 15.8, conf: M}
+    12MHz_range2: {mA: 0.25, uA_per_MHz: 20.8, conf: M}
+    6MHz_range2: {mA: 0.18, uA_per_MHz: 30, conf: M}
+    3MHz_range2: {mA: 0.15, uA_per_MHz: 50, conf: M, note: "low frequencies are dominated by fixed overhead"}
+    hse_bypass_24MHz: {mA: 0.43, uA_per_MHz: 17.9, conf: M}
+    hse_bypass_1MHz: {mA: 0.12, conf: H}
+  smps_typ_1p8V_coremark_mA: {range1_96MHz: 2.50, 48MHz: 1.0, 24MHz: 0.56, conf: H, src: "Table 32"}
+  ldo_typ_coremark_mA_3V: # Table 34 (VDD-independent), the ONLY option on UFQFPN32
+    range2_48MHz: {mA: 2.05, uA_per_MHz: 42.7, conf: H}
+    range1_96MHz: {mA: 4.55, uA_per_MHz: 47.4, conf: H}
+    range2_24MHz: {mA: 1.15, uA_per_MHz: 47.9, conf: H}
+    while1_96MHz: {mA: 3.4, uA_per_MHz: 35.4, conf: H}
+    while1_24MHz: {mA: 0.84, uA_per_MHz: 35.0, conf: H}
+    low_freq_hse_1MHz: {mA: 0.305, conf: H, src: "Table 31, 25 C, VDD condition per Table 27 unspecified"}
+  stop2_uA_typ_25C:
+    smps_3V_8KB_SRAM2: {uA: 4.0, conf: H, src: "Table 52"}
+    smps_3V_all_SRAM: {uA: 4.8, conf: H}
+    smps_3p3V_8KB: {uA: 3.8, conf: H}
+    ldo_3V_8KB_SRAM2: {uA: 13, conf: H, src: "Table 49 - what UFQFPN32 gets"}
+    ldo_3V_all_SRAM: {uA: 15.5, conf: H}
+    ldo_85C_8KB: {uA: 130, conf: H}
+    smps_85C_3V_8KB: {uA: 40, conf: H}
+  stop3_uA_headline: {with_8KB: 1.6, full_SRAM: 2.2, conf: H, src: "p1"}
+  consequence_QFN32: "On QFN32 (LDO) the CPU costs ~3x more per MHz and Stop 2 is ~3x higher than the SMPS headline; D11 (switching regulators allowed only as MCU core SMPS) can be met only on an SMPS package. For a duty-cycled design measure both; at low MHz fixed overhead dominates. conf M"
+  adf_clock:
+    fCCKO_master_SPI_max_MHz: {v: 25, conf: H, src: "Table 107 ADF characteristics"}
+    fCCKI_slave_SPI_max_MHz: {v: 25, conf: H}
+    fCCKO_LF_master_max_MHz: {v: 5, conf: H}
+    PDM_specific_max_clock: "NOT stated separately in the datasheet; 4.0 MHz hypothesis in synthesis is unconfirmed. Kernel-clock-limited: t_high/low >= 2 x adf_proc_ck. conf H (absence). Needs RM0487."
+boot_dfu:
+  usb_fs_dfu: {v: "System-memory bootloader reprograms flash via USART, I2C, SPI, FDCAN or USB FS in device mode through DFU; available on all devices", src: "DS14830 sec 2 boot modes", conf: H}
+  entry: "BOOT0 pin high at reset (PB7-BOOT0 on UFQFPN32) or nBOOT0/nSWBOOT0 option bits; wake-button could be wired to BOOT0 via PB7"
+  an2606: "NOT fetched (st.com unreachable 2026-10-07). Per AN2606 the USB DFU pins are PA11/PA12 and bootloader interface version is device-specific; verify before freeze."
+not_sourced:
+  - "primary st.com datasheet (Rev 3?) and STM32U375 datasheet itself"
+  - "AN2606 U3-specific bootloader section (USB DFU pin, interface version)"
+  - "RM0487: ADF filter count semantics for stereo PDM, PDM max clock, I3C-in-I2C pin behaviour, WKUP pin mapping on QFN32, ADC channel map on QFN32"
+  - "UFQFPN48 SMPS pin-by-pin check against the 27 signals"

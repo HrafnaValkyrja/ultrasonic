@@ -1,0 +1,117 @@
+# V2 verification: Renata Li-polymer cells. AI-facing. Read 2026-10-07 by Claude (Sonnet 5.5 subagent).
+# Primary source = Renata datasheets (renata.com reachable 2026-10-07; PDFs saved ~/Desktop/ultrasonic-scratch/datasheets/<part>.pdf, outside repo).
+# Fetch path: https://www.renata.com/en/products/lithium-polymer-batteries/<part>/ -> "Datasheet" link downloads/?product=<part>&fileid=...
+# Confidence: H = read directly from the Renata PDF; M = derived by arithmetic from PDF figures; L = inference.
+meta:
+  task: "synthesis.md section 3 item V2"
+  read_date: 2026-10-07
+  source_class: primary (Renata SA, Itingen CH)
+  glossary:
+    ICP: "Renata Li-Ion Polymer pouch cell/pack part-number prefix; digits = T(0.1mm) W L (mm), e.g. 331319 = 3.3 x 13 x 19 nominal"
+    PCM: "protection circuit module (over-charge/over-discharge/over-current/short-circuit board); Renata calls it 'Safety Circuit'"
+    C: "discharge/charge current numerically equal to nominal capacity in mAh (1C of 50 mAh = 50 mA)"
+  caveats:
+    - "Datasheets do NOT enumerate which PCM protections exist (no OVP/UVP/OCP/SCP thresholds). Only 'Safety Circuit: Yes/No'. Ask Renata for the PCM spec if K3 depends on cut-off thresholds. conf H (absence)"
+    - "Pulse current is only given as 'max discharge current 2.0 C for non continuous discharge'; no pulse duration/duty/temperature stated. conf H (absence)"
+    - "Datasheet drawings are 'illustration only; contact sales for detailed drawing' (331319PM, 281029HPG, 390831PR); tab/wire/PCM protrusion is not dimensioned in the text. Whether the max L x W x T includes PCM/wire is NOT stated. conf H (absence)"
+    - "Envelope for 331319PM, 281029HPG, 390831PR is stated 'after 500 cycles' (i.e. includes end-of-life swelling). For 401230UPR and 501233PA-02 the envelope has no 'after 500 cycles' qualifier: unknown whether swelling is included; budget extra. conf H"
+    - "Datasheet revisions are 11/2022 (three small cells) and 08/2019 (401230UPR, 501233PA-02). Older/maybe superseded; check current rev with Renata."
+    - "Capacity here differs from synthesis shorthand: ICP390831PR is 85 mAh typ (80 min), ICP401230UPR is 130 mAh typ (125 min). Synthesis lists 50/68 mAh cells for K3; those are 331319PM and 281029HPG."
+common_to_all_five:
+  discharge_cutoff_V: {v: 3.0, conf: H}
+  charge_method: {v: "CC/CV", conf: H}
+  charge_temp_C: {v: "0 to 45", conf: H}
+  discharge_temp_C: {v: "-20 to 60", conf: H}
+  storage_temp_C: {v: "-20 to 45 (0 to 30 recommended if >3 months)", conf: H}
+  cycle_life: {v: ">80% of MINIMUM capacity after 500 cycles (0.5C charge, 0.5C discharge, room temp)", conf: H}
+  capacity_test: "0.2C to 3.0 V at 20 C"
+  contact: "wire AWG 30 (all five)"
+  continuous_discharge_max: "1.0 C"
+  pulse_discharge_max: "2.0 C 'non continuous' (no duration stated)"
+  max_charge: "1.0 C CC; normal 0.5 C"
+cells:
+  ICP331319PM:
+    gloss: "Renata 3.3 x 13 x 19 mm Li-polymer pack with safety circuit; IEC ICP041321; Renata PN 100735"
+    src: {file: ~/Desktop/ultrasonic-scratch/datasheets/icp331319pm.pdf, url: "https://www.renata.com/en/products/lithium-polymer-batteries/icp331319pm/", rev: "ICP331319PM V01 11/2022", read: 2026-10-07}
+    nominal_V: 3.7
+    capacity_mAh: {typ: 50, min: 45, conf: H}
+    envelope_max_mm: {T: 3.7, W: 12.8, L: 21.0, note: "after 500 cycles; PCM/wire inclusion not stated", conf: H}
+    pcm: {present: true, protections_listed: none, conf: H}
+    cv_V: 4.2
+    charge_mA: {normal: 25, max: 50, conf: H}
+    discharge_mA: {continuous: 50, pulse_nonCont: 100, pulse_duration: unstated, conf: H}
+    impedance: "< 730 mOhm at 30% SOC"
+    weight_g: 2.0
+    swelling_allowance: "implicit: envelope is end-of-life (500 cycles). Nominal-to-max: 3.3 -> 3.7 mm = +0.4 mm (M, nominal T inferred from part number)"
+  ICP281029HPG:
+    gloss: "Renata 2.8 x 10 x 29 mm Li-polymer bare cell, 'HPG' high-power variant, 4.35 V high-voltage chemistry; IEC ICP041131; PN 101024"
+    src: {file: ~/Desktop/ultrasonic-scratch/datasheets/icp281029hpg.pdf, url: "https://www.renata.com/en/products/lithium-polymer-batteries/icp281029hpg/", rev: "ICP281029HPG_V01 11/2022", read: 2026-10-07}
+    nominal_V: 3.8
+    capacity_mAh: {typ: 68, min: 65, conf: H}
+    envelope_max_mm: {T: 3.3, W: 10.2, L: 30.5, note: "after 500 cycles", conf: H}
+    pcm: {present: false, note: "'Safety Circuit: No' - bare cell; our board must provide OVP/UVP/OCP/short-circuit protection (charger IC + external protector). conf H", conf: H}
+    cv_V: 4.35
+    cv_note: "4.35 V CV: charger must be 4.35 V capable; a 4.2 V charger under-fills (~70-75% capacity, L inference) and a 4.35 V charge on a 4.2 V design over-voltages the cell. conf H for 4.35, L for percentage"
+    charge_mA: {normal: 34, max: 68, conf: H}
+    discharge_mA: {continuous: 68, pulse_nonCont: 136, pulse_duration: unstated, conf: H}
+    impedance: "< 570 mOhm at 30% SOC"
+    weight_g: 2.4
+    swelling_allowance: "envelope at 500 cycles; nominal T 2.8 -> 3.3 mm = +0.5 mm (M)"
+  ICP390831PR:
+    gloss: "Renata 3.9 x 8 x 31 mm Li-polymer pack with safety circuit; IEC ICP050933; PN 101025"
+    src: {file: ~/Desktop/ultrasonic-scratch/datasheets/icp390831pr.pdf, url: "https://www.renata.com/en/products/lithium-polymer-batteries/icp390831pr/", rev: "ICP390831PR V01 11/2022", read: 2026-10-07}
+    nominal_V: 3.7
+    capacity_mAh: {typ: 85, min: 80, conf: H}
+    envelope_max_mm: {T: 4.3, W: 8.7, L: 33.0, note: "after 500 cycles; PCM/wire inclusion not stated", conf: H}
+    pcm: {present: true, protections_listed: none, conf: H}
+    cv_V: 4.2
+    charge_mA: {normal: 42.5, max: 85, conf: H}
+    discharge_mA: {continuous: 85, pulse_nonCont: 170, pulse_duration: unstated, conf: H}
+    impedance: "< 530 mOhm at 30% SOC"
+    weight_g: 2.8
+    swelling_allowance: "envelope at 500 cycles; nominal T 3.9 -> 4.3 mm = +0.4 mm (M)"
+  ICP401230UPR:
+    gloss: "Renata 4.0 x 12 x 30 mm Li-polymer pack with safety circuit; IEC ICP051331; PN 100642"
+    src: {file: ~/Desktop/ultrasonic-scratch/datasheets/icp401230upr.pdf, url: "https://www.renata.com/en/products/lithium-polymer-batteries/icp401230upr/", rev: "ICP401230 V02 08/2019", read: 2026-10-07}
+    nominal_V: 3.7
+    capacity_mAh: {nominal: 130, min: 125, conf: H}
+    envelope_max_mm: {T: 4.5, W: 12.7, L: 31.0, note: "no 'after 500 cycles' qualifier; swelling inclusion unknown; PCM/wire inclusion not stated", conf: H}
+    pcm: {present: true, protections_listed: none, conf: H}
+    cv_V: 4.2
+    charge_mA: {normal: 65, max: 130, conf: H}
+    discharge_mA: {continuous: 130, pulse_nonCont: 260, pulse_duration: unstated, conf: H}
+    impedance: "< 340 mOhm at 30% SOC"
+    weight_g: 3.5
+    swelling_allowance: "not stated; nominal T 4.0 -> 4.5 mm max = +0.5 mm (M)"
+  ICP501233PA-02:
+    gloss: "Renata 5.0 x 12 x 33 mm Li-polymer pack with safety circuit and wire (the CURRENT cell, for comparison); IEC ICP061235; PN 100689"
+    src: {file: ~/Desktop/ultrasonic-scratch/datasheets/icp501233pa-02.pdf, url: "https://www.renata.com/en/products/lithium-polymer-batteries/icp501233pa-02/", rev: "ICP501233PA V03 08/2019", read: 2026-10-07}
+    nominal_V: 3.7
+    capacity_mAh: {nominal: 175, min: 170, conf: H}
+    envelope_max_mm: {T: 5.3, W_listed_as_length: 12.0, L_listed_as_width: 35.0, note: "datasheet labels 'Length 12.0' and 'Width 35.0' - labels appear swapped vs the part number (33 long x 12 wide); treat as 35 x 12 x 5.3. No cycle qualifier.", conf: H}
+    pcm: {present: true, protections_listed: none, conf: H}
+    cv_V: 4.2
+    charge_mA: {normal: 87.5, max: 175, conf: H}
+    discharge_mA: {continuous: 175, pulse_nonCont: 350, pulse_duration: unstated, conf: H}
+    impedance: "< 480 mOhm at 30% SOC"
+    weight_g: 4.2
+    swelling_allowance: "not stated; nominal T 5.0 -> 5.3 mm max = +0.3 mm (M)"
+derived_for_K3_decision:
+  peak_current_vs_pulse_rating:
+    note: "Pulse limits are only 2C 'non continuous'. Bridge-peak survival (spec/synthesis K3 vs K2) depends on pulse duration, which Renata does not state; ask Renata or measure sag. conf H (gap)"
+    table_mA: {ICP331319PM: 100, ICP281029HPG: 136, ICP390831PR: 170, ICP401230UPR: 260, ICP501233PA-02: 350}
+  internal_resistance_sag_at_pulse_mV:
+    note: "I x R_max(30% SOC), cell+PCM, M; upper bound since R is a max"
+    ICP331319PM_at_100mA: 73
+    ICP281029HPG_at_136mA: 78
+    ICP390831PR_at_170mA: 90
+    ICP401230UPR_at_260mA: 88
+    ICP501233PA-02_at_350mA: 168
+  thickness_ranking_max_mm: {ICP281029HPG: 3.3, ICP331319PM: 3.7, ICP390831PR: 4.3, ICP401230UPR: 4.5, ICP501233PA-02: 5.3}
+  energy_Wh_typ: {ICP331319PM: 0.185, ICP281029HPG: 0.258, ICP390831PR: 0.315, ICP401230UPR: 0.481, ICP501233PA-02: 0.648, note: "typ capacity x nominal V; M"}
+not_sourced:
+  - "which PCM protections/thresholds (all PCM cells)"
+  - "pulse duration for the 2C rating"
+  - "PCM/tab/wire protrusion beyond the quoted envelope; detailed drawings (sales request)"
+  - "swelling allowance as a separate figure (only implicit via 500-cycle envelope)"
+  - "ICP281029HPG compatibility with the project charger (4.35 V CV) - design check, not a datasheet item"
