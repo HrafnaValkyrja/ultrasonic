@@ -72,10 +72,12 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
     return usb_desc_string(index, uid, s, 32u) ? s : NULL;
 }
 
-bool hal_usb_configured(void)
+hal_usb_bus_t hal_usb_bus(void)
 {
     if (!core_up)
-        return false;
+        return HAL_USB_BUS_NONE;
     tud_task();
-    return tud_mounted() && !tud_suspended();
+    if (tud_suspended())                        /* TinyUSB counts a suspend only after a bus reset: a dumb supply never "suspends" */
+        return HAL_USB_BUS_SUSPENDED;
+    return tud_mounted() ? HAL_USB_BUS_CONFIGURED : HAL_USB_BUS_NONE;
 }

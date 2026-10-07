@@ -36,7 +36,7 @@ static void call_every_hal_function(void)
     (void)hal_i2c_recover();
     (void)hal_usb_vbus();
     (void)hal_usb_enable(false);
-    (void)hal_usb_configured();
+    (void)hal_usb_bus();
     (void)hal_usb_cdc_write(b, 1u);
     (void)hal_usb_cdc_read(b, 1u);
     hal_usb_dfu_request();

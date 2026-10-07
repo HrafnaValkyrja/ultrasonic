@@ -572,23 +572,43 @@ void test_usb_ilim(void)
     fake_vbus(true);
     app_run(&app, 60u);
     TF_CHECK_EQ(r[0x08] & 7u, 1);                                    /* dumb supply / not yet enumerated: 100 mA */
-    fake_usb_configured(true);
+    fake_usb_bus(HAL_USB_BUS_CONFIGURED);
     app_run(&app, 2u);
     TF_CHECK(app.usb_cfg && app.st.usb_enumerated);
     TF_CHECK_EQ(r[0x08] & 7u, 5);                                    /* 500 mA in the same pass */
-    fake_usb_configured(false);                                      /* host suspends */
+    fake_usb_bus(HAL_USB_BUS_SUSPENDED);                             /* host suspends */
+    TF_CHECK(fake_bq_iin_ua() > 2500u);
     app_run(&app, 2u);
-    TF_CHECK_EQ(r[0x08] & 7u, 1);
-    fake_usb_configured(true);
+    TF_CHECK_EQ((r[0x0A] >> 2) & 3u, 1);                             /* SYS_MODE 01: IN disconnected, SYS from the cell */
+    TF_CHECK(fake_bq_iin_ua() <= 2500u);                              /* USB 2.0 suspend budget */
+    TF_CHECK(app.chg_ok);                                            /* the suspend plan is verified, not a fault */
+    TF_CHECK_EQ(r[0x04] & 0x80u, 0);                                  /* no CHG_DIS fallback */
+    app_run(&app, 200u);
+    TF_CHECK_EQ((r[0x0A] >> 2) & 3u, 1);                             /* held (keep-alive re-verifies it) */
+    fake_usb_bus(HAL_USB_BUS_CONFIGURED);                            /* resume */
     app_run(&app, 2u);
     TF_CHECK_EQ(r[0x08] & 7u, 5);
-    fake_vbus(false);
+    TF_CHECK_EQ((r[0x0A] >> 2) & 3u, 0);                             /* IN back */
+    fake_usb_bus(HAL_USB_BUS_SUSPENDED);
+    app_run(&app, 2u);
+    TF_CHECK_EQ((r[0x0A] >> 2) & 3u, 1);
+    fake_vbus(false);                                                /* unplug while suspended: VIN toggle resets SYS_MODE (and the core) */
     app_run(&app, 60u);
     TF_CHECK(!app.st.usb_enumerated && !app.usb_cfg);
-    fake_usb_configured(false);
+    fake_usb_bus(HAL_USB_BUS_NONE);
     fake_vbus(true);                                                 /* replug on a dumb charger */
     app_run(&app, 60u);
     TF_CHECK_EQ(r[0x08] & 7u, 1);
+    TF_CHECK_EQ((r[0x0A] >> 2) & 3u, 0);                             /* charges again */
+    /* flat cell: the charger refuses SYS_MODE 01; accepted (counted), charging stays enabled, no fault */
+    fake_bq_flat(true);
+    fake_usb_bus(HAL_USB_BUS_CONFIGURED);
+    app_run(&app, 2u);
+    fake_usb_bus(HAL_USB_BUS_SUSPENDED);
+    app_run(&app, 2u);
+    TF_CHECK_EQ((r[0x0A] >> 2) & 3u, 0);
+    TF_CHECK(app.chg_ok && app.chg.sys_mode_refused >= 1u);
+    TF_CHECK_EQ(r[0x04] & 0x80u, 0);
 }
 
 /* FWSIM-R21 DFU handoff via CDC: accepted only while charging docked; guards re-checked after the settle time; charger watchdog off
@@ -602,7 +622,7 @@ void test_dfu_handoff(void)
     app_boot_docked(&app, 2);
     const uint8_t *r = fake_i2c_regs(0x6Au);
     fake_vbus(true);
-    fake_usb_configured(true);
+    fake_usb_bus(HAL_USB_BUS_CONFIGURED);
     app_run(&app, 60u);
     TF_CHECK_EQ(app.st.sys.mode, FW_ST_DOCKED_CHARGE);
     fake_usb_rx(dfu, sizeof dfu);
@@ -634,7 +654,7 @@ void test_dfu_handoff(void)
     /* guard: charger unreachable (plan not verifiable) -> abort */
     app_boot_docked(&app, 2);
     fake_vbus(true);
-    fake_usb_configured(true);
+    fake_usb_bus(HAL_USB_BUS_CONFIGURED);
     app_run(&app, 60u);
     fake_usb_rx(dfu, sizeof dfu);
     app_run(&app, 2u);

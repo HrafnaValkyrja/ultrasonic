@@ -50,7 +50,7 @@ typedef enum {
     FW_EV_BREAK,                              /* TIM1 break latched by the MDF1 out-of-limit detector (FWSIM-R65) */
     FW_EV_QUIET,                              /* idle detector: nothing to hear -> IDLE */
     FW_EV_WAKE,                               /* idle detector: activity -> back to the mode before IDLE */
-    FW_EV_USB_ENUMERATED,                     /* arg 1: USB configured and not suspended -> charger ILIM may leave 100 mA; arg 0: back to 100 mA (FWSIM-R20) */
+    FW_EV_USB_ENUMERATED,                     /* arg = hal_usb_bus_t: 1 configured -> ILIM 500 mA; 2 suspended -> charger input off (SYS_MODE 01); 0 -> 100 mA (FWSIM-R20) */
     FW_EV_DFU_ABORT,                          /* the app's DFU handoff guards failed: DFU_PENDING -> DOCKED_CHARGE (FWSIM-R21) */
     FW_EV_COUNT
 } fw_event_id_t;
@@ -79,6 +79,7 @@ typedef struct {
     fw_sys_t sys;             /* modes, gestures, docked interlock, self-test, break latch (FWSIM-R18, R19, R29, R65) */
     int32_t vol_offset_cdb;   /* volume applied to the DSP gain */
     uint32_t usb_enumerated;
+    uint32_t usb_suspended;   /* a connected host suspended the bus: <= 2.5 mA from VBUS (charger input off, FWSIM-R20) */
     fw_dsp_t dsp;             /* DSP chain state (FWSIM-R13): front end, algorithm, interpolator, limiter, shaper */
 } fw_state_t;
 

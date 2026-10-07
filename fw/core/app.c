@@ -144,7 +144,7 @@ static void service_charger(fw_app_t *app, uint32_t force)
         app->chg_temp_class = cls;
         force = 1u;
     }
-    fw_chg_plan_t p = fw_chg_plan(&app->st.knobs, app->st.usb_enumerated, tv, t);
+    fw_chg_plan_t p = fw_chg_plan(&app->st.knobs, app->st.usb_enumerated, app->st.usb_suspended, tv, t);
     if (app->dfu_prep)
         p.want[0x07] = (uint8_t)((p.want[0x07] & ~0x03u) | 0x03u);   /* WATCHDOG_SEL 11: the ROM loader never talks I2C (sub-dock-usb DFU path 3) */
     app->chg_ok = fw_chg_service(&app->chg, &app->st.knobs, &p, hal_time_us(), force);
@@ -159,8 +159,8 @@ static void service_usb(fw_app_t *app, uint32_t pa1)
             app->usb_on = pa1;
         fw_cdc_frame_init(&app->cdc);
     }
-    uint32_t cfg = app->usb_on && hal_usb_configured() ? 1u : 0u;
-    if (cfg != app->usb_cfg) {                   /* enumeration / suspend / reset: charger ILIM follows at once */
+    uint32_t cfg = app->usb_on ? (uint32_t)hal_usb_bus() : 0u;
+    if (cfg != app->usb_cfg) {                   /* enumeration / suspend / reset: charger input follows at once */
         app->usb_cfg = cfg;
         fw_event(&app->st, FW_EV_USB_ENUMERATED, (int32_t)cfg, hal_time_us());
         service_charger(app, 1u);
@@ -203,7 +203,7 @@ static void service_dfu(fw_app_t *app)
         app->dfu_since_us = now;
     if (now - app->dfu_since_us < FW_DFU_SETTLE_US)
         return;
-    uint32_t ok = !app->bridge_on && hal_usb_vbus() && app->usb_cfg && app->chg_ok && !app->chg.fault;
+    uint32_t ok = !app->bridge_on && hal_usb_vbus() && app->usb_cfg == (uint32_t)HAL_USB_BUS_CONFIGURED && app->chg_ok && !app->chg.fault;
     if (ok) {
         app->dfu_prep = 1u;
         service_charger(app, 1u);                /* watchdog off, read back */

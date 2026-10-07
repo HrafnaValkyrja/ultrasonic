@@ -219,7 +219,10 @@ void fw_event(fw_state_t *st, fw_event_id_t id, int32_t arg, uint64_t now_us)
     case FW_EV_VBUS_OFF:
         st->vbus = id == FW_EV_VBUS_ON ? 1u : 0u;
         if (!st->vbus)
+        {
             st->usb_enumerated = 0u;                /* a dumb charger after a host must start again at 100 mA */
+            st->usb_suspended = 0u;
+        }
         fw_sys_vbus_edge(s, st->vbus, st->now_us);
         break;
     case FW_EV_BTN_EDGE:
@@ -238,7 +241,8 @@ void fw_event(fw_state_t *st, fw_event_id_t id, int32_t arg, uint64_t now_us)
         fw_sys_fsm(s, &st->knobs, FW_FE_WAKE, st->now_us);
         break;
     case FW_EV_USB_ENUMERATED:
-        st->usb_enumerated = arg != 0 ? 1u : 0u;
+        st->usb_enumerated = arg == 1 ? 1u : 0u;
+        st->usb_suspended = arg == 2 ? 1u : 0u;
         break;
     case FW_EV_DFU_ABORT:
         fw_sys_fsm(s, &st->knobs, FW_FE_DFU_ABORT, st->now_us);

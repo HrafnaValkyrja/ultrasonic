@@ -51,7 +51,7 @@ static struct {
     bool vbus, usb_on;
     uint8_t usb_rx[512], usb_tx[512];
     size_t usb_rx_n, usb_rx_i, usb_tx_n;
-    uint32_t dfu_requests, usb_cfg;
+    uint32_t dfu_requests, usb_cfg, bq_flat;
     uint8_t flash[FLASH_BYTES];
     uint32_t flash_ops, flash_fail_at, flash_dead, flash_ecc;
     uint32_t wdt_started, wdt_ms, wdt_kicks;
@@ -453,6 +453,8 @@ hal_status_t hal_i2c_write(uint8_t addr7, uint8_t reg, const uint8_t *buf, size_
     if (F.bq_attached && addr7 == BQ_ADDR)
         bq_access(d);
     memcpy(&F.i2c_reg[d][reg], buf, len);
+    if (F.bq_attached && addr7 == BQ_ADDR && F.bq_flat && reg <= 0x0Au && (size_t)reg + len > 0x0Au && ((F.i2c_reg[d][0x0A] >> 2) & 3u) == 1u)
+        F.i2c_reg[d][0x0A] &= (uint8_t)~0x0Cu;    /* SLUSE99C 8.3.4: SYS_MODE 01 ignored while VBAT < VBUVLO */
     if (F.bq_attached && addr7 == BQ_ADDR && reg <= 9u && (size_t)reg + len > 9u && (F.i2c_reg[d][9] & 0x80u)) {
         bq_defaults(F.i2c_reg[d]);                /* SHIP_RST.REG_RST: software reset (self-clearing) */
         F.bq.sw_resets++;
@@ -503,13 +505,27 @@ hal_status_t hal_usb_enable(bool on)
     F.usb_on = on;
     return HAL_OK;
 }
-bool hal_usb_configured(void)
+hal_usb_bus_t hal_usb_bus(void)
 {
-    if (enter(FAKE_FN_hal_usb_configured, 0u, 0u) != HAL_OK)
-        return false;
-    return F.usb_on && F.usb_cfg;
+    if (enter(FAKE_FN_hal_usb_bus, 0u, 0u) != HAL_OK || !F.usb_on)
+        return HAL_USB_BUS_NONE;
+    return (hal_usb_bus_t)F.usb_cfg;
 }
-void fake_usb_configured(bool cfg) { F.usb_cfg = cfg; }
+void fake_usb_bus(hal_usb_bus_t b) { F.usb_cfg = (uint32_t)b; }
+void fake_bq_flat(bool flat) { F.bq_flat = flat; }
+/* VBUS input current of the charger: none without VIN; SYS_MODE 01 (SYS from BAT, IN disconnected): IQ_IN only, 1 mA max (SLUSE99C 7.5,
+ * charge enabled, ICHG 0 - the closest stated condition [A]); otherwise the input runs at its ILIM (a charging pod at full system load) */
+uint32_t fake_bq_iin_ua(void)
+{
+    int d = i2c_dev(0x6Au);
+    if (!F.vbus || d < 0)
+        return 0u;
+    const uint8_t *r = F.i2c_reg[d];
+    if (((r[0x0A] >> 2) & 3u) == 1u)
+        return 1000u;
+    static const uint32_t ilim_ma[8] = {50u, 100u, 200u, 300u, 400u, 500u, 700u, 1100u};
+    return ilim_ma[r[0x08] & 7u] * 1000u;
+}
 uint32_t fake_dfu_requests(void) { return F.dfu_requests; }
 size_t hal_usb_cdc_write(const uint8_t *buf, size_t len)
 {
@@ -536,6 +552,9 @@ void hal_usb_dfu_request(void)
 }
 void fake_vbus(bool present)
 {
+    int dbq = F.bq_attached ? i2c_dev(0x6Au) : -1;
+    if (dbq >= 0 && present != (F.vbus != 0u))
+        F.i2c_reg[dbq][0x0A] &= (uint8_t)~0x0Cu;    /* SLUSE99C 8.3.4: toggling VIN resets SYS_MODE to 00 */
     F.vbus = present;
     if (!present)
         F.usb_on = false;

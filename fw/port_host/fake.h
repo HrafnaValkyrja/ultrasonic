@@ -15,7 +15,7 @@
     X(hal_pwm_config) X(hal_pwm_start) X(hal_pwm_stop) X(hal_pwm_submit) X(hal_pwm_underruns) \
     X(hal_adc_read_mv) \
     X(hal_i2c_write) X(hal_i2c_read) X(hal_i2c_recover) \
-    X(hal_usb_vbus) X(hal_usb_enable) X(hal_usb_configured) X(hal_usb_cdc_write) X(hal_usb_cdc_read) X(hal_usb_dfu_request) \
+    X(hal_usb_vbus) X(hal_usb_enable) X(hal_usb_bus) X(hal_usb_cdc_write) X(hal_usb_cdc_read) X(hal_usb_dfu_request) \
     X(hal_flash_erase_page) X(hal_flash_program_qw) X(hal_flash_read) \
     X(hal_wdt_start) X(hal_wdt_kick) \
     X(hal_time_us) X(hal_time_cycles) \
@@ -58,7 +58,9 @@ void fake_adc_script(hal_adc_ch_t ch, const uint16_t *mv, uint32_t n);   /* retu
 void fake_reset_cause(hal_reset_cause_t c);
 void fake_wake_source(hal_wake_t w);
 void fake_vbus(bool present);
-void fake_usb_configured(bool cfg);                      /* the host configured (true) / suspended or reset (false) the device */
+void fake_usb_bus(hal_usb_bus_t b);                     /* what the host did to the bus (configured / suspended / reset) */
+void fake_bq_flat(bool flat);                           /* VBAT < VBUVLO: the charger ignores SYS_MODE 01 */
+uint32_t fake_bq_iin_ua(void);                          /* modelled charger input current from VBUS (SLUSE99C 7.5 IQ_IN, ILIM) */
 void fake_usb_rx(const uint8_t *buf, size_t len);       /* bytes the host sends; read by hal_usb_cdc_read */
 size_t fake_usb_tx(uint8_t *buf, size_t cap);           /* bytes the firmware wrote */
 

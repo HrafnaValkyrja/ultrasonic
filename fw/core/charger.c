@@ -7,7 +7,7 @@
 #include "variant_config.h"
 
 /* register write order: safety limits first, charge current last */
-static const uint8_t order[7] = {0x0Bu, 0x09u, 0x08u, 0x05u, 0x07u, 0x03u, 0x04u};
+static const uint8_t order[8] = {0x0Bu, 0x09u, 0x08u, 0x05u, 0x07u, 0x0Au, 0x03u, 0x04u};
 
 int32_t fw_chg_ts_temp_c10(uint32_t ts_mv)
 {
@@ -20,7 +20,7 @@ int32_t fw_chg_ts_temp_c10(uint32_t ts_mv)
     return (int32_t)((1.0f / inv_t - 273.15f) * 10.0f + (inv_t > 0.0f ? 0.5f : -0.5f));
 }
 
-fw_chg_plan_t fw_chg_plan(const fw_knobs_t *k, uint32_t usb_enumerated, uint32_t temp_valid, int32_t temp_c10)
+fw_chg_plan_t fw_chg_plan(const fw_knobs_t *k, uint32_t usb_enumerated, uint32_t usb_suspended, uint32_t temp_valid, int32_t temp_c10)
 {
     fw_chg_plan_t p;
     memset(&p, 0, sizeof p);
@@ -36,15 +36,24 @@ fw_chg_plan_t fw_chg_plan(const fw_knobs_t *k, uint32_t usb_enumerated, uint32_t
     p.want[0x07] = 0x10u | 0x01u;                           p.mask[0x07] = 0x13u;   /* 2XTMR_EN = 1, WATCHDOG_SEL 01 (HW reset, 160 s) */
     p.want[0x08] = usb_enumerated ? 0x05u : 0x01u;          p.mask[0x08] = 0x07u;   /* ILIM 100 mA until enumeration, then 500 */
     p.want[0x09] = 0x00u;                                   p.mask[0x09] = 0x99u;   /* REG_RST 0, PB_LPRESS_ACTION 00, EN_PUSH 0 */
+    p.want[0x0A] = usb_suspended ? 0x04u : 0x00u;          p.mask[0x0A] = 0x0Cu;   /* SYS_MODE 01 on USB suspend, else 00 */
     p.want[0x0B] = (uint8_t)((ts_hot & 3) << 6);            p.mask[0x0B] = 0xC0u;   /* TS_HOT 11 = 45 C */
     return p;
 }
 
-static uint32_t matches(const uint8_t *r, const fw_chg_plan_t *p)
+/* SYS_MODE 01 is ignored by the charger while VBAT < VBUVLO (SLUSE99C 8.3.4: it falls back to 00 so a flat cell is never cut off). A
+ * read-back of 00 when 01 was asked is therefore accepted (counted), never a plan failure: CHG_DIS on a flat cell would be worse. */
+static uint32_t matches(const uint8_t *r, const fw_chg_plan_t *p, uint32_t *sys_refused)
 {
+    *sys_refused = 0u;
     for (uint32_t i = 0; i < FW_CHG_NREG; i++)
-        if ((r[i] & p->mask[i]) != (p->want[i] & p->mask[i]))
+        if ((r[i] & p->mask[i]) != (p->want[i] & p->mask[i])) {
+            if (i == 0x0Au && (p->want[i] & 0x0Cu) == 0x04u && (r[i] & 0x0Cu) == 0x00u) {
+                *sys_refused = 1u;
+                continue;
+            }
             return 0u;
+        }
     return 1u;
 }
 
@@ -63,7 +72,8 @@ uint32_t fw_chg_service(fw_chg_t *c, const fw_knobs_t *k, const fw_chg_plan_t *p
     }
     memcpy(c->seen, r, sizeof r);
     c->pgood = r[0] & 1u;
-    if (matches(r, p)) {
+    uint32_t refused = 0u;
+    if (matches(r, p, &refused) && !refused) {
         c->verified++;
         c->fault = 0u;
         return 1u;
@@ -77,7 +87,8 @@ uint32_t fw_chg_service(fw_chg_t *c, const fw_knobs_t *k, const fw_chg_plan_t *p
             break;
         }
     }
-    if (hal_i2c_read(FW_CHG_ADDR, FW_CHG_REG0, r, FW_CHG_NREG) == HAL_OK && matches(r, p)) {
+    if (hal_i2c_read(FW_CHG_ADDR, FW_CHG_REG0, r, FW_CHG_NREG) == HAL_OK && matches(r, p, &refused)) {
+        c->sys_mode_refused += refused;
         c->verified++;
         c->fault = 0u;
         c->last_ichg_code = p->want[0x04];
