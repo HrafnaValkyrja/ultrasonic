@@ -443,3 +443,4 @@
 - 2026-10-07 13:25 checkin REG-ARM by backlog-agent
 - 2026-10-07 13:25 checkin REG-PAD by backlog-agent
 - 2026-10-07 13:26 review SUB-UI by backlog-agent: padboard gen.py docstring only (R14 from VSYS); no circuit change
+- 2026-10-07 13:27 review SUB-PROCESSING by ultrasonic-lead: 2026-10-07: sim/dsp algo A two-stage decimator (9bb9f30) recorded in reference_models

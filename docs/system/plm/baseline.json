@@ -136,14 +136,14 @@
    }
   },
   "SUB-PROCESSING": {
-   "by": "backlog-agent",
+   "by": "ultrasonic-lead",
    "date": "2026-10-07",
-   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
+   "note": "2026-10-07: sim/dsp algo A two-stage decimator (9bb9f30) recorded in reference_models",
    "stamp": {
     "block:CLOCK": "2ac3a525f62269dc",
     "block:CORE_SMPS": "c2e952ea730a4765",
     "block:MCU": "60387f07208e3c06",
-    "glob:sim/dsp/*.py": "621ccf694e2ee7fc"
+    "glob:sim/dsp/*.py": "0044390e25166ce3"
    }
   },
   "SUB-UI": {
