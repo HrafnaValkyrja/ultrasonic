@@ -16,7 +16,7 @@ phase2_board:   # src: ECR-0018 implementation log; hw/pod/draft_r2/out/check.js
   silk: "hw/pod/silk.py one-face mode: port motif + STEREO/ULTRASOUND/PHASE 2 on F; refs on Fab; pin-1 dots U1 U3 U4 U6"
   noise_model: {date: 2026-10-07, out: sim/noise/out_r2/budget.json, planes: "In1 GND + In2 +3V0", LN-M01_db: 26.5, LN-M01_worst_db: 14.0, LN-M02_db: 20.1, LN-M03_pct: 1.29 (PASS after hw/pod/kelvin_r21.py; was 3.31), LN-M04_mv: 0.127, LN-M05_uv: 8.7}
   shell: "hw/mech/shell_r2.py: hung from the lid on full-face VHB, x-stop, duct D1.0, SW1 pocket + puck kit, 6211 mm3"
-  open: ["acoustics re-run on the Phase-2 duct", "switch defaults (checks, sch, bom, docs) to draft_r2 + shell_r2"]
+  open: ["acoustics MC on phase2_r2 (nominal done: peak 63 kHz Q6.4 -> EQ notch target ~63 kHz)", "switch defaults (checks, sch, bom, docs) to draft_r2 + shell_r2"]
 ```
 
 

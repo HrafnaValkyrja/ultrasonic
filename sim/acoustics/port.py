@@ -235,6 +235,10 @@ def scenarios(g: Geom):
         "gasket_id2.1": (g, sealed(1.05e-3)),                                     # sealed gasket ID 2.1 round both holes (5.2 mm3 ring)
         "size_s1": (size_variant(g, 0.8, 0.7, 1.15, True), sealed(0.5e-3)),       # size study S1: 0.8 lid + 0.7 plate + 1.15 chimney
         "size_s2": (size_variant(g, 1.0, 0.0, 1.15, False), sealed(0.5e-3, recess=False)),   # S2: plate removed, 1.0 lid
+        # Phase 2 (hw/mech/shell_r2.py, 2026-10-07): lid 0.8 + plate 0.7, hex window 0.8 deep, reamed D1.0 bore, then the
+        # D1.0 hole in the 0.25 VHB across the 0.30 F gap (sealed), board hole D0.6; duct axis on the hole (gauge pin)
+        "phase2_r2": (size_variant(g, 0.8, 0.7, 0.30, True), sealed(0.5e-3)),
+        "phase2_r2+mesh_floor": (size_variant(g, 0.8, 0.7, 0.30, True), sealed(0.5e-3, mesh="floor")),
         "as_built+mesh_mouth": (g, Opt(mesh="mouth")),
         "chimney_d1.0+mesh_mouth": (a0, sealed(0.5e-3, mesh="mouth")),
         "chimney_d1.0+mesh_floor": (a0, sealed(0.5e-3, mesh="floor")),
