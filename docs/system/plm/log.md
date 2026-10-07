@@ -417,3 +417,7 @@
 - 2026-10-07 13:19 review R-DOCK-BODY by backlog-agent: dock route v2 (y-first, climb above the cell behind the board): worst 0.58 to the arm bundle (was 0.11); hold + check step 11
 - 2026-10-07 13:19 checkin SUB-DOCK-USB by backlog-agent
 - 2026-10-07 13:19 checkin PHYSICAL by backlog-agent
+- 2026-10-07 13:20 checkout REG-POD-BODY by backlog-agent: RPB-16 gauge pin options
+- 2026-10-07 13:20 review REG-POD-BODY by backlog-agent: RPB-16: gauge pin options (A pin gauge + 20G sleeve, rec; B micro-turned; C tooling holes); docs only
+- 2026-10-07 13:20 review R-AUDIO-BODY by backlog-agent: RPB-16: gauge pin options (A pin gauge + 20G sleeve, rec; B micro-turned; C tooling holes); docs only
+- 2026-10-07 13:20 checkin REG-POD-BODY by backlog-agent
