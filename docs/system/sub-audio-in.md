@@ -1,56 +1,63 @@
 # Audio in: ultrasonic mic, acoustic port, PDM capture
-**Current design (2026-10-07): Phase 2, `hw/current.yaml` (ECR-0018); every tool and check defaults to it.** U2 on B at board (2.65, 6.0), port NPTH D0.6 at (1.88, 6.0) = pod 32.43; sealed duct ID 1.0 (reamed lid bore + VHB hole across the 0.30 F gap), gauge pin locates (worst 0.115 <= 0.20 mm); acoustics default `phase2_r2`: mean +5.6 dB, resonance 63 kHz Q6.4 (EQ notch target), MC60 p50 +4.51 dB, R14 all-pass 0.70 (`docs/sim/acoustics.yaml`); R2 33R 0201 (C473457). The body below is the Rev F/G reference design (`ULTRASONIC_DESIGN=revg`) unless it says Phase 2; its Phase-2 rewrite is open.
-Status: schematic Rev F (ERC 0 errors / 311 warnings, `hw/pod/gen.erc` 2026-10-02 20:01), routed draft (`pod_r1_routed.kicad_pcb`, 2026-10-02), rev-1 shell; board port and lid bore aligned in Rev F (ECR-0011, Open issue 1 closed); updated 2026-10-01, Rev F port facts synced 2026-10-02 · Source of truth: `hw/pod/gen.py` (mic block, lines 140-151), the KiCad board once placement starts (today the draft `hw/pod/draft_r1/pod_r1_routed.kicad_pcb`), `hw/mech/shell_r1.py` (lid port, lines 36-45, 102-103) · Owner decisions: O9, O12, O14, O16-5, O19 (sealing is a daily-use requirement) · Open ECRs: ECR-0008 (supply: U2 stock falling, add it to the reservation list)
+Rev MZ-2 2026-10-07: body rewritten to the Phase-2 design (`hw/current.yaml`, ECR-0018): U2 on the one-face board at (2.65, 6.0), port (1.88, 6.0) = pod 32.43; sealed D1.0 duct + gauge pin (O24 option B) replaces the open gap; acoustics `phase2_r2`; layout noise on the routed Phase-2 board; R2 now at the PB3 end; R2/C13 0201. Rev F/G facts moved to the last section.
+Status: schematic = Rev G nets with the MZ-2 package set (`POD_PACKAGES=mz2 python3 hw/pod/gen.py` -> `hw/pod/pod_mz2.net`; bom_check netlist/nets PASS, 195 pin-net assignments, 2026-10-07); board `hw/pod/draft_r2/out/routed.kicad_pcb` routed, DRC 0, 0 unconnected (ECR-0018 log 2026-10-07); shell `hw/mech/shell_r2.py` (constants `hw/mech/dims_r2.py`); interfaces.py [mic-port] PASS 2026-10-07. Updated 2026-10-07.
+· Source of truth: `hw/pod/gen.py` (mic block; MZ2 table L93-112), the routed board above, `hw/mech/dims_r2.py` (MIC, DUCT_D, HEX_R/HEX_DEPTH, `board_mic()`, `duct_offsets()`), `hw/mech/shell_r2.py::lid_base` (bore + hex window) · Owner decisions: O9, O12, O16-5, O19, O24 (sealed duct ID 1.0 + x-stop/locating feature + EQ notch), O26/O27 (Phase 2) · Open ECRs: ECR-0008 (supply: add U2 to the reservation list), ECR-0018 (Phase 2, approved, owner review pending)
 
 ## Purpose
 - Carries **F1 Hear 20-85 kHz** (`integration-map.md` §1) from air to PCM samples in RAM. Everything after that is `sub-processing.md` (F2).
 - Must be **off in Off mode** (D12, `docs/spec.md` line 221): no mic current when the pod is "off".
 - Must not hear the pod itself: bridge PWM noise, core SMPS, own speech/chewing (§1.2.3, T6; risks R8, R14, R15; MP-01).
-- One board serves both pods, so the port sits on the board centre line (O16-5, `spec.md` line 642).
+- One board serves both pods, so the port sits on the board centre line y 6.0 (O16-5; dims_r2.py `bpt` docstring: the right pod's mirror flips board y, mic and SW1 sit on y 6.0).
 
 ## Big picture
 ![Block schematic, rev 1 (mic top right)](../diagrams/schematic-rev1.png)
-![Rev-1 pod, exploded: the hex window at the lid's front end is the mic port](../../hw/mech/out/r1/spine/exploded.png)
+![Acoustic port model: path response, Phase-2 duct (sim/acoustics/port.py, 2026-10-07)](../../sim/acoustics/out/port_path.png)
 
-**No acoustic-path cross-section exists yet** (Open issue 12). The chain as built today:
+The chain as built in Phase 2 (pod y, `hw/mech/dims_r2.py`; acoustic stack from `sim/acoustics/out/port_results.json` scenarios.phase2_r2.stack_mm, 2026-10-07):
 ```
-sound -> lid hex window (0.8 deep) -> lid bore D1.0 (0.9 long) -> OPEN 1.5 mm gap (no seal)
-      -> board hole D0.6 (0.8 long) -> mic port D0.325 -> MEMS diaphragm
-PA5 (GPIO high) ---------------- MIC_VDD (C13 100n) ---> U2 VDD
-PB3 ADF1_CCK0 -> R2 33R -> MIC_CLK -------------------> U2 CLOCK  4.0004 MHz
-U2 DATA ------- MIC_DATA ------> PB4 ADF1_SDI0 -> CIC5 /5 (800 kS/s) -> RSFLT /4 -> 200 kS/s -> GPDMA -> SRAM
+sound -> plate hex window (circumradius 1.9, 0.8 deep from the plate top y 14.7 = mesh seat, no mesh yet)
+      -> reamed lid bore D1.0 (0.7 long, to the lid inner face y 13.2)
+      -> D1.0 hole in the 0.25 VHB across the 0.30 F gap (SEALED: VHB bonds board F face to the lid)
+      -> board hole NPTH D0.6 (0.8 long, y 12.9 -> 12.1) -> mic port D0.325 -> MEMS diaphragm (U2 on B)
+PA5 (GPIO high) ---------------- MIC_VDD (C13 100n 0201) -> U2 VDD
+PB3 ADF1_CCK0 -> R2 33R (at the MCU end, N$2 1.2 mm) -> MIC_CLK 9.5 mm (B) -> U2 CLOCK  4.0004 MHz
+U2 DATA ------- MIC_DATA 4.6 mm (B) --> PB4 ADF1_SDI0 -> CIC5 /5 (800 kS/s) -> RSFLT /4 -> 200 kS/s -> GPDMA -> SRAM
 ```
+(net lengths: pcbnew probe of the routed board, fenced, 2026-10-07)
 How it works:
-- The mic is a bottom-port MEMS part on the board's inner face (B). Sound enters through the lid, crosses the board through a 0.6 mm hole, and reaches the mic's own 0.325 mm port.
+- The mic is a bottom-port MEMS part on the board's inner face (B, toward the cell). Sound enters through the lid, runs down a sealed straight duct of ID 1.0 (lid bore + VHB hole), crosses the board through a 0.6 mm hole and reaches the mic's own 0.325 mm port. The VHB that hangs the board from the lid is the duct's seal: there is no side cavity (spec §8 "no gasket cavity": PASS, side volume 0.0 mm3, port_results.json spec_checks.phase2_r2, 2026-10-07).
 - Its output is 1-bit PDM (pulse-density modulation) at the clock rate. The MCU's ADF1 (audio digital filter, a hardware sigma-delta decimator) turns it into 24-bit samples at 200 kS/s with zero CPU (A3-u575-plan.md §1.2, option D1).
 - The mic's supply is a GPIO (PA5). Driving PA5 low removes the mic's power completely; its own sleep mode would still draw ~80 µA (mic datasheet, Syntiant Rev B-1, p.2), 10-20x the MCU's Stop 2 current.
 - Every rate is an integer ratio of one clock (mic clock = HCLK/20, PCM = PWM = HCLK/400), so bridge-carrier leakage folds to 0 Hz (D14, `spec.md` line 249). Shaped PWM *noise* does not fold away (MP-01, below).
+- Alignment: the bore is the datum. While bonding, a stepped gauge pin (D0.98 body in the bore, D0.50 tip in the board hole) registers VHB and board to the bore; the front skirt wall is only a coarse x-stop 0.25 mm ahead of the board and never fights the pin (`shell_r2.py` docstring; `dims_r2.duct_offsets()`).
 
 ## Elements
-| Ref / feature | What it is | LCSC · class | Where (draft) | Why |
+| Ref / feature | What it is | LCSC · class | Where (Phase-2 board / shell) | Why |
 |---|---|---|---|---|
-| U2 | **SPH0641LU4H-1**: Knowles (now Syntiant) PDM MEMS microphone with an ultrasonic mode, 3.50 x 2.65 x 0.98 mm, bottom port | C2879853 · Extended | B face, body origin at board (4.67, 6.5), rot 90 (ECR-0011; port at (3.9, 6.5)) | Only JLC-stocked mic characterised to 80 kHz (D13; A1-A2-mcu-and-mic.md §A2) |
+| U2 | **SPH0641LU4H-1**: Knowles (now Syntiant) PDM MEMS microphone with an ultrasonic mode, 3.50 x 2.65 x 0.98 mm (1.08 incl. solder, part_heights.yaml), bottom port | C2879853 · Extended | B, origin board (2.65, 6.0) rot 90; port 0.77 mm from the origin -> (1.88, 6.0) (routed board read by `dims_r2.board_mic()`, 2026-10-07) | Only JLC-stocked mic characterised to 80 kHz (D13; A1-A2-mcu-and-mic.md §A2) |
 | U2 SELECT | Left/right select pin, tied to GND | - | - | Must not float (D13). SEL = GND: mic asserts DATA on the falling edge; the receiver latches on the **rising** edge (mic datasheet p.8 table) |
-| R2 | 33 R 0402, series on the clock | C25105 · Basic | B, (6.6, 8.0), **mic end** of a 16.6 mm run | "Tames the 4 MHz clock edge" (gen.py line 148) |
-| C13 | 100 nF 16 V X7R 0402 (Samsung CL05B104KO5NNNC) | C1525 · Basic | B, (6.6, 5.0) | Mic VDD bypass. X7R breaks the datasheet's "no Class 2 near the mic"; no 0402 C0G reaches 100 nF (B-parts-selection.md, Class-1 note) |
-| Board port | NPTH D0.6 in footprint `Knowles_LGA-5_3.5x2.65mm_Port0.6`; copper ring ID 1.025 | - | **board (3.9, 6.50)** = pod x 34.5, under the lid bore; 0.77 mm from the body origin (4.67) (`place_r1.py` L61, ECR-0011; interfaces.py [mic-port] 0.000 mm, 2026-10-02) | Spec §8 rule: short, wide (0.6-1.0 mm), board <= 0.8 mm (`spec.md` lines 508-512) |
-| Board | 0.8 mm, 4 layers, In1 solid GND | - | - | Short duct (§8); In1 shields mic nets from F-side traffic |
-| Lid bore | D1.0 through 0.9 mm of lid, drilled after printing | - | pod (34.5, ZC) = board x 3.9 | `shell_r1.py` line 102; `docs/build/tolerances.md` row "Mic port" |
-| Lid hex window | Hexagonal recess, circumradius 1.9, 0.8 deep, at the outer face | - | same | `shell_r1.py` line 103. Purpose not stated in code; the only candidate mesh seat |
-| Mesh | **None designed or sourced** | - | - | Spec task D2 (`spec.md` line 688) open |
-| MCU side | PA5 GPIO (supply), ADF1 on PB3/PB4 (AF3), GPDMA | in U1 | - | See `sub-processing.md` |
+| R2 | 33 R 0201 (0201WMF330JTEE), series on the clock | C473457 · Basic/lock (bom_jlc_mz2.csv "yes") | B (5.48, 7.75) rot -90, **MCU end**: R2.1 N$2 (5.48, 7.43), R2.2 MIC_CLK (5.48, 8.07) | Source-series termination: the 9.5 mm MIC_CLK run carries the softened edge |
+| C13 | 100 nF 10 V X5R 0201 (Murata GRM033R61A104KE15D) | C76934 · lock "yes" | B (5.12, 5.4): MIC_VDD pad (5.12, 5.08) | Mic VDD bypass. X5R (Class 2) breaks the datasheet's "no Class 2 near the mic"; no small C0G reaches 100 nF (B-parts-selection.md, Class-1 note) |
+| Board port | NPTH D0.6 in footprint `Knowles_LGA-5_3.5x2.65mm_Port0.6` | - | board (1.88, 6.0) = pod (32.43, -2.45) (dims_r2.MIC; interfaces.py [mic-port] 0.000 mm, 2026-10-07) | Spec §8: short, wide (0.6-1.0 mm), board <= 0.8 mm (S8-board/S8-hole PASS, port_results.json 2026-10-07) |
+| Board | 30 x 12 x 0.8, 4 layers: F sig / In1 GND plane / In2 +3V0 plane / B sig | - | - | Short duct (§8); In1 shields mic nets on B from F-side traffic (reg-board) |
+| VHB duct hole | D1.0 hole in the 0.25 mm 3M VHB 4914 sheet (DUCT_D) | - | on the bore axis | Seals the 0.30 F gap round the board hole (`shell_r2.vhb()`) |
+| Lid bore | D1.0, printed undersize and reamed with a 1.0 drill (1.00-1.02 [A]) | - | pod (32.43, -2.45), y 13.2-13.9 | `dims_r2.DUCT_D`, `shell_r2.lid_base` |
+| Hex window | circumradius 1.9, 0.8 deep from the plate top: the mesh seat | - | same axis | `dims_r2.HEX_R/HEX_DEPTH`; shell_r2 comment "hex window = mesh seat" |
+| Gauge pin | stepped, turned brass [A]: body D0.98, tip D0.50, runout 0.02 | tool, not a part | in the bore during bonding only | `dims_r2.duct_offsets()` tolerances |
+| Mesh | **None chosen** (S8-mesh FAIL, port_results.json 2026-10-07; spec task D2) | - | modelled at the window floor (`phase2_r2+mesh_floor`) | - |
+| MCU side | PA5 GPIO (supply), ADF1 on PB3/PB4 (AF3), GPDMA | in U1 | U1 B (10.05, 5.4) | See `sub-processing.md` |
 
 Backup mic, not fitted: **TDK T5838** (PDM mic with an ultrasonic mode, characterised to 50 kHz only), C7230692 (D13).
 
 ## Interfaces
 | To | Nets / pins (as integration-map.md) | What crosses | Notes |
 |---|---|---|---|
-| [sub-processing](sub-processing.md) | MIC_VDD = U1.15 PA5; N$2 = U1.39 PB3 (-> R2 -> MIC_CLK); MIC_DATA = U1.40 PB4 | supply, 4 MHz clock out, PDM in | ADF1 config, mic start-up sequence, EQ, idle detector (F2) |
-| [sub-power](sub-power.md) | +3V0 (through the PA5 output driver), GND (In1) | 1.1 / 1.35 / 2.15 mA | power.py rev 2 at 3.0 V / 4 MHz |
-| [sub-output](sub-output.md) | none electrical; shared GND/+3V0 | PWM noise, 200 kHz gate edges, exciter vibration | MIC_VDD runs 1.0 mm from GA_N and 1.58 mm from BRIDGE_RTN on F (draft probe) |
-| [sub-debug-test](sub-debug-test.md) | no test pad on any mic net (MIC_CLK/MIC_DATA pads added in eb88de7, cut in 1c82d5c) | mic stream checked over USB instead | gen.py docstring lines 26-30 |
-| [reg-board](reg-board.md) | U2 on B (origin 4.67, 6.5), port NPTH at (3.9, 6.50) on the centre line; mic nets on B/In2/F | keep-outs | draft: MIC_CLK 3.6 mm (B), N$2 16.6 mm, MIC_DATA 13.7 mm, MIC_VDD 11.8 mm |
-| [reg-pod-body](reg-pod-body.md) / [physical](physical.md) | lid bore (pod x 34.5), hex window, 1.5 mm gap board-to-lid; board port at pod x 34.5 (aligned with the bore) | the acoustic duct and a water path | `shell_r1.py` Y_SPLIT 14.4, PCB y 12.1-12.9 |
+| [sub-processing](sub-processing.md) | MIC_VDD = U1.15 PA5; N$2 = U1.39 PB3 (-> R2 -> MIC_CLK); MIC_DATA = U1.40 PB4 | supply, 4 MHz clock out, PDM in | ADF1 config, mic start-up sequence, EQ (notch target now ~63 kHz, see Key numbers), idle detector (F2). Rel R-AUDIO-PROC |
+| [sub-power](sub-power.md) | +3V0 (In2 plane, through the PA5 output driver), GND (In1) | 1.1 / 1.35 / 2.15 mA | power.py rev 2 at 3.0 V / 4 MHz |
+| [sub-output](sub-output.md) | none electrical; shared GND/+3V0 | PWM noise, 200 kHz gate edges, exciter vibration | MIC_VDD runs 0.90 mm edge-to-edge from GA_N and 1.41 mm from BRIDGE_RTN, both on B near (13.5-14.2, 3.5-3.7) (probe 2026-10-07); LN-M01 PASS (Key numbers) |
+| [sub-debug-test](sub-debug-test.md) | TP10 MIC_DATA dot (3.1, 8.25) B; MDF fallback TP8 (3.5, 3.85) / TP9 (2.05, 8.25) B; R2 pads = MIC_CLK probe | mic stream checked over USB; duty at R2.2 | all on B: reachable with the lid lifted (board hangs from the lid, B faces the cell) |
+| [reg-board](reg-board.md) | U2 B (2.65, 6.0) rot 90, port NPTH (1.88, 6.0) on the centre line; mic nets all on B except MIC_VDD (F 12.1 + B 5.5 mm, 2 vias) | keep-outs; noisy parts >= 13 mm away | port -> nearest pad: C7 13.7, L1 13.8, Q1 15.9, R21 17.1, U3 17.4, Q2 19.0, U4 20.8 mm; nearest via 2.05 mm (GND) (probe 2026-10-07). Rel R-AUDIO-BOARD |
+| [reg-pod-body](reg-pod-body.md) / [physical](physical.md) | lid bore + hex window at pod (32.43, -2.45); VHB duct hole; gauge pin at bonding | the acoustic duct; sealed (no water path past the VHB) | interfaces.py [mic-port] 0.000 mm nominal, worst-case margin 0.00 at limit 0.20 (PASS, 2026-10-07). Rel R-AUDIO-BODY |
 
 Firmware dependencies (integration-map §8): ADF1 on PB3/PB4 at 4 MHz; PA5 is a supply pin, not I/O.
 
@@ -58,9 +65,11 @@ Firmware dependencies (integration-map §8): ADF1 on PB3/PB4 at 4 MHz; PA5 is a 
 - **D13** (`spec.md` 224-239): never power up or wake straight into ultrasonic mode; start at 1.024-2.475 MHz (plan: 2.0 MHz), wait, then switch; clock duty 48-52 % above 2.4 MHz; SELECT tied; no Class-2 caps near the mic.
 - **D14 / A3-u575-plan.md §1**: ADF clock divider changes only with the filter stopped (stop, re-divide, restart). Keep CCKDIV+1 even (only route to 50 % duty; ST specifies no duty).
 - **D12**: Off = mic unpowered (PA5 low).
-- **§8 acoustic rules**: board <= 0.8 mm; port 0.6-1.0 mm; **no gasket cavity**; opening directly over the hole; thin mesh, never foam.
+- **§8 acoustic rules**: board <= 0.8 mm; port 0.6-1.0 mm; **no gasket cavity**; opening directly over the hole; thin mesh, never foam. Phase 2: all PASS except mesh (port_results.json spec_checks.phase2_r2, 2026-10-07).
+- **O24 (1)**: sealed straight duct ID 1.0 lid bore -> board hole, with a locating feature (gauge pin + x-stop) and an EQ notch.
+- **R-ACO-P5 alignment**: bore axis vs hole axis <= r_duct - r_hole = 0.20 mm (`dims_r2.duct_offsets()` limit_R_ACO_P5).
 - **O16-5**: port on the board centre line, identical in both pods. **O12**: IPX4 minimum, IPX5 preferred.
-- **D11 / §1.2.3**: self-noise no louder than ambient; SMPS and bridge stay away from the mic (far face).
+- **D11 / §1.2.3**: self-noise no louder than ambient; SMPS and bridge stay away from the mic (>= 10 mm, MZG-04; met: >= 13.7 mm).
 - Mic datasheet (Syntiant Rev B-1): clock rise/fall tEDGE <= 3 ns (p.4); DATA load CLOAD <= 140 pF, VDD 1.62-3.6 V (p.2); bypass caps near VDD must not be Class 2 (p.8).
 
 ## Key numbers
@@ -79,36 +88,41 @@ Firmware dependencies (integration-map §8): ADF1 on PB3/PB4 at 4 MHz; PA5 is a 
 | PA5 output drop | VOH >= VDD - 0.4 V at 4 mA, so MIC_VDD >= 2.6 V | DS13737 Rev 10 Table 94, p.232 | Jul 2024 |
 | Power-up / mode change | <= 50 ms / <= 10 ms | datasheet p.2 | 2024-12-02 |
 | Sleep current (why PA5) | 80 µA typ | datasheet p.2 | 2024-12-02 |
-| Port: mic / board / lid | D0.325 +-0.05 / D0.6 / D1.0 | datasheet p.9; footprint; shell_r1.py | 2026-10-01 |
-| Duct as built (rev 1) | 0.8 board + 1.5 open gap + 0.9 lid + 0.8 window | shell_r1.py constants lines 36-44, 102-103 | 2026-10-01 |
-| Board port vs lid bore offset | **0.000 mm** nominal (Rev F: U2 origin x 4.67, port x 3.9 = lid bore); Rev E was 0.77 mm (port 3.13), hole and bore overlapping by only 0.03 mm | interfaces.py [mic-port] (WARN = nominal only, worst-case stack margin 0.00 mm at limit 0.20); `place_r1.py` L61; shell_r1.py line 45 | 2026-10-02 |
+| Port: mic / board hole / duct | D0.325 +-0.05 / D0.6 (+-0.05 [A]) / D1.0 (reamed 1.00-1.02 [A]) | datasheet p.9; footprint; dims_r2.py | 2026-10-07 |
+| Duct stack (Phase 2) | window 0.8 + bore 0.7 + sealed VHB/gap 0.30 + board 0.8 | port_results.json scenarios.phase2_r2.stack_mm | 2026-10-07 |
+| Bore vs hole offset | **0.000 mm** nominal; worst with the gauge pin 0.115 mm <= 0.20 PASS; walls alone would allow 0.86 (FAIL), so the pin is required; walls never fight the pin | `dims_r2.duct_offsets()` (run 2026-10-07); interfaces.py [mic-port] | 2026-10-07 |
+| Path response, phase2_r2 nominal | mean 20-96 kHz **+5.6 dB**; peaks 18.5 kHz +11.7 dB Q4.8, **63.0 kHz +18.5 dB Q6.4**; notch 26.0 kHz -7.8 dB; p2p 26.3 dB | port_results.json scenarios.phase2_r2; scratchpad v_aco.txt (sim/acoustics run) | 2026-10-07 |
+| Same with a mesh on the window floor | mean +5.1 dB; 63.0 kHz peak trimmed to +16.0 dB (Q4.7) | port_results.json `phase2_r2+mesh_floor` | 2026-10-07 |
+| In-pod (datasheet x path) 20-85 kHz | deepest -8.6 dB re median at 26.2 kHz; highest +11.5 dB at 63.6 kHz: R14 notch/peak PASS; EQ notch target ~63 kHz | port_results.json spec_checks.phase2_r2 (R14-notch, R14-peak) | 2026-10-07 |
+| Monte Carlo phase2_r2 | mean 20-96 kHz p05/p50/p95 -0.09 / 4.30 / 8.13 dB; peak re median p95 17.5 dB; R14 all-pass 0.57 (20-85 kHz), 0.68 (20-80 kHz); **n 40 in the file on disk** (ECR-0018 log quotes an n 60 run: p50 4.51, all-pass 0.70) | port_results.json mc_summary.phase2_r2 | 2026-10-07 |
+| Layout noise LN-M01 (mic supply spur margin) | 26.5 dB pessimistic PASS (nominal 46.5, worst 14.0 at A01 SMPS 28 MHz -> 39 kHz); sign-off >= 10 | `sim/noise/out_r2/budget.json` metrics (board sha da4e8b13 = current routed board) | 2026-10-07 |
+| Layout noise LN-M02 (PDM line pickup) | 20.1 dB vs >= 12 PASS, flagged REVIEW (inside the +-10 dB L2 model error): F03 PDM clock -> MIC_CLK, magnetic | same | 2026-10-07 |
 | Shaped PWM noise in the mic band | -35 dB re FS (bridge V), -59 dB (coil I) at 200 kHz | spec D6 MP-01; `sim/checks/pwm_ultrasonic_leak.py` | 2026-09-30 |
-| JLC stock / price | **960** · $1.99 (Extended); was 1,076 on 2026-09-30 and falling | JLC parts API, audit query (UTC; 2026-10-01 local) | 2026-10-02T00:44Z |
+| JLC stock / price | 960 · $1.99 (Extended) | JLC parts API audit query; bom.md $1.9915 | 2026-10-02T00:44Z |
 | ADF current | ~40 µA at 80 MHz (MDF ~0.28 mA) | A3 §1.4 (DS Table 72) | 2026-09-30 |
 
-## Open issues
-1. **CLOSED in Rev F (ECR-0011): board port and lid bore aligned.** U2 moved to board x 4.67, so its port (0.77 mm off the footprint origin) sits at board (3.9, 6.50) = pod x 34.5 under the lid bore (`place_r1.py` L61; interfaces.py [mic-port] 0.000 mm nominal, 2026-10-02; integration-map F1 states both). Rev E had the port at (3.13, 6.50), 0.77 mm off, holes overlapping by 0.03 mm. The port position also sets where a gasket or chimney presses (issue 2) and where the mesh sits (issue 3).
-2. **No seal between board and lid.** Rev 1 dropped the round-1 chimney + PORON washer (`frame.py` MIC_SEAL; `hw/mech/notes/shell.md` line 79). The port opens into the whole F-side cavity: a resonant side volume (breaks §8 "no gasket cavity") and a **water path to the MCU** (O12). *Closes it:* restore a chimney/washer (or a sealed boss) and keep vias out of r1.6 around the port.
-3. **No mesh exists.** integration-map §1 says "hydrophobic mesh"; no part, seat or source is in hw/mech, hardware.md or the BOM. *Closes it:* task D2: pick a mesh with ultrasonic transmission data; decide the seat.
-4. **Acoustic coupons vs O9.** CLAUDE.md lists coupons as bench boards; O9 says no separate test boards. Options: (a) JLC coupon panel, 0.6/0.8/1.0 mm holes; (b) the rev-1 board plus printed lid variants (bore, seal, mesh); (c) both. **Recommend (b)**: the lid is where rev 1 is uncertain and prints cost nothing. Owner decides. Response of the as-built duct: unknown (round-1's 3.2 mm duct had quarter-wave ~24 kHz, shell.md line 214).
-5. **Clock duty cycle unknown; Rev F has a hand-wire fallback.** ST specifies no CCK duty (A3 §1.1). The timer-clock fallback needs an MDF CKI pin; the ADF has none. Rev F adds the MDF fallback dots TP8 PB8 / TP9 PB1 / TP10 MIC_DATA on B (gen.py docstring L47-48, TP block L284-289): lift R2, wire TP8 to R2's mic-side pad R2.2 = MIC_CLK, TP9 to TP10; firmware moves the mic to MDF1 (sub-debug-test mdf_fallback). *Closes it:* scope PB3 (E6) before the board order.
+## Open issues (IDs stable; gaps = closed, see git)
+2. **CLOSED in Phase 2 (O24, ECR-0018): seal between board and lid.** The VHB that hangs the board carries a D1.0 duct hole; spec §8 "no gasket cavity" PASS (side volume 0.0 mm3). Residual: VHB hole registration to the bore relies on the gauge pin (process step, physical.md).
+3. **No mesh exists.** The hex window is the seat (shell_r2); no part, supplier or transmission data. S8-mesh FAIL (port_results.json 2026-10-07). *Closes it:* task D2: pick a mesh with ultrasonic transmission data; the floor position also trims the 63 kHz peak (+18.5 -> +16.0 dB).
+4. **Acoustic coupons vs O9.** Options: (a) JLC coupon panel, 0.6/0.8/1.0 mm holes; (b) the rev-1 board plus printed lid variants (bore, VHB hole, mesh); (c) both. **Recommend (b)**: the lid is where the duct is uncertain and prints cost nothing. Owner decides. The model is nominal + MC only; no measurement.
+5. **Clock duty cycle unknown; hand-wire fallback.** ST specifies no CCK duty (A3 §1.1). Fallback (gen.py MDF dots): lift R2, wire TP8 (3.5, 3.85) to R2.2 = MIC_CLK (5.48, 8.07), TP9 (2.05, 8.25) to TP10 (3.1, 8.25); firmware moves the mic to MDF1 (sub-debug-test mdf_fallback). *Closes it:* scope R2.2 (E6) on board 1.
 6. RSFLT response at 800 kHz unpublished (R18). *Closes it:* swept tone, D1 vs D2 decimation, on the first board.
-7. **MIC_VDD noise.** PA5 (pin 15) sits 2 pins from GA_N (pin 17) and 5 from VLXSMPS (pin 20); no RC filter, X7R bypass only; mic PSRR unspecified above 1 kHz. *Closes it:* a self-noise capture (USB stream, bridge on/off, SMPS vs LDO); a series R + C on MIC_VDD is the cheap fix if it shows.
+7. **MIC_VDD noise.** PA5 (pin 15) sits 2 pins from GA_N (pin 17) and 5 from VLXSMPS (pin 20); MIC_VDD passes 0.90 mm from GA_N on B; no RC filter, X5R bypass only; mic PSRR unspecified above 1 kHz. Model: LN-M01 26.5 dB pessimistic, 14.0 dB worst (PASS). *Closes it:* a self-noise capture (USB stream, bridge on/off, SMPS vs LDO); a series R + C on MIC_VDD is the cheap fix if it shows.
 8. **MP-01 self-hearing** (shaped PWM noise, 20-85 kHz) via rail, ground or exciter vibration. PWM rate is firmware (200/400/800 kHz). *Closes it:* S2 coupling measurement.
-9. R2 sits at the mic end, so the 16.6 mm N$2 run carries the fast edge. Edge at the mic must stay <= 3 ns. *Closes it:* move R2 to PB3 in the together-session (O14); check GPIO speed setting.
-10. No probe point on MIC_CLK on rev 1; E6 needs R2's pad on B (board out of the shell).
-11. **Unpowered-mic back-feed.** Off-mode pin state isn't specified anywhere: park PB3/PB4 low/analog when PA5 is low (proposed firmware rule). Firmware can't cover two states: **reset and ROM DFU**, where PB4 is NJTRST with an internal pull-up and back-feeds MIC_DATA while MIC_VDD floats (sub-debug-test ROM table). Breaks "Off really is off" (D12) only in those states. *Closes it:* meter MIC_VDD in reset and DFU at bring-up (sub-debug-test step 6); if it lifts, the boot stub parks PB4 first, or the mic supply gets a pull-down.
-12. Missing diagram: acoustic-path cross-section (lid, gap, board, mic, offset). `pcb-floorplan-rev1.png` is outdated (28 x 13 board).
+11. **Unpowered-mic back-feed.** Park PB3/PB4 low/analog when PA5 is low (proposed firmware rule). Firmware can't cover **reset and ROM DFU**, where PB4 is NJTRST with an internal pull-up and back-feeds MIC_DATA while MIC_VDD floats (sub-debug-test ROM table). Breaks "Off really is off" (D12) only in those states. *Closes it:* meter C13 pad (5.12, 5.08) and TP10 in reset and DFU at bring-up (sub-debug-test step 6).
+12. **Acoustic diagram:** `sim/acoustics/out/port_path.png` plots the modelled path; no dimensioned CAD cross-section (lid, window, bore, VHB, board, mic) for the owner yet. `pcb-floorplan-rev1.png` is outdated.
+13. **63 kHz duct resonance is the EQ target** (O24 named ~84.7 kHz for the Rev F chimney; Phase 2 moves it to 63.0 kHz, Q6.4). *Closes it:* firmware EQ notch constant set from a bench sweep on board 1 (O18 knob); spec O24 text still says 84.7 kHz (owner's record, not edited here).
+14. **MC run on disk (n 40) differs from the ECR-0018 log (n 60).** p50 4.30 vs 4.51 dB, R14 all-pass 0.57 vs 0.70. *Closes it:* re-run `sim/acoustics` MC at n 60 (fenced) and quote one run everywhere (reg-board phase2_board.acoustics too).
+15. **Gauge-pin and hole tolerances are assumed** ([A] in `dims_r2.duct_offsets()`: JLC NPTH +-0.05, outline +-0.2, print bore position 0.05). *Closes it:* JLC capability page read + measured bore on a print before freeze.
 
 ## Before you change this, check
-- **Moving U2 or its footprint:** the port, not the body, must match the lid bore (`shell_r1.py` MIC) in **both** pods (centre line, O16-5); `reg-board.md`, `reg-pod-body.md`, `physical.md`.
-- **Lid, shell, mesh, board thickness:** the duct (§8 rules), sealing (O12), coupon plan; EQ curve (C8).
+- **Moving U2 or its footprint:** `dims_r2.board_mic()` reads U2 from the routed board, so the duct follows it automatically, but it asserts rot 90; the port (not the body) sets the duct in **both** pods (centre line y 6.0, O16-5); `reg-board.md`, `reg-pod-body.md`, `physical.md`; run `tools/checks/interfaces.py` [mic-port] and `sim/acoustics` (scenario `phase2_r2`).
+- **Lid, plate, VHB thickness, mesh, board thickness:** the duct (§8 rules), sealing (O12), the 63 kHz resonance and EQ (C8), coupon plan.
 - **PA5 / PB3 / PB4:** pin map (`integration-map.md` §4); ADF only exists on PB3/PB4, MDF on PB8/PB1; D12 Off current.
 - **Clock or decimation:** `sub-processing.md` clock tree (integer ratios, even divider), D14.
-- **Anything new near the mic** (bridge, SMPS, Class-2 caps, vias): D11, D13, MP-01.
+- **Anything new near the mic** (bridge, SMPS, Class-2 caps, vias): D11, D13, MP-01; re-run `sim/noise` (LN-M01/M02).
 - **Mic part swap:** `sim/data/` response, power budget (`sub-power.md`), `sim/dsp/pipeline.py` constants.
-- Run the cross-check in `integration-map.md` §10.
+- Run `python3 tools/plm.py impact SUB-AUDIO-IN` and the cross-check in `integration-map.md` §10.
 
-## Change log
-- 2026-10-01: created from gen.py Rev E, the rev-1 draft board probe (19:44 route), shell_r1.py, spec v0.14, mic datasheet Rev B-1 and DS13737 Rev 10. Found issues 1-3.
-- 2026-10-01 (editor pass): port position corrected to the board file, (3.13, 6.50), offset 0.77 mm, overlap 0.03 mm; issue 11 adds the reset/DFU back-feed through PB4's NJTRST pull-up; mic stock 960 (falling); spec line refs moved to v0.15 (O16 L642, task D2 L688).
+## Reference design (Rev F/G)
+`ULTRASONIC_DESIGN=revg` (`hw/current.yaml` reference): two-face 34 x 13 board `hw/pod/draft_r1/pod_r1_routed.kicad_pcb`, shell `hw/mech/shell_r1.py`. U2 origin (4.67, 6.5), port (3.9, 6.5) = pod x 34.5 (ECR-0011 aligned it; Rev E was 0.77 mm off). Duct: lid bore D1.0 0.9 long + hex window, **open 1.5 mm gap** board-to-lid (no seal, a water path and a side cavity); acoustics `as_built` mean -2.5 dB (MC p05 -9.3), resonance at 84.7 kHz Q15.5 for the D1.0 chimney option. R2 0402 at the mic end of a 16.6 mm N$2 run; C13 0402 X7R. Layout noise on Rev F: LN-M01 23.1 dB, LN-M02 12.2 dB (0.2 dB margin). History: git.
