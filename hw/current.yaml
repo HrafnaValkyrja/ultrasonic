@@ -1,0 +1,38 @@
+# THE single pointer to the current pod design (owner rule: one source of truth for "which files are the design").
+# Every tool that needs a default board / netlist / BOM / shell reads this through tools/current.py (current()).
+# Never hard-code these paths in a tool again: a noise sim once ran half a day on a stale board (2026-10-02, Rev E fanout).
+# Switch design: edit the top block (and keep `reference`), or per run: env ULTRASONIC_DESIGN=revg selects `reference`.
+# Paths are repo-relative. updated: 2026-10-07
+schema: 1
+updated: 2026-10-07
+id: phase2
+name: "Phase-2 miniaturised pod (package set MZ-2 'Balanced'), one-face board 30 x 12 x 0.8"
+ecr: ECR-0018
+owner_decision: O26
+packages: mz2                                   # env POD_PACKAGES for hw/pod/gen.py (gen.py's own default stays revG)
+generate: "POD_PACKAGES=mz2 python3 hw/pod/gen.py"   # writes netlist + bom below
+board: hw/pod/draft_r2/out/routed.kicad_pcb     # routed, DRC 0 (read only for every tool)
+board_placed: hw/pod/draft_r2/out/placed.kicad_pcb
+placement: hw/pod/draft_r2/placement.yaml
+netlist: hw/pod/pod_mz2.net
+bom: hw/pod/bom_jlc_mz2.csv
+shell: hw/mech/shell_r2.py
+shell_dims: hw/mech/dims_r2.py                  # CAD-free constants of shell_r2 (import-safe: numpy only)
+shell_out: hw/mech/out/r2
+acoustic_scenario: phase2_r2                    # sim/acoustics/port.py scenario that encodes this shell's duct stack
+
+reference:                                      # Rev G / Rev F reference design: kept in the repo, never deleted
+  id: revg
+  name: "Rev G schematic / Rev F board (Phase 1), 34 x 13 x 0.8, parts on both faces"
+  ecr: null
+  packages: revG
+  generate: "python3 hw/pod/gen.py"
+  board: hw/pod/draft_r1/pod_r1_routed.kicad_pcb
+  board_placed: hw/pod/draft_r1/pod_r1_placed.kicad_pcb
+  placement: hw/pod/place_r1.py
+  netlist: hw/pod/pod.net
+  bom: hw/pod/bom_jlc.csv
+  shell: hw/mech/shell_r1.py
+  shell_dims: hw/mech/shell_r1.py               # AST-parsed by the tools (never imported)
+  shell_out: hw/mech/out/r1
+  acoustic_scenario: as_built

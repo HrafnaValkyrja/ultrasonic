@@ -1,0 +1,161 @@
+"""CAD-free dimensions of the Phase-2 pod shell (hw/mech/shell_r2.py, ECR-0018): the single source of its numbers.
+
+    import sys; sys.path.insert(0, "hw/mech"); import dims_r2 as D     # numpy only (via frame.py); no build123d
+shell_r2.py builds the solids from these; tools read them without loading the CAD kernel (tools/current.py `shell_dims`):
+tools/checks/interfaces.py (mic port, switch, outline, heights, VHB face, frame), sim/acoustics/geometry.py (duct stack).
+Split out of shell_r2.py on 2026-10-07 with every value unchanged (verified: all upper-case names identical before/after).
+Board-derived values (U2_XY, MIC_XY, F_PADS) are read from the Phase-2 routed board and placement.yaml at import.
+"""
+from __future__ import annotations
+
+import math
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]
+if str(HERE) not in sys.path:
+    sys.path.insert(0, str(HERE))
+import frame as F  # noqa: E402
+
+# ---------------------------------------------------------------- stack-up (pod frame, mm; x fwd->rear, y out, z up)
+X0, X1 = 29.5, 67.5                    # L 38.0 = 2 x 0.8 + 0.3 + cell 35 + rear gap 1.1 (size model)
+W = 0.8
+Y_IN = F.Y_IN                          # 4.3 inner face on the adapter (frame.py)
+TAPE = 0.3                             # cell VHB gap (0.25 tape)
+CELL_T, B_GAP, PCB_T, F_GAP, LID_T, PLATE_T = 5.3, 1.4, 0.8, 0.30, 0.8, 0.7
+Y_CELL0 = Y_IN + W + TAPE              # 5.4
+Y_CELL1 = Y_CELL0 + CELL_T             # 10.7
+Y_B = Y_CELL1 + B_GAP                  # 12.1 board B face
+Y_F = Y_B + PCB_T                      # 12.9 board F face
+Y_LID_IN = Y_F + F_GAP                 # 13.2 lid inner face
+Y_OUT = Y_LID_IN + LID_T               # 14.0 body outer face
+Y_TOP = Y_OUT + PLATE_T                # 14.7 armour plate top
+Y_SPLIT = Y_B                          # seam: tub | lid, at the board's B face
+VHB_T = 0.25                           # 3M VHB 4914 nominal (physical.md row 5.1-5.4)
+Z0 = -9.7                              # bottom kept from r1 (heel, strut relief and NiTi clearances unchanged)
+H = 2 * W + 12.0 + 0.8 + 0.1           # 14.5: cell 12 + s_fixed 0.8 under + 0.1 over (size model)
+Z1 = Z0 + H                            # 4.8
+BELLY_D = 2.8 + 0.85 - (W + 0.8)       # 2.05: target 2.8 + flat tails 0.85 - (wall + slack under the cell)
+Z_BELLY = Z0 - BELLY_D                 # -11.75
+X_BELLY = X0 + 25.5                    # 55.0 (DOCKS['flat_tails'].L)
+CAV = dict(x0=X0 + W, x1=X1 - W, y0=Y_IN + W, y1=Y_LID_IN, z0=Z0 + W, z1=Z1 - W)
+BAY = dict(x0=X0 + W, x1=X_BELLY - W, z0=Z_BELLY + W, z1=CAV["z0"])
+CELL = dict(x0=CAV["x0"] + 0.3, x1=CAV["x0"] + 0.3 + 35.0, y0=Y_CELL0, y1=Y_CELL1, z0=CAV["z0"] + 0.8, z1=CAV["z0"] + 12.8)
+
+# ---------------------------------------------------------------- board (hw/pod/draft_r2/placement.yaml)
+PCB_L, PCB_H, PCB_R = 30.0, 12.0, 1.0
+X_STOP_GAP = 0.25                      # coarse x-stop: front skirt wall to board front edge
+PCB = dict(x0=CAV["x0"] + X_STOP_GAP, y0=Y_B, y1=Y_F, z0=(CAV["z0"] + CAV["z1"]) / 2 - PCB_H / 2)
+PCB["x1"], PCB["z1"] = PCB["x0"] + PCB_L, PCB["z0"] + PCB_H
+
+
+def bpt(bx, by):
+    """board (x, y) -> pod (x, z). Board +y = pod +z (the right pod's mirror flips it; mic and SW1 sit on y 6.0)."""
+    return PCB["x0"] + bx, PCB["z0"] + by
+
+
+MIC_HOLE_D = 0.6
+def board_mic():
+    """U2 centre and its port hole (board mm) read from the routed Phase-2 board, so the duct follows the layout."""
+    import re
+    f = Path(__file__).resolve().parents[1] / "pod/draft_r2/out/routed.kicad_pcb"
+    s = f.read_text()
+    i = s.index('"Reference" "U2"')
+    blk = s[s.rfind("(footprint ", 0, i):i]
+    x, y, rot = (float(v) for v in re.search(r"\(at ([\d.\-]+) ([\d.\-]+) ([\d.\-]+)\)", blk).groups())
+    assert abs(rot - 90) < 1e-6, "port-hole offset below assumes U2 at rot 90"
+    return (x, y), (x - 0.77, y)      # Knowles LGA port hole at local (0, -0.77)
+
+
+U2_XY, MIC_XY = board_mic()            # 2026-10-07: (2.65, 6.0) / (1.88, 6.0) after route closure v6
+MIC = bpt(*MIC_XY)                     # board hole = duct axis (nominal offset 0)
+SW = bpt(18.5, 6.0)
+U2 = dict(c=bpt(*U2_XY), dx=2.65, dz=3.5, h=1.08)          # Knowles LGA 3.5 x 2.65, rot 90; tallest B part
+SW1 = dict(body=(3.0, 2.6), pads=(3.8, 2.6), h=0.65, travel=(0.05, 0.15, 0.25))  # KMT022: 3.0x2.6x0.65; travel 0.15+-0.1
+B_MAX = 1.08                           # tools/checks/part_heights.yaml: U2
+PAD_ZONE = (25.0, 30.0)                # rear wire pads, board x
+
+
+def _f_pads():
+    """Bare F-face pads other than SW1 (TP1-TP6 since the 2026-10-03 00:28 placement edit), read live from the file."""
+    try:
+        import yaml
+        pl = yaml.safe_load((ROOT / "hw/pod/draft_r2/placement.yaml").read_text())
+        return {k: (v[0], v[1]) for k, v in pl.items() if isinstance(v, list) and len(v) >= 4 and v[3] == "F" and k != "SW1"}
+    except Exception:          # noqa: BLE001  (the shell must build without the board file)
+        return {}
+
+
+F_PADS = _f_pads()
+TP_PAD_D, TP_CUT_MARGIN = 1.0, 0.4     # [A] test-pad copper D1.0; VHB kept 0.4 clear so the pads stay clean
+
+# ---------------------------------------------------------------- lid features
+DUCT_D = 1.0                           # O24: ID 1.0; bore printed undersize and reamed with a 1.0 drill
+HEX_R, HEX_DEPTH = 1.9, 0.8            # r1 window (mesh seat), cut down from the plate top
+POCKET = dict(dx=4.3, dz=3.1, top=Y_LID_IN + 0.6)     # SW1 pocket: 4.3 x 3.1, ceiling at y 13.8
+BORE_D, PUCK_D, NUB_D, NUB_H = 2.6, 2.3, 1.0, 0.10
+SKIN_D, SKIN_T = 4.6, 0.25
+SKIN_FLOOR = Y_TOP - SKIN_T            # 14.45
+PRE_GAP = 0.07                         # nominal puck top -> skin underside (selective fit keeps it in 0.005..0.135)
+PUCK_L = SKIN_FLOOR - PRE_GAP - (Y_F + SW1["h"])        # 0.83 nominal
+PUCK_STEP = 0.05
+PUCK_KIT = tuple(round(PUCK_L + k * PUCK_STEP, 2) for k in (-2, -1, 0, 1, 2))   # print all 5, measure, fit one
+
+Y_MID = (Y_IN + Y_OUT) / 2
+DOCK = dict(x0=31.5, x1=52.7, y0=Y_MID - 3.43, y1=Y_MID + 3.43, z0=Z_BELLY, z1=Z_BELLY + 2.8)   # YZT0675 21.2 x 6.86 x 2.8
+TONGUE_W, TONGUE_H, GROOVE_CL, CORNER_KEEP = 0.35, 0.5, 0.05, 1.4
+STEP_H = 0.35                          # belly-step key: its top must stay below the hanging board's lower edge (sweep)
+
+
+# ---------------------------------------------------------------- checks
+def duct_offsets():
+    """Bore axis vs board-hole axis. Tolerances: [A] assumed, verify before freeze."""
+    tol = dict(
+        print_bore_pos=0.05,          # [A] resin print, bore position vs any lid feature (frame.RESIN class)
+        bore_ream=(1.00, 1.02),       # reamed with a 1.0 drill, +0.02 [A]
+        pin_body=0.98, pin_tip=0.50, pin_runout=0.02,   # stepped gauge pin [A] (turned brass)
+        hole=(0.55, 0.65),            # NPTH D0.6 +-0.05 [A: JLC capability, verify]
+        outline_to_hole=0.20,         # [A] JLC routed outline +-0.2 (verify), sets the edge-stop error
+    )
+    pin_r = (tol["bore_ream"][1] - tol["pin_body"]) / 2 + (tol["hole"][1] - tol["pin_tip"]) / 2 + tol["pin_runout"]
+    stop_dx = X_STOP_GAP + tol["outline_to_hole"] + tol["print_bore_pos"]
+    stop_dz = (CAV["z1"] - CAV["z0"] - PCB_H) / 2 + tol["outline_to_hole"] + tol["print_bore_pos"]
+    hole = bpt(*board_mic()[1])         # re-read: the duct must sit on the board's port hole as built
+    nominal = math.hypot(MIC[0] - hole[0], MIC[1] - hole[1])
+    lim = DUCT_D / 2 - MIC_HOLE_D / 2
+    # the pin must never be fought by the x-stop / skirt walls: wall gap > outline error
+    walls_free = X_STOP_GAP > tol["outline_to_hole"] and (CAV["z1"] - CAV["z0"] - PCB_H) / 2 > tol["outline_to_hole"]
+    return dict(limit_R_ACO_P5=round(lim, 3), nominal=round(nominal, 3),
+                worst_walls_only=round(math.hypot(stop_dx, stop_dz), 3), worst_walls_only_pass=math.hypot(stop_dx, stop_dz) <= lim,
+                worst_with_gauge_pin=round(pin_r, 3), worst_with_gauge_pin_pass=pin_r <= lim + 1e-9,
+                walls_never_fight_pin=walls_free, tolerances=tol)
+
+
+def switch_stack():
+    """Puck top -> skin underside. Negative = switch pre-pressed. Tolerances [A] (C&K gives 0.65 nominal only)."""
+    t = dict(vhb=0.025, sw_h=0.05, solder_lift=(0.0, 0.05), puck_print=0.05, recess_floor=0.05, lid_face=0.03)
+    sym = t["vhb"] + t["sw_h"] + t["puck_print"] + t["recess_floor"] + t["lid_face"]
+    g_min, g_max = PRE_GAP - sym - t["solder_lift"][1], PRE_GAP + sym
+    rss = math.sqrt(t["vhb"] ** 2 + t["sw_h"] ** 2 + t["puck_print"] ** 2 + t["recess_floor"] ** 2 + t["lid_face"] ** 2 + 0.025 ** 2)
+    # selective fit: gauge the skin-floor -> SW1-top depth through the bore (+-0.02), measure each printed puck
+    # (calipers +-0.02; its print error drops out), fit the one that leaves PRE_GAP: residual = half a kit step + both
+    sel_err = PUCK_STEP / 2 + 0.02 + 0.02
+    sel = (PRE_GAP - sel_err, PRE_GAP + sel_err)
+    tmin = SW1["travel"][0]
+    return dict(nominal_gap=PRE_GAP, puck_L=round(PUCK_L, 3), puck_kit=PUCK_KIT,
+                fixed_worst=[round(g_min, 3), round(g_max, 3)], fixed_rss=[round(PRE_GAP + 0.025 - rss, 3), round(PRE_GAP + 0.025 + rss, 3)],
+                fixed_worst_prepress=g_min < -tmin, selective_fit=[round(sel[0], 3), round(sel[1], 3)],
+                selective_fit_ok=sel[0] >= 0.0 and sel[1] < 0.3,
+                pocket_ceiling_clear_nominal=round(POCKET["top"] - (Y_F + SW1["h"]), 3),
+                pocket_ceiling_clear_worst=round(POCKET["top"] - (Y_F + SW1["h"]) - t["vhb"] - t["sw_h"] - t["solder_lift"][1] - t["lid_face"], 3),
+                rule_travel_min=tmin, tolerances=t)
+
+
+def interface_facts():
+    """The facts the board interfaces rest on, in the shape tools/checks/interfaces.py uses (pod frame mm)."""
+    return dict(PCB=dict(PCB), CAV=dict(CAV), MIC=MIC, SWITCH=SW, ZC=PCB["z0"] + PCB_H / 2, X0=X0, X1=X1, Z0=Z0, CELL=dict(CELL),
+                mic_port_d=DUCT_D, mic_hole_d=MIC_HOLE_D, switch_bore_d=BORE_D, plunger_head_d=PUCK_D,
+                bands=dict(B=B_GAP, F=F_GAP), pocket=dict(ref="SW1", centre=SW, dx=POCKET["dx"], dz=POCKET["dz"], band=POCKET["top"] - Y_F),
+                vhb=dict(t=VHB_T, inset=0.2, duct_d=DUCT_D, tp_cut_r=TP_PAD_D / 2 + TP_CUT_MARGIN, f_pads=dict(F_PADS)),
+                x_stop_gap=X_STOP_GAP)
