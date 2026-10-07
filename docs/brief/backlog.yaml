@@ -142,7 +142,7 @@ fw_agent:   # owned by the firmware agent (fw/, docs/sim/firmware-emulation.yaml
 item_dep:   # waits on another item
   - {id: RPB-9, t: "r2 render dump + STEP export", blk: "item:ECR-0018 owner review edits"}
   - {id: RPB-13, t: "seam corner butt joints: sealant bead or corner key", blk: "item:RPB-5 (sealing note) -> note done 2026-10-07: rec = RTV fillet bead in each corner (S2); confirm on the spray coupon (hardware)"}
-  - {id: UI-4, t: "button skin material", blk: "item:RPB-5 -> note done 2026-10-07 (S4: 0.2-0.3 silicone + primer or captured under the plate); product pick open (unblocked)"}
+  - {id: UI-4, t: "button skin material", blk: "owner-confirm (feel)", st: "options written 2026-10-07 (sub-ui issue 4)", opts: "A (rec) Wacker ELASTOSIL Film 2030 silicone film 300 um (+-5 %, compression set 5 %, glues with silicone adhesive) in a recess deepened to 0.30 (puck kit -0.05) / B 0.25 TPU film (easy bond, stiffer, creeps) / C moulded Sugru (no purchase, poor thickness control)"}
   - {id: RPB-3, t: "body-side mic path", blk: "item:SAI-3, SAI-13"}
 
 info_only:   # check WARNs that are tracked elsewhere, not work items

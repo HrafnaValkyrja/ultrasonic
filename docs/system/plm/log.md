@@ -491,3 +491,7 @@
 - 2026-10-07 15:57 review R-AUDIO-BODY by backlog-agent: CHK-MODELS: only the 3D model path changed in the Knowles/KMT022 library footprints (pads, hole unchanged); interfaces mic-port/heights PASS
 - 2026-10-07 15:57 review REG-BOARD by backlog-agent: CHK-MODELS: only the 3D model path changed in the Knowles/KMT022 library footprints (pads, hole unchanged); interfaces mic-port/heights PASS
 - 2026-10-07 15:57 checkin REG-BOARD by backlog-agent
+- 2026-10-07 15:58 checkout SUB-UI by backlog-agent: UI-4 skin options
+- 2026-10-07 15:58 review SUB-UI by backlog-agent: UI-4: skin options with ELASTOSIL Film 2030 TDS; owner-confirm; docs only
+- 2026-10-07 15:58 review R-UI-BODY by backlog-agent: UI-4: skin options with ELASTOSIL Film 2030 TDS; owner-confirm; docs only
+- 2026-10-07 15:58 checkin SUB-UI by backlog-agent
