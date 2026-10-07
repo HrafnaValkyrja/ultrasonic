@@ -365,6 +365,16 @@ int main(void)
         CHECK(usb_desc_string(4u, uid, w, 40u) == 0u);
         CHECK(usb_desc_string(1u, uid, w, 5u) == 5u && (w[0] & 0xFFu) == 10u);             /* truncated to the buffer, still well-formed */
     }
+
+    /* ==== round 11: DFU request = backup-register flag, then system reset */
+    rf_reset();
+    {
+        uint32_t r0 = rf_resets();
+        hal_usb_dfu_request();
+        CHECK(reg_read(TAMP_BKP0R) == FW_DFU_MAGIC && rf_resets() == r0 + 1u);
+        CHECK((reg_read(PWR_DBPR) & 1u) && (reg_read(RCC_APB3ENR) & (1u << 21)));
+        CHECK((uint32_t)rf_find(TAMP_BKP0R, 0u) < rf_nlog() && rf_find(PWR_DBPR, 0u) < rf_find(TAMP_BKP0R, 0u));
+    }
     printf("{\"checks\": %u, \"fails\": %u}\n", checks, fails);
     return fails ? 1 : 0;
 }

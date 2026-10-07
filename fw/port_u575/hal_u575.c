@@ -29,7 +29,6 @@ void hal_power_ucpd_dbdis(void) {}
 
 
 
-void hal_usb_dfu_request(void) {}
 
 hal_status_t hal_flash_erase_page(uint32_t page) { (void)page; return HAL_ENOTIMPL; }
 hal_status_t hal_flash_program_qw(uint32_t offset, const uint8_t qw[HAL_FLASH_QW_BYTES]) { (void)offset; (void)qw; return HAL_ENOTIMPL; }

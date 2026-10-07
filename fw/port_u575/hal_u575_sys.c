@@ -321,3 +321,27 @@ hal_status_t hal_usb_enable(bool on)
     }
     return HAL_OK;
 }
+
+/* ---------------------------------------------------------------------------------------------- DFU handoff (FWSIM-R21) */
+#if defined(FW_REG_RECORD)
+void u575_system_reset(void);                                    /* the test records it */
+#else
+static void u575_system_reset(void)
+{
+    __asm volatile("dsb" ::: "memory");
+    REG_W(SCB_AIRCR, (0x05FAu << 16) | (1u << 2));               /* SYSRESETREQ */
+    for (;;) {
+    }
+}
+#endif
+
+/* flag in TAMP backup register 0, then a system reset: Reset_Handler (startup.c) sees the flag before any clock or peripheral is touched,
+ * clears it and jumps to the ROM loader, which enumerates USB DFU (AN2606). A clean reset keeps the loader's assumptions (MSIS, no IRQs). */
+void hal_usb_dfu_request(void)
+{
+    REG_SET(RCC_AHB3ENR, 1u << 2);
+    REG_SET(PWR_DBPR, 1u);
+    REG_SET(RCC_APB3ENR, 1u << 21);                              /* RTCAPBEN: TAMP register clock */
+    REG_W(TAMP_BKP0R, FW_DFU_MAGIC);
+    u575_system_reset();
+}

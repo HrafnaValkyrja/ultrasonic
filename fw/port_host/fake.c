@@ -51,7 +51,7 @@ static struct {
     bool vbus, usb_on;
     uint8_t usb_rx[512], usb_tx[512];
     size_t usb_rx_n, usb_rx_i, usb_tx_n;
-    uint32_t dfu_requests;
+    uint32_t dfu_requests, usb_cfg;
     uint8_t flash[FLASH_BYTES];
     uint32_t flash_ops, flash_fail_at, flash_dead, flash_ecc;
     uint32_t wdt_started, wdt_ms, wdt_kicks;
@@ -503,6 +503,14 @@ hal_status_t hal_usb_enable(bool on)
     F.usb_on = on;
     return HAL_OK;
 }
+bool hal_usb_configured(void)
+{
+    if (enter(FAKE_FN_hal_usb_configured, 0u, 0u) != HAL_OK)
+        return false;
+    return F.usb_on && F.usb_cfg;
+}
+void fake_usb_configured(bool cfg) { F.usb_cfg = cfg; }
+uint32_t fake_dfu_requests(void) { return F.dfu_requests; }
 size_t hal_usb_cdc_write(const uint8_t *buf, size_t len)
 {
     if (enter(FAKE_FN_hal_usb_cdc_write, (uint32_t)len, 0u) != HAL_OK || !F.usb_on || buf == NULL)

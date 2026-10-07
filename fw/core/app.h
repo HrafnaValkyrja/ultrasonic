@@ -20,6 +20,9 @@ typedef struct {
     uint32_t mic_on, led_duty_ppm, stops, last_wake;
     fw_chg_t chg;
     uint32_t usb_on, cdc_replies;          /* OTG_FS powered (FWSIM-R28: only while PA1 shows VBUS) */
+    uint32_t usb_cfg;                      /* host configured, not suspended: charger ILIM 500 mA (FWSIM-R20) */
+    uint32_t dfu_prep, dfu_refusals, dfu_handoffs;   /* FWSIM-R21 handoff: charger watchdog off while the ROM loader runs */
+    uint64_t dfu_since_us;
     fw_cdc_frame_t cdc;
 } fw_app_t;
 

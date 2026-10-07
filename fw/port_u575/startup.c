@@ -38,8 +38,28 @@ __attribute__((section(".isr_vector"), used)) const vec_t vector_table[16u + U57
 
 #define SCB_CPACR (*(volatile uint32_t *)0xE000ED88u)
 
+/* FWSIM-R21 DFU entry: hal_usb_dfu_request left FW_DFU_MAGIC in TAMP_BKP0R and reset. Checked first, with only PWR/RTC-APB clocks
+ * turned on; the flag is cleared before the jump so the loader's own reset returns to the application. */
+static void dfu_check(void)
+{
+    volatile uint32_t *const ahb3 = (volatile uint32_t *)0x46020C94u, *const apb3 = (volatile uint32_t *)0x46020CA8u;
+    volatile uint32_t *const dbpr = (volatile uint32_t *)0x46020828u, *const bkp0 = (volatile uint32_t *)0x46007D00u;
+    *ahb3 |= 1u << 2;                                          /* PWREN */
+    *apb3 |= 1u << 21;                                         /* RTCAPBEN */
+    __asm volatile("dsb" ::: "memory");
+    if (*bkp0 != 0xDF00B007u)
+        return;
+    *dbpr |= 1u;
+    *bkp0 = 0u;
+    *dbpr &= ~1u;
+    const volatile uint32_t *rom = (const volatile uint32_t *)0x0BF90000u;
+    uint32_t sp = rom[0], pc = rom[1];
+    __asm volatile("msr msp, %0\n bx %1" ::"r"(sp), "r"(pc) : "memory");
+}
+
 void Reset_Handler(void)
 {
+    dfu_check();
     SCB_CPACR |= 0xFu << 20;                                  /* CP10/CP11 full access: FPU on */
     __asm volatile("dsb\n isb" ::: "memory");
     uint32_t fpscr;

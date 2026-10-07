@@ -165,6 +165,10 @@ uint32_t reg_read(uint32_t addr);
 #define ADF_DFLT0ISR 0x0B0u                 /* rc_w1: DOVRF 1, SATF 9, CKABF 10, RFOVRF 11 */
 #define DMA_ADF_CH 6u                       /* GPDMA1 channel for ADF1 FLT0 (REQSEL 98, Table 137) */
 
+#define TAMP_BKP0R 0x46007D00u              /* TAMP 0x4600 7C00 + 0x100: backup register 0 (survives system reset; RTCAPBEN clocks TAMP) */
+#define FW_DFU_MAGIC 0xDF00B007u            /* hal_usb_dfu_request -> Reset_Handler: jump to the ROM loader */
+#define ROM_LOADER 0x0BF90000u              /* RM0456 Rev 7 boot table: bootloader at 0x0BF9 0000 (TZEN = 0) */
+#define SCB_AIRCR  0xE000ED0Cu              /* VECTKEY 0x05FA, SYSRESETREQ bit 2 */
 #define OTG_BASE   0x42040000u              /* OTG_FS 0x4204 0000 */
 #define OTG_GUSBCFG 0x00Cu                  /* bit 30 FDMOD */
 #define OTG_GCCFG  0x038u                   /* bit 16 PWRDWN (1 = transceiver on), bit 21 VBDEN */

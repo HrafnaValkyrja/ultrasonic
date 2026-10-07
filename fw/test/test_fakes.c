@@ -36,6 +36,7 @@ static void call_every_hal_function(void)
     (void)hal_i2c_recover();
     (void)hal_usb_vbus();
     (void)hal_usb_enable(false);
+    (void)hal_usb_configured();
     (void)hal_usb_cdc_write(b, 1u);
     (void)hal_usb_cdc_read(b, 1u);
     hal_usb_dfu_request();
@@ -71,7 +72,7 @@ void test_fakes_coverage(void)
         TF_CHECK(fake_log_find((fake_fn_t)f, 0u) >= 0);
     }
     TF_CHECK_EQ(fake_log_len(), FAKE_FN_COUNT);
-    TF_CHECK_EQ(FAKE_FN_COUNT, 45);
+    TF_CHECK_EQ(FAKE_FN_COUNT, 46);
 }
 
 void test_fakes_fault_injection(void)

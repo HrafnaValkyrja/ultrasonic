@@ -180,6 +180,9 @@ void u575_usb_core_start(void)
     reg_write(OTG_BASE + OTG_DCTL, reg_read(OTG_BASE + OTG_DCTL) & ~(1u << 1));
 }
 void u575_usb_core_stop(void) { reg_write(OTG_BASE + OTG_DCTL, reg_read(OTG_BASE + OTG_DCTL) | (1u << 1)); }
+static uint32_t resets;
+void u575_system_reset(void) { resets++; }
+uint32_t rf_resets(void) { return resets; }
 void u575_wfi(void)                                    /* "hardware": the wake source the test scripted raises its flag */
 {
     if (wake_flag == 1u) rf_poke(PWR_WUSR, 1u);

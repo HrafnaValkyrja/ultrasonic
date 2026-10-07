@@ -7,6 +7,7 @@
 
 void fw_app_boot(fw_app_t *app)
 {
+    memset(app, 0, sizeof *app);                /* a boot is a power-on: nothing survives (the target's app is static, the tests reuse one) */
     fw_knobs_t k;
     app->store = fw_store_load(&k);
     fw_init(&app->st, &k, hal_time_us());
@@ -144,6 +145,8 @@ static void service_charger(fw_app_t *app, uint32_t force)
         force = 1u;
     }
     fw_chg_plan_t p = fw_chg_plan(&app->st.knobs, app->st.usb_enumerated, tv, t);
+    if (app->dfu_prep)
+        p.want[0x07] = (uint8_t)((p.want[0x07] & ~0x03u) | 0x03u);   /* WATCHDOG_SEL 11: the ROM loader never talks I2C (sub-dock-usb DFU path 3) */
     app->chg_ok = fw_chg_service(&app->chg, &app->st.knobs, &p, hal_time_us(), force);
 }
 
@@ -155,6 +158,12 @@ static void service_usb(fw_app_t *app, uint32_t pa1)
         if (hal_usb_enable(pa1 != 0u) == HAL_OK || !pa1)
             app->usb_on = pa1;
         fw_cdc_frame_init(&app->cdc);
+    }
+    uint32_t cfg = app->usb_on && hal_usb_configured() ? 1u : 0u;
+    if (cfg != app->usb_cfg) {                   /* enumeration / suspend / reset: charger ILIM follows at once */
+        app->usb_cfg = cfg;
+        fw_event(&app->st, FW_EV_USB_ENUMERATED, (int32_t)cfg, hal_time_us());
+        service_charger(app, 1u);
     }
     if (!app->usb_on)
         return;
@@ -169,6 +178,53 @@ static void service_usb(fw_app_t *app, uint32_t pa1)
             app->cdc_replies += (uint32_t)hal_usb_cdc_write(rep, r);
         }
     }
+}
+
+/* FWSIM-R21 DFU handoff. DFU_PENDING is reachable only from DOCKED_CHARGE (fsm.yaml): no output path is live. After FW_DFU_SETTLE_US (the
+ * ACK leaves on CDC) the guards are re-checked; all must hold, else DFU_ABORT back to charging (counted):
+ *   bridge off and break disarmed; PA1 VBUS present; USB configured (a host is there to run DFU); charger plan verified and no fault.
+ * Then: charger plan re-written with WATCHDOG_SEL = 11 and verified (the ROM loader never services I2C; a 160 s watchdog reset mid-update
+ * would drop the plan), mic and LED off, USB soft-disconnect (the host re-enumerates the ROM's DFU device), hal_usb_dfu_request. */
+#define FW_DFU_SETTLE_US 50000u
+static void service_dfu(fw_app_t *app)
+{
+    if (app->dfu_handoffs)
+        return;                                  /* the request returned: only the host fake does that */
+    if (app->st.sys.mode != (uint32_t)FW_ST_DFU_PENDING) {
+        app->dfu_since_us = 0u;
+        if (app->dfu_prep) {                     /* left DFU_PENDING (unplug, fault): watchdog back on */
+            app->dfu_prep = 0u;
+            service_charger(app, 1u);
+        }
+        return;
+    }
+    uint64_t now = hal_time_us();
+    if (app->dfu_since_us == 0u)
+        app->dfu_since_us = now;
+    if (now - app->dfu_since_us < FW_DFU_SETTLE_US)
+        return;
+    uint32_t ok = !app->bridge_on && hal_usb_vbus() && app->usb_cfg && app->chg_ok && !app->chg.fault;
+    if (ok) {
+        app->dfu_prep = 1u;
+        service_charger(app, 1u);                /* watchdog off, read back */
+        ok = app->chg_ok;
+    }
+    if (!ok) {
+        app->dfu_refusals++;
+        fw_event(&app->st, FW_EV_DFU_ABORT, 0, now);
+        app->dfu_prep = 0u;
+        service_charger(app, 1u);
+        return;
+    }
+    hal_adf_stop();
+    hal_gpio_write(BOARD_PIN_MIC_VDD, false);
+    app->mic_on = 0u;
+    (void)hal_led_set(0u);
+    app->led_duty_ppm = 0u;
+    (void)hal_usb_enable(false);
+    app->usb_on = 0u;
+    app->dfu_handoffs++;
+    hal_usb_dfu_request();                       /* target: backup-register flag + reset into the ROM loader; does not return */
 }
 
 void fw_app_step(fw_app_t *app)
@@ -202,6 +258,7 @@ void fw_app_step(fw_app_t *app)
     }
     service_usb(app, pa1);
     fw_poll(&app->st, hal_time_us());
+    service_dfu(app);
     apply_outputs(app);
     apply_mic_led(app);
     service_charger(app, force_chg);

@@ -71,3 +71,11 @@ uint16_t const *tud_descriptor_string_cb(uint8_t index, uint16_t langid)
                              *(const volatile uint32_t *)(UID_BASE + 8u)};
     return usb_desc_string(index, uid, s, 32u) ? s : NULL;
 }
+
+bool hal_usb_configured(void)
+{
+    if (!core_up)
+        return false;
+    tud_task();
+    return tud_mounted() && !tud_suspended();
+}

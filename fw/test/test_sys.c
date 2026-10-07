@@ -348,7 +348,7 @@ void test_charger_plan(void)
     fake_adc_script(HAL_ADC_TS, cool, 1u);
     app_run(&app, 30u);
     TF_CHECK_EQ(r[0x04] & 0x7Fu, (uint32_t)app.st.knobs.ichg_code_cool);
-    fw_event(&app.st, FW_EV_USB_ENUMERATED, 0, 0u);
+    fw_event(&app.st, FW_EV_USB_ENUMERATED, 1, 0u);
     fw_event(&app.st, FW_EV_CHG_INT, 0, 0u);
     app_run(&app, 2u);
     TF_CHECK_EQ(r[0x08] & 7u, 5);
@@ -560,4 +560,109 @@ void test_usb_cdc_lifecycle_clamp(void)
     }
     TF_CHECK_EQ(bad, 0u);
     TF_CHECK(app.cdc_replies >= 950u);                               /* ~1000 well-formed frames answered (garbage may swallow a few) */
+}
+
+/* FWSIM-R20 + R28: charger ILIM follows USB configuration: 100 mA docked on a dumb supply, 500 mA once a host configures the device,
+ * back to 100 mA on suspend / bus reset, and a replug starts again at 100 mA */
+void test_usb_ilim(void)
+{
+    static fw_app_t app;
+    app_boot_docked(&app, 2);
+    const uint8_t *r = fake_i2c_regs(0x6Au);
+    fake_vbus(true);
+    app_run(&app, 60u);
+    TF_CHECK_EQ(r[0x08] & 7u, 1);                                    /* dumb supply / not yet enumerated: 100 mA */
+    fake_usb_configured(true);
+    app_run(&app, 2u);
+    TF_CHECK(app.usb_cfg && app.st.usb_enumerated);
+    TF_CHECK_EQ(r[0x08] & 7u, 5);                                    /* 500 mA in the same pass */
+    fake_usb_configured(false);                                      /* host suspends */
+    app_run(&app, 2u);
+    TF_CHECK_EQ(r[0x08] & 7u, 1);
+    fake_usb_configured(true);
+    app_run(&app, 2u);
+    TF_CHECK_EQ(r[0x08] & 7u, 5);
+    fake_vbus(false);
+    app_run(&app, 60u);
+    TF_CHECK(!app.st.usb_enumerated && !app.usb_cfg);
+    fake_usb_configured(false);
+    fake_vbus(true);                                                 /* replug on a dumb charger */
+    app_run(&app, 60u);
+    TF_CHECK_EQ(r[0x08] & 7u, 1);
+}
+
+/* FWSIM-R21 DFU handoff via CDC: accepted only while charging docked; guards re-checked after the settle time; charger watchdog off
+ * (WATCHDOG_SEL 11) and verified before the request; USB soft-disconnected before it; any failed guard aborts back to DOCKED_CHARGE */
+void test_dfu_handoff(void)
+{
+    static fw_app_t app;
+    static const uint8_t dfu[3] = {0xA5u, 0x04u, 0x00u};
+    uint8_t tx[8];
+    /* happy path */
+    app_boot_docked(&app, 2);
+    const uint8_t *r = fake_i2c_regs(0x6Au);
+    fake_vbus(true);
+    fake_usb_configured(true);
+    app_run(&app, 60u);
+    TF_CHECK_EQ(app.st.sys.mode, FW_ST_DOCKED_CHARGE);
+    fake_usb_rx(dfu, sizeof dfu);
+    app_run(&app, 2u);
+    TF_CHECK_EQ(fake_usb_tx(tx, sizeof tx), 1u);
+    TF_CHECK_EQ(tx[0], 0x06u);
+    TF_CHECK_EQ(app.st.sys.mode, FW_ST_DFU_PENDING);
+    TF_CHECK_EQ(fake_dfu_requests(), 0u);                            /* not before the settle time */
+    app_run(&app, 60u);
+    TF_CHECK_EQ(fake_dfu_requests(), 1u);
+    TF_CHECK_EQ(r[0x07] & 3u, 3);                                    /* charger watchdog off for the ROM loader */
+    int32_t i_off = fake_log_find(FAKE_FN_hal_usb_enable, 0u), i_req = fake_log_find(FAKE_FN_hal_usb_dfu_request, 0u);
+    while (i_off >= 0 && fake_log_find(FAKE_FN_hal_usb_enable, (uint32_t)i_off + 1u) >= 0 &&
+           fake_log_find(FAKE_FN_hal_usb_enable, (uint32_t)i_off + 1u) < i_req)
+        i_off = fake_log_find(FAKE_FN_hal_usb_enable, (uint32_t)i_off + 1u);
+    TF_CHECK(i_off >= 0 && i_req > i_off && fake_log_at((uint32_t)i_off)->a0 == 0u);   /* soft disconnect right before the request */
+    TF_CHECK(!fake_pwm()->running);
+    /* guard: no configured host -> abort to charging, watchdog back on */
+    app_boot_docked(&app, 2);
+    r = fake_i2c_regs(0x6Au);
+    fake_vbus(true);
+    app_run(&app, 60u);
+    fake_usb_rx(dfu, sizeof dfu);
+    app_run(&app, 80u);
+    TF_CHECK_EQ(fake_dfu_requests(), 0u);
+    TF_CHECK_EQ(app.dfu_refusals, 1u);
+    TF_CHECK_EQ(app.st.sys.mode, FW_ST_DOCKED_CHARGE);
+    TF_CHECK_EQ(r[0x07] & 3u, 1);
+    /* guard: charger unreachable (plan not verifiable) -> abort */
+    app_boot_docked(&app, 2);
+    fake_vbus(true);
+    fake_usb_configured(true);
+    app_run(&app, 60u);
+    fake_usb_rx(dfu, sizeof dfu);
+    app_run(&app, 2u);
+    fake_fault(FAKE_FN_hal_i2c_write, 0u, 0xFFFFFFFFu, HAL_NACK);
+    fake_fault(FAKE_FN_hal_i2c_read, 0u, 0xFFFFFFFFu, HAL_NACK);
+    app_run(&app, 80u);
+    TF_CHECK_EQ(fake_dfu_requests(), 0u);
+    TF_CHECK(app.dfu_refusals >= 1u);
+    TF_CHECK(app.st.sys.mode != (uint32_t)FW_ST_DFU_PENDING);
+    fake_fault_clear();
+    /* not docked: DFU_REQ is NACKed (listening, output path live) */
+    app_boot_docked(&app, 2);
+    app_run(&app, 400u);
+    uint8_t rep = 0;
+    (void)fw_cdc_rx(&app.st, dfu, sizeof dfu, &rep, 1u);
+    TF_CHECK_EQ(rep, 0x15u);
+    TF_CHECK(app.st.sys.mode != (uint32_t)FW_ST_DFU_PENDING);
+#if FW_VAR_DOCKED_OUTPUT_MAX
+    /* docked self-test running: NACK, the drive keeps its own state machine */
+    app_boot_docked(&app, 2);
+    fake_vbus(true);
+    app_run(&app, 60u);
+    uint8_t arm[7] = {0xA5u, 0x01u, 4u, 0x38u, 0xFFu, 0x60u, 0x09u};
+    (void)fw_cdc_rx(&app.st, arm, sizeof arm, &rep, 1u);
+    app_run(&app, 20u);
+    TF_CHECK_EQ(app.st.sys.mode, FW_ST_DOCKED_SELFTEST);
+    (void)fw_cdc_rx(&app.st, dfu, sizeof dfu, &rep, 1u);
+    TF_CHECK_EQ(rep, 0x15u);
+    TF_CHECK_EQ(app.st.sys.mode, FW_ST_DOCKED_SELFTEST);
+#endif
 }

@@ -50,7 +50,8 @@ typedef enum {
     FW_EV_BREAK,                              /* TIM1 break latched by the MDF1 out-of-limit detector (FWSIM-R65) */
     FW_EV_QUIET,                              /* idle detector: nothing to hear -> IDLE */
     FW_EV_WAKE,                               /* idle detector: activity -> back to the mode before IDLE */
-    FW_EV_USB_ENUMERATED,                     /* USB configured: charger ILIM may leave 100 mA (FWSIM-R20) */
+    FW_EV_USB_ENUMERATED,                     /* arg 1: USB configured and not suspended -> charger ILIM may leave 100 mA; arg 0: back to 100 mA (FWSIM-R20) */
+    FW_EV_DFU_ABORT,                          /* the app's DFU handoff guards failed: DFU_PENDING -> DOCKED_CHARGE (FWSIM-R21) */
     FW_EV_COUNT
 } fw_event_id_t;
 

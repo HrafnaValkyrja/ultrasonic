@@ -12,5 +12,6 @@ void rf_i2c_hold(uint32_t on);
 void rf_adc_code(uint32_t ch, uint16_t code);
 void rf_sda_stuck(uint32_t clocks);
 void rf_adc4_code(uint32_t ch, uint16_t code);
+uint32_t rf_resets(void);
 void rf_wake(uint32_t which);   /* 1 button (WUF1), 2 CHG_INT (EXTI15 falling), 3 VBUS (EXTI1 rising), 4 RTC (WUTF) */
 #endif

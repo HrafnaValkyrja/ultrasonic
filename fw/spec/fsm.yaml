@@ -5,7 +5,7 @@
 # COOLDOWN (brk_cooldown_ms since the fault latched). Gestures: the recogniser's raw gestures -> FSM events per option (knob gesture_option).
 schema: 1
 states: ["OFF", FULL, TRANSIENT, IDLE, DOCKED_CHARGE, DOCKED_SELFTEST, DFU_PENDING, SAFE]
-events: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT, FAULT_CLEAR]
+events: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, DFU_ABORT, FAULT, FAULT_CLEAR]
 actions: [NONE, VOL_STEP, LOAD_DEFAULTS, SAVE_PREV, ST_START, ST_END]
 guards: [ALWAYS, EXEMPTION, COOLDOWN]
 transitions:
@@ -15,7 +15,7 @@ transitions:
     G_NEXT: [DEFAULT, LOAD_DEFAULTS]
     VBUS_ON: [DOCKED_CHARGE]
     FAULT: [SAFE]
-    ignore: [G_VOL, G_OFF, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
+    ignore: [G_VOL, G_OFF, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR, DFU_ABORT]
   FULL:                     # steady tones must stay audible in Full mode, so the idle detector (which adapts to them) never sends it to IDLE
     G_TOGGLE: [TRANSIENT]
     G_NEXT: [TRANSIENT]
@@ -23,7 +23,7 @@ transitions:
     G_OFF: ["OFF"]
     VBUS_ON: [DOCKED_CHARGE]
     FAULT: [SAFE]
-    ignore: [G_ANY, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
+    ignore: [G_ANY, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR, DFU_ABORT]
   TRANSIENT:
     G_TOGGLE: [FULL]
     G_NEXT: ["OFF"]
@@ -32,7 +32,7 @@ transitions:
     QUIET: [IDLE, SAVE_PREV]
     VBUS_ON: [DOCKED_CHARGE]
     FAULT: [SAFE]
-    ignore: [G_ANY, VBUS_OFF, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
+    ignore: [G_ANY, VBUS_OFF, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR, DFU_ABORT]
   IDLE:                     # low-power listening: bridge stopped, wake detector running; a gesture acts on the mode it woke into
     WAKE: [PREV]
     G_TOGGLE: [PREV_TOGGLED]
@@ -41,26 +41,27 @@ transitions:
     G_OFF: ["OFF"]
     VBUS_ON: [DOCKED_CHARGE]
     FAULT: [SAFE]
-    ignore: [G_ANY, VBUS_OFF, QUIET, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
+    ignore: [G_ANY, VBUS_OFF, QUIET, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR, DFU_ABORT]
   DOCKED_CHARGE:            # ECR-0009: no output while docked
     VBUS_OFF: ["OFF"]
     ST_ARM: [DOCKED_SELFTEST, ST_START, EXEMPTION]
     DFU_REQ: [DFU_PENDING]
     FAULT: [SAFE]
-    ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, QUIET, WAKE, ST_STOP, ST_TIMEOUT, FAULT_CLEAR]
+    ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, QUIET, WAKE, ST_STOP, ST_TIMEOUT, FAULT_CLEAR, DFU_ABORT]
   DOCKED_SELFTEST:          # variant (a) exemption only: capped drive, max duration, stops within one hop of unplug
     ST_STOP: [DOCKED_CHARGE, ST_END]
     ST_TIMEOUT: [DOCKED_CHARGE, ST_END]
     VBUS_OFF: ["OFF", ST_END]
     FAULT: [SAFE, ST_END]
-    ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, QUIET, WAKE, ST_ARM, DFU_REQ, FAULT_CLEAR]
-  DFU_PENDING:              # the port resets into the boot stub (FWSIM-R21); unplug aborts
+    ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, QUIET, WAKE, ST_ARM, DFU_REQ, FAULT_CLEAR, DFU_ABORT]
+  DFU_PENDING:              # the port resets into the boot stub (FWSIM-R21); unplug aborts; the app's handoff guards abort back to charging
     VBUS_OFF: ["OFF"]
+    DFU_ABORT: [DOCKED_CHARGE]
     FAULT: [SAFE]
     ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
   SAFE:                     # FWSIM-R65 break latched (or another fault): bridge off until the cool-down, then Off
     FAULT_CLEAR: ["OFF", NONE, COOLDOWN]
-    ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT]
+    ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT, DFU_ABORT]
 gestures:                   # raw gesture -> event, per knob gesture_option (sub-ui.md issue 5); NONE = not used by that option
   raw: [SHORT, DOUBLE, HOLD1, HOLD2]
   A: {SHORT: G_NEXT, DOUBLE: NONE, HOLD1: G_VOL, HOLD2: NONE, hold1_repeats: 1, double: 0}
