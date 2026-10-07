@@ -216,3 +216,15 @@
 - 2026-10-07 12:05 review REG-ARM by claude-ecr0001: ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell
 - 2026-10-07 12:05 review REG-POD-BODY by claude-ecr0001: ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell
 - 2026-10-07 12:05 review REG-PAD by claude-ecr0001: ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell
+- 2026-10-07 12:10 checkout REG-ARM by heel-exit-agent: heel channel exit re-route into the rear gap / stowage (reg-arm issue 1, reg-pod-body issue 6)
+- 2026-10-07 12:10 checkout REG-POD-BODY by heel-exit-agent: heel channel exit re-route (reg-pod-body issue 6)
+- 2026-10-07 12:20 checkout PHYSICAL by heel-exit-agent: heel exit numbers (physical row, issue 2)
+- 2026-10-07 12:20 checkout WHOLE by heel-exit-agent: heel exit line in the physical row
+- 2026-10-07 12:21 review REG-ARM by heel-exit-agent: heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)
+- 2026-10-07 12:21 review R-BOARD-ARM by heel-exit-agent: heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)
+- 2026-10-07 12:21 review R-OUT-ARM by heel-exit-agent: heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)
+- 2026-10-07 12:21 review R-BODY-ARM by heel-exit-agent: heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)
+- 2026-10-07 12:21 checkin REG-ARM by heel-exit-agent
+- 2026-10-07 12:21 checkin REG-POD-BODY by heel-exit-agent
+- 2026-10-07 12:21 checkin PHYSICAL by heel-exit-agent
+- 2026-10-07 12:21 checkin WHOLE by heel-exit-agent

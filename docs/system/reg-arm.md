@@ -17,8 +17,8 @@ Status: CAD rev 1, not built. `heel.py` checks.json and `pad.py` strut from 2026
 
 ```mermaid
 flowchart LR
-  J["Board B face, rear pads (board x 27.0 / 28.9):<br/>J1 OUT_A · J7 LED_A (x 28.9), J2 OUT_B · J8 LED_K (x 27.0)"] --> GAP["stowage zone behind the board, pod x 60.55-66.7<br/>(1.1 mm behind the cell)"]
-  GAP --> EXIT["heel channel exit through the tub wall<br/>(65.75, 5.30, −5.62)"]
+  J["Board B face, rear pads (board x 27.0 / 28.9):<br/>J1 OUT_A · J7 LED_A (x 28.9), J2 OUT_B · J8 LED_K (x 27.0)"] --> GAP["stowage zone behind the board, pod x 60.55-66.7<br/>(upper half z 0..2.6; arm route heel.md 2026-10-07)"]
+  GAP --> EXIT["heel channel exit through the tub wall, Ø0.8<br/>(66.20, 5.15, −5.50), climbs the 1.1 gap behind the cell"]
   EXIT --> CH["heel channel Ø1.0, 7.6 mm, two R0.8 bends"]
   CH --> CB1["Ø1.6 counterbore on the land"]
   CB1 -->|"shrink tube ≤ 1.1 OD, ~2 mm slack,<br/>3 mm flex zone, REAR of the NiTi"| CB2["Ø1.6 counterbore, strut top"]
@@ -42,7 +42,7 @@ flowchart LR
 | Pad socket + lock | Ø0.85 × 3.5 in a hex collar (7.4 AF, grown from 5.9 for the rear bore); M1.4 × 2 set screw from the **front** flat, brass nut | flat 0.1 deep (pad.py) |
 | Conductors | 4 × **7/44 served litz** (7 enamelled 0.05 mm strands, yarn served), ~0.21 mm OD, 1.25 Ω/m | $0.71 / 10 m, Elecify (hardware.md §3, 2026-09-30); ~80 mm each |
 | Joint protection | Thin-wall 2:1 polyolefin shrink tube, recovered ≤ 1.1 mm OD, seated in Ø1.6 counterbores (heel 1.0 deep, strut 1.7 deep) | tolerances.md |
-| Seal/strain relief | Neutral-cure RTV dabs at the land opening and the rear-gap exit; **never in the flared mouth** | heel.md step 7 |
+| Seal/strain relief | Neutral-cure RTV dabs at the land opening and the rear-gap exit (bundle held on the rear wall); **never in the flared mouth** | heel.md step 7, last section |
 
 ## Interfaces
 | To | Nets / features | What crosses / invariant |
@@ -89,13 +89,14 @@ Lower plateau 150 / 250 MPa (0.80 wire): settled 0.96 / 1.14 N. Model checks: 0.
 | Published plateau minimums, 32 °C (interpolated) | FWM #1/#2/#9 unloading ~184 / 253 / 195 MPa | hardware.md §1 (fwmetals.com, 2026-09-30) |
 | Pad tilt rock over jaw ±2 mm | ~14.7° (rigid, set 3.5, 0.80) | niti_preload_sweep.json |
 | Wire ↔ flare | ≥ 0.009 mm (jaw closed); pessimistic model artefact (2.5–3° root slope) | heel checks.json |
-| Heel channel | Ø1.0, 7.56 mm, 196° of bends at R0.8, min wall 0.62, bundle fill 0.36 | heel checks.json |
+| Heel channel | Ø1.0, 7.68 mm, 187° of bends at R0.8, min wall 0.64, bundle fill 0.36; exit neck Ø0.8 (66.20, 5.15, −5.50), hole x 65.80–66.60, outer wall 0.60 | heel checks.json (2026-10-07) |
+| In-pod arm route | bundle ↔ cell 0.39, ↔ rear seam 0.68, ↔ lid 1.35; wires 0.45 under the board edge, ≥ 0.45 to the other arm pads; bends ≥ R1.0 (strand strain ≤ 2.5 %); 5 mm service loop; cut lengths exit → pad 21.0–23.4 mm | heel checks.json `wire_route`; notes/heel.md last section |
 | Bundle sizes | 4 × 0.21 litz = Ø0.51; heel 1.0 / strut 1.2 static bores | hardware.md §3; tolerances.md |
 | Strut ↔ heel / ↔ housing (r1 relief = r2 relief) | 1.50 / 1.18–1.34 mm (target 1.4) | heel checks.json; tolerances.md (2026-10-01) |
 | Strut ↔ NiTi | ≥ 0.135 mm, any state | pad checks.json |
 
 ## Open issues
-1. **Heel wire exit vs the cell (same cell position in Phase 2, dims_r2 CELL x1 65.6).** The channel exit (x 65.25–66.25, z −5.62) overlaps the Renata cell's rear end (x 65.6) in x, 0.1 mm off its face. Behind the cell the wires get only 1.1 mm (66.7 − 65.6), not the 6.15 mm stowage zone behind the board; a 1.1 mm shrink tube fills it. heel.py still checks against frame.py's old LP401230 cell and PCM. The same overlap is flagged in `system-overview-physical.png`. **Closes:** ECR-0001, then re-run heel.py against dims_r2's CELL/PCB; dry-fit the real cell.
+1. (closed 2026-10-07 in CAD; dry fit remains) **Heel wire exit vs the cell.** The exit moved to (66.20, 5.15, −5.50) and necks to Ø0.8 through the wall: hole x 65.80–66.60, 0.20 behind the cell's rear plane, rim ↔ cell corner 0.36, outer wall 0.60 (the tub's corner chamfer is the binding limit). The bundle climbs the 1.1 gap on the rear wall (0.39 to the cell), turns over the cell at the board-B level (R1.0) into the upper stowage and fans to J1/J7/J2/J8 (0.45 under the board edge); heel checks all pass incl. `exit_in_rear_gap` True and `wire_route.pass_0.3`. Only the channel changed (tub outside the channel zone identical; heel_add, lid unchanged). Build order: notes/heel.md last section (fish with the tub empty, solder before the lid bond, RTV dot, then the cell). **Remains:** dry fit with the real ICP501233PA-02 (length tolerance, lead end) and a print check that the Ø0.8 neck reams clean.
 2. **The pad can drop below 0.5 N on jaw opening** once the glasses' own give is counted: 0.42–0.45 N at the built 3.5 mm set (table). Options (owner decides after E12):
    - **(A, recommended once E12 confirms k_t ≲ 5 N/mm)** Set ~5 mm: 0.80–0.84 N minimum and 1.8–2.4 % strain. But if the glasses turn out rigid, strain hits 7.1 %, past NiTi's ~6 %.
    - **(B)** Keep 3.5 mm and use the 0.85 wire: higher force, the same dip ratio.
@@ -131,4 +132,5 @@ Lower plateau 150 / 250 MPa (0.80 wire): settled 0.96 / 1.14 N. Model checks: 0.
 
 ## Change log
 - 2026-10-01: created from frame.py, heel.py/pad.py checks (00:47/00:54), niti_arm_real.py (re-run today), niti_preload outputs, tolerances.md, spec v0.14. New findings: the heel exit vs rev-1 cell gap is 1.1 mm; with the glasses' give the built set dips to ~0.45 N; O11's deeper set trades minimum force for root strain; build notes and arm-wiring.png still show the old routes.
+- 2026-10-07: issue 1 closed in CAD (heel exit re-routed into the rear gap, in-pod route + build order in notes/heel.md, diagram heel-wire-route.png).
 - 2026-10-01 (editor pass): O19, R20/R24 and ECR-0006 added; issue 12 (shrink tube goes on pre-shrunk before fishing), issue 13 (heel exit check vs the wrong cell); the reg-board row names the 1.1 mm behind-cell gap; interface rows link their docs.

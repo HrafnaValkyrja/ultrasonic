@@ -17,9 +17,13 @@ What it is (all numbers from frame.py; units mm; x back, y outward, z up):
 - One M1.4 x 3 set screw on the socket's FRONT side (-b: front-down), through a captured brass DIN 934
   nut slid in from the INBOARD face, landing on a flat filed on the wire. The flat faces the bend's
   neutral axis, so it costs no bending strength. Key access: the boss's front disc / raked front face.
-- A Ø1.2 channel for the 4 pad conductors: square out of the land 2.25 mm behind the wire, up 2.4 mm,
-  bend (R 0.8), rearward inside the heel, bend, then square through the tub's inner wall into the rear
-  gap behind the PCM (x 65.75, z -5.6). Two bends: thread it with a fish wire.
+- A Ø1.0 channel for the 4 pad conductors: square out of the land 2.25 mm behind the wire, up 2.4 mm,
+  bend (R 0.8), rearward inside the heel, bend, then out through the tub's inner wall (necked to Ø0.8 over
+  its last 1.3 mm, reamed) into the 1.1 mm rear gap behind the cell (exit x 66.20, z -5.50: hole
+  65.80-66.60, 0.20 behind the cell's rear plane, 0.36 from the cell's corner across the 0.3 VHB gap). Two bends: thread it with a fish wire.
+  From the exit the bundle rises diagonally up the rear gap, turns forward over the cell (R 1.0) into the
+  stowage zone behind the board and fans out to J1/J7/J2/J8 on the board's B face: wire_route(), checked
+  in checks()['wire_route'] (2026-10-07, reg-arm issue 1).
 Owner notes: hw/mech/notes/heel.md. Checks: hw/mech/out/parts/heel/checks.json.
 """
 from __future__ import annotations
@@ -106,8 +110,12 @@ CH_CBORE_D, CH_CBORE_L = 1.6, 1.0   # mouth counterbore on the land: seats the e
                                     # protects the bundle through the flex joint (owner 2026-10-01)
 CH_B0, CH_N0 = 2.25, 0.55     # channel entry on the land (local b, n)
 CH_C1_H = -1.30               # 1st corner: straight up from the land (local h), 2.45 above it
-CH_C2 = np.array([65.75, 2.75, -5.70])     # 2nd corner: after running rearward inside the heel
-CH_EXIT = np.array([65.75, 5.30, -5.62])   # straight out through the tub's inner wall into the rear gap
+CH_C2 = np.array([65.85, 2.75, -5.60])     # 2nd corner: after running rearward inside the heel
+CH_EXIT = np.array([66.20, 5.15, -5.50])   # out through the tub's inner wall (face y 5.1) into the 1.1 rear gap (2026-10-07;
+                                           # was 65.75, 5.30, -5.62: the hole straddled the cell's rear end x 65.6).
+                                           # x 66.20: Ø0.8 hole 65.80-66.60 keeps 0.6 outer wall to the tub's 1 mm corner chamfer
+CH_NECK_D = 0.8               # exit neck: Ø0.8 through the inner wall (y 3.85 -> exit), reamed 0.8 from the cavity side.
+CH_NECK_Y0, CH_NECK_CONE = 3.85, 0.3      # neck starts at y 3.85 after a 0.3 mm cone (no shoulder to snag the fish)
 CH_BEND = 0.8                 # centreline bend radius (0.3 mm PTFE wire bends far tighter)
 STRUT_LEN = 6.0
 STATES = ("free", "jaw_open_1.5", "worn_3.5", "jaw_closed_5.5")
@@ -319,15 +327,163 @@ def channel_path(n_arc=10):
     return [np.asarray(p, float) for p in pts], math.degrees(total), labels
 
 
-def channel_cut(path=None, r=CH_D / 2):
+def channel_cut(path=None, r=CH_D / 2, neck=True):
+    """Union of cylinders + joint spheres along the centreline; the last (exit) segment necks to CH_NECK_D
+    through a CH_NECK_CONE long cone ending at y = CH_NECK_Y0."""
     pts = path if path is not None else channel_path()[0]
     s = None
-    for p0, p1 in zip(pts[:-1], pts[1:]):
-        seg = _cyl(p0, p1, r)
+    for i, (p0, p1) in enumerate(zip(pts[:-1], pts[1:])):
+        last = i == len(pts) - 2
+        if last and neck and p0[1] < CH_NECK_Y0 - CH_NECK_CONE:
+            d = (p1 - p0) / np.linalg.norm(p1 - p0)
+            pa = p0 + d * ((CH_NECK_Y0 - CH_NECK_CONE - p0[1]) / d[1])
+            pb = p0 + d * ((CH_NECK_Y0 - p0[1]) / d[1])
+            x = np.cross(d, [0.0, 0.0, 1.0])
+            cone = _loc((pa + pb) / 2, d, x) * Cone(r, CH_NECK_D / 2, float(np.linalg.norm(pb - pa)))
+            seg = _cyl(p0, pa, r) + cone + _cyl(pb, p1, CH_NECK_D / 2)
+        else:
+            seg = _cyl(p0, p1, r)
         s = seg if s is None else s + seg
     for p in pts[1:-1]:
         s = s + Pos(*p) * Sphere(r)
     return s
+
+
+# ----------------------------------------------------------------------------- wires in the cavity (rear gap -> stowage -> pads)
+WIRE_OD, BUNDLE_D = 0.21, 0.51       # 7/44 served litz; 4 of them as a loose round bundle (reg-arm Conductors)
+ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN = 2.0, 1.0, 1.0   # centreline bend radii (static; see notes/heel.md wire_route)
+FAN = np.array([62.3, 11.60, 0.80])  # bundle ends, the 4 wires fan out (behind the board's rear edge x 60.55)
+EDGE_Y = 11.55                       # each wire passes under the board's rear edge at this y (B face 12.1)
+
+
+def _pads():
+    """J1/J7/J2/J8 centres on the board's B face (pod frame), from the routed board via dims_r2/frame.PCB."""
+    import re
+    f = HERE.parents[1] / "hw/pod/draft_r2/out/routed.kicad_pcb"
+    txt = f.read_text()
+    out = {}
+    for ref, net in (("J1", "OUT_A"), ("J7", "LED_A"), ("J2", "OUT_B"), ("J8", "LED_K")):
+        i = txt.index(f'"Reference" "{ref}"')
+        blk = txt[txt.rfind("(footprint ", 0, i):i]
+        bx, by = (float(v) for v in re.search(r"\(at ([\d.\-]+) ([\d.\-]+)", blk).groups())
+        out[ref] = dict(net=net, board=(bx, by), pod=np.array([F.PCB["x0"] + bx, F.PCB["y0"], F.PCB["z0"] + by]))
+    return out
+
+
+def _fillet_poly(wps, R):
+    """Polyline through waypoints with every corner replaced by an arc of radius R (R may be a list per corner)."""
+    wps = [np.asarray(w, float) for w in wps]
+    Rs = R if isinstance(R, (list, tuple)) else [R] * (len(wps) - 2)
+    pts = [wps[0]]
+    for i in range(1, len(wps) - 1):
+        P, r = wps[i], Rs[i - 1]
+        d1 = (P - wps[i - 1]) / np.linalg.norm(P - wps[i - 1])
+        d2 = (wps[i + 1] - P) / np.linalg.norm(wps[i + 1] - P)
+        th = math.acos(float(np.clip(d1 @ d2, -1, 1)))
+        if th < 1e-6:
+            pts.append(P)
+            continue
+        tl = r * math.tan(th / 2)
+        S1 = P - d1 * tl
+        nrm = d2 - (d2 @ d1) * d1
+        nrm /= np.linalg.norm(nrm)
+        Cc = S1 + r * nrm
+        for k in range(13):
+            ang = th * k / 12
+            pts.append(Cc - r * nrm * math.cos(ang) + r * d1 * math.sin(ang))
+    pts.append(wps[-1])
+    return pts
+
+
+def wire_route():
+    """Centrelines in the cavity, pod frame. 'bundle': exit -> diagonal up the rear gap (against the rear wall,
+    x 66.40) -> turn forward over the cell's rear-top edge at the board-B level -> FAN. One per pad: FAN -> pad,
+    dropping under the board edge (EDGE_Y at x 60.55) and lying on the pad at the end. Closed-lid geometry."""
+    y_pad = F.PCB["y0"] - WIRE_OD / 2
+    bundle = _fillet_poly([np.array([CH_EXIT[0], F.CAV["y0"], CH_EXIT[2]]), np.array([66.40, 6.30, CH_EXIT[2]]),
+                           np.array([66.40, 11.55, 0.80]), np.array([64.0, 11.60, 0.80]), FAN],
+                          [ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN])
+    wires = {}
+    for ref, p in _pads().items():
+        pad = p["pod"]
+        z = pad[2]
+        # pass the neighbouring pad column at the pad's own height: J2 above J1, J8 between J1 and J7
+        wps = [FAN, np.array([61.4, 11.58, (FAN[2] + z) / 2]), np.array([F.PCB["x1"], EDGE_Y, z]),
+               np.array([pad[0] + 0.5, y_pad, z]), np.array([pad[0], y_pad, z])]
+        wires[ref] = dict(net=p["net"], pts=_fillet_poly(wps, [ROUTE_R_FAN, ROUTE_R_FAN, 0.5]), pad=pad)
+    return bundle, wires
+
+
+def _plen(pts):
+    return float(sum(np.linalg.norm(b - a) for a, b in zip(pts[:-1], pts[1:])))
+
+
+def route_checks():
+    """Clearances (mm, surface to surface) of the wires in the cavity, closed lid. The bundle may touch the tub's
+    rear wall (it is laid against it); the wire ends touch their own pads (soldered)."""
+    bundle, wires = wire_route()
+    rb, rw = BUNDLE_D / 2, WIRE_OD / 2
+    cell, pcb, cav = F.CELL, F.PCB, F.CAV
+
+    def box_d(p, b):
+        dx = max(b["x0"] - p[0], 0, p[0] - b["x1"])
+        dy = max(b["y0"] - p[1], 0, p[1] - b["y1"])
+        dz = max(b["z0"] - p[2], 0, p[2] - b["z1"])
+        return math.sqrt(dx * dx + dy * dy + dz * dz)
+
+    def dense(pts, n=6):
+        out = []
+        for a, b in zip(pts[:-1], pts[1:]):
+            out += [a + t * (b - a) for t in np.linspace(0, 1, n, endpoint=False)]
+        return out + [pts[-1]]
+
+    seam = lambda p: math.hypot(p[0] - cav["x1"], p[1] - F.Y_SPLIT)       # rear tub|lid joint line (along z)
+    res = {}
+    bp = dense(bundle)
+    gap_pts = [p for p in bp if p[1] <= F.CELL["y1"] + 0.05]
+    res["bundle"] = {"d": BUNDLE_D, "length_mm": round(_plen(bundle), 2),
+                     "to_cell": round(min(box_d(p, cell) for p in bp) - rb, 3),
+                     "to_cell_in_rear_gap": round(min(box_d(p, cell) for p in gap_pts) - rb, 3),
+                     "to_board": round(min(box_d(p, pcb) for p in bp) - rb, 3),
+                     "to_lid_inner": round(min(cav["y1"] - p[1] for p in bp) - rb, 3),
+                     "to_rear_seam": round(min(seam(p) for p in bp) - rb, 3),
+                     "to_rear_wall": round(min(cav["x1"] - p[0] for p in bp) - rb, 3),
+                     "to_cavity_top": round(min(cav["z1"] - p[2] for p in bp) - rb, 3),
+                     "bend_radii": [ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN],
+                     "strand_bend_strain_pct": round(100 * 0.05 / (2 * min(ROUTE_R_GAP, ROUTE_R_TOP, ROUTE_R_FAN, 0.8)), 2)}
+    pads = _pads()
+    wres = {}
+    for ref, w in wires.items():
+        pts = dense(w["pts"])
+        free = [p for p in pts if p[0] >= pcb["x1"] - 1e-6]                   # behind the board's rear edge
+        other = [q["pod"] for k, q in pads.items() if k != ref]
+        pad_cl = min(math.hypot(p[0] - q[0], p[2] - q[2]) for p in pts for q in other) - 0.5 - rw
+        wres[ref] = {"net": w["net"], "length_mm": round(_plen(w["pts"]), 2),
+                     "to_cell": round(min(box_d(p, cell) for p in pts) - rw, 3),
+                     "to_board_behind_edge": round(min(box_d(p, pcb) for p in free) - rw, 3),
+                     "at_board_edge_below_B": round(pcb["y0"] - EDGE_Y - rw, 3),
+                     "to_other_pads_copper": round(pad_cl, 3),
+                     "to_lid_inner": round(min(cav["y1"] - p[1] for p in pts) - rw, 3)}
+    res["wires"] = wres
+    # lid opened 180 deg about the rear seam edge (x X1, y Y_SPLIT): pads land mirrored behind the pod, B face up.
+    # Path: exit -> up the gap to the seam -> over the edge -> straight (x-z) to the mirrored pad.
+    x_h = F.X1
+    open_len = {}
+    for ref, p in pads.items():
+        q = p["pod"]
+        qm = np.array([2 * x_h - q[0], q[1], q[2]])
+        up = F.Y_SPLIT - CH_EXIT[1]
+        open_len[ref] = round(up + (x_h - 66.40) + math.hypot(qm[0] - x_h, qm[2] - CH_EXIT[2]), 2)
+    closed = {ref: round(res["bundle"]["length_mm"] + wres[ref]["length_mm"], 2) for ref in wires}
+    need = max(open_len[k] - closed[k] for k in closed)
+    res["service"] = {"closed_exit_to_pad_mm": closed, "lid_open_180_exit_to_pad_mm": open_len,
+                      "extra_needed_mm": round(need, 2), "service_loop_mm": round(math.ceil(need + 2.0), 1),
+                      "cut_length_exit_to_pad_mm": {k: round(closed[k] + math.ceil(need + 2.0), 1) for k in closed},
+                      "loop_stowed": "one U toward the cavity top behind the board (x 61-66, z 0.8..3.5), R >= 1.5"}
+    res["pass_0.3"] = all(v >= 0.3 - 1e-3 for k, v in res["bundle"].items()
+                          if k.startswith("to_") and k != "to_rear_wall") and \
+        all(v >= 0.3 - 1e-3 for w in wres.values() for k, v in w.items() if k.startswith(("to_", "at_")))
+    return res
 
 
 # ----------------------------------------------------------------------------- body
@@ -537,7 +693,13 @@ def checks():
     boxes = {k: Pos((v["x0"] + v["x1"]) / 2, (v["y0"] + v["y1"]) / 2, (v["z0"] + v["z1"]) / 2) *
              Box(v["x1"] - v["x0"], v["y1"] - v["y0"], v["z1"] - v["z0"]) for k, v in
              (("cell", F.CELL), ("pcb", F.PCB))}     # the current design's cell and board (frame.pod_facts(); no PCM since rev 1)
-    exit_ok = F.CELL["x1"] < CH_EXIT[0] - CH_D / 2 and CH_EXIT[0] + CH_D / 2 < F.CAV["x1"] and CH_EXIT[2] > F.CAV["z0"]
+    r_exit = CH_NECK_D / 2
+    exit_ok = F.CELL["x1"] < CH_EXIT[0] - r_exit and CH_EXIT[0] + r_exit < F.CAV["x1"] and CH_EXIT[2] > F.CAV["z0"]
+    # exit neck's wall to the true outside (tub + heel + cavity counted as 'not outside'), wall part only (y <= CAV y0)
+    outside = big - (solid_all + cavity_box())
+    pn = CH_EXIT - np.array([0.0, CH_EXIT[1] - CH_NECK_Y0, 0.0])
+    neck_wall = _cyl(pn, CH_EXIT - np.array([0.0, CH_EXIT[1] - F.CAV["y0"], 0.0]), r_exit)
+    exit_outer = neck_wall.distance_to(outside)
     res["channel"] = {"d": CH_D, "total_bend_deg": round(bend_deg, 1), "bend_radius": CH_BEND,
                       "entry_world": W(CH_B0, CH_N0, H_LAND).round(3).tolist(), "exit_world": CH_EXIT.tolist(),
                       "length_mm": round(sum(float(np.linalg.norm(p1 - p0)) for p0, p1 in zip(path[:-1], path[1:])), 2),
@@ -546,9 +708,16 @@ def checks():
                       "entry_to_flare_lip_wall": round(entry_lateral, 3),
                       "pass_wall_0.6": ch_wall >= 0.6 - 1e-3 and entry_lateral >= 0.6,
                       "exit_in_rear_gap": bool(exit_ok),
+                      "exit_neck_d": CH_NECK_D, "exit_hole_x": [round(CH_EXIT[0] - r_exit, 3), round(CH_EXIT[0] + r_exit, 3)],
+                      "exit_hole_to_cell_rear_plane_x": round(CH_EXIT[0] - r_exit - F.CELL["x1"], 3),
+                      "exit_rim_to_cell_corner_3d": round(math.hypot(CH_EXIT[0] - r_exit - F.CELL["x1"], F.CELL["y0"] - F.CAV["y0"]), 3),
+                      "exit_hole_to_rear_wall_plane_x": round(F.CAV["x1"] - CH_EXIT[0] - r_exit, 3),
+                      "exit_neck_outer_wall": round(exit_outer, 3),
+                      "pass_exit_outer_wall_0.6": exit_outer >= 0.6 - 1e-3,
                       "gap_to": {k: _gap(ch, v) for k, v in boxes.items()},
                       "bundle_fill": round(4 * 0.3 ** 2 / CH_D ** 2, 3)}
     res["channel"]["pass_clear_of_cell_pcb"] = all(g >= 0.2 for g in res["channel"]["gap_to"].values())
+    res["wire_route"] = route_checks()
 
     # 5. shroud / boss / land vs the strut top, all states: generic boxes (two centrings, two
     #    orientations), pad.py's section as a box, and pad.py's actual lofted strut when it imports.
@@ -726,6 +895,144 @@ def views(parts, path):
     plt.close(fig)
 
 
+def route_figure(path, tub_r2=None):
+    """Dark 3-panel diagram of the arm-wire path (2026-10-07): x-y section through the exit, the rear gap seen
+    from behind (y-z), and the plan from outside (x-z) with the pads, fan-out, service loop and the build order."""
+    sys.path.insert(0, str(HERE.parents[1] / "tools"))
+    import plotstyle
+    from matplotlib.patches import Rectangle as Rect, Polygon as MPoly
+    plt = plotstyle.apply()
+    S, T2 = plotstyle.SERIES, plotstyle.TEXT_2
+    cell, pcb, cav = F.CELL, F.PCB, F.CAV
+    bundle, wires = wire_route()
+    chan = channel_path()[0]
+    rc = route_checks()
+    ch = None
+    if tub_r2 is None:
+        import shell_r2 as SR
+        tub_r2 = SR.tub(sys.modules[__name__])
+    fig, axs = plt.subplots(1, 3, figsize=(17.5, 7.4), gridspec_kw=dict(width_ratios=[1.05, 1.0, 1.25]))
+    wc = {"J1": S[1], "J2": S[7], "J7": S[3], "J8": S[4]}
+
+    # (a) section z = exit z, looking down (-z): x right (rearward), y up (outward)
+    ax = axs[0]
+    z0 = float(CH_EXIT[2])
+    o = np.array([62.0, 7.0, z0])
+    for ln in _section_lines(tub_r2, o, np.array([1.0, 0, 0]), np.array([0, 1.0, 0]), np.array([0, 0, 1.0])):
+        xs, ys = zip(*ln)
+        ax.plot([x + o[0] for x in xs], [y + o[1] for y in ys], color=S[0], lw=1.2)
+    ax.add_patch(Rect((cell["x0"], cell["y0"]), cell["x1"] - cell["x0"], cell["y1"] - cell["y0"], fc=S[1], alpha=0.18, ec=S[1], lw=1.0))
+    ax.text(59.0, 8.0, "cell\n(Renata 5.3 x 12 x 35)", color=S[1], fontsize=8)
+    ax.add_patch(Rect((pcb["x0"], pcb["y0"]), pcb["x1"] - pcb["x0"], pcb["y1"] - pcb["y0"], fc=S[2], alpha=0.35, ec=S[2], lw=1.0))
+    ax.text(58.2, 12.25, "board (hangs from the lid)", color=S[2], fontsize=7.5)
+    ax.axhline(F.Y_SPLIT, color=T2, lw=0.7, ls="--")
+    ax.text(58.1, 14.75, "dashed: seam y 12.1 (tub below, lid above)", color=T2, fontsize=7)
+    ax.add_patch(Rect((57.8, cav["y1"]), cav["x1"] - 57.8, 0.8, fc=S[0], alpha=0.25, ec=S[0], lw=0.8))
+    ax.text(58.1, 13.35, "lid", color=S[0], fontsize=7)
+    ax.add_patch(Rect((pcb["x1"], cell["y1"]), cav["x1"] - pcb["x1"], cav["y1"] - cell["y1"], fc=S[3], alpha=0.10, ec="none"))
+    ax.add_patch(Rect((cell["x1"], cav["y0"]), cav["x1"] - cell["x1"], cell["y1"] - cav["y0"], fc=S[3], alpha=0.10, ec="none"))
+    ax.text(61.0, 12.55, "stowage zone", color=S[3], fontsize=8)
+    ax.plot([p[0] for p in chan], [p[1] for p in chan], color=S[5], lw=2.0, label="heel channel D1.0 (neck D0.8)")
+    ax.plot([p[0] for p in bundle], [p[1] for p in bundle], color=S[6], lw=4.0, alpha=0.9, solid_capstyle="round", label="4-wire bundle D0.51")
+    for ref, w in wires.items():
+        ax.plot([p[0] for p in w["pts"]], [p[1] for p in w["pts"]], color=wc[ref], lw=1.3)
+    c = rc
+    ax.annotate(f"exit hole D0.8, x {CH_EXIT[0]-0.4:.2f}-{CH_EXIT[0]+0.4:.2f}\n0.20 behind the cell's rear plane,\n"
+                f"0.36 to its corner (0.3 VHB gap)", xy=(CH_EXIT[0], cav["y0"]), xytext=(58.2, 2.2), color=S[5], fontsize=7.5,
+                arrowprops=dict(arrowstyle="->", color=S[5]))
+    ax.annotate(f"bundle laid on the rear wall:\n{c['bundle']['to_cell']:.2f} to the cell", xy=(66.4, 8.5), xytext=(66.9, 6.6),
+                color=S[6], fontsize=7.5, arrowprops=dict(arrowstyle="->", color=S[6]))
+    ax.annotate(f"turn R1.0 over the cell's\nrear-top edge", xy=(65.7, 11.45), xytext=(62.6, 9.4), color=S[6], fontsize=7.5,
+                arrowprops=dict(arrowstyle="->", color=S[6]))
+    ax.set_xlim(57.8, 68.6)
+    ax.set_ylim(0.0, 15.2)
+    ax.set_aspect("equal")
+    ax.set_xlabel("x (mm, rearward)")
+    ax.set_ylabel("y (mm, outward from the head)")
+    ax.set_title(f"(a) Section at z {z0:.2f} (through the exit), seen from above\nheel + tub section in blue", fontsize=9)
+    ax.legend(loc="lower left", fontsize=7, labelcolor=plotstyle.TEXT)
+
+    # (b) the rear gap seen from behind (looking forward, -x): y right (outward), z up
+    ax = axs[1]
+    ax.add_patch(Rect((cell["y0"], cell["z0"]), cell["y1"] - cell["y0"], cell["z1"] - cell["z0"], fc=S[1], alpha=0.18, ec=S[1], lw=1.0))
+    ax.text(6.2, -7.6, "cell's rear end\n(x 65.6, in front\nof the wires)", color=S[1], fontsize=7.5)
+    ax.add_patch(Rect((pcb["y0"], pcb["z0"]), pcb["y1"] - pcb["y0"], pcb["z1"] - pcb["z0"], fc=S[2], alpha=0.35, ec=S[2], lw=1.0))
+    ax.text(12.15, -9.4, "board\nrear edge\n(x 60.55)", color=S[2], fontsize=7)
+    ax.add_patch(Rect((F.Y_IN, cav["z0"] - 0.8), cav["y0"] - F.Y_IN, cav["z1"] - cav["z0"] + 1.6, fc=S[0], alpha=0.25, ec=S[0], lw=0.8))
+    ax.text(3.0, 4.4, "tub inner wall", color=S[0], fontsize=7)
+    ax.add_patch(Rect((cav["y1"], cav["z0"] - 0.8), 0.8, cav["z1"] - cav["z0"] + 1.6, fc=S[0], alpha=0.25, ec=S[0], lw=0.8))
+    ax.text(13.3, 4.4, "lid", color=S[0], fontsize=7)
+    ax.axvline(F.Y_SPLIT, color=T2, lw=0.7, ls="--")
+    ax.add_patch(MPoly([(cav["y0"], cav["z0"]), (cav["y0"] + 1.0, cav["z0"]), (cav["y0"], cav["z0"] + 1.0)], fc=S[0], alpha=0.35, ec="none"))
+    ax.plot([CH_EXIT[1] - 0.05], [CH_EXIT[2]], "o", ms=9, mfc="none", mec=S[5], mew=2)
+    ax.plot([p[1] for p in bundle], [p[2] for p in bundle], color=S[6], lw=4.0, alpha=0.9, solid_capstyle="round")
+    for ref, w in wires.items():
+        ax.plot([p[1] for p in w["pts"]], [p[2] for p in w["pts"]], color=wc[ref], lw=1.3)
+        ax.plot([w["pad"][1]], [w["pad"][2]], "s", ms=5, color=wc[ref])
+    ax.annotate("exit (heel channel\nends here, D0.8)", xy=(CH_EXIT[1], CH_EXIT[2]), xytext=(5.6, -2.0), color=S[5], fontsize=7.5,
+                arrowprops=dict(arrowstyle="->", color=S[5]))
+    ax.annotate("bundle climbs the 1.1 gap\ndiagonally (bend R2.0),\nflat on the rear wall", xy=(8.6, -2.4), xytext=(8.1, -6.2),
+                color=S[6], fontsize=7.5, arrowprops=dict(arrowstyle="->", color=S[6]))
+    ax.set_xlim(2.5, 15.0)
+    ax.set_ylim(-10.5, 5.5)
+    ax.set_aspect("equal")
+    ax.set_xlabel("y (mm, outward)")
+    ax.set_ylabel("z (mm, up)")
+    ax.set_title("(b) Rear gap x 65.6-66.7, seen from behind\n(the rear wall removed)", fontsize=9)
+
+    # (c) plan from outside (through the lid): x right (rearward), z up
+    ax = axs[2]
+    ax.add_patch(Rect((cav["x0"], cav["z0"]), cav["x1"] - cav["x0"], cav["z1"] - cav["z0"], fc="none", ec=S[0], lw=1.0))
+    ax.add_patch(Rect((cell["x0"], cell["z0"]), cell["x1"] - cell["x0"], cell["z1"] - cell["z0"], fc=S[1], alpha=0.12, ec=S[1], lw=0.8, ls=":"))
+    ax.add_patch(Rect((pcb["x0"], pcb["z0"]), pcb["x1"] - pcb["x0"], pcb["z1"] - pcb["z0"], fc=S[2], alpha=0.15, ec=S[2], lw=1.0))
+    ax.add_patch(Rect((pcb["x1"], cav["z0"]), cav["x1"] - pcb["x1"], cav["z1"] - cav["z0"], fc=S[3], alpha=0.10, ec="none"))
+    ax.text(pcb["x1"] + 0.3, cav["z0"] + 0.3, "stowage\n(dock + cell\nwires: lower\nhalf)", color=S[3], fontsize=7)
+    import re
+    txt = (HERE.parents[1] / "hw/pod/draft_r2/out/routed.kicad_pcb").read_text()
+    for ref in ("J3", "J4", "J5", "J9", "J10", "J11", "J12"):
+        i = txt.index(f'"Reference" "{ref}"')
+        bx, by = (float(v) for v in re.search(r"\(at ([\d.\-]+) ([\d.\-]+)", txt[txt.rfind("(footprint ", 0, i):i]).groups())
+        ax.add_patch(plt.Circle((pcb["x0"] + bx, pcb["z0"] + by), 0.5, fc="none", ec=T2, lw=0.7))
+        ax.text(pcb["x0"] + bx - 0.5, pcb["z0"] + by - 1.1, ref, color=T2, fontsize=6)
+    ax.plot([p[0] for p in bundle], [p[2] for p in bundle], color=S[6], lw=4.0, alpha=0.9, solid_capstyle="round", label="4-wire bundle")
+    for ref, w in wires.items():
+        ax.plot([p[0] for p in w["pts"]], [p[2] for p in w["pts"]], color=wc[ref], lw=1.5, label=f"{ref} {w['net']}")
+        ax.add_patch(plt.Circle((w["pad"][0], w["pad"][2]), 0.5, fc=wc[ref], alpha=0.5, ec=wc[ref]))
+    lp = rc["service"]["service_loop_mm"]
+    th = np.linspace(0, math.pi, 30)
+    ax.plot(64.2 + 0.9 * np.cos(th), 1.0 + 1.4 * np.sin(th) + 0.9, color=S[6], lw=2.0, ls="--")
+    ax.plot([63.3, 63.3], [0.8, 1.9], color=S[6], lw=2.0, ls="--")
+    ax.plot([65.1, 65.1], [0.8, 1.9], color=S[6], lw=2.0, ls="--")
+    ax.annotate(f"service loop +{lp:.0f} mm (one U,\nR >= 0.9): lets the lid\nopen 180 deg about its\nrear edge for cell swap", xy=(64.2, 3.3),
+                xytext=(45.0, 4.4), color=S[6], fontsize=7.5, arrowprops=dict(arrowstyle="->", color=S[6]))
+    ax.plot([CH_EXIT[0]], [CH_EXIT[2]], "o", ms=9, mfc="none", mec=S[5], mew=2)
+    ax.text(CH_EXIT[0] - 2.6, CH_EXIT[2] - 1.0, "heel exit", color=S[5], fontsize=7.5)
+    steps = ("Build order (arm wires)\n"
+             "1 cap + strut done, pre-shrunk tube on\n"
+             "2 fish 4 ends land -> exit, tub EMPTY\n"
+             "3 solder J1 J7 J2 J8 (B face), board\n   loose, BEFORE the lid VHB bond\n"
+             "4 bond board to lid (step 3-5 shell_r2)\n"
+             "5 lay bundle on the rear wall, RTV dot\n   at the exit, let it skin\n"
+             "6 cell drops in (y-), bundle stays\n   behind it in the 1.1 gap\n"
+             "7 fold the loop, lower the lid")
+    ax.text(44.3, -17.6, steps, color=plotstyle.TEXT, fontsize=7.2, va="bottom",
+            bbox=dict(boxstyle="round", fc=plotstyle.SURFACE, ec=T2, lw=0.6))
+    ax.set_xlim(44.0, 67.5)
+    ax.set_ylim(-18.0, 7.5)
+    ax.set_aspect("equal")
+    ax.set_xlabel("x (mm, rearward)")
+    ax.set_ylabel("z (mm, up)")
+    ax.set_title("(c) Plan from outside, through the lid (board on top, cell below it)\npads on the board's B face (toward the cell)", fontsize=9)
+    ax.legend(loc="lower right", fontsize=6.8, ncol=1, labelcolor=plotstyle.TEXT)
+    b = rc["bundle"]
+    fig.suptitle(f"Arm wires: heel exit -> rear gap -> stowage -> J1/J7/J2/J8 (right pod; left = mirror). Clearances: bundle-cell "
+                 f"{b['to_cell']:.2f}, -seam {b['to_rear_seam']:.2f}, -lid {b['to_lid_inner']:.2f}; wires under the board edge "
+                 f"{min(w['at_board_edge_below_B'] for w in rc['wires'].values()):.2f}, wire-other pad "
+                 f"{min(w['to_other_pads_copper'] for w in rc['wires'].values()):.2f} mm", fontsize=9.5, color=plotstyle.TEXT)
+    fig.savefig(path)
+    plt.close(fig)
+
+
 def matplotlib_rgb(c):
     import matplotlib.colors as mc
     return mc.to_rgb(c)
@@ -748,7 +1055,7 @@ def main():
     for k, s in hw.items():
         export_step(s, str(OUT / f"{k}.step"))
     res["outputs"] = sorted(p.name for p in OUT.iterdir() if p.suffix in (".step", ".stl"))
-    res["date"] = "2026-09-30"
+    res["date"] = "2026-10-07"
     res["frame_inputs"] = {"E": E.tolist(), "A_E": A.round(5).tolist(), "N_BEND": N.round(5).tolist(),
                            "SOCKET_D": F.SOCKET_D, "HEEL_SOCKET_DEPTH": F.HEEL_SOCKET_DEPTH,
                            "FLEX_ZONE": F.FLEX_ZONE, "STRUT_START": F.STRUT_START,
@@ -757,6 +1064,7 @@ def main():
     try:
         figure(parts, res, OUT / "heel_sections.png")
         views(parts, OUT / "heel_views.png")
+        route_figure(HERE.parents[1] / "docs/diagrams/heel-wire-route.png")
     except Exception as ex:  # figures are a convenience; never block the checks
         print("figure failed:", repr(ex))
     print(json.dumps({k: v for k, v in res.items() if k not in ("outputs",)}, indent=1,

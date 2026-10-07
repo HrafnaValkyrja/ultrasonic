@@ -29,7 +29,7 @@ decisions:
   D4_mic_duct: "O24 option B as built here: lid bore D1.0 (print undersize, ream 1.0) 0.7 long + VHB hole D1.0 0.3 -> board F face round the D0.6 hole. Duct 1.0 long total (r1 open gap gone). Hex window R1.9 x 0.8 deep from the plate top = mesh seat (as r1)."
   D5_duct_location: "the bore is the datum. Stepped gauge pin (D0.98 body / D0.50 tip, turned brass) through bore, VHB hole and board hole while the VHB grabs, then pulled. Front skirt wall = coarse x-stop at 0.25 gap; walls stay clear of the board in tolerance so they never fight the pin."
   D6_switch: "lid pocket 4.3 x 3.1, ceiling y 13.8 (0.25 over SW1 nominal); puck D2.3 (+ nub D1.0 x 0.10 on the actuator) in a D2.6 bore; silicone skin 0.25 in a D4.6 recess, flush with the plate. Puck is SELECTIVE-FIT: 5 printed lengths 0.73-0.93 step 0.05."
-  D7_stowage: "rear zone only, as MZG-10: pads at board x 25-30 face B; wires fold up into 60.55-66.7. Arm wires arrive from heel CH_EXIT (65.75, 5.30, -5.62) in the 1.1 rear gap behind the cell."
+  D7_stowage: "rear zone only, as MZG-10: pads at board x 25-30 face B; wires fold up into 60.55-66.7. Arm wires arrive from heel CH_EXIT (66.20, 5.15, -5.50; D0.8, hole x 65.80-66.60, 2026-10-07) in the 1.1 rear gap behind the cell, climb it on the rear wall and take the UPPER stowage (z 0..2.6) to J1/J7/J2/J8 (heel.md last section)."
   D8_top: "r1 'spine' concept reused, moved -1.4 y / -0.7 z onto the r2 top; any r1 concept transfers the same way (not exported)."
 
 checks:  # hw/mech/out/r2/checks.json, run 2026-10-03 ~00:40 local
@@ -60,7 +60,7 @@ assembly_sequence:  # owner builds by hand
   4: "board onto the pin tip through its D0.6 hole, F face down onto the VHB; press through a foam pad over the B parts (3M: ~0.1 MPa -> ~30 N over the board [A]), pull the pin"
   5: "depth gauge from the skin-recess floor to the SW1 top through the D2.6 bore; pick the puck leaving 0.05-0.10; drop it in; bond the skin"
   6: "cell into the tub on its VHB (0.3 gap); dock target into the belly window; tails flat under the cell (0.8 slack)"
-  7: "route dock + cell wires along the cell bottom to the 1.1 rear gap, up into the stowage; arm wires from the heel channel the same way"
+  7: "route dock + cell wires along the cell bottom to the 1.1 rear gap, up into the LOWER stowage; arm wires (fished and soldered before the bond, heel.md last section) climb the gap on the rear wall into the UPPER stowage"
   8: "lower lid + hanging board onto the tongue; tape for testing; bond the seam at freeze"
 
 open_items:

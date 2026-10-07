@@ -37,12 +37,12 @@
    }
   },
   "REG-ARM": {
-   "by": "claude-ecr0001",
+   "by": "heel-exit-agent",
    "date": "2026-10-07",
-   "note": "ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell",
+   "note": "heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)",
    "stamp": {
     "file:hw/mech/frame.py": "c7981bfec8a45660",
-    "file:hw/mech/heel.py": "a6aaafbeaa3839e1",
+    "file:hw/mech/heel.py": "0d6540a25ae7d443",
     "file:sim/checks/niti_arm_real.py": "62944f12dde4e774"
    }
   },
@@ -217,14 +217,14 @@
    }
   },
   "R-BOARD-ARM": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "heel-exit-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/mech/shell_r1.py (reference) to hw/mech/dims_r2.py (CAD-free constants, values identical to shell_r2 before the split) + shell_r2.py solids; checked with interfaces.py on the routed board: mic-port PASS 0.000 mm (gauge pin 0.115 <= 0.20), switch WARN stack 0.20 vs 0.15, outline PASS, heights PASS (B 1.4, F 0.30, SW1 pocket 0.90), clamp-bands WARN (VHB 31 % bonded, open), frame WARN ECR-0001; USB-C keep-out not in shell_r2",
+   "note": "heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)",
    "stamp": {
     "sym:hw/mech/dims_r2.py::CELL": "77243a4be17c6775",
     "sym:hw/mech/dims_r2.py::PAD_ZONE": "729ca0d2e54ea911",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
-    "sym:hw/mech/heel.py::CH_EXIT": "31a5e01ff4670e60",
+    "sym:hw/mech/heel.py::CH_EXIT": "80b98145b1a497a8",
     "yaml:hw/pod/draft_r2/placement.yaml::J1": "1e2aacaa4f8dd03b",
     "yaml:hw/pod/draft_r2/placement.yaml::J2": "4285fcc3a9eae4fb",
     "yaml:hw/pod/draft_r2/placement.yaml::J7": "e76f671534298054",
@@ -252,9 +252,9 @@
    }
   },
   "R-BODY-ARM": {
-   "by": "claude-ecr0001",
+   "by": "heel-exit-agent",
    "date": "2026-10-07",
-   "note": "ECR-0001: heel_add/heel_cut/hardware solids identical before/after (vol, bbox, centroid); E unchanged; shell_r2.tub identical. heel checks now see the r2 cell: exit_in_rear_gap False, channel-cell 0.085 mm (known reg-arm issue 1 / reg-pod-body issue 6); plain-shell strut clearance 0.314->0.173 (blade.shell at r2 envelope, no relief)",
+   "note": "heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)",
    "stamp": {
     "sym:hw/mech/frame.py::E": "e41a5d539abd8437",
     "sym:hw/mech/heel.py::heel_add": "f10d6b9f6e8fecbf",
@@ -332,15 +332,15 @@
    }
   },
   "R-OUT-ARM": {
-   "by": "claude",
-   "date": "2026-10-02",
-   "note": "Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds",
+   "by": "heel-exit-agent",
+   "date": "2026-10-07",
+   "note": "heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)",
    "stamp": {
     "net:OUT_A": "5e4d360780fe54df",
     "net:OUT_B": "28cc65f9b1bf070c",
     "sym:hw/mech/heel.py::CH_CBORE_D": "b0ebeb1af4d09325",
     "sym:hw/mech/heel.py::CH_D": "537ae252b28b7412",
-    "sym:hw/mech/heel.py::CH_EXIT": "31a5e01ff4670e60"
+    "sym:hw/mech/heel.py::CH_EXIT": "80b98145b1a497a8"
    }
   },
   "R-OUT-BOARD": {

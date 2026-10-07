@@ -47,7 +47,7 @@ Keeps every region (pod body, board, cell, arm, pad) in one coordinate frame, so
 | Dock target | 31.5-52.7 | 5.72-12.58 | −11.75-(−8.95) | dims_r2 DOCK |
 | Heel (keel + boss, as built) | 55.06-67.3 | 0.3-5.0 | −10.05…−3.78 | heel checks.json `heel_bbox` (unchanged) |
 | NiTi socket mouth E | 61.3 | 2.0 | −8.3 | `frame.py` E |
-| Heel wire exit into the pod | 65.75 | 5.30 | −5.62 | `heel.py` CH_EXIT L110 |
+| Heel wire exit into the pod (Ø0.8 neck) | 66.20 | 5.15 | −5.50 | `heel.py` CH_EXIT (2026-10-07) |
 | Pad contact centre (on the skin) | 70.6 | −3.0 | −25.0 | `frame.py` PAD_CONTACT |
 
 ## Stack-up through the pod (y, at the board)
@@ -135,7 +135,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 |---|---|---|---|---|
 | 1 | [reg-board](reg-board.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ air ([sub-audio-in](sub-audio-in.md)) | sound | U2 on B; NPTH D0.6 at board (1.88, 6.0) = pod 32.43; VHB hole D1.0 + reamed bore D1.0 (1.0 long) + hex mesh seat; gauge pin at bonding | F1 |
 | 2 | [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) ([sub-ui](sub-ui.md)) | finger force | skin → puck D2.3 (selective fit) → SW1 at board (18.5, 6.0) = pod 49.05; press loads the VHB in tension | F11: BTN → PA0 |
-| 3 | [reg-pad](reg-pad.md) ↔ [reg-arm](reg-arm.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) ([sub-output](sub-output.md), [sub-ui](sub-ui.md)) | 4 litz wires | strut bore Ø1.2 → tube → heel Ø1.0 → exit (65.75, 5.30, −5.62) → 1.1 gap behind the cell → stowage → B pads J1/J2 (board 28.9/27.0) and J7/J8 | F3: OUT_A/OUT_B → J1/J2 · F12: LED_A/LED_K → J7/J8 |
+| 3 | [reg-pad](reg-pad.md) ↔ [reg-arm](reg-arm.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) ([sub-output](sub-output.md), [sub-ui](sub-ui.md)) | 4 litz wires | strut bore Ø1.2 → tube → heel Ø1.0 → exit Ø0.8 (66.20, 5.15, −5.50) → 1.1 gap behind the cell (on the rear wall) → upper stowage → B pads J1/J2 (board 28.9/27.0) and J7/J8 | F3: OUT_A/OUT_B → J1/J2 · F12: LED_A/LED_K → J7/J8 |
 | 4 | [reg-pod-body](reg-pod-body.md) (heel) ↔ [reg-arm](reg-arm.md) ↔ [reg-pad](reg-pad.md) | spring force (≥ 1 N) | NiTi Ø0.80; sockets 4.0 / 3.5 deep; M1.4 set screws (unchanged) | – |
 | 5 | [sub-dock-usb](sub-dock-usb.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) | charge + USB | YZT0675 flush in the belly; 5 wires under the cell (0.8) to the rear gap, up to J3/J4/J10/J11/J12 (B, board x 25.1-28.9) | F5, F9, F10, F15 |
 | 6 | [sub-power](sub-power.md) (cell) ↔ [reg-board](reg-board.md) | battery | leads to J5 (28.9, 1.1) / J4 (27.0, 1.9); optional NTC to J9 (28.9, 3.3) | F5-F8 |
@@ -167,7 +167,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 
 ## Open issues (IDs stable; gaps = closed)
 1. (closed in Phase 2) Mic port unsealed: sealed D1.0 duct (O24); 1b board port vs lid bore: nominal 0.000, gauge pin worst 0.115 (dims_r2.duct_offsets, 2026-10-07). R-ACO-P6 keep-out holds since 2026-10-07 (reg-pod-body issue 19 closed).
-2. **Heel wire exit vs the cell.** Exit x 65.25-66.25 vs cell end 65.6 (unchanged in Phase 2); heel.py now checks the real cell (ECR-0001): exit_in_rear_gap **False**, channel ↔ cell 0.085 mm (< 0.2 rule). Close: move the exit or accept with a dry-fit of the pouch.
+2. (closed 2026-10-07 in CAD) **Heel wire exit vs the cell.** Exit moved to x 66.20 with a Ø0.8 neck (hole 65.80-66.60, 0.20 behind the cell end 65.6, rim-corner 0.36); arm wires 0.39 from the cell; build order in notes/heel.md. Remains: dry fit with the real pouch ([reg-arm](reg-arm.md) issue 1).
 3. **Dock wire route not designed.** 5 wires from the belly to the B pads at board x 25-29: 0.8 under the cell beside the flat tails (0.85 tail-to-cell) or the rear gap; OD ≤ 0.6 needed under the cell (notes/shell_r2.md).
 4. (closed 2026-10-07, ECR-0001) `frame.py` / `pod.py` derive the pod from the current dims; rail and adapter default to the body centre.
 5. **Which pod the CAD is**, and board orientation per pod, are stated two ways (pcb-mech-interface §1 "right"; dims_r2/notes "right = mirror"). Close: one statement in dims_r2 + a KiCad 3D render placed in the CAD for both pods.

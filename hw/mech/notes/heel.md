@@ -33,11 +33,12 @@ union both.
     heel's inboard (head-side) face.
   - It presses on a flat filed on the wire. The flat faces the bend's neutral axis (the wire bends
     outward), so it costs no bending strength.
-- **Conductor channel.** A Ø1.2 channel carries the 4 pad wires (transducer ×2, LED ×2).
+- **Conductor channel.** A Ø1.0 channel carries the 4 pad wires (transducer ×2, LED ×2).
   - It starts on the land 2.25 mm behind the NiTi and goes 2.4 mm straight up.
-  - It turns rearward inside the heel, then turns again and runs straight outboard through the tub's
-    inner wall.
-  - It comes out in the rear gap behind the PCM at x 65.75, z -5.6.
+  - It turns rearward inside the heel, then turns again and runs outboard through the tub's inner wall,
+    necked to Ø0.8 for its last 1.3 mm.
+  - It comes out in the 1.1 mm rear gap behind the cell at x 66.20, z -5.50 (changed 2026-10-07; it used
+    to straddle the cell's rear end). Route and build order: the section at the end of this note.
 
 ## Parts
 
@@ -98,7 +99,8 @@ Wire length: the heel takes **4.0 mm** of it. The full cut length is socket 4.0 
      crack.
 3. **Conductors through the channel.**
    - Tape the 4 conductor ends to the fish and pull them from the land opening up into the rear gap.
-     Leave about 30 mm in the gap.
+     Do it with the tub **empty** (no cell yet). Pull out the cut length in the last section
+     (21-24 mm from the exit to each pad, plus solder ends).
    - Where they leave the strut top, they cross the 1.5 mm gap to the heel. Route them round the
      **inboard (head) side** of the NiTi. The wire only ever moves outboard, so it never pinches
      them there.
@@ -122,8 +124,8 @@ Wire length: the heel takes **4.0 mm** of it. The full cut length is socket 4.0 
    - Put a small dab of RTV at the land opening, around the conductors, with a toothpick.
    - **Keep RTV out of the flared mouth** (1.4 mm away). Silicone there would stiffen the root.
    - Put a dab in the rear gap where the conductors exit, as strain relief.
-8. Route the conductors up the rear gap and forward to the PCB's rear-edge pads (the shell note covers
-   this). Solder OUT_A, OUT_B, LED+ and LED-.
+8. Route the conductors up the rear gap and forward to the board's rear B-face pads J1 OUT_A, J7 LED_A,
+   J2 OUT_B, J8 LED_K: order and numbers in the last section (the soldering happens before the lid bond).
 9. **Check.**
    - Press the pad: the arm springs back.
    - Look from the side: the strut's top end must not touch the land in any position, with about
@@ -268,6 +270,50 @@ not the heel's. The heel itself clears by 1.52.
   - `heel.py` re-derives the land from pad.py's live `STRUT_B2` / `STRUT_B1_*` numbers, and checks
     pad.py's lofted strut in all four states.
 - **shell.py:**
-  - Keep the rear gap clear at the channel exit: inner wall y 5.1, x 65.15..66.35, z -6.2..-5.0.
+  - Keep the rear gap clear at the channel exit: inner wall y 5.1, x 65.80..66.60 (hole), z -5.9..-5.1.
   - The shell's lower lid boss (y 9.9..13.4) is clear of it. Its note already routes the wires
     "under the lower boss (y 5.1..9.9)", which matches.
+
+## Arm wires in the pod: exit, route, build order (2026-10-07, Phase 2 shell_r2)
+
+![route](../../../docs/diagrams/heel-wire-route.png)
+
+```yaml
+why: "reg-arm issue 1 / reg-pod-body issue 6: the old exit (x 65.25-66.25, z -5.62, D1.0) straddled the Renata cell's rear end (x 65.6), 0.085 mm off it"
+src: "hw/mech/heel.py CH_C2/CH_EXIT/CH_NECK_*, wire_route(), route_checks(); checks.json channel + wire_route (run 2026-10-07)"
+fixed_inputs: {cell: "dims_r2 CELL x 30.6-65.6, y 5.4-10.7, z -8.1..3.9 (unchanged)", board: "PCB x 30.55-60.55, B face y 12.1", lid_inner: 13.2, seam: "y 12.1", rear_wall_inner: "x 66.7",
+  pads_routed_board_2026-10-07: {J1_OUT_A: "(28.9, 9.9) -> pod x 59.45 z 1.45", J7_LED_A: "(28.9, 7.7) -> 59.45 / -0.75", J2_OUT_B: "(27.0, 10.95) -> 57.55 / 2.50", J8_LED_K: "(27.0, 8.75) -> 57.55 / 0.30"}}
+channel_change:
+  C2: "(65.75, 2.75, -5.70) -> (65.85, 2.75, -5.60)"
+  exit: "(65.75, 5.30, -5.62) D1.0 -> (66.20, 5.15, -5.50), last 1.3 mm necked to D0.8 (0.3 cone at y 3.55-3.85, no shoulder for the fish)"
+  hole_x: "65.80-66.60: 0.20 behind the cell's rear plane; rim to the cell's corner 0.36 (the cell sits 0.3 off the wall on VHB); 0.10 to the rear wall plane"
+  walls: "outer wall at the neck 0.60 (to the tub's 1 mm corner chamfer, the binding limit: x 66.20 is the rearmost centre that keeps 0.6); channel min wall 0.644 (was 0.619); total bend 186.6 deg (was 196.3)"
+  why_not_more: "a channel in the rear wall needs >= 2.2 mm wall (0.8 exists) = envelope change; a D1.0 exit cannot fit the 1.1 gap with 0.3 each side, so the neck is D0.8"
+  unchanged: "heel_add, socket, flare, set screw/nut, land, counterbore, strut clearances, rail, lid; tub outside the channel zone (x 61.9-66.9, y 1.7-5.45, z -9.7..-4.9) identical to 0.001 mm3"
+route_closed_lid:  # bundle D0.51 = 4 x 0.21 served litz; centreline bends static
+  1_rear_gap: "exit (66.20, 5.1, -5.50) -> laid flat on the rear wall (x 66.40) -> climbs diagonally in the y-z plane (bend R2.0) to (66.40, 11.55, 0.80)"
+  2_turn: "R1.0 turn forward over the cell's rear-top edge at the board-B level (y 11.55-11.6)"
+  3_stowage: "straight forward at z 0.8 to the fan point (62.3, 11.6, 0.8), 1.75 behind the board's rear edge"
+  4_fan: "each wire passes under the board's rear edge at y 11.55 (0.45 below the B face) at its own pad height: J2 at z 2.5 above J1's pad, J8 at z 0.3 between J1 and J7; then lies on its pad"
+  lanes: "arm wires use the UPPER stowage (z 0..2.6); the 8 dock/cell wires (pads at z -7.35..-1.9) keep the lower half: no crossing"
+clearances_mm:  # surface to surface, checks.json wire_route (pass_0.3 true)
+  bundle: {cell: 0.39, cell_while_in_gap: 0.39, board: 1.57, lid_inner: 1.35, rear_seam_line: 0.68, cavity_top: 2.95, rear_wall: "0.05 (laid on it on purpose)"}
+  wires: {cell: ">= 0.75", under_board_edge: 0.45, behind_edge_to_board: ">= 0.36", to_other_arm_pads_copper: ">= 0.45", lid_inner: 1.10}
+bend_radius_justification: "all in-pod bends are static. A bent strand's surface strain = d_strand / 2R = 0.05 / (2 x 0.8) = 3.1 % at the tightest bend (the heel channel's existing R0.8); the in-pod route uses R >= 1.0 (2.5 %). Annealed Cu elongation is >= 10-20 % class and enamel is wound far tighter in production (strand on its own diameter) [A: ASTM B3 / IEC 60317-0-1 mandrel test, not re-read today]. Dynamic flex lives only in the 1.5 mm heel-strut joint, outside this route."
+service_loop:
+  need: "lid opened 180 deg about its rear edge (cell swap, O19): exit-to-pad path grows by up to 2.65 mm (J1); +2 mm margin -> 5 mm loop"
+  cut_length_exit_to_pad: {J1_OUT_A: 21.0, J7_LED_A: 21.5, J2_OUT_B: 23.4, J8_LED_K: 22.8, plus: "~2 mm strip/tin end each"}
+  stowed: "one U in the upper stowage behind the board (x 63.3-65.1, up to z ~3.3), radius >= 0.9"
+build_order:  # owner builds by hand; merges with shell_r2.md assembly_sequence (its steps in brackets)
+  1: "pad cap + strut done, bundle closed in the cap, pre-shrunk tube slid on (reg-arm issue 12); NiTi in the heel, set screw locked (steps 1-6 above)"
+  2: "tub EMPTY (no cell, lid off). Prove the channel with the fish; ream the exit neck with a 0.8 drill in a pin vise from the cavity side (straight along -y). Fish the 4 ends land -> exit; pull out the cut lengths above"
+  3: "[shell_r2 step 2] solder J1 OUT_A, J7 LED_A, J2 OUT_B, J8 LED_K on the board's B face with the board LOOSE beside the tub (rear end toward the tub), together with the 8 cell/dock wires. Before the VHB bond: no iron heat into the VHB or the resin lid; the joints are >= 20 mm from the NiTi"
+  4: "[shell_r2 steps 3-5] bond the board F-face-down to the lid (gauge pin, press, puck). The tub rides along on its 21-24 mm tether: lay it on its side next to the lid"
+  5: "lay the bundle flat on the tub's rear wall from the exit up the gap (diagonal, as in panel b); one RTV dot at the exit with a toothpick, keeping the bundle against the rear wall; let it skin (~15 min)"
+  6: "[shell_r2 step 6] cell drops in along -y onto its VHB; register it on the FRONT wall 0.3 shim so its rear end stays at x <= 65.6. The bundle stays behind it in the 1.1 gap (0.39 clear)"
+  7: "[shell_r2 steps 7-8] dock/cell wires low, arm wires high; fold the 5 mm U loop behind the board; lower the lid + hanging board straight down along -y. Look through the open rear corner before the lid seats: no wire on the seam land"
+service: "arm swap / cell swap: cut the seam, open the lid like a book about its rear edge (the loop allows 180 deg), board pads face up; desolder J1/J2/J7/J8; peel the exit RTV dot"
+open: ["dry fit with the real Renata ICP501233PA-02: its max length 35 and its lead/PCM end are not checked against the rear gap [T datasheet]; if its leads leave the rear end they share this gap",
+       "dock/cell wire route itself is still undesigned (reg-pod-body issue 7); this note only reserves the upper stowage for the arm",
+       "service_loop assumes the lid hinges about its rear edge; a lid lifted straight up needs ~same length (the board pads are 1.1-3.0 from the rear edge)"]
+```

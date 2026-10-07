@@ -67,8 +67,8 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
   invariant: "B parts never touch the cell (checks.json clash parts_B/cell 0)"
   rel: R-PWR-BODY
 - to: reg-arm
-  crosses: "heel unioned into the tub (heel.heel_add/heel_cut, unchanged); channel exit (65.75, 5.30, -5.62) D1.0 into the 1.1 gap behind the cell; strut relief"
-  invariant: "exit x 65.25-66.25 overlaps the cell's rear end 65.6 (issue 6)"
+  crosses: "heel unioned into the tub (heel.heel_add/heel_cut, unchanged); channel exit (66.20, 5.15, -5.50) necked D0.8 into the 1.1 gap behind the cell (2026-10-07); arm bundle on the rear wall, then the upper stowage; strut relief"
+  invariant: "exit hole x 65.80-66.60 behind the cell end 65.6 (rim-corner 0.36), outer wall 0.60; arm wires keep >= 0.39 to the cell, 0.68 to the rear seam (heel checks.json wire_route)"
   rel: R-BODY-ARM
 - to: physical
   crosses: "frame axes; frame.py/pod.py pod names derived from dims_r2.py (frame.pod_facts(), ECR-0001); assembly order"
@@ -127,7 +127,7 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
 3. **Mic acoustic path (body side):** duct sealed and aligned; mesh product and the EQ notch (~63 kHz) open; Monte Carlo R14 all-pass 0.70 (ECR-0018 log 2026-10-07). Closes: sub-audio-in issues.
 4. **Switch stack:** fixed puck pre-presses at worst case, so the kit is selective fit (PASS); lateral stack WARN in interfaces.py (0.20 worst vs 0.15 limit, 2026-10-07). KMT022 height tolerance unknown (C&K gives 0.65 nominal only). Closes: tighten lid/board position tolerance or accept, owner review; sub-ui.
 5. **Sealing undesigned past the seam** (table above); `docs/research/sealing-and-service.md` (cited by O10) doesn't exist. Closes: sealing note + IPX4 spray test plan.
-6. **Heel wire-channel exit overlaps the cell's rear end** (x 65.25-66.25 vs 65.6; cell position unchanged in Phase 2). heel.py now checks the real cell (ECR-0001, 2026-10-07): exit_in_rear_gap False, channel ↔ cell 0.085 mm (< 0.2). Closes: [reg-arm](reg-arm.md) issue 1.
+6. (closed 2026-10-07 in CAD; dry fit remains) **Heel wire-channel exit vs the cell's rear end.** Exit moved to x 66.20, Ø0.8 neck: hole 65.80–66.60, 0.20 behind the cell's rear plane, outer wall 0.60; tub outside the channel zone and the lid unchanged; shell_r2 rebuild valid, clashes 0, stowage 277 mm³ unchanged. The arm wires take the upper stowage (z 0..2.6), leaving the lower half for the dock/cell wires (issue 7). Remains: real-cell dry fit. Detail: [reg-arm](reg-arm.md) issue 1.
 7. **Dock wire route** belly → rear pads undesigned: 5 wires in the 0.8 under-cell slack beside the flat tails; OD 0.8 won't lie flat, needs OD ≤ 0.6 or the rear-gap route (notes/shell_r2.md open items). Closes: [sub-dock-usb](sub-dock-usb.md).
 8. (closed 2026-10-07, ECR-0001) **Stale frame sources.** frame.py's pod names and pod.py POD_L/W/H/ZC now come from the current design's dims (frame.pod_facts(); revg via ULTRASONIC_DESIGN); interfaces.py frame PASS 10/10 (revg too). blade.rail()/adapter() default to the body centre −2.45; shell_r1 pins −2.0. Pre-rev-1 values frozen in shell.py PRE_R1. Before/after CAD diff: shell_r2, shell_r1, heel_add/heel_cut, pad, dummies' bodies unchanged; modelled adapter slot −0.45 mm, dummies' default rail −0.45 mm (now = shell_r2's), Blade/styles concept bodies follow the r2 envelope (ECR-0001 log).
 9. **No 3D render dump of r2** (section.png/plan.png only); STEP not exported. Closes: render dump (memory rule) after the owner review edits.
