@@ -104,7 +104,7 @@ def __getattr__(name):
 # Resin printing (owner). No heat-set inserts in resin: captured nuts or self-tapping screws.
 FASTENERS = {
     "M1.4_pan": dict(d=1.4, head_d=2.6, head_h=0.9, clear=1.6, pilot=1.1, note="eyeglass/micro screw"),
-    "M1.2_pan": dict(d=1.2, head_d=2.2, head_h=0.8, clear=1.4, pilot=0.95, note="eyeglass screw"),
+    "M1.2_pan": dict(d=1.2, head_d=2.2, head_h=0.8, clear=1.4, pilot=1.0, note="eyeglass screw; pilot 1.0 = ~74 % engagement (0.95 = 92 %, splits resin; hardware.md, 2026-10-07)"),
     "M1.4_nut": dict(s=3.0, m=1.2, pocket_af=3.1, note="brass DIN 934, solderable"),
     "M1.4_set": dict(d=1.4, lengths=(2, 3), key_af=0.7, pilot=1.1, note="cup point; lands on a filed flat"),
 }

@@ -321,3 +321,11 @@
 - 2026-10-07 12:56 checkin SUB-AUDIO-IN by backlog-agent
 - 2026-10-07 12:56 checkin WHOLE by backlog-agent
 - 2026-10-07 12:56 checkin REG-BOARD by backlog-agent
+- 2026-10-07 12:57 checkout PHYSICAL by backlog-agent: PAD-5: M1.2 pilot 0.95 -> 1.0
+- 2026-10-07 12:57 checkout REG-PAD by backlog-agent: PAD-5: M1.2 pilot 0.95 -> 1.0
+- 2026-10-07 12:58 review PHYSICAL by backlog-agent: PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected
+- 2026-10-07 12:58 review REG-ARM by backlog-agent: PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected
+- 2026-10-07 12:58 review REG-PAD by backlog-agent: PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected
+- 2026-10-07 12:58 review R-ARM-PAD by backlog-agent: PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected
+- 2026-10-07 12:58 checkin PHYSICAL by backlog-agent
+- 2026-10-07 12:58 checkin REG-PAD by backlog-agent

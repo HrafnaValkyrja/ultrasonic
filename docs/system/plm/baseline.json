@@ -22,10 +22,10 @@
   "PHYSICAL": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D",
+   "note": "PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
-    "file:hw/mech/frame.py": "c7981bfec8a45660",
+    "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
     "sym:hw/mech/dims_r2.py::B_GAP": "9e0415c00f9dc49a",
     "sym:hw/mech/dims_r2.py::CAV": "57e979455ac943d6",
     "sym:hw/mech/dims_r2.py::CELL": "77243a4be17c6775",
@@ -39,9 +39,9 @@
   "REG-ARM": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "ARM-6/PAD-6: heel.py checks + exports the real shell_r2 tub; pad.py cross-check uses it (geometry unchanged): strut to tub worn 1.176 / free 1.303 / jaw 1.29-1.34 vs 1.4 (was 0.79 on the plain preview); owner decision ARM-6D",
+   "note": "PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected",
    "stamp": {
-    "file:hw/mech/frame.py": "c7981bfec8a45660",
+    "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
     "file:hw/mech/heel.py": "343c7dac129c06c9",
     "file:sim/checks/niti_arm_real.py": "62944f12dde4e774"
    }
@@ -60,7 +60,7 @@
   "REG-PAD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "ARM-6/PAD-6: heel.py checks + exports the real shell_r2 tub; pad.py cross-check uses it (geometry unchanged): strut to tub worn 1.176 / free 1.303 / jaw 1.29-1.34 vs 1.4 (was 0.79 on the plain preview); owner decision ARM-6D",
+   "note": "PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected",
    "stamp": {
     "file:hw/mech/pad.py": "8f91343799a69ead",
     "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
@@ -171,7 +171,7 @@
   "R-ARM-PAD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "ARM-6/PAD-6: heel.py checks + exports the real shell_r2 tub; pad.py cross-check uses it (geometry unchanged): strut to tub worn 1.176 / free 1.303 / jaw 1.29-1.34 vs 1.4 (was 0.79 on the plain preview); owner decision ARM-6D",
+   "note": "PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected",
    "stamp": {
     "file:hw/mech/pad.py": "8f91343799a69ead",
     "sym:hw/mech/frame.py::PAD_CONTACT": "a9817b30cc013f18",

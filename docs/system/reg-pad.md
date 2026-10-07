@@ -83,7 +83,7 @@ Solder each arm wire on the **top half** of its pad: the cap's epoxy dam (r 3.25
 | Solder joints | ≤ 0.45 mm tall in 0.5 mm pockets: **0.05 mm to the cap**; SMD laps 1.36–1.8 mm outside the dam (≥ 1.0) | pad checks.json; tolerances.md |
 | LED top | y 3.88 (0.45 LED + 0.03 solder); frame's 3.75 is too low | pad.py; Everlight DSE-0008890 Rev 3 (2013-05-29) |
 | Board recess | 0.15/side; depth 0.8 nominal (JLC ±10 %: 0.72–0.88) | pad.md |
-| Closure pilot | Ø0.95 in CAD (92 % thread engagement); hardware.md says ream to Ø1.0 (74 %) | frame.FASTENERS; hardware.md §2.1 (2026-09-30) |
+| Closure pilot | Ø1.0 in CAD since 2026-10-07 (~74 % thread engagement; was 0.95 = 92 %, split risk) | frame.FASTENERS M1.2_pan; hardware.md |
 | Wall minimum | 0.60 everywhere, except 0.559 (nut hex ↔ front joint pocket), internal | pad checks.json; tolerances.md (accepted) |
 
 ## Open issues
@@ -101,7 +101,7 @@ Solder each arm wire on the **top half** of its pad: the cap's epoxy dam (r 3.25
    - Stack tolerance: the exciter's thickness is unknown and the board is ±0.08.
 
    Either can rock the cap or buzz. **Closes:** dry-fit before driving the screw; Kapton shims; flatten the joints.
-5. **The closure pilot is Ø0.95 in CAD, but hardware.md says Ø1.0** (92 % vs 74 % thread engagement; the boss can split at 92 %). **Closes:** set `FASTENERS["M1.2_pan"]["pilot"]` = 1.0, or ream to 1.0 on the bench.
+5. (closed 2026-10-07) Closure pilot set to Ø1.0 in `frame.FASTENERS["M1.2_pan"]` (hardware.md: 74 % engagement; 0.95 = 92 % splits the boss). pad.py re-run: only cup cavity↔pilot wall changed, 0.775 → 0.75 (≥ 0.6); cup −0.3 mm³.
 6. **checks.json `all_pass` is false:**
    - (a) the 0.559 mm internal web, accepted in tolerances.md;
    - (b) strut ↔ "tub" 0.79 mm against heel.py's old frame-based tub preview. The rev-1 shell gives 1.18–1.34 mm (tolerances.md).
