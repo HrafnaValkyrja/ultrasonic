@@ -7,10 +7,16 @@ B="$HOME/.claude-shared/board"
 mkdir -p "$B/sessions" "$B/requests" "$B/locks"
 heavy="${1:-none}"
 wd=$(pgrep -f '^bash tools/memwatch\.sh' >/dev/null && echo "tools/memwatch.sh alive: stops only this repo's python/java/kicad/blender jobs below 3.5 GB free" || echo "DOWN")
+# record the session's claude process (walk up the process tree), not the throwaway shell that runs this script
+CLAUDE_PID=$PPID; p=$$
+while [ "$p" -gt 1 ]; do
+  [ "$(cat /proc/$p/comm 2>/dev/null)" = claude ] && { CLAUDE_PID=$p; break; }
+  p=$(awk '{print $4}' /proc/$p/stat 2>/dev/null || echo 1)
+done
 cat > "$B/sessions/ultrasonic.json" <<JSON
 {
  "project": "Stereo Ultrasound / PCB + CAD (/home/hrafnavalkyrja/Desktop/ultrasonic)",
- "pid": $PPID,
+ "pid": $CLAUDE_PID,
  "updated": "$(date -Iseconds)",
  "mem_budget_gb": 8,
  "session_fence": "MemoryMax 8G (owner-set 2026-10-07, until reboot)",
