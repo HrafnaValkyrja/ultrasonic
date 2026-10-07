@@ -1,189 +1,187 @@
 # The whole pod, on one page
-Status: rev-1 prototype design (schematic Rev F, routed board draft, rev-1 "Spine" shell), updated 2026-10-01; Rev F facts synced 2026-10-02 (key numbers, status table, risks 1-4, 8, 10, 17, 20) · Sources of truth: `docs/spec.md`, `hw/pod/gen.py`, `hw/pod/place_r1.py` (until the KiCad board takes over), `hw/mech/shell_r1.py` + `frame.py` + `heel.py` + `pad.py` · Owner decisions: O1–O20 ([spec §12](../spec.md#owner-decisions-open); spec v0.15 at commit 092f2aa). **O20 (2026-10-01 20:48): rev 1 aims to be the final device, so the 34 × 13 board and the rev-1 shell, grown under O15, must be re-sized.**
+Rev MZ-2 2026-10-07: body rewritten to the Phase-2 design (`hw/current.yaml`, ECR-0018): one-face 30 × 12 board hung from the lid, MZ-2 package set, sealed D1.0 mic duct, SW1 pocket + puck, shell_r2; Rev F/G facts moved to "Reference design" at the end.
+Status: Phase-2 miniaturised pod (package set MZ-2 "Balanced"): schematic = Rev G nets with MZ-2 packages (`POD_PACKAGES=mz2 python3 hw/pod/gen.py` → `hw/pod/pod_mz2.net`, `hw/pod/bom_jlc_mz2.csv`); board routed, DRC 0, 0 unconnected (`hw/pod/draft_r2/out/routed.kicad_pcb`, commit f6291e6, 2026-10-07); shell CAD `hw/mech/shell_r2.py` + `dims_r2.py`, not printed; no firmware. Owner review of Claude's layout pending (O25, 1–2 weeks from 2026-10-02). Updated 2026-10-07.
+
+```yaml
+abbrev: {MZ-2: "Phase-2 package set 'Balanced' (ECR-0018)", F: "board face toward the lid (outside)", B: "board face toward the cell", VHB: "3M VHB 4914 acrylic foam tape, 0.25 mm", LN-M0x: "layout-noise metrics (docs/sim/layout-noise.yaml)", NPTH: "non-plated through hole", MC: "Monte Carlo"}
+item: WHOLE
+design_pointer: hw/current.yaml (id phase2; reference = revg)
+src_of_truth: [docs/spec.md, "hw/pod/gen.py (POD_PACKAGES=mz2, MZ2 table L93)", hw/pod/draft_r2/out/routed.kicad_pcb, hw/mech/dims_r2.py, hw/mech/shell_r2.py, hw/mech/frame.py, hw/mech/heel.py, hw/mech/pad.py]
+owner_decisions: "O1-O27 (spec §12); Phase 2 = O25 (Claude lays out, owner reviews), O26 (miniaturise internals first), O27 (thin > short > long)"
+open_ecrs: {ECR-0018: "approved (owner delegated), implementation in progress", others: "ECR-0001, 0005-0010, 0014-0016 proposed (plm.py status 2026-10-07)"}
+checks_2026-10-07: {interfaces.py: "PASS mic-port, outline, inside, clamp-bands (VHB face, 91 % bonded), heights, board-nets; WARN switch (worst stack 0.05 over), pins (3 known hazards), rails (+3V0 326 mA vs U4 300 mA, ECR-0005), frame (8 of 10, ECR-0001)", bom_check.py: "PASS refs/netlist/footprints/fp-library/nets/assembly-tier/jlc-bom/cost-bom/selftest 61; WARN values, identity, stock-lock (8 rows missing), lock-drift (12)"}
+```
 
 Read this first, then [integration-map.md](integration-map.md), then the doc of every subsystem and region a change touches ([README](README.md) has the rule).
 
 ## What it does
-1. Each pod hears ultrasound (realistically 20–85 kHz; the locked MVP says "roughly 20–96") with a PDM MEMS mic ([§1.1](../spec.md#1-mvp--locked-owner-defined-do-not-modify), D14 band-edge note, spec L269).
-2. An STM32U575 MCU (Arm Cortex-M33 microcontroller with a built-in core switching regulator) shifts it into 1.5–4 kHz (D9, L203).
-3. A discrete H-bridge (four transistors, as two N+P pairs) drives a bone-conduction exciter pressed on the skin in front of the tragus (D1, L85; D6, L153).
-4. Two identical pods clip onto her prescription glasses, one per temple arm, with no link between them (D2, L107; §1.2.1).
-5. A 175 mAh cell runs each pod for ≥ 8 h (target ~12 h); a magnetic USB dock charges it and loads firmware (D18, L297; O12, L638; O16, L642).
+1. Each pod hears ultrasound (realistically 20–85 kHz; the locked MVP says "roughly 20–96") with a PDM MEMS mic ([§1.1](../spec.md#1-mvp--locked-owner-defined-do-not-modify), D14 band-edge note).
+2. An STM32U575 MCU (Arm Cortex-M33 microcontroller with a built-in core switching regulator) shifts it into 1.5–4 kHz (D9).
+3. A discrete H-bridge (two N+P MOSFET pairs) drives a bone-conduction exciter pressed on the skin in front of the tragus (D1, D6).
+4. Two identical pods clip onto her prescription glasses, one per temple arm, with no link between them (D2, §1.2.1).
+5. A 175 mAh cell runs each pod for ≥ 8 h (target ~12 h); a magnetic USB dock charges it and loads firmware (D18, O12, O16).
+
+Phase 2 changed packages, board, shell and placement only: **the circuit is frozen at Rev G** (`pod_mz2.net` nets == Rev G, gen.py `apply_packages` docstring; bom_check [nets] 195 pins / 42 nets PASS 2026-10-07). Every F-row, pin and rail below is the Rev G one.
 
 ## Functions (F-rows from integration-map.md §1) and the doc that owns each
 | F | Function | Owner doc | Also touches |
 |---|---|---|---|
-| F1 | Hear 20–85 kHz | [sub-audio-in](sub-audio-in.md) | reg-board (mic on B), reg-pod-body (lid port), physical |
-| F2 | Process | [sub-processing](sub-processing.md) | sub-power (SMPS, D11) |
+| F1 | Hear 20–85 kHz | [sub-audio-in](sub-audio-in.md) | reg-board (mic on B, port NPTH), reg-pod-body (sealed D1.0 duct), physical |
+| F2 | Process | [sub-processing](sub-processing.md) | sub-power (SMPS, D11), reg-board (In2 +3V0 plane) |
 | F3 | Drive the exciter | [sub-output](sub-output.md) | reg-arm (wires), reg-pad (exciter) |
-| F4 | Self-test exciter \|Z\| | [sub-output](sub-output.md) | sub-debug-test (USB self-test) |
-| F5 | Charge the cell | [sub-power](sub-power.md) | sub-dock-usb, reg-pod-body (dock bay) |
+| F4 | Self-test exciter \|Z\| | [sub-output](sub-output.md) | sub-debug-test (USB self-test), reg-board (R21 Kelvin vias) |
+| F5 | Charge the cell | [sub-power](sub-power.md) | sub-dock-usb, reg-pod-body (dock bay, cell on VHB) |
 | F6 | Temperature-safe charge | [sub-power](sub-power.md) | sub-processing (PA2 20 °C rule) |
 | F7 | System power rail | [sub-power](sub-power.md) | – |
 | F8 | Battery level | [sub-power](sub-power.md) | sub-processing (ADC4 in Stop 2) |
 | F9 | Dock detect | [sub-dock-usb](sub-dock-usb.md) | sub-processing |
 | F10 | USB data / DFU | [sub-dock-usb](sub-dock-usb.md) | sub-processing (boot stub) |
-| F11 | Wake / button | [sub-ui](sub-ui.md) | reg-pod-body (plunger, skin) |
+| F11 | Wake / button | [sub-ui](sub-ui.md) | reg-pod-body (SW1 pocket, puck, skin) |
 | F12 | Power LED (solid) | [sub-ui](sub-ui.md) | reg-arm (2 of the 4 wires), reg-pad (pad board) |
-| F13 | Charger link (I2C) | [sub-power](sub-power.md) | sub-processing |
-| F14 | Debug / flash / test | [sub-debug-test](sub-debug-test.md) | reg-board (TP1–TP6 on F) |
-| F15 | ESD at exposed contacts | [sub-dock-usb](sub-dock-usb.md) | sub-power (D5 TPD1E10B06 at the J3 contact, D4 stays the reverse block), reg-board (J-pad adjacency) |
+| F13 | Charger link (I2C) | [sub-power](sub-power.md) | sub-processing; reg-board (I2C_SCL runs inside In2) |
+| F14 | Debug / flash / test | [sub-debug-test](sub-debug-test.md) | reg-board (TP1–TP6 bare on F), reg-pod-body (VHB cut-outs) |
+| F15 | ESD at exposed contacts | [sub-dock-usb](sub-dock-usb.md) | sub-power (D5 at J3, D4 reverse block), reg-board (J-pad gaps) |
 
 ## Logical block diagram
-![block schematic, gen.py Rev F](../diagrams/schematic-rev1.png)
+![block schematic, gen.py](../diagrams/schematic-rev1.png)
 
-*Source `docs/diagrams/schematic-rev1.svg`. Three labels are now stale: "58 placed parts" (now 56), "R21 0.33 Ω" (now 0.1 Ω after the 2026-10-01 audit) and "~1C = 175 mA max" (U3 can only set 170 mA). The signal-chain diagram `docs/diagrams/system-overview.svg` is from spec v0.13 (MCU/ADF chain still right); it has no current PNG in `docs/diagrams/`.*
+*Source `docs/diagrams/schematic-rev1.svg`: the block structure is still right (nets unchanged since Rev G); package labels and three values on it are stale ("58 placed parts" → 53; "R21 0.33 Ω" → 0.1 Ω 0402; "~1C = 175 mA" → 170 mA).*
 
-## Physical overview: where each block lives, what crosses between regions
-![physical overview](../diagrams/system-overview-physical.png)
+## Physical overview
+Phase-2 views are build outputs (gitignored): `python3 hw/mech/shell_r2.py` → `hw/mech/out/r2/section.png` (y stack through the mic) and `plan.png`; `python3 tools/board_map.py` → `docs/diagrams/board-map-phase2.png`. `docs/diagrams/system-overview-physical.png` still draws Rev F (ribs, foam, parts on both faces): use it for topology only.
 
-*Source `docs/diagrams/system-overview-physical.svg` (new, 2026-10-01; text corrected in the editor pass). Panel A is the LEFT pod from outside with the lid off. That view is exactly KiCad's top view of the board. Panel B is the stack-up through the mic; it draws the board hole and lid bore in line; Rev F makes that true (ECR-0011; they were 0.77 mm apart in Rev E). Details: [physical.md](physical.md). CAD renders: `hw/mech/out/r1/spine/open.png`, `exploded.png` (right pod).*
-
-| Region | Holds | Doc |
+| Region | Holds (Phase 2) | Doc |
 |---|---|---|
-| Pod body | tub, lid (mic port, plunger, ribs), spine top, belly dock bay, heel (NiTi root) | [reg-pod-body](reg-pod-body.md) |
-| Board (in the pod) | F face: MCU, SMPS, crystal, SW1, TP1–TP6, all J pads · B face: mic, bridge, charger, LDO, dock protection | [reg-board](reg-board.md) |
-| Cell (in the pod) | Renata 175 mAh, under the board on foam | [sub-power](sub-power.md), [physical](physical.md) |
-| Arm | NiTi wire Ø0.80, printed strut cover, 4 litz wires | [reg-arm](reg-arm.md) |
+| Pod body | tub (cell on VHB, belly dock bay, heel), lid (sealed D1.0 mic duct + mesh window, SW1 pocket + puck + skin, x-stop), seam at the board's B face | [reg-pod-body](reg-pod-body.md) |
+| Board | 30 × 12 × 0.8, 4 layers (In1 GND plane, In2 +3V0 plane). **B face: every part** (MCU, SMPS, crystal, mic, bridge, charger, LDO, dock protection, all J wire pads, TP7–TP10 dots). **F face: SW1 + bare TP1–TP6 only**; F is bonded to the lid by VHB with per-pad cut-outs | [reg-board](reg-board.md) |
+| Cell | Renata 175 mAh pouch on 0.25 VHB in the tub; 1.4 mm gap to the board's B face (no foam) | [sub-power](sub-power.md), [physical](physical.md) |
+| Arm | NiTi wire Ø0.80, printed strut cover, 4 litz wires to the rear B pads | [reg-arm](reg-arm.md) |
 | Pad | cup + cap, RC-BC02 exciter, pad board with a blue LED, contact face | [reg-pad](reg-pad.md) |
 
 ## Key numbers
 | Quantity | Value | Source (date) |
 |---|---|---|
-| Pod envelope, rev 1 | 38.0 long × 11.8 deep (adapter face to armour top) × 15.2 tall; belly adds 3.5 under the front 25.5 mm; spine adds up to 3.1 on top at the rear | `shell_r1.py` L35–37, L120–132; STL bounding boxes `hw/mech/out/r1/spine/` (measured 2026-10-01) |
-| Board | 34 × 13 × 0.8 mm, 4 layers, In1 solid GND, parts on both faces | `place_r1.py` L1, L8 (2026-10-01) |
-| Cell | Renata ICP501233PA-02 (Li-ion pouch with its protection circuit inside), 175 mAh, 35 × 12 × 5.3 mm | spec O16(1) L642; `shell_r1.py` L8 |
-| Arm | NiTi (superelastic nickel-titanium) wire Ø0.80, 20 mm, 30° sweep | `frame.py` L68; spec O7b L633 |
-| Pad force target | ≥ 1 N inward at the tragus | spec D1 L100 |
-| Mass per pod | **≥ ~10.2 g lower bound [derived]**, before parts, dock target, adapter and wires: shell 2.92 + heel 0.26 + cell ~4.2 + pad **2.19** + bare board ~0.65. **Already above the ~8 g target**; ~15 g is where glasses start to hurt (D18, R20). Two resin densities in the sum (1.15 / 1.18 g/cm³). Last whole-pod figure: ~7.1 g for the older 38 × 10 × 15 pod with a 105 mAh cell | reg-pod-body Key numbers; pad checks.json (2026-10-01 00:54); spec §8 L455, L516 |
-| Current, full chain awake | 5.0 / 6.8 / 9.8 mA (low / nominal / high) | spec §7 L408; `sim/checks/power.py` rev 2 |
+| Pod envelope (Phase 2) | L 38.0 × T 10.4 × H 14.5, belly 2.05; volume 6211 mm³ (body 5721 + plate 331 + spine 160); Rev F 7801 mm³ → −20 % | `hw/mech/out/r2/checks.json` envelope (shell_r2.py, commit c348661, 2026-10-07) |
+| Stack (pod y, mm) | adapter face 4.3 · wall 0.8 · tape 0.3 · cell 5.4–10.7 · B gap 1.4 · board 12.1–12.9 · F gap 0.30 (VHB 0.25) · lid 13.2–14.0 · plate to 14.7 | `dims_r2.py` Y_* (2026-10-07) |
+| Board | 30.0 × 12.0 × 0.8, R1.0 corners, 4 layers F / In1 GND / In2 +3V0 / B; pod x 30.55–60.55, 0.25 x-stop gap, 0.45 side gaps | routed board probe (pcbnew, 2026-10-07); checks.json board_in_cavity |
+| Board parts | 74 footprints: 53 JLC-placed (52 B + SW1 on F) + 21 copper-only pads; 31 BOM lines; no DNP | bom_check.py [refs] [jlc-bom] 2026-10-07; board probe (B 67 / F 7 footprints) |
+| Route | 610 track segments (F 277 mm, B 252 mm, In2 9.0 mm = the I2C_SCL bridge), 136 vias 0.35/0.15; DRC 0, 0 unconnected | board probe 2026-10-07; ECR-0018 log 2026-10-07 |
+| Layout noise | LN-M01 26.5 dB (nominal 46.5, worst 14.0) PASS; LN-M02 20.1 dB PASS (review band); LN-M03 1.29 % ≤ 2 % PASS; LN-M04 0.127 mV PASS; LN-M05 8.7 µV PASS | `sim/noise/out_r2/budget.json` (valid, board sha da4e8b13 = routed board, 2026-10-07) |
+| Mic port acoustics | phase2_r2 duct: mean 20–96 kHz +5.6 dB nominal; MC (n 60, ±0.2 mm, offset 0–0.2) p05/p50/p95 −0.06/4.51/8.43 dB; peak 63.0 kHz +18.5 dB Q6.4 (firmware EQ target); notch 26.0 kHz −7.8 dB | `sim/acoustics/port.py` scenario phase2_r2 (`sim/acoustics/out/port_results.json`), ECR-0018 log 2026-10-07 |
+| Cell | Renata ICP501233PA-02 (Li-ion pouch with its protection circuit inside), 175 mAh, 35 × 12 × 5.3 mm | spec O16(1); `dims_r2.py` CELL |
+| Arm | NiTi (superelastic nickel-titanium) wire Ø0.80, 20 mm, 30° sweep | `frame.py`; spec O7b |
+| Pad force target | ≥ 1 N inward at the tragus | spec D1 |
+| Mass per pod | **≥ ~9.5 g lower bound [derived]**: shell 2.52–2.58 (tub 1321.5 + lid 863.3 + puck 3.1 mm³ at 1.15–1.18 g/cm³) + cell ~4.2 + pad 2.19 + bare board ~0.53 (288 mm³ FR-4 at ~1.85 g/cm³ [A]); before parts, dock target, adapter, wires. Target ~8 g, ~15 g hurts (D18, R20) | checks.json volumes (2026-10-07); pad checks.json (2026-10-01); derived 2026-10-07 |
+| Current, full chain awake | 5.0 / 6.8 / 9.8 mA (low / nominal / high) | spec §7; `sim/checks/power.py` rev 2 (circuit unchanged since Rev G) |
 | Current, idle listening | 1.7 / 2.2 / 3.4 mA | same |
-| Pad LED (O8) | +0.14–0.73 mA on battery (VSYS 3.0–4.2 V), 0.82–0.86 mA docked (4.5 V); **not in `power.py`** | sub-ui Key numbers (R14 2k2, V<sub>F</sub> 2.6–2.7 V from pad-led.md) |
-| Runtime, 175 mAh (derived) | always awake: 13.4–22.0 h (pessimistic–nominal); 12.5 h pessimistic with the LED at 0.75 mA; half awake: 19.9–33.2 h | `power.py` model with 175 mAh plugged in (run 2026-10-01 for this doc; the same model reproduces spec's 105 mAh 8.0–13.2 h) |
-| Runtime requirement | ≥ 8 h, target ~12 h | D18 L297 |
-| Charge current | **170 mA** (ICHG code 44, the nearest 10 mA step ≤ 1C) at 20–45 °C; 50 mA (code 32) below 20 °C; firmware sets it over I2C (U3 default 10 mA). gen.py L191 still says 175 mA | [sub-power](sub-power.md) register plan; SLUSE99C §8.5.1 |
-| Charge time | **TBD** (no source computes it; needs the BQ25180 CC/CV profile with the real cell) | – |
-| Cost per pod | $22.90 priced parts per pod, $45.81 per pair, **plus** cell and exciter (no price yet). Includes the **wrong** 4-pin cable head C5126845; with the 5-pin C5126847 ($1.39, 0 JLC stock 2026-10-02T00:03Z) the pod cost drops ~$0.68 (sub-dock-usb issue 1). bom.md also over-counts passives by 3 (23 caps vs 22; 21 resistors incl. R20/R21) | `docs/build/bom.md` L40 (JLC API 2026-10-01; lock 2026-09-30) |
-| One-time per JLC order | $93–195 (rough, not a quote) | `bom.md` L50 |
-| Budget | ~$300 rev-1 milestone (may double after); device target ~$150. O19: a personal device, no volume-cost goals; buy critical parts once with spares | O13 L639; O19 L645 |
-| Board parts | 53 JLC-placed parts on 30 BOM lines (Rev G: +D6 on the D5 line; C8/C9 now C107369); **11 Extended part types on the pod board** (+1, the pad-board LED C131223 = 12 loading fees per JLC order); 21 copper-only pads (J1–J5, J7–J12, TP1–TP10); no DNP (D1/D2 removed) | `hw/pod/bom_jlc.csv` (counts derived 2026-10-02); reg-board counts and Interfaces (Cost) row; JLC parts API 2026-10-02T00:44Z (audit query, every line) |
-| ERC | 0 errors, 311 warnings | `hw/pod/gen.erc` (2026-10-02 20:01) |
-| Board draft route | Rev G: 694 tracks, 118 vias, **1 unconnected** (I2C_SDA), +1 clearance 0.0892 mm (router rounding); Rev F was 687/118/2 unconnected (SWCLK→TP2, LED_K→J8), 19 DRC errors (all courtyard overlaps: 18 J-pad ring pairs + C1↔U1) | `hw/pod/draft_r1/summary.json`, `drc.json` (2026-10-02T20:07) |
-| MCU / mic stock | U1: 8 at JLC (C5271013); U2: 960 and falling (1,076 on 2026-09-30) | `bom.md` L7 (2026-10-01); JLC API 2026-10-02T00:44Z; ECR-0008 |
-| Sealing target | IPX4 minimum, IPX5 preferred | O12(b) L638 |
-| Signal chain | mic 4.0 MHz PDM → 200 kS/s; output 1.5–4 kHz; PWM 200 kHz | D14 L241–258, D9 L203, D6 L155 |
+| Pad LED (O8) | +0.14–0.73 mA on battery, 0.82–0.86 mA docked; not in `power.py` | [sub-ui](sub-ui.md) |
+| Runtime, 175 mAh (derived) | always awake 13.4–22.0 h; 12.5 h pessimistic with the LED at 0.75 mA | `power.py` (2026-10-01; same circuit) |
+| Rail peaks | +3V0 326 mA vs U4 300 mA rating (ECR-0005); VSYS 327 mA = 93 % of the cell's 350 mA 2C pulse | interfaces.py [rails] 2026-10-07 |
+| Charge current | 170 mA (ICHG code 44) at 20–45 °C; 50 mA below 20 °C; firmware sets it over I2C | [sub-power](sub-power.md) |
+| Cost per pod | **$23.18 priced parts per pod, $46.36 per pair**, plus cell and exciter (no price) | `docs/build/bom.md` (bom.py, MZ-2 re-price JLC API 2026-10-07T11:31Z) |
+| One-time per JLC order | $93–195 (rough, not a quote) | `bom.md` |
+| Budget | ~$300 rev-1 milestone; O19 personal device, no volume-cost goals; O21 nothing ordered before the design freeze | O13, O19, O21 |
+| MCU stock | U1 C5271013: 8 at JLC (ECR-0008) | bom.md / JLC API 2026-10-01 (not re-queried 2026-10-07) |
+| Sealing target | IPX4 minimum, IPX5 preferred | O12(b) |
+| Signal chain | mic 4.0 MHz PDM → 200 kS/s; output 1.5–4 kHz; PWM 200 kHz | D14, D9, D6 |
 
-## Status of every part of the system
-Every doc below was created 2026-10-01 with this set and revised the same evening (editor pass). "State" mirrors each doc's own status line.
-
-| Doc | State (2026-10-01) | Biggest open issue |
+## Status of every part of the system (2026-10-07)
+| Doc | State | Biggest open issue |
 |---|---|---|
-| [integration-map](integration-map.md) | Generated from `gen.py` Rev F; hand-kept facts live in `hw/pod/system_map.py` | Hand-kept facts lag: "~315 mA" peaks (interfaces.py rails: 326 mA on +3V0); LED "~0.35-0.75 mA" (sub-ui: 0.14-0.73 battery, 0.82-0.86 docked); TP1-TP6 only (TP7-TP10 exist); "PA8/PA7/PA9/PB0" in §8 (now PA8/PA7/PA10/PB15); LED duty "from VBAT"; shrink tube "through" the bores. All wait on `system_map.py` (list below) |
-| [physical](physical.md) | Rev-1 shell + 34 × 13 draft; O20 says both must be re-sized | The foam strips have no floor (0.1 mm on the cell); mic port unsealed (port aligned with the lid bore since ECR-0011); heel exit vs the cell end |
-| [sub-power](sub-power.md) | Schematic Rev F; routed, none of the 2 unconnected here; charger firmware not written | U3 defaults are unsafe for this cell (TS_HOT 60 °C, 10 mA); firmware must also set EN_PUSH = 0 and handle the watchdog in DFU. Cell is quote-only |
-| [sub-audio-in](sub-audio-in.md) | Schematic Rev F; routed draft; rev-1 shell; port aligned with the lid bore (ECR-0011) | No seal across the 1.5 mm gap; acoustic path unmeasured; mic stock falling |
-| [sub-processing](sub-processing.md) | Schematic Rev F; routed draft; **no firmware** | No firmware (ECR-0010); only 8 MCUs at JLC (ECR-0008); spec D5 names a different SMPS inductor |
-| [sub-output](sub-output.md) | Schematic Rev F; routed, nothing unrouted here; firmware not written; exciter not measured | Exciter R and L unknown (E1, ECR-0007); Q1/Q2 footprint (ECR-0004); ECR-0009's docked interlock vs the self-test |
-| [sub-dock-usb](sub-dock-usb.md) | Schematic Rev F; pads hand-wired to a bought target; belly bay modelled; cable, pin order and DFU firmware not designed | No wire route or gauge from the belly; wrong 4-pin head in the BOM (D5 now clamps the exposed DOCK_VBUS contact) |
-| [sub-ui](sub-ui.md) | Schematic Rev F; BTN routed, LED_K→J8 unrouted; plunger and bore modelled, skin not chosen; gesture model partial; no firmware | Seated plunger sits 0.40 mm under the skin recess floor: head ↔ skin is set nowhere; nothing rigid (floorless foam) backs SW1 |
-| [sub-debug-test](sub-debug-test.md) | Schematic Rev F; TP row placed; SWCLK→TP2 unrouted; test frame, self-test firmware and note don't exist; no bring-up yet | First flash needs an SWD probe (none recorded); ECR-0009 blocks the docked \|Z\| sweep; O20: test access may not cost size |
-| [reg-pod-body](reg-pod-body.md) | Rev-1 shell CAD, not printed; overlap checks all 0; O20 re-size | Foam has no floor; spine is a floating solid; board has no x stop; seam cut line is a 0.2 mm rebate with no lip round the belly |
-| [reg-board](reg-board.md) | Routed draft, not the layout: 2 unconnected, 19 DRC (courtyard overlaps); O20 re-size | 2 unconnected; J4 GND–J5 VBAT 0.60 mm (cell short), J5–J12 CC 0.89 mm; owner layout (O14) not started; Phase 2 miniaturization pending |
-| [reg-arm](reg-arm.md) | CAD rev 1, not built; heel/pad checks still built against `frame.py` (ECR-0001) | Spring force unverified (bend a coupon, O7b); heel exit vs the rev-1 cell; wire Ø 0.80 (`frame.py`) vs 0.75 (BOM) |
-| [reg-pad](reg-pad.md) | CAD rev 1, not built; `pad.py` all_pass false (2 known items); pad board DRC 0; exciter not measured | Exciter not bought; contact face Ø8 vs O16(4)'s 100–150 mm²; pad-board LED_K 0.45 mm from OUT_B |
+| [integration-map](integration-map.md) | Generated from gen.py mz2 + `system_map.py` hand-kept facts (Phase 2 mechanical facts since 07c8a83) | §10 item 6 still says "clamp bands" (generator text, system_map.py) |
+| [physical](physical.md) | Phase-2 stack from `dims_r2.py`; board hung from the lid | Heel wire exit overlaps the cell end (x 65.25–66.25 vs 65.6); dock wire route belly → rear B pads undesigned; sealing unverified (physical issues 2, 3, 6) |
+| [sub-power](sub-power.md) | Rev G circuit, MZ-2 packages, routed; charger firmware not written | U4 300 mA vs the 326 mA +3V0 peak (ECR-0005); charger defaults unsafe until firmware writes the register plan; J3 DOCK_VBUS–J5 VBAT now neighbours, 1.17 mm, no GND pad between (PWR-I17; ASM-09) |
+| [sub-audio-in](sub-audio-in.md) | Mic at board (2.65, 6.0), port (1.88, 6.0) = pod 32.43; sealed D1.0 duct + gauge pin; acoustics phase2_r2 modelled | No mesh part (S8-mesh FAIL); 63 kHz Q6.4 duct resonance needs the firmware EQ notch (O24 text still says ~84.7 kHz); duct-seat keep-out broken by an F track; port_results.json now holds an n 40 MC (p50 4.30, all-pass 0.57) vs the n 60 run in the ECR-0018 log (4.51, 0.70) |
+| [sub-processing](sub-processing.md) | U1 QFN-48 on B; routed; **no firmware** | No firmware (ECR-0010); 8 MCUs at JLC (ECR-0008); LSE traces use vias and both faces, VDDA caps C5/C6 ~9 mm from pin 9 (issues 13, 14) |
+| [sub-output](sub-output.md) | Rev G circuit; R21 0402 with Kelvin vias (LN-M03 1.29 %); exciter not measured | Exciter unmeasured (E1, ECR-0007); U4 vs full-scale peaks (ECR-0005); R21 sits mid-board (19.45, 6.45), not at the edge MZD-4 asks for |
+| [sub-dock-usb](sub-dock-usb.md) | Dock pads on B rear columns; D5/D6/U6/D4 on B | BOM still pairs the 5-pin target with a 4-pin head (DK-01); dock wire route undesigned (DK-05); O16(3) USB-C space not carried into shell_r2, owner decision needed (DK-10) |
+| [sub-ui](sub-ui.md) | SW1 alone on F in the lid pocket; puck kit modelled | Puck reach by selective fit, every tolerance [A]; the 1.2–2.0 N press is reacted by the VHB and the 0.8 mm board, nothing rigid backs SW1; skin not chosen; gesture model open (owner) |
+| [sub-debug-test](sub-debug-test.md) | TP1–TP6 bare on F (VHB cut-outs), TP7–TP10 on B; no bring-up yet | First flash = ROM DFU via the R1 tack pad (no SWD probe, O13/O21); TP1–TP6 reachable only before the lid bond; TP4 +3V0 beside TP5 GND at 0.8 mm (DBG-2) |
+| [reg-pod-body](reg-pod-body.md) | shell_r2 CAD, not printed; clash checks 0, printable | Switch lateral stack WARN (0.20 vs 0.15); heel exit vs cell; seam rebate 0.2 below the 0.4 resin minimum; duct-seat keep-out R-ACO-P6 broken by an MDF_SDI F track 1.35 mm from the port |
+| [reg-board](reg-board.md) | Routed: DRC 0, 0 unconnected; owner review pending (O25) | No dielectric stack-up in the file; DRC rules only in the untracked `routed.kicad_pro`; LSE vias, VDDA caps; J3–J5 1.17 mm (reg-board issues 2, 4, 16–18) |
+| [reg-arm](reg-arm.md) | CAD rev 1, not built; heel/pad checks still read `frame.py` (ECR-0001) | Heel exit vs cell; pad force dips to 0.42–0.45 N on jaw opening; wire Ø 0.80 (frame) vs 0.75 (BOM) |
+| [reg-pad](reg-pad.md) | CAD rev 1, not built; exciter not measured | Contact face Ø8 (~50 mm²) vs O16(4) 100–150 mm²; exciter size/leads unknown (E1); sealing undesigned |
 
 ## Decision index (everything that shapes the hardware)
-Decisions: [spec §4](../spec.md#4-decisions). Owner decisions: [spec §12](../spec.md#owner-decisions-open). L = line in `docs/spec.md` v0.15 (commit 092f2aa; its header still says v0.14). Lines move whenever the spec grows: cite by ID first, line second.
+Decisions: [spec §4](../spec.md#4-decisions). Owner decisions: [spec §12](../spec.md#owner-decisions-open). L = line in `docs/spec.md` (read 2026-10-07; header still says v0.14). Cite by ID first, line second.
 
 | ID | Line | What it fixes in hardware |
 |---|---|---|
 | §1 MVP | L26 | Locked. Clip-on clasps, Ear (open) coexistence, self-noise ≤ ambient, comfort first |
-| §8 v0.9 | L476 | Peripheral vision is a no-go zone: nothing forward of ~18 mm behind the pupil plane (E10 measures) |
+| §8 | L435 | Physical layout per side; peripheral vision no-go zone (nothing forward of ~18 mm behind the pupil plane); mic port rules |
 | D1 | L85 | Exciter on the skin in front of the tragus, pressing inward, ≥ 1 N |
 | D2 | L107 | Two independent pods: own cell and MCU each, no wires across the hinges |
 | D3 | L119 | Fixed gain + stepped volume: one button (SW1) does it all |
-| D4 | L127 | Digital DSP, so an MCU, not an analog divider |
-| D5 | L131 | MCU = STM32U575CIU6Q, QFN-48 7 × 7, internal SMPS (its inductor, L152, differs from the schematic's: sub-processing issue 11) |
+| D4 | L127 | Digital DSP, so an MCU |
+| D5 | L131 | MCU = STM32U575CIU6Q, QFN-48 7 × 7 (kept in Phase 2, MZD-2), internal SMPS |
 | D6 | L153 | 200 kHz 2-level PWM into a discrete H-bridge; gate pull resistors mandatory |
-| D7 | L189 | Exciter = RC-BC02 class (vendor specs disagree; measure in E1) |
+| D7 | L189 | Exciter = RC-BC02 class (measure in E1) |
 | D8 | L199 | JLC machine assembly; the owner hand-solders only the wires, cell and exciter |
-| D11 | L210 | The only switching regulator is the MCU core SMPS (shielded, low-magnetostriction L1); the main rail is a linear LDO |
+| D11 | L210 | The only switching regulator is the MCU core SMPS; the main rail is a linear LDO |
 | D12 | L218 | Off = Stop 2 with the mic unpowered, so the mic is fed from PA5 |
-| D13 | L224 | Mic SPH0641LU4H-1; no Class-2 ceramic caps near it; the §8 port rules (L508) follow from it |
+| D13 | L224 | Mic SPH0641LU4H-1; no Class-2 ceramic caps near it; §8 port rules |
 | D14 | L241 | One synchronous clock tree; mic clock 4.0 MHz |
-| D16 | L285 | 32.768 kHz crystal Y1 |
-| D17 | L293 | Fixed output ceiling, pop-free starts (firmware; relies on the D6 gate pulls) |
-| D18 | L297 | ≥ 8 h runtime, weight balance: sets cell size and position |
-| D9, D10, D15 | L203, L207, L272 | Firmware-only (output band, band floor, toolchain) |
-| R19–R25 | L612–L618 | v0.15 project-level risks: experience, wearability, silence, DOA rev 1, safety, joint fatigue, design paralysis; mitigations in ECR-0006…0010 |
-| O1, O2 | L627, L628 | Runtime 8/12 h; tragus site (both resolved) |
-| **O3** | L629 | OPEN: approve the shopping list |
-| **O4** | L647 | OPEN: confirm the D18 reading (cell along the arm, nothing behind the ear) |
-| **O5** | L630 | Pod growth is acceptable when it is clearance |
-| O6 | L631 | Resolved into D11 (core SMPS allowed) |
-| O7, O7b | L632, L633 | Superelastic NiTi wire arm, no heat-setting; 20 mm, 30° sweep, wiring option A (Ø0.75 proposal still awaiting OK) |
+| D16 | L285 | 32.768 kHz crystal Y1 (Phase 2: 2012 package, CL 7 pF) |
+| D17 | L293 | Fixed output ceiling, pop-free starts |
+| D18 | L297 | ≥ 8 h runtime, weight balance |
+| O5 | L630 | Pod growth acceptable when it is clearance |
+| O7, O7b | L632–633 | Superelastic NiTi arm, no heat-setting; 20 mm, 30° sweep |
 | O8 | L634 | Solid power LED in the pad (R14, J7/J8, PB7) |
-| O9 | L635 | Rev 1 IS the prototype: test pads + snap-off test frame, no dev boards |
+| O9 | L635 | Rev 1 is the prototype: test pads + snap-off test frame |
 | O10 | L636 | Two-stage build: test build, then a bonded final build that can be cut open |
-| O11 | L637 | Printed strut cover, Sugru contact, arms tilted inward for preload |
 | O12 | L638 | Magnetic USB dock (charge + DFU), IPX4/IPX5, fastest practical charge |
-| **O13** | L639 | Budget is a milestone (~$300); board stays double-sided |
-| O14 | L640 | PCB layout done together; Claude teaches, the owner drives KiCad |
-| O15 | L641 | Self-test over USB. "Rev 1 may be bigger" is **superseded by O20** |
-| O16 | L642 | Renata 175 mAh, BQ25180, pre-built magnetic connector (+ USB-C space), bigger near-flat pad, one board for both pods, no screws in the housing, IP68 switch |
-| O17 | L643 | Spine top; arm-joint wiring with clearance, no pinched wires |
-| O18 | L644 | Fail informatively: test hooks, telemetry, isolation links; DFU the most-verified path, SWD backup; the board measures itself; spare MCU pins to pads; every uncertain value a firmware knob |
-| O19 | L645 | A personal device: optimise comfort, reliability, durability, **serviceability** (cell swap, owner repairs) and diagnosability; no volume-cost goals; buy spares |
-| O20 | L646 | Rev 1 aims to be the final device: size is a rev-1 priority; test access must not cost size; the 34 × 13 board and rev-1 shell must be re-sized |
+| O13 | L639 | Budget is a milestone (~$300); "board stays double-sided": Phase 2 places one face by machine (SW1 is the only F part) |
+| O14 | L640 | Layout together: **superseded for rev 1 by O25** |
+| O16 | L642 | Renata 175 mAh, BQ25180, magnetic connector, near-flat pad, one board for both pods (mic + switch on the centre line), no screws, IP68 switch |
+| O17 | L643 | Spine top; arm-joint wiring with clearance |
+| O18 | L644 | Fail informatively: hooks (R1/R20/R21 stay hand-liftable 0402), spare pins to pads, every uncertain value a firmware knob |
+| O19 | L645 | Personal device: comfort, reliability, serviceability; no volume-cost goals |
+| O20 | L646 | Rev 1 aims to be the final device; size is a rev-1 priority (Phase 2 is its answer) |
+| O21 | L647 | No orders until the design is final |
+| O22 | L648 | Freeze = evidence gate, not a date |
+| O23 | L649 | Black solder mask, white legend |
+| O24 | L650 | Sealed D1.0 mic duct + x-stop/locating feature (+ EQ notch); C8/C9 10 V; D6 ESD at CC; long sim runs |
+| O25 | L651 | Claude lays out the rev-1 board; owner reviews in 1–2 weeks |
+| O26 | L652 | Phase 2 miniaturisation now, internals first; adapter deferred (two frames) |
+| O27 | L653 | Size priority: thin, then short (height), then length |
+| O3, O4 | L629, L654 | OPEN: shopping list; D18 reading (cell along the arm) |
 
 ## Where the spec and the design disagree today
-- Spec §3 (L60–73) and §9 (L520–535) still describe the L452/DFSDM, MCP73831 charger, 105–150 mAh cell and the old FET candidates. Rev E is U575/ADF1, BQ25180, Renata 175 mAh and PMCXB290UE.
-- Spec §7 runtime (L413–417) and D18 (L299) are sized for 105–150 mAh; O16 picked 175 mAh. The charge rule "≤ 0.5C" (L386) is now 170 mA ≈ 1C (O12c; sub-power).
-- D5 (L152) names the Murata LQM21PN2R2MGHL SMPS inductor; Rev E fits the DFE201610E, whose magnetostriction (D11, L214) isn't published.
-- O20 (L646) says rev 1 is final-size; the design in hand (34 × 13 board, rev-1 shell) was grown under O15 and hasn't been re-sized yet.
-- The spec header still says v0.14; its changelog and content are v0.15 (owner to bump).
-- O10 says the test build is "screwed where needed"; O16(6) (later) says the housing is taped, with no screws.
-- Spec cites four research notes that don't exist: `sealing-and-service.md` (O10), `contact-face-and-preload.md` (O11), `battery-and-charging.md` (O12), `self-test-firmware.md` (O15).
+- Spec §3 and §9 still describe the L452/DFSDM, MCP73831 charger, 105–150 mAh cell and old FET candidates; the design is U575/ADF1, BQ25180, Renata 175 mAh, PMCXB290UE.
+- Spec §7 runtime and D18 are sized for 105–150 mAh; O16 picked 175 mAh. The charge rule "≤ 0.5C" is now 170 mA ≈ 1C (O12c).
+- D5 names the Murata LQM21PN2R2MGHL SMPS inductor; the board fits the DFE201610E (L0806), whose magnetostriction (D11) isn't published.
+- D5's v0.14 note still says the bridge is on PA8/PA7/PA9/PB0; it is PA8/PA7/PA10/PB15 (ECR-0003).
+- O13 "board stays double-sided" vs Phase 2's one-face machine placement (SW1 alone on F; bom_check [assembly-tier] still counts it double-sided: 1 F + 52 B, 2026-10-07).
+- O24(1) names the EQ notch at ~84.7 kHz; on the Phase-2 duct the peak is at 63.0 kHz (ECR-0018 log 2026-10-07).
+- The spec header says v0.14; O10 "screwed where needed" vs O16(6) no screws; four cited research notes don't exist (`sealing-and-service.md`, `contact-face-and-preload.md`, `battery-and-charging.md`, `self-test-firmware.md`).
 
-## Design-level cross-domain risks
-Each one crosses at least two docs; a change in any listed doc can trigger it. Raised by the 2026-10-01 inspection of this set.
+## Design-level cross-domain risks (Phase 2)
+IDs kept from the Rev F list; a gap = closed by Phase 2 (reason in the Reference section).
 
 | # | Risk | Docs |
 |---|---|---|
-| 1 | **J5 VBAT has two Rev F bridge paths; J4 GND now separates it from J3 DOCK_VBUS (3.2 mm).** J4 GND–J5 VBAT at 0.60 mm (a bridge shorts the cell through its PCM) and J5 VBAT–J12 CC at 0.89 mm (VBAT on an exposed dock contact: sweat electrolysis, shorts to the frame). J3 DOCK_VBUS–J4 GND (0.60) shorts dock 5 V; J12 CC–J1 OUT_A (0.60) puts a 200 kHz bridge output on the exposed CC contact (reg-board issue 4) | reg-board, sub-dock-usb, sub-power, sub-debug-test |
-| 2 | **The exposed DOCK_VBUS contact is clamped by D5** (TPD1E10B06, bidirectional, 5.5 V working, at J3 since Rev F; Rev E had no clamp at the contact). D4 stays the reverse-dock block; reverse-dock behaviour with D5 in place [TBD: not re-analysed here]. Magnet keying and contact order still tie to both | sub-dock-usb, sub-power, integration-map F15 |
-| 3 | **PB7 (LED_K) has no series resistor and three fault paths:** the arm bundle beside OUT_A/OUT_B, pad-board J4 0.45 mm from J2 OUT_B, and, on the pod board, J2 OUT_B beside J8 LED_K (0.60 mm); the Rev E J8–J9 bridge into TS is gone (1.72 mm apart in Rev F) | sub-ui, reg-pad, reg-arm, reg-board, sub-power |
-| 4 | **TS/MR is the NTC input and the charger's button input.** With EN_PUSH at its default, TS < 90 mV for 10 s on battery = ship mode (pod dead until docked): a bridge from J9 to a pad that holds TS low (J8 LED_K is no longer a neighbour, 1.72 mm; J2 OUT_B 0.71 and J1 OUT_A 0.89 hold TS low only if the TIM1 idle state does [TBD]), PA2 driven low, or the NTC above ~84 °C. In ROM DFU, PA2 (USART2_TX) drives TS high: "cold", charging pauses | sub-power, sub-ui, sub-debug-test, sub-processing |
-| 5 | **Charger watchdog vs firmware update.** Option B (HW reset after 160 s without I2C) power-cycles a long ROM DFU session unless the boot stub disables it first (40 s with setting 10) | sub-power, sub-dock-usb, sub-processing |
-| 6 | **ECR-0009 (no output while docked) vs O15/O18 diagnostics.** The \|Z\| sweep and PWM-noise A/B run docked over USB. Needs an explicit capped self-test exemption; the cap must also cover U4 heating at 4.5 V VSYS and the ECR-0005 peak above 300 mA | sub-output, sub-debug-test, sub-power, sub-processing |
-| 7 | **One board in mirrored shells (O16-5):** anything off the centre line lands at a different height per pod. TP row up in one, down in the other; L1 ~6.6 mm from the dock's rear magnet in the left pod vs ~14 mm in the right (derived); J-pad order and any move of the dock pads; rear-gap wire routes. Handed bought parts (the target's one-sided tab, the cell's lead exit) need a per-pod contact map. Only the right pod has been modelled | physical, reg-board, sub-dock-usb, reg-pod-body, sub-processing |
-| 8 | **The board has no x stop** (~2.4 mm of slide). It moves SW1 under the Ø1.2 stem (switch top 3.0 × 2.6) and the mic port (aligned with the lid bore at nominal since ECR-0011; interfaces.py mic-port 0.000 mm): a tolerance becomes a dead button or a blocked mic | reg-pod-body, sub-ui, sub-audio-in, reg-board |
-| 9 | **The single 3.0 V LDO value is load-bearing in four domains:** USB VDDUSB margin (≥ 3.0 V; AN2606's 3.3 V is boilerplate, DS13737 Table 150 allows USB down to 2.7 V: no LDO change needed), bridge gain and peak current (ECR-0005), the mic supply via PA5, the ADC reference. Raising it for DFU moves the bridge peak, `power.py` and the runtime | sub-power, sub-dock-usb, sub-output, sub-audio-in, sub-processing |
-| 10 | **Charge current vs cable.** ILIM 500 mA default; ICHG powers up at 10 mA and firmware writes 170 mA (hold ILIM 100 mA until enumeration, VINDPM 4.2 V); a CC-less USB-A cable on an unenumerated port allows 100 mA. Firmware sets ILIM by enumeration (CC sense R19 removed in Rev F) | sub-power, sub-dock-usb |
-| 11 | **MCU reset defaults vs mic power gating (D12).** PB4's NJTRST pull-up (and PB3 if driven while PA5 is low) back-feeds the unpowered mic in reset, ROM DFU and Off | sub-audio-in, sub-processing, sub-debug-test |
-| 12 | **Retention and the button share one unsupported spring.** The edge foam has 0.1 mm of cell under it. A 1.2–2.0 N press can push the board ~0.2 mm until B parts (R21 under SW1, Q1/Q2, U3's DSBGA) land on the pouch: joint stress, pouch pressure, and a swallowed 0.15 mm switch stroke. A mic gasket adds load at the front | reg-pod-body, sub-ui, reg-board, sub-power, sub-audio-in |
-| 13 | **Thermal placement vs cell safety (R23).** U3 (~0.3 W at start of constant current, ~+31 °C die; 0.2 W mid-charge) sits on B 0.2 mm above a pouch rated to charge at 0–45 °C, RT1 beside it. Moving U3 or changing the stack changes cell temperature in charge | sub-power, reg-board, reg-pod-body |
-| 14 | **USB-C fallback (O16-3) may be unusable:** the keep-out sits behind the belly's 3.5 mm rear step; a plug overmold (~6.5 mm, unchecked) can't engage with the body bottom behind it and the heel, strut and pad inboard. `USBC_KEEPOUT` is never checked | sub-dock-usb, reg-pod-body, physical, reg-arm |
-| 15 | **The heel exit is checked against the wrong cell** (`frame.py`'s old cell and PCM). The real PCM bulge or lead exit can close the 1.1 mm behind-cell gap or pinch the bundle (O17) while every check passes | reg-arm, physical, sub-power, reg-pod-body |
-| 16 | **Serviceability (O19, R24) vs the bonded build.** Arm conductors and cell leads end on J pads inside the sealed pod, the cell is on permanent VHB, the cut line is a 0.2 mm rebate: every arm or cell swap is a cut-and-rebond cycle | physical, reg-pod-body, reg-arm, sub-power |
-| 17 | **The proposed per-pod 3D fit check needs the board's stack-up:** the board file now sets 0.8 mm (`place_r1.py` L195, Rev F) but still has no stack-up block (reg-board issue 2); a wrong stack puts every fit off in y, the axis of the plunger stack and the mic duct | reg-board, physical, sub-ui, sub-audio-in |
-| 18 | **Mass ≥ ~10.2 g before parts vs the ~8 g target** (~15 g hurts). Cell, shell growth and pad size all push the same way; no doc owned the total until now; ECR-0006's ballast depends on it; O20's re-size is the main lever | 00-whole, physical, reg-pod-body, reg-pad, sub-power |
-| 19 | **The pending simplification study can change J-pad count and order, wire counts and board size.** Those feed the heel channel fill (0.36), strut bore, counterbores, rear-gap stowage, pad adjacencies, rib and foam lengths. `shell_r1.py` follows `PCB` automatically, but `heel.py`/`pad.py` read `frame.py`: a board change updates half the mechanics | reg-board, reg-arm, reg-pad, reg-pod-body, physical |
-| 20 | **Mic acoustics and sealing interact.** A gasket or chimney for the 1.5 mm gap (§8, O12) must press round the board port at (3.9, 6.5), which since ECR-0011 sits under the lid bore (U2 moved to x 4.67; interfaces.py mic-port 0.000 mm), and it loads the board through the floorless foam. The mesh seat and gasket footprint follow that port position | sub-audio-in, reg-pod-body, physical |
-
-## Fixes waiting in source files (outside this doc set)
-Found and verified in the editor pass; this set may not edit them. Each belongs in the next commit that touches the file.
-- **`hw/pod/gen.py`:** docstring L10–11 (MCP73831, 105 mAh, "charge status PA10" → BQ25180, Renata 175 mAh, PA10 = R11 pull-up); L15–17 and L247 ("fed from VBAT", duty "from VBAT" → VSYS, duty from VBAT on battery and 4.5 V docked); L34 ("14 -> 11 Extended" → 13 → 10 on the pod board, +1 pad LED); L172–174 (R21 reads supply current i·(2d−1)); L190 ("SLUSE13" → SLUSE99C); L191 (175 mA → 170 mA, code 44). Then regenerate the integration map.
-- **`hw/pod/system_map.py`** (integration-map hand-kept text): F1 port at board (3.13, 6.50) = pod x 33.73 and "PB3 (N$2) → R2 33R → MIC_CLK → U2 CLOCK"; MECH mic keep-out; F2 clock plan → `A3-u575-plan.md` §2; F12 and FIRMWARE[5] duty from VSYS; F15 chain "DOCK_VBUS (J3, exposed) → D4 → VBUS (D3)"; RAILS['+3V0'] and CONSTRAINTS to `power.py` rev 2 (full chain 5.0/6.8/9.8 mA, idle 1.7/2.2/3.4 mA, LED not modelled); RAILS['VSYS'] LED 0.14–0.73 mA battery / 0.82–0.86 docked; arm bullet: bare litz (Ø0.51) through heel Ø1.0 and strut Ø1.2, shrink tube only across the 3 mm flex zone, 1.1 mm behind the cell; add O18 to CONSTRAINTS and to the §10 pins item ("say whether freed pins go to pads"); escape the "|Z|" in F4 (it breaks the §1 table).
-- **`docs/build/bom.py`:** capacitors 22 (not 23), generic resistors 19 (R20/R21 have own rows), cable head C5126847, Extended note "10 + pad LED".
-- **`docs/diagrams/schematic-rev1.svg`:** "~1C = 175 mA max" → 170 mA; 58 → 56 parts; R21 0.33 → 0.1 Ω.
-- **`hw/mech/shell_r1.py`:** foam floor + a "foam ∩ support" check; seam groove in the lid (or a 0.4 tub rebate); lip round the belly; plunger head length; a check that uses `USBC_KEEPOUT`. **`hw/mech/heel.py`:** exit check against `shell_r1.CELL`.
-- **Notes:** `docs/build/hardware.md` L67 and `hw/mech/notes/hardware.md` L47 (foam 1.1 × 17.5 is round-1); `notes/pad.md` and `notes/heel.md` (wire route); `notes/electronics.md` (35 mm slack).
-- **PLM:** ECR-0001 should cover `pod.py` too; spec header v0.14 → v0.15 (owner).
+| 1 | **J-pad neighbours a solder bridge turns into a fault.** Phase 2 keeps ≥ 0.8 mm copper gaps between harmful pairs (MZD-10; place_r2.py rule); see reg-board for the measured gaps | reg-board, sub-dock-usb, sub-power, sub-debug-test |
+| 2 | **The exposed DOCK_VBUS contact is clamped by D5** (TPD1E10B06 at J3, now on B); D4 PMEG3005EL is the reverse-dock block (~0.07 W, Tj ~71 °C docked, ECR-0018 MZV-06); reverse-dock behaviour with D5 in place not re-analysed | sub-dock-usb, sub-power |
+| 3 | **PB7 (LED_K) has no series resistor** and shares the arm bundle with OUT_A/OUT_B; pad-board J4 0.45 mm from J2 OUT_B | sub-ui, reg-pad, reg-arm, reg-board |
+| 4 | **TS/MR is the NTC input and the charger's button input** (EN_PUSH default → ship mode if TS < 90 mV for 10 s); in ROM DFU PA2 (USART2_TX) drives TS high | sub-power, sub-processing, sub-debug-test |
+| 5 | **Charger watchdog vs firmware update** (HW reset after 160 s without I2C unless the boot stub disables it) | sub-power, sub-dock-usb, sub-processing |
+| 6 | **ECR-0009 (no output while docked) vs O15/O18 docked self-test**; the cap must cover U4 at 4.5 V VSYS and the ECR-0005 peak | sub-output, sub-debug-test, sub-power |
+| 7 | **One board in mirrored shells (O16-5):** mic and SW1 sit on board y 6.0 (pod z −2.45, both pods); everything else lands at a different height per pod (TP row, J pads, dock pads); handed bought parts need a per-pod contact map; only the right pod is modelled | physical, reg-board, sub-dock-usb, reg-pod-body |
+| 8 | **Board location in x/z:** the coarse x-stop (0.25) and side gaps (0.45) alone give 0.86 mm worst duct offset vs the 0.20 limit; the stepped gauge pin through the bore at bonding makes it 0.115 (dims_r2 duct_offsets). Without the pin, the mic port can be half-blocked | reg-pod-body, sub-audio-in, physical |
+| 9 | **The single 3.0 V LDO value is load-bearing in four domains** (USB VDDUSB, bridge peak ECR-0005, mic supply via PA5, ADC reference) | sub-power, sub-dock-usb, sub-output, sub-audio-in, sub-processing |
+| 10 | **Charge current vs cable** (ILIM by enumeration; CC not sensed) | sub-power, sub-dock-usb |
+| 11 | **MCU reset defaults vs mic power gating (D12):** PB4's NJTRST pull-up back-feeds the unpowered mic in reset, ROM DFU and Off | sub-audio-in, sub-processing, sub-debug-test |
+| 12 | **Button press loads the VHB bond, not a spring:** the board hangs from the lid on VHB; SW1's force goes puck → SW1 → board → VHB → lid. Switch stack: fixed tolerances pre-press (−0.185 worst), selective puck fit holds 0.005–0.135 (dims_r2 switch_stack); interfaces.py [switch] WARN 0.05 mm over in x/z | reg-pod-body, sub-ui, reg-board |
+| 13 | **Thermal placement vs cell safety (R23):** U3 (~0.3 W at start of CC) on B faces the pouch across the 1.4 mm gap | sub-power, reg-board, reg-pod-body |
+| 15 | **Heel exit checked against the wrong cell** (`frame.py`; ECR-0001, interfaces.py [frame] 8 of 10 facts differ) | reg-arm, physical, sub-power, reg-pod-body |
+| 16 | **Serviceability (O19) vs the bonded build:** the board is bonded to the lid, the cell to the tub; TP1–TP6 are reachable only before the lid bond or after a peel (checks.json F_face_pads); field recovery = ROM DFU via the R1 tack pad + dock USB | physical, reg-pod-body, reg-arm, sub-power, sub-debug-test |
+| 17 | **No dielectric stack-up in the board file;** sim/noise uses the Rev E draft stack (budget.json board.stackup "unverified vs JLC page"); y fits (duct, puck) assume 0.8 mm | reg-board, physical, sub-audio-in |
+| 18 | **Mass ≥ ~9.5 g before parts vs the ~8 g target** | 00-whole, physical, reg-pod-body, reg-pad, sub-power |
+| 20 | **Mic acoustics and sealing:** the sealed duct raises the 20–96 kHz mean (+5.6 dB) but puts a 63 kHz Q6.4 peak in band; it needs the firmware EQ notch (O24) and a measured coupon. The duct-seat keep-out R-ACO-P6 (nothing within 1.6 mm of the port) is broken on the routed board: MDF_SDI F track 1.35 mm from (1.88, 6.0) (pcbnew probe 2026-10-07; acoustics.yaml still records the Rev F PASS) | sub-audio-in, reg-pod-body, sub-processing |
+| 21 | **I2C_SCL runs 8.97 mm inside the In2 +3V0 plane** (hw/pod/inner_bridge.py): the plane stays one island (−4 mm², 1.4 %); modelled in sim/noise (LN metrics pass). Any re-route near U1 pin 26 or a plane cut must keep it | reg-board, sub-power, sub-processing |
 
 ## Before you change anything
-Follow [README](README.md) "The rule" and walk the change through [integration-map.md §10](integration-map.md#10-required-cross-check-for-every-proposed-change). For any geometry change, read [physical.md](physical.md) "Before you change this" too.
+Follow [README](README.md) "The rule" and walk the change through [integration-map.md §10](integration-map.md#10-required-cross-check-for-every-proposed-change). For any geometry change, read [physical.md](physical.md) "Before you change this". Switching designs: `hw/current.yaml` (env `ULTRASONIC_DESIGN=revg` selects the reference).
 
-## Change log
-- 2026-10-01: created. New diagram `docs/diagrams/system-overview-physical.svg`. Kept the old v0.13 `system-overview.svg` (signal chain, used by `tools/smoke/run_all.py`). Runtime for 175 mAh derived from `power.py`.
-- 2026-10-01 (editor pass, inspectors' fixes): status line O1–O20; Key numbers: charge 170 mA, LED on the VSYS basis, 10 Extended types on the pod board, mass ≥ ~10.2 g, cost caveat (wrong head); status table re-synced with each doc; decision index moved to spec v0.15 lines with R19–R25 and O18–O20; new sections "Design-level cross-domain risks" and "Fixes waiting in source files".
+## Reference design (Rev F/G)
+Kept in the repo, never deleted (`hw/current.yaml` reference): Rev G schematic / Rev F board `hw/pod/draft_r1/pod_r1_routed.kicad_pcb`, 34 × 13 × 0.8, parts on both faces (F 21 / B 31), In2 signals, 1 unconnected + 19 courtyard DRC; shell `hw/mech/shell_r1.py` ("Spine"): board on foam strips clamped by lid ribs, 1.5 mm unsealed mic gap, plunger Ø1.2; envelope 38.0 × 11.8 × 15.2 + belly 3.5, 7801 mm³; LN-M03 5.2 % FAIL, LN-M02 12.2 dB. Risks closed by Phase 2: 12 (floorless foam: no foam), 14 (USB-C fallback keep-out: not carried into shell_r2), 19 (simplification study: superseded by MZ-2). Full Rev F text: git history of this file before 2026-10-07.
