@@ -8,14 +8,14 @@
    "f_out_hz": 21875.0,
    "att_db": -0.051278296650429045,
    "i_peak_a": 0.0001133684919941577,
-   "v_rms": 6.442381864170641e-06,
-   "spur_nom": -158.87034902641494,
-   "spur_pes": -138.87034902641494,
+   "v_rms": 6.442769312028876e-06,
+   "spur_nom": -158.86982666865723,
+   "spur_pes": -138.86982666865723,
    "limit": -112.32987910175078,
-   "margin_nom": 46.540469924664166,
-   "margin_pes": 26.540469924664166,
-   "spur_worst": -132.07138779252793,
-   "margin_worst": 19.741508690777152,
+   "margin_nom": 46.53994756690645,
+   "margin_pes": 26.53994756690645,
+   "spur_worst": -132.0708654347702,
+   "margin_worst": 19.740986333019436,
    "aggressor": "A05_CPU_HOP",
    "victim": "V1_MIC_SUPPLY",
    "mechanism": "conduction",
@@ -28,7 +28,7 @@
      "net_or_ref": "U4",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 43.6253,
+     "contribution_mohm": 43.6252,
      "share_pct_of_abs_total": 23.3
     },
     {
@@ -36,7 +36,7 @@
      "net_or_ref": "C13",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 41.6952,
+     "contribution_mohm": 41.6977,
      "share_pct_of_abs_total": 22.2
     },
     {
@@ -44,7 +44,7 @@
      "net_or_ref": "U1",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 41.6022,
+     "contribution_mohm": 41.6048,
      "share_pct_of_abs_total": 22.2
     },
     {
@@ -70,8 +70,8 @@
     },
     {
      "kind": "total",
-     "z_t_mohm": 80.3654,
-     "check_vs_direct_mohm": 80.3654
+     "z_t_mohm": 80.3702,
+     "check_vs_direct_mohm": 80.3702
     }
    ]
   },
@@ -79,14 +79,14 @@
    "kind": "band",
    "f_hz": 50000.0,
    "f_out_hz": 50000.0,
-   "v_rms": 1.4435100924406871e-05,
-   "spur_nom": -151.81160350721385,
-   "spur_pes": -131.81160350721385,
+   "v_rms": 1.4428224677097371e-05,
+   "spur_nom": -151.81574206887575,
+   "spur_pes": -131.81574206887575,
    "limit": -93.12864583884354,
-   "margin_nom": 58.68295766837031,
-   "margin_pes": 38.68295766837031,
-   "spur_worst": -113.22322499292798,
-   "margin_worst": 20.094579154084443,
+   "margin_nom": 58.68709623003221,
+   "margin_pes": 38.68709623003221,
+   "spur_worst": -113.22736355458989,
+   "margin_worst": 20.098717715746346,
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V1_MIC_SUPPLY",
    "mechanism": "conduction",
@@ -99,7 +99,7 @@
      "net_or_ref": "C13",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 45.104,
+     "contribution_mohm": 45.0828,
      "share_pct_of_abs_total": 24.4
     },
     {
@@ -107,7 +107,7 @@
      "net_or_ref": "U1",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 44.9427,
+     "contribution_mohm": 44.9216,
      "share_pct_of_abs_total": 24.4
     },
     {
@@ -115,7 +115,7 @@
      "net_or_ref": "U4",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 33.7777,
+     "contribution_mohm": 33.7776,
      "share_pct_of_abs_total": 18.3
     },
     {
@@ -123,7 +123,7 @@
      "net_or_ref": "C14",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 13.0404,
+     "contribution_mohm": 13.036,
      "share_pct_of_abs_total": 7.1
     },
     {
@@ -131,13 +131,13 @@
      "net_or_ref": "C4",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 9.7105,
+     "contribution_mohm": 9.7066,
      "share_pct_of_abs_total": 5.3
     },
     {
      "kind": "total",
-     "z_t_mohm": 55.6522,
-     "check_vs_direct_mohm": 55.6522
+     "z_t_mohm": 55.626,
+     "check_vs_direct_mohm": 55.626
     }
    ]
   },
@@ -148,14 +148,14 @@
    "f_out_hz": 38955.2631578967,
    "att_db": -0.16270888583850437,
    "i_peak_a": 0.0035897949309548903,
-   "v_rms": 8.740603734291599e-07,
-   "spur_nom": -176.3318802573705,
-   "spur_pes": -156.3318802573705,
+   "v_rms": 8.741039176536623e-07,
+   "spur_nom": -176.3314475516684,
+   "spur_pes": -156.3314475516684,
    "limit": -112.32987910175078,
-   "margin_nom": 64.00200115561972,
-   "margin_pes": 44.00200115561972,
-   "spur_worst": -126.3318802573705,
-   "margin_worst": 14.002001155619723,
+   "margin_nom": 64.00156844991761,
+   "margin_pes": 44.00156844991761,
+   "spur_worst": -126.3314475516684,
+   "margin_worst": 14.001568449917627,
    "aggressor": "A01_SMPS_IN",
    "victim": "V1_MIC_SUPPLY",
    "mechanism": "conduction",
@@ -223,8 +223,8 @@
     },
     {
      "kind": "total",
-     "z_t_mohm": 0.3443,
-     "check_vs_direct_mohm": 0.3443
+     "z_t_mohm": 0.3444,
+     "check_vs_direct_mohm": 0.3444
     }
    ]
   },
@@ -235,14 +235,14 @@
    "f_out_hz": 25000.0,
    "att_db": -0.06698098249790124,
    "i_peak_a": 0.0004647276560042431,
-   "v_rms": 5.277017397283721e-07,
-   "spur_nom": -180.61921046324625,
-   "spur_pes": -160.61921046324625,
+   "v_rms": 5.285345325657058e-07,
+   "spur_nom": -180.60551362596635,
+   "spur_pes": -160.60551362596635,
    "limit": -112.32987910175078,
-   "margin_nom": 68.28933136149547,
-   "margin_pes": 48.28933136149547,
-   "spur_worst": -152.6604102898055,
-   "margin_worst": 40.33053118805472,
+   "margin_nom": 68.27563452421558,
+   "margin_pes": 48.275634524215576,
+   "spur_worst": -152.64671345252557,
+   "margin_worst": 40.3168343507748,
    "aggressor": "A08_LED_PWM",
    "victim": "V1_MIC_SUPPLY",
    "mechanism": "conduction",
@@ -255,7 +255,7 @@
      "net_or_ref": "C13",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.919,
+     "contribution_mohm": 0.9204,
      "share_pct_of_abs_total": 20.6
     },
     {
@@ -263,7 +263,7 @@
      "net_or_ref": "U1",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.9159,
+     "contribution_mohm": 0.9174,
      "share_pct_of_abs_total": 20.5
     },
     {
@@ -271,7 +271,7 @@
      "net_or_ref": "U4",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.1506,
+     "contribution_mohm": 0.1508,
      "share_pct_of_abs_total": 3.4
     },
     {
@@ -279,7 +279,7 @@
      "net_or_ref": "C4",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.1256,
+     "contribution_mohm": 0.1258,
      "share_pct_of_abs_total": 2.8
     },
     {
@@ -287,13 +287,13 @@
      "net_or_ref": "C7",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.0643,
+     "contribution_mohm": 0.0644,
      "share_pct_of_abs_total": 1.4
     },
     {
      "kind": "total",
-     "z_t_mohm": 1.6059,
-     "check_vs_direct_mohm": 1.6059
+     "z_t_mohm": 1.6084,
+     "check_vs_direct_mohm": 1.6084
     }
    ]
   },
@@ -304,14 +304,14 @@
    "f_out_hz": 38955.2631578967,
    "att_db": -0.16270888583850437,
    "i_peak_a": 0.0005403796460924682,
-   "v_rms": 6.837636487243753e-11,
-   "spur_nom": -258.464588716734,
-   "spur_pes": -238.46458871673394,
+   "v_rms": 6.837876759981767e-11,
+   "spur_nom": -258.4642835022315,
+   "spur_pes": -238.4642835022315,
    "limit": -112.32987910175078,
-   "margin_nom": 146.13470961498322,
-   "margin_pes": 126.13470961498317,
-   "spur_worst": -208.46458871673394,
-   "margin_worst": 96.13470961498317,
+   "margin_nom": 146.13440440048075,
+   "margin_pes": 126.13440440048072,
+   "spur_worst": -208.4642835022315,
+   "margin_worst": 96.13440440048072,
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V1_MIC_SUPPLY",
    "mechanism": "conduction",
@@ -448,15 +448,15 @@
    "f_hz": 7977889.447236181,
    "f_out_hz": 23010.552763819695,
    "att_db": -0.056741839356408315,
-   "v_rms": 5.081186851135919e-07,
-   "spur_nom": -180.9374385279436,
-   "spur_pes": -160.9374385279436,
+   "v_rms": 5.081186859220141e-07,
+   "spur_nom": -180.9374385141243,
+   "spur_pes": -160.9374385141243,
    "limit": -112.32987910175078,
-   "margin_nom": 68.60755942619284,
-   "margin_pes": 48.607559426192836,
+   "margin_nom": 68.60755941237352,
+   "margin_pes": 48.60755941237352,
    "regime": "T=0.12",
-   "spur_worst": -130.9374385279436,
-   "margin_worst": 18.607559426192836
+   "spur_worst": -130.9374385141243,
+   "margin_worst": 18.60755941237352
   },
   {
    "aggressor": "F02_SMPS_LX",
@@ -466,15 +466,15 @@
    "f_hz": 28058291.457286432,
    "f_out_hz": 55141.457286432385,
    "att_db": -0.32627977774788536,
-   "v_rms": 1.1842400501485581e-08,
-   "spur_nom": -213.8574848873073,
-   "spur_pes": -193.8574848873073,
+   "v_rms": 1.1842400499145137e-08,
+   "spur_nom": -213.8574848890239,
+   "spur_pes": -193.8574848890239,
    "limit": -112.32987910175078,
-   "margin_nom": 101.52760578555652,
-   "margin_pes": 81.52760578555652,
+   "margin_nom": 101.52760578727313,
+   "margin_pes": 81.52760578727313,
    "regime": "T=0.03",
-   "spur_worst": -163.8574848873073,
-   "margin_worst": 51.52760578555652
+   "spur_worst": -163.8574848890239,
+   "margin_worst": 51.52760578727313
   },
   {
    "aggressor": "F02_SMPS_LX",
@@ -896,360 +896,371 @@
   {
    "aggressor": "A01_SMPS_IN",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 6.045282393877661e-05,
+   "v_rms": 6.045243164317415e-05,
    "f_hz": 66000000.0,
-   "total_rms": 0.00016068029494661123
+   "total_rms": 0.00016067948854102382
   },
   {
    "aggressor": "A01_SMPS_IN",
    "victim": "V3_ADC_REF",
-   "v_rms": 0.0002627383109147553,
+   "v_rms": 0.0002628390114153009,
    "f_hz": 3000000.0,
-   "total_rms": 0.0006405337553976353
+   "total_rms": 0.0006405712248344318
   },
   {
    "aggressor": "A01_SMPS_IN",
    "victim": "V4_LDO_OUT",
-   "v_rms": 9.431993179923435e-05,
+   "v_rms": 9.430421202832104e-05,
    "f_hz": 3000000.0,
-   "total_rms": 0.00014157260862588804
+   "total_rms": 0.00014155892180123784
   },
   {
    "aggressor": "A01_SMPS_IN",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 0.00020718863082448387,
+   "v_rms": 0.00020694910487596422,
    "f_hz": 3000000.0,
-   "total_rms": 0.00042273492881959727
+   "total_rms": 0.000422584902422575
   },
   {
    "aggressor": "A01_SMPS_IN",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 5.9769524209515195e-05,
+   "v_rms": 5.9769903410534786e-05,
    "f_hz": 66000000.0,
-   "total_rms": 0.0001587539969696028
+   "total_rms": 0.0001587741810318985
   },
   {
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 0.00035245099642690326,
+   "v_rms": 0.0003524509964152241,
    "f_hz": 3000000.0,
-   "total_rms": 0.00037518538846703517
+   "total_rms": 0.00037518538844165655
   },
   {
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V3_ADC_REF",
-   "v_rms": 2.1211270549008993e-07,
+   "v_rms": 2.1211114399061785e-07,
    "f_hz": 3000000.0,
-   "total_rms": 3.121938222529309e-07
+   "total_rms": 3.121920653798718e-07
   },
   {
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V4_LDO_OUT",
-   "v_rms": 6.598482862963349e-09,
+   "v_rms": 6.598431943924009e-09,
    "f_hz": 69000000.0,
-   "total_rms": 1.0677326222613326e-08
+   "total_rms": 1.0677218110453813e-08
   },
   {
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 2.197061992830443e-08,
+   "v_rms": 2.197041352414549e-08,
    "f_hz": 69000000.0,
-   "total_rms": 3.56380742075236e-08
+   "total_rms": 3.563742784972392e-08
   },
   {
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 2.1300463450123663e-07,
+   "v_rms": 2.130025555878985e-07,
    "f_hz": 3000000.0,
-   "total_rms": 2.953679731713142e-07
+   "total_rms": 2.953649897748973e-07
   },
   {
    "aggressor": "A03_BRIDGE_CARRIER",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 4.885208291965999e-07,
+   "v_rms": 4.884005721746289e-07,
    "f_hz": 400045.0,
-   "total_rms": 6.864965276167305e-07
+   "total_rms": 6.861229323511198e-07
   },
   {
    "aggressor": "A03_BRIDGE_CARRIER",
    "victim": "V3_ADC_REF",
-   "v_rms": 5.529871926901456e-05,
+   "v_rms": 5.528804371911641e-05,
    "f_hz": 400045.0,
-   "total_rms": 5.959879370599051e-05
+   "total_rms": 5.958354192017832e-05
   },
   {
    "aggressor": "A03_BRIDGE_CARRIER",
    "victim": "V4_LDO_OUT",
-   "v_rms": 5.2984125096058e-05,
+   "v_rms": 5.3019117158240474e-05,
    "f_hz": 400045.0,
-   "total_rms": 5.5781813623683726e-05
+   "total_rms": 5.5834250730877576e-05
   },
   {
    "aggressor": "A03_BRIDGE_CARRIER",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 5.760481511587311e-05,
+   "v_rms": 5.68435017288717e-05,
    "f_hz": 400045.0,
-   "total_rms": 9.758321477743102e-05
+   "total_rms": 7.99728691532804e-05
   },
   {
    "aggressor": "A03_BRIDGE_CARRIER",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 1.2165556858279036e-05,
+   "v_rms": 5.8055719417779825e-06,
    "f_hz": 400045.0,
-   "total_rms": 4.3785938135184284e-05
+   "total_rms": 1.8905362052773263e-05
   },
   {
    "aggressor": "A03b_BRIDGE_EDGES",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 2.6255222713739754e-08,
+   "v_rms": 2.6244423214272425e-08,
    "f_hz": 8800990.0,
-   "total_rms": 1.9467449662515207e-07
+   "total_rms": 1.9460314347291303e-07
   },
   {
    "aggressor": "A03b_BRIDGE_EDGES",
    "victim": "V3_ADC_REF",
-   "v_rms": 2.3365669374799196e-06,
+   "v_rms": 2.336098394247103e-06,
    "f_hz": 200022.5,
-   "total_rms": 1.0266516293674306e-05
+   "total_rms": 1.0264108409483126e-05
   },
   {
    "aggressor": "A03b_BRIDGE_EDGES",
    "victim": "V4_LDO_OUT",
-   "v_rms": 1.998196826861315e-06,
+   "v_rms": 1.9985018854221243e-06,
    "f_hz": 200022.5,
-   "total_rms": 3.932672543526773e-06
+   "total_rms": 3.936364768355536e-06
   },
   {
    "aggressor": "A03b_BRIDGE_EDGES",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 9.080380293755387e-06,
+   "v_rms": 6.114454083859518e-06,
    "f_hz": 24002700.0,
-   "total_rms": 6.019215756547149e-05
+   "total_rms": 4.068382147747679e-05
   },
   {
    "aggressor": "A03b_BRIDGE_EDGES",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 5.129665439604019e-06,
+   "v_rms": 2.1615229599073217e-06,
    "f_hz": 24002700.0,
-   "total_rms": 3.4424693977578116e-05
+   "total_rms": 1.4571199072844951e-05
   },
   {
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 2.916445531722161e-08,
+   "v_rms": 2.9150171006813637e-08,
    "band": "20-85k noise"
   },
   {
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V3_ADC_REF",
-   "v_rms": 2.450801185303766e-05,
+   "v_rms": 2.4496608585827394e-05,
    "band": "20-85k noise"
   },
   {
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V4_LDO_OUT",
-   "v_rms": 1.5130065800787747e-05,
+   "v_rms": 1.5130168191818848e-05,
    "band": "20-85k noise"
   },
   {
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 2.5919476741086618e-05,
+   "v_rms": 2.5436046719935817e-05,
    "band": "20-85k noise"
   },
   {
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 8.906601405118241e-07,
+   "v_rms": 3.858164946750692e-07,
    "band": "20-85k noise"
   },
   {
    "aggressor": "A05_CPU_HOP",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 3.079032670743002e-06,
+   "v_rms": 3.079147143350203e-06,
    "f_hz": 1562.5,
-   "total_rms": 3.773205508549784e-06,
+   "total_rms": 3.773345617809266e-06,
    "lf16k": {
     "f_hz": 1562.5,
-    "v_rms": 3.079032670743002e-06
+    "v_rms": 3.079147143350203e-06
    },
    "audio": {
     "f_hz": 1562.5,
-    "v_rms": 3.079032670743002e-06
+    "v_rms": 3.079147143350203e-06
    }
   },
   {
    "aggressor": "A05_CPU_HOP",
    "victim": "V3_ADC_REF",
-   "v_rms": 8.95379180213578e-05,
+   "v_rms": 8.954332059948765e-05,
    "f_hz": 1562.5,
-   "total_rms": 0.00010974384052557374,
+   "total_rms": 0.0001097504177369783,
    "lf16k": {
     "f_hz": 1562.5,
-    "v_rms": 8.95379180213578e-05
+    "v_rms": 8.954332059948765e-05
    },
    "audio": {
     "f_hz": 1562.5,
-    "v_rms": 8.95379180213578e-05
+    "v_rms": 8.954332059948765e-05
    }
   },
   {
    "aggressor": "A05_CPU_HOP",
    "victim": "V4_LDO_OUT",
-   "v_rms": 4.7518019661228864e-05,
+   "v_rms": 4.75180192463573e-05,
    "f_hz": 1562.5,
-   "total_rms": 5.8509112611420926e-05,
+   "total_rms": 5.85090953707044e-05,
    "lf16k": {
     "f_hz": 1562.5,
-    "v_rms": 4.7518019661228864e-05
+    "v_rms": 4.75180192463573e-05
    },
    "audio": {
     "f_hz": 1562.5,
-    "v_rms": 4.7518019661228864e-05
+    "v_rms": 4.75180192463573e-05
    }
   },
   {
    "aggressor": "A05_CPU_HOP",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 8.724230263774839e-05,
+   "v_rms": 8.719834715900231e-05,
    "f_hz": 1562.5,
-   "total_rms": 0.00010694184252697784,
+   "total_rms": 0.00010688817259811008,
    "lf16k": {
     "f_hz": 1562.5,
-    "v_rms": 8.724230263774839e-05
+    "v_rms": 8.719834715900231e-05
    },
    "audio": {
     "f_hz": 1562.5,
-    "v_rms": 8.724230263774839e-05
+    "v_rms": 8.719834715900231e-05
    }
   },
   {
    "aggressor": "A05_CPU_HOP",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 1.4431778321941108e-06,
+   "v_rms": 1.4900238057814487e-06,
    "f_hz": 1562.5,
-   "total_rms": 1.7632367433013048e-06,
+   "total_rms": 1.820384641119471e-06,
    "lf16k": {
     "f_hz": 1562.5,
-    "v_rms": 1.4431778321941108e-06
+    "v_rms": 1.4900238057814487e-06
    },
    "audio": {
     "f_hz": 1562.5,
-    "v_rms": 1.4431778321941108e-06
+    "v_rms": 1.4900238057814487e-06
    }
   },
   {
    "aggressor": "A06_PDM_CLOCK_RETURN",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 0.0003935448316900696,
+   "v_rms": 0.0003935448929161614,
    "f_hz": 100011250.0,
-   "total_rms": 0.0009146523407561646
+   "total_rms": 0.0009146523327981356
   },
   {
    "aggressor": "A06_PDM_CLOCK_RETURN",
    "victim": "V3_ADC_REF",
-   "v_rms": 2.8863584358011976e-05,
+   "v_rms": 2.886315862551354e-05,
    "f_hz": 84009450.0,
-   "total_rms": 5.8078308322289346e-05
+   "total_rms": 5.807769445031862e-05
   },
   {
    "aggressor": "A06_PDM_CLOCK_RETURN",
    "victim": "V4_LDO_OUT",
-   "v_rms": 4.093727516609194e-06,
+   "v_rms": 4.093683026739377e-06,
    "f_hz": 92010350.0,
-   "total_rms": 7.852291457798922e-06
+   "total_rms": 7.852205807805675e-06
   },
   {
    "aggressor": "A06_PDM_CLOCK_RETURN",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 1.3620314141857047e-05,
+   "v_rms": 1.3620150157213735e-05,
    "f_hz": 92010350.0,
-   "total_rms": 2.613163656002955e-05
+   "total_rms": 2.613131452728067e-05
   },
   {
    "aggressor": "A06_PDM_CLOCK_RETURN",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 1.34777428395312e-05,
+   "v_rms": 1.3477288809103106e-05,
    "f_hz": 76008550.0,
-   "total_rms": 2.9579462105023523e-05
+   "total_rms": 2.9578508889566144e-05
   },
   {
    "aggressor": "A07_USB_FS",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 0.00010806681320714555,
+   "v_rms": 0.00010806679051239986,
    "f_hz": 54000000.0,
-   "total_rms": 0.00021086310199930805
+   "total_rms": 0.00021086307635126688
   },
   {
    "aggressor": "A07_USB_FS",
    "victim": "V3_ADC_REF",
-   "v_rms": 3.450795562284252e-05,
+   "v_rms": 3.4507793020209084e-05,
    "f_hz": 66000000.0,
-   "total_rms": 5.375969787453011e-05
+   "total_rms": 5.3759581700223056e-05
   },
   {
    "aggressor": "A07_USB_FS",
    "victim": "V4_LDO_OUT",
-   "v_rms": 2.7677622353450566e-06,
+   "v_rms": 2.7675570027246507e-06,
    "f_hz": 66000000.0,
-   "total_rms": 3.462212693294141e-06
+   "total_rms": 3.462423120781055e-06
   },
   {
    "aggressor": "A07_USB_FS",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 9.716493167581713e-06,
+   "v_rms": 9.700236277093718e-06,
    "f_hz": 66000000.0,
-   "total_rms": 1.1469499779507342e-05
+   "total_rms": 1.145778063025716e-05
   },
   {
    "aggressor": "A07_USB_FS",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 2.1163039700914848e-05,
+   "v_rms": 2.1165814375173154e-05,
    "f_hz": 54000000.0,
-   "total_rms": 3.952582231642719e-05
+   "total_rms": 3.953342772908696e-05
   },
   {
    "aggressor": "A08_LED_PWM",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 1.064215718386604e-06,
+   "v_rms": 1.0642678747463358e-06,
    "f_hz": 25000.0,
-   "total_rms": 1.1532469585026231e-06
+   "total_rms": 1.1533035642145181e-06
   },
   {
    "aggressor": "A08_LED_PWM",
    "victim": "V3_ADC_REF",
-   "v_rms": 7.062482618243316e-07,
+   "v_rms": 7.073356427204412e-07,
    "f_hz": 25000.0,
-   "total_rms": 7.389226706407355e-07
+   "total_rms": 7.400654152395666e-07
   },
   {
    "aggressor": "A08_LED_PWM",
    "victim": "V4_LDO_OUT",
-   "v_rms": 7.528233208662661e-08,
+   "v_rms": 7.538573075879112e-08,
    "f_hz": 75000.0,
-   "total_rms": 1.2994025589726463e-07
+   "total_rms": 1.3012019476917124e-07
   },
   {
    "aggressor": "A08_LED_PWM",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 2.2792132849369934e-07,
+   "v_rms": 2.1261208354904065e-07,
    "f_hz": 25000.0,
-   "total_rms": 2.5625381503698136e-07
+   "total_rms": 2.434879296973219e-07
   },
   {
    "aggressor": "A08_LED_PWM",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 4.975990174197377e-07,
+   "v_rms": 5.162909772162684e-07,
    "f_hz": 25000.0,
-   "total_rms": 5.383719051466695e-07
+   "total_rms": 5.585861222194999e-07
   }
  ],
  "kelvin": {
-  "z_kelvin_5khz_mohm": 3.3092316775161534,
-  "z_kelvin_error_pct_of_r21": 3.3092316775161534,
+  "z_kelvin_5khz_mohm": 1.2854408414740202,
+  "z_kelvin_error_pct_of_r21": 1.28544084147402,
   "features": [
    {
-    "layout_share_pct": 98.6
+    "layout_share_pct": 96.6
+   },
+   {
+    "kind": "via",
+    "net_or_ref": "GND",
+    "layer": "In1.Cu-In2.Cu",
+    "xy": [
+     18.55,
+     6.45
+    ],
+    "contribution_mohm": 0.208,
+    "share_pct_of_abs_total": 12.2
    },
    {
     "kind": "trace",
@@ -1258,75 +1269,64 @@
     "xy": [
      18.94,
      6.45,
-     18.395,
+     18.94,
+     6.01
+    ],
+    "contribution_mohm": 0.2072,
+    "share_pct_of_abs_total": 12.1
+   },
+   {
+    "kind": "trace",
+    "net_or_ref": "GND",
+    "layer": "B.Cu",
+    "xy": [
+     18.94,
+     6.45,
+     18.55,
      6.45
     ],
-    "contribution_mohm": 1.7856,
-    "share_pct_of_abs_total": 47.9
+    "contribution_mohm": 0.1998,
+    "share_pct_of_abs_total": 11.7
    },
    {
     "kind": "via",
     "net_or_ref": "GND",
     "layer": "In1.Cu-In2.Cu",
     "xy": [
-     18.395,
-     6.45
+     18.94,
+     6.01
     ],
-    "contribution_mohm": 0.7981,
-    "share_pct_of_abs_total": 21.4
-   },
-   {
-    "kind": "via",
-    "net_or_ref": "GND",
-    "layer": "In2.Cu-B.Cu",
-    "xy": [
-     18.395,
-     6.45
-    ],
-    "contribution_mohm": 0.2005,
-    "share_pct_of_abs_total": 5.4
+    "contribution_mohm": 0.1912,
+    "share_pct_of_abs_total": 11.2
    },
    {
     "kind": "plane",
     "net_or_ref": "GND",
     "layer": "In1.Cu",
     "xy": [
-     16.98,
-     5.745,
-     18.395,
-     6.449999999999999
+     18.55,
+     6.449999999999999,
+     17.58,
+     8.004999999999999
     ],
-    "contribution_mohm": 0.1302,
-    "share_pct_of_abs_total": 3.5
-   },
-   {
-    "kind": "plane",
-    "net_or_ref": "GND",
-    "layer": "In1.Cu",
-    "xy": [
-     20.68,
-     6.444999999999999,
-     18.395,
-     6.449999999999999
-    ],
-    "contribution_mohm": 0.1066,
-    "share_pct_of_abs_total": 2.9
+    "contribution_mohm": 0.0564,
+    "share_pct_of_abs_total": 3.3
    },
    {
     "kind": "total",
-    "z_t_mohm": 3.3092,
-    "check_vs_direct_mohm": 3.3092
+    "z_t_mohm": 1.2854,
+    "check_vs_direct_mohm": 1.2854
    }
   ]
  },
  "z_mic_supply_mohm": {
   "A01_SMPS_IN": {
-   "1000": 94.2449,
-   "5000": 93.4574,
-   "20000": 83.4359,
-   "85000": 38.1122,
-   "200000": 8.2111,
-   "1000000": 0.3394,
+   "1000": 94.2545,
+   "5000": 93.4669,
+   "20000": 83.4442,
+   "85000": 38.1148,
+   "200000": 8.2117,
+   "1000000": 0.3397,
    "4000000": 0.1121,
    "12000000": 0.0282
   },
@@ -1341,72 +1341,72 @@
    "12000000": 0.0
   },
   "A03_BRIDGE_CARRIER": {
-   "1000": 89.602,
-   "5000": 88.8582,
-   "20000": 79.3989,
-   "85000": 36.6774,
-   "200000": 7.998,
-   "1000000": 0.2504,
+   "1000": 89.555,
+   "5000": 88.8117,
+   "20000": 79.3581,
+   "85000": 36.6629,
+   "200000": 7.9965,
+   "1000000": 0.2501,
    "4000000": 0.0969,
    "12000000": 0.0174
   },
   "A03b_BRIDGE_EDGES": {
-   "1000": 89.602,
-   "5000": 88.8582,
-   "20000": 79.3989,
-   "85000": 36.6774,
-   "200000": 7.998,
-   "1000000": 0.2504,
+   "1000": 89.555,
+   "5000": 88.8117,
+   "20000": 79.3581,
+   "85000": 36.6629,
+   "200000": 7.9965,
+   "1000000": 0.2501,
    "4000000": 0.0969,
    "12000000": 0.0174
   },
   "A04_BRIDGE_SHAPED_NOISE": {
-   "1000": 89.602,
-   "5000": 88.8582,
-   "20000": 79.3989,
-   "85000": 36.6774,
-   "200000": 7.998,
-   "1000000": 0.2504,
+   "1000": 89.555,
+   "5000": 88.8117,
+   "20000": 79.3581,
+   "85000": 36.6629,
+   "200000": 7.9965,
+   "1000000": 0.2501,
    "4000000": 0.0969,
    "12000000": 0.0174
   },
   "A05_CPU_HOP": {
-   "1000": 92.6107,
-   "5000": 91.8384,
-   "20000": 82.0138,
-   "85000": 37.5965,
-   "200000": 8.1195,
-   "1000000": 0.2948,
+   "1000": 92.6165,
+   "5000": 91.8442,
+   "20000": 82.0188,
+   "85000": 37.5979,
+   "200000": 8.1197,
+   "1000000": 0.2949,
    "4000000": 0.1064,
    "12000000": 0.0272
   },
   "A06_PDM_CLOCK_RETURN": {
-   "1000": 14.5493,
-   "5000": 14.5401,
-   "20000": 14.431,
+   "1000": 14.5492,
+   "5000": 14.54,
+   "20000": 14.4309,
    "85000": 14.1696,
    "200000": 14.4039,
-   "1000000": 20.0462,
+   "1000000": 20.0463,
    "4000000": 58.6673,
    "12000000": 171.4124
   },
   "A07_USB_FS": {
-   "1000": 2.3572,
-   "5000": 2.3351,
-   "20000": 2.051,
-   "85000": 0.723,
-   "200000": 0.1445,
+   "1000": 2.3583,
+   "5000": 2.3361,
+   "20000": 2.052,
+   "85000": 0.7234,
+   "200000": 0.1446,
    "1000000": 0.04,
    "4000000": 0.0183,
    "12000000": 0.0112
   },
   "A08_LED_PWM": {
-   "1000": 1.9717,
-   "5000": 1.9531,
-   "20000": 1.715,
-   "85000": 0.6056,
-   "200000": 0.1364,
-   "1000000": 0.0371,
+   "1000": 1.9748,
+   "5000": 1.9562,
+   "20000": 1.7177,
+   "85000": 0.6066,
+   "200000": 0.1366,
+   "1000000": 0.0372,
    "4000000": 0.0172,
    "12000000": 0.0107
   }
@@ -1435,11 +1435,11 @@
  },
  "n_freqs": 693,
  "e2e_if": {
-  "background_mv_rms": 0.10736147019957024,
-  "background_mv_rms_20k_100k": 0.019882220156833462,
+  "background_mv_rms": 0.10736712864078439,
+  "background_mv_rms_20k_100k": 0.019877783504491164,
   "dominant_line": {
    "f_hz": 1562.5,
-   "v_rms": 8.795389889747519e-05,
+   "v_rms": 8.795940109163883e-05,
    "source": "A05_CPU_HOP",
    "sync": false
   },
@@ -1447,24 +1447,24 @@
  },
  "dc_plane_mohm": {
   "mic_gnd_to_mcu_vss": 4.053,
-  "shunt_gnd_to_mcu_vssa": 3.128,
-  "mcu_vss_to_cell_neg": 4.074,
-  "shunt_gnd_to_cell_neg": 2.181,
+  "shunt_gnd_to_mcu_vssa": 3.139,
+  "mcu_vss_to_cell_neg": 4.073,
+  "shunt_gnd_to_cell_neg": 2.147,
   "mic_bypass_gnd_to_mcu_vss": 3.522
  },
  "dc_rail_paths_mohm": {
   "U4.1->Q1.4": 40.42,
   "U4.1->Q2.4": 39.51,
-  "U4.1->U1.25": 42.81,
-  "U4.1->U1.21": 45.01,
+  "U4.1->U1.25": 42.82,
+  "U4.1->U1.21": 45.02,
   "U1.15->U2.5": 82.47,
   "Q1.1->R21.1": 25.18,
   "U2.3->U1.24": 18.2,
   "C13.2->U2.3": 17.86,
   "C13.2->U1.24": 7.78,
-  "R21.2->U1.8": 7.88,
+  "R21.2->U1.8": 5.91,
   "U1.24->J4.1": 11.4,
-  "C14.2->R21.2": 8.02
+  "C14.2->R21.2": 6.0
  },
  "netlist_check": {
   "netlist": "hw/pod/pod_mz2.net",
@@ -1501,9 +1501,9 @@
   {
    "id": "LN-M03",
    "name": "I_SENSE Kelvin error (plane+stub drop shunt-GND to MCU VSSA, % of R21) at 5 kHz",
-   "value_pct": 3.31,
+   "value_pct": 1.29,
    "limit_pct": "<= 2",
-   "ok": false
+   "ok": true
   },
   {
    "id": "LN-M04",
@@ -1516,7 +1516,7 @@
   {
    "id": "LN-M05",
    "name": "bridge rail ripple 1.5-8 kHz x leg asymmetry 10 % vs 50 uV rms",
-   "value_uv": 8.724,
+   "value_uv": 8.72,
    "limit_uv": "<= 50",
    "ok": true,
    "at": "A05_CPU_HOP 1562 Hz"
@@ -1533,7 +1533,7 @@
  ],
  "board": {
   "path": "hw/pod/draft_r2/out/routed.kicad_pcb",
-  "sha256": "92ad295b6748be9a",
+  "sha256": "da4e8b132b895741",
   "stackup": "hw/pod/kicad-draft/pod.kicad_pcb:39-55 (JLC 0.8mm 4L as entered 2026-09-30); unverified vs JLC page"
  },
  "planes": {
@@ -1543,14 +1543,14 @@
     "sheet_ohm_sq": 0.001131578947368421,
     "cells": 29695,
     "area_mm2": 296.95,
-    "ports": 48,
+    "ports": 49,
     "orphan_ports": []
    },
    "+3V0": {
     "layer": "In2.Cu",
     "sheet_ohm_sq": 0.001131578947368421,
-    "cells": 28185,
-    "area_mm2": 281.85,
+    "cells": 28145,
+    "area_mm2": 281.45,
     "ports": 24,
     "orphan_ports": []
    }
