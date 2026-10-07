@@ -1,0 +1,9 @@
+# Status of the drastic-size verification items (synthesis.md s3). Updated 2026-10-07. AI-facing.
+V1: {status: owner, where: "review packet https://claude.ai/artifact/4qKNF7Q9sAocATuqHnasvg Q1 (D18 reading) + Q2 (plate)", note: "K1 cell ICP401230UPR pulse 260 mA < bridge peak ~315 mA: K1 needs a firmware top-volume cap ~-3 dB (packet Q1 says so)"}
+V2: {status: done, out: V2-cells.yaml, key: "Renata PDFs: ICP401230UPR 130 mAh T4.5 PCM 130/260 mA; ICP390831PR 85 mAh T4.3 PCM 85/170; ICP281029HPG 68 mAh T3.3 NO PCM 4.35 V; ICP331319PM 50 mAh T3.7 PCM 50/100"}
+V3: {status: done-secondary, out: V3-stm32u3.yaml, key: "U385 DS14830 Rev 2 via Farnell (st.com unreachable): QFN32 fits the 27 signals but has NO SMPS (LDO ~48 uA/MHz); PB7=BOOT0 snag; ADF PDM max clock unconfirmed"}
+V4: {status: done-static, out: V4-cycles.yaml, key: "spec B 61-71 MHz (no fit at 55); slim B 35-44 (fits 55 if her ears accept it); A 22-36; nothing fits 24 MHz (Range 4 SRAM wait state): floor ~34 MHz Range 3", consequence: "B3 budget (K2/K3 runtime at 24 MHz) is dead; K2/K3 runtimes must be re-estimated at >= 34 MHz"}
+V5: {status: running, note: "placement-only trial 16 mm (WLCSP U575 / QFN32 U3) and 20 mm (QFN48)"}
+V6: {status: dropped, why: "it qualified the 24 MHz Range-4 async SMPS mode for B3; V4 shows B3 doesn't fit, so the check has no consumer"}
+V7: {status: done, out: "hw/mech/dummies.py (STLs local in hw/mech/out/dummies), docs/diagrams/size-dummies.png (local)", key: "MZ2 T10.4 / K1 8.5 / K2 7.3 / K3 5.6 / OU4 5.6 (H 19.2); same dovetail rail; ballast pockets"}
+V8: {status: owner, note: "E4 current rig (~$60-80) = O21 exception, not asked again (owner rule: don't nag about orders)"}
