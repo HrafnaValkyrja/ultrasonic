@@ -20,9 +20,9 @@
    }
   },
   "PHYSICAL": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: owns moved to the Phase-2 sources (dims_r2.py / shell_r2.py, MZ-2 package set); each doc got a dated 'Current design: Phase 2' line with the item's Phase-2 facts (from dims_r2.py, placement.yaml, gen.py MZ2, interfaces.py/bom_check/noise/acoustics runs of 2026-10-07). The doc BODIES still describe the Rev F/G reference and say so: Phase-2 body rewrite is an open item (reg-board.md phase2_board.open)",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "file:docs/build/tolerances.md": "13099f559e727c93",
     "file:hw/mech/frame.py": "a4558cc4b7da5a09",
@@ -37,9 +37,9 @@
    }
   },
   "REG-ARM": {
-   "by": "claude",
-   "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "by": "docs-phase2-rewrite",
+   "date": "2026-10-07",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "file:hw/mech/frame.py": "a4558cc4b7da5a09",
     "file:hw/mech/heel.py": "47a6a72f88e793a7",
@@ -47,9 +47,9 @@
    }
   },
   "REG-BOARD": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: owns = draft_r2/placement.yaml + routed board; reg-board.md header says Phase 2 is the current design; phase2_board gets defaults/checks lines; open list: defaults switch done, VHB bond 31 %, bom.py re-price, docs rewrite",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "file:hw/pod/draft_r2/out/routed.kicad_pcb": "da4e8b132b895741",
     "file:hw/pod/draft_r2/placement.yaml": "4e1e955e4f95106b",
@@ -58,9 +58,9 @@
    }
   },
   "REG-PAD": {
-   "by": "claude",
-   "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "by": "docs-phase2-rewrite",
+   "date": "2026-10-07",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "file:hw/mech/pad.py": "00d8456a0d641613",
     "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
@@ -68,9 +68,9 @@
    }
   },
   "REG-POD-BODY": {
-   "by": "ultrasonic-lead",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: VHB cut-outs per test pad (shell_r2 vhb(), interfaces vhb_cutouts): bond 31 -> 91 %; both sides' text updated",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "file:hw/mech/blade.py": "4f7507b58a9e9bcd",
     "file:hw/mech/dims_r2.py": "2e56e5d5e9675ad1",
@@ -87,9 +87,9 @@
    }
   },
   "SUB-AUDIO-IN": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: owns moved to the Phase-2 sources (dims_r2.py / shell_r2.py, MZ-2 package set); each doc got a dated 'Current design: Phase 2' line with the item's Phase-2 facts (from dims_r2.py, placement.yaml, gen.py MZ2, interfaces.py/bom_check/noise/acoustics runs of 2026-10-07). The doc BODIES still describe the Rev F/G reference and say so: Phase-2 body rewrite is an open item (reg-board.md phase2_board.open)",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "block:MIC": "3b3b0512fc8e5584",
     "sym:hw/mech/dims_r2.py::DUCT_D": "3fbb6d185c33173c",
@@ -97,9 +97,9 @@
    }
   },
   "SUB-DEBUG-TEST": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: owns moved to the Phase-2 sources (dims_r2.py / shell_r2.py, MZ-2 package set); each doc got a dated 'Current design: Phase 2' line with the item's Phase-2 facts (from dims_r2.py, placement.yaml, gen.py MZ2, interfaces.py/bom_check/noise/acoustics runs of 2026-10-07). The doc BODIES still describe the Rev F/G reference and say so: Phase-2 body rewrite is an open item (reg-board.md phase2_board.open)",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "block:DEBUG": "eb54d1edb852e4fd",
     "block:SELFTEST": "b91fae734845754d",
@@ -107,27 +107,27 @@
    }
   },
   "SUB-DOCK-USB": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: owns moved to the Phase-2 sources (dims_r2.py / shell_r2.py, MZ-2 package set); each doc got a dated 'Current design: Phase 2' line with the item's Phase-2 facts (from dims_r2.py, placement.yaml, gen.py MZ2, interfaces.py/bom_check/noise/acoustics runs of 2026-10-07). The doc BODIES still describe the Rev F/G reference and say so: Phase-2 body rewrite is an open item (reg-board.md phase2_board.open)",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"
    }
   },
   "SUB-OUTPUT": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: owns moved to the Phase-2 sources (dims_r2.py / shell_r2.py, MZ-2 package set); each doc got a dated 'Current design: Phase 2' line with the item's Phase-2 facts (from dims_r2.py, placement.yaml, gen.py MZ2, interfaces.py/bom_check/noise/acoustics runs of 2026-10-07). The doc BODIES still describe the Rev F/G reference and say so: Phase-2 body rewrite is an open item (reg-board.md phase2_board.open)",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "block:BRIDGE": "cfe0c5bab46b5005",
     "block:SELFTEST": "b91fae734845754d"
    }
   },
   "SUB-POWER": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: owns moved to the Phase-2 sources (dims_r2.py / shell_r2.py, MZ-2 package set); each doc got a dated 'Current design: Phase 2' line with the item's Phase-2 facts (from dims_r2.py, placement.yaml, gen.py MZ2, interfaces.py/bom_check/noise/acoustics runs of 2026-10-07). The doc BODIES still describe the Rev F/G reference and say so: Phase-2 body rewrite is an open item (reg-board.md phase2_board.open)",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "block:CELL_PADS": "0b9eba20ffd94920",
     "block:CHARGER": "cc9c3ed6e5f52601",
@@ -136,9 +136,9 @@
    }
   },
   "SUB-PROCESSING": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: owns moved to the Phase-2 sources (dims_r2.py / shell_r2.py, MZ-2 package set); each doc got a dated 'Current design: Phase 2' line with the item's Phase-2 facts (from dims_r2.py, placement.yaml, gen.py MZ2, interfaces.py/bom_check/noise/acoustics runs of 2026-10-07). The doc BODIES still describe the Rev F/G reference and say so: Phase-2 body rewrite is an open item (reg-board.md phase2_board.open)",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "block:CLOCK": "2ac3a525f62269dc",
     "block:CORE_SMPS": "c2e952ea730a4765",
@@ -147,9 +147,9 @@
    }
   },
   "SUB-UI": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: owns moved to the Phase-2 sources (dims_r2.py / shell_r2.py, MZ-2 package set); each doc got a dated 'Current design: Phase 2' line with the item's Phase-2 facts (from dims_r2.py, placement.yaml, gen.py MZ2, interfaces.py/bom_check/noise/acoustics runs of 2026-10-07). The doc BODIES still describe the Rev F/G reference and say so: Phase-2 body rewrite is an open item (reg-board.md phase2_board.open)",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "block:UI": "2e30cc3f141e491d",
     "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
@@ -159,9 +159,9 @@
    }
   },
   "WHOLE": {
-   "by": "claude",
-   "date": "2026-10-03",
-   "note": "spec O24-O27 added (owner decisions); 00-whole unaffected in substance",
+   "by": "docs-phase2-rewrite",
+   "date": "2026-10-07",
+   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
    "stamp": {
     "grep:docs/spec.md::\\b[DO][0-9]+\\b": "8109175ed2b59501"
    }
@@ -376,9 +376,9 @@
    }
   },
   "R-PHYS-FRAME": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/mech/shell_r1.py (reference) to hw/mech/dims_r2.py (CAD-free constants, values identical to shell_r2 before the split) + shell_r2.py solids; checked with interfaces.py on the routed board: mic-port PASS 0.000 mm (gauge pin 0.115 <= 0.20), switch WARN stack 0.20 vs 0.15, outline PASS, heights PASS (B 1.4, F 0.30, SW1 pocket 0.90), clamp-bands WARN (VHB 31 % bonded, open), frame WARN ECR-0001; USB-C keep-out not in shell_r2",
+   "note": "2026-10-07: relation text updated to Phase 2 (U4->bridge 40 mohm via In2 plane; CC wording; blade.py 0.45 offset); both sides' docs agree",
    "stamp": {
     "sym:hw/mech/dims_r2.py::CELL": "77243a4be17c6775",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
@@ -414,9 +414,9 @@
    }
   },
   "R-PROC-DOCK": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "docs-phase2-rewrite",
    "date": "2026-10-07",
-   "note": "2026-10-07: plm now builds the SKiDL circuit with the current design's package set (hw/current.yaml, MZ-2). Changes are the ECR-0018 package swaps only (footprint/LCSC/value of D4, R14, R2, R18, R21/R22/C22); nets unchanged: bom_check nets 195/195 and pod_mz2.net == SKiDL, interfaces.py pins/rails unchanged vs Rev G",
+   "note": "2026-10-07: relation text updated to Phase 2 (U4->bridge 40 mohm via In2 plane; CC wording; blade.py 0.45 offset); both sides' docs agree",
    "stamp": {
     "net:CC": "90ab0345f812ddb5",
     "net:USB_DM": "e24d0b9352c00b90",
@@ -492,9 +492,9 @@
    }
   },
   "R-PWR-OUT-RAIL": {
-   "by": "claude",
-   "date": "2026-10-02",
-   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
+   "by": "docs-phase2-rewrite",
+   "date": "2026-10-07",
+   "note": "2026-10-07: relation text updated to Phase 2 (U4->bridge 40 mohm via In2 plane; CC wording; blade.py 0.45 offset); both sides' docs agree",
    "stamp": {
     "net:+3V0": "ea116e94f98e5ddd",
     "ref:C14": "10b7c698ba308aa8",
