@@ -1,5 +1,5 @@
 {
- "placement": "/tmp/claude-1000/-home-hrafnavalkyrja-Desktop-ultrasonic/759e00a7-254c-4cd3-926a-efbece430ab6/scratchpad/route_closure/v6.yaml",
+ "placement": "hw/pod/draft_r2/placement.yaml",
  "W": 30.0,
  "H": 12.0,
  "pass": true,
@@ -9,36 +9,22 @@
    1.88,
    6.0
   ],
-  "ratsnest_mm": 382.5,
+  "gap_J3_J5_mm": 2.8,
+  "port_keepout_mm": 2.06,
+  "ratsnest_mm": 383.4,
   "board_mm2": 359.1,
   "courtyard_B_mm2": 194.5,
   "courtyard_F_mm2": 14.4,
   "U_B": 0.541,
-  "gnd_vias": 78,
+  "gnd_vias": 72,
   "gnd_fanout_skipped": [
-   "U2.3"
+   "C10.2",
+   "C6.2",
+   "R9.2",
+   "U2.3",
+   "U1.1",
+   "U1.9",
+   "U1.48"
   ]
- },
- "route": {
-  "tracks": 594,
-  "vias": 134,
-  "drc_by_type": {},
-  "unconnected": [
-   [
-    "Track [I2C_SCL] on F.Cu, length 1.5074 mm",
-    "Pad 26 [I2C_SCL] of U1 on B.Cu"
-   ]
-  ],
-  "passes": {
-   "first": [
-    3,
-    0
-   ],
-   "second": [
-    1,
-    0
-   ],
-   "kept": "second"
-  }
  }
 }

@@ -97,6 +97,7 @@ def gnd_plane(b):
 
 
 DNP = ()                                             # Rev F: D1/D2 footprints removed (OUT-04)
+AVOID = None    # optional hook avoid(x, y, seg_from) -> True rejects a fan-out via/stub (place_r2: port keep-out, pre-routes)
 VIA_D, VIA_DRILL, STUB_W, GAP = 0.35, 0.15, 0.15, 0.12   # mm; GAP = copper clearance kept by the fan-out
 
 
@@ -124,6 +125,8 @@ def gnd_fanout(b, fps, inset=0.0):
     def free(x, y, seg_from=None, layer_pads=None):
         lo = 0.45 + inset
         if not (lo <= x <= P.W - lo and lo <= y <= P.H - lo):
+            return False
+        if AVOID is not None and AVOID(x, y, seg_from):
             return False
         if any(((x - vx) ** 2 + (y - vy) ** 2) ** 0.5 < VIA_D + 0.2 for vx, vy in vias):
             return False

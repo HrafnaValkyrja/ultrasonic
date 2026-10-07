@@ -8,14 +8,14 @@
    "f_out_hz": 21875.0,
    "att_db": -0.051278296650429045,
    "i_peak_a": 0.0001133684919941577,
-   "v_rms": 6.442769312028876e-06,
-   "spur_nom": -158.86982666865723,
-   "spur_pes": -138.86982666865723,
+   "v_rms": 6.4473144029373745e-06,
+   "spur_nom": -158.86370131516298,
+   "spur_pes": -138.86370131516298,
    "limit": -112.32987910175078,
-   "margin_nom": 46.53994756690645,
-   "margin_pes": 26.53994756690645,
-   "spur_worst": -132.0708654347702,
-   "margin_worst": 19.740986333019436,
+   "margin_nom": 46.53382221341221,
+   "margin_pes": 26.533822213412208,
+   "spur_worst": -132.06474008127597,
+   "margin_worst": 19.734860979525195,
    "aggressor": "A05_CPU_HOP",
    "victim": "V1_MIC_SUPPLY",
    "mechanism": "conduction",
@@ -28,15 +28,15 @@
      "net_or_ref": "U4",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 43.6252,
-     "share_pct_of_abs_total": 23.3
+     "contribution_mohm": 43.6299,
+     "share_pct_of_abs_total": 23.2
     },
     {
      "kind": "comp",
      "net_or_ref": "C13",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 41.6977,
+     "contribution_mohm": 41.7269,
      "share_pct_of_abs_total": 22.2
     },
     {
@@ -44,7 +44,7 @@
      "net_or_ref": "U1",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 41.6048,
+     "contribution_mohm": 41.6239,
      "share_pct_of_abs_total": 22.2
     },
     {
@@ -52,7 +52,7 @@
      "net_or_ref": "R20",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 8.3866,
+     "contribution_mohm": 8.3875,
      "share_pct_of_abs_total": 4.5
     },
     {
@@ -65,13 +65,13 @@
       24.801,
       9.051
      ],
-     "contribution_mohm": 7.9935,
+     "contribution_mohm": 7.9943,
      "share_pct_of_abs_total": 4.3
     },
     {
      "kind": "total",
-     "z_t_mohm": 80.3702,
-     "check_vs_direct_mohm": 80.3702
+     "z_t_mohm": 80.4269,
+     "check_vs_direct_mohm": 80.4269
     }
    ]
   },
@@ -79,14 +79,14 @@
    "kind": "band",
    "f_hz": 50000.0,
    "f_out_hz": 50000.0,
-   "v_rms": 1.4428224677097371e-05,
-   "spur_nom": -151.81574206887575,
-   "spur_pes": -131.81574206887575,
+   "v_rms": 1.4432606559113553e-05,
+   "spur_nom": -151.8131045465133,
+   "spur_pes": -131.8131045465133,
    "limit": -93.12864583884354,
-   "margin_nom": 58.68709623003221,
-   "margin_pes": 38.68709623003221,
-   "spur_worst": -113.22736355458989,
-   "margin_worst": 20.098717715746346,
+   "margin_nom": 58.68445870766976,
+   "margin_pes": 38.68445870766976,
+   "spur_worst": -113.22472603222744,
+   "margin_worst": 20.096080193383898,
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V1_MIC_SUPPLY",
    "mechanism": "conduction",
@@ -99,15 +99,15 @@
      "net_or_ref": "C13",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 45.0828,
-     "share_pct_of_abs_total": 24.4
+     "contribution_mohm": 45.1009,
+     "share_pct_of_abs_total": 24.5
     },
     {
      "kind": "comp",
      "net_or_ref": "U1",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 44.9216,
+     "contribution_mohm": 44.9386,
      "share_pct_of_abs_total": 24.4
     },
     {
@@ -115,7 +115,7 @@
      "net_or_ref": "U4",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 33.7776,
+     "contribution_mohm": 33.7965,
      "share_pct_of_abs_total": 18.3
     },
     {
@@ -123,7 +123,7 @@
      "net_or_ref": "C14",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 13.036,
+     "contribution_mohm": 13.0437,
      "share_pct_of_abs_total": 7.1
     },
     {
@@ -131,13 +131,13 @@
      "net_or_ref": "C4",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 9.7066,
+     "contribution_mohm": 9.6827,
      "share_pct_of_abs_total": 5.3
     },
     {
      "kind": "total",
-     "z_t_mohm": 55.626,
-     "check_vs_direct_mohm": 55.626
+     "z_t_mohm": 55.6449,
+     "check_vs_direct_mohm": 55.6449
     }
    ]
   },
@@ -148,28 +148,28 @@
    "f_out_hz": 38955.2631578967,
    "att_db": -0.16270888583850437,
    "i_peak_a": 0.0035897949309548903,
-   "v_rms": 8.741039176536623e-07,
-   "spur_nom": -176.3314475516684,
-   "spur_pes": -156.3314475516684,
+   "v_rms": 7.499585415060076e-07,
+   "spur_nom": -177.66196376981335,
+   "spur_pes": -157.66196376981335,
    "limit": -112.32987910175078,
-   "margin_nom": 64.00156844991761,
-   "margin_pes": 44.00156844991761,
-   "spur_worst": -126.3314475516684,
-   "margin_worst": 14.001568449917627,
+   "margin_nom": 65.33208466806258,
+   "margin_pes": 45.33208466806258,
+   "spur_worst": -127.66196376981337,
+   "margin_worst": 15.332084668062592,
    "aggressor": "A01_SMPS_IN",
    "victim": "V1_MIC_SUPPLY",
    "mechanism": "conduction",
    "features": [
     {
-     "layout_share_pct": 68.2
+     "layout_share_pct": 68.6
     },
     {
      "kind": "comp",
      "net_or_ref": "U1",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.3171,
-     "share_pct_of_abs_total": 26.2
+     "contribution_mohm": 0.2556,
+     "share_pct_of_abs_total": 25.0
     },
     {
      "kind": "trace",
@@ -181,8 +181,8 @@
       5.037,
       5.162
      ],
-     "contribution_mohm": 0.0863,
-     "share_pct_of_abs_total": 7.1
+     "contribution_mohm": 0.0738,
+     "share_pct_of_abs_total": 7.2
     },
     {
      "kind": "trace",
@@ -194,8 +194,8 @@
       5.12,
       6.375
      ],
-     "contribution_mohm": 0.0784,
-     "share_pct_of_abs_total": 6.5
+     "contribution_mohm": 0.0671,
+     "share_pct_of_abs_total": 6.6
     },
     {
      "kind": "trace",
@@ -207,8 +207,8 @@
       14.298,
       6.945
      ],
-     "contribution_mohm": 0.0675,
-     "share_pct_of_abs_total": 5.6
+     "contribution_mohm": 0.0606,
+     "share_pct_of_abs_total": 5.9
     },
     {
      "kind": "via",
@@ -218,13 +218,13 @@
       5.12,
       6.375
      ],
-     "contribution_mohm": 0.0669,
-     "share_pct_of_abs_total": 5.5
+     "contribution_mohm": 0.0572,
+     "share_pct_of_abs_total": 5.6
     },
     {
      "kind": "total",
-     "z_t_mohm": 0.3444,
-     "check_vs_direct_mohm": 0.3444
+     "z_t_mohm": 0.2954,
+     "check_vs_direct_mohm": 0.2954
     }
    ]
   },
@@ -235,51 +235,51 @@
    "f_out_hz": 25000.0,
    "att_db": -0.06698098249790124,
    "i_peak_a": 0.0004647276560042431,
-   "v_rms": 5.285345325657058e-07,
-   "spur_nom": -180.60551362596635,
-   "spur_pes": -160.60551362596635,
+   "v_rms": 5.495799960910336e-07,
+   "spur_nom": -180.26636264940785,
+   "spur_pes": -160.26636264940785,
    "limit": -112.32987910175078,
-   "margin_nom": 68.27563452421558,
-   "margin_pes": 48.275634524215576,
-   "spur_worst": -152.64671345252557,
-   "margin_worst": 40.3168343507748,
+   "margin_nom": 67.93648354765708,
+   "margin_pes": 47.936483547657076,
+   "spur_worst": -152.3075624759671,
+   "margin_worst": 39.977683374216326,
    "aggressor": "A08_LED_PWM",
    "victim": "V1_MIC_SUPPLY",
    "mechanism": "conduction",
    "features": [
     {
-     "layout_share_pct": 48.1
+     "layout_share_pct": 47.3
     },
     {
      "kind": "comp",
      "net_or_ref": "C13",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.9204,
-     "share_pct_of_abs_total": 20.6
+     "contribution_mohm": 0.9565,
+     "share_pct_of_abs_total": 20.8
     },
     {
      "kind": "comp",
      "net_or_ref": "U1",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.9174,
-     "share_pct_of_abs_total": 20.5
+     "contribution_mohm": 0.9533,
+     "share_pct_of_abs_total": 20.7
     },
     {
      "kind": "comp",
      "net_or_ref": "U4",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.1508,
-     "share_pct_of_abs_total": 3.4
+     "contribution_mohm": 0.1599,
+     "share_pct_of_abs_total": 3.5
     },
     {
      "kind": "comp",
      "net_or_ref": "C4",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.1258,
+     "contribution_mohm": 0.1306,
      "share_pct_of_abs_total": 2.8
     },
     {
@@ -287,37 +287,37 @@
      "net_or_ref": "C7",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.0644,
-     "share_pct_of_abs_total": 1.4
+     "contribution_mohm": 0.0715,
+     "share_pct_of_abs_total": 1.6
     },
     {
      "kind": "total",
-     "z_t_mohm": 1.6084,
-     "check_vs_direct_mohm": 1.6084
+     "z_t_mohm": 1.6724,
+     "check_vs_direct_mohm": 1.6724
     }
    ]
   },
   {
    "kind": "tone",
-   "f_hz": 28042105.263157897,
-   "f_k_nominal_hz": 27000000.0,
-   "f_out_hz": 38955.2631578967,
-   "att_db": -0.16270888583850437,
-   "i_peak_a": 0.0005403796460924682,
-   "v_rms": 6.837876759981767e-11,
-   "spur_nom": -258.4642835022315,
-   "spur_pes": -238.4642835022315,
+   "f_hz": 16030075.187969925,
+   "f_k_nominal_hz": 15000000.0,
+   "f_out_hz": 28275.18796992302,
+   "att_db": -0.08568859880726185,
+   "i_peak_a": 0.0017508300533395967,
+   "v_rms": 7.999437411165168e-11,
+   "spur_nom": -257.0244997035134,
+   "spur_pes": -237.02449970351338,
    "limit": -112.32987910175078,
-   "margin_nom": 146.13440440048075,
-   "margin_pes": 126.13440440048072,
-   "spur_worst": -208.4642835022315,
-   "margin_worst": 96.13440440048072,
+   "margin_nom": 144.69462060176264,
+   "margin_pes": 124.69462060176261,
+   "spur_worst": -207.02449970351338,
+   "margin_worst": 94.69462060176261,
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V1_MIC_SUPPLY",
    "mechanism": "conduction",
    "features": [
     {
-     "layout_share_pct": 97.8
+     "layout_share_pct": 94.9
     },
     {
      "kind": "trace",
@@ -329,8 +329,8 @@
       12.55,
       7.9
      ],
-     "contribution_mohm": 0.0052,
-     "share_pct_of_abs_total": 47.6
+     "contribution_mohm": 0.0019,
+     "share_pct_of_abs_total": 42.5
     },
     {
      "kind": "trace",
@@ -342,47 +342,37 @@
       12.55,
       7.15
      ],
-     "contribution_mohm": 0.0052,
-     "share_pct_of_abs_total": 46.9
+     "contribution_mohm": 0.0019,
+     "share_pct_of_abs_total": 41.7
+    },
+    {
+     "kind": "comp",
+     "net_or_ref": "C6",
+     "layer": "",
+     "xy": [],
+     "contribution_mohm": 0.0001,
+     "share_pct_of_abs_total": 2.1
     },
     {
      "kind": "comp",
      "net_or_ref": "U1",
      "layer": "",
      "xy": [],
-     "contribution_mohm": 0.0002,
-     "share_pct_of_abs_total": 1.9
+     "contribution_mohm": 0.0001,
+     "share_pct_of_abs_total": 1.3
     },
     {
-     "kind": "trace",
-     "net_or_ref": "MIC_VDD",
-     "layer": "B.Cu",
-     "xy": [
-      4.377,
-      5.162,
-      5.037,
-      5.162
-     ],
+     "kind": "comp",
+     "net_or_ref": "C3",
+     "layer": "",
+     "xy": [],
      "contribution_mohm": 0.0,
-     "share_pct_of_abs_total": 0.4
-    },
-    {
-     "kind": "trace",
-     "net_or_ref": "GND",
-     "layer": "B.Cu",
-     "xy": [
-      5.12,
-      5.72,
-      5.12,
-      6.375
-     ],
-     "contribution_mohm": 0.0,
-     "share_pct_of_abs_total": 0.4
+     "share_pct_of_abs_total": 0.8
     },
     {
      "kind": "total",
-     "z_t_mohm": 0.0002,
-     "check_vs_direct_mohm": 0.0002
+     "z_t_mohm": 0.0001,
+     "check_vs_direct_mohm": 0.0001
     }
    ]
   }
@@ -448,15 +438,15 @@
    "f_hz": 7977889.447236181,
    "f_out_hz": 23010.552763819695,
    "att_db": -0.056741839356408315,
-   "v_rms": 5.081186859220141e-07,
-   "spur_nom": -180.9374385141243,
-   "spur_pes": -160.9374385141243,
+   "v_rms": 5.081082282718053e-07,
+   "spur_nom": -180.9376172812762,
+   "spur_pes": -160.9376172812762,
    "limit": -112.32987910175078,
-   "margin_nom": 68.60755941237352,
-   "margin_pes": 48.60755941237352,
+   "margin_nom": 68.60773817952543,
+   "margin_pes": 48.60773817952543,
    "regime": "T=0.12",
-   "spur_worst": -130.9374385141243,
-   "margin_worst": 18.60755941237352
+   "spur_worst": -130.9376172812762,
+   "margin_worst": 18.607738179525427
   },
   {
    "aggressor": "F02_SMPS_LX",
@@ -466,15 +456,15 @@
    "f_hz": 28058291.457286432,
    "f_out_hz": 55141.457286432385,
    "att_db": -0.32627977774788536,
-   "v_rms": 1.1842400499145137e-08,
-   "spur_nom": -213.8574848890239,
-   "spur_pes": -193.8574848890239,
+   "v_rms": 1.1842405066999962e-08,
+   "spur_nom": -213.8574815387002,
+   "spur_pes": -193.8574815387002,
    "limit": -112.32987910175078,
-   "margin_nom": 101.52760578727313,
-   "margin_pes": 81.52760578727313,
+   "margin_nom": 101.52760243694942,
+   "margin_pes": 81.52760243694942,
    "regime": "T=0.03",
-   "spur_worst": -163.8574848890239,
-   "margin_worst": 51.52760578727313
+   "spur_worst": -163.8574815387002,
+   "margin_worst": 51.52760243694942
   },
   {
    "aggressor": "F02_SMPS_LX",
@@ -896,360 +886,360 @@
   {
    "aggressor": "A01_SMPS_IN",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 6.045243164317415e-05,
+   "v_rms": 4.822618296105463e-05,
    "f_hz": 66000000.0,
-   "total_rms": 0.00016067948854102382
+   "total_rms": 0.00013447511233961464
   },
   {
    "aggressor": "A01_SMPS_IN",
    "victim": "V3_ADC_REF",
-   "v_rms": 0.0002628390114153009,
+   "v_rms": 0.0002527297448372757,
    "f_hz": 3000000.0,
-   "total_rms": 0.0006405712248344318
+   "total_rms": 0.00047528828003857315
   },
   {
    "aggressor": "A01_SMPS_IN",
    "victim": "V4_LDO_OUT",
-   "v_rms": 9.430421202832104e-05,
+   "v_rms": 9.207985813464162e-05,
    "f_hz": 3000000.0,
-   "total_rms": 0.00014155892180123784
+   "total_rms": 0.00013279730597809118
   },
   {
    "aggressor": "A01_SMPS_IN",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 0.00020694910487596422,
+   "v_rms": 0.00020239391572694754,
    "f_hz": 3000000.0,
-   "total_rms": 0.000422584902422575
+   "total_rms": 0.00039459129182654174
   },
   {
    "aggressor": "A01_SMPS_IN",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 5.9769903410534786e-05,
-   "f_hz": 66000000.0,
-   "total_rms": 0.0001587741810318985
+   "v_rms": 2.4641013979194853e-05,
+   "f_hz": 3000000.0,
+   "total_rms": 5.8022692675727514e-05
   },
   {
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 0.0003524509964152241,
+   "v_rms": 0.00035244923765247123,
    "f_hz": 3000000.0,
-   "total_rms": 0.00037518538844165655
+   "total_rms": 0.00037518188807780605
   },
   {
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V3_ADC_REF",
-   "v_rms": 2.1211114399061785e-07,
+   "v_rms": 1.498116627753616e-07,
    "f_hz": 3000000.0,
-   "total_rms": 3.121920653798718e-07
+   "total_rms": 2.1364525023047942e-07
   },
   {
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V4_LDO_OUT",
-   "v_rms": 6.598431943924009e-09,
-   "f_hz": 69000000.0,
-   "total_rms": 1.0677218110453813e-08
+   "v_rms": 4.697825558824282e-09,
+   "f_hz": 9000000.0,
+   "total_rms": 9.32703440642155e-09
   },
   {
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 2.197041352414549e-08,
-   "f_hz": 69000000.0,
-   "total_rms": 3.563742784972392e-08
+   "v_rms": 1.765650707314899e-08,
+   "f_hz": 9000000.0,
+   "total_rms": 3.215009199003243e-08
   },
   {
    "aggressor": "A02_SMPS_VDD11",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 2.130025555878985e-07,
+   "v_rms": 1.5018411516313903e-07,
    "f_hz": 3000000.0,
-   "total_rms": 2.953649897748973e-07
+   "total_rms": 2.0822648253481496e-07
   },
   {
    "aggressor": "A03_BRIDGE_CARRIER",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 4.884005721746289e-07,
+   "v_rms": 3.678071945100439e-07,
    "f_hz": 400045.0,
-   "total_rms": 6.861229323511198e-07
+   "total_rms": 6.559744552486359e-07
   },
   {
    "aggressor": "A03_BRIDGE_CARRIER",
    "victim": "V3_ADC_REF",
-   "v_rms": 5.528804371911641e-05,
+   "v_rms": 5.538171731382482e-05,
    "f_hz": 400045.0,
-   "total_rms": 5.958354192017832e-05
+   "total_rms": 6.0037149447355805e-05
   },
   {
    "aggressor": "A03_BRIDGE_CARRIER",
    "victim": "V4_LDO_OUT",
-   "v_rms": 5.3019117158240474e-05,
+   "v_rms": 5.2969193140368255e-05,
    "f_hz": 400045.0,
-   "total_rms": 5.5834250730877576e-05
+   "total_rms": 5.575667963962036e-05
   },
   {
    "aggressor": "A03_BRIDGE_CARRIER",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 5.68435017288717e-05,
+   "v_rms": 5.672984192279097e-05,
    "f_hz": 400045.0,
-   "total_rms": 7.99728691532804e-05
+   "total_rms": 7.9890582933138e-05
   },
   {
    "aggressor": "A03_BRIDGE_CARRIER",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 5.8055719417779825e-06,
+   "v_rms": 5.721282416386545e-06,
    "f_hz": 400045.0,
-   "total_rms": 1.8905362052773263e-05
+   "total_rms": 2.010882364540799e-05
   },
   {
    "aggressor": "A03b_BRIDGE_EDGES",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 2.6244423214272425e-08,
-   "f_hz": 8800990.0,
-   "total_rms": 1.9460314347291303e-07
+   "v_rms": 6.040108283584259e-08,
+   "f_hz": 16401845.0,
+   "total_rms": 4.3661551618007607e-07
   },
   {
    "aggressor": "A03b_BRIDGE_EDGES",
    "victim": "V3_ADC_REF",
-   "v_rms": 2.336098394247103e-06,
+   "v_rms": 2.33798388009185e-06,
    "f_hz": 200022.5,
-   "total_rms": 1.0264108409483126e-05
+   "total_rms": 1.0199132257286296e-05
   },
   {
    "aggressor": "A03b_BRIDGE_EDGES",
    "victim": "V4_LDO_OUT",
-   "v_rms": 1.9985018854221243e-06,
+   "v_rms": 1.9987504945576577e-06,
    "f_hz": 200022.5,
-   "total_rms": 3.936364768355536e-06
+   "total_rms": 3.927991392189149e-06
   },
   {
    "aggressor": "A03b_BRIDGE_EDGES",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 6.114454083859518e-06,
+   "v_rms": 6.0060221960456875e-06,
    "f_hz": 24002700.0,
-   "total_rms": 4.068382147747679e-05
+   "total_rms": 4.0444991449029105e-05
   },
   {
    "aggressor": "A03b_BRIDGE_EDGES",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 2.1615229599073217e-06,
+   "v_rms": 2.473765378343635e-06,
    "f_hz": 24002700.0,
-   "total_rms": 1.4571199072844951e-05
+   "total_rms": 1.650603884941898e-05
   },
   {
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 2.9150171006813637e-08,
+   "v_rms": 2.175867655387859e-08,
    "band": "20-85k noise"
   },
   {
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V3_ADC_REF",
-   "v_rms": 2.4496608585827394e-05,
+   "v_rms": 2.450845336120859e-05,
    "band": "20-85k noise"
   },
   {
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V4_LDO_OUT",
-   "v_rms": 1.5130168191818848e-05,
+   "v_rms": 1.5135627359379683e-05,
    "band": "20-85k noise"
   },
   {
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 2.5436046719935817e-05,
+   "v_rms": 2.5443980431839268e-05,
    "band": "20-85k noise"
   },
   {
    "aggressor": "A04_BRIDGE_SHAPED_NOISE",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 3.858164946750692e-07,
+   "v_rms": 3.82516578517119e-07,
    "band": "20-85k noise"
   },
   {
    "aggressor": "A05_CPU_HOP",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 3.079147143350203e-06,
+   "v_rms": 3.0803560043795523e-06,
    "f_hz": 1562.5,
-   "total_rms": 3.773345617809266e-06,
+   "total_rms": 3.774301338327504e-06,
    "lf16k": {
     "f_hz": 1562.5,
-    "v_rms": 3.079147143350203e-06
+    "v_rms": 3.0803560043795523e-06
    },
    "audio": {
     "f_hz": 1562.5,
-    "v_rms": 3.079147143350203e-06
+    "v_rms": 3.0803560043795523e-06
    }
   },
   {
    "aggressor": "A05_CPU_HOP",
    "victim": "V3_ADC_REF",
-   "v_rms": 8.954332059948765e-05,
+   "v_rms": 8.958087568331444e-05,
    "f_hz": 1562.5,
-   "total_rms": 0.0001097504177369783,
+   "total_rms": 0.00010979757551308689,
    "lf16k": {
     "f_hz": 1562.5,
-    "v_rms": 8.954332059948765e-05
+    "v_rms": 8.958087568331444e-05
    },
    "audio": {
     "f_hz": 1562.5,
-    "v_rms": 8.954332059948765e-05
+    "v_rms": 8.958087568331444e-05
    }
   },
   {
    "aggressor": "A05_CPU_HOP",
    "victim": "V4_LDO_OUT",
-   "v_rms": 4.75180192463573e-05,
+   "v_rms": 4.751803137026793e-05,
    "f_hz": 1562.5,
-   "total_rms": 5.85090953707044e-05,
+   "total_rms": 5.850983793877484e-05,
    "lf16k": {
     "f_hz": 1562.5,
-    "v_rms": 4.75180192463573e-05
+    "v_rms": 4.751803137026793e-05
    },
    "audio": {
     "f_hz": 1562.5,
-    "v_rms": 4.75180192463573e-05
+    "v_rms": 4.751803137026793e-05
    }
   },
   {
    "aggressor": "A05_CPU_HOP",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 8.719834715900231e-05,
+   "v_rms": 8.718354537994109e-05,
    "f_hz": 1562.5,
-   "total_rms": 0.00010688817259811008,
+   "total_rms": 0.00010687107778533847,
    "lf16k": {
     "f_hz": 1562.5,
-    "v_rms": 8.719834715900231e-05
+    "v_rms": 8.718354537994109e-05
    },
    "audio": {
     "f_hz": 1562.5,
-    "v_rms": 8.719834715900231e-05
+    "v_rms": 8.718354537994109e-05
    }
   },
   {
    "aggressor": "A05_CPU_HOP",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 1.4900238057814487e-06,
+   "v_rms": 1.3828463011651367e-06,
    "f_hz": 1562.5,
-   "total_rms": 1.820384641119471e-06,
+   "total_rms": 1.6894456567030006e-06,
    "lf16k": {
     "f_hz": 1562.5,
-    "v_rms": 1.4900238057814487e-06
+    "v_rms": 1.3828463011651367e-06
    },
    "audio": {
     "f_hz": 1562.5,
-    "v_rms": 1.4900238057814487e-06
+    "v_rms": 1.3828463011651367e-06
    }
   },
   {
    "aggressor": "A06_PDM_CLOCK_RETURN",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 0.0003935448929161614,
+   "v_rms": 0.0003942075412558429,
    "f_hz": 100011250.0,
-   "total_rms": 0.0009146523327981356
+   "total_rms": 0.0009150464881106491
   },
   {
    "aggressor": "A06_PDM_CLOCK_RETURN",
    "victim": "V3_ADC_REF",
-   "v_rms": 2.886315862551354e-05,
+   "v_rms": 1.8154994891138564e-05,
    "f_hz": 84009450.0,
-   "total_rms": 5.807769445031862e-05
+   "total_rms": 3.68697260649987e-05
   },
   {
    "aggressor": "A06_PDM_CLOCK_RETURN",
    "victim": "V4_LDO_OUT",
-   "v_rms": 4.093683026739377e-06,
+   "v_rms": 3.6754552981668393e-06,
    "f_hz": 92010350.0,
-   "total_rms": 7.852205807805675e-06
+   "total_rms": 6.543722174976655e-06
   },
   {
    "aggressor": "A06_PDM_CLOCK_RETURN",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 1.3620150157213735e-05,
+   "v_rms": 1.222906971711503e-05,
    "f_hz": 92010350.0,
-   "total_rms": 2.613131452728067e-05
+   "total_rms": 2.177581433744788e-05
   },
   {
    "aggressor": "A06_PDM_CLOCK_RETURN",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 1.3477288809103106e-05,
-   "f_hz": 76008550.0,
-   "total_rms": 2.9578508889566144e-05
+   "v_rms": 8.481950398903586e-06,
+   "f_hz": 84009450.0,
+   "total_rms": 1.99401797574854e-05
   },
   {
    "aggressor": "A07_USB_FS",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 0.00010806679051239986,
+   "v_rms": 0.00010635608515869613,
    "f_hz": 54000000.0,
-   "total_rms": 0.00021086307635126688
+   "total_rms": 0.00020795944415973074
   },
   {
    "aggressor": "A07_USB_FS",
    "victim": "V3_ADC_REF",
-   "v_rms": 3.4507793020209084e-05,
+   "v_rms": 1.93906217435485e-05,
    "f_hz": 66000000.0,
-   "total_rms": 5.3759581700223056e-05
+   "total_rms": 3.0447514749398988e-05
   },
   {
    "aggressor": "A07_USB_FS",
    "victim": "V4_LDO_OUT",
-   "v_rms": 2.7675570027246507e-06,
+   "v_rms": 1.6470122483025932e-06,
    "f_hz": 66000000.0,
-   "total_rms": 3.462423120781055e-06
+   "total_rms": 2.1032668106374308e-06
   },
   {
    "aggressor": "A07_USB_FS",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 9.700236277093718e-06,
+   "v_rms": 5.990321566401344e-06,
    "f_hz": 66000000.0,
-   "total_rms": 1.145778063025716e-05
+   "total_rms": 6.736467623835001e-06
   },
   {
    "aggressor": "A07_USB_FS",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 2.1165814375173154e-05,
+   "v_rms": 1.3758057055482518e-05,
    "f_hz": 54000000.0,
-   "total_rms": 3.953342772908696e-05
+   "total_rms": 2.5654818687428944e-05
   },
   {
    "aggressor": "A08_LED_PWM",
    "victim": "V2_MIC_GND_VS_MCU",
-   "v_rms": 1.0642678747463358e-06,
+   "v_rms": 1.0650770928022013e-06,
    "f_hz": 25000.0,
-   "total_rms": 1.1533035642145181e-06
+   "total_rms": 1.1541594116703257e-06
   },
   {
    "aggressor": "A08_LED_PWM",
    "victim": "V3_ADC_REF",
-   "v_rms": 7.073356427204412e-07,
+   "v_rms": 7.096108969762257e-07,
    "f_hz": 25000.0,
-   "total_rms": 7.400654152395666e-07
+   "total_rms": 7.421072173834226e-07
   },
   {
    "aggressor": "A08_LED_PWM",
    "victim": "V4_LDO_OUT",
-   "v_rms": 7.538573075879112e-08,
+   "v_rms": 7.997857393072394e-08,
    "f_hz": 75000.0,
-   "total_rms": 1.3012019476917124e-07
+   "total_rms": 1.3803209455969827e-07
   },
   {
    "aggressor": "A08_LED_PWM",
    "victim": "V5_BRIDGE_RAIL",
-   "v_rms": 2.1261208354904065e-07,
+   "v_rms": 2.487238616891333e-07,
    "f_hz": 25000.0,
-   "total_rms": 2.434879296973219e-07
+   "total_rms": 2.7787443199982003e-07
   },
   {
    "aggressor": "A08_LED_PWM",
    "victim": "V6_ISENSE_KELVIN",
-   "v_rms": 5.162909772162684e-07,
+   "v_rms": 4.797571551710678e-07,
    "f_hz": 25000.0,
-   "total_rms": 5.585861222194999e-07
+   "total_rms": 5.190358151316845e-07
   }
  ],
  "kelvin": {
-  "z_kelvin_5khz_mohm": 1.2854408414740202,
-  "z_kelvin_error_pct_of_r21": 1.28544084147402,
+  "z_kelvin_5khz_mohm": 1.2876571912324837,
+  "z_kelvin_error_pct_of_r21": 1.2876571912324835,
   "features": [
    {
-    "layout_share_pct": 96.6
+    "layout_share_pct": 96.8
    },
    {
     "kind": "via",
@@ -1273,7 +1263,7 @@
      6.01
     ],
     "contribution_mohm": 0.2072,
-    "share_pct_of_abs_total": 12.1
+    "share_pct_of_abs_total": 12.2
    },
    {
     "kind": "trace",
@@ -1309,26 +1299,26 @@
      17.58,
      8.004999999999999
     ],
-    "contribution_mohm": 0.0564,
+    "contribution_mohm": 0.0558,
     "share_pct_of_abs_total": 3.3
    },
    {
     "kind": "total",
-    "z_t_mohm": 1.2854,
-    "check_vs_direct_mohm": 1.2854
+    "z_t_mohm": 1.2877,
+    "check_vs_direct_mohm": 1.2877
    }
   ]
  },
  "z_mic_supply_mohm": {
   "A01_SMPS_IN": {
-   "1000": 94.2545,
-   "5000": 93.4669,
-   "20000": 83.4442,
-   "85000": 38.1148,
-   "200000": 8.2117,
-   "1000000": 0.3397,
-   "4000000": 0.1121,
-   "12000000": 0.0282
+   "1000": 93.9781,
+   "5000": 93.1933,
+   "20000": 83.2074,
+   "85000": 38.0505,
+   "200000": 8.1941,
+   "1000000": 0.3283,
+   "4000000": 0.0871,
+   "12000000": 0.0415
   },
   "A02_SMPS_VDD11": {
    "1000": 0.0,
@@ -1341,74 +1331,74 @@
    "12000000": 0.0
   },
   "A03_BRIDGE_CARRIER": {
-   "1000": 89.555,
-   "5000": 88.8117,
-   "20000": 79.3581,
-   "85000": 36.6629,
-   "200000": 7.9965,
-   "1000000": 0.2501,
-   "4000000": 0.0969,
-   "12000000": 0.0174
+   "1000": 89.5625,
+   "5000": 88.8194,
+   "20000": 79.3681,
+   "85000": 36.6864,
+   "200000": 7.9941,
+   "1000000": 0.2463,
+   "4000000": 0.0678,
+   "12000000": 0.0341
   },
   "A03b_BRIDGE_EDGES": {
-   "1000": 89.555,
-   "5000": 88.8117,
-   "20000": 79.3581,
-   "85000": 36.6629,
-   "200000": 7.9965,
-   "1000000": 0.2501,
-   "4000000": 0.0969,
-   "12000000": 0.0174
+   "1000": 89.5625,
+   "5000": 88.8194,
+   "20000": 79.3681,
+   "85000": 36.6864,
+   "200000": 7.9941,
+   "1000000": 0.2463,
+   "4000000": 0.0678,
+   "12000000": 0.0341
   },
   "A04_BRIDGE_SHAPED_NOISE": {
-   "1000": 89.555,
-   "5000": 88.8117,
-   "20000": 79.3581,
-   "85000": 36.6629,
-   "200000": 7.9965,
-   "1000000": 0.2501,
-   "4000000": 0.0969,
-   "12000000": 0.0174
+   "1000": 89.5625,
+   "5000": 88.8194,
+   "20000": 79.3681,
+   "85000": 36.6864,
+   "200000": 7.9941,
+   "1000000": 0.2463,
+   "4000000": 0.0678,
+   "12000000": 0.0341
   },
   "A05_CPU_HOP": {
-   "1000": 92.6165,
-   "5000": 91.8442,
-   "20000": 82.0188,
-   "85000": 37.5979,
-   "200000": 8.1197,
-   "1000000": 0.2949,
-   "4000000": 0.1064,
-   "12000000": 0.0272
+   "1000": 92.6784,
+   "5000": 91.9058,
+   "20000": 82.0761,
+   "85000": 37.6377,
+   "200000": 8.1186,
+   "1000000": 0.2911,
+   "4000000": 0.0802,
+   "12000000": 0.0412
   },
   "A06_PDM_CLOCK_RETURN": {
-   "1000": 14.5492,
-   "5000": 14.54,
-   "20000": 14.4309,
-   "85000": 14.1696,
-   "200000": 14.4039,
-   "1000000": 20.0463,
-   "4000000": 58.6673,
-   "12000000": 171.4124
+   "1000": 14.5242,
+   "5000": 14.5159,
+   "20000": 14.417,
+   "85000": 14.1827,
+   "200000": 14.406,
+   "1000000": 20.0468,
+   "4000000": 58.6663,
+   "12000000": 171.4112
   },
   "A07_USB_FS": {
-   "1000": 2.3583,
-   "5000": 2.3361,
-   "20000": 2.052,
-   "85000": 0.7234,
-   "200000": 0.1446,
-   "1000000": 0.04,
-   "4000000": 0.0183,
-   "12000000": 0.0112
+   "1000": 2.3191,
+   "5000": 2.2973,
+   "20000": 2.0178,
+   "85000": 0.7107,
+   "200000": 0.1416,
+   "1000000": 0.0381,
+   "4000000": 0.013,
+   "12000000": 0.0119
   },
   "A08_LED_PWM": {
-   "1000": 1.9748,
-   "5000": 1.9562,
-   "20000": 1.7177,
-   "85000": 0.6066,
-   "200000": 0.1366,
-   "1000000": 0.0372,
-   "4000000": 0.0172,
-   "12000000": 0.0107
+   "1000": 2.0533,
+   "5000": 2.0339,
+   "20000": 1.7861,
+   "85000": 0.6296,
+   "200000": 0.1373,
+   "1000000": 0.0364,
+   "4000000": 0.0126,
+   "12000000": 0.0116
   }
  },
  "floor": {
@@ -1435,39 +1425,39 @@
  },
  "n_freqs": 693,
  "e2e_if": {
-  "background_mv_rms": 0.10736712864078439,
-  "background_mv_rms_20k_100k": 0.019877783504491164,
+  "background_mv_rms": 0.1074386286001451,
+  "background_mv_rms_20k_100k": 0.019888694663838174,
   "dominant_line": {
    "f_hz": 1562.5,
-   "v_rms": 8.795940109163883e-05,
+   "v_rms": 8.801826602997395e-05,
    "source": "A05_CPU_HOP",
    "sync": false
   },
   "note": "background excludes the bridge's own audio-band supply current: the e2e sim supplies ctx.side['i_sup'] and multiplies by h_ibridge_to_micvdd"
  },
  "dc_plane_mohm": {
-  "mic_gnd_to_mcu_vss": 4.053,
-  "shunt_gnd_to_mcu_vssa": 3.139,
-  "mcu_vss_to_cell_neg": 4.073,
-  "shunt_gnd_to_cell_neg": 2.147,
-  "mic_bypass_gnd_to_mcu_vss": 3.522
+  "mic_gnd_to_mcu_vss": 2.384,
+  "shunt_gnd_to_mcu_vssa": 2.818,
+  "mcu_vss_to_cell_neg": 3.621,
+  "shunt_gnd_to_cell_neg": 2.563,
+  "mic_bypass_gnd_to_mcu_vss": 1.914
  },
  "dc_rail_paths_mohm": {
-  "U4.1->Q1.4": 40.42,
+  "U4.1->Q1.4": 40.41,
   "U4.1->Q2.4": 39.51,
-  "U4.1->U1.25": 42.82,
-  "U4.1->U1.21": 45.02,
+  "U4.1->U1.25": 42.51,
+  "U4.1->U1.21": 44.7,
   "U1.15->U2.5": 82.47,
   "Q1.1->R21.1": 25.18,
-  "U2.3->U1.24": 18.2,
-  "C13.2->U2.3": 17.86,
-  "C13.2->U1.24": 7.78,
-  "R21.2->U1.8": 5.91,
-  "U1.24->J4.1": 11.4,
+  "U2.3->U1.24": 18.18,
+  "C13.2->U2.3": 17.85,
+  "C13.2->U1.24": 7.76,
+  "R21.2->U1.8": 4.9,
+  "U1.24->J4.1": 11.71,
   "C14.2->R21.2": 6.0
  },
  "netlist_check": {
-  "netlist": "hw/pod/pod_mz2.net",
+  "netlist": "/home/hrafnavalkyrja/Desktop/ultrasonic/hw/pod/pod_mz2.net",
   "pads_netlist": 195,
   "pads_board": 195,
   "mismatches": 0,
@@ -1484,7 +1474,7 @@
    "signoff": true,
    "at": "A05_CPU_HOP conduction 21875 Hz -> 21875 Hz",
    "value_db_nominal": 46.5,
-   "value_db_worst": 14.0,
+   "value_db_worst": 15.3,
    "at_worst": "A01_SMPS_IN conduction 28042105 Hz -> 38955 Hz",
    "psrr_scenarios": "nominal flat 55 dB | pessimistic 35 dB above 20 kHz | worst e2e rolloff 55-20log10(f/1k), floor 5 dB (docs/sim/shared-params.yaml#psrr)"
   },
@@ -1508,7 +1498,7 @@
   {
    "id": "LN-M04",
    "name": "ADC reference ripple, lines <= 16 kHz, peak vs 0.37 mV (0.5 LSB of 12 bit at 3.0 V)",
-   "value_mv_pk": 0.1266,
+   "value_mv_pk": 0.1267,
    "limit_mv_pk": "<= 0.37",
    "ok": true,
    "at": "A05_CPU_HOP 1562 Hz"
@@ -1516,7 +1506,7 @@
   {
    "id": "LN-M05",
    "name": "bridge rail ripple 1.5-8 kHz x leg asymmetry 10 % vs 50 uV rms",
-   "value_uv": 8.72,
+   "value_uv": 8.718,
    "limit_uv": "<= 50",
    "ok": true,
    "at": "A05_CPU_HOP 1562 Hz"
@@ -1532,8 +1522,8 @@
   }
  ],
  "board": {
-  "path": "hw/pod/draft_r2/out/routed.kicad_pcb",
-  "sha256": "da4e8b132b895741",
+  "path": "/home/hrafnavalkyrja/Desktop/ultrasonic/hw/pod/draft_r2/out/routed.kicad_pcb",
+  "sha256": "9e7627860783b952",
   "stackup": "hw/pod/kicad-draft/pod.kicad_pcb:39-55 (JLC 0.8mm 4L as entered 2026-09-30); unverified vs JLC page"
  },
  "planes": {
@@ -1541,17 +1531,17 @@
    "GND": {
     "layer": "In1.Cu",
     "sheet_ohm_sq": 0.001131578947368421,
-    "cells": 29695,
-    "area_mm2": 296.95,
+    "cells": 29890,
+    "area_mm2": 298.9,
     "ports": 49,
     "orphan_ports": []
    },
    "+3V0": {
     "layer": "In2.Cu",
     "sheet_ohm_sq": 0.001131578947368421,
-    "cells": 28145,
-    "area_mm2": 281.45,
-    "ports": 24,
+    "cells": 28269,
+    "area_mm2": 282.69,
+    "ports": 23,
     "orphan_ports": []
    }
   },
