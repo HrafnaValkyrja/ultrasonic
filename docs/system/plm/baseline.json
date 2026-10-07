@@ -125,9 +125,9 @@
    }
   },
   "SUB-POWER": {
-   "by": "docs-phase2-rewrite",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "PWR-I9: provenance rows for BQ25180 SLUSE99C, Renata V03, VHB 4914 TDS added (docs only)",
    "stamp": {
     "block:CELL_PADS": "0b9eba20ffd94920",
     "block:CHARGER": "cc9c3ed6e5f52601",

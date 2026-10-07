@@ -272,3 +272,6 @@
 - 2026-10-07 12:41 review PHYSICAL by backlog-agent: RPB-12: seam rebate 0.2x0.3 -> 0.2x0.4 (shell_r2.REBATE_D/H; tolerances.md recess min 0.4; wall 0.6 = RESIN min_wall); shell_r2 rebuilt: tub 1 valid solid, 1318.9 -> 1317.4 mm3, all other checks unchanged; belly step still unmarked
 - 2026-10-07 12:41 checkin REG-POD-BODY by backlog-agent
 - 2026-10-07 12:41 checkin PHYSICAL by backlog-agent
+- 2026-10-07 12:42 checkout SUB-POWER by backlog-agent: PWR-I9: provenance rows for BQ25180 + Renata V03
+- 2026-10-07 12:42 review SUB-POWER by backlog-agent: PWR-I9: provenance rows for BQ25180 SLUSE99C, Renata V03, VHB 4914 TDS added (docs only)
+- 2026-10-07 12:42 checkin SUB-POWER by backlog-agent

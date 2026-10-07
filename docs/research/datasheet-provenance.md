@@ -57,6 +57,15 @@ Pin-by-pin and pad-by-pad checks against the datasheets are part of the adversar
   - These match: 2.2 µH coil VLXSMPS→VDD11; two 2.2 µF on VDD11 (layout: return them to the VSSSMPS pin); 100 nF per VDD pin; VDDA 100 nF + 1 µF.
   - **One shortfall:** AN5373 asks for "10 µF typical, 4.7 µF minimum" bulk on VDD for the package. C4 is 4.7 µF nominal in 0402 X5R, so below the minimum under DC bias. C7 (10 µF, same +3V0 net, at the SMPS input) and C14 (22 µF) are on the net, but not necessarily close to the VDD pins. **Fix: make C4 10 µF 0603 (Basic C19702), or place C7 so it serves the VDD pins.**
 
+## Added for the Phase-2 design (2026-10-07)
+The board-parts table above is the 2026-09-30 (Rev E) BOM: U3 is now the TI BQ25180 (not MCP73831). Rows below record documents the current design (hw/current.yaml, MZ-2) rests on that were missing here (sub-power PWR-I9).
+
+| Item | Document | Revision | SHA-256 prefix | Fetched | Cited by |
+|---|---|---|---|---|---|
+| U3 charger | TI BQ25180 datasheet SLUSE99C, https://www.ti.com/lit/ds/symlink/bq25180.pdf | Rev C | c2008f613723fec3 | 2026-10-02 | sub-power, audit-datasheet-claims.md, simplify/power.md |
+| Cell | Renata ICP501233PA-02 specification | V03, 08/2019 | c3bb2ebe9c1d78af | 2026-10-01 | sub-power `cell:` block |
+| Board/cell bond | 3M VHB Tape Specialty Tape 4914 TDS, https://multimedia.3m.com/mws/media/2366463O/3M-VHB-Tape-Specialty-Tape-4914.pdf | rev 2024-09 (supersedes 2024-06) | 2fc355523c5e5dff | 2026-10-07 | dims_r2.switch_stack (thickness ±15 %), sim/checks/sw1_press_fem.py (85 kPa dynamic design factor, 900 kPa normal tensile) |
+
 ## To close the gap
 1. **Owner downloads from st.com** (it blocks this sandbox): DS13737 (current), RM0456 (current), ES0499 (current), AN5373. Then diff Rev 8 → current for pinout, currents, and SMPS/VDD11 capacitor requirements.
 2. **Fetch real PDFs** for PESD5V0S1BL, ESD9X5.0ST5G, KXT321LHS and the capacitor lines, and re-check the quoted values.
