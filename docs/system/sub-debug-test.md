@@ -115,6 +115,7 @@ local_copy: "scratchpad boot/an2606.pdf, fetched 2026-09-30, SHA-256 b0ed4c4839c
 ```
 
 ## Bring-up sequence (proposal for ECR-0010; adapted from hw/mech/notes/electronics.md §A; build stages per physical.md assembly order)
+**Superseded as the working plan (2026-10-07) by `docs/build/bringup.yaml` (agent twin) / `bringup.md` (owner) / `docs/diagrams/bringup-sequence.svg`: 9 stages A-I, 40 steps, gates G0-G5, each step with tools, expected value, pass, on-fail and the backlog ids it closes. The list below stays as the debug-side summary; step numbers map n1 -> B2, n2 -> C1, n3 -> D1, n4 -> E1, n5 -> E3, n6 -> D4, n7 -> E5/E6, n8 -> F1/F2, n9 -> E7/G1, n10 -> H2.**
 ```yaml
 - {n: 0, stage: bare board, do: "loupe: U3 balls, U1, Q1/Q2 (Nexperia land pattern, ECR-0004), SW1, D5/D6, 0201 tombstones, pad-board LED cathode mark", fail: "photograph, stop"}
 - n: 1

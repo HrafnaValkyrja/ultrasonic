@@ -92,7 +92,7 @@ hardware:   # parts / bench / built board (O21: nothing ordered before freeze)
   - {id: E2-ALGO, src: "docs/sim/firmware-emulation.yaml FWSIM-R13 status; sim/fw/l2.py (2026-10-07)", t: "E2 listening test must choose the algorithm variant with these sim facts in hand: slim B (16 bands, 1.28 ms frames; fits ~44 MHz only as V4's tuned kernels) misses T2 bat-call recall 0.65 vs >= 0.80 - in the Python reference too, so it is the algorithm, not the port; algorithm A (heterodyne 38 kHz) misses EVERY FM bat call (recall 0) in Python and firmware with the old 575-tap decimator, and recalls 0.39 (still < 0.80) in both since the 16+40-tap cascade (lead decision 2026-10-07); spec B passes (0.83) but costs 94-119 MHz static in today's firmware (V4 floor 59-69)", opts: "A spec B at P80/P160 clock (rec until E2) / B slim B if her ears accept fewer bands and the recall loss / C A only as a tone-finder fallback", blk: "hardware (E2 listening, owner ears)"}
   - {id: ECR-0006, t: "weighted dummy pair wear + joint flex test"}
   - {id: ECR-0007, dup: [OUT-2, PAD-2], t: "exciter E1 coil R/L, E2 listening"}
-  - {id: ECR-0010, t: "bring-up plan + firmware tested before order", note: "firmware half = fw-agent"}
+  - {id: ECR-0010, t: "bring-up plan + firmware tested before order", note: "firmware half = fw-agent", st: "plan half done 2026-10-07 round 9: docs/build/bringup.yaml/.md (40 steps, gates G0-G5); every hardware entry below maps to a step via its `closes` list"}
   - {id: OUT-4, t: "JLCDFM verdict on Q1/Q2 0.15 mm gaps; 0.10 mm stencil", note: "needs the owner's JLC account"}
   - {id: OUT-5, t: "C14 X5R sing risk (S2/E7 listening)"}
   - {id: OUT-7, t: "dead time on the real Nexperia part", note: "or a browser-fetched model"}

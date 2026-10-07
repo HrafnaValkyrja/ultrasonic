@@ -557,3 +557,5 @@
 - 2026-10-07 16:52 checkin COST by backlog-agent
 - 2026-10-07 16:52 checkin PHYSICAL by backlog-agent
 - 2026-10-07 16:52 checkin SUB-POWER by backlog-agent
+- 2026-10-07 17:01 checkout SUB-DEBUG-TEST by claude-backlog: ECR-0010: bring-up plan pointer to docs/build/bringup.md
+- 2026-10-07 17:01 checkin SUB-DEBUG-TEST by claude-backlog
