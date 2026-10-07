@@ -203,7 +203,7 @@ missing: ["STM32U3 primary datasheet (pin count, ADF clock)", "BQ25180 power-on 
 ## 5. Verification results (2026-10-07, V-status.yaml) and what they change
 
 ```yaml
-K1: {verdict: "still the floor; recommended", change: "ICP401230UPR pulse 260 mA < bridge full-drive peak ~315 mA -> FWSIM-R64 hard current clamp (208 mA = -3.6 dBFS) on full-scale paths only (self-test, CDC); the -12 dBFS listening ceiling (~79 mA) is already below it, so no audible cost; also clears ECR-0005", src: [V2-cells.yaml, docs/system/sub-power.md bridge_peak]}
+K1: {verdict: "still the floor; recommended", change: "ICP401230UPR pulse 260 mA < bridge full-drive peak ~315 mA -> FWSIM-R64 hard current clamp (208 mA, about -3.9 dBFS) on full-scale paths only (self-test, CDC); the -12 dBFS listening ceiling (~79 mA) is already below it, so no audible cost; also clears ECR-0005", src: [V2-cells.yaml, docs/system/sub-power.md bridge_peak]}
 K2: {verdict: "weaker", change: "ICP390831PR 85 mAh pulse 170 mA -> cap ~-6 dB (I_peak <= ~150 mA); the B3 24 MHz budget is dead (V4: nothing fits below ~34 MHz), so its 9.9 h worst-case runtime must be recomputed at >= 34 MHz (lower); ICP281029HPG (68 mAh, 3.3 mm) has NO PCM and charges to 4.35 V: needs a protection IC on the board", src: [V2-cells.yaml, V4-cycles.yaml]}
 K3: {verdict: "not recommended now", change: "50 mAh cell pulse 100 mA (cap ~-10 dB); 24 MHz budget dead (V4); the 15-17 mm board places but only routes on 6 layers (V5: 1.6-1.9x today's routing load on 4); WLCSP needs filled via-in-pad", src: [V2-cells.yaml, V4-cycles.yaml, V5-density.yaml]}
 firmware: {note: "spec algorithm B needs 61-71 MHz (not 55); slim B 35-44 MHz fits B1 if the owner's listening test accepts it (E2); A 22-36 MHz", src: V4-cycles.yaml}
