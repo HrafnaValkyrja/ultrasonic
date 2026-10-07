@@ -37,6 +37,24 @@ static inline uint16_t fw_ccr_from_amp(float a, const fw_ccr_bounds_t *b, uint32
         c = b->lo;
     return c;
 }
+/* integer path for the shaper: level qi (V_diff/Vdd = 2 qi / ARR) -> CCR = qi + ARR/2, bounded exactly like fw_ccr_from_amp(2 qi / ARR)
+ * (test_clamp_level_matches_amp). Statement macro so hot loops expand it on one source line (fw/tools/cycles.py attribution);
+ * in-range test is one unsigned compare, the clamp itself is the rare path. */
+#define FW_CCR_LEVEL_STORE(dst, qi, b, hits)                                                                             \
+    do {                                                                                                                 \
+        int32_t c_ = (qi) + (int32_t)((b)->arr / 2u);                                                                    \
+        if ((uint32_t)(c_ - (int32_t)(b)->lo) > (uint32_t)((b)->hi - (b)->lo)) {                                         \
+            c_ = c_ < (int32_t)(b)->lo ? (int32_t)(b)->lo : (int32_t)(b)->hi;                                            \
+            (hits)++;                                                                                                    \
+        }                                                                                                                \
+        (dst) = (uint16_t)c_;                                                                                            \
+    } while (0)
+static inline uint16_t fw_ccr_from_level(int32_t qi, const fw_ccr_bounds_t *b, uint32_t *clamp_hits)
+{
+    uint16_t c;
+    FW_CCR_LEVEL_STORE(c, qi, b, *clamp_hits);
+    return c;
+}
 float fw_db_to_amp(int32_t cdb);                                   /* table lookup, 0.1 dB steps, -80..0 dB; > 0 dB -> 1 */
 uint16_t fw_arr_for_khz(int32_t pwm_khz);                          /* 200 -> 200, 400 -> 100, 800 -> 50 (else 200) */
 #endif

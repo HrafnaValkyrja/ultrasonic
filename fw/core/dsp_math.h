@@ -18,4 +18,6 @@ static inline float fw_sin_turns(uint32_t ph)
     float a = fw_sin_tab[i];
     return a + f * (fw_sin_tab[i + 1u] - a);
 }
+/* macro form of fw_sin_turns for hot loops (same arithmetic; instructions attributed to the calling line by fw/tools/cycles.py) */
+#define FW_SIN_TURNS(ph) (fw_sin_tab[(ph) >> 22] + (float)((ph) & 0x3FFFFFu) * 0x1p-22f * (fw_sin_tab[((ph) >> 22) + 1u] - fw_sin_tab[(ph) >> 22]))
 #endif

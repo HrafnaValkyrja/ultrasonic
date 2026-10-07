@@ -92,3 +92,22 @@ void test_clamp_db_table(void)
         prev = a;
     }
 }
+
+/* the shaper's integer CCR path bounds exactly like the float path (FWSIM-R64: fw_ccr_from_level == fw_ccr_from_amp(2 qi / ARR)) */
+void test_clamp_level_matches_amp(void)
+{
+    static const uint16_t arrs[3] = {200u, 100u, 50u};
+    static const uint32_t ppm[3] = {1000000u, 635300u, 251189u};
+    uint32_t bad = 0;
+    for (int a = 0; a < 3; a++)
+        for (int p = 0; p < 3; p++) {
+            fw_ccr_bounds_t b = fw_ccr_bounds(arrs[a], ppm[p]);
+            for (int32_t qi = -(int32_t)arrs[a] / 2; qi <= (int32_t)arrs[a] / 2; qi++) {
+                uint32_t h1 = 0, h2 = 0;
+                uint16_t c1 = fw_ccr_from_level(qi, &b, &h1);
+                uint16_t c2 = fw_ccr_from_amp((float)qi * (2.0f / (float)arrs[a]), &b, &h2);
+                bad += c1 != c2 || h1 != h2;
+            }
+        }
+    TF_CHECK_EQ(bad, 0);
+}

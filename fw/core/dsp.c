@@ -20,7 +20,6 @@ static const float hann[FW_DSP_HANN_N] = FW_DSP_HANN_INIT;
 static const float eq2[FW_DSP_EQ2_N] = FW_DSP_EQ2_INIT;
 static const float noise_spec[FW_DSP_NOISE_SPEC_N] = FW_DSP_NOISE_SPEC_INIT;
 static const float noise_slim[FW_DSP_NOISE_SLIM_N] = FW_DSP_NOISE_SLIM_INIT;
-static const uint8_t bitrev[FW_DSP_BITREV_N] = FW_DSP_BITREV_INIT;
 static const float tw128[FW_DSP_TW128_N] = FW_DSP_TW128_INIT;
 static const float twr256[FW_DSP_TWR256_N] = FW_DSP_TWR256_INIT;
 static const float interp[FW_DSP_INTERP_N] = FW_DSP_INTERP_INIT;   /* [16][TPP] */
@@ -102,6 +101,18 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr)
         }
         d->band_of_bin[kb] = b;
     }
+    for (uint32_t n = 0; n < 128u; n++) {
+        uint32_t r = 0;
+        for (uint32_t bit = 0; bit < 7u; bit++)
+            r |= ((n >> bit) & 1u) << (6u - bit);
+        d->rev[n] = (uint8_t)r;
+    }
+    for (uint32_t b = 0; b <= d->nb; b++) {                       /* first bin of each band (bins of a band are contiguous) */
+        uint32_t kb = d->bin_lo;
+        while (kb < d->bin_hi && d->band_of_bin[kb] < b)
+            kb++;
+        d->band_start[b] = (uint8_t)kb;
+    }
     for (uint32_t b = 0; b < d->nb; b++) {
         d->geo[b] = sqrtf(edge[b] * edge[b + 1u]);
         d->noise[b] = d->slim ? noise_slim[b] : noise_spec[b];
@@ -156,42 +167,49 @@ NOINL void fw_dsp_halfband(fw_dsp_t *d, const int32_t in400[256], float pcm[128]
 }
 
 /* ------------------------------------------------------------------ 256-pt real FFT (128-pt complex radix-2 DIT + split) */
-NOINL static void fft_pack(const float *pcm, float *z)
+/* window + bit-reversed packing in one pass: z[rev(n)] = (x[2n] + j x[2n+1]) * hann (replaces a separate bit-reverse pass) */
+NOINL static void fft_pack(const fw_dsp_t *d, float *z)
 {
-    for (uint32_t i = 0; i < FW_DSP_NFFT; i++)
-        z[i] = pcm[i] * hann[i];                                 /* z[2n] + j z[2n+1]: interleaved complex */
-}
-
-NOINL static void fft_bitrev(float *z)
-{
-    for (uint32_t p = 0; p < FW_DSP_BITREV_N; p += 2u) {
-        uint32_t a = 2u * bitrev[p], b = 2u * bitrev[p + 1u];
-        float tr = z[a], ti = z[a + 1u];
-        z[a] = z[b];
-        z[a + 1u] = z[b + 1u];
-        z[b] = tr;
-        z[b + 1u] = ti;
+    uint32_t off = d->pcm_old;                                   /* pcm[] is a 2-half ring: frame sample i = pcm[(off + i) & 255] */
+    for (uint32_t n = 0; n < 128u; n++) {
+        uint32_t r = 2u * d->rev[n], i = (off + 2u * n) & 255u;
+        z[r] = d->pcm[i] * hann[2u * n];
+        z[r + 1u] = d->pcm[i + 1u] * hann[2u * n + 1u];
     }
 }
 
+/* radix-2 DIT butterfly: (a, b) <- (a + w b, a - w b), the operation order of the plain radix-2 loop */
+#define BFLY(a, b, wr, wi)                                                                            \
+    do {                                                                                              \
+        float tr_ = (wr) * (b)[0] - (wi) * (b)[1], ti_ = (wr) * (b)[1] + (wi) * (b)[0];               \
+        float ar_ = (a)[0], ai_ = (a)[1];                                                             \
+        (b)[0] = ar_ - tr_;                                                                           \
+        (b)[1] = ai_ - ti_;                                                                           \
+        (a)[0] = ar_ + tr_;                                                                           \
+        (a)[1] = ai_ + ti_;                                                                           \
+    } while (0)
+
+/* 128-pt complex FFT, input bit-reversed: radix-2 stages fused in pairs (lengths 2+4, 8+16, 32+64: one pass over memory per
+ * pair, same arithmetic as the plain radix-2 order, so results are bit-identical to it), then the length-128 stage. */
 NOINL static void fft_cfft128(float *z)
 {
-    for (uint32_t len = 2u, ts = 64u; len <= 128u; len <<= 1, ts >>= 1) {
-        uint32_t half = len >> 1;
-        for (uint32_t j = 0; j < half; j++) {
-            float wr = tw128[2u * j * ts], wi = tw128[2u * j * ts + 1u];
-            for (uint32_t i = j; i < 128u; i += len) {
-                float *a = &z[2u * i], *b = &z[2u * (i + half)];
-                float tr = wr * b[0] - wi * b[1];
-                float ti = wr * b[1] + wi * b[0];
-                float ar = a[0], ai = a[1];
-                b[0] = ar - tr;
-                b[1] = ai - ti;
-                a[0] = ar + tr;
-                a[1] = ai + ti;
+    for (uint32_t q = 1u; q <= 16u; q <<= 2) {                 /* q = quarter of the fused group: 1, 4, 16 */
+        uint32_t ts1 = 64u / q, ts2 = 32u / q;                  /* twiddle strides of the stages of length 2q and 4q */
+        for (uint32_t j = 0; j < q; j++) {
+            float w1r = tw128[2u * j * ts1], w1i = tw128[2u * j * ts1 + 1u];
+            float w2r = tw128[2u * j * ts2], w2i = tw128[2u * j * ts2 + 1u];
+            float w3r = tw128[2u * (j + q) * ts2], w3i = tw128[2u * (j + q) * ts2 + 1u];
+            for (uint32_t g = j; g < 128u; g += 4u * q) {
+                float *a = &z[2u * g], *b = &z[2u * (g + q)], *c = &z[2u * (g + 2u * q)], *e = &z[2u * (g + 3u * q)];
+                BFLY(a, b, w1r, w1i);
+                BFLY(c, e, w1r, w1i);
+                BFLY(a, c, w2r, w2i);
+                BFLY(b, e, w3r, w3i);
             }
         }
     }
+    for (uint32_t j = 0; j < 64u; j++)                          /* length-128 stage */
+        BFLY(&z[2u * j], &z[2u * (j + 64u)], tw128[2u * j], tw128[2u * j + 1u]);
 }
 
 NOINL static void fft_split(float *z)
@@ -214,17 +232,18 @@ NOINL static void fft_split(float *z)
 }
 
 /* ------------------------------------------------------------------ algorithm B */
+/* band energy and power-weighted frequency: bins of a band are contiguous, so per band one accumulation in registers */
 NOINL static void b_bands(fw_dsp_t *d, const float *z, float *fc)
 {
     for (uint32_t b = 0; b < d->nb; b++) {
-        d->E[b] = 0.0f;
-        fc[b] = 0.0f;
-    }
-    for (uint32_t k = d->bin_lo; k < d->bin_hi; k++) {
-        float p = (z[2u * k] * z[2u * k] + z[2u * k + 1u] * z[2u * k + 1u]) * eq2[k];
-        uint32_t b = d->band_of_bin[k];
-        d->E[b] += p;
-        fc[b] += p * ((float)k * BIN_HZ);
+        float e = 0.0f, f = 0.0f;
+        for (uint32_t k = d->band_start[b]; k < d->band_start[b + 1u]; k++) {
+            float p = (z[2u * k] * z[2u * k] + z[2u * k + 1u] * z[2u * k + 1u]) * eq2[k];
+            e += p;
+            f += p * ((float)k * BIN_HZ);
+        }
+        d->E[b] = e;
+        fc[b] = f;
     }
 }
 
@@ -254,22 +273,32 @@ NOINL static void b_update(fw_dsp_t *d, const float *fc)
 }
 
 /* oscillator bank: ramp amplitude and phase increment across ramp_len samples (8 spec, 16 slim); 8 samples per hop */
+/* oscillator bank: ramp amplitude and phase increment across ramp_len samples (8 spec, 16 slim); 8 samples per hop.
+ * Increment at ramp step kk = inc0 + floor(di kk / L) = inc0 + q kk + floor(r kk / L) with di = q L + r (exact in 32 bits). */
+#define SYN(acc)                                                                                      \
+    do {                                                                                              \
+        qk += qd;                                                                                     \
+        rk += rd;                                                                                     \
+        fk += inv_len;                                                                                \
+        ph += inc0 + qk + (rk >> sh);                                                                 \
+        acc += (a0 + da * fk) * FW_SIN_TURNS(ph);                                                     \
+    } while (0)
+
 NOINL static void b_synth(fw_dsp_t *d, float *y8)
 {
     float inv_len = d->slim ? 0.0625f : 0.125f;
-    for (uint32_t s = 0; s < 8u; s++)
-        y8[s] = 0.0f;
+    uint32_t sh = d->ramp_shift, kk0 = d->ramp_pos;
+    float y0 = 0.0f, y1 = 0.0f, y2 = 0.0f, y3 = 0.0f, y4 = 0.0f, y5 = 0.0f, y6 = 0.0f, y7 = 0.0f;
     for (uint32_t b = 0; b < d->nb; b++) {
         float a0 = d->amp_prev[b], da = d->amp_new[b] - a0;
         int32_t di = (int32_t)(d->inc_new[b] - d->inc_prev[b]);
-        uint32_t ph = d->phase[b], inc0 = d->inc_prev[b];
-        for (uint32_t s = 0; s < 8u; s++) {
-            uint32_t kk = d->ramp_pos + s + 1u;
-            ph += inc0 + (uint32_t)(int32_t)(((int64_t)di * (int64_t)kk) >> d->ramp_shift);
-            y8[s] += (a0 + da * ((float)kk * inv_len)) * fw_sin_turns(ph);
-        }
+        uint32_t qd = (uint32_t)(di >> sh), rd = (uint32_t)di & (d->ramp_len - 1u);   /* floor division (arithmetic shift) */
+        uint32_t ph = d->phase[b], inc0 = d->inc_prev[b], qk = qd * kk0, rk = rd * kk0;
+        float fk = (float)kk0 * inv_len;
+        SYN(y0); SYN(y1); SYN(y2); SYN(y3); SYN(y4); SYN(y5); SYN(y6); SYN(y7);
         d->phase[b] = ph;
     }
+    y8[0] = y0; y8[1] = y1; y8[2] = y2; y8[3] = y3; y8[4] = y4; y8[5] = y5; y8[6] = y6; y8[7] = y7;
     d->ramp_pos += 8u;
     if (d->ramp_pos >= d->ramp_len) {
         d->ramp_pos = 0u;
@@ -284,9 +313,8 @@ static void algo_b(fw_dsp_t *d, float y8[8], float *band_energy, float *floor_ta
 {
     uint32_t idx = d->hops - 1u;                                 /* this hop's index */
     if (idx >= 1u && (!d->slim || (idx & 1u))) {                 /* a full 256-sample frame: spec every hop, slim every other */
-        float z[FW_DSP_NFFT], fc[FW_DSP_NB_MAX];
-        fft_pack(d->pcm, z);
-        fft_bitrev(z);
+        float z[FW_DSP_NFFT], fc[FW_DSP_NB_MAX] = {0.0f};
+        fft_pack(d, z);
         fft_cfft128(z);
         fft_split(z);
         b_bands(d, z, fc);
@@ -309,7 +337,9 @@ static void algo_b(fw_dsp_t *d, float y8[8], float *band_energy, float *floor_ta
 /* ------------------------------------------------------------------ algorithm A (fallback) */
 NOINL static void a_mix(fw_dsp_t *d, const float *pcm)
 {
-    float *h = &d->a_hist[FW_DSP_A_NC - 1u];
+    /* ring of FW_DSP_A_RING samples stored twice (x[i] at i and i + RING): the 575-sample window ending at the newest sample
+     * is always contiguous. Window start for this hop = a_pos; new samples land at a_pos + 574 .. + 701. */
+    uint32_t w0 = d->a_pos + FW_DSP_A_NC - 1u;
     float z1 = d->a_z1, z2 = d->a_z2;
     uint32_t ph = d->a_lo_ph;
     for (uint32_t i = 0; i < HOP; i++) {
@@ -318,24 +348,28 @@ NOINL static void a_mix(fw_dsp_t *d, const float *pcm)
         float y = a_hp[0] * x + z1;                              /* butter(2) HP, transposed direct form II */
         z1 = a_hp[1] * x - a_hp[3] * y + z2;
         z2 = a_hp[2] * x - a_hp[4] * y;
-        h[i] = y;
+        uint32_t w = w0 + i >= FW_DSP_A_RING ? w0 + i - FW_DSP_A_RING : w0 + i;
+        d->a_ring[w] = y;
+        d->a_ring[w + FW_DSP_A_RING] = y;
     }
     d->a_z1 = z1;
     d->a_z2 = z2;
     d->a_lo_ph = ph;
 }
 
+/* 575-tap symmetric decimating FIR, folded (288 MACs per output), 7 tap pairs per source line (287 = 41 x 7), the same
+ * summation order as one pair per iteration. History is a doubled ring: no 574-sample shift per hop. */
+#define APAIR(j) a_c[j] * (x[574u - (j)] + x[j])
 NOINL static void a_decim(fw_dsp_t *d, float *y8)
 {
     for (uint32_t q = 0; q < 8u; q++) {
-        const float *x = &d->a_hist[16u * q + 15u];              /* oldest tap of output q: x[0..574] */
+        const float *x = &d->a_ring[d->a_pos + 16u * q + 15u];   /* oldest tap of output q: x[0..574] */
         float acc = a_c[287] * x[287];
-        for (uint32_t j = 0; j < 287u; j++)
-            acc += a_c[j] * (x[574u - j] + x[j]);
+        for (uint32_t j = 0; j < 287u; j += 7u)
+            acc = acc + APAIR(j) + APAIR(j + 1u) + APAIR(j + 2u) + APAIR(j + 3u) + APAIR(j + 4u) + APAIR(j + 5u) + APAIR(j + 6u);
         y8[q] = acc;
     }
-    for (uint32_t i = 0; i < FW_DSP_A_NC - 1u; i++)
-        d->a_hist[i] = d->a_hist[HOP + i];
+    d->a_pos = d->a_pos + HOP >= FW_DSP_A_RING ? d->a_pos + HOP - FW_DSP_A_RING : d->a_pos + HOP;
 }
 
 NOINL static void a_post(fw_dsp_t *d, float *y8)
@@ -375,36 +409,49 @@ void fw_dsp_algo(fw_dsp_t *d, const float pcm[128], float y8[8], float *band_ene
                 band_energy[b] = floor_tap[b] = 0.0f;
         return;
     }
-    for (uint32_t i = 0; i < HOP; i++) {
-        d->pcm[i] = d->pcm[HOP + i];
-        d->pcm[HOP + i] = pcm[i];
-    }
+    uint32_t w = (d->hops & 1u) * HOP;                           /* the new half overwrites the oldest one: no shift */
+    d->pcm_old = w ^ HOP;
+    for (uint32_t i = 0; i < HOP; i++)
+        d->pcm[w + i] = pcm[i];
     algo_b(d, y8, band_energy, floor_tap);
 }
 
 /* ------------------------------------------------------------------ output stage */
-static float dither_u(uint32_t *s)
-{
-    uint32_t x = *s;
-    x ^= x << 13;
-    x ^= x >> 17;
-    x ^= x << 5;
-    *s = x;
-    return (float)(x >> 8) * 0x1p-24f;                          /* [0, 1) */
-}
+/* history in scalars (registers): h0 newest */
+#define DOT4(c, o, x0, x1, x2, x3) (c)[o] * x0 + (c)[(o) + 1] * x1 + (c)[(o) + 2] * x2 + (c)[(o) + 3] * x3
+#if FW_INTERP_TPP == 8
+#define INTERP_DOT(c) (DOT4(c, 0, h0, h1_, h2_, h3) + DOT4(c, 4, h4, h5, h6, h7))
+#elif FW_INTERP_TPP == 10
+#define INTERP_DOT(c) (DOT4(c, 0, h0, h1_, h2_, h3) + DOT4(c, 4, h4, h5, h6, h7) + (c)[8] * h8 + (c)[9] * h9)
+#else
+#define INTERP_DOT(c) (DOT4(c, 0, h0, h1_, h2_, h3) + DOT4(c, 4, h4, h5, h6, h7) + DOT4(c, 8, h8, h9, h10, h11))
+#endif
 
-static int32_t floor_i(float v)
-{
-    int32_t i = (int32_t)v;
-    return (float)i > v ? i - 1 : i;
-}
+/* one PWM period of the 3rd-order error-feedback shaper (stages.PwmShaper) with TPDF dither; level qi -> CCR through the clamp.
+ * No clip inside the loop (FWSIM-R15: never clip after the shaper); the FWSIM-R64 bound applies to the CCR only. */
+#define SHAPE_ONE()                                                                                   \
+    do {                                                                                              \
+        float vv = x + h1 * e1 + h2 * e2 - e3;                                                        \
+        dith ^= dith << 13;                                                                           \
+        dith ^= dith >> 17;                                                                           \
+        dith ^= dith << 5;                                                                            \
+        float dz = (float)((int32_t)(dith >> 16) - (int32_t)(dith & 0xFFFFu)) * dscale;               \
+        int32_t qi = (int32_t)((vv + dz) * inv_step + 1024.5f) - 1024;   /* floor(. + 0.5), arg > -1024 */ \
+        e3 = e2;                                                                                      \
+        e2 = e1;                                                                                      \
+        e1 = (float)qi * step - vv;                                                                   \
+        FW_CCR_LEVEL_STORE(ccr[n], qi, b, hits);                                                      \
+        n++;                                                                                          \
+    } while (0)
 
 NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8[8], uint32_t force_squelch, const fw_ccr_bounds_t *b, uint16_t *ccr, fw_out_info_t *info)
 {
     size_t n = 0;
     float peak = 0.0f;
-    uint32_t sq = 0u, sq_periods = 0u, hits = 0u;
-    int32_t half = (int32_t)(d->arr / 2u);
+    uint32_t sq = 0u, sq_periods = 0u, hits = 0u, reps = d->reps, dith = d->dither;
+    float e1 = d->e1, e2 = d->e2, e3 = d->e3, h1 = d->h1, h2 = d->h2, step = d->step, inv_step = d->inv_step;
+    float dscale = d->dither_on ? step * 0x1p-16f : 0.0f;       /* TPDF: two 16-bit uniforms of one xorshift32 draw, x 1 LSB */
+    uint16_t centre = fw_ccr_from_level(0, b, &hits);
     for (uint32_t s = 0; s < 8u; s++) {
         float y = y8[s];
         /* squelch (stages.PwmShaper): 5 ms power below threshold for squelch_hold_ms -> exact zero, dither off, shaper reset */
@@ -416,16 +463,21 @@ NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8[8], uint32_t force_squelch, 
             d->sq_quiet = 0u;
         }
         sq = (force_squelch || d->sq_quiet >= d->hold_samples) ? 1u : 0u;
-        /* x16 polyphase interpolation */
+        /* x16 polyphase interpolation (zero-stuffed taps skipped: TPP taps per output) */
         for (uint32_t t = FW_INTERP_TPP - 1u; t > 0u; t--)
             d->ihist[t] = d->ihist[t - 1u];
         d->ihist[0] = y;
+        float h0 = d->ihist[0], h1_ = d->ihist[1], h2_ = d->ihist[2], h3 = d->ihist[3], h4 = d->ihist[4], h5 = d->ihist[5], h6 = d->ihist[6],
+              h7 = d->ihist[7];
+#if FW_INTERP_TPP >= 10
+        float h8 = d->ihist[8], h9 = d->ihist[9];
+#endif
+#if FW_INTERP_TPP >= 12
+        float h10 = d->ihist[10], h11 = d->ihist[11];
+#endif
         float v[UP], pk = 0.0f;
         for (uint32_t p = 0; p < UP; p++) {
-            const float *c = &interp[p * FW_INTERP_TPP];
-            float acc = 0.0f;
-            for (uint32_t t = 0; t < FW_INTERP_TPP; t++)
-                acc += c[t] * d->ihist[t];
+            float acc = INTERP_DOT(&interp[p * FW_INTERP_TPP]);
             v[p] = acc;
             float a = fabsf(acc);
             pk = a > pk ? a : pk;
@@ -436,38 +488,34 @@ NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8[8], uint32_t force_squelch, 
         if (pk * g > d->lim_c)
             g = d->lim_c / pk;
         d->lim_g = g;
+        if (sq) {                                                /* F2: exact centre, shaper state zeroed, dither off */
+            e1 = e2 = e3 = 0.0f;
+            for (uint32_t m = 0; m < UP * reps; m++)
+                ccr[n++] = centre;
+            sq_periods += UP * reps;
+            continue;
+        }
         for (uint32_t p = 0; p < UP; p++) {
-            float x = sq ? 0.0f : v[p] * g;
+            float x = v[p] * g;
             float a = fabsf(x);
             peak = a > peak ? a : peak;
-            for (uint32_t r = 0; r < d->reps; r++) {
-                float q;
-                if (sq) {
-                    d->e1 = d->e2 = d->e3 = 0.0f;                /* F2: shaper state zeroed while squelched */
-                    q = 0.0f;
-                    sq_periods++;
-                } else {
-                    float vv = x + d->h1 * d->e1 + d->h2 * d->e2 - d->e3;
-                    float dz = d->dither_on ? (dither_u(&d->dither) - dither_u(&d->dither)) : 0.0f;
-                    int32_t qi = floor_i((vv + dz * d->step) * d->inv_step + 0.5f);
-                    if (qi > half)
-                        qi = half;
-                    if (qi < -half)
-                        qi = -half;
-                    q = (float)qi * d->step;
-                    d->e3 = d->e2;
-                    d->e2 = d->e1;
-                    d->e1 = q - vv;
-                }
-                ccr[n++] = fw_ccr_from_amp(q, b, &hits);
+            if (reps == 1u) {                                    /* 200 kHz PWM: one period per interpolated sample */
+                SHAPE_ONE();
+            } else {                                             /* 400 / 800 kHz: zero-order hold x2 / x4 */
+                for (uint32_t r = 0; r < reps; r++)
+                    SHAPE_ONE();
             }
         }
     }
+    d->e1 = e1;
+    d->e2 = e2;
+    d->e3 = e3;
+    d->dither = dith;
     if (info != NULL) {
         info->true_peak = peak;
-        info->shaper_norm[0] = fabsf(d->e1);
-        info->shaper_norm[1] = fabsf(d->e2);
-        info->shaper_norm[2] = fabsf(d->e3);
+        info->shaper_norm[0] = fabsf(e1);
+        info->shaper_norm[1] = fabsf(e2);
+        info->shaper_norm[2] = fabsf(e3);
         info->squelched = sq;
         info->squelched_periods = sq_periods;
         info->clamp_hits = hits;

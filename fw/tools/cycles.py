@@ -106,7 +106,7 @@ def line_counts(tmp, words, d2, knobs, hops):
             for L in fl["lines"]:
                 cnt[(s, L["line_number"])] = cnt.get((s, L["line_number"]), 0) + L["count"]
             for fn in fl["functions"]:
-                ranges[fn["name"]] = (s, fn["start_line"], fn["end_line"])
+                ranges[fn["name"]] = (s, fn["start_line"], fn["end_line"], fn["execution_count"])
     cnt["__ranges__"] = ranges
     return cnt
 
@@ -145,6 +145,8 @@ def total(cost_rows, cnt):
         own = ranges.get(base)
         inside = own is not None and own[0] == f and own[1] <= ln <= own[2]
         c = cnt.get((f, ln)) if inside else None
+        if inside and (ln == own[1] or ln == own[2] or src_line(f, ln) in ("{", "}")):
+            c = own[3]                                 # prologue / epilogue: once per call
         if c is None:                                  # inlined code from elsewhere, or no gcov record: the previous own line's count
             c = prev.get(fn, 0)
         prev[fn] = c

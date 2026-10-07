@@ -16,7 +16,7 @@
 #define FW_DSP_NFFT 256u
 #define FW_DSP_NB_MAX 28u
 #define FW_DSP_A_NC 575u                         /* algorithm-A decimating FIR length */
-#define FW_DSP_A_HIST (FW_DSP_A_NC - 1u + 128u)
+#define FW_DSP_A_RING 768u                      /* >= 575 - 1 + 128, multiple of 128 */
 #define FW_DSP_HB_HIST (31u - 1u + 256u)
 
 typedef enum { FW_ALGO_A = 1, FW_ALGO_B = 2 } fw_algo_t;
@@ -26,17 +26,20 @@ typedef struct {
     uint32_t algo, slim, nb, ramp_len, ramp_shift, transient, arr, reps, dither_on, hold_samples;
     uint32_t bin_lo, bin_hi;                      /* bins [bin_lo, bin_hi) fall inside a band */
     uint8_t band_of_bin[132];
+    uint8_t rev[128];                             /* 7-bit bit reversal */
+    uint8_t band_start[FW_DSP_NB_MAX + 4u];       /* first bin of band b; [nb] = bin_hi */
     float a_up, om_up, a_dn, om_dn, gate_lin, margin_lin, gain_lin, a_att, a_rel, k_map, out_lo, f_lo, f_hi;
     float geo[FW_DSP_NB_MAX];                     /* geometric band centres (centroid of an empty band) */
     float noise[FW_DSP_NB_MAX];                   /* mic self-noise band energy (calibration) */
     float lim_c, lim_rel, sq_thr2, sq_a, step, inv_step, h1, h2;   /* h3 = -1 */
     /* ---- front end + algorithm B */
     float pcm[FW_DSP_NFFT];                       /* last 256 PCM samples, DR-word units (2^31 = FS) */
-    uint32_t hops, frames, ramp_pos;
+    uint32_t hops, frames, ramp_pos, pcm_old;      /* pcm_old: start of the older half of pcm[] */
     float E[FW_DSP_NB_MAX], floor_[FW_DSP_NB_MAX], env[FW_DSP_NB_MAX], amp_prev[FW_DSP_NB_MAX], amp_new[FW_DSP_NB_MAX];
     uint32_t inc_prev[FW_DSP_NB_MAX], inc_new[FW_DSP_NB_MAX], phase[FW_DSP_NB_MAX];
     /* ---- algorithm A */
-    float a_hist[FW_DSP_A_HIST];
+    float a_ring[2u * FW_DSP_A_RING];             /* doubled ring (window always contiguous) */
+    uint32_t a_pos;                               /* window start of the current hop */
     float a_z1, a_z2, a_sm, a_floor, a_gate_lin, a_noise_thr, a_up_s, a_dn_s;
     uint32_t a_lo_ph, a_lo_inc, a_floor_init;
     /* ---- D2 half-band */
