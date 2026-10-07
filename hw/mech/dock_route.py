@@ -30,7 +30,7 @@ PCB, CELL, CAV = D.PCB, D.CELL, D.CAV
 EDGE_Y = 11.55
 DOCK_PADS = {"J3": ("DOCK_VBUS", 25.1, 1.7, 0.249), "J4": ("GND", 27.0, 1.9, 0.249), "J12": ("CC", 27.0, 4.35, 0.160),
              "J10": ("USB_DP", 28.9, 5.5, 0.160), "J11": ("USB_DN", 27.0, 6.55, 0.160)}      # placement.yaml 2026-10-07
-ARM_PADS = {"J1": 9.9, "J7": 7.7, "J2": 9.9, "J8": 7.7}                                       # board y (x 28.9/27.0)
+ARM_PADS = {"J1": 9.9, "J7": 7.7, "J2": 10.95, "J8": 8.75}                                   # placement.yaml 2026-10-07 (info only; routes come from heel.wire_route)
 ARM_X = {"J1": 28.9, "J7": 28.9, "J2": 27.0, "J8": 27.0}
 BUNDLE_D, ARM_WIRE_OD = 0.51, 0.21
 CH_EXIT = np.array([66.20, 5.15, -5.50])

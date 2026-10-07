@@ -218,6 +218,7 @@ option_bytes: "set nSWBOOT0=0, nBOOT0=1 only once a write-protected boot stub wo
   status: "banners added 2026-10-07 (electronics.md, pcb-mech-interface.md); hardware.md lid-screw charging section 6 bannered too; the SWD header scheme lives only in those bannered notes now"
 - id: DBG-11
   t: "no test-access map (TPs, dots, probe points, lift links, both faces, per build stage) or bring-up flow PNG; board-map-phase2.png covers part"
+  status: "drawn 2026-10-07: docs/diagrams/test-access-map.svg (F TP1-TP6 + mic keep-out; B dots, R1 tack, R20/R21 lifts, J pads with the 6 meter pairs; stages), generated from placement.yaml by make_test_access_map.py"
 - id: DBG-12
   t: "ECR-0009 (no output while VBUS) blocks docked ZSWEEP and PWMAB"
   options: "a rec: capped self-test-only exemption in ECR-0009 (drive <= ~-12 dBFS; covers ECR-0005, U4 heating) / b run on battery, log, read back over USB"

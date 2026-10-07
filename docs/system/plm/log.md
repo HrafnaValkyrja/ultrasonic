@@ -504,3 +504,9 @@
 - 2026-10-07 16:02 review R-SMPS-BOARD by backlog-agent: via pair: redundant +3V0 via d5fef857 + 0.86 stub deleted (U1.9-C6 island keeps the C6 via); DRC 0/0/0; noise metrics identical
 - 2026-10-07 16:02 checkin REG-BOARD by backlog-agent
 - 2026-10-07 16:04 review REG-BOARD by backlog-agent: place_r2.py: prune_dangling_vias() after route import (tested offline on the pre-cleanup board: exactly the 2 vias; current board: none); no board change
+- 2026-10-07 16:06 checkout PHYSICAL by backlog-agent: PHYS-11 + DBG-11 diagrams
+- 2026-10-07 16:06 checkout SUB-DEBUG-TEST by backlog-agent: PHYS-11 + DBG-11 diagrams
+- 2026-10-07 16:06 review PHYSICAL by backlog-agent: PHYS-11 phase2-overview.svg + DBG-11 test-access-map.svg (generated); dock_route ARM_PADS info constants corrected
+- 2026-10-07 16:06 review SUB-DEBUG-TEST by backlog-agent: PHYS-11 phase2-overview.svg + DBG-11 test-access-map.svg (generated); dock_route ARM_PADS info constants corrected
+- 2026-10-07 16:06 checkin PHYSICAL by backlog-agent
+- 2026-10-07 16:06 checkin SUB-DEBUG-TEST by backlog-agent

@@ -176,7 +176,7 @@ Wire slack for lifting the lid with the board on its wires (DBG-17, computed 202
 8. **Mass 11.2–13.2 g per side worn vs ~8 g** (computed 2026-10-07, `sim/checks/pod_mass.py`, resin 1.15–1.18 as one range; pod body 8.7–10.1, cell 4.2 of it). Remaining unknowns are weighed, not computed: dock target [A 0.8–1.6 g] and exciter [Low 1.0–1.5 g]. The gap to 8 g is an owner call (backlog PHYS-8D; A-TODAY-MASS-TARGET wear test).
 9. **Contact face** Ø8 (≈ 50 mm²) vs O16(4)'s 100-150 mm².
 10. **Cell lead exit and PCM position** in the Renata pouch unknown, so the J5/J4 lead route is unknown.
-11. **Diagrams stale:** `system-overview-physical.png` (Rev F stack, ribs, foam, open gap); `arm-wiring.png`; `hardware-map.png`. No Phase-2 physical overview yet.
+11. **Diagrams stale:** `system-overview-physical.png` (Rev F stack, ribs, foam, open gap); `arm-wiring.png`; `hardware-map.png`. No Phase-2 physical overview yet. **Phase-2 overview drawn 2026-10-07:** `docs/diagrams/phase2-overview.svg` (section through the dock + plan through the lid, generated from dims_r2 by make_phase2_overview.py); arm-wiring redrawn (reg-arm 11). hardware-map.png still stale.
 12. (closed in Phase 2) Foam strips: none.
 13. **Seam:** rebate now 0.2 × 0.4 (2026-10-07); belly step unmarked, butt joints at corners (reg-pod-body issues 12, 13).
 14. **Service** costs one seam cut per cell or arm swap; a board swap or SWD also destroys the board bond (Service table).
