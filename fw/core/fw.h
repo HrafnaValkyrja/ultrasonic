@@ -11,12 +11,14 @@
 #include <stddef.h>
 #include <stdint.h>
 #include "dsp.h"
+#include "idle.h"
 #include "knobs.h"
 #include "modes.h"
 #include "variant_config.h"
 
 #define FW_ABI_VERSION 1u
 #define FW_HOP_N 128u                         /* input samples per hop */
+#define FW_IDLE_LOOKBACK 12u                  /* hops (7.7 ms) the algorithm trails the idle detector when idle_enable = 1 */
 #define FW_CCR_MAX_PER_HOP (FW_HOP_N * 4u)    /* ARR 50 (800 kHz): FWSIM-R61 sizes buffers for it */
 #define FW_N_BANDS 28u
 #define FW_DSP_OUT_N 8u                       /* 12.5 kS/s output samples per hop */
@@ -67,6 +69,10 @@ typedef struct {
     uint32_t last_event;
     int32_t last_arg;
     uint32_t event_count[FW_EV_COUNT];
+    fw_idle_t idle;           /* idle-listening wake detector (spec C9) */
+    float lb[FW_IDLE_LOOKBACK][FW_HOP_N];   /* look-back: the algorithm's input delayed by FW_IDLE_LOOKBACK hops */
+    float lb_out[FW_HOP_N];
+    uint32_t lb_head;
     fw_sys_t sys;             /* modes, gestures, docked interlock, self-test, break latch (FWSIM-R18, R19, R29, R65) */
     int32_t vol_offset_cdb;   /* volume applied to the DSP gain */
     uint32_t usb_enumerated;

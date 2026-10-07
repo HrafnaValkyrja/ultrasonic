@@ -60,6 +60,73 @@ static void apply_outputs(fw_app_t *app)
     }
 }
 
+/* mic power + ADF pins and the LED follow the mode (sub-ui.md issue 7: LED duty from VSYS = 4.5 V docked, else VBAT) */
+static void apply_mic_led(fw_app_t *app)
+{
+    fw_outputs_t o = fw_outputs(&app->st);
+    if (o.mic_power != app->mic_on) {
+        app->mic_on = o.mic_power;
+        if (o.mic_power) {
+            hal_gpio_write(BOARD_PIN_MIC_VDD, true);
+            (void)hal_gpio_mode(BOARD_PIN_MIC_CLK, HAL_GPIO_AF);
+            (void)hal_gpio_mode(BOARD_PIN_MIC_DATA, HAL_GPIO_AF);
+            (void)hal_adf_start(4000450u);
+        } else {
+            hal_adf_stop();
+            hal_gpio_write(BOARD_PIN_MIC_VDD, false);
+            (void)hal_gpio_mode(BOARD_PIN_MIC_CLK, HAL_GPIO_ANALOG);
+            (void)hal_gpio_mode(BOARD_PIN_MIC_DATA, HAL_GPIO_ANALOG);
+        }
+    }
+    uint32_t vsys = 4500u;
+    if (!app->st.vbus) {
+        uint16_t mv = 0u;
+        vsys = hal_adc_read_mv(HAL_ADC_VBAT_SENSE, &mv) == HAL_OK ? 2u * mv : 3700u;   /* R8/R9 1 M / 1 M divider */
+    }
+    uint32_t duty = fw_led_duty_ppm(&app->st.sys, &app->st.knobs, vsys);
+    uint32_t diff = duty > app->led_duty_ppm ? duty - app->led_duty_ppm : app->led_duty_ppm - duty;
+    if (diff > 10000u || (duty == 0u) != (app->led_duty_ppm == 0u)) {   /* re-write on > 1 % change */
+        if (duty && !app->led_duty_ppm)
+            (void)hal_gpio_mode(BOARD_PIN_LED_K, HAL_GPIO_AF);
+        if (hal_led_set(duty) == HAL_OK)
+            app->led_duty_ppm = duty;
+        if (!duty)
+            (void)hal_gpio_mode(BOARD_PIN_LED_K, HAL_GPIO_ANALOG);
+    }
+}
+
+static void service_charger(fw_app_t *app, uint32_t force);
+
+/* FWSIM-R23 Off: bridge stopped (break disarmed after) -> squelch (core) -> PA5 low -> PB3/PB4 analog, no pull -> PB7 released ->
+ * PLL2/PLL3/HSI48/SHSI off with RDY clear -> RTC wake for the charger keep-alive -> Stop 2 (SMPS) -> exit restores the clock plan */
+static void enter_stop2(fw_app_t *app)
+{
+    if (app->bridge_on) {
+        hal_pwm_stop();
+        hal_brk_disarm();
+        app->bridge_on = 0u;
+    }
+    hal_adf_stop();
+    hal_gpio_write(BOARD_PIN_MIC_VDD, false);
+    (void)hal_gpio_mode(BOARD_PIN_MIC_CLK, HAL_GPIO_ANALOG);
+    (void)hal_gpio_mode(BOARD_PIN_MIC_DATA, HAL_GPIO_ANALOG);
+    app->mic_on = 0u;
+    (void)hal_led_set(0u);
+    (void)hal_gpio_mode(BOARD_PIN_LED_K, HAL_GPIO_ANALOG);
+    app->led_duty_ppm = 0u;
+    if (hal_clock_stop_prep() != HAL_OK)
+        return;                                  /* never enter Stop 2 with the PLLs still requested */
+    (void)hal_power_rtc_wakeup_s((uint32_t)app->st.knobs.chg_keepalive_s);
+    hal_wake_t w = hal_power_stop2();
+    (void)hal_clock_set_plan((hal_clock_plan_t)app->st.knobs.clock_plan);
+    app->stops++;
+    app->last_wake = (uint32_t)w;
+    if (w == HAL_WAKE_RTC)
+        service_charger(app, 1u);                /* keep-alive inside the 160 s charger watchdog, then back to Stop 2 */
+    else if (w == HAL_WAKE_CHG_INT)
+        fw_event(&app->st, FW_EV_CHG_INT, 0, hal_time_us());
+}
+
 static void service_charger(fw_app_t *app, uint32_t force)
 {
     uint32_t tv = 0u;
@@ -111,6 +178,9 @@ void fw_app_step(fw_app_t *app)
     }
     fw_poll(&app->st, hal_time_us());
     apply_outputs(app);
+    apply_mic_led(app);
     service_charger(app, force_chg);
     hal_wdt_kick();
+    if (app->st.sys.mode == (uint32_t)FW_ST_OFF && fw_sys_can_sleep(&app->st.sys))
+        enter_stop2(app);
 }

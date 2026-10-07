@@ -47,6 +47,7 @@ static struct {
     uint64_t bq_last_us;
     fake_bq_state_t bq;
     fake_brk_state_t brk;
+    fake_lp_state_t lp;
     bool vbus, usb_on;
     uint8_t usb_rx[512], usb_tx[512];
     size_t usb_rx_n, usb_rx_i, usb_tx_n;
@@ -146,10 +147,53 @@ hal_wake_t hal_power_stop2(void)
 {
     if (enter(FAKE_FN_hal_power_stop2, 0u, 0u) != HAL_OK)
         return HAL_WAKE_NONE;
+    /* pin / clock audit at entry (FWSIM-R23): bridge stopped, break disarmed, mic power off, ADF/mic and LED pins parked, clocks prepared */
+    F.lp.stop2_entries++;
+    uint32_t bad = 0u;
+    bad += F.pwm.running != 0u;
+    bad += F.brk.armed != 0u;
+    bad += F.gpio_out[BOARD_PIN_MIC_VDD] != false;
+    bad += F.gpio_mode[BOARD_PIN_MIC_CLK] != HAL_GPIO_ANALOG;
+    bad += F.gpio_mode[BOARD_PIN_MIC_DATA] != HAL_GPIO_ANALOG;
+    bad += F.gpio_mode[BOARD_PIN_LED_K] != HAL_GPIO_ANALOG;
+    bad += F.lp.led_duty_ppm != 0u;
+    bad += F.lp.clocks_prepped == 0u;
+    bad += F.adf_running != 0u;
+    F.lp.audit_violations += bad;
+    F.lp.clocks_prepped = 0u;                    /* Stop 2 exit: the caller must restore the clock plan */
     hal_wake_t w = F.wake;
     F.wake = HAL_WAKE_NONE;
+    if (w == HAL_WAKE_NONE && F.lp.rtc_s != 0u) {
+        F.t_us += (uint64_t)F.lp.rtc_s * 1000000u;
+        w = HAL_WAKE_RTC;
+    }
     return w;
 }
+hal_status_t hal_power_rtc_wakeup_s(uint32_t seconds)
+{
+    hal_status_t e = enter(FAKE_FN_hal_power_rtc_wakeup_s, seconds, 0u);
+    if (e != HAL_OK)
+        return e;
+    F.lp.rtc_s = seconds;
+    return HAL_OK;
+}
+hal_status_t hal_clock_stop_prep(void)
+{
+    hal_status_t e = enter(FAKE_FN_hal_clock_stop_prep, 0u, 0u);
+    if (e != HAL_OK)
+        return e;
+    F.lp.clocks_prepped = 1u;
+    return HAL_OK;
+}
+hal_status_t hal_led_set(uint32_t duty_ppm)
+{
+    hal_status_t e = enter(FAKE_FN_hal_led_set, duty_ppm, 0u);
+    if (e != HAL_OK)
+        return e;
+    F.lp.led_duty_ppm = duty_ppm > 1000000u ? 1000000u : duty_ppm;
+    return HAL_OK;
+}
+const fake_lp_state_t *fake_lp(void) { return &F.lp; }
 hal_reset_cause_t hal_power_reset_cause(void)
 {
     (void)enter(FAKE_FN_hal_power_reset_cause, 0u, 0u);

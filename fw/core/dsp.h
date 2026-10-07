@@ -60,6 +60,9 @@ void fw_dsp_set_gain_cdb(fw_dsp_t *d, int32_t volume_cdb);   /* fixed 30 dB + vo
 int fw_dsp_set_noise(fw_dsp_t *d, const float *band_energy, uint32_t n);   /* unit calibration; n must equal the band count */
 /* D2 front end: 256 words at 400 kS/s -> 128 PCM (DR-word units) */
 void fw_dsp_halfband(fw_dsp_t *d, const int32_t in400[256], float pcm[128]);
+/* every hop, before fw_dsp_algo (also while IDLE skips the algorithm): the 256-sample PCM ring both B and the idle detector read */
+void fw_dsp_pcm_push(fw_dsp_t *d, const float pcm[128]);
+void fw_dsp_spectrum(const fw_dsp_t *d, const float *pcm256, uint32_t off, float p[129]);   /* |X|^2 of a Hann-windowed 256-sample 2-half ring (FS units) */
 /* algorithm: 128 PCM -> 8 samples at 12.5 kS/s (full scale 1.0); band_energy / floor taps (may be NULL) */
 void fw_dsp_algo(fw_dsp_t *d, const float pcm[128], float y8[8], float *band_energy, float *floor_tap);
 typedef struct {

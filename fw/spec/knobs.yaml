@@ -7,8 +7,8 @@
 # Coverage: the knobs_required ids of docs/sim/firmware-emulation.yaml that the foundation needs; the rest are added with their
 # feature (FWSIM-R6 status lists them). Adding, removing or retyping a knob bumps `version` (stored records then load as defaults + event).
 schema: 1
-version: 3
-updated: 2026-10-07   # v3: ui/fsm/charger/break knobs, ts_hot_code fixed to 45 C; v2: DSP knobs (b_variant, transient_only, volume_cdb, noise_margin_cdb, a_lo_hz, limiter_release_ms); squelch_hold_ms default 20
+version: 4
+updated: 2026-10-07   # v4: idle detector, ticks, LED; v3: ui/fsm/charger/break knobs, ts_hot_code fixed to 45 C; v2: DSP knobs (b_variant, transient_only, volume_cdb, noise_margin_cdb, a_lo_hz, limiter_release_ms); squelch_hold_ms default 20
 assumed: "assumed (no source yet; FWSIM knobs_required lists the id only)"
 
 hard_clamps:
@@ -75,6 +75,11 @@ knobs:
   - {id: charger_log_period_s, def: 1, min: 1, max: 60, unit: s, src: "FWSIM-R62"}
   # ---- ui
   - {id: stuck_button_s, def: 5, min: 1, max: 60, unit: s, src: "sub-ui.md issue 7 (FWSIM-R29 default 5 s)"}
+  - {id: idle_enable, def: 0, min: 0, max: 1, unit: bool, src: "spec C9 idle-listening mode; pipeline.idle_detector_fft rev 2 (FFT snapshot every ~5 ms, per-bin floors, 15 dB + 10 dB peak test, 0.3 s hang). Default OFF (2026-10-07): with it on, the detector (firmware and Python reference alike) is awake within 20 ms of only 73-75 % of the Port Meadow calls, so e2e T2.call_recall_20ms falls 0.83 -> 0.56 (< 0.80); owner trade-off vs runtime (sim/checks/runtime_fw.py scenes)"}
+  - {id: tick_cdb, def: -3000, min: -6000, max: -1200, unit: cdBFS, src: "spec D3 L123-L124 volume tick pattern (level assumed; capped by the -12 dBFS ceiling path, FWSIM-R29/R15)"}
+  - {id: tick_hz, def: 2000, min: 1500, max: 4000, unit: Hz, src: "inside the D9 output band 1.5-4 kHz (assumed)"}
+  - {id: led_target_ua, def: 100, min: 0, max: 1000, unit: uA, src: "sub-ui.md issue 7 (target current, firmware constant; ~0.14 mA cap if brightness must hold at 3.0 V); power-cell.md B1 LED 0.08 mA nominal"}
+  - {id: led_vf_mv, def: 1800, min: 1200, max: 3200, unit: mV, src: "assumed: LED V_F below 5 mA is not in the datasheet (sub-ui.md issue 7; bench-measure at 0.1-1 mA)"}
   - {id: gesture_option, def: 2, min: 1, max: 3, unit: enum, src: "sub-ui.md issue 5: 1 = A (short = next mode, hold = volume), 2 = B (short = Full/Transient, double = volume, hold = Off; recommended), 3 = C (short = toggle, hold = volume, long hold = Off); owner packet 2 decides"}
   - {id: debounce_ms, def: 10, min: 2, max: 50, unit: ms, src: "FWSIM-R29 (bounce <= 6 ms, C&K KMT0 p.B-9 via sub-ui.md)"}
   - {id: double_window_ms, def: 300, min: 100, max: 800, unit: ms, src: "sub-ui.md issue 5 option B (~0.3 s wait to rule out a double)"}

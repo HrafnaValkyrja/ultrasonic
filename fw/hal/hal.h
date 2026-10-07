@@ -16,4 +16,5 @@
 #include "hal_irq.h"
 #include "hal_fmac.h"
 #include "hal_brk.h"
+#include "hal_led.h"
 #endif

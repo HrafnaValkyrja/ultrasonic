@@ -33,7 +33,7 @@ HOPS_PER_S = 200_020 / 128
 V4 = {"B": {"cfg": "B_28bands (V4: 28 bands, hop 128, TPP 8, CMSIS FFT)", "MHz": [59.1, 68.8]},
       "slim": {"cfg": "B_slim1 (V4: 16 bands, hop 256, TPP 8, CMSIS FFT)", "MHz": [37.7, 43.7]},
       "A": {"cfg": "A_spec (V4: float mix + 16/40-tap decimators, TPP 8)", "MHz": [30.6, 35.8]}}
-VARIANTS = {"B": ["algo=2", "b_variant=0"], "slim": ["algo=2", "b_variant=1"], "A": ["algo=1"]}
+VARIANTS = {"B": ["algo=2", "b_variant=0", "idle_enable=0"], "slim": ["algo=2", "b_variant=1", "idle_enable=0"], "A": ["algo=1", "idle_enable=0"]}   # active path
 
 
 def sh(cmd, cwd=None):
@@ -96,7 +96,7 @@ def line_counts(tmp, words, d2, knobs, hops, defines=()):
     d.mkdir()
     exe = d / "drv"
     sh(["gcc", "--coverage", "-O0", "-std=c11", "-ffp-contract=off", "-fno-math-errno", *defines, *fwsim.INC,
-        *[FW / "core" / s for s in SRCS + ["knobs.c", "crc32.c", "fmac_model.c", "modes.c"]], FW / "tools/cycdrv.c", "-lm", "-o", exe], cwd=d)
+        *[FW / "core" / s for s in SRCS + ["knobs.c", "crc32.c", "fmac_model.c", "modes.c", "idle.c"]], FW / "tools/cycdrv.c", "-lm", "-o", exe], cwd=d)
     per = 256 if d2 else 128
     words[: hops * per].astype("<i4").tofile(d / "w.i32")
     sh([exe, d / "w.i32", int(d2), *knobs], cwd=d)

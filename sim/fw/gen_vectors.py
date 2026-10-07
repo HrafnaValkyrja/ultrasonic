@@ -43,7 +43,8 @@ OUTJ = REPO / "sim/out/fw/l1.json"
 SWEEP_F = np.geomspace(22e3, 83e3, 12)
 SEG_S = 0.06
 DELAY = {"B": 8, "slim": 8, "A": 0}          # firmware 12.5 kS/s sample n = reference n - DELAY (dsp.h)
-FW_KNOBS = {"B": {"algo": 2, "b_variant": 0}, "slim": {"algo": 2, "b_variant": 1}, "A": {"algo": 1, "transient_only": 0}}
+FW_KNOBS = {"B": {"algo": 2, "b_variant": 0, "idle_enable": 0}, "slim": {"algo": 2, "b_variant": 1, "idle_enable": 0},
+            "A": {"algo": 1, "transient_only": 0, "idle_enable": 0}}   # L1/L0 compare the algorithm: the idle detector off
 SQ_LAG = 125                                   # 10 ms at 12.5 kS/s: half the reference's centred 20 ms hold window
 HOLD_HOPS = 470                                # power-on hold 300 ms = 469 hops of 0.64 ms (squelch forced; excluded from squelch agreement)
 

@@ -15,7 +15,8 @@
     T(test_dsp_tone_passes_full_mode, "FWSIM-R13") T(test_dsp_variants, "FWSIM-R13") T(test_dsp_ceiling_short, "FWSIM-R15") \
     T(test_fsm_random_walk, "FWSIM-R18") T(test_gestures_b, "FWSIM-R29") T(test_rematch_two_presses, "FWSIM-R18") \
     T(test_docked_interlock, "FWSIM-R19") T(test_cdc_paths_clamp, "FWSIM-R64") T(test_charger_plan, "FWSIM-R20") \
-    T(test_charger_watchdog_faults, "FWSIM-R20") T(test_break_always_on, "FWSIM-R65")
+    T(test_charger_watchdog_faults, "FWSIM-R20") T(test_break_always_on, "FWSIM-R65") \
+    T(test_stop2_sequence, "FWSIM-R23") T(test_led_duty, "FWSIM-R29") T(test_volume_ticks, "FWSIM-R29") T(test_idle_detector, "FWSIM-R18")
 #define FW_TEST_DECL(fn, req) void fn(void);
 FW_TESTS(FW_TEST_DECL)
 #undef FW_TEST_DECL

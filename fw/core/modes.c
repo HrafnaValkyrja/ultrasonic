@@ -62,6 +62,8 @@ void fw_sys_fsm(fw_sys_t *s, const fw_knobs_t *k, uint32_t ev, uint64_t now_us)
     switch (c->action) {
     case FW_AC_VOL_STEP:
         s->vol_idx = s->vol_idx + 1 >= k->volume_steps ? 0 : s->vol_idx + 1;     /* wraps (sub-ui option B) */
+        s->tick_left = (uint32_t)s->vol_idx + 1u;                               /* the tick pattern says which step (D3) */
+        s->tick_pos = 0u;
         break;
     case FW_AC_LOAD_DEFAULTS:
         s->vol_idx = k->volume_steps / 2;
@@ -202,4 +204,22 @@ fw_outputs_t fw_sys_outputs(const fw_sys_t *s)
 int32_t fw_sys_volume_offset_cdb(const fw_sys_t *s, const fw_knobs_t *k)
 {
     return (s->vol_idx - k->volume_steps / 2) * k->volume_step_cdb;
+}
+
+#define R14_OHM 2200u   /* sub-ui.md / pad-led: R14 2k2 from VSYS to the LED anode; PB7 sinks the cathode */
+uint32_t fw_led_duty_ppm(const fw_sys_t *s, const fw_knobs_t *k, uint32_t vsys_mv)
+{
+    uint32_t m = s->mode;
+    if (m == (uint32_t)FW_ST_OFF || m == (uint32_t)FW_ST_SAFE || k->led_target_ua <= 0)
+        return 0u;
+    if (vsys_mv <= (uint32_t)k->led_vf_mv + 50u)
+        return 1000000u;                                         /* headroom gone: full on (brightness falls, sub-ui issue 7) */
+    uint64_t i_full_ua = (uint64_t)(vsys_mv - (uint32_t)k->led_vf_mv) * 1000u / R14_OHM;   /* current at 100 % duty */
+    uint64_t ppm = (uint64_t)(uint32_t)k->led_target_ua * 1000000u / (i_full_ua ? i_full_ua : 1u);
+    return ppm > 1000000u ? 1000000u : (uint32_t)ppm;
+}
+
+uint32_t fw_sys_can_sleep(const fw_sys_t *s)
+{
+    return !s->btn_raw && !s->btn && !s->taps && s->vbus_raw == s->vbus;
 }

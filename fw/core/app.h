@@ -16,6 +16,7 @@ typedef struct {
     uint32_t vbus_seen;
     uint32_t bridge_on, brk_reported, start_errors;
     uint32_t chg_ok, chg_temp_class, chg_int_seen, pa1_seen;
+    uint32_t mic_on, led_duty_ppm, stops, last_wake;
     fw_chg_t chg;
 } fw_app_t;
 

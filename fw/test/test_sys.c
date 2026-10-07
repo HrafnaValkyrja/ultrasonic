@@ -434,11 +434,12 @@ void test_break_always_on(void)
     TF_CHECK_EQ(app.st.sys.mode, FW_ST_OFF);
     TF_CHECK_EQ(fake_brk()->clears, 1);
     TF_CHECK(!fake_brk()->latched);
-    /* on again */
-    uint64_t t = fake_log_at(fake_log_len() - 1u)->t_us;
-    fw_event(&app.st, FW_EV_BTN_EDGE, 1, t);
+    /* on again: the button wakes Stop 2; the app stays awake while the gesture is in progress */
+    fake_wake_source(HAL_WAKE_BUTTON);
+    app_run(&app, 1u);
+    fw_event(&app.st, FW_EV_BTN_EDGE, 1, hal_time_us());
     app_run(&app, 80u);
-    fw_event(&app.st, FW_EV_BTN_EDGE, 0, t + 80000u);
+    fw_event(&app.st, FW_EV_BTN_EDGE, 0, hal_time_us());
     app_run(&app, 50u);
     TF_CHECK_EQ(app.st.sys.mode, FW_ST_TRANSIENT);
     TF_CHECK(app.bridge_on);

@@ -47,7 +47,7 @@ uint32_t shim_ccr_per_hop(const fw_state_t *st) { return FW_HOP_N * 200u / st->a
 /* n_hops hops of words (128 per hop for D1, 256 for D2). Outputs (each may be NULL): ccr[n_hops * ccr_per_hop],
  * dsp[n_hops * 8], band[n_hops * 28], floor_[n_hops * 28], peak[n_hops], sq[n_hops], norm[n_hops * 3], sq_periods[n_hops] */
 int32_t shim_run(fw_state_t *st, const int32_t *words, uint32_t n_hops, int32_t d2, uint16_t *ccr, float *dsp, float *band,
-                 float *floor_, float *peak, uint32_t *sq, float *norm, uint32_t *clamp, uint64_t t0_us)
+                 float *floor_, float *peak, uint32_t *sq, float *norm, uint32_t *clamp, uint64_t t0_us, uint32_t *mode)
 {
     fw_taps_t t;
     uint16_t buf[FW_CCR_MAX_PER_HOP];
@@ -68,6 +68,7 @@ int32_t shim_run(fw_state_t *st, const int32_t *words, uint32_t n_hops, int32_t 
         if (sq) sq[h] = t.squelch_state;
         if (norm) memcpy(&norm[(size_t)h * 3u], t.shaper_norm, sizeof t.shaper_norm);
         if (clamp) clamp[h] = t.clamp_hits;
+        if (mode) mode[h] = st->sys.mode | (st->idle.active << 8);   /* fw_mode_t | idle-detector active << 8 */
     }
     FTZ_OFF();
     return 0;

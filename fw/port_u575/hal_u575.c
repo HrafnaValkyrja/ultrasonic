@@ -28,9 +28,6 @@ void hal_power_system_reset(void)
 }
 void hal_power_ucpd_dbdis(void) {}
 
-hal_status_t hal_gpio_mode(board_pin_t pin, hal_gpio_mode_t mode) { (void)pin; (void)mode; return HAL_ENOTIMPL; }
-void hal_gpio_write(board_pin_t pin, bool high) { (void)pin; (void)high; }
-bool hal_gpio_read(board_pin_t pin) { (void)pin; return false; }
 
 hal_status_t hal_adf_start(uint32_t cck_hz) { (void)cck_hz; return HAL_ENOTIMPL; }
 void hal_adf_stop(void) {}
@@ -38,11 +35,6 @@ const int32_t *hal_adf_hop_take(void) { return NULL; }
 void hal_adf_hop_release(void) {}
 uint32_t hal_adf_flags(void) { return 0u; }
 
-hal_status_t hal_pwm_config(const hal_pwm_cfg_t *cfg) { (void)cfg; return HAL_ENOTIMPL; }
-hal_status_t hal_pwm_start(void) { return HAL_ENOTIMPL; }
-void hal_pwm_stop(void) {}
-hal_status_t hal_pwm_submit(const uint16_t *ccr, size_t n) { (void)ccr; (void)n; return HAL_ENOTIMPL; }
-uint32_t hal_pwm_underruns(void) { return 0u; }
 
 hal_status_t hal_adc_read_mv(hal_adc_ch_t ch, uint16_t *mv) { (void)ch; *mv = 0u; return HAL_ENOTIMPL; }
 
@@ -107,8 +99,6 @@ hal_status_t hal_fmac_fir_bank(const int16_t *coef, uint32_t n_phase, uint32_t t
     return HAL_OK;
 }
 
-/* FWSIM-R65 break: register code lands with bring-up (MDF1 OLD + TIM1 BKCMP7E, sub-processing.md issue 6) */
-hal_status_t hal_brk_arm(uint32_t threshold_ma) { (void)threshold_ma; return HAL_ENOTIMPL; }
-void hal_brk_disarm(void) {}
-bool hal_brk_latched(void) { return false; }
-void hal_brk_clear(void) {}
+hal_status_t hal_power_rtc_wakeup_s(uint32_t seconds) { (void)seconds; return HAL_ENOTIMPL; }
+hal_status_t hal_clock_stop_prep(void) { return HAL_ENOTIMPL; }
+hal_status_t hal_led_set(uint32_t duty_ppm) { (void)duty_ppm; return HAL_ENOTIMPL; }

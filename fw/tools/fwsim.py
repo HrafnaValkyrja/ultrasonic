@@ -324,6 +324,18 @@ def stage_dsp(cfg):
     # A/B build option: CPU float interpolator (FW_INTERP_FMAC=0) passes the host tests too
     r_cpu, _ = host_build_and_test("host_gcc_interp_cpu", GCC, HOST_FLAGS, ("-DFW_INTERP_FMAC=0",), req="FWSIM-R13")
     rows.append(r_cpu)
+    # U575 register layer vs RM0456 values (recorded-register fake; QEMU's mps2 has no STM32 peripherals)
+    d = OUT / "port_regs"
+    d.mkdir(parents=True, exist_ok=True)
+    exe = d / "test_regs"
+    rc, _, se, w = run([GCC, "-std=c11", "-O2", *WARN, "-DFW_REG_RECORD", *INC, f"-I{FW / 'port_u575'}", f"-I{FW / 'test/port'}",
+                        FW / "port_u575/hal_u575_periph.c", *sorted((FW / "test/port").glob("*.c")), "-o", exe])
+    if rc == 0:
+        rc, so, se, w2 = run([exe])
+        w += w2
+    rows.append(row("port_u575.regs", "PASS" if rc == 0 else "FAIL", (so.strip().splitlines() or ["?"])[-1] if rc in (0, 1) else f"exit {rc}", "0 fails",
+                    basis="fw/test/port/test_regs.c: GPIO + TIM1 PWM/break write sequences and values vs RM0456 Rev 7", src="FWSIM-R16, FWSIM-R65",
+                    detail=None if rc == 0 else tail(se), wall=w))
     # FWSIM-R15 ceiling property
     d = OUT / "prop"
     d.mkdir(parents=True, exist_ok=True)

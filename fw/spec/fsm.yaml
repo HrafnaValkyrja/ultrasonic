@@ -16,15 +16,14 @@ transitions:
     VBUS_ON: [DOCKED_CHARGE]
     FAULT: [SAFE]
     ignore: [G_VOL, G_OFF, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
-  FULL:
+  FULL:                     # steady tones must stay audible in Full mode, so the idle detector (which adapts to them) never sends it to IDLE
     G_TOGGLE: [TRANSIENT]
     G_NEXT: [TRANSIENT]
     G_VOL: [SAME, VOL_STEP]
     G_OFF: ["OFF"]
-    QUIET: [IDLE, SAVE_PREV]
     VBUS_ON: [DOCKED_CHARGE]
     FAULT: [SAFE]
-    ignore: [G_ANY, VBUS_OFF, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
+    ignore: [G_ANY, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
   TRANSIENT:
     G_TOGGLE: [FULL]
     G_NEXT: ["OFF"]

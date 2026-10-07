@@ -26,6 +26,31 @@ void fw_init(fw_state_t *st, const fw_knobs_t *knobs, uint64_t now_us)
     apply_knobs(st);
     fw_dsp_init(&st->dsp, &st->knobs, st->arr);
     fw_sys_init(&st->sys, &st->knobs, now_us);
+    fw_idle_init(&st->idle);
+}
+
+/* volume tick pattern (spec D3): vol_idx + 1 ticks of 15 ms (sin^2 envelope) every 100 ms at tick_hz / tick_cdb, added to the algorithm
+ * output so it passes the same squelch, true-peak limiter and FWSIM-R64 clamp as everything else (FWSIM-R29) */
+#define TICK_ON 188u
+#define TICK_PERIOD 1250u
+static void tick_add(fw_state_t *st, float y8[FW_DSP_OUT_N])
+{
+    fw_sys_t *s = &st->sys;
+    if (s->tick_left == 0u)
+        return;
+    float amp = fw_db20_to_lin((float)st->knobs.tick_cdb * 0.01f);
+    uint32_t inc = (uint32_t)((((uint64_t)(uint32_t)st->knobs.tick_hz << 32) + 6250u) / 12500u);
+    for (uint32_t i = 0; i < FW_DSP_OUT_N && s->tick_left; i++) {
+        if (s->tick_pos < TICK_ON) {
+            float w = fw_sin_turns((uint32_t)(((uint64_t)s->tick_pos << 31) / TICK_ON));   /* sin(pi pos / L) */
+            s->tick_ph += inc;
+            y8[i] += amp * w * w * fw_sin_turns(s->tick_ph);
+        }
+        if (++s->tick_pos >= TICK_PERIOD) {
+            s->tick_pos = 0u;
+            s->tick_left--;
+        }
+    }
 }
 
 static void sync_volume(fw_state_t *st)
@@ -52,8 +77,37 @@ static size_t hop_pcm(fw_state_t *st, const float pcm[FW_HOP_N], uint16_t *ccr, 
     fw_out_info_t oi;
     if (taps != NULL)
         memset(taps, 0, sizeof *taps);
+    /* look-back (spec C9 'the look-back buffer covers the wake-up'): with the idle detector on, the algorithm runs FW_IDLE_LOOKBACK hops
+     * behind the detector, so a call that wakes the pod is still ahead of the algorithm (+7.7 ms latency); off: no delay (L1 alignment) */
+    const float *apcm = pcm;
+    if (st->knobs.idle_enable) {
+        uint32_t slot = st->lb_head;
+        for (uint32_t i = 0; i < FW_HOP_N; i++) {
+            float x = st->lb[slot][i];
+            st->lb[slot][i] = pcm[i];
+            st->lb_out[i] = x;
+        }
+        st->lb_head = slot + 1u >= FW_IDLE_LOOKBACK ? 0u : slot + 1u;
+        apcm = st->lb_out;
+    }
+    fw_dsp_pcm_push(&st->dsp, apcm);
+    /* idle detector (spec C9): every 8 hops while listening or idle; Transient -> IDLE when quiet, IDLE -> back on activity */
+    uint32_t m = st->sys.mode;
+    if (st->knobs.idle_enable && (m == (uint32_t)FW_ST_FULL || m == (uint32_t)FW_ST_TRANSIENT || m == (uint32_t)FW_ST_IDLE) &&
+        fw_idle_hop(&st->idle, &st->dsp, pcm)) {
+        if (st->idle.active && m == (uint32_t)FW_ST_IDLE)
+            fw_sys_fsm(&st->sys, &st->knobs, FW_FE_WAKE, st->now_us);
+        else if (!st->idle.active && m != (uint32_t)FW_ST_IDLE && st->idle.frames > st->idle.hang_hops)
+            fw_sys_fsm(&st->sys, &st->knobs, FW_FE_QUIET, st->now_us);
+    }
     fw_outputs_t o = fw_sys_outputs(&st->sys);
-    fw_dsp_algo(&st->dsp, pcm, y8, taps ? taps->band_energy : NULL, taps ? taps->floor : NULL);
+    if (st->sys.mode == (uint32_t)FW_ST_IDLE) {                  /* IDLE: the algorithm sleeps (power model: 16 MHz detector only) */
+        for (uint32_t i = 0; i < FW_DSP_OUT_N; i++)
+            y8[i] = 0.0f;
+    } else {
+        fw_dsp_algo(&st->dsp, apcm, y8, taps ? taps->band_energy : NULL, taps ? taps->floor : NULL);
+    }
+    tick_add(st, y8);
     fw_ccr_bounds_t b = fw_ccr_bounds((uint16_t)st->arr, st->amp_max_ppm);
 #if FW_VAR_DOCKED_OUTPUT_MAX
     if (o.selftest) {

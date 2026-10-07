@@ -55,6 +55,9 @@ static void call_every_hal_function(void)
     hal_brk_disarm();
     (void)hal_brk_latched();
     hal_brk_clear();
+    (void)hal_power_rtc_wakeup_s(0u);
+    (void)hal_clock_stop_prep();
+    (void)hal_led_set(0u);
 }
 
 void test_fakes_coverage(void)
@@ -68,7 +71,7 @@ void test_fakes_coverage(void)
         TF_CHECK(fake_log_find((fake_fn_t)f, 0u) >= 0);
     }
     TF_CHECK_EQ(fake_log_len(), FAKE_FN_COUNT);
-    TF_CHECK_EQ(FAKE_FN_COUNT, 42);
+    TF_CHECK_EQ(FAKE_FN_COUNT, 45);
 }
 
 void test_fakes_fault_injection(void)

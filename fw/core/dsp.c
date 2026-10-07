@@ -198,15 +198,15 @@ NOINL void fw_dsp_halfband(fw_dsp_t *d, const int32_t in400[256], float pcm[128]
 
 /* ------------------------------------------------------------------ 256-pt real FFT (128-pt complex radix-2 DIT + split) */
 /* window + bit-reversed packing in one pass: z[rev(n)] = (x[2n] + j x[2n+1]) * hann (replaces a separate bit-reverse pass) */
-NOINL static void fft_pack(const fw_dsp_t *d, float *z)
+NOINL static void fft_pack_ring(const fw_dsp_t *d, const float *pcm, uint32_t off, float *z)
 {
-    uint32_t off = d->pcm_old;                                   /* pcm[] is a 2-half ring: frame sample i = pcm[(off + i) & 255] */
-    for (uint32_t n = 0; n < 128u; n++) {
+    for (uint32_t n = 0; n < 128u; n++) {                       /* pcm[] is a 2-half ring: frame sample i = pcm[(off + i) & 255] */
         uint32_t r = 2u * d->rev[n], i = (off + 2u * n) & 255u;
-        z[r] = d->pcm[i] * hann[2u * n];
-        z[r + 1u] = d->pcm[i + 1u] * hann[2u * n + 1u];
+        z[r] = pcm[i] * hann[2u * n];
+        z[r + 1u] = pcm[i + 1u] * hann[2u * n + 1u];
     }
 }
+#define fft_pack(d, z) fft_pack_ring((d), (d)->pcm, (d)->pcm_old, (z))
 
 /* radix-2 DIT butterfly: (a, b) <- (a + w b, a - w b), the operation order of the plain radix-2 loop */
 #define BFLY(a, b, wr, wi)                                                                            \
@@ -356,6 +356,18 @@ NOINL static void b_synth(fw_dsp_t *d, float *y8)
     }
 }
 
+void fw_dsp_spectrum(const fw_dsp_t *d, const float *pcm256, uint32_t off, float p[129])
+{
+    float z[FW_DSP_NFFT];
+    fft_pack_ring(d, pcm256, off, z);
+    fft_cfft128(z);
+    fft_split(z);
+    p[0] = z[0] * z[0];
+    p[128] = z[1] * z[1];
+    for (uint32_t k = 1; k < 128u; k++)
+        p[k] = z[2u * k] * z[2u * k] + z[2u * k + 1u] * z[2u * k + 1u];
+}
+
 static void algo_b(fw_dsp_t *d, float y8[8], float *band_energy, float *floor_tap)
 {
     uint32_t idx = d->hops - 1u;                                 /* this hop's index */
@@ -448,9 +460,17 @@ NOINL static void a_post(fw_dsp_t *d, float *y8)
     }
 }
 
-void fw_dsp_algo(fw_dsp_t *d, const float pcm[128], float y8[8], float *band_energy, float *floor_tap)
+void fw_dsp_pcm_push(fw_dsp_t *d, const float pcm[128])
 {
     d->hops++;
+    uint32_t w = (d->hops & 1u) * HOP;                           /* the new half overwrites the oldest one: no shift */
+    d->pcm_old = w ^ HOP;
+    for (uint32_t i = 0; i < HOP; i++)
+        d->pcm[w + i] = pcm[i];
+}
+
+void fw_dsp_algo(fw_dsp_t *d, const float pcm[128], float y8[8], float *band_energy, float *floor_tap)
+{
     if (d->algo == (uint32_t)FW_ALGO_A) {
         a_mix(d, pcm);
         a_decim(d, y8);
@@ -460,10 +480,6 @@ void fw_dsp_algo(fw_dsp_t *d, const float pcm[128], float y8[8], float *band_ene
                 band_energy[b] = floor_tap[b] = 0.0f;
         return;
     }
-    uint32_t w = (d->hops & 1u) * HOP;                           /* the new half overwrites the oldest one: no shift */
-    d->pcm_old = w ^ HOP;
-    for (uint32_t i = 0; i < HOP; i++)
-        d->pcm[w + i] = pcm[i];
     algo_b(d, y8, band_energy, floor_tap);
 }
 

@@ -26,6 +26,7 @@ typedef struct {
     uint32_t brk_latched, brk_events, brk_clear_req;
     uint64_t brk_us;
     uint32_t gestures[FW_RG_COUNT];
+    uint32_t tick_left, tick_pos, tick_ph;   /* volume tick pattern in progress */
 } fw_sys_t;
 
 typedef struct {
@@ -45,6 +46,9 @@ void fw_sys_fsm(fw_sys_t *s, const fw_knobs_t *k, uint32_t ev, uint64_t now_us);
 void fw_sys_btn_edge(fw_sys_t *s, uint32_t level, uint64_t now_us);
 void fw_sys_vbus_edge(fw_sys_t *s, uint32_t level, uint64_t now_us);
 fw_outputs_t fw_sys_outputs(const fw_sys_t *s);
+uint32_t fw_sys_can_sleep(const fw_sys_t *s);   /* Off may enter Stop 2: no button activity or VBUS change pending */
 int32_t fw_sys_volume_offset_cdb(const fw_sys_t *s, const fw_knobs_t *k);
+/* LED duty (sub-ui.md issue 7): toward led_target_ua through R14 2k2 from VSYS (4.5 V docked, else VBAT); 0 when off; ppm */
+uint32_t fw_led_duty_ppm(const fw_sys_t *s, const fw_knobs_t *k, uint32_t vsys_mv);
 const char *fw_mode_name(uint32_t m);
 #endif
