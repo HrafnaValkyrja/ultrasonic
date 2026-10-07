@@ -109,32 +109,18 @@ void hal_pwm_stop(void)
     (void)hal_gpio_mode(BOARD_PIN_GB_N, HAL_GPIO_ANALOG);
 }
 
-hal_status_t hal_pwm_submit(const uint16_t *ccr, size_t n)
+
+/* the TIM1 side of the break, used by hal_brk_* in hal_u575_io.c */
+void u575_tim1_brk_enable(uint32_t on)
 {
-    (void)ccr;
-    (void)n;
-    return HAL_ENOTIMPL;                                         /* GPDMA burst into DMAR (DBA = CCR1, DBL = 2) lands with the DMA layer */
-}
-
-uint32_t hal_pwm_underruns(void) { return 0u; }
-
-/* ---------------------------------------------------------------------------------------------- break (FWSIM-R65), TIM1 side */
-static uint32_t brk_threshold;
-
-hal_status_t hal_brk_arm(uint32_t threshold_ma)
-{
-    REG_SET(RCC_APB2ENR, 1u << 11);
-    REG_MOD(T(TIM_BDTR), (1u << 13), (1u << 12));                /* BKE; BKP = 0 [T: confirm against the mdf1_break0 output polarity at bring-up] */
-    REG_SET(T(TIM_AF1), 1u << 7);                                /* BKCMP7E: tim_brk_cmp7 = mdf1_break0 */
-    brk_threshold = threshold_ma;
-    return HAL_ENOTIMPL;                                         /* MDF1 OLD window + ADC1 stream not written yet: the app keeps the bridge off */
-}
-
-void hal_brk_disarm(void)
-{
-    REG_CLR(T(TIM_AF1), 1u << 7);
-    REG_CLR(T(TIM_BDTR), 1u << 12);
-    brk_threshold = 0u;
+    if (on) {
+        REG_SET(RCC_APB2ENR, 1u << 11);
+        REG_MOD(T(TIM_BDTR), (1u << 13), (1u << 12));            /* BKE; BKP = 0 [T: confirm against the mdf1_break0 output polarity at bring-up] */
+        REG_SET(T(TIM_AF1), 1u << 7);                            /* BKCMP7E: tim_brk_cmp7 = mdf1_break0 */
+    } else {
+        REG_CLR(T(TIM_AF1), 1u << 7);
+        REG_CLR(T(TIM_BDTR), 1u << 12);
+    }
 }
 
 bool hal_brk_latched(void)
@@ -146,3 +132,5 @@ void hal_brk_clear(void)
 {
     REG_W(T(TIM_SR), ~(1u << 7));                                /* rc_w0: write 0 to BIF only */
 }
+
+uint16_t u575_pwm_arr(void) { return pwm_arr; }

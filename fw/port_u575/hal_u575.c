@@ -36,11 +36,7 @@ void hal_adf_hop_release(void) {}
 uint32_t hal_adf_flags(void) { return 0u; }
 
 
-hal_status_t hal_adc_read_mv(hal_adc_ch_t ch, uint16_t *mv) { (void)ch; *mv = 0u; return HAL_ENOTIMPL; }
 
-hal_status_t hal_i2c_write(uint8_t addr7, uint8_t reg, const uint8_t *buf, size_t len) { (void)addr7; (void)reg; (void)buf; (void)len; return HAL_ENOTIMPL; }
-hal_status_t hal_i2c_read(uint8_t addr7, uint8_t reg, uint8_t *buf, size_t len) { (void)addr7; (void)reg; (void)buf; (void)len; return HAL_ENOTIMPL; }
-hal_status_t hal_i2c_recover(void) { return HAL_ENOTIMPL; }
 
 bool hal_usb_vbus(void) { return false; }
 hal_status_t hal_usb_enable(bool on) { (void)on; return HAL_ENOTIMPL; }

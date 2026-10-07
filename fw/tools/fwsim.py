@@ -329,12 +329,12 @@ def stage_dsp(cfg):
     d.mkdir(parents=True, exist_ok=True)
     exe = d / "test_regs"
     rc, _, se, w = run([GCC, "-std=c11", "-O2", *WARN, "-DFW_REG_RECORD", *INC, f"-I{FW / 'port_u575'}", f"-I{FW / 'test/port'}",
-                        FW / "port_u575/hal_u575_periph.c", *sorted((FW / "test/port").glob("*.c")), "-o", exe])
+                        FW / "port_u575/hal_u575_periph.c", FW / "port_u575/hal_u575_io.c", *sorted((FW / "test/port").glob("*.c")), "-o", exe])
     if rc == 0:
         rc, so, se, w2 = run([exe])
         w += w2
     rows.append(row("port_u575.regs", "PASS" if rc == 0 else "FAIL", (so.strip().splitlines() or ["?"])[-1] if rc in (0, 1) else f"exit {rc}", "0 fails",
-                    basis="fw/test/port/test_regs.c: GPIO + TIM1 PWM/break write sequences and values vs RM0456 Rev 7", src="FWSIM-R16, FWSIM-R65",
+                    basis="fw/test/port/test_regs.c: GPIO, TIM1 PWM/break, I2C2, ADC1, MDF1 OLD break chain, GPDMA->TIM1 DMAR bursts vs RM0456 Rev 7", src="FWSIM-R16, FWSIM-R20, FWSIM-R46, FWSIM-R65",
                     detail=None if rc == 0 else tail(se), wall=w))
     # FWSIM-R15 ceiling property
     d = OUT / "prop"

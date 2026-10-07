@@ -7,4 +7,7 @@ void rf_poke(uint32_t a, uint32_t v);
 uint32_t rf_nlog(void);
 const rf_write_t *rf_log(uint32_t i);
 int32_t rf_find(uint32_t a, uint32_t from);
+uint8_t *rf_i2c_regs(void);
+void rf_i2c_hold(uint32_t on);
+void rf_adc_code(uint32_t ch, uint16_t code);
 #endif
