@@ -109,7 +109,7 @@
   "SUB-DOCK-USB": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "Stale notes cleanup (ARM-7 rest, DK-13, UI-9, DBG-10, PAD-10): learn script values, gen.py/pad.md VSYS comments, provenance SW1 row, superseded banners on electronics.md, shell.md, pcb-mech-interface.md, B-parts-selection.md, hardware.md s6; no circuit/geometry change",
+   "note": "DK-14 belly-section.svg generated; docs only",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"

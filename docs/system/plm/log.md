@@ -511,3 +511,6 @@
 - 2026-10-07 16:06 checkin PHYSICAL by backlog-agent
 - 2026-10-07 16:06 checkin SUB-DEBUG-TEST by backlog-agent
 - 2026-10-07 16:07 review REG-ARM by backlog-agent: text fix: left-pod arm pads z -7.4..-4.15 (J2/J8 from placement), comment only in heel.py
+- 2026-10-07 16:09 checkout SUB-DOCK-USB by backlog-agent: DK-14 belly section
+- 2026-10-07 16:09 review SUB-DOCK-USB by backlog-agent: DK-14 belly-section.svg generated; docs only
+- 2026-10-07 16:09 checkin SUB-DOCK-USB by backlog-agent
