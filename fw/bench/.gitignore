@@ -1,0 +1,3 @@
+out/*.o
+out/host_test
+out/host_test.txt

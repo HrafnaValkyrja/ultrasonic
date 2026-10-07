@@ -1,0 +1,99 @@
+# V4 verification: CPU cycle budgets on the STM32U575 (Cortex-M33 + FPU + DSP ext.) for algorithms A/B. AI-facing.
+# Done 2026-10-07 by Claude (Opus 5.5 subagent). NO HARDWARE, NO cycle-accurate simulator on Valhalla (no Renode/QEMU/unicorn installed):
+#   every number is a STATIC ESTIMATE (FWSIM-R47 layer E1) from the compiled disassembly, NOT a measurement. Close with DWT CYCCNT on rev 1 (FWSIM-R49) or a Nucleo (E4/V8).
+# Reproduce: `systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 make -C fw/bench` (+ `make -C fw/bench test`).
+# Confidence: H = read from a primary doc / exact from listing; M = derived with a stated model; L = assumption.
+meta:
+  task: "docs/research/drastic/synthesis.md s3 item V4 (B1 = algorithm B at 55 MHz Range 3; B3 = algorithm A or slim B at <= 24 MHz Range 4; ADF decimation path)"
+  date: 2026-10-07
+  glossary:
+    STM32U575: "ST Cortex-M33 MCU, 160 MHz max, FPv5 single-precision FPU, DSP extension (SMLAD = two 16x16 MACs in 1 instruction), 8 KB ICACHE (spec D5)"
+    ADF1: "audio digital filter: hardware sinc5 + reshape decimator for the PDM mic; D1 = all-hardware to 200 kS/s, D2 = /10 in hardware + CPU half-band"
+    hop: "128 PCM samples = 0.640 ms; 1562.65 hops/s (200.02 kS/s / 128); every figure is cycles per hop or MHz = cycles/hop x 1562.65"
+    TPP: "taps per phase of the x16 polyphase interpolator (prototype FIR = 16 x TPP taps)"
+    CMSIS-DSP: "Arm's DSP library (spec D15); arm_rfft_fast_f32 is the 256-pt real FFT the firmware would call"
+    WS: "wait states: extra cycles per memory access"
+    R48: "FWSIM-R48 margin rule: PASS if hi <= 80 % of the clock; FAIL if lo > 85 %; between = unresolved (here 'tight')"
+  sources:
+    - {id: RM0456, what: "STM32U5 reference manual Rev 7 (March 2026), local text ~/Desktop/ultrasonic-scratch/st_new/rm7.txt = 'From Valkyrie/Datasheets/rm0456...pdf'", used: "Table 47 SRAM WS (L26920-26940), Table 54 flash WS (L29941), ICACHE '0 wait-state on hits' (L38166+), voltage ranges R3 <= 55 MHz / R4 <= 25 MHz (L42740)", read: 2026-10-07}
+    - {id: M4TRM, what: "Arm Cortex-M4 TRM r0p1 (DDI 0439B) Table 3-1 + FPU instruction timing; used as the M33 CPI proxy (Arm publishes no M33 cycle table)", read: "from memory of the published tables, NOT re-fetched 2026-10-07", conf: M}
+    - {id: CMSIS-M4, what: "arm_rfft_fast_f32 256-pt on Cortex-M4F: 14,285-16,534 cycles (Lorenser, ARM white paper Nov 2016; Stenzel FFT4CM4F measured on STM32F446)", via: "docs/research/C2-cpu-budget.md (2026-09-30)", conf: M}
+    - {id: STC-L552, what: "ST Community, 'stm32l552 cmsis dsp performance issue' (Cortex-M33), posted 2020-06-24/25: 2.5x more cycles than the M4 app note with ICACHE off; 2-way ICACHE on gave 10-25 % fewer cycles", url: "https://community.st.com/s/question/0D53W00000AaLnO/stm32l552-cmsis-dsp-performance-issue", read: 2026-10-07, conf: M}
+  no_m33_cmsis_figure_found: "web search 2026-10-07 found no published arm_rfft_fast_f32 cycle count on a Cortex-M33"
+
+method:
+  what: "Minimal C kernels of every per-hop inner loop (fw/bench/kernels.c float, fw/bench/kernels_q15.c fixed-point), compiled with arm-none-eabi-gcc 14.2.1 -O2 -mcpu=cortex-m33 -mthumb -mfpu=fpv5-sp-d16 -mfloat-abi=hard -std=c11 -fno-math-errno; fw/bench/cyccount.py parses the objdump listing (fw/bench/out/kernels_*.lst), finds every loop (backward branch), charges each instruction [lo, hi] cycles, multiplies loop bodies by trip counts derived from the C source (the script aborts if the loop count found differs from the table), adds +1 cycle per SRAM data word at 24 MHz. fw/bench/budget.py sums kernels into scenarios and adds overhead."
+  kernel_fidelity: "mirrors sim/dsp/pipeline.py (algo_b, algo_a, limiter) and sim/e2e/stages.py PwmShaper (x16 interp, 3rd-order error-feedback shaper, TPDF dither, 201 levels, squelch). Hot loops unrolled with #pragma (normal firmware practice); branchless selects (VSEL/VMAXNM/VMINNM). Not hand-written assembly: a tuned implementation could be 10-30 % faster [L]."
+  fft_check: "the counted rfft256 (bit-reverse + 128-pt radix-2 DIT + real split) matches numpy.fft.rfft to 7.4e-6 of a 31.2 peak (make test, host build). Own FFT = 18.4-22.4 kcyc vs CMSIS M4 14.3-16.5 kcyc: CMSIS (radix-8/4) is used in the scenarios, own count kept as the upper envelope"
+  cpi: {lo_hi: "ALU 1; MUL 1; MLA 2; SDIV 2-12; LDR/STR/VLDR/VSTR 2 (lo: 1 when pipelined behind another load/store); LDRD 3; LDM/VLDM/PUSH 1+N; VADD/VMUL/VCVT/VSEL/VMAXNM/VRINTM 1; VMLA/VFMA 3; VDIV/VSQRT 14; taken branch 1+P with P 1 (lo) / 3 (hi); IT 0/1", src: M4TRM, conf: M, note: "-ffp-contract=off (c11) so a*b+c is VMUL+VADD (2) not VFMA (3) on this table; FPv5-only ops (VSEL, VMAXNM, VRINTM) charged 1 [L]"}
+  memory:
+    sram_ws: {55MHz_R3: 0, 24MHz_R4: "1 (Range 4: 0 WS only <= 16 MHz)", src: "RM0456 Table 47", conf: H, effect: "+1 cycle per data word at 24 MHz: +12-25 % on these kernels"}
+    flash_ws: {55MHz_R3: 2, 24MHz_R4: 1, src: "RM0456 Table 54", conf: H}
+    icache: {assumption: "all hot DSP code (3.4 KB float + 0.9 KB q15) stays resident in the 8 KB ICACHE -> 0 WS on fetch", conf: L, cold_envelope: "if all kernel code were refilled every hop: +5.0 MHz at 55 MHz (2 WS), +3.3 MHz at 24 MHz (1 WS) - worst case, not in the totals. ICACHE must be enabled (STC-L552: 2.5x slower without)"}
+  overhead: {value: "+0.5 MHz fixed (ADF + TIM1 DMA ISRs ~2 x 100 cyc/hop, SysTick 1 kHz, ~10 kernel calls/hop) + 3 % (lo) / 8 % (hi) for DMA bus contention and stray ICACHE misses; USB off while worn (VBUS absent, FWSIM-R28)", conf: L}
+  pcm_rate: {assumption: "PCM stays ~200 kS/s (1562.65 hops/s) at 55 and 24 MHz; the mic/ADF clock then comes from MSIK, not HCLK/20 (synthesis SK-2(d))", conf: M}
+  not_counted: "idle-mode FFT wake detector (separate mode); button/LED/charger/I2C polling (<0.1 MHz [L]); q15 FFT (lever, not counted); squelched path (cheaper than the active path counted)"
+
+per_stage_cycles_per_hop:   # base build: 32 bands, TPP 8; SRAM 0 WS; [lo, hi] cycles per 0.64 ms hop -> MHz at 1562.65 hops/s (no overhead)
+  shared_input:
+    adf_D1_hardware: {cyc: 0, MHz: 0, note: "ADF1 sinc5 /5 + RSFLT /4 to 200 kS/s in hardware; DMA moves words, 0 CPU (A3-u575-plan s1.2)", conf: H}
+    in_window: {cyc: [3151, 3281], MHz: [4.9, 5.1], what: "256 ADF words >>8 -> float x Hann (algorithm B only)", conf: M}
+    halfband_D2_fallback: {cyc: [7088, 8638], MHz: [11.1, 13.5], what: "31-tap half-band 400 -> 200 kS/s (8 symmetric pairs, 128 outputs/hop); only if D1 is rejected (S1). 24 MHz: 14.7-17.1 MHz = 61-71 % of the clock by itself", conf: M}
+  algorithm_B:
+    rfft256_own: {cyc: [18423, 22382], MHz: [28.8, 35.0], split: "bitrev 1135-1478, cfft128 14813-17919 (448 butterflies @29-35), real split 2475-2985", conf: M}
+    rfft256_cmsis_published_M4: {cyc: [14285, 16534], MHz: [22.3, 25.8], src: CMSIS-M4, conf: M}
+    b_bands: {cyc: [2592, 2995], MHz: [4.1, 4.7], what: "84 in-band bins (20.3-85.2 kHz): |X|^2 x EQ^2 -> band energy + centroid"}
+    b_update: {cyc: [3342, 3513], MHz: [5.2, 5.5], what: "32 bands: floor tracker, gate, VSQRT envelope, VDIV centroid, fast log2/exp2 frequency map (newlib logf/powf would add ~2-4x here [L])"}
+    b_synth: {cyc: [3403, 3620], MHz: [5.3, 5.7], what: "32 oscillators x 8 samples, amp + freq ramps, 1024-entry sine table"}
+    per_band_marginal: "~212 cyc/hop per band (update 104 + synth 107) = 0.33 MHz per band"
+  algorithm_A:
+    a_mix: {cyc: [2074, 2332], MHz: [3.2, 3.6], what: "LO table x input, 128 samples"}
+    a_decim: {cyc: [5655, 6593], MHz: [8.8, 10.3], what: "/4 16-tap (77.7 dB alias rejection) then /4 40-tap (48.2 dB), polyphase, float"}
+    a_post: {cyc: [411, 444], MHz: [0.6, 0.7], what: "HP biquad + envelope squelch with VDIV, 8 samples"}
+    q15_variants: {a_mix_q15: {cyc: [1818, 2076], MHz: [2.8, 3.2]}, a_decim_q15: {cyc: [2171, 2981], MHz: [3.4, 4.7], note: "SMLAD halves the MAC count"}}
+  shared_output:   # x16 polyphase interp + true-peak limiter (B-FW-LIMITER: instant attack from the 16 interpolated samples, one divide per 12.5 kS/s sample) + 3rd-order shaper + TPDF dither + CCR
+    out_float_TPP8: {cyc: [10592, 11545], MHz: [16.6, 18.0], split: "interp 128 x 39-43 cyc, shaper 128 x 38-40 cyc (~7.7-8.0 MHz each), limiter/peak ~0.6 MHz"}
+    out_float_TPP4: {cyc: [8412, 9283], MHz: [13.1, 14.5]}
+    out_float_TPP12: {cyc: [13319, 14524], MHz: [20.8, 22.7]}
+    out_q15_TPP8: {cyc: [8700, 10132], MHz: [13.6, 15.8], note: "SMLAD interp 24-28 cyc/phase; the integer shaper is NOT cheaper (39-44 cyc/sample: MLA 2 cyc, clamps, two-tap TPDF)"}
+    out_q15_TPP12: {cyc: [9603, 11071], MHz: [15.0, 17.3]}
+    image_rejection: {TPP4: "23 dB", TPP6: "32 dB", TPP8: "40.5 dB", TPP12: "57.9 dB", what: "least-squares prototype, images of the 12.5 kS/s output from 8.25 kHz up (fw/bench/filters.py)", conf: M, gap: "no spec value for interpolator image rejection; e2e sim uses resample_poly kaiser 9 (~20 taps/phase)"}
+    vs_C2: "C2-cpu-budget.md had 6-10 MHz for interp + shaper; the counted figure is 13.6-18 MHz. This is the main reason every budget below is worse than the spec s5.2 percentages"
+
+scenarios:   # MHz needed INCLUDING overhead; % of clock; verdict per R48. 55 MHz column at SRAM 0 WS, 24 MHz column at SRAM 1 WS
+  B_spec:              {cfg: "32 bands, hop 128 (50 % overlap), TPP 8, CMSIS FFT", 55MHz: {MHz: [60.6, 70.5], pct: [110, 128], verdict: "doesn't fit"}, 24MHz: {MHz: [75.8, 86.4], pct: [316, 360], verdict: "doesn't fit"}, clock_for_R48_pass: "~88 MHz (Range 2/1); at today's 80 MHz = 76-88 % -> tight, not the 55-81 % in spec s5.2"}
+  B_spec_ownFFT:       {55MHz: {MHz: [67.3, 80.4], pct: [122, 146], verdict: "doesn't fit"}}
+  B_28bands:           {cfg: "pipeline.py default 28 bands, otherwise B_spec", 55MHz: {MHz: [59.1, 68.8], pct: [107, 125], verdict: "doesn't fit"}}
+  B_q15out:            {cfg: "B_spec with the q15 output path", 55MHz: {MHz: [57.6, 68.1], pct: [105, 124], verdict: "doesn't fit"}}
+  B_slim1:             {cfg: "16 bands, hop 256 (no overlap: 1.28 ms frames, 781 frames/s), TPP 8, CMSIS FFT", 55MHz: {MHz: [37.7, 43.7], pct: [69, 79], verdict: "fits (at the R48 edge)"}, 24MHz: {MHz: [46.5, 52.9], pct: [194, 221], verdict: "doesn't fit"}}
+  B_slim1_q15out:      {cfg: "B_slim1 with the q15 output path", 55MHz: {MHz: [34.6, 41.3], pct: [63, 75], verdict: fits}, 24MHz: {MHz: [43.1, 50.1], pct: [179, 209], verdict: "doesn't fit"}}
+  B_slim2:             {cfg: "B_slim1 with TPP 4 (23 dB images - probably audible)", 55MHz: {MHz: [34.2, 39.9], pct: [62, 73], verdict: fits}, 24MHz: {MHz: [42.0, 48.1], pct: [175, 200], verdict: "doesn't fit"}}
+  A_spec:              {cfg: "float mix + 16/40-tap decimators + HP + squelch, TPP 8", 55MHz: {MHz: [30.6, 35.8], pct: [56, 65], verdict: fits}, 24MHz: {MHz: [36.7, 42.1], pct: [153, 175], verdict: "doesn't fit"}, clock_for_R48_pass: "~45 MHz"}
+  A_slim:              {cfg: "A_spec with TPP 4", 24MHz: {MHz: [32.2, 37.3], pct: [134, 155], verdict: "doesn't fit"}}
+  A_q15:               {cfg: "q15 mix + SMLAD decimators + float HP/squelch + q15 output TPP 8 (cheapest counted A)", 55MHz: {MHz: [21.6, 26.9], pct: [39, 49], verdict: fits}, 24MHz: {MHz: [26.2, 31.8], pct: [109, 132], verdict: "doesn't fit"}, clock_for_R48_pass: "~34 MHz at 0 WS (Range 3, 25-55 MHz)"}
+  A_q15_hq:            {cfg: "A_q15 with TPP 12 (58 dB images)", 55MHz: {MHz: [23.0, 28.5], pct: [42, 52], verdict: fits}, 24MHz: {MHz: [28.2, 33.9], pct: [118, 141], verdict: "doesn't fit"}}
+  output_stage_alone_24MHz: "float TPP 8: 19.2-20.7 MHz = 80-86 % of 24 MHz before any algorithm runs; q15 TPP 8: 15.8-18.1 MHz = 66-75 %"
+
+verdicts:
+  B1_alg_B_at_55MHz: {verdict: "DOESN'T FIT as specified (32 bands, 50 % overlap): needs 61-71 MHz = 110-128 % of 55. FITS only as slim B (16 bands, no overlap): 35-44 MHz = 63-79 %", conf: M, consequence: "B1's 55 MHz lever (PC-L2) holds only if her ears accept slim B (fewer, wider bands; 1.28 ms frames) - a listening test, Phase 1 render. Algorithm A fits 55 MHz easily (56-65 %)"}
+  B3_24MHz: {verdict: "DOESN'T FIT for A, slim A, q15 A, or any B. Cheapest counted (A_q15) needs 26-32 MHz = 109-132 % of 24 MHz at Range 4 (1 SRAM WS)", conf: M, why: "the 200 kHz output path (x16 interp + 3rd-order shaper, 128 samples/hop) alone costs 66-86 % of 24 MHz; Range 4 adds 1 SRAM wait state above 16 MHz", consequence: "supports synthesis SK-2: B3 falls back to Range 3 at ~32-36 MHz for algorithm A (A_q15 needs ~34 MHz for R48 PASS); K2/K3 runtime must be recomputed at that clock (+0.4..+0.6 mA per SK-2(b) [E])"}
+  adf_path: {verdict: "D1 (all-hardware ADF decimation) is mandatory for B1/B3: D2's CPU half-band costs 11-13.5 MHz (20-25 % of 55; 61-71 % of 24)", conf: M}
+  levers_not_counted:
+    - "FMAC peripheral for the interpolation FIR (q15, own clock domain): would remove ~4-5 MHz (interp) from the CPU; at 24 MHz A_q15 would still be ~21-26 MHz [E] -> tight-to-doesn't-fit"
+    - "2nd-order shaper or 100 kHz shaper update: shaper is ~8 MHz; halving it moves A_q15 at 24 MHz to ~22-27 MHz [E]; changes D6 noise-shaping (C3) -> spec decision"
+    - "q15 FFT (CMSIS ~1.5x faster, C2 [C]): -7..-9 MHz on B_spec; still > 55 MHz"
+    - "128-pt FFT: halves FFT cost per frame but doubles frame rate at 50 % overlap: no net saving"
+    - "hand-tuned assembly for the shaper/interp: 10-30 % [L]"
+
+uncertainties:
+  - {id: U1, what: "CPI = Cortex-M4 table as M33 proxy; Arm publishes no M33 instruction timing. M33 CoreMark/MHz is ~15 % above M4 (vendor figure, not re-checked 2026-10-07) -> counts may be 0-15 % high; FP load/FMA behaviour on M33 unverified", size: "+0/-15 %", conf: L}
+  - {id: U2, what: "output-stage design (TPP, shaper order, dither) is not in the spec; it dominates both budgets", size: "13-23 MHz range across TPP 4-12", conf: M}
+  - {id: U3, what: "CMSIS M33 rfft figure missing; M4 figure used (STC-L552: ICACHE state alone moves it 10-25 %)", conf: M}
+  - {id: U4, what: "overhead 0.5 MHz + 3-8 % and ICACHE-warm are assumptions; cold envelope +3-5 MHz", conf: L}
+  - {id: U5, what: "static count takes all instructions in a loop body every iteration (no data-dependent paths exist by design; squelched hops are cheaper)", conf: H}
+biggest_uncertainty: "U2 + U1 together: the output path (not in the spec) and M4-as-M33 timings. Neither can move B3 to 'fits': even -15 % (U1) leaves A_q15 at 22-27 MHz = 93-113 % of 24 MHz. Only DWT counts on hardware close it (FWSIM-R49, E4/V8)."
+
+integration_map_crosscheck:
+  touches: [docs/system/sub-processing.md (Key numbers, spec R3 cycle risk), docs/sim/firmware-emulation.yaml cycle_budget (E1 layer now exists for the kernels), docs/research/drastic/synthesis.md SK-2 / R5 / R8 / K2 / K3, docs/spec.md s5.2 percentages and D14 'Algorithm A at 48-64 MHz']
+  design_change: "none (research only; no ECR). Owner-visible implications: B1 = slim B or A only; B3 at 24 MHz is not reachable -> K2/K3 power must use Range 3 ~32-36 MHz"
+  files: [fw/bench/kernels.c, fw/bench/kernels_q15.c, fw/bench/kernels.h, fw/bench/cyccount.py, fw/bench/budget.py, fw/bench/filters.py, fw/bench/host_test.c, fw/bench/host_test.py, fw/bench/Makefile, fw/bench/out/kernels_*.lst, fw/bench/out/cycles.txt, fw/bench/out/budget.txt]

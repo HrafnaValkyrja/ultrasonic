@@ -1,0 +1,578 @@
+{
+ "B_spec_ownFFT (32 bands, hop 128, TPP 8, own radix-2 FFT)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    41503,
+    47336
+   ],
+   "MHz": [
+    67.3,
+    80.4
+   ],
+   "pct": [
+    122,
+    146
+   ],
+   "verdict": "doesn't fit"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    50941,
+    56774
+   ],
+   "MHz": [
+    82.5,
+    96.3
+   ],
+   "pct": [
+    344,
+    401
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "B_spec_cmsisFFT (32 bands, hop 128, TPP 8, CMSIS f32 FFT)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    37365,
+    41488
+   ],
+   "MHz": [
+    60.6,
+    70.5
+   ],
+   "pct": [
+    110,
+    128
+   ],
+   "verdict": "doesn't fit"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    46803,
+    50926
+   ],
+   "MHz": [
+    75.8,
+    86.4
+   ],
+   "pct": [
+    316,
+    360
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "B_28bands_cmsisFFT (28 bands = pipeline.py default)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    36388,
+    40462
+   ],
+   "MHz": [
+    59.1,
+    68.8
+   ],
+   "pct": [
+    107,
+    125
+   ],
+   "verdict": "doesn't fit"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    45688,
+    49762
+   ],
+   "MHz": [
+    74.0,
+    84.5
+   ],
+   "pct": [
+    308,
+    352
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "B_slim1 (16 bands, hop 256 = no overlap, TPP 8, CMSIS FFT)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    23100,
+    25596
+   ],
+   "MHz": [
+    37.7,
+    43.7
+   ],
+   "pct": [
+    69,
+    79
+   ],
+   "verdict": "fits"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    28574,
+    31070
+   ],
+   "MHz": [
+    46.5,
+    52.9
+   ],
+   "pct": [
+    194,
+    221
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "B_slim2 (16 bands, hop 256, TPP 4 [23 dB images], CMSIS FFT)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    20920,
+    23334
+   ],
+   "MHz": [
+    34.2,
+    39.9
+   ],
+   "pct": [
+    62,
+    73
+   ],
+   "verdict": "fits"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    25786,
+    28200
+   ],
+   "MHz": [
+    42.0,
+    48.1
+   ],
+   "pct": [
+    175,
+    200
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "A_spec (mix + 16/40-tap decimators + HP + squelch, TPP 8)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    18732,
+    20914
+   ],
+   "MHz": [
+    30.6,
+    35.8
+   ],
+   "pct": [
+    56,
+    65
+   ],
+   "verdict": "fits"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    22464,
+    24646
+   ],
+   "MHz": [
+    36.7,
+    42.1
+   ],
+   "pct": [
+    153,
+    175
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "A_slim (TPP 4 [23 dB images])": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    16552,
+    18652
+   ],
+   "MHz": [
+    27.1,
+    32.0
+   ],
+   "pct": [
+    49,
+    58
+   ],
+   "verdict": "fits"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    19676,
+    21776
+   ],
+   "MHz": [
+    32.2,
+    37.3
+   ],
+   "pct": [
+    134,
+    155
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "A_hq (TPP 12 [58 dB images])": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    21459,
+    23893
+   ],
+   "MHz": [
+    35.0,
+    40.8
+   ],
+   "pct": [
+    64,
+    74
+   ],
+   "verdict": "fits"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    26093,
+    28527
+   ],
+   "MHz": [
+    42.5,
+    48.6
+   ],
+   "pct": [
+    177,
+    203
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "B_q15out (32 bands, hop 128, CMSIS FFT, q15 output path TPP 8)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    35473,
+    40075
+   ],
+   "MHz": [
+    57.6,
+    68.1
+   ],
+   "pct": [
+    105,
+    124
+   ],
+   "verdict": "doesn't fit"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    44669,
+    49271
+   ],
+   "MHz": [
+    72.4,
+    83.7
+   ],
+   "pct": [
+    302,
+    349
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "B_slim1_q15out (16 bands, hop 256, CMSIS FFT, q15 output TPP 8)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    21208,
+    24182
+   ],
+   "MHz": [
+    34.6,
+    41.3
+   ],
+   "pct": [
+    63,
+    75
+   ],
+   "verdict": "fits"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    26440,
+    29414
+   ],
+   "MHz": [
+    43.1,
+    50.1
+   ],
+   "pct": [
+    179,
+    209
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "A_q15 (q15 mix + SMLAD decimators, float HP/squelch, q15 output TPP 8)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    13100,
+    15633
+   ],
+   "MHz": [
+    21.6,
+    26.9
+   ],
+   "pct": [
+    39,
+    49
+   ],
+   "verdict": "fits"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    15985,
+    18518
+   ],
+   "MHz": [
+    26.2,
+    31.8
+   ],
+   "pct": [
+    109,
+    132
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "A_q15_hq (as A_q15, q15 output TPP 12 [58 dB images])": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    14003,
+    16572
+   ],
+   "MHz": [
+    23.0,
+    28.5
+   ],
+   "pct": [
+    42,
+    52
+   ],
+   "verdict": "fits"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    17224,
+    19793
+   ],
+   "MHz": [
+    28.2,
+    33.9
+   ],
+   "pct": [
+    118,
+    141
+   ],
+   "verdict": "doesn't fit"
+  }
+ },
+ "out_only_q15_TPP8": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    8700,
+    10132
+   ],
+   "MHz": [
+    13.6,
+    15.8
+   ],
+   "pct": [
+    25,
+    29
+   ],
+   "verdict": "-"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    10130,
+    11562
+   ],
+   "MHz": [
+    15.8,
+    18.1
+   ],
+   "pct": [
+    66,
+    75
+   ],
+   "verdict": "-"
+  }
+ },
+ "out_only_q15_TPP12": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    9603,
+    11071
+   ],
+   "MHz": [
+    15.0,
+    17.3
+   ],
+   "pct": [
+    27,
+    31
+   ],
+   "verdict": "-"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    11369,
+    12837
+   ],
+   "MHz": [
+    17.8,
+    20.1
+   ],
+   "pct": [
+    74,
+    84
+   ],
+   "verdict": "-"
+  }
+ },
+ "out_only_TPP8 (x16 interp + limiter + 3rd-order shaper)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    10592,
+    11545
+   ],
+   "MHz": [
+    16.6,
+    18.0
+   ],
+   "pct": [
+    30,
+    33
+   ],
+   "verdict": "-"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    12264,
+    13217
+   ],
+   "MHz": [
+    19.2,
+    20.7
+   ],
+   "pct": [
+    80,
+    86
+   ],
+   "verdict": "-"
+  }
+ },
+ "out_only_TPP4": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    8412,
+    9283
+   ],
+   "MHz": [
+    13.1,
+    14.5
+   ],
+   "pct": [
+    24,
+    26
+   ],
+   "verdict": "-"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    9476,
+    10347
+   ],
+   "MHz": [
+    14.8,
+    16.2
+   ],
+   "pct": [
+    62,
+    67
+   ],
+   "verdict": "-"
+  }
+ },
+ "out_only_TPP12": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    13319,
+    14524
+   ],
+   "MHz": [
+    20.8,
+    22.7
+   ],
+   "pct": [
+    38,
+    41
+   ],
+   "verdict": "-"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    15893,
+    17098
+   ],
+   "MHz": [
+    24.8,
+    26.7
+   ],
+   "pct": [
+    103,
+    111
+   ],
+   "verdict": "-"
+  }
+ },
+ "D2_halfband_addon (only if ADF D1 is not used)": {
+  "B1_55MHz_R3": {
+   "cyc_hop": [
+    7088,
+    8638
+   ],
+   "MHz": [
+    11.1,
+    13.5
+   ],
+   "pct": [
+    20,
+    25
+   ],
+   "verdict": "-"
+  },
+  "B3_24MHz_R4": {
+   "cyc_hop": [
+    9420,
+    10970
+   ],
+   "MHz": [
+    14.7,
+    17.1
+   ],
+   "pct": [
+    61,
+    71
+   ],
+   "verdict": "-"
+  }
+ }
+}

@@ -1,0 +1,1219 @@
+
+out/kernels_slim.o:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <in_window>:
+   0:	push	{r4, r5, r6, lr}
+   2:	mov	r5, r1
+   4:	mov	r4, r2
+   6:	add.w	r6, r0, #1020	@ 0x3fc
+   a:	subs	r2, r0, #4
+   c:	ldr	r0, [r2, #4]
+   e:	mov	lr, r5
+  10:	asrs	r3, r0, #8
+  12:	vmov	s15, r3
+  16:	vcvt.f32.s32	s14, s15
+  1a:	vldmia	lr!, {s15}
+  1e:	mov	ip, r4
+  20:	vmul.f32	s15, s14, s15
+  24:	mov	r1, r2
+  26:	ldr	r0, [r2, #8]
+  28:	adds	r2, #16
+  2a:	asrs	r3, r0, #8
+  2c:	ldr.w	r0, [r2, #-4]
+  30:	vmov	s14, r3
+  34:	asrs	r3, r0, #8
+  36:	ldr	r0, [r1, #16]
+  38:	vstmia	ip!, {s15}
+  3c:	vcvt.f32.s32	s14, s14
+  40:	vldr	s15, [r5, #4]
+  44:	vmul.f32	s15, s14, s15
+  48:	vmov	s14, r3
+  4c:	vstr	s15, [r4, #4]
+  50:	vcvt.f32.s32	s14, s14
+  54:	vldr	s15, [lr, #4]
+  58:	vmul.f32	s15, s14, s15
+  5c:	asrs	r3, r0, #8
+  5e:	vmov	s14, r3
+  62:	vstr	s15, [ip, #4]
+  66:	vcvt.f32.s32	s14, s14
+  6a:	vldr	s15, [lr, #8]
+  6e:	vmul.f32	s15, s14, s15
+  72:	cmp	r2, r6
+  74:	vstr	s15, [ip, #8]
+  78:	add.w	r5, lr, #12
+  7c:	add.w	r4, ip, #12
+  80:	bne.n	c <in_window+0xc>
+  82:	pop	{r4, r5, r6, pc}
+
+00000084 <halfband_d2>:
+  84:	subs	r3, r2, #0
+  86:	ble.n	16c <halfband_d2+0xe8>
+  88:	vpush	{d8-d12}
+  8c:	vmov.f32	s1, #96	@ 0x3f000000  0.5
+  90:	vldr	s2, [pc, #220]	@ 170 <halfband_d2+0xec>
+  94:	vldr	s3, [pc, #220]	@ 174 <halfband_d2+0xf0>
+  98:	vldr	s4, [pc, #220]	@ 178 <halfband_d2+0xf4>
+  9c:	vldr	s5, [pc, #220]	@ 17c <halfband_d2+0xf8>
+  a0:	vldr	s6, [pc, #220]	@ 180 <halfband_d2+0xfc>
+  a4:	vldr	s7, [pc, #220]	@ 184 <halfband_d2+0x100>
+  a8:	vldr	s8, [pc, #220]	@ 188 <halfband_d2+0x104>
+  ac:	vldr	s9, [pc, #220]	@ 18c <halfband_d2+0x108>
+  b0:	add.w	r3, r0, r3, lsl #3
+  b4:	vldr	s16, [r0, #56]	@ 0x38
+  b8:	vldr	s25, [r0, #64]	@ 0x40
+  bc:	vldr	s17, [r0, #60]	@ 0x3c
+  c0:	vldr	s0, [r0, #48]	@ 0x30
+  c4:	vldr	s24, [r0, #72]	@ 0x48
+  c8:	vadd.f32	s16, s16, s25
+  cc:	vldr	s10, [r0, #40]	@ 0x28
+  d0:	vldr	s23, [r0, #80]	@ 0x50
+  d4:	vmul.f32	s17, s17, s1
+  d8:	vadd.f32	s0, s0, s24
+  dc:	vmul.f32	s16, s16, s2
+  e0:	vldr	s11, [r0, #32]
+  e4:	vldr	s22, [r0, #88]	@ 0x58
+  e8:	vadd.f32	s10, s10, s23
+  ec:	vmul.f32	s0, s0, s3
+  f0:	vadd.f32	s16, s16, s17
+  f4:	vldr	s12, [r0, #24]
+  f8:	vldr	s21, [r0, #96]	@ 0x60
+  fc:	vadd.f32	s11, s11, s22
+ 100:	vmul.f32	s10, s10, s4
+ 104:	vadd.f32	s0, s0, s16
+ 108:	vldr	s13, [r0, #16]
+ 10c:	vldr	s20, [r0, #104]	@ 0x68
+ 110:	vadd.f32	s12, s12, s21
+ 114:	vmul.f32	s11, s11, s5
+ 118:	vadd.f32	s10, s10, s0
+ 11c:	vldr	s14, [r0, #8]
+ 120:	vldr	s19, [r0, #112]	@ 0x70
+ 124:	vadd.f32	s13, s13, s20
+ 128:	vmul.f32	s12, s12, s6
+ 12c:	vadd.f32	s11, s11, s10
+ 130:	vldr	s15, [r0]
+ 134:	vldr	s18, [r0, #120]	@ 0x78
+ 138:	vadd.f32	s14, s14, s19
+ 13c:	vmul.f32	s13, s13, s7
+ 140:	vadd.f32	s12, s12, s11
+ 144:	vadd.f32	s15, s15, s18
+ 148:	vmul.f32	s14, s14, s8
+ 14c:	vadd.f32	s13, s13, s12
+ 150:	vmul.f32	s15, s15, s9
+ 154:	vadd.f32	s14, s14, s13
+ 158:	vadd.f32	s15, s15, s14
+ 15c:	adds	r0, #8
+ 15e:	cmp	r3, r0
+ 160:	vstmia	r1!, {s15}
+ 164:	bne.n	b4 <halfband_d2+0x30>
+ 166:	vpop	{d8-d12}
+ 16a:	bx	lr
+ 16c:	bx	lr
+ 16e:	nop
+ 170:	.word	0x3ea068dc
+ 174:	.word	0xbdc36113
+ 178:	.word	0x3d491d15
+ 17c:	.word	0xbcded289
+ 180:	.word	0x3c727bb3
+ 184:	.word	0xbbf5c28f
+ 188:	.word	0x3b5ed289
+ 18c:	.word	0xbaaa64c3
+
+00000190 <bitrev128>:
+ 190:	cmp	r2, #0
+ 192:	ble.n	1d0 <bitrev128+0x40>
+ 194:	push	{r4, lr}
+ 196:	mov	r4, r0
+ 198:	mov	lr, r1
+ 19a:	add.w	r2, r1, r2, lsl #1
+ 19e:	ldrb.w	ip, [lr]
+ 1a2:	ldrb.w	r3, [lr, #1]
+ 1a6:	add.w	ip, r4, ip, lsl #3
+ 1aa:	vldr	s14, [ip]
+ 1ae:	vldr	s15, [ip, #4]
+ 1b2:	add.w	lr, lr, #2
+ 1b6:	add.w	r3, r4, r3, lsl #3
+ 1ba:	cmp	r2, lr
+ 1bc:	ldmia.w	r3, {r0, r1}
+ 1c0:	stmia.w	ip, {r0, r1}
+ 1c4:	vstr	s14, [r3]
+ 1c8:	vstr	s15, [r3, #4]
+ 1cc:	bne.n	19e <bitrev128+0xe>
+ 1ce:	pop	{r4, pc}
+ 1d0:	bx	lr
+ 1d2:	nop
+
+000001d4 <cfft128>:
+ 1d4:	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1d8:	movs	r3, #7
+ 1da:	mov	sl, r1
+ 1dc:	mov.w	lr, #2
+ 1e0:	movs	r1, #64	@ 0x40
+ 1e2:	mov	r2, r3
+ 1e4:	mov	r5, r0
+ 1e6:	mov	r4, sl
+ 1e8:	sub	sp, #12
+ 1ea:	mov.w	r9, lr, asr #1
+ 1ee:	cmp.w	r9, #0
+ 1f2:	ble.n	286 <cfft128+0xb2>
+ 1f4:	mov	r7, r5
+ 1f6:	mov.w	r8, #0
+ 1fa:	strd	r1, r2, [sp]
+ 1fe:	lsls	r3, r1, #3
+ 200:	add.w	ip, r4, #4
+ 204:	mov.w	r6, lr, lsl #3
+ 208:	mov.w	sl, r9, lsl #3
+ 20c:	vldr	s9, [ip, #-4]
+ 210:	vldr	s10, [ip]
+ 214:	mov	r0, r7
+ 216:	mov	fp, r8
+ 218:	add.w	r2, sl, r7
+ 21c:	adds	r1, r7, #4
+ 21e:	vldr	s13, [r2]
+ 222:	vldr	s15, [r2, #4]
+ 226:	vmul.f32	s14, s13, s9
+ 22a:	vmul.f32	s8, s15, s10
+ 22e:	vmul.f32	s13, s13, s10
+ 232:	vmul.f32	s15, s15, s9
+ 236:	vldr	s11, [r1, #-4]
+ 23a:	vldr	s12, [r0, #4]
+ 23e:	vsub.f32	s14, s14, s8
+ 242:	vadd.f32	s15, s15, s13
+ 246:	vsub.f32	s8, s11, s14
+ 24a:	vsub.f32	s13, s12, s15
+ 24e:	vadd.f32	s14, s14, s11
+ 252:	vadd.f32	s15, s15, s12
+ 256:	add	fp, lr
+ 258:	cmp.w	fp, #127	@ 0x7f
+ 25c:	vstr	s8, [r2]
+ 260:	vstr	s13, [r2, #4]
+ 264:	vstr	s14, [r1, #-4]
+ 268:	add	r2, r6
+ 26a:	vstr	s15, [r0, #4]
+ 26e:	add	r1, r6
+ 270:	add	r0, r6
+ 272:	ble.n	21e <cfft128+0x4a>
+ 274:	add.w	r8, r8, #1
+ 278:	cmp	r9, r8
+ 27a:	add.w	r7, r7, #8
+ 27e:	add	ip, r3
+ 280:	bne.n	20c <cfft128+0x38>
+ 282:	ldrd	r1, r2, [sp]
+ 286:	subs	r2, #1
+ 288:	mov.w	lr, lr, lsl #1
+ 28c:	mov.w	r1, r1, asr #1
+ 290:	bne.n	1ea <cfft128+0x16>
+ 292:	add	sp, #12
+ 294:	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+
+00000298 <rsplit256>:
+ 298:	vldr	s15, [r0]
+ 29c:	vldr	s13, [r0, #4]
+ 2a0:	vldr	s14, [r0, #516]	@ 0x204
+ 2a4:	vadd.f32	s12, s15, s13
+ 2a8:	vneg.f32	s14, s14
+ 2ac:	vsub.f32	s15, s15, s13
+ 2b0:	vmov.f32	s10, #96	@ 0x3f000000  0.5
+ 2b4:	vmov.f32	s6, #224	@ 0xbf000000 -0.5
+ 2b8:	mov	r3, r0
+ 2ba:	mov	r2, r0
+ 2bc:	vstr	s12, [r0]
+ 2c0:	vstr	s15, [r0, #4]
+ 2c4:	vstr	s14, [r0, #516]	@ 0x204
+ 2c8:	add.w	ip, r0, #504	@ 0x1f8
+ 2cc:	vldr	s15, [r3, #8]
+ 2d0:	vldr	s14, [r3, #12]
+ 2d4:	vldr	s11, [r2, #1016]	@ 0x3f8
+ 2d8:	vldr	s7, [r2, #1020]	@ 0x3fc
+ 2dc:	vsub.f32	s12, s15, s11
+ 2e0:	vadd.f32	s13, s14, s7
+ 2e4:	vldr	s8, [r1, #8]
+ 2e8:	vldr	s9, [r1, #12]
+ 2ec:	vmul.f32	s12, s12, s6
+ 2f0:	vmul.f32	s13, s13, s10
+ 2f4:	vsub.f32	s14, s14, s7
+ 2f8:	vadd.f32	s15, s15, s11
+ 2fc:	vmul.f32	s7, s13, s9
+ 300:	vmul.f32	s11, s12, s8
+ 304:	vmul.f32	s14, s14, s10
+ 308:	vadd.f32	s11, s11, s7
+ 30c:	vmul.f32	s12, s12, s9
+ 310:	vmul.f32	s13, s13, s8
+ 314:	vmul.f32	s15, s15, s10
+ 318:	vsub.f32	s13, s13, s12
+ 31c:	vsub.f32	s12, s14, s11
+ 320:	vadd.f32	s14, s14, s11
+ 324:	vadd.f32	s11, s15, s13
+ 328:	vsub.f32	s15, s15, s13
+ 32c:	vneg.f32	s13, s12
+ 330:	adds	r3, #8
+ 332:	cmp	ip, r3
+ 334:	vstr	s14, [r3, #4]
+ 338:	vstr	s11, [r3]
+ 33c:	add.w	r1, r1, #8
+ 340:	vstr	s15, [r2, #1016]	@ 0x3f8
+ 344:	vstr	s13, [r2, #1020]	@ 0x3fc
+ 348:	sub.w	r2, r2, #8
+ 34c:	bne.n	2cc <rsplit256+0x34>
+ 34e:	bx	lr
+
+00000350 <b_bands>:
+ 350:	push	{r4, r5, lr}
+ 352:	ldr	r4, [sp, #12]
+ 354:	mov.w	lr, #0
+ 358:	mov	ip, r4
+ 35a:	add.w	r5, r4, #64	@ 0x40
+ 35e:	str.w	lr, [ip], #4
+ 362:	cmp	ip, r5
+ 364:	str.w	lr, [ip, #60]	@ 0x3c
+ 368:	bne.n	35e <b_bands+0xe>
+ 36a:	add.w	ip, r3, #4294967295	@ 0xffffffff
+ 36e:	add.w	lr, r0, #672	@ 0x2a0
+ 372:	vldr	s15, [r0, #208]	@ 0xd0
+ 376:	vldr	s14, [r0, #212]	@ 0xd4
+ 37a:	vmul.f32	s15, s15, s15
+ 37e:	vmul.f32	s14, s14, s14
+ 382:	vldmia	r1!, {s11}
+ 386:	vadd.f32	s15, s15, s14
+ 38a:	ldrb.w	r3, [ip, #1]!
+ 38e:	vmul.f32	s15, s15, s11
+ 392:	add.w	r3, r4, r3, lsl #2
+ 396:	vldr	s12, [r3]
+ 39a:	vadd.f32	s14, s12, s15
+ 39e:	vstr	s14, [r3]
+ 3a2:	vldmia	r2!, {s14}
+ 3a6:	vldr	s13, [r3, #64]	@ 0x40
+ 3aa:	vmul.f32	s15, s14, s15
+ 3ae:	vadd.f32	s15, s13, s15
+ 3b2:	adds	r0, #8
+ 3b4:	cmp	lr, r0
+ 3b6:	vstr	s15, [r3, #64]	@ 0x40
+ 3ba:	bne.n	372 <b_bands+0x22>
+ 3bc:	pop	{r4, r5, pc}
+ 3be:	nop
+
+000003c0 <b_update>:
+ 3c0:	vpush	{d8-d9}
+ 3c4:	vldr	s0, [pc, #308]	@ 4fc <b_update+0x13c>
+ 3c8:	vldr	s1, [pc, #308]	@ 500 <b_update+0x140>
+ 3cc:	vldr	s2, [pc, #308]	@ 504 <b_update+0x144>
+ 3d0:	vldr	s3, [pc, #308]	@ 508 <b_update+0x148>
+ 3d4:	vldr	s4, [pc, #308]	@ 50c <b_update+0x14c>
+ 3d8:	vldr	s5, [pc, #308]	@ 510 <b_update+0x150>
+ 3dc:	vldr	s6, [pc, #308]	@ 514 <b_update+0x154>
+ 3e0:	vldr	s7, [pc, #308]	@ 518 <b_update+0x158>
+ 3e4:	vmov.f32	s8, #112	@ 0x3f800000  1.0
+ 3e8:	vldr	s9, [r0, #520]	@ 0x208
+ 3ec:	vldr	s10, [r0, #524]	@ 0x20c
+ 3f0:	vldr	s11, [r0, #540]	@ 0x21c
+ 3f4:	vldr	s12, [r0, #536]	@ 0x218
+ 3f8:	vldr	s13, [r0, #544]	@ 0x220
+ 3fc:	mov	r2, r0
+ 3fe:	add.w	ip, r0, #64	@ 0x40
+ 402:	vldmia	r2!, {s14}
+ 406:	vldr	s16, [r2, #124]	@ 0x7c
+ 40a:	vcmpe.f32	s14, s16
+ 40e:	vmrs	APSR_nzcv, fpscr
+ 412:	vsub.f32	s15, s14, s16
+ 416:	ite	gt
+ 418:	vldrgt	s18, [r0, #512]	@ 0x200
+ 41c:	vldrle	s18, [r0, #516]	@ 0x204
+ 420:	vmul.f32	s15, s15, s18
+ 424:	vadd.f32	s15, s15, s16
+ 428:	vmul.f32	s16, s9, s15
+ 42c:	vsub.f32	s16, s14, s16
+ 430:	vmaxnm.f32	s16, s16, s0
+ 434:	vstr	s15, [r2, #124]	@ 0x7c
+ 438:	vsqrt.f32	s15, s16
+ 43c:	vldr	s17, [r2, #188]	@ 0xbc
+ 440:	vmul.f32	s15, s15, s10
+ 444:	vadd.f32	s16, s14, s1
+ 448:	vcmpe.f32	s15, s17
+ 44c:	vsub.f32	s14, s15, s17
+ 450:	vldr	s15, [r2, #60]	@ 0x3c
+ 454:	vdiv.f32	s15, s15, s16
+ 458:	vmrs	APSR_nzcv, fpscr
+ 45c:	vmaxnm.f32	s15, s15, s2
+ 460:	ite	gt
+ 462:	vldrgt	s18, [r0, #528]	@ 0x210
+ 466:	vldrle	s18, [r0, #532]	@ 0x214
+ 46a:	ldr.w	r3, [r2, #380]	@ 0x17c
+ 46e:	vmul.f32	s14, s14, s18
+ 472:	str.w	r3, [r2, #316]	@ 0x13c
+ 476:	vmov	r3, s15
+ 47a:	ubfx	r1, r3, #0, #23
+ 47e:	orr.w	r1, r1, #1065353216	@ 0x3f800000
+ 482:	vadd.f32	s14, s14, s17
+ 486:	vstr	s17, [r2, #252]	@ 0xfc
+ 48a:	vmov	s17, r1
+ 48e:	vmul.f32	s16, s17, s3
+ 492:	asrs	r3, r3, #23
+ 494:	subs	r3, #127	@ 0x7f
+ 496:	vmov	s15, r3
+ 49a:	vstr	s14, [r2, #188]	@ 0xbc
+ 49e:	vadd.f32	s14, s16, s4
+ 4a2:	vcvt.f32.s32	s15, s15
+ 4a6:	vmul.f32	s14, s14, s17
+ 4aa:	vadd.f32	s15, s15, s14
+ 4ae:	vsub.f32	s15, s15, s5
+ 4b2:	vsub.f32	s15, s15, s12
+ 4b6:	vmul.f32	s15, s15, s11
+ 4ba:	vrintm.f32	s14, s15
+ 4be:	vsub.f32	s15, s15, s14
+ 4c2:	vcvt.s32.f32	s14, s14
+ 4c6:	vmov	r3, s14
+ 4ca:	vmul.f32	s14, s15, s6
+ 4ce:	vadd.f32	s14, s14, s7
+ 4d2:	vmul.f32	s15, s14, s15
+ 4d6:	adds	r3, #127	@ 0x7f
+ 4d8:	lsls	r3, r3, #23
+ 4da:	vadd.f32	s15, s15, s8
+ 4de:	vmov	s14, r3
+ 4e2:	vmul.f32	s15, s15, s14
+ 4e6:	vmul.f32	s15, s15, s13
+ 4ea:	vcvt.u32.f32	s15, s15
+ 4ee:	cmp	ip, r2
+ 4f0:	vstr	s15, [r2, #380]	@ 0x17c
+ 4f4:	bne.n	402 <b_update+0x42>
+ 4f6:	vpop	{d8-d9}
+ 4fa:	bx	lr
+ 4fc:	.word	0x00000000
+ 500:	.word	0x0da24260
+ 504:	.word	0x469c4000
+ 508:	.word	0xbeb08ff9
+ 50c:	.word	0x40019420
+ 510:	.word	0x3f2cc4c7
+ 514:	.word	0x3eafdf3b
+ 518:	.word	0x3f281062
+
+0000051c <b_synth>:
+ 51c:	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, lr}
+ 520:	mov	r3, r2
+ 522:	movs	r6, #0
+ 524:	add.w	r5, r2, #32
+ 528:	str.w	r6, [r3], #4
+ 52c:	cmp	r5, r3
+ 52e:	bne.n	528 <b_synth+0xc>
+ 530:	vldr	s2, [r2]
+ 534:	vldr	s3, [r2, #4]
+ 538:	vldr	s4, [r2, #8]
+ 53c:	vldr	s5, [r2, #12]
+ 540:	vldr	s6, [r2, #16]
+ 544:	vldr	s7, [r2, #20]
+ 548:	vldr	s8, [r2, #24]
+ 54c:	vldr	s9, [r2, #28]
+ 550:	vmov.f32	s1, #64	@ 0x3e000000  0.125
+ 554:	add.w	lr, r0, #192	@ 0xc0
+ 558:	add.w	r4, r0, #256	@ 0x100
+ 55c:	mov	r3, lr
+ 55e:	vldr	s14, [lr, #64]	@ 0x40
+ 562:	vldr	s15, [r3]
+ 566:	vsub.f32	s15, s15, s14
+ 56a:	vmul.f32	s15, s15, s1
+ 56e:	ldr.w	r0, [lr, #128]	@ 0x80
+ 572:	ldr.w	r5, [lr, #192]	@ 0xc0
+ 576:	ldr.w	r3, [lr, #256]	@ 0x100
+ 57a:	sub.w	ip, r5, r0
+ 57e:	add.w	r0, r0, ip, asr #3
+ 582:	add	r3, r0
+ 584:	lsrs	r5, r3, #22
+ 586:	add.w	r5, r1, r5, lsl #2
+ 58a:	vldr	s13, [r5]
+ 58e:	vadd.f32	s14, s14, s15
+ 592:	vmul.f32	s13, s14, s13
+ 596:	vadd.f32	s2, s2, s13
+ 59a:	vstr	s2, [r2]
+ 59e:	add.w	r0, r0, ip, asr #3
+ 5a2:	add	r3, r0
+ 5a4:	lsrs	r5, r3, #22
+ 5a6:	add.w	r5, r1, r5, lsl #2
+ 5aa:	vldr	s13, [r5]
+ 5ae:	vadd.f32	s14, s15, s14
+ 5b2:	vadd.f32	s10, s15, s14
+ 5b6:	vmul.f32	s14, s14, s13
+ 5ba:	vadd.f32	s3, s3, s14
+ 5be:	vstr	s3, [r2, #4]
+ 5c2:	add.w	r0, r0, ip, asr #3
+ 5c6:	add	r3, r0
+ 5c8:	lsrs	r6, r3, #22
+ 5ca:	add.w	r6, r1, r6, lsl #2
+ 5ce:	vldr	s0, [r6]
+ 5d2:	vadd.f32	s11, s15, s10
+ 5d6:	vmul.f32	s10, s10, s0
+ 5da:	vadd.f32	s4, s4, s10
+ 5de:	add.w	r0, r0, ip, asr #3
+ 5e2:	add	r3, r0
+ 5e4:	lsrs	r7, r3, #22
+ 5e6:	vstr	s4, [r2, #8]
+ 5ea:	add.w	r7, r1, r7, lsl #2
+ 5ee:	vldr	s10, [r7]
+ 5f2:	vadd.f32	s12, s15, s11
+ 5f6:	vmul.f32	s11, s11, s10
+ 5fa:	vadd.f32	s5, s5, s11
+ 5fe:	vstr	s5, [r2, #12]
+ 602:	add.w	r0, r0, ip, asr #3
+ 606:	add	r3, r0
+ 608:	mov.w	r8, r3, lsr #22
+ 60c:	add.w	r8, r1, r8, lsl #2
+ 610:	vldr	s11, [r8]
+ 614:	vadd.f32	s13, s15, s12
+ 618:	vmul.f32	s12, s12, s11
+ 61c:	vadd.f32	s6, s6, s12
+ 620:	vstr	s6, [r2, #16]
+ 624:	add.w	r0, r0, ip, asr #3
+ 628:	add	r3, r0
+ 62a:	mov.w	r9, r3, lsr #22
+ 62e:	add.w	r9, r1, r9, lsl #2
+ 632:	vldr	s12, [r9]
+ 636:	vadd.f32	s14, s15, s13
+ 63a:	vmul.f32	s13, s13, s12
+ 63e:	vadd.f32	s7, s7, s13
+ 642:	vstr	s7, [r2, #20]
+ 646:	add.w	r0, r0, ip, asr #3
+ 64a:	add	r3, r0
+ 64c:	mov.w	sl, r3, lsr #22
+ 650:	add.w	sl, r1, sl, lsl #2
+ 654:	vldr	s13, [sl]
+ 658:	vadd.f32	s15, s15, s14
+ 65c:	vmul.f32	s14, s14, s13
+ 660:	vadd.f32	s8, s8, s14
+ 664:	vstr	s8, [r2, #24]
+ 668:	add.w	r0, r0, ip, asr #3
+ 66c:	add	r0, r3
+ 66e:	lsrs	r3, r0, #22
+ 670:	add.w	r3, r1, r3, lsl #2
+ 674:	vldr	s14, [r3]
+ 678:	vmul.f32	s15, s15, s14
+ 67c:	vadd.f32	s9, s9, s15
+ 680:	add.w	lr, lr, #4
+ 684:	cmp	r4, lr
+ 686:	vstr	s9, [r2, #28]
+ 68a:	str.w	r0, [lr, #252]	@ 0xfc
+ 68e:	bne.w	55c <b_synth+0x40>
+ 692:	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, pc}
+ 696:	nop
+
+00000698 <a_mix>:
+ 698:	push	{r4, r5, r6, r7, lr}
+ 69a:	ldrd	r7, r5, [r2]
+ 69e:	mov	lr, r7
+ 6a0:	mov	r6, r2
+ 6a2:	mov	r4, r1
+ 6a4:	sub.w	ip, r0, #4
+ 6a8:	add.w	r1, r0, #508	@ 0x1fc
+ 6ac:	adds	r2, #68	@ 0x44
+ 6ae:	ldr.w	r3, [ip, #4]!
+ 6b2:	add	lr, r5
+ 6b4:	asrs	r3, r3, #8
+ 6b6:	vmov	s15, r3
+ 6ba:	mov.w	r0, lr, lsr #22
+ 6be:	add.w	r0, r4, r0, lsl #2
+ 6c2:	vldr	s14, [r0]
+ 6c6:	vcvt.f32.s32	s15, s15
+ 6ca:	vmul.f32	s15, s14, s15
+ 6ce:	cmp	r1, ip
+ 6d0:	vstmia	r2!, {s15}
+ 6d4:	bne.n	6ae <a_mix+0x16>
+ 6d6:	add.w	r7, r7, r5, lsl #7
+ 6da:	str	r7, [r6, #0]
+ 6dc:	pop	{r4, r5, r6, r7, pc}
+ 6de:	nop
+
+000006e0 <a_decim>:
+ 6e0:	stmdb	sp!, {r4, r5, r6, r7, r8, r9, lr}
+ 6e4:	mov	lr, r2
+ 6e6:	mov	r5, r1
+ 6e8:	add.w	r1, lr, #736	@ 0x2e0
+ 6ec:	vpush	{d8-d15}
+ 6f0:	mov	r2, r0
+ 6f2:	mov	r4, r3
+ 6f4:	vldr	s31, [pc, #704]	@ 9b8 <a_decim+0x2d8>
+ 6f8:	vldr	s29, [lr, #20]
+ 6fc:	vldr	s19, [lr, #36]	@ 0x24
+ 700:	vldr	s0, [lr, #52]	@ 0x34
+ 704:	vldr	s28, [lr, #16]
+ 708:	vldr	s18, [lr, #32]
+ 70c:	vldr	s22, [lr, #48]	@ 0x30
+ 710:	vldr	s27, [lr, #12]
+ 714:	vldr	s17, [lr, #28]
+ 718:	vldr	s21, [lr, #44]	@ 0x2c
+ 71c:	vldr	s26, [lr, #8]
+ 720:	vldr	s16, [lr, #24]
+ 724:	vldr	s20, [lr, #40]	@ 0x28
+ 728:	mov	r0, r1
+ 72a:	mov	r3, lr
+ 72c:	add.w	r6, lr, #512	@ 0x200
+ 730:	b.n	73e <a_decim+0x5e>
+ 732:	vmov.f32	s20, s25
+ 736:	vmov.f32	s21, s24
+ 73a:	vmov.f32	s22, s23
+ 73e:	vldr	s1, [r2]
+ 742:	vldr	s2, [r2, #4]
+ 746:	vmul.f32	s1, s26, s1
+ 74a:	vldr	s3, [r2, #8]
+ 74e:	vmul.f32	s2, s27, s2
+ 752:	vadd.f32	s1, s1, s31
+ 756:	vldr	s4, [r2, #12]
+ 75a:	vmul.f32	s3, s28, s3
+ 75e:	vadd.f32	s2, s2, s1
+ 762:	vldr	s5, [r2, #16]
+ 766:	vmul.f32	s4, s29, s4
+ 76a:	vadd.f32	s3, s3, s2
+ 76e:	vldr	s6, [r2, #20]
+ 772:	vmul.f32	s5, s16, s5
+ 776:	vadd.f32	s4, s4, s3
+ 77a:	vldr	s7, [r2, #24]
+ 77e:	vmul.f32	s6, s17, s6
+ 782:	vadd.f32	s5, s5, s4
+ 786:	vldr	s8, [r2, #28]
+ 78a:	vmul.f32	s7, s18, s7
+ 78e:	vadd.f32	s6, s6, s5
+ 792:	vldr	s9, [r2, #32]
+ 796:	vmul.f32	s8, s19, s8
+ 79a:	vadd.f32	s7, s7, s6
+ 79e:	vldr	s10, [r2, #36]	@ 0x24
+ 7a2:	vmul.f32	s9, s20, s9
+ 7a6:	vadd.f32	s8, s8, s7
+ 7aa:	vldr	s11, [r2, #40]	@ 0x28
+ 7ae:	vmul.f32	s10, s21, s10
+ 7b2:	vadd.f32	s9, s9, s8
+ 7b6:	vldr	s12, [r2, #44]	@ 0x2c
+ 7ba:	vmul.f32	s11, s22, s11
+ 7be:	vadd.f32	s10, s10, s9
+ 7c2:	vldr	s25, [r3, #56]	@ 0x38
+ 7c6:	vldr	s13, [r2, #48]	@ 0x30
+ 7ca:	vmul.f32	s12, s0, s12
+ 7ce:	vadd.f32	s11, s11, s10
+ 7d2:	vldr	s24, [r3, #60]	@ 0x3c
+ 7d6:	vldr	s14, [r2, #52]	@ 0x34
+ 7da:	vmul.f32	s13, s25, s13
+ 7de:	vadd.f32	s12, s12, s11
+ 7e2:	vldr	s23, [r3, #64]	@ 0x40
+ 7e6:	vldr	s15, [r2, #56]	@ 0x38
+ 7ea:	vmul.f32	s14, s24, s14
+ 7ee:	vadd.f32	s13, s13, s12
+ 7f2:	adds	r3, #16
+ 7f4:	vmov.f32	s30, s0
+ 7f8:	vmul.f32	s15, s23, s15
+ 7fc:	vldr	s0, [r3, #52]	@ 0x34
+ 800:	vmov.f32	s26, s16
+ 804:	vadd.f32	s14, s14, s13
+ 808:	vmov.f32	s16, s20
+ 80c:	vldr	s20, [r2, #60]	@ 0x3c
+ 810:	vadd.f32	s15, s15, s14
+ 814:	vmul.f32	s20, s0, s20
+ 818:	vadd.f32	s15, s20, s15
+ 81c:	cmp	r6, r3
+ 81e:	vmov.f32	s29, s19
+ 822:	vmov.f32	s28, s18
+ 826:	vmov.f32	s27, s17
+ 82a:	vmov.f32	s18, s22
+ 82e:	vmov.f32	s17, s21
+ 832:	vmov.f32	s19, s30
+ 836:	vstmia	r0!, {s15}
+ 83a:	bne.w	732 <a_decim+0x52>
+ 83e:	add.w	r3, lr, #580	@ 0x244
+ 842:	mov	r6, r3
+ 844:	add.w	ip, r5, #160	@ 0xa0
+ 848:	add.w	r7, r4, #32
+ 84c:	sub.w	r2, ip, r5
+ 850:	subs	r2, #4
+ 852:	lsrs	r2, r2, #2
+ 854:	adds	r2, #1
+ 856:	ands.w	r2, r2, #7
+ 85a:	mov	r9, r5
+ 85c:	mov	r0, r6
+ 85e:	vldr	s15, [pc, #344]	@ 9b8 <a_decim+0x2d8>
+ 862:	beq.n	8f0 <a_decim+0x210>
+ 864:	cmp	r2, #1
+ 866:	beq.n	8dc <a_decim+0x1fc>
+ 868:	cmp	r2, #2
+ 86a:	beq.n	8cc <a_decim+0x1ec>
+ 86c:	cmp	r2, #3
+ 86e:	beq.n	8bc <a_decim+0x1dc>
+ 870:	cmp	r2, #4
+ 872:	beq.n	8ac <a_decim+0x1cc>
+ 874:	cmp	r2, #5
+ 876:	beq.n	89c <a_decim+0x1bc>
+ 878:	cmp	r2, #6
+ 87a:	beq.n	88c <a_decim+0x1ac>
+ 87c:	vldmia	r9!, {s12}
+ 880:	vldmia	r0!, {s13}
+ 884:	vmul.f32	s14, s12, s13
+ 888:	vadd.f32	s15, s15, s14
+ 88c:	vldmia	r9!, {s12}
+ 890:	vldmia	r0!, {s13}
+ 894:	vmul.f32	s14, s12, s13
+ 898:	vadd.f32	s15, s15, s14
+ 89c:	vldmia	r9!, {s12}
+ 8a0:	vldmia	r0!, {s13}
+ 8a4:	vmul.f32	s14, s12, s13
+ 8a8:	vadd.f32	s15, s15, s14
+ 8ac:	vldmia	r9!, {s12}
+ 8b0:	vldmia	r0!, {s13}
+ 8b4:	vmul.f32	s14, s12, s13
+ 8b8:	vadd.f32	s15, s15, s14
+ 8bc:	vldmia	r9!, {s12}
+ 8c0:	vldmia	r0!, {s13}
+ 8c4:	vmul.f32	s14, s12, s13
+ 8c8:	vadd.f32	s15, s15, s14
+ 8cc:	vldmia	r9!, {s12}
+ 8d0:	vldmia	r0!, {s13}
+ 8d4:	vmul.f32	s14, s12, s13
+ 8d8:	vadd.f32	s15, s15, s14
+ 8dc:	vldmia	r9!, {s12}
+ 8e0:	vldmia	r0!, {s13}
+ 8e4:	vmul.f32	s14, s12, s13
+ 8e8:	cmp	ip, r9
+ 8ea:	vadd.f32	s15, s15, s14
+ 8ee:	beq.n	980 <a_decim+0x2a0>
+ 8f0:	mov	r2, r9
+ 8f2:	mov	r8, r0
+ 8f4:	vldmia	r2!, {s12}
+ 8f8:	vldmia	r8!, {s13}
+ 8fc:	vmul.f32	s14, s12, s13
+ 900:	vldr	s12, [r9, #4]
+ 904:	vldr	s13, [r0, #4]
+ 908:	vadd.f32	s15, s15, s14
+ 90c:	vmul.f32	s14, s12, s13
+ 910:	vldr	s12, [r2, #4]
+ 914:	vldr	s13, [r8, #4]
+ 918:	vadd.f32	s15, s15, s14
+ 91c:	vmul.f32	s14, s12, s13
+ 920:	vldr	s12, [r2, #8]
+ 924:	vldr	s13, [r8, #8]
+ 928:	vadd.f32	s15, s15, s14
+ 92c:	vmul.f32	s14, s12, s13
+ 930:	vldr	s12, [r2, #12]
+ 934:	vldr	s13, [r8, #12]
+ 938:	vadd.f32	s15, s15, s14
+ 93c:	vmul.f32	s14, s12, s13
+ 940:	vldr	s12, [r2, #16]
+ 944:	vldr	s13, [r8, #16]
+ 948:	vadd.f32	s15, s15, s14
+ 94c:	vmul.f32	s14, s12, s13
+ 950:	vldr	s12, [r2, #20]
+ 954:	vldr	s13, [r8, #20]
+ 958:	vadd.f32	s15, s15, s14
+ 95c:	vmul.f32	s14, s12, s13
+ 960:	vldr	s12, [r2, #24]
+ 964:	vldr	s13, [r8, #24]
+ 968:	vadd.f32	s15, s15, s14
+ 96c:	vmul.f32	s14, s12, s13
+ 970:	add.w	r9, r2, #28
+ 974:	cmp	ip, r9
+ 976:	vadd.f32	s15, s15, s14
+ 97a:	add.w	r0, r8, #28
+ 97e:	bne.n	8f0 <a_decim+0x210>
+ 980:	vstmia	r4!, {s15}
+ 984:	cmp	r7, r4
+ 986:	add.w	r6, r6, #16
+ 98a:	bne.w	84c <a_decim+0x16c>
+ 98e:	add.w	r2, lr, #8
+ 992:	add.w	lr, lr, #68	@ 0x44
+ 996:	ldr.w	r0, [r2, #512]	@ 0x200
+ 99a:	str.w	r0, [r2], #4
+ 99e:	cmp	lr, r2
+ 9a0:	bne.n	996 <a_decim+0x2b6>
+ 9a2:	ldr.w	r2, [r3, #128]	@ 0x80
+ 9a6:	str.w	r2, [r3], #4
+ 9aa:	cmp	r1, r3
+ 9ac:	bne.n	9a2 <a_decim+0x2c2>
+ 9ae:	vpop	{d8-d15}
+ 9b2:	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, pc}
+ 9b6:	nop
+ 9b8:	.word	0x00000000
+
+000009bc <a_post>:
+ 9bc:	vpush	{d8-d9}
+ 9c0:	vldr	s0, [pc, #188]	@ a80 <a_post+0xc4>
+ 9c4:	vldr	s17, [pc, #188]	@ a84 <a_post+0xc8>
+ 9c8:	vldr	s16, [pc, #188]	@ a88 <a_post+0xcc>
+ 9cc:	vmov.f32	s1, #112	@ 0x3f800000  1.0
+ 9d0:	vldr	s2, [r0, #864]	@ 0x360
+ 9d4:	vldr	s3, [r0, #868]	@ 0x364
+ 9d8:	vldr	s4, [r0, #872]	@ 0x368
+ 9dc:	vldr	s5, [r0, #876]	@ 0x36c
+ 9e0:	vldr	s6, [r0, #880]	@ 0x370
+ 9e4:	vldr	s7, [r0, #884]	@ 0x374
+ 9e8:	vldr	s8, [r0, #888]	@ 0x378
+ 9ec:	vldr	s14, [r0, #892]	@ 0x37c
+ 9f0:	vldr	s9, [r0, #896]	@ 0x380
+ 9f4:	add.w	r3, r1, #32
+ 9f8:	vldr	s15, [r1]
+ 9fc:	vmul.f32	s13, s2, s15
+ a00:	vadd.f32	s13, s13, s7
+ a04:	vmul.f32	s11, s4, s15
+ a08:	vmul.f32	s10, s3, s15
+ a0c:	vmul.f32	s7, s5, s13
+ a10:	vabs.f32	s15, s13
+ a14:	vsub.f32	s10, s10, s7
+ a18:	vsub.f32	s15, s15, s14
+ a1c:	vldr	s7, [r0, #904]	@ 0x388
+ a20:	vmul.f32	s15, s15, s7
+ a24:	vadd.f32	s14, s14, s15
+ a28:	vmul.f32	s15, s14, s17
+ a2c:	vadd.f32	s15, s15, s9
+ a30:	vldr	s12, [r0, #900]	@ 0x384
+ a34:	vminnm.f32	s9, s15, s14
+ a38:	vmul.f32	s18, s6, s13
+ a3c:	vmul.f32	s12, s9, s12
+ a40:	vadd.f32	s7, s10, s8
+ a44:	vsub.f32	s12, s14, s12
+ a48:	vsub.f32	s8, s11, s18
+ a4c:	vadd.f32	s11, s14, s16
+ a50:	vdiv.f32	s15, s12, s11
+ a54:	vmaxnm.f32	s15, s15, s0
+ a58:	vminnm.f32	s15, s15, s1
+ a5c:	vmul.f32	s15, s15, s13
+ a60:	vstmia	r1!, {s15}
+ a64:	cmp	r3, r1
+ a66:	bne.n	9f8 <a_post+0x3c>
+ a68:	vpop	{d8-d9}
+ a6c:	vstr	s7, [r0, #884]	@ 0x374
+ a70:	vstr	s8, [r0, #888]	@ 0x378
+ a74:	vstr	s14, [r0, #892]	@ 0x37c
+ a78:	vstr	s9, [r0, #896]	@ 0x380
+ a7c:	bx	lr
+ a7e:	nop
+ a80:	.word	0x00000000
+ a84:	.word	0x358637bd
+ a88:	.word	0x1e3ce508
+
+00000a8c <out_hop>:
+ a8c:	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ a90:	add.w	sl, r2, #12
+ a94:	vpush	{d8-d13}
+ a98:	mov	r6, r2
+ a9a:	mov	r8, r1
+ a9c:	mov	r2, sl
+ a9e:	mov	r7, r0
+ aa0:	mov	r5, r3
+ aa2:	sub	sp, #76	@ 0x4c
+ aa4:	mov	r3, r0
+ aa6:	adds	r0, #32
+ aa8:	ldr.w	r1, [r3], #4
+ aac:	cmp	r0, r3
+ aae:	str.w	r1, [r2], #4
+ ab2:	bne.n	aa8 <out_hop+0x1c>
+ ab4:	vldr	s11, [r6, #92]	@ 0x5c
+ ab8:	vldr	s21, [r6, #60]	@ 0x3c
+ abc:	vldr	s10, [r6, #64]	@ 0x40
+ ac0:	vldr	s13, [r6, #68]	@ 0x44
+ ac4:	vldr	s9, [r6, #48]	@ 0x30
+ ac8:	vldr	s17, [r6, #52]	@ 0x34
+ acc:	vldr	s20, [r6, #56]	@ 0x38
+ ad0:	vldr	s19, [r6, #100]	@ 0x64
+ ad4:	vldr	s0, [r6, #72]	@ 0x48
+ ad8:	vldr	s1, [r6, #76]	@ 0x4c
+ adc:	vldr	s2, [r6, #80]	@ 0x50
+ ae0:	vldr	s3, [r6, #88]	@ 0x58
+ ae4:	vldr	s4, [r6, #84]	@ 0x54
+ ae8:	vldr	s16, [r6, #96]	@ 0x60
+ aec:	vldr	s5, [pc, #380]	@ c6c <out_hop+0x1e0>
+ af0:	vmov.f32	s18, #112	@ 0x3f800000  1.0
+ af4:	vneg.f32	s6, s11
+ af8:	vldr	s7, [pc, #372]	@ c70 <out_hop+0x1e4>
+ afc:	vmov.f32	s8, #96	@ 0x3f000000  0.5
+ b00:	mov	ip, r6
+ b02:	mov	fp, r6
+ b04:	ldr	r1, [r6, #104]	@ 0x68
+ b06:	ldr	r4, [pc, #364]	@ (c74 <out_hop+0x1e8>)
+ b08:	ldr.w	lr, [pc, #364]	@ c78 <out_hop+0x1ec>
+ b0c:	subs	r5, #2
+ b0e:	add.w	r9, r6, #32
+ b12:	vldr	s26, [ip]
+ b16:	add	r2, sp, #8
+ b18:	vmov.f32	s22, s17
+ b1c:	mov	r3, r8
+ b1e:	mov	r0, r2
+ b20:	vldr	s25, [ip, #4]
+ b24:	vldr	s24, [ip, #8]
+ b28:	vldr	s23, [ip, #12]
+ b2c:	add.w	ip, ip, #4
+ b30:	str	r2, [sp, #4]
+ b32:	vldr	s27, [r3]
+ b36:	vldr	s12, [r3, #4]
+ b3a:	vmul.f32	s27, s26, s27
+ b3e:	vldr	s14, [r3, #8]
+ b42:	vmul.f32	s12, s25, s12
+ b46:	vadd.f32	s27, s27, s5
+ b4a:	vldr	s15, [r3, #12]
+ b4e:	vmul.f32	s14, s24, s14
+ b52:	vadd.f32	s12, s12, s27
+ b56:	vmul.f32	s15, s23, s15
+ b5a:	vadd.f32	s14, s14, s12
+ b5e:	vadd.f32	s15, s15, s14
+ b62:	vstmia	r0!, {s15}
+ b66:	vabs.f32	s15, s15
+ b6a:	add	r2, sp, #72	@ 0x48
+ b6c:	cmp	r2, r0
+ b6e:	vmaxnm.f32	s22, s15, s22
+ b72:	add.w	r3, r3, #16
+ b76:	bne.n	b32 <out_hop+0xa6>
+ b78:	vldmia	r7!, {s15}
+ b7c:	vmul.f32	s15, s15, s15
+ b80:	vsub.f32	s14, s18, s9
+ b84:	vsub.f32	s15, s15, s16
+ b88:	vmul.f32	s14, s14, s20
+ b8c:	vmul.f32	s15, s15, s19
+ b90:	vdiv.f32	s23, s17, s22
+ b94:	vadd.f32	s9, s14, s9
+ b98:	vadd.f32	s16, s16, s15
+ b9c:	vmov.f32	s12, s13
+ ba0:	ldr	r2, [sp, #4]
+ ba2:	vmov.f32	s13, s10
+ ba6:	mov	r0, r5
+ ba8:	vmov.f32	s10, s21
+ bac:	vminnm.f32	s9, s9, s23
+ bb0:	vstr	s16, [r6, #96]	@ 0x60
+ bb4:	str.w	r9, [sp, #4]
+ bb8:	b.n	bc2 <out_hop+0x136>
+ bba:	vmov.f32	s13, s10
+ bbe:	vmov.f32	s10, s21
+ bc2:	vldmia	r2!, {s14}
+ bc6:	vmul.f32	s23, s0, s21
+ bca:	vmul.f32	s14, s14, s9
+ bce:	vmul.f32	s21, s1, s13
+ bd2:	vadd.f32	s14, s14, s23
+ bd6:	mla	r9, r4, r1, lr
+ bda:	mla	r1, r4, r9, lr
+ bde:	lsrs	r3, r1, #9
+ be0:	rsb	r3, r3, r9, lsr #9
+ be4:	vmul.f32	s22, s2, s12
+ be8:	vmov	s15, r3
+ bec:	vadd.f32	s14, s14, s21
+ bf0:	vcvt.f32.s32	s15, s15
+ bf4:	vadd.f32	s14, s14, s22
+ bf8:	vmul.f32	s15, s15, s7
+ bfc:	vmul.f32	s21, s3, s14
+ c00:	vadd.f32	s15, s15, s21
+ c04:	vadd.f32	s15, s15, s8
+ c08:	vrintm.f32	s15, s15
+ c0c:	vmaxnm.f32	s15, s6, s15
+ c10:	vminnm.f32	s15, s11, s15
+ c14:	vadd.f32	s21, s11, s15
+ c18:	vcvt.s32.f32	s21, s21
+ c1c:	vmov	r3, s21
+ c20:	vmul.f32	s15, s4, s15
+ c24:	strh.w	r3, [r0, #2]!
+ c28:	add	r3, sp, #72	@ 0x48
+ c2a:	cmp	r3, r2
+ c2c:	vmov.f32	s12, s13
+ c30:	vsub.f32	s21, s15, s14
+ c34:	bne.n	bba <out_hop+0x12e>
+ c36:	ldr.w	r9, [sp, #4]
+ c3a:	adds	r5, #32
+ c3c:	cmp	r9, ip
+ c3e:	bne.w	b12 <out_hop+0x86>
+ c42:	mov	r2, fp
+ c44:	ldr	r3, [r2, #32]
+ c46:	str.w	r3, [r2], #4
+ c4a:	cmp	r2, sl
+ c4c:	bne.n	c44 <out_hop+0x1b8>
+ c4e:	vstr	s21, [r6, #60]	@ 0x3c
+ c52:	vstr	s10, [r6, #64]	@ 0x40
+ c56:	vstr	s13, [r6, #68]	@ 0x44
+ c5a:	vstr	s9, [r6, #48]	@ 0x30
+ c5e:	str	r1, [r6, #104]	@ 0x68
+ c60:	add	sp, #76	@ 0x4c
+ c62:	vpop	{d8-d13}
+ c66:	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+ c6a:	nop
+ c6c:	.word	0x00000000
+ c70:	.word	0x34000000
+ c74:	.word	0x0019660d
+ c78:	.word	0x3c6ef35f
+
+out/kernels_q15_slim.o:     file format elf32-littlearm
+
+
+Disassembly of section .text:
+
+00000000 <a_mix_q15>:
+   0:	push	{r4, r5, r6, r7, lr}
+   2:	ldrd	r7, r5, [r2]
+   6:	mov	lr, r7
+   8:	mov	r6, r2
+   a:	mov	r4, r1
+   c:	sub.w	ip, r0, #4
+  10:	add.w	r1, r0, #508	@ 0x1fc
+  14:	adds	r2, #38	@ 0x26
+  16:	add	lr, r5
+  18:	ldr.w	r0, [ip, #4]!
+  1c:	mov.w	r3, lr, lsr #22
+  20:	ldrsh.w	r3, [r4, r3, lsl #1]
+  24:	asrs	r0, r0, #16
+  26:	mul.w	r3, r0, r3
+  2a:	cmp	r1, ip
+  2c:	mov.w	r3, r3, asr #15
+  30:	strh.w	r3, [r2, #2]!
+  34:	bne.n	16 <a_mix_q15+0x16>
+  36:	add.w	r7, r7, r5, lsl #7
+  3a:	str	r7, [r6, #0]
+  3c:	pop	{r4, r5, r6, r7, pc}
+  3e:	nop
+
+00000040 <a_decim_q15>:
+  40:	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+  44:	mov.w	r8, #0
+  48:	mov	r6, r2
+  4a:	mov	r7, r3
+  4c:	add.w	ip, r2, #10
+  50:	add.w	r4, r2, #374	@ 0x176
+  54:	add.w	r5, r2, #438	@ 0x1b6
+  58:	ldr.w	fp, [ip]
+  5c:	ldr.w	lr, [r0]
+  60:	ldr.w	sl, [ip, #4]
+  64:	ldr	r2, [r0, #4]
+  66:	ldr.w	r9, [ip, #8]
+  6a:	ldr	r3, [r0, #8]
+  6c:	smlad	lr, lr, fp, r8
+  70:	smlad	r2, r2, sl, lr
+  74:	ldr.w	sl, [ip, #12]
+  78:	ldr.w	lr, [r0, #12]
+  7c:	smlad	r3, r3, r9, r2
+  80:	smlad	lr, lr, sl, r3
+  84:	ldr.w	sl, [ip, #16]
+  88:	ldr	r3, [r0, #16]
+  8a:	ldr.w	r9, [ip, #20]
+  8e:	ldr	r2, [r0, #20]
+  90:	smlad	r3, r3, sl, lr
+  94:	smlad	r2, r2, r9, r3
+  98:	ldr.w	sl, [ip, #24]
+  9c:	ldr	r3, [r0, #24]
+  9e:	ldr.w	r9, [ip, #28]
+  a2:	ldr.w	lr, [r0, #28]
+  a6:	smlad	r3, r3, sl, r2
+  aa:	smlad	lr, lr, r9, r3
+  ae:	mov.w	lr, lr, asr #15
+  b2:	strh.w	lr, [r4, #2]!
+  b6:	cmp	r5, r4
+  b8:	add.w	ip, ip, #8
+  bc:	bne.n	58 <a_decim_q15+0x18>
+  be:	mov.w	ip, #0
+  c2:	add.w	r0, r6, #298	@ 0x12a
+  c6:	subs	r7, #2
+  c8:	add.w	lr, r6, #362	@ 0x16a
+  cc:	ldr	r3, [r0, #0]
+  ce:	ldr	r5, [r1, #0]
+  d0:	ldr.w	sl, [r0, #4]
+  d4:	ldr	r4, [r1, #4]
+  d6:	ldr.w	r8, [r0, #8]
+  da:	smlad	r5, r5, r3, ip
+  de:	ldr	r2, [r1, #8]
+  e0:	ldr.w	r9, [r0, #12]
+  e4:	smlad	r4, r4, sl, r5
+  e8:	ldr	r3, [r1, #12]
+  ea:	ldr.w	sl, [r0, #16]
+  ee:	smlad	r2, r2, r8, r4
+  f2:	ldr	r5, [r1, #16]
+  f4:	ldr.w	r8, [r0, #20]
+  f8:	smlad	r3, r3, r9, r2
+  fc:	ldr	r4, [r1, #20]
+  fe:	smlad	r5, r5, sl, r3
+ 102:	ldr	r2, [r1, #24]
+ 104:	ldr.w	sl, [r0, #24]
+ 108:	ldr.w	r9, [r0, #28]
+ 10c:	smlad	r4, r4, r8, r5
+ 110:	ldr	r3, [r1, #28]
+ 112:	smlad	r2, r2, sl, r4
+ 116:	ldr	r5, [r1, #32]
+ 118:	ldr.w	sl, [r0, #32]
+ 11c:	ldr.w	r8, [r0, #36]	@ 0x24
+ 120:	smlad	r3, r3, r9, r2
+ 124:	ldr	r4, [r1, #36]	@ 0x24
+ 126:	smlad	r5, r5, sl, r3
+ 12a:	ldr	r2, [r1, #40]	@ 0x28
+ 12c:	ldr.w	sl, [r0, #40]	@ 0x28
+ 130:	ldr.w	r9, [r0, #44]	@ 0x2c
+ 134:	smlad	r4, r4, r8, r5
+ 138:	ldr	r3, [r1, #44]	@ 0x2c
+ 13a:	smlad	r2, r2, sl, r4
+ 13e:	ldr	r5, [r1, #48]	@ 0x30
+ 140:	ldr.w	sl, [r0, #48]	@ 0x30
+ 144:	ldr.w	r8, [r0, #52]	@ 0x34
+ 148:	smlad	r3, r3, r9, r2
+ 14c:	ldr	r4, [r1, #52]	@ 0x34
+ 14e:	smlad	r5, r5, sl, r3
+ 152:	ldr	r2, [r1, #56]	@ 0x38
+ 154:	ldr.w	sl, [r0, #56]	@ 0x38
+ 158:	ldr.w	r9, [r0, #60]	@ 0x3c
+ 15c:	smlad	r4, r4, r8, r5
+ 160:	ldr	r3, [r1, #60]	@ 0x3c
+ 162:	smlad	r2, r2, sl, r4
+ 166:	ldr	r5, [r1, #64]	@ 0x40
+ 168:	ldr.w	sl, [r0, #64]	@ 0x40
+ 16c:	ldr.w	r8, [r0, #68]	@ 0x44
+ 170:	smlad	r3, r3, r9, r2
+ 174:	ldr	r4, [r1, #68]	@ 0x44
+ 176:	smlad	r5, r5, sl, r3
+ 17a:	ldr	r2, [r1, #72]	@ 0x48
+ 17c:	ldr.w	sl, [r0, #72]	@ 0x48
+ 180:	ldr.w	r9, [r0, #76]	@ 0x4c
+ 184:	ldr	r3, [r1, #76]	@ 0x4c
+ 186:	smlad	r4, r4, r8, r5
+ 18a:	smlad	r2, r2, sl, r4
+ 18e:	smlad	r3, r3, r9, r2
+ 192:	adds	r0, #8
+ 194:	asrs	r3, r3, #15
+ 196:	cmp	r0, lr
+ 198:	strh.w	r3, [r7, #2]!
+ 19c:	bne.n	cc <a_decim_q15+0x8c>
+ 19e:	add.w	r3, r6, #8
+ 1a2:	add.w	r1, r6, #40	@ 0x28
+ 1a6:	ldr.w	r2, [r3, #256]	@ 0x100
+ 1aa:	str.w	r2, [r3], #4
+ 1ae:	cmp	r3, r1
+ 1b0:	bne.n	1a6 <a_decim_q15+0x166>
+ 1b2:	add.w	r3, r6, #296	@ 0x128
+ 1b6:	add.w	r6, r6, #376	@ 0x178
+ 1ba:	ldr	r2, [r3, #64]	@ 0x40
+ 1bc:	str.w	r2, [r3], #4
+ 1c0:	cmp	r3, r6
+ 1c2:	bne.n	1ba <a_decim_q15+0x17a>
+ 1c4:	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+
+000001c8 <out_hop_q15>:
+ 1c8:	stmdb	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, lr}
+ 1cc:	mov	r4, r2
+ 1ce:	sub	sp, #124	@ 0x7c
+ 1d0:	strd	r2, r1, [sp, #28]
+ 1d4:	mov	r1, r4
+ 1d6:	adds	r1, #4
+ 1d8:	subs	r2, r0, #2
+ 1da:	add.w	r5, r0, #14
+ 1de:	mov	r0, r1
+ 1e0:	ldrsh.w	r4, [r2, #2]!
+ 1e4:	cmp	r5, r2
+ 1e6:	strh.w	r4, [r0, #2]!
+ 1ea:	bne.n	1e0 <out_hop_q15+0x18>
+ 1ec:	subs	r3, #2
+ 1ee:	str	r3, [sp, #8]
+ 1f0:	movs	r3, #0
+ 1f2:	ldr	r4, [sp, #28]
+ 1f4:	str	r3, [sp, #4]
+ 1f6:	ldr	r5, [r4, #28]
+ 1f8:	ldr	r3, [r4, #32]
+ 1fa:	ldr.w	ip, [r4, #56]	@ 0x38
+ 1fe:	ldr	r2, [r4, #36]	@ 0x24
+ 200:	ldr.w	r9, [r4, #24]
+ 204:	ldr	r0, [r4, #60]	@ 0x3c
+ 206:	str	r3, [sp, #48]	@ 0x30
+ 208:	ldrd	r7, lr, [r4, #40]	@ 0x28
+ 20c:	ldrd	r3, r6, [r4, #48]	@ 0x30
+ 210:	lsls	r4, r5, #15
+ 212:	str	r4, [sp, #36]	@ 0x24
+ 214:	mov	r4, ip
+ 216:	str	r5, [sp, #44]	@ 0x2c
+ 218:	str	r6, [sp, #40]	@ 0x28
+ 21a:	add.w	r8, sp, #116	@ 0x74
+ 21e:	str	r1, [sp, #52]	@ 0x34
+ 220:	ldr	r1, [sp, #32]
+ 222:	ldr	r6, [sp, #4]
+ 224:	str	r1, [sp, #12]
+ 226:	ldr	r1, [sp, #28]
+ 228:	add	r5, sp, #52	@ 0x34
+ 22a:	add.w	sl, r1, r6, lsl #1
+ 22e:	ldr.w	fp, [sl, #4]
+ 232:	ldr.w	sl, [r1, r6, lsl #1]
+ 236:	mov	r6, r5
+ 238:	strd	r9, r0, [sp, #20]
+ 23c:	ldr.w	ip, [sp, #44]	@ 0x2c
+ 240:	ldr	r1, [sp, #12]
+ 242:	str	r5, [sp, #16]
+ 244:	movs	r0, #0
+ 246:	ldr.w	r9, [r1]
+ 24a:	adds	r1, #8
+ 24c:	smlad	r9, r9, sl, r0
+ 250:	ldr.w	r0, [r1, #-4]
+ 254:	smlad	r0, r0, fp, r9
+ 258:	asrs	r0, r0, #15
+ 25a:	cmp	r0, #0
+ 25c:	str.w	r0, [r6, #4]!
+ 260:	it	lt
+ 262:	neglt	r0, r0
+ 264:	cmp	ip, r0
+ 266:	it	lt
+ 268:	movlt	ip, r0
+ 26a:	cmp	r8, r6
+ 26c:	bne.n	244 <out_hop_q15+0x7c>
+ 26e:	ldr	r1, [sp, #36]	@ 0x24
+ 270:	ldr	r6, [sp, #48]	@ 0x30
+ 272:	sdiv	ip, r1, ip
+ 276:	ldrd	r9, r0, [sp, #20]
+ 27a:	rsb	r1, r9, #32768	@ 0x8000
+ 27e:	mul.w	r1, r6, r1
+ 282:	add.w	r1, r9, r1, asr #15
+ 286:	cmp	ip, r1
+ 288:	it	ge
+ 28a:	movge	ip, r1
+ 28c:	mov	sl, lr
+ 28e:	mov	r9, ip
+ 290:	mov	lr, r7
+ 292:	mov	fp, r2
+ 294:	mov	r7, r2
+ 296:	ldr.w	ip, [sp, #8]
+ 29a:	ldr	r6, [sp, #40]	@ 0x28
+ 29c:	b.n	2a2 <out_hop_q15+0xda>
+ 29e:	mov	lr, r7
+ 2a0:	mov	r7, fp
+ 2a2:	ldr	r2, [pc, #156]	@ (340 <out_hop_q15+0x178>)
+ 2a4:	ldr	r1, [pc, #156]	@ (344 <out_hop_q15+0x17c>)
+ 2a6:	mla	r0, r1, r0, r2
+ 2aa:	mul.w	r2, lr, r6
+ 2ae:	mla	r2, fp, r3, r2
+ 2b2:	ldr.w	r1, [r5, #4]!
+ 2b6:	mla	r2, sl, r4, r2
+ 2ba:	mul.w	r1, r1, r9
+ 2be:	asrs	r2, r2, #12
+ 2c0:	add.w	r2, r2, r1, asr #15
+ 2c4:	movs	r1, #100	@ 0x64
+ 2c6:	mul.w	r1, r1, r2
+ 2ca:	ubfx	sl, r0, #16, #8
+ 2ce:	rsb	sl, sl, r0, lsr #24
+ 2d2:	add.w	r1, r1, sl, lsl #7
+ 2d6:	mvn.w	sl, #99	@ 0x63
+ 2da:	add.w	r1, r1, #16384	@ 0x4000
+ 2de:	asrs	r1, r1, #15
+ 2e0:	cmp	r1, sl
+ 2e2:	it	lt
+ 2e4:	movlt	r1, sl
+ 2e6:	cmp	r1, #100	@ 0x64
+ 2e8:	it	ge
+ 2ea:	movge	r1, #100	@ 0x64
+ 2ec:	mov.w	fp, #328	@ 0x148
+ 2f0:	mul.w	fp, fp, r1
+ 2f4:	cmp	r8, r5
+ 2f6:	add.w	r1, r1, #100	@ 0x64
+ 2fa:	mov	sl, lr
+ 2fc:	sub.w	fp, fp, r2
+ 300:	strh.w	r1, [ip, #2]!
+ 304:	bne.n	29e <out_hop_q15+0xd6>
+ 306:	ldr	r1, [sp, #4]
+ 308:	ldr	r5, [sp, #8]
+ 30a:	adds	r1, #1
+ 30c:	adds	r5, #32
+ 30e:	cmp	r1, #8
+ 310:	mov	r2, fp
+ 312:	str	r1, [sp, #4]
+ 314:	str	r5, [sp, #8]
+ 316:	bne.n	220 <out_hop_q15+0x58>
+ 318:	ldr	r3, [sp, #28]
+ 31a:	ldr	r1, [sp, #52]	@ 0x34
+ 31c:	subs	r3, #2
+ 31e:	ldrsh.w	r4, [r3, #18]
+ 322:	strh.w	r4, [r3, #2]!
+ 326:	cmp	r3, r1
+ 328:	bne.n	31e <out_hop_q15+0x156>
+ 32a:	ldr	r3, [sp, #28]
+ 32c:	strd	r2, r7, [r3, #36]	@ 0x24
+ 330:	str.w	lr, [r3, #44]	@ 0x2c
+ 334:	str.w	r9, [r3, #24]
+ 338:	str	r0, [r3, #60]	@ 0x3c
+ 33a:	add	sp, #124	@ 0x7c
+ 33c:	ldmia.w	sp!, {r4, r5, r6, r7, r8, r9, sl, fp, pc}
+ 340:	.word	0x3c6ef35f
+ 344:	.word	0x0019660d

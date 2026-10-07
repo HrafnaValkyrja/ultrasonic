@@ -1,0 +1,2146 @@
+{
+ "base": {
+  "params": {
+   "NB": 32,
+   "TPP": 8
+  },
+  "kernels": {
+   "in_window": {
+    "lo": 3151,
+    "hi": 3281,
+    "mem": 776,
+    "loops": [
+     {
+      "range": [
+       "0xc",
+       "0x80"
+      ],
+      "trips": 64,
+      "body_lo_hi_mem": [
+       49,
+       51,
+       12
+      ]
+     }
+    ],
+    "code_bytes": 134
+   },
+   "halfband_d2": {
+    "lo": 7088,
+    "hi": 8638,
+    "mem": 2332,
+    "loops": [
+     {
+      "range": [
+       "0xb4",
+       "0x164"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       55,
+       67,
+       18
+      ]
+     }
+    ],
+    "code_bytes": 268
+   },
+   "bitrev128": {
+    "lo": 1135,
+    "hi": 1478,
+    "mem": 564,
+    "loops": [
+     {
+      "range": [
+       "0x19e",
+       "0x1cc"
+      ],
+      "trips": 56,
+      "body_lo_hi_mem": [
+       20,
+       26,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 70
+   },
+   "cfft128": {
+    "lo": 14813,
+    "hi": 17919,
+    "mem": 3884,
+    "loops": [
+     {
+      "range": [
+       "0x1ea",
+       "0x290"
+      ],
+      "trips": 7,
+      "body_lo_hi_mem": [
+       20,
+       25,
+       4
+      ]
+     },
+     {
+      "range": [
+       "0x20c",
+       "0x280"
+      ],
+      "trips": 127,
+      "body_lo_hi_mem": [
+       13,
+       16,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x21e",
+       "0x272"
+      ],
+      "trips": 448,
+      "body_lo_hi_mem": [
+       29,
+       35,
+       8
+      ]
+     }
+    ],
+    "code_bytes": 196
+   },
+   "rsplit256": {
+    "lo": 2475,
+    "hi": 2985,
+    "mem": 636,
+    "loops": [
+     {
+      "range": [
+       "0x2cc",
+       "0x34c"
+      ],
+      "trips": 63,
+      "body_lo_hi_mem": [
+       39,
+       47,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 186
+   },
+   "b_bands": {
+    "lo": 2592,
+    "hi": 2995,
+    "mem": 827,
+    "loops": [
+     {
+      "range": [
+       "0x35e",
+       "0x368"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x372",
+       "0x3ba"
+      ],
+      "trips": 84,
+      "body_lo_hi_mem": [
+       28,
+       32,
+       9
+      ]
+     }
+    ],
+    "code_bytes": 114
+   },
+   "b_update": {
+    "lo": 3342,
+    "hi": 3513,
+    "mem": 343,
+    "loops": [
+     {
+      "range": [
+       "0x418",
+       "0x51a"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       103,
+       108,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 392
+   },
+   "b_synth": {
+    "lo": 3403,
+    "hi": 3620,
+    "mem": 736,
+    "loops": [
+     {
+      "range": [
+       "0x554",
+       "0x55a"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       5,
+       7,
+       1
+      ]
+     },
+     {
+      "range": [
+       "0x588",
+       "0x6ba"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       104,
+       110,
+       22
+      ]
+     }
+    ],
+    "code_bytes": 382
+   },
+   "a_mix": {
+    "lo": 2074,
+    "hi": 2332,
+    "mem": 397,
+    "loops": [
+     {
+      "range": [
+       "0x6da",
+       "0x700"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       16,
+       18,
+       3
+      ]
+     }
+    ],
+    "code_bytes": 74
+   },
+   "a_decim": {
+    "lo": 5655,
+    "hi": 6593,
+    "mem": 1607,
+    "loops": [
+     {
+      "range": [
+       "0x75e",
+       "0x866"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       86,
+       92,
+       21
+      ]
+     },
+     {
+      "range": [
+       "0x878",
+       "0x9b6"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       72,
+       98,
+       16
+      ]
+     },
+     {
+      "range": [
+       "0x91c",
+       "0x9aa"
+      ],
+      "trips": 40,
+      "body_lo_hi_mem": [
+       48,
+       57,
+       16
+      ]
+     },
+     {
+      "range": [
+       "0x9c2",
+       "0x9cc"
+      ],
+      "trips": 15,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x9ce",
+       "0x9d8"
+      ],
+      "trips": 39,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 732
+   },
+   "a_post": {
+    "lo": 411,
+    "hi": 444,
+    "mem": 56,
+    "loops": [
+     {
+      "range": [
+       "0xa24",
+       "0xa92"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       47,
+       49,
+       4
+      ]
+     }
+    ],
+    "code_bytes": 208
+   },
+   "out_hop": {
+    "lo": 10592,
+    "hi": 11545,
+    "mem": 1672,
+    "loops": [
+     {
+      "range": [
+       "0xad4",
+       "0xade"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0xb46",
+       "0xcce"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       66,
+       82,
+       20
+      ]
+     },
+     {
+      "range": [
+       "0xb82",
+       "0xbf6"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       39,
+       43,
+       9
+      ]
+     },
+     {
+      "range": [
+       "0xc4a",
+       "0xcc4"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       38,
+       40,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0xcd4",
+       "0xcdc"
+      ],
+      "trips": 7,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 596
+   },
+   "a_mix_q15": {
+    "lo": 1818,
+    "hi": 2076,
+    "mem": 397,
+    "loops": [
+     {
+      "range": [
+       "0x16",
+       "0x34"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       14,
+       16,
+       3
+      ]
+     }
+    ],
+    "code_bytes": 66
+   },
+   "a_decim_q15": {
+    "lo": 2171,
+    "hi": 2981,
+    "mem": 1002,
+    "loops": [
+     {
+      "range": [
+       "0x58",
+       "0xbc"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       35,
+       49,
+       17
+      ]
+     },
+     {
+      "range": [
+       "0xcc",
+       "0x19c"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       85,
+       109,
+       41
+      ]
+     },
+     {
+      "range": [
+       "0x1a6",
+       "0x1b0"
+      ],
+      "trips": 16,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x1ba",
+       "0x1c2"
+      ],
+      "trips": 40,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 392
+   },
+   "out_hop_q15": {
+    "lo": 8700,
+    "hi": 10132,
+    "mem": 1430,
+    "loops": [
+     {
+      "range": [
+       "0x1e0",
+       "0x1ea"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x222",
+       "0x336"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       57,
+       85,
+       25
+      ]
+     },
+     {
+      "range": [
+       "0x24e",
+       "0x286"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       24,
+       28,
+       5
+      ]
+     },
+     {
+      "range": [
+       "0x2be",
+       "0x324"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       39,
+       44,
+       4
+      ]
+     },
+     {
+      "range": [
+       "0x342",
+       "0x34c"
+      ],
+      "trips": 7,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 420
+   }
+  }
+ },
+ "slim": {
+  "params": {
+   "NB": 16,
+   "TPP": 4
+  },
+  "kernels": {
+   "in_window": {
+    "lo": 3151,
+    "hi": 3281,
+    "mem": 776,
+    "loops": [
+     {
+      "range": [
+       "0xc",
+       "0x80"
+      ],
+      "trips": 64,
+      "body_lo_hi_mem": [
+       49,
+       51,
+       12
+      ]
+     }
+    ],
+    "code_bytes": 134
+   },
+   "halfband_d2": {
+    "lo": 7088,
+    "hi": 8638,
+    "mem": 2332,
+    "loops": [
+     {
+      "range": [
+       "0xb4",
+       "0x164"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       55,
+       67,
+       18
+      ]
+     }
+    ],
+    "code_bytes": 268
+   },
+   "bitrev128": {
+    "lo": 1135,
+    "hi": 1478,
+    "mem": 564,
+    "loops": [
+     {
+      "range": [
+       "0x19e",
+       "0x1cc"
+      ],
+      "trips": 56,
+      "body_lo_hi_mem": [
+       20,
+       26,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 70
+   },
+   "cfft128": {
+    "lo": 14813,
+    "hi": 17919,
+    "mem": 3884,
+    "loops": [
+     {
+      "range": [
+       "0x1ea",
+       "0x290"
+      ],
+      "trips": 7,
+      "body_lo_hi_mem": [
+       20,
+       25,
+       4
+      ]
+     },
+     {
+      "range": [
+       "0x20c",
+       "0x280"
+      ],
+      "trips": 127,
+      "body_lo_hi_mem": [
+       13,
+       16,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x21e",
+       "0x272"
+      ],
+      "trips": 448,
+      "body_lo_hi_mem": [
+       29,
+       35,
+       8
+      ]
+     }
+    ],
+    "code_bytes": 196
+   },
+   "rsplit256": {
+    "lo": 2475,
+    "hi": 2985,
+    "mem": 636,
+    "loops": [
+     {
+      "range": [
+       "0x2cc",
+       "0x34c"
+      ],
+      "trips": 63,
+      "body_lo_hi_mem": [
+       39,
+       47,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 186
+   },
+   "b_bands": {
+    "lo": 2480,
+    "hi": 2851,
+    "mem": 795,
+    "loops": [
+     {
+      "range": [
+       "0x35e",
+       "0x368"
+      ],
+      "trips": 16,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x372",
+       "0x3ba"
+      ],
+      "trips": 84,
+      "body_lo_hi_mem": [
+       28,
+       32,
+       9
+      ]
+     }
+    ],
+    "code_bytes": 114
+   },
+   "b_update": {
+    "lo": 1621,
+    "hi": 1715,
+    "mem": 181,
+    "loops": [
+     {
+      "range": [
+       "0x402",
+       "0x4f4"
+      ],
+      "trips": 16,
+      "body_lo_hi_mem": [
+       99,
+       104,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 348
+   },
+   "b_synth": {
+    "lo": 1739,
+    "hi": 1860,
+    "mem": 384,
+    "loops": [
+     {
+      "range": [
+       "0x528",
+       "0x52e"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       5,
+       7,
+       1
+      ]
+     },
+     {
+      "range": [
+       "0x55c",
+       "0x68e"
+      ],
+      "trips": 16,
+      "body_lo_hi_mem": [
+       104,
+       110,
+       22
+      ]
+     }
+    ],
+    "code_bytes": 382
+   },
+   "a_mix": {
+    "lo": 2074,
+    "hi": 2332,
+    "mem": 397,
+    "loops": [
+     {
+      "range": [
+       "0x6ae",
+       "0x6d4"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       16,
+       18,
+       3
+      ]
+     }
+    ],
+    "code_bytes": 74
+   },
+   "a_decim": {
+    "lo": 5655,
+    "hi": 6593,
+    "mem": 1607,
+    "loops": [
+     {
+      "range": [
+       "0x732",
+       "0x83a"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       86,
+       92,
+       21
+      ]
+     },
+     {
+      "range": [
+       "0x84c",
+       "0x98a"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       72,
+       98,
+       16
+      ]
+     },
+     {
+      "range": [
+       "0x8f0",
+       "0x97e"
+      ],
+      "trips": 40,
+      "body_lo_hi_mem": [
+       48,
+       57,
+       16
+      ]
+     },
+     {
+      "range": [
+       "0x996",
+       "0x9a0"
+      ],
+      "trips": 15,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x9a2",
+       "0x9ac"
+      ],
+      "trips": 39,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 732
+   },
+   "a_post": {
+    "lo": 411,
+    "hi": 444,
+    "mem": 56,
+    "loops": [
+     {
+      "range": [
+       "0x9f8",
+       "0xa66"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       47,
+       49,
+       4
+      ]
+     }
+    ],
+    "code_bytes": 208
+   },
+   "out_hop": {
+    "lo": 8412,
+    "hi": 9283,
+    "mem": 1064,
+    "loops": [
+     {
+      "range": [
+       "0xaa8",
+       "0xab2"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0xb12",
+       "0xc3e"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       54,
+       61,
+       10
+      ]
+     },
+     {
+      "range": [
+       "0xb32",
+       "0xb76"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       23,
+       27,
+       5
+      ]
+     },
+     {
+      "range": [
+       "0xbba",
+       "0xc34"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       38,
+       40,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0xc44",
+       "0xc4c"
+      ],
+      "trips": 3,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 496
+   },
+   "a_mix_q15": {
+    "lo": 1818,
+    "hi": 2076,
+    "mem": 397,
+    "loops": [
+     {
+      "range": [
+       "0x16",
+       "0x34"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       14,
+       16,
+       3
+      ]
+     }
+    ],
+    "code_bytes": 66
+   },
+   "a_decim_q15": {
+    "lo": 2171,
+    "hi": 2981,
+    "mem": 1002,
+    "loops": [
+     {
+      "range": [
+       "0x58",
+       "0xbc"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       35,
+       49,
+       17
+      ]
+     },
+     {
+      "range": [
+       "0xcc",
+       "0x19c"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       85,
+       109,
+       41
+      ]
+     },
+     {
+      "range": [
+       "0x1a6",
+       "0x1b0"
+      ],
+      "trips": 16,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x1ba",
+       "0x1c2"
+      ],
+      "trips": 40,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 392
+   },
+   "out_hop_q15": {
+    "lo": 7854,
+    "hi": 9262,
+    "mem": 1132,
+    "loops": [
+     {
+      "range": [
+       "0x1e0",
+       "0x1ea"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x220",
+       "0x316"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       51,
+       78,
+       21
+      ]
+     },
+     {
+      "range": [
+       "0x244",
+       "0x26c"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       18,
+       22,
+       3
+      ]
+     },
+     {
+      "range": [
+       "0x29e",
+       "0x304"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       39,
+       44,
+       4
+      ]
+     },
+     {
+      "range": [
+       "0x31e",
+       "0x328"
+      ],
+      "trips": 3,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 384
+   }
+  }
+ },
+ "hq": {
+  "params": {
+   "NB": 32,
+   "TPP": 12
+  },
+  "kernels": {
+   "in_window": {
+    "lo": 3151,
+    "hi": 3281,
+    "mem": 776,
+    "loops": [
+     {
+      "range": [
+       "0xc",
+       "0x80"
+      ],
+      "trips": 64,
+      "body_lo_hi_mem": [
+       49,
+       51,
+       12
+      ]
+     }
+    ],
+    "code_bytes": 134
+   },
+   "halfband_d2": {
+    "lo": 7088,
+    "hi": 8638,
+    "mem": 2332,
+    "loops": [
+     {
+      "range": [
+       "0xb4",
+       "0x164"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       55,
+       67,
+       18
+      ]
+     }
+    ],
+    "code_bytes": 268
+   },
+   "bitrev128": {
+    "lo": 1135,
+    "hi": 1478,
+    "mem": 564,
+    "loops": [
+     {
+      "range": [
+       "0x19e",
+       "0x1cc"
+      ],
+      "trips": 56,
+      "body_lo_hi_mem": [
+       20,
+       26,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 70
+   },
+   "cfft128": {
+    "lo": 14813,
+    "hi": 17919,
+    "mem": 3884,
+    "loops": [
+     {
+      "range": [
+       "0x1ea",
+       "0x290"
+      ],
+      "trips": 7,
+      "body_lo_hi_mem": [
+       20,
+       25,
+       4
+      ]
+     },
+     {
+      "range": [
+       "0x20c",
+       "0x280"
+      ],
+      "trips": 127,
+      "body_lo_hi_mem": [
+       13,
+       16,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x21e",
+       "0x272"
+      ],
+      "trips": 448,
+      "body_lo_hi_mem": [
+       29,
+       35,
+       8
+      ]
+     }
+    ],
+    "code_bytes": 196
+   },
+   "rsplit256": {
+    "lo": 2475,
+    "hi": 2985,
+    "mem": 636,
+    "loops": [
+     {
+      "range": [
+       "0x2cc",
+       "0x34c"
+      ],
+      "trips": 63,
+      "body_lo_hi_mem": [
+       39,
+       47,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 186
+   },
+   "b_bands": {
+    "lo": 2592,
+    "hi": 2995,
+    "mem": 827,
+    "loops": [
+     {
+      "range": [
+       "0x35e",
+       "0x368"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x372",
+       "0x3ba"
+      ],
+      "trips": 84,
+      "body_lo_hi_mem": [
+       28,
+       32,
+       9
+      ]
+     }
+    ],
+    "code_bytes": 114
+   },
+   "b_update": {
+    "lo": 3342,
+    "hi": 3513,
+    "mem": 343,
+    "loops": [
+     {
+      "range": [
+       "0x418",
+       "0x51a"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       103,
+       108,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 392
+   },
+   "b_synth": {
+    "lo": 3403,
+    "hi": 3620,
+    "mem": 736,
+    "loops": [
+     {
+      "range": [
+       "0x554",
+       "0x55a"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       5,
+       7,
+       1
+      ]
+     },
+     {
+      "range": [
+       "0x588",
+       "0x6ba"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       104,
+       110,
+       22
+      ]
+     }
+    ],
+    "code_bytes": 382
+   },
+   "a_mix": {
+    "lo": 2074,
+    "hi": 2332,
+    "mem": 397,
+    "loops": [
+     {
+      "range": [
+       "0x6da",
+       "0x700"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       16,
+       18,
+       3
+      ]
+     }
+    ],
+    "code_bytes": 74
+   },
+   "a_decim": {
+    "lo": 5655,
+    "hi": 6593,
+    "mem": 1607,
+    "loops": [
+     {
+      "range": [
+       "0x75e",
+       "0x866"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       86,
+       92,
+       21
+      ]
+     },
+     {
+      "range": [
+       "0x878",
+       "0x9b6"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       72,
+       98,
+       16
+      ]
+     },
+     {
+      "range": [
+       "0x91c",
+       "0x9aa"
+      ],
+      "trips": 40,
+      "body_lo_hi_mem": [
+       48,
+       57,
+       16
+      ]
+     },
+     {
+      "range": [
+       "0x9c2",
+       "0x9cc"
+      ],
+      "trips": 15,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x9ce",
+       "0x9d8"
+      ],
+      "trips": 39,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 732
+   },
+   "a_post": {
+    "lo": 411,
+    "hi": 444,
+    "mem": 56,
+    "loops": [
+     {
+      "range": [
+       "0xa24",
+       "0xa92"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       47,
+       49,
+       4
+      ]
+     }
+    ],
+    "code_bytes": 208
+   },
+   "out_hop": {
+    "lo": 13319,
+    "hi": 14524,
+    "mem": 2574,
+    "loops": [
+     {
+      "range": [
+       "0xad4",
+       "0xade"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0xb4c",
+       "0xd50"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       84,
+       114,
+       36
+      ]
+     },
+     {
+      "range": [
+       "0xbb0",
+       "0xc58"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       56,
+       61,
+       14
+      ]
+     },
+     {
+      "range": [
+       "0xcc4",
+       "0xd46"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       41,
+       43,
+       3
+      ]
+     },
+     {
+      "range": [
+       "0xd56",
+       "0xd5e"
+      ],
+      "trips": 11,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 728
+   },
+   "a_mix_q15": {
+    "lo": 1818,
+    "hi": 2076,
+    "mem": 397,
+    "loops": [
+     {
+      "range": [
+       "0x16",
+       "0x34"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       14,
+       16,
+       3
+      ]
+     }
+    ],
+    "code_bytes": 66
+   },
+   "a_decim_q15": {
+    "lo": 2171,
+    "hi": 2981,
+    "mem": 1002,
+    "loops": [
+     {
+      "range": [
+       "0x58",
+       "0xbc"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       35,
+       49,
+       17
+      ]
+     },
+     {
+      "range": [
+       "0xcc",
+       "0x19c"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       85,
+       109,
+       41
+      ]
+     },
+     {
+      "range": [
+       "0x1a6",
+       "0x1b0"
+      ],
+      "trips": 16,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x1ba",
+       "0x1c2"
+      ],
+      "trips": 40,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 392
+   },
+   "out_hop_q15": {
+    "lo": 9603,
+    "hi": 11071,
+    "mem": 1766,
+    "loops": [
+     {
+      "range": [
+       "0x1e0",
+       "0x1ea"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x224",
+       "0x35c"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       71,
+       102,
+       34
+      ]
+     },
+     {
+      "range": [
+       "0x262",
+       "0x2aa"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       30,
+       34,
+       7
+      ]
+     },
+     {
+      "range": [
+       "0x2e4",
+       "0x34a"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       39,
+       44,
+       4
+      ]
+     },
+     {
+      "range": [
+       "0x368",
+       "0x372"
+      ],
+      "trips": 11,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 456
+   }
+  }
+ },
+ "b28": {
+  "params": {
+   "NB": 28,
+   "TPP": 8
+  },
+  "kernels": {
+   "in_window": {
+    "lo": 3151,
+    "hi": 3281,
+    "mem": 776,
+    "loops": [
+     {
+      "range": [
+       "0xc",
+       "0x80"
+      ],
+      "trips": 64,
+      "body_lo_hi_mem": [
+       49,
+       51,
+       12
+      ]
+     }
+    ],
+    "code_bytes": 134
+   },
+   "halfband_d2": {
+    "lo": 7088,
+    "hi": 8638,
+    "mem": 2332,
+    "loops": [
+     {
+      "range": [
+       "0xb4",
+       "0x164"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       55,
+       67,
+       18
+      ]
+     }
+    ],
+    "code_bytes": 268
+   },
+   "bitrev128": {
+    "lo": 1135,
+    "hi": 1478,
+    "mem": 564,
+    "loops": [
+     {
+      "range": [
+       "0x19e",
+       "0x1cc"
+      ],
+      "trips": 56,
+      "body_lo_hi_mem": [
+       20,
+       26,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 70
+   },
+   "cfft128": {
+    "lo": 14813,
+    "hi": 17919,
+    "mem": 3884,
+    "loops": [
+     {
+      "range": [
+       "0x1ea",
+       "0x290"
+      ],
+      "trips": 7,
+      "body_lo_hi_mem": [
+       20,
+       25,
+       4
+      ]
+     },
+     {
+      "range": [
+       "0x20c",
+       "0x280"
+      ],
+      "trips": 127,
+      "body_lo_hi_mem": [
+       13,
+       16,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x21e",
+       "0x272"
+      ],
+      "trips": 448,
+      "body_lo_hi_mem": [
+       29,
+       35,
+       8
+      ]
+     }
+    ],
+    "code_bytes": 196
+   },
+   "rsplit256": {
+    "lo": 2475,
+    "hi": 2985,
+    "mem": 636,
+    "loops": [
+     {
+      "range": [
+       "0x2cc",
+       "0x34c"
+      ],
+      "trips": 63,
+      "body_lo_hi_mem": [
+       39,
+       47,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 186
+   },
+   "b_bands": {
+    "lo": 2564,
+    "hi": 2959,
+    "mem": 819,
+    "loops": [
+     {
+      "range": [
+       "0x35e",
+       "0x368"
+      ],
+      "trips": 28,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x372",
+       "0x3ba"
+      ],
+      "trips": 84,
+      "body_lo_hi_mem": [
+       28,
+       32,
+       9
+      ]
+     }
+    ],
+    "code_bytes": 114
+   },
+   "b_update": {
+    "lo": 2809,
+    "hi": 2963,
+    "mem": 301,
+    "loops": [
+     {
+      "range": [
+       "0x402",
+       "0x4f4"
+      ],
+      "trips": 28,
+      "body_lo_hi_mem": [
+       99,
+       104,
+       10
+      ]
+     }
+    ],
+    "code_bytes": 348
+   },
+   "b_synth": {
+    "lo": 2987,
+    "hi": 3180,
+    "mem": 648,
+    "loops": [
+     {
+      "range": [
+       "0x528",
+       "0x52e"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       5,
+       7,
+       1
+      ]
+     },
+     {
+      "range": [
+       "0x55c",
+       "0x68e"
+      ],
+      "trips": 28,
+      "body_lo_hi_mem": [
+       104,
+       110,
+       22
+      ]
+     }
+    ],
+    "code_bytes": 382
+   },
+   "a_mix": {
+    "lo": 2074,
+    "hi": 2332,
+    "mem": 397,
+    "loops": [
+     {
+      "range": [
+       "0x6ae",
+       "0x6d4"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       16,
+       18,
+       3
+      ]
+     }
+    ],
+    "code_bytes": 74
+   },
+   "a_decim": {
+    "lo": 5655,
+    "hi": 6593,
+    "mem": 1607,
+    "loops": [
+     {
+      "range": [
+       "0x732",
+       "0x83a"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       86,
+       92,
+       21
+      ]
+     },
+     {
+      "range": [
+       "0x84c",
+       "0x98a"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       72,
+       98,
+       16
+      ]
+     },
+     {
+      "range": [
+       "0x8f0",
+       "0x97e"
+      ],
+      "trips": 40,
+      "body_lo_hi_mem": [
+       48,
+       57,
+       16
+      ]
+     },
+     {
+      "range": [
+       "0x996",
+       "0x9a0"
+      ],
+      "trips": 15,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x9a2",
+       "0x9ac"
+      ],
+      "trips": 39,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 732
+   },
+   "a_post": {
+    "lo": 411,
+    "hi": 444,
+    "mem": 56,
+    "loops": [
+     {
+      "range": [
+       "0x9f8",
+       "0xa66"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       47,
+       49,
+       4
+      ]
+     }
+    ],
+    "code_bytes": 208
+   },
+   "out_hop": {
+    "lo": 10592,
+    "hi": 11545,
+    "mem": 1672,
+    "loops": [
+     {
+      "range": [
+       "0xaa8",
+       "0xab2"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0xb1a",
+       "0xca2"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       66,
+       82,
+       20
+      ]
+     },
+     {
+      "range": [
+       "0xb56",
+       "0xbca"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       39,
+       43,
+       9
+      ]
+     },
+     {
+      "range": [
+       "0xc1e",
+       "0xc98"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       38,
+       40,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0xca8",
+       "0xcb0"
+      ],
+      "trips": 7,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 596
+   },
+   "a_mix_q15": {
+    "lo": 1818,
+    "hi": 2076,
+    "mem": 397,
+    "loops": [
+     {
+      "range": [
+       "0x16",
+       "0x34"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       14,
+       16,
+       3
+      ]
+     }
+    ],
+    "code_bytes": 66
+   },
+   "a_decim_q15": {
+    "lo": 2171,
+    "hi": 2981,
+    "mem": 1002,
+    "loops": [
+     {
+      "range": [
+       "0x58",
+       "0xbc"
+      ],
+      "trips": 32,
+      "body_lo_hi_mem": [
+       35,
+       49,
+       17
+      ]
+     },
+     {
+      "range": [
+       "0xcc",
+       "0x19c"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       85,
+       109,
+       41
+      ]
+     },
+     {
+      "range": [
+       "0x1a6",
+       "0x1b0"
+      ],
+      "trips": 16,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x1ba",
+       "0x1c2"
+      ],
+      "trips": 40,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 392
+   },
+   "out_hop_q15": {
+    "lo": 8700,
+    "hi": 10132,
+    "mem": 1430,
+    "loops": [
+     {
+      "range": [
+       "0x1e0",
+       "0x1ea"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       7,
+       9,
+       2
+      ]
+     },
+     {
+      "range": [
+       "0x222",
+       "0x336"
+      ],
+      "trips": 8,
+      "body_lo_hi_mem": [
+       57,
+       85,
+       25
+      ]
+     },
+     {
+      "range": [
+       "0x24e",
+       "0x286"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       24,
+       28,
+       5
+      ]
+     },
+     {
+      "range": [
+       "0x2be",
+       "0x324"
+      ],
+      "trips": 128,
+      "body_lo_hi_mem": [
+       39,
+       44,
+       4
+      ]
+     },
+     {
+      "range": [
+       "0x342",
+       "0x34c"
+      ],
+      "trips": 7,
+      "body_lo_hi_mem": [
+       6,
+       9,
+       2
+      ]
+     }
+    ],
+    "code_bytes": 420
+   }
+  }
+ }
+}

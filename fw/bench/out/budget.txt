@@ -1,0 +1,40 @@
+== B1_55MHz_R3: SRAM 0 WS; overhead 0.5 MHz + 3-8 %
+  B_spec_ownFFT (32 bands, hop 128, TPP 8, own radix-2 FFT)            41503-  47336 cyc/hop   67.3- 80.4 MHz   122- 146 %  doesn't fit
+  B_spec_cmsisFFT (32 bands, hop 128, TPP 8, CMSIS f32 FFT)            37365-  41488 cyc/hop   60.6- 70.5 MHz   110- 128 %  doesn't fit
+  B_28bands_cmsisFFT (28 bands = pipeline.py default)                  36388-  40462 cyc/hop   59.1- 68.8 MHz   107- 125 %  doesn't fit
+  B_slim1 (16 bands, hop 256 = no overlap, TPP 8, CMSIS FFT)           23100-  25596 cyc/hop   37.7- 43.7 MHz    69-  79 %  fits
+  B_slim2 (16 bands, hop 256, TPP 4 [23 dB images], CMSIS FFT)         20920-  23334 cyc/hop   34.2- 39.9 MHz    62-  73 %  fits
+  A_spec (mix + 16/40-tap decimators + HP + squelch, TPP 8)            18732-  20914 cyc/hop   30.6- 35.8 MHz    56-  65 %  fits
+  A_slim (TPP 4 [23 dB images])                                        16552-  18652 cyc/hop   27.1- 32.0 MHz    49-  58 %  fits
+  A_hq (TPP 12 [58 dB images])                                         21459-  23893 cyc/hop   35.0- 40.8 MHz    64-  74 %  fits
+  B_q15out (32 bands, hop 128, CMSIS FFT, q15 output path TPP 8)       35473-  40075 cyc/hop   57.6- 68.1 MHz   105- 124 %  doesn't fit
+  B_slim1_q15out (16 bands, hop 256, CMSIS FFT, q15 output TPP 8)      21208-  24182 cyc/hop   34.6- 41.3 MHz    63-  75 %  fits
+  A_q15 (q15 mix + SMLAD decimators, float HP/squelch, q15 output TPP 8)   13100-  15633 cyc/hop   21.6- 26.9 MHz    39-  49 %  fits
+  A_q15_hq (as A_q15, q15 output TPP 12 [58 dB images])                14003-  16572 cyc/hop   23.0- 28.5 MHz    42-  52 %  fits
+  out_only_q15_TPP8                                                     8700-  10132 cyc/hop   13.6- 15.8 MHz    25-  29 %  -
+  out_only_q15_TPP12                                                    9603-  11071 cyc/hop   15.0- 17.3 MHz    27-  31 %  -
+  out_only_TPP8 (x16 interp + limiter + 3rd-order shaper)              10592-  11545 cyc/hop   16.6- 18.0 MHz    30-  33 %  -
+  out_only_TPP4                                                         8412-   9283 cyc/hop   13.1- 14.5 MHz    24-  26 %  -
+  out_only_TPP12                                                       13319-  14524 cyc/hop   20.8- 22.7 MHz    38-  41 %  -
+  D2_halfband_addon (only if ADF D1 is not used)                        7088-   8638 cyc/hop   11.1- 13.5 MHz    20-  25 %  -
+== B3_24MHz_R4: SRAM 1 WS; overhead 0.5 MHz + 3-8 %
+  B_spec_ownFFT (32 bands, hop 128, TPP 8, own radix-2 FFT)            50941-  56774 cyc/hop   82.5- 96.3 MHz   344- 401 %  doesn't fit
+  B_spec_cmsisFFT (32 bands, hop 128, TPP 8, CMSIS f32 FFT)            46803-  50926 cyc/hop   75.8- 86.4 MHz   316- 360 %  doesn't fit
+  B_28bands_cmsisFFT (28 bands = pipeline.py default)                  45688-  49762 cyc/hop   74.0- 84.5 MHz   308- 352 %  doesn't fit
+  B_slim1 (16 bands, hop 256 = no overlap, TPP 8, CMSIS FFT)           28574-  31070 cyc/hop   46.5- 52.9 MHz   194- 221 %  doesn't fit
+  B_slim2 (16 bands, hop 256, TPP 4 [23 dB images], CMSIS FFT)         25786-  28200 cyc/hop   42.0- 48.1 MHz   175- 200 %  doesn't fit
+  A_spec (mix + 16/40-tap decimators + HP + squelch, TPP 8)            22464-  24646 cyc/hop   36.7- 42.1 MHz   153- 175 %  doesn't fit
+  A_slim (TPP 4 [23 dB images])                                        19676-  21776 cyc/hop   32.2- 37.3 MHz   134- 155 %  doesn't fit
+  A_hq (TPP 12 [58 dB images])                                         26093-  28527 cyc/hop   42.5- 48.6 MHz   177- 203 %  doesn't fit
+  B_q15out (32 bands, hop 128, CMSIS FFT, q15 output path TPP 8)       44669-  49271 cyc/hop   72.4- 83.7 MHz   302- 349 %  doesn't fit
+  B_slim1_q15out (16 bands, hop 256, CMSIS FFT, q15 output TPP 8)      26440-  29414 cyc/hop   43.1- 50.1 MHz   179- 209 %  doesn't fit
+  A_q15 (q15 mix + SMLAD decimators, float HP/squelch, q15 output TPP 8)   15985-  18518 cyc/hop   26.2- 31.8 MHz   109- 132 %  doesn't fit
+  A_q15_hq (as A_q15, q15 output TPP 12 [58 dB images])                17224-  19793 cyc/hop   28.2- 33.9 MHz   118- 141 %  doesn't fit
+  out_only_q15_TPP8                                                    10130-  11562 cyc/hop   15.8- 18.1 MHz    66-  75 %  -
+  out_only_q15_TPP12                                                   11369-  12837 cyc/hop   17.8- 20.1 MHz    74-  84 %  -
+  out_only_TPP8 (x16 interp + limiter + 3rd-order shaper)              12264-  13217 cyc/hop   19.2- 20.7 MHz    80-  86 %  -
+  out_only_TPP4                                                         9476-  10347 cyc/hop   14.8- 16.2 MHz    62-  67 %  -
+  out_only_TPP12                                                       15893-  17098 cyc/hop   24.8- 26.7 MHz   103- 111 %  -
+  D2_halfband_addon (only if ADF D1 is not used)                        9420-  10970 cyc/hop   14.7- 17.1 MHz    61-  71 %  -
+cold-ICACHE envelope at 55 MHz: all 4230 B of kernel code refilled every hop (264 lines x 4 words x 3 cyc) = +5.0 MHz (worst case; warm cache = 0)
+cold-ICACHE envelope at 24 MHz: all 4230 B of kernel code refilled every hop (264 lines x 4 words x 2 cyc) = +3.3 MHz (worst case; warm cache = 0)

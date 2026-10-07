@@ -1,0 +1,64 @@
+== base: NB=32 TPP=8  (cycles per call = per 0.64 ms hop; mem = data words)
+  in_window      3151-  3281 cyc  mem   776  code  134 B  loops: x64 @49-51
+  halfband_d2    7088-  8638 cyc  mem  2332  code  268 B  loops: x128 @55-67
+  bitrev128      1135-  1478 cyc  mem   564  code   70 B  loops: x56 @20-26
+  cfft128       14813- 17919 cyc  mem  3884  code  196 B  loops: x7 @20-25; x127 @13-16; x448 @29-35
+  rsplit256      2475-  2985 cyc  mem   636  code  186 B  loops: x63 @39-47
+  b_bands        2592-  2995 cyc  mem   827  code  114 B  loops: x32 @7-9; x84 @28-32
+  b_update       3342-  3513 cyc  mem   343  code  392 B  loops: x32 @103-108
+  b_synth        3403-  3620 cyc  mem   736  code  382 B  loops: x8 @5-7; x32 @104-110
+  a_mix          2074-  2332 cyc  mem   397  code   74 B  loops: x128 @16-18
+  a_decim        5655-  6593 cyc  mem  1607  code  732 B  loops: x32 @86-92; x8 @72-98; x40 @48-57; x15 @6-9; x39 @6-9
+  a_post          411-   444 cyc  mem    56  code  208 B  loops: x8 @47-49
+  out_hop       10592- 11545 cyc  mem  1672  code  596 B  loops: x8 @7-9; x8 @66-82; x128 @39-43; x128 @38-40; x7 @6-9
+  a_mix_q15      1818-  2076 cyc  mem   397  code   66 B  loops: x128 @14-16
+  a_decim_q15    2171-  2981 cyc  mem  1002  code  392 B  loops: x32 @35-49; x8 @85-109; x16 @6-9; x40 @6-9
+  out_hop_q15    8700- 10132 cyc  mem  1430  code  420 B  loops: x8 @7-9; x8 @57-85; x128 @24-28; x128 @39-44; x7 @6-9
+== slim: NB=16 TPP=4  (cycles per call = per 0.64 ms hop; mem = data words)
+  in_window      3151-  3281 cyc  mem   776  code  134 B  loops: x64 @49-51
+  halfband_d2    7088-  8638 cyc  mem  2332  code  268 B  loops: x128 @55-67
+  bitrev128      1135-  1478 cyc  mem   564  code   70 B  loops: x56 @20-26
+  cfft128       14813- 17919 cyc  mem  3884  code  196 B  loops: x7 @20-25; x127 @13-16; x448 @29-35
+  rsplit256      2475-  2985 cyc  mem   636  code  186 B  loops: x63 @39-47
+  b_bands        2480-  2851 cyc  mem   795  code  114 B  loops: x16 @7-9; x84 @28-32
+  b_update       1621-  1715 cyc  mem   181  code  348 B  loops: x16 @99-104
+  b_synth        1739-  1860 cyc  mem   384  code  382 B  loops: x8 @5-7; x16 @104-110
+  a_mix          2074-  2332 cyc  mem   397  code   74 B  loops: x128 @16-18
+  a_decim        5655-  6593 cyc  mem  1607  code  732 B  loops: x32 @86-92; x8 @72-98; x40 @48-57; x15 @6-9; x39 @6-9
+  a_post          411-   444 cyc  mem    56  code  208 B  loops: x8 @47-49
+  out_hop        8412-  9283 cyc  mem  1064  code  496 B  loops: x8 @7-9; x8 @54-61; x128 @23-27; x128 @38-40; x3 @6-9
+  a_mix_q15      1818-  2076 cyc  mem   397  code   66 B  loops: x128 @14-16
+  a_decim_q15    2171-  2981 cyc  mem  1002  code  392 B  loops: x32 @35-49; x8 @85-109; x16 @6-9; x40 @6-9
+  out_hop_q15    7854-  9262 cyc  mem  1132  code  384 B  loops: x8 @7-9; x8 @51-78; x128 @18-22; x128 @39-44; x3 @6-9
+== hq: NB=32 TPP=12  (cycles per call = per 0.64 ms hop; mem = data words)
+  in_window      3151-  3281 cyc  mem   776  code  134 B  loops: x64 @49-51
+  halfband_d2    7088-  8638 cyc  mem  2332  code  268 B  loops: x128 @55-67
+  bitrev128      1135-  1478 cyc  mem   564  code   70 B  loops: x56 @20-26
+  cfft128       14813- 17919 cyc  mem  3884  code  196 B  loops: x7 @20-25; x127 @13-16; x448 @29-35
+  rsplit256      2475-  2985 cyc  mem   636  code  186 B  loops: x63 @39-47
+  b_bands        2592-  2995 cyc  mem   827  code  114 B  loops: x32 @7-9; x84 @28-32
+  b_update       3342-  3513 cyc  mem   343  code  392 B  loops: x32 @103-108
+  b_synth        3403-  3620 cyc  mem   736  code  382 B  loops: x8 @5-7; x32 @104-110
+  a_mix          2074-  2332 cyc  mem   397  code   74 B  loops: x128 @16-18
+  a_decim        5655-  6593 cyc  mem  1607  code  732 B  loops: x32 @86-92; x8 @72-98; x40 @48-57; x15 @6-9; x39 @6-9
+  a_post          411-   444 cyc  mem    56  code  208 B  loops: x8 @47-49
+  out_hop       13319- 14524 cyc  mem  2574  code  728 B  loops: x8 @7-9; x8 @84-114; x128 @56-61; x128 @41-43; x11 @6-9
+  a_mix_q15      1818-  2076 cyc  mem   397  code   66 B  loops: x128 @14-16
+  a_decim_q15    2171-  2981 cyc  mem  1002  code  392 B  loops: x32 @35-49; x8 @85-109; x16 @6-9; x40 @6-9
+  out_hop_q15    9603- 11071 cyc  mem  1766  code  456 B  loops: x8 @7-9; x8 @71-102; x128 @30-34; x128 @39-44; x11 @6-9
+== b28: NB=28 TPP=8  (cycles per call = per 0.64 ms hop; mem = data words)
+  in_window      3151-  3281 cyc  mem   776  code  134 B  loops: x64 @49-51
+  halfband_d2    7088-  8638 cyc  mem  2332  code  268 B  loops: x128 @55-67
+  bitrev128      1135-  1478 cyc  mem   564  code   70 B  loops: x56 @20-26
+  cfft128       14813- 17919 cyc  mem  3884  code  196 B  loops: x7 @20-25; x127 @13-16; x448 @29-35
+  rsplit256      2475-  2985 cyc  mem   636  code  186 B  loops: x63 @39-47
+  b_bands        2564-  2959 cyc  mem   819  code  114 B  loops: x28 @7-9; x84 @28-32
+  b_update       2809-  2963 cyc  mem   301  code  348 B  loops: x28 @99-104
+  b_synth        2987-  3180 cyc  mem   648  code  382 B  loops: x8 @5-7; x28 @104-110
+  a_mix          2074-  2332 cyc  mem   397  code   74 B  loops: x128 @16-18
+  a_decim        5655-  6593 cyc  mem  1607  code  732 B  loops: x32 @86-92; x8 @72-98; x40 @48-57; x15 @6-9; x39 @6-9
+  a_post          411-   444 cyc  mem    56  code  208 B  loops: x8 @47-49
+  out_hop       10592- 11545 cyc  mem  1672  code  596 B  loops: x8 @7-9; x8 @66-82; x128 @39-43; x128 @38-40; x7 @6-9
+  a_mix_q15      1818-  2076 cyc  mem   397  code   66 B  loops: x128 @14-16
+  a_decim_q15    2171-  2981 cyc  mem  1002  code  392 B  loops: x32 @35-49; x8 @85-109; x16 @6-9; x40 @6-9
+  out_hop_q15    8700- 10132 cyc  mem  1430  code  420 B  loops: x8 @7-9; x8 @57-85; x128 @24-28; x128 @39-44; x7 @6-9
