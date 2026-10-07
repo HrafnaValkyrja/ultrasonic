@@ -37,11 +37,30 @@ def sha(path):
 
 
 def inputs_hash(paths):
+    """paths: files, or (name, bytes) pairs for derived inputs (e.g. only the active block of hw/current.yaml)."""
     h = hashlib.sha256()
     for p in paths:
+        if isinstance(p, tuple):
+            h.update(p[0].encode())
+            h.update(p[1])
+            continue
         h.update(str(Path(p).relative_to(REPO)).encode())
         h.update(Path(p).read_bytes())
     return h.hexdigest()[:16]
+
+
+def active_design_bytes():
+    """The ACTIVE design block of hw/current.yaml only (tools/current.py selection, ULTRASONIC_DESIGN respected), canonical JSON without
+    the bookkeeping keys, so adding or editing a non-selected variant or the reference block does not stale the firmware."""
+    sys.path.insert(0, str(REPO / "tools"))
+    import current as C                                             # noqa: E402
+    top, ref, variants = C._load(REPO / "hw/current.yaml")
+    want = (os.environ.get(C.ENV) or "").strip().lower()
+    blocks = [top, ref, *variants.values()]
+    block = top if want in ("", "current", str(top.get("id", "")).lower()) else \
+        (ref if want in ("reference", "revf", str(ref.get("id", "")).lower()) else next(b for b in blocks if str(b.get("id", "")).lower() == want))
+    keep = {k: v for k, v in block.items() if not isinstance(v, dict) and k not in ("updated", "schema")}
+    return ("hw/current.yaml[active]", json.dumps(keep, sort_keys=True, default=str).encode())
 
 
 def cstr(s):
@@ -96,9 +115,9 @@ def board_config():
             raise SystemExit(f"gen: {e['id']}: contract AF{af} not in ST's table {af_st} for {port} {sig}")
         rows.append(dict(id=e["id"], net=net, port=p_letter, num=p_num, pkg=int(pos[0]), af=af if af is not None else 255, sig=sig, adc=adc,
                          alts=got, hazard=any(h["port"] == port for h in contract.get("hazards", []))))
-    srcs = [I.CFG.contract, REPO / contract["mcu"]["mcu_xml"], REPO / contract["mcu"]["gpio_xml"], I.CFG.netlist, REPO / "hw/current.yaml"]
+    srcs = [I.CFG.contract, REPO / contract["mcu"]["mcu_xml"], REPO / contract["mcu"]["gpio_xml"], I.CFG.netlist, active_design_bytes()]
     design = getattr(I.DESIGN, "id", "?")
-    out = [HDR.format(src="docs/system/pin-contract.yaml + circuit of hw/current.yaml + ST open pin data", h=inputs_hash(srcs)),
+    out = [HDR.format(src="docs/system/pin-contract.yaml + circuit of hw/current.yaml (active design block) + ST open pin data", h=inputs_hash(srcs)),
            f"/* design {design}; interfaces [pins] {res.status}: {res.msg[:160]} */",
            "#ifndef FW_GEN_BOARD_CONFIG_H\n#define FW_GEN_BOARD_CONFIG_H\n#include <stdint.h>\n",
            f"#define BOARD_DESIGN_ID {cstr(design)}",
@@ -119,7 +138,7 @@ def board_config():
         if r["adc"]:
             out.append(f"#define BOARD_{r['id']}_ADC {r['adc'][0]}u\n#define BOARD_{r['id']}_ADC_CH {r['adc'][1]}u")
     out.append("\n#endif\n")
-    return "\n".join(out), [str(Path(s).relative_to(REPO)) for s in srcs]
+    return "\n".join(out), [s[0] if isinstance(s, tuple) else str(Path(s).relative_to(REPO)) for s in srcs]
 
 
 # ------------------------------------------------------------------------------------------- variant_config.h
