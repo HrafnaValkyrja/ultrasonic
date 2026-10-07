@@ -863,7 +863,9 @@ def main(render=False):
         xc = {}
         try:
             others = {"heel_add": import_step(str(heel_dir / "heel_add.step"))}
-            if (heel_dir / "tub_with_heel_preview.step").exists():
+            if (heel_dir / "tub_r2_with_heel.step").exists():      # the real shell_r2 tub (strut relief), 2026-10-07
+                others["tub_r2_with_heel"] = import_step(str(heel_dir / "tub_r2_with_heel.step"))
+            elif (heel_dir / "tub_with_heel_preview.step").exists():  # plain-shell preview (no strut relief): fallback only
                 others["tub_with_heel_preview"] = import_step(str(heel_dir / "tub_with_heel_preview.step"))
             for st in ("free", "jaw_open_1.5", "worn_3.5", "jaw_closed_5.5"):
                 R, t = F.pad_pose(st)

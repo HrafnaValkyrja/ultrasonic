@@ -37,12 +37,12 @@
    }
   },
   "REG-ARM": {
-   "by": "heel-exit-agent",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)",
+   "note": "ARM-6/PAD-6: heel.py checks + exports the real shell_r2 tub; pad.py cross-check uses it (geometry unchanged): strut to tub worn 1.176 / free 1.303 / jaw 1.29-1.34 vs 1.4 (was 0.79 on the plain preview); owner decision ARM-6D",
    "stamp": {
     "file:hw/mech/frame.py": "c7981bfec8a45660",
-    "file:hw/mech/heel.py": "0d6540a25ae7d443",
+    "file:hw/mech/heel.py": "343c7dac129c06c9",
     "file:sim/checks/niti_arm_real.py": "62944f12dde4e774"
    }
   },
@@ -58,11 +58,11 @@
    }
   },
   "REG-PAD": {
-   "by": "claude-ecr0001",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell",
+   "note": "ARM-6/PAD-6: heel.py checks + exports the real shell_r2 tub; pad.py cross-check uses it (geometry unchanged): strut to tub worn 1.176 / free 1.303 / jaw 1.29-1.34 vs 1.4 (was 0.79 on the plain preview); owner decision ARM-6D",
    "stamp": {
-    "file:hw/mech/pad.py": "00d8456a0d641613",
+    "file:hw/mech/pad.py": "8f91343799a69ead",
     "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
     "file:hw/padboard/mech.py": "63ebe69b0207a26c"
    }
@@ -169,11 +169,11 @@
  },
  "relations": {
   "R-ARM-PAD": {
-   "by": "claude-ecr0001",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "ECR-0001: arm/pad constants untouched (frame.summary identical: E, A_E, span, T_worn, pad_centre); pad.py solids identical before/after",
+   "note": "ARM-6/PAD-6: heel.py checks + exports the real shell_r2 tub; pad.py cross-check uses it (geometry unchanged): strut to tub worn 1.176 / free 1.303 / jaw 1.29-1.34 vs 1.4 (was 0.79 on the plain preview); owner decision ARM-6D",
    "stamp": {
-    "file:hw/mech/pad.py": "00d8456a0d641613",
+    "file:hw/mech/pad.py": "8f91343799a69ead",
     "sym:hw/mech/frame.py::PAD_CONTACT": "a9817b30cc013f18",
     "sym:hw/mech/frame.py::PAD_SOCKET_DEPTH": "efe69b14b1f262c2",
     "sym:hw/mech/frame.py::pad_pose": "44f555654336b728"
@@ -252,9 +252,9 @@
    }
   },
   "R-BODY-ARM": {
-   "by": "heel-exit-agent",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "heel exit moved to (66.20,5.15,-5.50) D0.8 neck into the 1.1 rear gap (0.20 behind cell end, rim-corner 0.36, outer wall 0.60); in-pod route modelled (wire_route: bundle-cell 0.39, -seam 0.68, -lid 1.35, under board edge 0.45); reg-arm issue 1 closed in CAD, dry fit remains; only the channel changed (tub outside channel zone identical, heel_add/lid unchanged)",
+   "note": "ARM-6/PAD-6: heel.py checks + exports the real shell_r2 tub; pad.py cross-check uses it (geometry unchanged): strut to tub worn 1.176 / free 1.303 / jaw 1.29-1.34 vs 1.4 (was 0.79 on the plain preview); owner decision ARM-6D",
    "stamp": {
     "sym:hw/mech/frame.py::E": "e41a5d539abd8437",
     "sym:hw/mech/heel.py::heel_add": "f10d6b9f6e8fecbf",
@@ -366,11 +366,11 @@
    }
   },
   "R-OUT-PAD": {
-   "by": "claude",
-   "date": "2026-10-02",
-   "note": "Rev F doc-sync 2026-10-02 (workflow wf_dbc0b187-78a + cross-check; docs/system/plm/reviews/2026-10-02-revf-doc-sync.json): holds",
+   "by": "backlog-agent",
+   "date": "2026-10-07",
+   "note": "ARM-6/PAD-6: heel.py checks + exports the real shell_r2 tub; pad.py cross-check uses it (geometry unchanged): strut to tub worn 1.176 / free 1.303 / jaw 1.29-1.34 vs 1.4 (was 0.79 on the plain preview); owner decision ARM-6D",
    "stamp": {
-    "file:hw/mech/pad.py": "00d8456a0d641613",
+    "file:hw/mech/pad.py": "8f91343799a69ead",
     "net:OUT_A": "5e4d360780fe54df",
     "net:OUT_B": "28cc65f9b1bf070c"
    }

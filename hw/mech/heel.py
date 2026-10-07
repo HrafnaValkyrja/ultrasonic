@@ -741,7 +741,21 @@ def checks():
                               "pad_py_actual_checked": bool(act), "cases": hcases}
     res["strut_clearance_to_shell_edge"] = {
         "min": min(tcases.values()), "pass": min(tcases.values()) >= F.SHROUD_CLEARANCE - 1e-3,
-        "min_by_model": by_model(tcases), "cases": tcases}
+        "min_by_model": by_model(tcases), "cases": tcases,
+        "note": "plain blade.shell() WITHOUT the strut relief: a preview, not the build; the governing number is strut_clearance_to_r2_tub"}
+    # 5b. the real tub (shell_r2.tub with this heel: strut relief, tongue, rebate) - reg-arm issue 6 (2026-10-07)
+    try:
+        import shell_r2 as SR
+        r2 = SR.tub(sys.modules[__name__])
+        rcases = {k: _gap(v, r2) for k, v in solids.items()}
+        act_min = min((v for k, v in rcases.items() if k.startswith("pad.py_actual")), default=None)
+        res["strut_clearance_to_r2_tub"] = {
+            "min_pad_py_actual": act_min, "min_all_models": min(rcases.values()), "required": F.SHROUD_CLEARANCE,
+            "pass_pad_py_actual": act_min is not None and act_min >= F.SHROUD_CLEARANCE - 1e-3,
+            "min_by_model": by_model(rcases), "cases": rcases,
+            "binding_surface": "strut-relief chamfer y + z = -3.65 at x ~65.7 (shell_r2.tub); moving it 0.22 thins the wall to 0.375 < RESIN min_wall 0.6"}
+    except Exception as ex:  # noqa: BLE001
+        res["strut_clearance_to_r2_tub"] = {"error": repr(ex)[:200]}
 
     # 6. adapter / temple / cavity
     swept = _adapter_swept()
@@ -1049,6 +1063,11 @@ def main():
     export_step(parts["heel_cut"], str(OUT / "heel_cut.step"))
     export_step(heel_cut(undersize=True), str(OUT / "heel_cut_print.step"))
     export_step(parts["part_reamed"], str(OUT / "tub_with_heel_preview.step"))
+    try:                                   # the real tub (strut relief etc.) for pad.py's cross-check (reg-arm issue 6)
+        import shell_r2 as SR
+        export_step(SR.tub(sys.modules[__name__]), str(OUT / "tub_r2_with_heel.step"))
+    except Exception as ex:  # noqa: BLE001
+        print("r2 tub export failed:", repr(ex))
     export_stl(parts["heel_only"], str(OUT / "heel_only.stl"), tolerance=0.01, angular_tolerance=0.1)
     preview_print = (parts["tub"] + parts["heel_add"]) - heel_cut(undersize=True)
     export_stl(preview_print, str(OUT / "tub_with_heel_print_preview.stl"), tolerance=0.01, angular_tolerance=0.1)

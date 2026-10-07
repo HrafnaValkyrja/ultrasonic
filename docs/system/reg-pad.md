@@ -106,7 +106,7 @@ Solder each arm wire on the **top half** of its pad: the cap's epoxy dam (r 3.25
    - (a) the 0.559 mm internal web, accepted in tolerances.md;
    - (b) strut ↔ "tub" 0.79 mm against heel.py's old frame-based tub preview. The rev-1 shell gives 1.18–1.34 mm (tolerances.md).
 
-   **Closes:** re-run pad.py against the rev-1 tub (reg-arm issue 6).
+   **Re-run 2026-10-07 against the real shell_r2 tub** (heel.py exports `tub_r2_with_heel.step`): (b) is now 1.176 mm worn / 1.29–1.34 other states, still below SHROUD_CLEARANCE 1.4, so `all_pass` stays false on (a) + (b). (b) is an owner decision (reg-arm issue 6, backlog ARM-6D).
 7. **The collar stands 10.6 mm off the skin,** ~1.4 mm higher than rev 2 toward the Ear (open). pad.md option B2 (lower T by 1.5 mm) gets ~9.1 mm but re-solves the frame. **Closes:** E9 clearance at true scale.
 8. **LED polarity:** KiCad's LED footprint has pad 1 = cathode, while Everlight numbers the anode "1". **Closes:** check the cathode mark in JLC's placement preview (operate-jlcpcb-order).
 9. **Pad-board fabrication:** layout.py makes a 2-layer board, while pad.md and electronics.md put it on the pod board's panel. The pod board is 4-layer, so a shared panel makes the pad board 4-layer (derived), and JLC charges a different-design fee (electronics.md item 10). **Closes:** the JLC quote; decide panel vs separate order (O13).
