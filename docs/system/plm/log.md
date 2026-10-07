@@ -259,3 +259,10 @@
 - 2026-10-07 12:37 review SUB-AUDIO-IN by backlog-agent: stale issues closed in doc (reg-board 18 kicad_pro tracked; sub-audio-in 14 MC n 60 on disk); no design change
 - 2026-10-07 12:37 checkin REG-BOARD by backlog-agent
 - 2026-10-07 12:37 checkin SUB-AUDIO-IN by backlog-agent
+- 2026-10-07 12:39 checkout SUB-OUTPUT by backlog-agent: OUT-1/DBG-5: option D verified (sim/checks/selftest_lockin.py)
+- 2026-10-07 12:39 checkout SUB-DEBUG-TEST by backlog-agent: OUT-1/DBG-5: option D verified (sim/checks/selftest_lockin.py)
+- 2026-10-07 12:39 review R-OUT-DEBUG by backlog-agent: OUT-1/DBG-5: option D (2f lock-in on R21 supply current + 100k offset) verified in sim/checks/selftest_lockin.py: -12 dBFS |Z|<=1.9 %, phase<=0.7 deg; -22 dBFS <=3 %/3.4 deg at 0.25 s; -32 unusable; offset R still to add (router item OUT-1B)
+- 2026-10-07 12:39 review SUB-OUTPUT by backlog-agent: OUT-1/DBG-5: option D (2f lock-in on R21 supply current + 100k offset) verified in sim/checks/selftest_lockin.py: -12 dBFS |Z|<=1.9 %, phase<=0.7 deg; -22 dBFS <=3 %/3.4 deg at 0.25 s; -32 unusable; offset R still to add (router item OUT-1B)
+- 2026-10-07 12:39 review SUB-DEBUG-TEST by backlog-agent: OUT-1/DBG-5: option D (2f lock-in on R21 supply current + 100k offset) verified in sim/checks/selftest_lockin.py: -12 dBFS |Z|<=1.9 %, phase<=0.7 deg; -22 dBFS <=3 %/3.4 deg at 0.25 s; -32 unusable; offset R still to add (router item OUT-1B)
+- 2026-10-07 12:39 checkin SUB-OUTPUT by backlog-agent
+- 2026-10-07 12:39 checkin SUB-DEBUG-TEST by backlog-agent

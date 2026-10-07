@@ -97,9 +97,9 @@
    }
   },
   "SUB-DEBUG-TEST": {
-   "by": "docs-phase2-rewrite",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "OUT-1/DBG-5: option D (2f lock-in on R21 supply current + 100k offset) verified in sim/checks/selftest_lockin.py: -12 dBFS |Z|<=1.9 %, phase<=0.7 deg; -22 dBFS <=3 %/3.4 deg at 0.25 s; -32 unusable; offset R still to add (router item OUT-1B)",
    "stamp": {
     "block:DEBUG": "eb54d1edb852e4fd",
     "block:SELFTEST": "b91fae734845754d",
@@ -118,7 +118,7 @@
   "SUB-OUTPUT": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "PROC-6R: RM0456 Rev 7 TIM1 break sources read: ADC1(PA6)->MDF1 out-of-limit->mdf1_break0->TIM1 BKCMP7E is a CPU-independent fault break with no board change; COMP excluded (PA6 not a COMP input); ocref_clr path rejected (ES0499 2.16.2); ADC1 dedicated while guarding (VBAT to ADC4). Docs only, decision stays with owner",
+   "note": "OUT-1/DBG-5: option D (2f lock-in on R21 supply current + 100k offset) verified in sim/checks/selftest_lockin.py: -12 dBFS |Z|<=1.9 %, phase<=0.7 deg; -22 dBFS <=3 %/3.4 deg at 0.25 s; -32 unusable; offset R still to add (router item OUT-1B)",
    "stamp": {
     "block:BRIDGE": "cfe0c5bab46b5005",
     "block:SELFTEST": "b91fae734845754d"
@@ -357,9 +357,9 @@
    }
   },
   "R-OUT-DEBUG": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: plm now builds the SKiDL circuit with the current design's package set (hw/current.yaml, MZ-2). Changes are the ECR-0018 package swaps only (footprint/LCSC/value of D4, R14, R2, R18, R21/R22/C22); nets unchanged: bom_check nets 195/195 and pod_mz2.net == SKiDL, interfaces.py pins/rails unchanged vs Rev G",
+   "note": "OUT-1/DBG-5: option D (2f lock-in on R21 supply current + 100k offset) verified in sim/checks/selftest_lockin.py: -12 dBFS |Z|<=1.9 %, phase<=0.7 deg; -22 dBFS <=3 %/3.4 deg at 0.25 s; -32 unusable; offset R still to add (router item OUT-1B)",
    "stamp": {
     "block:SELFTEST": "b91fae734845754d",
     "net:BRIDGE_RTN": "ba784679c5066ccc"

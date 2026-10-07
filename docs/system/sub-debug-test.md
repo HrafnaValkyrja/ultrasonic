@@ -204,6 +204,7 @@ option_bytes: "set nSWBOOT0=0, nBOOT0=1 only once a write-protected boot stub wo
 - id: DBG-5
   t: "self-test = requirements only (FWSIM-R57..R61); no firmware; self-test-firmware.md missing; |Z| method unverified (sub-output issue 1 option D)"
   close: "verify option D in sim/checks/bridge_spice.py (LN-M03 now passes)"
+  status: "method verified 2026-10-07 (sim/checks/selftest_lockin.py): -12 dBFS |Z| <= 1.9 %, phase <= 0.7 deg; -22 dBFS <= 3 % / 3.4 deg at 0.25 s/point; -32 unusable. Needs the (B) 100k offset R (not in gen.py yet: schematic + placement/route item). Firmware note still missing (PROC-7)"
 - id: DBG-6
   t: "ROM DFU: AN2606 'VDDUSB must be 3.3 V' vs +3V0 2.955-3.045 V; DS13737 fn 1: functional, degraded electricals below 3.0 V (sub-dock-usb)"
   close: "bring-up steps 3 + 6 incl. 2.95 V on TP4"
