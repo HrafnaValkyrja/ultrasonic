@@ -212,3 +212,7 @@
 - 2026-10-07 12:04 checkin REG-ARM by claude-ecr0001
 - 2026-10-07 12:04 checkin REG-POD-BODY by claude-ecr0001
 - 2026-10-07 12:04 checkin REG-PAD by claude-ecr0001
+- 2026-10-07 12:05 review PHYSICAL by claude-ecr0001: ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell
+- 2026-10-07 12:05 review REG-ARM by claude-ecr0001: ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell
+- 2026-10-07 12:05 review REG-POD-BODY by claude-ecr0001: ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell
+- 2026-10-07 12:05 review REG-PAD by claude-ecr0001: ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell

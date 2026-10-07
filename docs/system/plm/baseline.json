@@ -20,12 +20,12 @@
    }
   },
   "PHYSICAL": {
-   "by": "docs-phase2-rewrite",
+   "by": "claude-ecr0001",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell",
    "stamp": {
     "file:docs/build/tolerances.md": "13099f559e727c93",
-    "file:hw/mech/frame.py": "a4558cc4b7da5a09",
+    "file:hw/mech/frame.py": "c7981bfec8a45660",
     "sym:hw/mech/dims_r2.py::B_GAP": "9e0415c00f9dc49a",
     "sym:hw/mech/dims_r2.py::CAV": "57e979455ac943d6",
     "sym:hw/mech/dims_r2.py::CELL": "77243a4be17c6775",
@@ -37,12 +37,12 @@
    }
   },
   "REG-ARM": {
-   "by": "docs-phase2-rewrite",
+   "by": "claude-ecr0001",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell",
    "stamp": {
-    "file:hw/mech/frame.py": "a4558cc4b7da5a09",
-    "file:hw/mech/heel.py": "47a6a72f88e793a7",
+    "file:hw/mech/frame.py": "c7981bfec8a45660",
+    "file:hw/mech/heel.py": "a6aaafbeaa3839e1",
     "file:sim/checks/niti_arm_real.py": "62944f12dde4e774"
    }
   },
@@ -58,21 +58,21 @@
    }
   },
   "REG-PAD": {
-   "by": "docs-phase2-rewrite",
+   "by": "claude-ecr0001",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell",
    "stamp": {
     "file:hw/mech/pad.py": "00d8456a0d641613",
     "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
-    "file:hw/padboard/mech.py": "7f658b878ab3e395"
+    "file:hw/padboard/mech.py": "63ebe69b0207a26c"
    }
   },
   "REG-POD-BODY": {
-   "by": "ultrasonic-lead",
+   "by": "claude-ecr0001",
    "date": "2026-10-07",
-   "note": "2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)",
+   "note": "ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell",
    "stamp": {
-    "file:hw/mech/blade.py": "48f90fab3319fbad",
+    "file:hw/mech/blade.py": "20e890c775848522",
     "file:hw/mech/dims_r2.py": "2e56e5d5e9675ad1",
     "file:hw/mech/shell_r2.py": "6ecadd65f1af5dbe",
     "file:hw/mech/styles.py": "23dcb6bfe495f82f"
