@@ -293,3 +293,7 @@
 - 2026-10-07 12:50 checkin PHYSICAL by backlog-agent
 - 2026-10-07 12:50 checkin REG-POD-BODY by backlog-agent
 - 2026-10-07 12:50 checkin WHOLE by backlog-agent
+- 2026-10-07 12:51 checkout SUB-DOCK-USB by backlog-agent: DK-18: D5 TPD1E10B06 ratings read (SLLSEB1G)
+- 2026-10-07 12:51 review SUB-DOCK-USB by backlog-agent: DK-18: D5 TPD1E10B06 SLLSEB1G read: VRWM 5.5 V, ILEAK<=100 nA at 5 V, VBR>=6 V; dock VBUS within VRWM; docs only
+- 2026-10-07 12:51 review R-PWR-DOCK by backlog-agent: DK-18: D5 TPD1E10B06 SLLSEB1G read: VRWM 5.5 V, ILEAK<=100 nA at 5 V, VBR>=6 V; dock VBUS within VRWM; docs only
+- 2026-10-07 12:51 checkin SUB-DOCK-USB by backlog-agent

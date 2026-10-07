@@ -64,6 +64,7 @@ The board-parts table above is the 2026-09-30 (Rev E) BOM: U3 is now the TI BQ25
 |---|---|---|---|---|---|
 | U3 charger | TI BQ25180 datasheet SLUSE99C, https://www.ti.com/lit/ds/symlink/bq25180.pdf | Rev C | c2008f613723fec3 | 2026-10-02 | sub-power, audit-datasheet-claims.md, simplify/power.md |
 | Cell | Renata ICP501233PA-02 specification | V03, 08/2019 | c3bb2ebe9c1d78af | 2026-10-01 | sub-power `cell:` block |
+| D5, D6 ESD | TI TPD1E10B06 datasheet SLLSEB1G, https://www.ti.com/lit/ds/symlink/tpd1e10b06.pdf | rev Aug 2024 | 6ffe72cb5f5e607f | 2026-10-07 | sub-dock-usb DK-18 (V_RWM 5.5, I_LEAK 100 nA at 5 V, V_BR 6 V min) |
 | Board/cell bond | 3M VHB Tape Specialty Tape 4914 TDS, https://multimedia.3m.com/mws/media/2366463O/3M-VHB-Tape-Specialty-Tape-4914.pdf | rev 2024-09 (supersedes 2024-06) | 2fc355523c5e5dff | 2026-10-07 | dims_r2.switch_stack (thickness ±15 %), sim/checks/sw1_press_fem.py (85 kPa dynamic design factor, 900 kPa normal tensile) |
 
 ## To close the gap
