@@ -266,7 +266,14 @@ def stage_variants(cfg):
         a = arm_build(f"var_{tag}_arm", defs)
         ra = row(f"var_{tag}_arm.build", "PASS" if a["ok"] else "FAIL", f"flash {a.get('flash', '-')} B" if a["ok"] else "error", "builds", op="",
                  basis="arm-none-eabi-gcc " + " ".join(defs), src="FWSIM-R5", detail=None if a["ok"] else a["err"], wall=a["wall"])
-        return [r, ra]
+        rows_ = [r, ra]
+        if a["ok"]:   # FWSIM-R19: variant (b) has no exemption code at all (nm), variant (a) has it
+            _, so, _, _ = run(["arm-none-eabi-nm", a["elf"]])
+            has = "fw_selftest_hop" in so
+            want = m["exemption"] == "a"
+            rows_.append(row(f"var_{tag}_arm.selftest_symbol", "PASS" if has == want else "FAIL", "present" if has else "absent",
+                             "present" if want else "absent", basis="arm-none-eabi-nm: fw_selftest_hop (ECR-0009 exemption path)", src="FWSIM-R19"))
+        return rows_
 
     with cf.ThreadPoolExecutor(max_workers=cfg.jobs) as ex:
         for rs in ex.map(one, v["matrix"]):

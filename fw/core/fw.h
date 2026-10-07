@@ -12,6 +12,8 @@
 #include <stdint.h>
 #include "dsp.h"
 #include "knobs.h"
+#include "modes.h"
+#include "variant_config.h"
 
 #define FW_ABI_VERSION 1u
 #define FW_HOP_N 128u                         /* input samples per hop */
@@ -42,6 +44,11 @@ typedef enum {
     FW_EV_MIC_FAULT,
     FW_EV_KNOBS_DEFAULTED,                    /* knob store empty or bad (FWSIM-R6) */
     FW_EV_KNOBS_CLAMPED,                      /* stored knobs outside today's ranges were clamped */
+    FW_EV_BTN_EDGE,                           /* raw BTN (PA0) level change, arg = level (debounced in core, FWSIM-R29) */
+    FW_EV_BREAK,                              /* TIM1 break latched by the MDF1 out-of-limit detector (FWSIM-R65) */
+    FW_EV_QUIET,                              /* idle detector: nothing to hear -> IDLE */
+    FW_EV_WAKE,                               /* idle detector: activity -> back to the mode before IDLE */
+    FW_EV_USB_ENUMERATED,                     /* USB configured: charger ILIM may leave 100 mA (FWSIM-R20) */
     FW_EV_COUNT
 } fw_event_id_t;
 
@@ -60,6 +67,9 @@ typedef struct {
     uint32_t last_event;
     int32_t last_arg;
     uint32_t event_count[FW_EV_COUNT];
+    fw_sys_t sys;             /* modes, gestures, docked interlock, self-test, break latch (FWSIM-R18, R19, R29, R65) */
+    int32_t vol_offset_cdb;   /* volume applied to the DSP gain */
+    uint32_t usb_enumerated;
     fw_dsp_t dsp;             /* DSP chain state (FWSIM-R13): front end, algorithm, interpolator, limiter, shaper */
 } fw_state_t;
 
@@ -75,6 +85,14 @@ size_t fw_hop_d2(fw_state_t *st, const int32_t in400[2u * FW_HOP_N], uint16_t *c
 int fw_set_noise_cal(fw_state_t *st, const float *band_energy, uint32_t n);
 void fw_poll(fw_state_t *st, uint64_t now_us);
 void fw_event(fw_state_t *st, fw_event_id_t id, int32_t arg, uint64_t now_us);
-size_t fw_cdc_rx(fw_state_t *st, const uint8_t *buf, size_t len, uint8_t *reply, size_t reply_cap);   /* FWSIM-R57 codec: later */
+/* CDC commands (minimal framing until the FWSIM-R57 codec): 0xA5, type, len, payload. Types: 0x01 ST_ARM {int16 amp_cdb, uint16 freq_hz},
+ * 0x02 ST_STOP, 0x03 RAW {int16 q15 V_diff/Vdd: bring-up constant drive}, 0x04 DFU_REQ. Reply: 1 byte ACK 0x06 / NACK 0x15. Every drive these
+ * paths produce goes through fw_ccr_from_amp (FWSIM-R64) and only in DOCKED_SELFTEST (ECR-0009 variant a). */
+size_t fw_cdc_rx(fw_state_t *st, const uint8_t *buf, size_t len, uint8_t *reply, size_t reply_cap);
+fw_outputs_t fw_outputs(const fw_state_t *st);
+void fw_brk_clear_done(fw_state_t *st);   /* the app cleared TIM1 BIF as fw_outputs().brk_clear asked */
+#if FW_VAR_DOCKED_OUTPUT_MAX
+size_t fw_selftest_hop(fw_state_t *st, float y8[FW_DSP_OUT_N], const fw_ccr_bounds_t *b, uint16_t *ccr, uint32_t *hits);
+#endif
 uint32_t fw_state_hash(const fw_state_t *st);
 #endif

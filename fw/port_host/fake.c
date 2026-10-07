@@ -43,6 +43,10 @@ static struct {
     uint8_t i2c_addr[I2C_DEV_CAP];
     uint8_t i2c_reg[I2C_DEV_CAP][256];
     uint32_t i2c_n;
+    uint32_t bq_attached, bq_wd_started, pa1_stuck;
+    uint64_t bq_last_us;
+    fake_bq_state_t bq;
+    fake_brk_state_t brk;
     bool vbus, usb_on;
     uint8_t usb_rx[512], usb_tx[512];
     size_t usb_rx_n, usb_rx_i, usb_tx_n;
@@ -285,6 +289,8 @@ hal_status_t hal_pwm_start(void)
         return e;
     if (!F.pwm.configured)
         return HAL_EINVAL;
+    if (F.brk.latched)
+        return HAL_BUSY;                          /* MOE cannot be set while BIF is latched */
     F.pwm.running = 1u;
     return HAL_OK;
 }
@@ -354,6 +360,42 @@ static int i2c_dev(uint8_t addr7)
             return (int)i;
     return -1;
 }
+#define BQ_ADDR 0x6Au
+static const uint8_t bq_reset[13] = {0x00u, 0x00u, 0x00u, 0x46u, 0x05u, 0x2Cu, 0x56u, 0x84u, 0x4Du, 0x11u, 0x40u, 0x00u, 0xC0u};
+static void bq_defaults(uint8_t *r)
+{
+    memcpy(&r[3], &bq_reset[3], 10u);
+}
+static void bq_access(int d)                      /* watchdog + status before every transaction to the charger */
+{
+    uint8_t *r = F.i2c_reg[d];
+    if (F.bq_wd_started) {
+        uint32_t sel = r[7] & 3u;
+        uint64_t limit = sel == 2u ? 40000000u : 160000000u;
+        if (sel != 3u && F.t_us - F.bq_last_us >= limit) {
+            bq_defaults(r);
+            if (sel == 0u)
+                F.bq.wd_reverts++;
+            else
+                F.bq.hw_resets++;
+            F.bq_wd_started = 0u;                 /* restarts at the next transaction */
+        }
+    }
+    r[0] = (uint8_t)((r[0] & 0xFEu) | (F.vbus ? 1u : 0u));   /* STAT0 VIN_PGOOD */
+    F.bq_last_us = F.t_us;
+    F.bq_wd_started = 1u;
+    F.bq.txns++;
+}
+void fake_bq25180_attach(void)
+{
+    fake_i2c_attach(BQ_ADDR);
+    int d = i2c_dev(BQ_ADDR);
+    if (d >= 0)
+        bq_defaults(F.i2c_reg[d]);
+    F.bq_attached = 1u;
+}
+const fake_bq_state_t *fake_bq(void) { return &F.bq; }
+
 hal_status_t hal_i2c_write(uint8_t addr7, uint8_t reg, const uint8_t *buf, size_t len)
 {
     hal_status_t e = enter(FAKE_FN_hal_i2c_write, addr7, (uint32_t)reg << 8 | (len ? buf[0] : 0u));
@@ -364,7 +406,13 @@ hal_status_t hal_i2c_write(uint8_t addr7, uint8_t reg, const uint8_t *buf, size_
         return HAL_NACK;
     if (buf == NULL || (size_t)reg + len > 256u)
         return HAL_EINVAL;
+    if (F.bq_attached && addr7 == BQ_ADDR)
+        bq_access(d);
     memcpy(&F.i2c_reg[d][reg], buf, len);
+    if (F.bq_attached && addr7 == BQ_ADDR && reg <= 9u && (size_t)reg + len > 9u && (F.i2c_reg[d][9] & 0x80u)) {
+        bq_defaults(F.i2c_reg[d]);                /* SHIP_RST.REG_RST: software reset (self-clearing) */
+        F.bq.sw_resets++;
+    }
     return HAL_OK;
 }
 hal_status_t hal_i2c_read(uint8_t addr7, uint8_t reg, uint8_t *buf, size_t len)
@@ -377,6 +425,8 @@ hal_status_t hal_i2c_read(uint8_t addr7, uint8_t reg, uint8_t *buf, size_t len)
         return HAL_NACK;
     if (buf == NULL || (size_t)reg + len > 256u)
         return HAL_EINVAL;
+    if (F.bq_attached && addr7 == BQ_ADDR)
+        bq_access(d);
     memcpy(buf, &F.i2c_reg[d][reg], len);
     return HAL_OK;
 }
@@ -397,7 +447,7 @@ bool hal_usb_vbus(void)
 {
     if (enter(FAKE_FN_hal_usb_vbus, 0u, 0u) != HAL_OK)
         return false;
-    return F.vbus;
+    return F.pa1_stuck ? F.pa1_stuck == 2u : F.vbus;
 }
 hal_status_t hal_usb_enable(bool on)
 {
@@ -589,3 +639,44 @@ hal_status_t hal_fmac_fir_bank(const int16_t *coef, uint32_t n_phase, uint32_t t
     fw_fmac_model_bank(coef, n_phase, taps, r_gain, x, n_new, y);   /* bit-accurate FMAC model (fw/core/fmac_model.c) */
     return HAL_OK;
 }
+
+/* ------------------------------------------------------------------------------------------- break (FWSIM-R65) */
+hal_status_t hal_brk_arm(uint32_t threshold_ma)
+{
+    hal_status_t e = enter(FAKE_FN_hal_brk_arm, threshold_ma, 0u);
+    if (e != HAL_OK)
+        return e;
+    F.brk.armed = 1u;
+    F.brk.threshold_ma = threshold_ma;
+    F.brk.arms++;
+    return HAL_OK;
+}
+void hal_brk_disarm(void)
+{
+    (void)enter(FAKE_FN_hal_brk_disarm, 0u, 0u);
+    F.brk.armed = 0u;
+    F.brk.disarms++;
+}
+bool hal_brk_latched(void)
+{
+    if (enter(FAKE_FN_hal_brk_latched, 0u, 0u) != HAL_OK)
+        return true;                              /* an unreadable break status reads as tripped (fail safe) */
+    return F.brk.latched != 0u;
+}
+void hal_brk_clear(void)
+{
+    (void)enter(FAKE_FN_hal_brk_clear, 0u, 0u);
+    F.brk.latched = 0u;
+    F.brk.clears++;
+}
+void fake_isense_ma(int32_t ma)
+{
+    uint32_t a = (uint32_t)(ma < 0 ? -ma : ma);
+    if (F.brk.armed && a > F.brk.threshold_ma) {
+        F.brk.latched = 1u;
+        F.brk.trips++;
+        F.pwm.running = 0u;                       /* hardware: MOE cleared, outputs to the safe idle state */
+    }
+}
+const fake_brk_state_t *fake_brk(void) { return &F.brk; }
+void fake_pa1_stuck(uint32_t mode) { F.pa1_stuck = mode; }

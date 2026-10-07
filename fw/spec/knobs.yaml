@@ -7,8 +7,8 @@
 # Coverage: the knobs_required ids of docs/sim/firmware-emulation.yaml that the foundation needs; the rest are added with their
 # feature (FWSIM-R6 status lists them). Adding, removing or retyping a knob bumps `version` (stored records then load as defaults + event).
 schema: 1
-version: 2
-updated: 2026-10-07   # v2: DSP knobs (b_variant, transient_only, volume_cdb, noise_margin_cdb, a_lo_hz, limiter_release_ms); squelch_hold_ms default 20
+version: 3
+updated: 2026-10-07   # v3: ui/fsm/charger/break knobs, ts_hot_code fixed to 45 C; v2: DSP knobs (b_variant, transient_only, volume_cdb, noise_margin_cdb, a_lo_hz, limiter_release_ms); squelch_hold_ms default 20
 assumed: "assumed (no source yet; FWSIM knobs_required lists the id only)"
 
 hard_clamps:
@@ -50,7 +50,7 @@ knobs:
   - {id: out_hi_hz, def: 4000, min: 2000, max: 6000, unit: Hz, src: "spec D9"}
   - {id: n_bands, def: 28, min: 28, max: 28, unit: band, src: "sim/dsp/pipeline.py BConfig (taps fixed at 28: FWSIM-R10); b_variant 1 uses 16"}
   - {id: b_variant, def: 0, min: 0, max: 1, unit: enum, src: "0 = spec B (28 bands, 256-pt frames every 128 samples); 1 = slim B (16 bands, no overlap: frames every 256 samples, 1.28 ms) docs/research/drastic/V4-cycles.yaml B_slim1; listening test E2 chooses"}
-  - {id: transient_only, def: 1, min: 0, max: 1, unit: bool, src: "spec D12 L220-L222 (1 = transient mode, indoor default; 0 = full mode, only the mic self-noise is removed)"}
+  - {id: transient_only, def: 1, min: 0, max: 1, unit: bool, src: "spec D12 L220-L222: the power-on / re-match DEFAULT mode (1 = Transient-only, indoor default; 0 = Full: only the mic self-noise is removed); the live mode is the FSM's (Full/Transient gesture), which sets the DSP gate"}
   - {id: noise_margin_cdb, def: 600, min: 0, max: 2000, unit: cdB, src: "sim/dsp/pipeline.py BConfig noise_margin_db 6"}
   - {id: a_lo_hz, def: 38000, min: 20000, max: 80000, unit: Hz, src: "FWSIM knobs_required.dsp lo_hz = 38000 for A; pipeline.algo_a f_lo"}
   - {id: gate_cdb, def: 600, min: 0, max: 2000, unit: cdB, src: "sim/dsp/pipeline.py BConfig gate_db 6"}
@@ -68,13 +68,21 @@ knobs:
   - {id: ichg_code_warm, def: FW_VAR_ICHG_CODE_MAX, min: 5, max: FW_VAR_ICHG_CODE_MAX, hard: {max: HC_ICHG_CODE_MAX}, unit: code, src: "sub-power.md ICHG code 44 = 170 mA at 20-45 C (175 mAh cell; K1 code 40 = 130 mA)"}
   - {id: ichg_code_cool, def: 32, min: 5, max: FW_VAR_ICHG_CODE_MAX, hard: {max: HC_ICHG_CODE_MAX}, unit: code, src: "sub-power.md ICHG code 32 = 50 mA below 20 C"}
   - {id: vbatreg_code, def: 0x46, min: 0x3C, max: FW_VAR_VBATREG_CODE_MAX, hard: {max: HC_VBATREG_CODE_MAX}, unit: code, src: "sub-power.md VBATREG 0x46 = 4.20 V; tws-power-size.md s3 (0x3C-0x41 = 4.10-4.15 V)"}
-  - {id: ts_hot_code, def: 3, min: 0, max: 3, hard: {max: HC_TS_HOT_CODE_MAX}, unit: code, src: "sub-power.md TS_HOT 0b11 (45 C)"}
+  - {id: ts_hot_code, def: 3, min: 3, max: 3, hard: {max: HC_TS_HOT_CODE_MAX}, unit: code, src: "sub-power.md TS_HOT 0b11 (45 C); SLUSE99C Table 8-20: 00 = 60, 01 = 65, 10 = 50, 11 = 45 C - a lower code is HOTTER, so the knob is pinned to 3 (v3; v2 allowed 0-3 = up to 65 C)"}
+  - {id: chg_keepalive_s, def: 60, min: 5, max: 80, unit: s, src: "FWSIM-R20 keep-alive <= half the BQ25180 160 s watchdog (SLUSE99C Table 8-16 WATCHDOG_SEL 01)"}
   - {id: ilim_pre_enum_ma, def: 100, min: 50, max: 500, unit: mA, src: "sub-power.md ILIM 100 mA until enumeration (ECR-0013 F1)"}
   - {id: vindpm_mv, def: 4200, min: 4200, max: 4700, unit: mV, src: "sub-power.md VINDPM 4.2 V"}
   - {id: charger_log_period_s, def: 1, min: 1, max: 60, unit: s, src: "FWSIM-R62"}
   # ---- ui
   - {id: stuck_button_s, def: 5, min: 1, max: 60, unit: s, src: "sub-ui.md issue 7 (FWSIM-R29 default 5 s)"}
+  - {id: gesture_option, def: 2, min: 1, max: 3, unit: enum, src: "sub-ui.md issue 5: 1 = A (short = next mode, hold = volume), 2 = B (short = Full/Transient, double = volume, hold = Off; recommended), 3 = C (short = toggle, hold = volume, long hold = Off); owner packet 2 decides"}
+  - {id: debounce_ms, def: 10, min: 2, max: 50, unit: ms, src: "FWSIM-R29 (bounce <= 6 ms, C&K KMT0 p.B-9 via sub-ui.md)"}
+  - {id: double_window_ms, def: 300, min: 100, max: 800, unit: ms, src: "sub-ui.md issue 5 option B (~0.3 s wait to rule out a double)"}
+  - {id: hold_ms, def: 2000, min: 500, max: 5000, unit: ms, src: "sub-ui.md issue 5 option B (hold >= ~2 s = Off); option A/C: volume hold"}
+  - {id: hold2_ms, def: 4000, min: 1000, max: 10000, unit: ms, src: "sub-ui.md issue 5 option C (third hold length = Off)"}
   # ---- self-test and dock interlock
   - {id: selftest_cap_cdb, def: -1200, min: -6000, max: -1200, hard: {max: HC_SELFTEST_CAP_CDB_MAX}, unit: cdBFS, src: "FWSIM knobs_required.selftest -12 dBFS; ECR-0009"}
   - {id: selftest_max_s, def: 60, min: 1, max: 600, unit: s, src: "FWSIM-R19 (default 60 s)"}
+  - {id: brk_margin_ma, def: 30, min: 0, max: 100, unit: mA, src: "FWSIM-R65 break threshold = i_peak_max (FWSIM-R64) + margin"}
+  - {id: brk_cooldown_ms, def: 2000, min: 100, max: 60000, unit: ms, src: "FWSIM-R65 latched break cleared only after a cool-down (assumed value)"}
   - {id: docked_output, def: 0, min: 0, max: FW_VAR_DOCKED_OUTPUT_MAX, hard: {max: HC_DOCKED_OUTPUT_MAX}, unit: bool, src: "ECR-0009 item 1 (0 unless exemption variant a)"}

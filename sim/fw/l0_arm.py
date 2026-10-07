@@ -32,7 +32,7 @@ QEMU = ["qemu-system-arm", "-M", "mps2-an505", "-nographic", "-monitor", "none",
 
 
 def build(defines=()):
-    core = [p for p in fwsim.CORE if p.stem not in ("app", "knob_store")]          # no HAL users in the L0 image
+    core = [p for p in fwsim.CORE if p.stem not in ("app", "knob_store", "charger")]          # no HAL users in the L0 image
     srcs = core + sorted((FW / "port_qemu").glob("*.c"))
     h = hashlib.sha256()
     for p in srcs + sorted(p for d in ("core", "gen", "hal") for p in (FW / d).glob("*.h")) + [FW / "port_qemu/an505.ld"]:

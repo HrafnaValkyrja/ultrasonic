@@ -20,7 +20,8 @@
     X(hal_wdt_start) X(hal_wdt_kick) \
     X(hal_time_us) X(hal_time_cycles) \
     X(hal_irq_save) X(hal_irq_restore) \
-    X(hal_fmac_fir_bank)
+    X(hal_fmac_fir_bank) \
+    X(hal_brk_arm) X(hal_brk_disarm) X(hal_brk_latched) X(hal_brk_clear)
 
 #define FAKE_FN_ID(f) FAKE_FN_##f,
 typedef enum { FAKE_HAL_FUNCS(FAKE_FN_ID) FAKE_FN_COUNT } fake_fn_t;
@@ -66,6 +67,17 @@ fw_ring_t *fake_adf_ring(void);
 
 /* I2C: register-file devices (256 x 8 bit) per 7-bit address; absent address -> HAL_NACK */
 void fake_i2c_attach(uint8_t addr7);
+/* BQ25180 behaviour (SLUSE99C Rev C, registers 0x00-0x0C, reset values Table 8-9..8-21): watchdog per IC_CTRL WATCHDOG_SEL starts at the
+ * first transaction, any transaction restarts it; 00 = registers back to reset values after 160 s, 01 = HW reset after 160 s, 10 = after
+ * 40 s, 11 = off; REG_RST; STAT0 VIN_PGOOD follows fake_vbus. Evaluated at each access to 0x6A (lazily, with simulated time). */
+typedef struct { uint32_t wd_reverts, hw_resets, sw_resets, txns; } fake_bq_state_t;
+void fake_bq25180_attach(void);
+const fake_bq_state_t *fake_bq(void);
+/* FWSIM-R65 break model: supply current seen by the MDF1 detector; above the armed threshold -> latched, PWM MOE cleared */
+void fake_isense_ma(int32_t ma);
+void fake_pa1_stuck(uint32_t mode);   /* 0 = follows fake_vbus, 1 = PA1 reads low, 2 = PA1 reads high (FWSIM-R19 faults) */
+typedef struct { uint32_t armed, threshold_ma, latched, trips, arms, disarms, clears; } fake_brk_state_t;
+const fake_brk_state_t *fake_brk(void);
 uint8_t *fake_i2c_regs(uint8_t addr7);                  /* NULL if not attached */
 
 /* PWM: the CCR streams submitted, in order */

@@ -15,4 +15,5 @@
 #include "hal_time.h"
 #include "hal_irq.h"
 #include "hal_fmac.h"
+#include "hal_brk.h"
 #endif

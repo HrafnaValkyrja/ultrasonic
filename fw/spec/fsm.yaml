@@ -1,0 +1,69 @@
+# fw/spec/fsm.yaml: THE mode state machine (FWSIM-R18, spec D12 L218-L222, D3 L119-L125, sub-ui.md interaction model + issue 5).
+# fw/tools/gen.py writes fw/gen/fsm_table.h from it; fw/core/modes.c executes the table. Every (state, event) cell must appear exactly once,
+# either as a transition or in the state's `ignore` list (gen.py refuses otherwise). Targets: a state, or SAME / PREV (IDLE wake: the mode
+# before IDLE) / PREV_TOGGLED / DEFAULT (knob transient_only: the power-on mode). Guards: ALWAYS, EXEMPTION (variant a + knob docked_output + VBUS present),
+# COOLDOWN (brk_cooldown_ms since the fault latched). Gestures: the recogniser's raw gestures -> FSM events per option (knob gesture_option).
+schema: 1
+states: ["OFF", FULL, TRANSIENT, IDLE, DOCKED_CHARGE, DOCKED_SELFTEST, DFU_PENDING, SAFE]
+events: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT, FAULT_CLEAR]
+actions: [NONE, VOL_STEP, LOAD_DEFAULTS, SAVE_PREV, ST_START, ST_END]
+guards: [ALWAYS, EXEMPTION, COOLDOWN]
+transitions:
+  "OFF":
+    G_ANY: [DEFAULT, LOAD_DEFAULTS]
+    G_TOGGLE: [DEFAULT, LOAD_DEFAULTS]
+    G_NEXT: [DEFAULT, LOAD_DEFAULTS]
+    VBUS_ON: [DOCKED_CHARGE]
+    FAULT: [SAFE]
+    ignore: [G_VOL, G_OFF, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
+  FULL:
+    G_TOGGLE: [TRANSIENT]
+    G_NEXT: [TRANSIENT]
+    G_VOL: [SAME, VOL_STEP]
+    G_OFF: ["OFF"]
+    QUIET: [IDLE, SAVE_PREV]
+    VBUS_ON: [DOCKED_CHARGE]
+    FAULT: [SAFE]
+    ignore: [G_ANY, VBUS_OFF, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
+  TRANSIENT:
+    G_TOGGLE: [FULL]
+    G_NEXT: ["OFF"]
+    G_VOL: [SAME, VOL_STEP]
+    G_OFF: ["OFF"]
+    QUIET: [IDLE, SAVE_PREV]
+    VBUS_ON: [DOCKED_CHARGE]
+    FAULT: [SAFE]
+    ignore: [G_ANY, VBUS_OFF, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
+  IDLE:                     # low-power listening: bridge stopped, wake detector running; a gesture acts on the mode it woke into
+    WAKE: [PREV]
+    G_TOGGLE: [PREV_TOGGLED]
+    G_NEXT: [PREV_TOGGLED]
+    G_VOL: [PREV, VOL_STEP]
+    G_OFF: ["OFF"]
+    VBUS_ON: [DOCKED_CHARGE]
+    FAULT: [SAFE]
+    ignore: [G_ANY, VBUS_OFF, QUIET, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
+  DOCKED_CHARGE:            # ECR-0009: no output while docked
+    VBUS_OFF: ["OFF"]
+    ST_ARM: [DOCKED_SELFTEST, ST_START, EXEMPTION]
+    DFU_REQ: [DFU_PENDING]
+    FAULT: [SAFE]
+    ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, QUIET, WAKE, ST_STOP, ST_TIMEOUT, FAULT_CLEAR]
+  DOCKED_SELFTEST:          # variant (a) exemption only: capped drive, max duration, stops within one hop of unplug
+    ST_STOP: [DOCKED_CHARGE, ST_END]
+    ST_TIMEOUT: [DOCKED_CHARGE, ST_END]
+    VBUS_OFF: ["OFF", ST_END]
+    FAULT: [SAFE, ST_END]
+    ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, QUIET, WAKE, ST_ARM, DFU_REQ, FAULT_CLEAR]
+  DFU_PENDING:              # the port resets into the boot stub (FWSIM-R21); unplug aborts
+    VBUS_OFF: ["OFF"]
+    FAULT: [SAFE]
+    ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT_CLEAR]
+  SAFE:                     # FWSIM-R65 break latched (or another fault): bridge off until the cool-down, then Off
+    FAULT_CLEAR: ["OFF", NONE, COOLDOWN]
+    ignore: [G_TOGGLE, G_VOL, G_NEXT, G_OFF, G_ANY, VBUS_ON, VBUS_OFF, QUIET, WAKE, ST_ARM, ST_STOP, ST_TIMEOUT, DFU_REQ, FAULT]
+gestures:                   # raw gesture -> event, per knob gesture_option (sub-ui.md issue 5); NONE = not used by that option
+  raw: [SHORT, DOUBLE, HOLD1, HOLD2]
+  A: {SHORT: G_NEXT, DOUBLE: NONE, HOLD1: G_VOL, HOLD2: NONE, hold1_repeats: 1, double: 0}
+  B: {SHORT: G_TOGGLE, DOUBLE: G_VOL, HOLD1: G_OFF, HOLD2: NONE, hold1_repeats: 0, double: 1}
+  C: {SHORT: G_TOGGLE, DOUBLE: NONE, HOLD1: G_VOL, HOLD2: G_OFF, hold1_repeats: 0, double: 0}

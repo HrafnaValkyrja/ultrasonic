@@ -217,12 +217,72 @@ def dsp_tables():
     return dt.generate(hdr), [str(Path(s).relative_to(REPO)) for s in srcs]
 
 
+# ------------------------------------------------------------------------------------------- fsm_table.h
+def fsm_table():
+    f = yaml.safe_load((FW / "spec/fsm.yaml").read_text())
+    st, ev, ac, gd = f["states"], f["events"], f["actions"], f["guards"]
+    special = ["SAME", "PREV", "PREV_TOGGLED", "DEFAULT"]
+    cells = {}
+    for s_ in st:
+        row = f["transitions"].get(s_)
+        if row is None:
+            raise SystemExit(f"gen: fsm state {s_} has no row")
+        seen = []
+        for e, t in row.items():
+            if e == "ignore":
+                for x in t:
+                    cells[(s_, x)] = None
+                    seen.append(x)
+                continue
+            tgt, act, grd = t[0], (t[1] if len(t) > 1 else "NONE"), (t[2] if len(t) > 2 else "ALWAYS")
+            if tgt not in st + special or act not in ac or grd not in gd or e not in ev:
+                raise SystemExit(f"gen: fsm {s_}.{e}: bad cell {t}")
+            cells[(s_, e)] = (tgt, act, grd)
+            seen.append(e)
+        if sorted(seen) != sorted(ev) or len(seen) != len(set(seen)):
+            raise SystemExit(f"gen: fsm state {s_}: every event exactly once (missing {sorted(set(ev) - set(seen))}, dup {sorted(x for x in seen if seen.count(x) > 1)})")
+    out = [HDR.format(src="fw/spec/fsm.yaml", h=inputs_hash([FW / "spec/fsm.yaml"])), "#ifndef FW_GEN_FSM_TABLE_H\n#define FW_GEN_FSM_TABLE_H\n#include <stdint.h>\n"]
+    out.append("typedef enum { " + ", ".join(f"FW_ST_{x}" for x in st) + ", FW_ST_COUNT } fw_mode_t;")
+    out.append("typedef enum { " + ", ".join(f"FW_FE_{x}" for x in ev) + ", FW_FE_COUNT } fw_fsm_ev_t;")
+    out.append("typedef enum { " + ", ".join(f"FW_AC_{x}" for x in ac) + " } fw_fsm_act_t;")
+    out.append("typedef enum { " + ", ".join(f"FW_GD_{x}" for x in gd) + " } fw_fsm_guard_t;")
+    out.append("typedef enum { FW_TG_STATE = 0, " + ", ".join(f"FW_TG_{x}" for x in special) + " } fw_fsm_tgkind_t;")
+    out.append("typedef struct { uint8_t valid, kind, state, action, guard; } fw_fsm_cell_t;   /* valid 0 = explicit ignore */")
+    out.append(f"#define FW_FSM_STATE_NAMES {{ {', '.join(chr(34) + x + chr(34) for x in st)} }}")
+    out.append(f"#define FW_FSM_EVENT_NAMES {{ {', '.join(chr(34) + x + chr(34) for x in ev)} }}")
+    out.append("#define FW_FSM_TABLE_INIT { \\")
+    for s_ in st:
+        row = []
+        for e in ev:
+            c = cells[(s_, e)]
+            if c is None:
+                row.append("{0, 0, 0, 0, 0}")
+            else:
+                tgt, act, grd = c
+                kind = f"FW_TG_{tgt}" if tgt in special else "FW_TG_STATE"
+                stv = f"FW_ST_{tgt}" if tgt in st else "0"
+                row.append(f"{{1, {kind}, {stv}, FW_AC_{act}, FW_GD_{grd}}}")
+        out.append(f"    /* {s_} */ {{ " + ", ".join(row) + " }, \\")
+    out.append("}")
+    g = f["gestures"]
+    raw = g["raw"]
+    out.append("typedef enum { " + ", ".join(f"FW_RG_{x}" for x in raw) + ", FW_RG_COUNT } fw_raw_gesture_t;")
+    out.append("typedef struct { int8_t ev[FW_RG_COUNT]; uint8_t hold1_repeats, double_used; } fw_gesture_map_t;   /* ev -1 = unused */")
+    out.append("#define FW_GESTURE_MAPS_INIT { \\")
+    for opt in ("A", "B", "C"):
+        m = g[opt]
+        evs = ", ".join("-1" if m[r] == "NONE" else f"FW_FE_{m[r]}" for r in raw)
+        out.append(f"    /* {opt} */ {{{{{evs}}}, {int(m['hold1_repeats'])}u, {int(m['double'])}u}}, \\")
+    out.append("}\n#endif\n")
+    return "\n".join(out), ["fw/spec/fsm.yaml"]
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--check", action="store_true", help="exit 1 if a committed fw/gen file differs from a fresh generation")
     ap.add_argument("--json", type=Path, help="write a result row here")
     a = ap.parse_args(argv)
-    outputs = {"board_config.h": board_config, "variant_config.h": variant_config, "knobs_def.h": knobs_def, "tables.h": tables, "dsp_tables.h": dsp_tables}
+    outputs = {"board_config.h": board_config, "variant_config.h": variant_config, "knobs_def.h": knobs_def, "tables.h": tables, "dsp_tables.h": dsp_tables, "fsm_table.h": fsm_table}
     stale, srcs = [], {}
     for name, fn in outputs.items():
         text, s = fn()

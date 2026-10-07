@@ -164,6 +164,11 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr)
     d->dither = 22695477u;                                          /* xorshift32 seed (determinism rules: fixed) */
 }
 
+void fw_dsp_set_gain_cdb(fw_dsp_t *d, int32_t volume_cdb)
+{
+    d->gain_lin = fw_db20_to_lin((3000.0f + (float)volume_cdb) * 0.01f);   /* pipeline gain_db 30 + volume */
+}
+
 int fw_dsp_set_noise(fw_dsp_t *d, const float *band_energy, uint32_t n)
 {
     if (band_energy == NULL || n != d->nb)

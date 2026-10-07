@@ -11,7 +11,7 @@
       "status": "PASS",
       "basis": "fw/gen == gen.py output now; gen refuses if interfaces [pins] FAILs (design from hw/current.yaml)",
       "src": "FWSIM-R5",
-      "wall_s": 2.46
+      "wall_s": 1.89
     },
     {
       "id": "lint",
@@ -21,75 +21,75 @@
       "status": "PASS",
       "basis": "include + absolute-address + HAL-surface rules, planted-violation self-test",
       "src": "FWSIM-R1, FWSIM-R2",
-      "wall_s": 0.06
+      "wall_s": 0.05
     },
     {
       "id": "analyzer",
       "op": "==",
       "thr": 0,
-      "last": "0 file(s) with findings / 10",
+      "last": "0 file(s) with findings / 12",
       "status": "PASS",
       "basis": "gcc -fanalyzer -Werror (core + port_host)",
       "src": "FWSIM-R11",
-      "wall_s": 1.19
+      "wall_s": 1.14
     },
     {
       "id": "asan_ubsan.tests",
       "op": "==",
       "thr": "all pass",
-      "last": "27/27 tests, 2383 checks",
+      "last": "35/35 tests, 2648 checks",
       "status": "PASS",
       "basis": "gcc -std=c11 -O1 -g...",
       "src": "FWSIM-R1, FWSIM-R11",
-      "wall_s": 9.63
+      "wall_s": 8.69
     },
     {
       "id": "host_clang.tests",
       "op": "==",
       "thr": "all pass",
-      "last": "27/27 tests, 2383 checks",
+      "last": "35/35 tests, 2648 checks",
       "status": "PASS",
       "basis": "clang-18 -std=c11 -O2 -msse2...",
       "src": "FWSIM-R1, FWSIM-R11",
-      "wall_s": 6.1
+      "wall_s": 5.62
     },
     {
       "id": "host_gcc.tests",
       "op": "==",
       "thr": "all pass",
-      "last": "27/27 tests, 2383 checks",
+      "last": "35/35 tests, 2648 checks",
       "status": "PASS",
       "basis": "gcc -std=c11 -O2 -msse2...",
       "src": "FWSIM-R1, FWSIM-R11",
-      "wall_s": 6.54
+      "wall_s": 6.01
     },
     {
       "id": "msan.tests",
       "op": "==",
       "thr": "all pass",
-      "last": "27/27 tests, 2383 checks",
+      "last": "35/35 tests, 2648 checks",
       "status": "PASS",
       "basis": "clang-18 -std=c11 -O1 -g...",
       "src": "FWSIM-R1, FWSIM-R11",
-      "wall_s": 15.49
+      "wall_s": 8.26
     },
     {
       "id": "arm.build",
       "op": "",
       "thr": "builds",
-      "last": "flash 25932 B, RAM static 6640 B + stack 8192 B",
+      "last": "flash 30940 B, RAM static 6976 B + stack 8192 B",
       "status": "PASS",
       "basis": "arm-none-eabi-gcc 14.2 -mcpu=cortex-m33 -mfloat-abi=hard -O2, same core sources as host",
       "src": "FWSIM-R1",
-      "wall_s": 0.76
+      "wall_s": 0.73
     },
     {
       "id": "stack.worst_case_fraction",
       "op": "<=",
       "thr": 0.5,
-      "last": 0.2607,
+      "last": 0.2627,
       "status": "PASS",
-      "basis": "2136 B worst case / 8192 B linker stack region (-fstack-usage + -fcallgraph-info=su)",
+      "basis": "2152 B worst case / 8192 B linker stack region (-fstack-usage + -fcallgraph-info=su)",
       "src": "FWSIM-R11",
       "detail": {
         "main_path": [
@@ -102,7 +102,7 @@
           "fw/core/dsp.c:algo_b",
           "fw/core/dsp.c:b_synth"
         ],
-        "main_bytes": 2032,
+        "main_bytes": 2048,
         "isr_path": [
           "Default_Handler"
         ],
@@ -131,13 +131,18 @@
         "core_external_symbols": [
           "__stack_chk_fail",
           "fw_arr_for_khz",
+          "fw_brk_clear_done",
           "fw_ccr_bounds",
+          "fw_chg_plan",
+          "fw_chg_service",
+          "fw_chg_ts_temp_c10",
           "fw_crc32_update",
           "fw_db20_to_lin",
           "fw_dsp_algo",
           "fw_dsp_halfband",
           "fw_dsp_init",
           "fw_dsp_out",
+          "fw_dsp_set_gain_cdb",
           "fw_dsp_set_noise",
           "fw_event",
           "fw_exp2f",
@@ -148,17 +153,35 @@
           "fw_log2f",
           "fw_om_exp",
           "fw_out_amp_max_ppm",
+          "fw_outputs",
           "fw_poll",
           "fw_sin_tab",
           "fw_store_load",
+          "fw_sys_btn_edge",
+          "fw_sys_fsm",
+          "fw_sys_init",
+          "fw_sys_outputs",
+          "fw_sys_poll",
+          "fw_sys_vbus_edge",
+          "fw_sys_volume_offset_cdb",
+          "hal_adc_read_mv",
           "hal_adf_hop_release",
           "hal_adf_hop_take",
+          "hal_brk_arm",
+          "hal_brk_clear",
+          "hal_brk_disarm",
+          "hal_brk_latched",
           "hal_flash_erase_page",
           "hal_flash_program_qw",
           "hal_flash_read",
           "hal_fmac_fir_bank",
+          "hal_i2c_read",
+          "hal_i2c_recover",
+          "hal_i2c_write",
           "hal_power_ucpd_dbdis",
           "hal_pwm_config",
+          "hal_pwm_start",
+          "hal_pwm_stop",
           "hal_pwm_submit",
           "hal_time_cycles",
           "hal_time_us",
@@ -174,81 +197,117 @@
       "id": "var_PH2_175_a.tests",
       "op": "==",
       "thr": "all pass",
-      "last": "27/27 tests, 2383 checks",
+      "last": "35/35 tests, 2805 checks",
       "status": "PASS",
       "basis": "gcc -std=c11 -O2 -msse2... -DFW_CELL=FW_CELL_PH2_175 -DFW_SELFTEST_EXEMPTION=FW_EXEMPTION_a",
       "src": "FWSIM-R5, FWSIM-R64",
-      "wall_s": 6.44
+      "wall_s": 9.31
     },
     {
       "id": "var_PH2_175_a_arm.build",
       "op": "",
       "thr": "builds",
-      "last": "flash 25932 B",
+      "last": "flash 31428 B",
       "status": "PASS",
       "basis": "arm-none-eabi-gcc -DFW_CELL=FW_CELL_PH2_175 -DFW_SELFTEST_EXEMPTION=FW_EXEMPTION_a",
       "src": "FWSIM-R5",
-      "wall_s": 0.65
+      "wall_s": 1.71
+    },
+    {
+      "id": "var_PH2_175_a_arm.selftest_symbol",
+      "op": "==",
+      "thr": "present",
+      "last": "present",
+      "status": "PASS",
+      "basis": "arm-none-eabi-nm: fw_selftest_hop (ECR-0009 exemption path)",
+      "src": "FWSIM-R19"
     },
     {
       "id": "var_PH2_175_b.tests",
       "op": "==",
       "thr": "all pass",
-      "last": "27/27 tests, 2383 checks",
+      "last": "35/35 tests, 2648 checks",
       "status": "PASS",
       "basis": "gcc -std=c11 -O2 -msse2... -DFW_CELL=FW_CELL_PH2_175 -DFW_SELFTEST_EXEMPTION=FW_EXEMPTION_b",
       "src": "FWSIM-R5, FWSIM-R64",
-      "wall_s": 6.21
+      "wall_s": 8.68
     },
     {
       "id": "var_PH2_175_b_arm.build",
       "op": "",
       "thr": "builds",
-      "last": "flash 25932 B",
+      "last": "flash 30940 B",
       "status": "PASS",
       "basis": "arm-none-eabi-gcc -DFW_CELL=FW_CELL_PH2_175 -DFW_SELFTEST_EXEMPTION=FW_EXEMPTION_b",
       "src": "FWSIM-R5",
-      "wall_s": 0.74
+      "wall_s": 1.42
+    },
+    {
+      "id": "var_PH2_175_b_arm.selftest_symbol",
+      "op": "==",
+      "thr": "absent",
+      "last": "absent",
+      "status": "PASS",
+      "basis": "arm-none-eabi-nm: fw_selftest_hop (ECR-0009 exemption path)",
+      "src": "FWSIM-R19"
     },
     {
       "id": "var_K1_130_a.tests",
       "op": "==",
       "thr": "all pass",
-      "last": "27/27 tests, 2383 checks",
+      "last": "35/35 tests, 2805 checks",
       "status": "PASS",
       "basis": "gcc -std=c11 -O2 -msse2... -DFW_CELL=FW_CELL_K1_130 -DFW_SELFTEST_EXEMPTION=FW_EXEMPTION_a",
       "src": "FWSIM-R5, FWSIM-R64",
-      "wall_s": 6.64
+      "wall_s": 9.16
     },
     {
       "id": "var_K1_130_a_arm.build",
       "op": "",
       "thr": "builds",
-      "last": "flash 25932 B",
+      "last": "flash 31428 B",
       "status": "PASS",
       "basis": "arm-none-eabi-gcc -DFW_CELL=FW_CELL_K1_130 -DFW_SELFTEST_EXEMPTION=FW_EXEMPTION_a",
       "src": "FWSIM-R5",
-      "wall_s": 0.7
+      "wall_s": 1.52
+    },
+    {
+      "id": "var_K1_130_a_arm.selftest_symbol",
+      "op": "==",
+      "thr": "present",
+      "last": "present",
+      "status": "PASS",
+      "basis": "arm-none-eabi-nm: fw_selftest_hop (ECR-0009 exemption path)",
+      "src": "FWSIM-R19"
     },
     {
       "id": "var_K1_130_b.tests",
       "op": "==",
       "thr": "all pass",
-      "last": "27/27 tests, 2383 checks",
+      "last": "35/35 tests, 2648 checks",
       "status": "PASS",
       "basis": "gcc -std=c11 -O2 -msse2... -DFW_CELL=FW_CELL_K1_130 -DFW_SELFTEST_EXEMPTION=FW_EXEMPTION_b",
       "src": "FWSIM-R5, FWSIM-R64",
-      "wall_s": 6.46
+      "wall_s": 9.72
     },
     {
       "id": "var_K1_130_b_arm.build",
       "op": "",
       "thr": "builds",
-      "last": "flash 25932 B",
+      "last": "flash 30940 B",
       "status": "PASS",
       "basis": "arm-none-eabi-gcc -DFW_CELL=FW_CELL_K1_130 -DFW_SELFTEST_EXEMPTION=FW_EXEMPTION_b",
       "src": "FWSIM-R5",
-      "wall_s": 0.66
+      "wall_s": 1.23
+    },
+    {
+      "id": "var_K1_130_b_arm.selftest_symbol",
+      "op": "==",
+      "thr": "absent",
+      "last": "absent",
+      "status": "PASS",
+      "basis": "arm-none-eabi-nm: fw_selftest_hop (ECR-0009 exemption path)",
+      "src": "FWSIM-R19"
     },
     {
       "id": "dsp.R8.vectors_sha",
@@ -276,7 +335,7 @@
       "status": "PASS",
       "basis": "sim/fw/gen_vectors.py: firmware host build vs sim/dsp/pipeline.py on 6 golden vectors x {B, slim, A}",
       "src": "FWSIM-R7, FWSIM-R13",
-      "wall_s": 4.37
+      "wall_s": 3.77
     },
     {
       "id": "dsp.L0.arm_qemu_vs_host",
@@ -286,7 +345,7 @@
       "status": "PASS",
       "basis": "sim/fw/l0_arm.py: fw/core (fwsim ARM_FLAGS) + fw/port_qemu on qemu-system-arm -M mps2-an505 (semihosting) vs sim/fw/fwlib host gcc",
       "src": "FWSIM-R7, FWSIM-R4",
-      "wall_s": 3.94
+      "wall_s": 4.48
     },
     {
       "id": "dsp.fmac_model_c_vs_py",
@@ -296,17 +355,17 @@
       "status": "PASS",
       "basis": "200 random banks (taps 2-127, 1-16 phases, R 0-7, extremes incl. accumulator wrap and saturation)",
       "src": "FWSIM-R7, FWSIM-R47",
-      "wall_s": 1.13
+      "wall_s": 1.8
     },
     {
       "id": "host_gcc_interp_cpu.tests",
       "op": "==",
       "thr": "all pass",
-      "last": "27/27 tests, 2383 checks",
+      "last": "35/35 tests, 2648 checks",
       "status": "PASS",
       "basis": "gcc -std=c11 -O2 -msse2... -DFW_INTERP_FMAC=0",
       "src": "FWSIM-R13",
-      "wall_s": 5.18
+      "wall_s": 8.68
     },
     {
       "id": "dsp.ceiling_property",
@@ -348,7 +407,7 @@
           "ccr_amp_max": 0.6
         }
       ],
-      "wall_s": 7.39
+      "wall_s": 14.89
     },
     {
       "id": "dsp.cycles_hop_static",
@@ -357,12 +416,12 @@
       "last": {
         "B": {
           "cyc": [
-            48016,
-            59137
+            48033,
+            59170
           ],
           "MHz": [
             77.8,
-            100.3
+            100.4
           ],
           "V4_MHz": [
             59.1,
@@ -371,12 +430,12 @@
         },
         "slim": {
           "cyc": [
-            31262,
-            38483
+            31279,
+            38516
           ],
           "MHz": [
             50.8,
-            65.4
+            65.5
           ],
           "V4_MHz": [
             37.7,
@@ -385,8 +444,8 @@
         },
         "A": {
           "cyc": [
-            23648,
-            28668
+            23665,
+            28701
           ],
           "MHz": [
             38.6,
@@ -399,8 +458,8 @@
         },
         "B_cpu": {
           "cyc": [
-            52056,
-            63559
+            52073,
+            63592
           ],
           "MHz": [
             84.3,
@@ -413,12 +472,12 @@
         },
         "slim_cpu": {
           "cyc": [
-            35302,
-            42905
+            35319,
+            42938
           ],
           "MHz": [
             57.3,
-            72.9
+            73.0
           ],
           "V4_MHz": [
             37.7,
@@ -427,12 +486,12 @@
         },
         "A_cpu": {
           "cyc": [
-            27688,
-            33090
+            27705,
+            33123
           ],
           "MHz": [
             45.1,
-            56.3
+            56.4
           ],
           "V4_MHz": [
             30.6,
@@ -443,7 +502,7 @@
       "status": "PASS",
       "basis": "fw/tools/cycles.py: fw/bench/cyccount CPI x gcov line counts on the sweep vector (active path), 0 WS",
       "src": "FWSIM-R10, FWSIM-R47",
-      "wall_s": 3.69
+      "wall_s": 6.1
     },
     {
       "id": "dsp.insns_hop_qemu",
@@ -451,25 +510,40 @@
       "thr": "reported (static model must not undercount: ratio <= 1.05)",
       "last": {
         "B": {
-          "qemu": 32841,
-          "static": 39323,
-          "ratio": 0.835
+          "qemu": 32884,
+          "static": 39334,
+          "ratio": 0.836
         },
         "slim": {
-          "qemu": 21463,
-          "static": 25490,
-          "ratio": 0.842
+          "qemu": 21510,
+          "static": 25501,
+          "ratio": 0.843
         },
         "A": {
-          "qemu": 15967,
-          "static": 18960,
-          "ratio": 0.842
+          "qemu": 16009,
+          "static": 18971,
+          "ratio": 0.844
+        },
+        "B_cpu": {
+          "qemu": 36345,
+          "static": 42777,
+          "ratio": 0.85
+        },
+        "slim_cpu": {
+          "qemu": 24966,
+          "static": 28944,
+          "ratio": 0.863
+        },
+        "A_cpu": {
+          "qemu": 19467,
+          "static": 22414,
+          "ratio": 0.869
         }
       },
       "status": "PASS",
       "basis": "sim/fw/qemu_icount.py: QEMU mps2-an505 -icount shift=0, SysTick around fw_hop, sweep vector hops 600+",
       "src": "FWSIM-R47",
-      "wall_s": 3.44
+      "wall_s": 7.14
     }
   ],
   "requirements": {
@@ -487,8 +561,13 @@
     "FWSIM-R13": "PASS",
     "FWSIM-R14": "PASS",
     "FWSIM-R15": "PASS",
+    "FWSIM-R18": "PASS",
+    "FWSIM-R19": "PASS",
+    "FWSIM-R20": "PASS",
+    "FWSIM-R29": "PASS",
     "FWSIM-R47": "PASS",
-    "FWSIM-R64": "PASS"
+    "FWSIM-R64": "PASS",
+    "FWSIM-R65": "PASS"
   },
   "tests": [
     {
@@ -536,13 +615,13 @@
     {
       "test": "test_knobs_table",
       "req": "FWSIM-R6",
-      "checks": 493,
+      "checks": 573,
       "fails": 0
     },
     {
       "test": "test_knobs_enum_and_clamps",
       "req": "FWSIM-R6",
-      "checks": 62,
+      "checks": 70,
       "fails": 0
     },
     {
@@ -554,7 +633,7 @@
     {
       "test": "test_store_power_fail_every_step",
       "req": "FWSIM-R6",
-      "checks": 138,
+      "checks": 154,
       "fails": 0
     },
     {
@@ -584,7 +663,7 @@
     {
       "test": "test_fakes_coverage",
       "req": "FWSIM-R2",
-      "checks": 78,
+      "checks": 86,
       "fails": 0
     },
     {
@@ -614,7 +693,7 @@
     {
       "test": "test_board_config",
       "req": "FWSIM-R5",
-      "checks": 411,
+      "checks": 440,
       "fails": 0
     },
     {
@@ -652,18 +731,66 @@
       "req": "FWSIM-R15",
       "checks": 5,
       "fails": 0
+    },
+    {
+      "test": "test_fsm_random_walk",
+      "req": "FWSIM-R18",
+      "checks": 18,
+      "fails": 0
+    },
+    {
+      "test": "test_gestures_b",
+      "req": "FWSIM-R29",
+      "checks": 15,
+      "fails": 0
+    },
+    {
+      "test": "test_rematch_two_presses",
+      "req": "FWSIM-R18",
+      "checks": 21,
+      "fails": 0
+    },
+    {
+      "test": "test_docked_interlock",
+      "req": "FWSIM-R19",
+      "checks": 16,
+      "fails": 0
+    },
+    {
+      "test": "test_cdc_paths_clamp",
+      "req": "FWSIM-R64",
+      "checks": 2,
+      "fails": 0
+    },
+    {
+      "test": "test_charger_plan",
+      "req": "FWSIM-R20",
+      "checks": 16,
+      "fails": 0
+    },
+    {
+      "test": "test_charger_watchdog_faults",
+      "req": "FWSIM-R20",
+      "checks": 15,
+      "fails": 0
+    },
+    {
+      "test": "test_break_always_on",
+      "req": "FWSIM-R65",
+      "checks": 21,
+      "fails": 0
     }
   ],
   "arm": {
-    "flash": 25932,
-    "ram_static": 6640,
+    "flash": 30940,
+    "ram_static": 6976,
     "stack_region": 8192,
     "sections": {
       ".isr_vector": 564,
-      ".text": 25360,
+      ".text": 30368,
       ".ARM.exidx": 8,
       ".data": 0,
-      ".bss": 6640,
+      ".bss": 6976,
       ".stack": 8192,
       ".comment": 38,
       ".debug_line": 2203,
@@ -682,8 +809,8 @@
     "clang": "Ubuntu clang version 18.1.8 (20ubuntu8)",
     "arm-none-eabi-gcc": "arm-none-eabi-gcc (15:14.2.rel1-1) 14.2.1 20241119",
     "python": "3.14.4",
-    "repo_head": "b15c781"
+    "repo_head": "e7ddeb1"
   },
-  "wall_s": 57.8,
+  "wall_s": 71.5,
   "scope": "tier S + H: foundation (group a) + DSP chain host behaviour (group b: R7 L0-host/L1, R8, R13, R14, R15); L0 ARM vs host on QEMU mps2-an505 (no STM32 peripheral model: tier E open); port_u575 HAL is stubs (HAL_ENOTIMPL)"
 }

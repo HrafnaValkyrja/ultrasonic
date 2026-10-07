@@ -56,6 +56,7 @@ typedef struct {
 } fw_dsp_t;
 
 void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr);
+void fw_dsp_set_gain_cdb(fw_dsp_t *d, int32_t volume_cdb);   /* fixed 30 dB + volume (knob volume_cdb + gesture steps) */
 int fw_dsp_set_noise(fw_dsp_t *d, const float *band_energy, uint32_t n);   /* unit calibration; n must equal the band count */
 /* D2 front end: 256 words at 400 kS/s -> 128 PCM (DR-word units) */
 void fw_dsp_halfband(fw_dsp_t *d, const int32_t in400[256], float pcm[128]);

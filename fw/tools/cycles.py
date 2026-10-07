@@ -96,7 +96,7 @@ def line_counts(tmp, words, d2, knobs, hops, defines=()):
     d.mkdir()
     exe = d / "drv"
     sh(["gcc", "--coverage", "-O0", "-std=c11", "-ffp-contract=off", "-fno-math-errno", *defines, *fwsim.INC,
-        *[FW / "core" / s for s in SRCS + ["knobs.c", "crc32.c", "fmac_model.c"]], FW / "tools/cycdrv.c", "-lm", "-o", exe], cwd=d)
+        *[FW / "core" / s for s in SRCS + ["knobs.c", "crc32.c", "fmac_model.c", "modes.c"]], FW / "tools/cycdrv.c", "-lm", "-o", exe], cwd=d)
     per = 256 if d2 else 128
     words[: hops * per].astype("<i4").tofile(d / "w.i32")
     sh([exe, d / "w.i32", int(d2), *knobs], cwd=d)

@@ -106,3 +106,9 @@ hal_status_t hal_fmac_fir_bank(const int16_t *coef, uint32_t n_phase, uint32_t t
     fw_fmac_model_bank(coef, n_phase, taps, r_gain, x, n_new, y);
     return HAL_OK;
 }
+
+/* FWSIM-R65 break: register code lands with bring-up (MDF1 OLD + TIM1 BKCMP7E, sub-processing.md issue 6) */
+hal_status_t hal_brk_arm(uint32_t threshold_ma) { (void)threshold_ma; return HAL_ENOTIMPL; }
+void hal_brk_disarm(void) {}
+bool hal_brk_latched(void) { return false; }
+void hal_brk_clear(void) {}

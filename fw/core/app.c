@@ -1,6 +1,9 @@
 #include "app.h"
 
+#include <string.h>
+
 #include "hal.h"
+#include "variant_config.h"
 
 void fw_app_boot(fw_app_t *app)
 {
@@ -18,6 +21,63 @@ void fw_app_boot(fw_app_t *app)
     app->hops = 0u;
     app->submit_errors = 0u;
     app->vbus_seen = 0u;
+    app->bridge_on = app->brk_reported = app->start_errors = 0u;
+    app->chg_temp_class = 0xFFu;
+    memset(&app->chg, 0, sizeof app->chg);
+}
+
+uint32_t fw_app_brk_threshold_ma(const fw_app_t *app)
+{
+    int32_t i = app->st.knobs.out_i_peak_ma < FW_VAR_I_PEAK_MA_MAX ? app->st.knobs.out_i_peak_ma : FW_VAR_I_PEAK_MA_MAX;
+    return (uint32_t)(i + app->st.knobs.brk_margin_ma);   /* FWSIM-R65: i_peak_max (FWSIM-R64) + margin */
+}
+
+/* bridge on/off with the break armed before the first PWM edge and disarmed only after MOE = 0 (FWSIM-R65) */
+static void apply_outputs(fw_app_t *app)
+{
+    fw_outputs_t o = fw_outputs(&app->st);
+    if (o.brk_clear) {
+        hal_brk_clear();
+        fw_brk_clear_done(&app->st);
+        app->brk_reported = 0u;
+    }
+    if (o.bridge_run && !app->bridge_on) {
+        if (hal_brk_arm(fw_app_brk_threshold_ma(app)) == HAL_OK && hal_pwm_start() == HAL_OK)
+            app->bridge_on = 1u;
+        else
+            app->start_errors++;                 /* never run the bridge without the break armed */
+    } else if (!o.bridge_run && app->bridge_on) {
+        hal_pwm_stop();
+        hal_brk_disarm();
+        app->bridge_on = 0u;
+    }
+    if (app->bridge_on && !app->brk_reported && hal_brk_latched()) {
+        app->brk_reported = 1u;
+        fw_event(&app->st, FW_EV_BREAK, 0, hal_time_us());
+        hal_pwm_stop();                          /* MOE is already 0 in hardware; keep the software state consistent */
+        hal_brk_disarm();
+        app->bridge_on = 0u;
+    }
+}
+
+static void service_charger(fw_app_t *app, uint32_t force)
+{
+    uint32_t tv = 0u;
+    int32_t t = 0;
+    if (app->st.vbus) {                          /* TS is meaningful only with VIN present (SLUSE99C Table 8-6) */
+        uint16_t mv = 0u;
+        if (hal_adc_read_mv(HAL_ADC_TS, &mv) == HAL_OK) {
+            t = fw_chg_ts_temp_c10(mv);
+            tv = t > -400 && t < 1000 ? 1u : 0u;
+        }
+    }
+    uint32_t cls = tv ? (t >= 200 ? 1u : 0u) : 2u;
+    if (cls != app->chg_temp_class) {
+        app->chg_temp_class = cls;
+        force = 1u;
+    }
+    fw_chg_plan_t p = fw_chg_plan(&app->st.knobs, app->st.usb_enumerated, tv, t);
+    app->chg_ok = fw_chg_service(&app->chg, &app->st.knobs, &p, hal_time_us(), force);
 }
 
 void fw_app_step(fw_app_t *app)
@@ -32,11 +92,25 @@ void fw_app_step(fw_app_t *app)
             app->submit_errors++;
         app->hops++;
     }
-    uint32_t vbus = hal_usb_vbus() ? 1u : 0u;
+    /* docked if PA1 shows VBUS OR the charger reports power good (FWSIM-R19: a PA1 stuck low cannot enable docked output); a PA1 edge
+     * re-reads the charger at once so a stale power-good never outlives the plug */
+    uint32_t pa1 = hal_usb_vbus() ? 1u : 0u, force_chg = 0u;
+    if (pa1 != app->pa1_seen) {
+        app->pa1_seen = pa1;
+        service_charger(app, 1u);
+    }
+    uint32_t vbus = (pa1 || app->chg.pgood) ? 1u : 0u;
     if (vbus != app->vbus_seen) {
         app->vbus_seen = vbus;
         fw_event(&app->st, vbus ? FW_EV_VBUS_ON : FW_EV_VBUS_OFF, 0, hal_time_us());
+        force_chg = 1u;                          /* power-good change: re-assert the charger plan */
+    }
+    if (app->st.event_count[FW_EV_CHG_INT] != app->chg_int_seen) {   /* /INT pulse (power good, faults): re-check the plan */
+        app->chg_int_seen = app->st.event_count[FW_EV_CHG_INT];
+        force_chg = 1u;
     }
     fw_poll(&app->st, hal_time_us());
+    apply_outputs(app);
+    service_charger(app, force_chg);
     hal_wdt_kick();
 }
