@@ -109,7 +109,7 @@
   "SUB-DOCK-USB": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-18: D5 TPD1E10B06 SLLSEB1G read: VRWM 5.5 V, ILEAK<=100 nA at 5 V, VBR>=6 V; dock VBUS within VRWM; docs only",
+   "note": "DK-17 corrected: PA9 is USB_OTG_FS_VBUS on QFN48 (left NC); RM0456 B-session override exists; ROM USB path unproven; options DK-17D (A add series R, rec)",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"
@@ -413,9 +413,9 @@
    }
   },
   "R-PROC-DOCK": {
-   "by": "docs-phase2-rewrite",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: relation text updated to Phase 2 (U4->bridge 40 mohm via In2 plane; CC wording; blade.py 0.45 offset); both sides' docs agree",
+   "note": "DK-17 corrected: PA9 is USB_OTG_FS_VBUS on QFN48 (left NC); RM0456 B-session override exists; ROM USB path unproven; options DK-17D (A add series R, rec)",
    "stamp": {
     "net:CC": "90ab0345f812ddb5",
     "net:USB_DM": "e24d0b9352c00b90",

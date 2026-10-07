@@ -297,3 +297,7 @@
 - 2026-10-07 12:51 review SUB-DOCK-USB by backlog-agent: DK-18: D5 TPD1E10B06 SLLSEB1G read: VRWM 5.5 V, ILEAK<=100 nA at 5 V, VBR>=6 V; dock VBUS within VRWM; docs only
 - 2026-10-07 12:51 review R-PWR-DOCK by backlog-agent: DK-18: D5 TPD1E10B06 SLLSEB1G read: VRWM 5.5 V, ILEAK<=100 nA at 5 V, VBR>=6 V; dock VBUS within VRWM; docs only
 - 2026-10-07 12:51 checkin SUB-DOCK-USB by backlog-agent
+- 2026-10-07 12:53 checkout SUB-DOCK-USB by backlog-agent: DK-17 correction: PA9 is USB_OTG_FS_VBUS on QFN48
+- 2026-10-07 12:53 review SUB-DOCK-USB by backlog-agent: DK-17 corrected: PA9 is USB_OTG_FS_VBUS on QFN48 (left NC); RM0456 B-session override exists; ROM USB path unproven; options DK-17D (A add series R, rec)
+- 2026-10-07 12:53 review R-PROC-DOCK by backlog-agent: DK-17 corrected: PA9 is USB_OTG_FS_VBUS on QFN48 (left NC); RM0456 B-session override exists; ROM USB path unproven; options DK-17D (A add series R, rec)
+- 2026-10-07 12:53 checkin SUB-DOCK-USB by backlog-agent
