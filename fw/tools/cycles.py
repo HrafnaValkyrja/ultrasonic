@@ -43,12 +43,16 @@ def sh(cmd, cwd=None):
     return p.stdout
 
 
-def arm_listing(tmp):
+FMAC_DRIVER_EST = [500, 800]   # CPU cycles/hop of the U575 FMAC driver (16 x X2_BASE + START/stop + GPDMA re-arm, ~30-50 each) [L];
+                               # the FMAC's own MACs run in the peripheral (V5-fmac-cordic.yaml), so the model is not costed
+
+
+def arm_listing(tmp, defines=()):
     """[(func, file, line, mnemonic, ops)] for every instruction of SRCS, plus per-function code bytes."""
     rows, size = [], {}
     for s in SRCS:
         o = tmp / (Path(s).stem + ".o")
-        sh(["arm-none-eabi-gcc", *fwsim.ARM_FLAGS, "-g", *fwsim.INC, "-c", FW / "core" / s, "-o", o])
+        sh(["arm-none-eabi-gcc", *fwsim.ARM_FLAGS, *defines, "-g", *fwsim.INC, "-c", FW / "core" / s, "-o", o])
         lst = sh(["arm-none-eabi-objdump", "-dl", "--no-show-raw-insn", o])
         func, f, ln, start, last = None, None, 0, 0, 0
         for line in lst.splitlines():
@@ -86,13 +90,13 @@ def costs(rows):
     return out
 
 
-def line_counts(tmp, words, d2, knobs, hops):
+def line_counts(tmp, words, d2, knobs, hops, defines=()):
     """gcov line execution counts {(file, line): count} after `hops` hops."""
-    d = tmp / f"cov_{abs(hash((tuple(knobs), hops, d2)))}"
+    d = tmp / f"cov_{abs(hash((tuple(knobs), hops, d2, tuple(defines))))}"
     d.mkdir()
     exe = d / "drv"
-    sh(["gcc", "--coverage", "-O0", "-std=c11", "-ffp-contract=off", "-fno-math-errno", *fwsim.INC,
-        *[FW / "core" / s for s in SRCS + ["knobs.c", "crc32.c"]], FW / "tools/cycdrv.c", "-lm", "-o", exe], cwd=d)
+    sh(["gcc", "--coverage", "-O0", "-std=c11", "-ffp-contract=off", "-fno-math-errno", *defines, *fwsim.INC,
+        *[FW / "core" / s for s in SRCS + ["knobs.c", "crc32.c", "fmac_model.c"]], FW / "tools/cycdrv.c", "-lm", "-o", exe], cwd=d)
     per = 256 if d2 else 128
     words[: hops * per].astype("<i4").tofile(d / "w.i32")
     sh([exe, d / "w.i32", int(d2), *knobs], cwd=d)
@@ -160,34 +164,37 @@ def total(cost_rows, cnt):
     return lo, hi, per_fn
 
 
-def estimate(vector="sweep", transient=0):
+def estimate(vector="sweep", transient=0, fmac=True):
+    defines = () if fmac else ("-DFW_INTERP_FMAC=0",)
     z = np.load(REPO / f"sim/fw/vectors/{vector}.npz")
     words = z["words"]
     res = {}
     with tempfile.TemporaryDirectory(dir=str(FW / "out")) as t:
         tmp = Path(t)
-        rows, size = arm_listing(tmp)
+        rows, size = arm_listing(tmp, defines)
         cr = costs(rows)
         n_all = len(words) // 128
         h1, h2 = n_all, max(600, n_all // 2)
         assert h1 - h2 >= 300, "vector too short for a steady-state difference"
         for v, kn in VARIANTS.items():
             kn = kn + [f"transient_only={transient}"]
-            c1 = line_counts(tmp, words, False, kn, h1)
-            c2 = line_counts(tmp, words, False, kn, h2)
+            c1 = line_counts(tmp, words, False, kn, h1, defines)
+            c2 = line_counts(tmp, words, False, kn, h2, defines)
             lo1, hi1, f1 = total(cr, c1)
             i1 = total.last_insns
             lo2, hi2, f2 = total(cr, c2)
             i2 = total.last_insns
             dh = h1 - h2
             lo, hi = (lo1 - lo2) / dh, (hi1 - hi2) / dh
+            if fmac:
+                lo, hi = lo + FMAC_DRIVER_EST[0], hi + FMAC_DRIVER_EST[1]
             fns = {k: [round((f1[k][0] - f2.get(k, [0, 0])[0]) / dh), round((f1[k][1] - f2.get(k, [0, 0])[1]) / dh)] for k in f1}
             fns = {k: x for k, x in sorted(fns.items(), key=lambda kv: -kv[1][1]) if x[1] > 0}
             used = [k for k in fns]
             res[v] = {"cycles_hop": [round(lo), round(hi)], "insns_hop_static": round((i1 - i2) / dh), "MHz_dsp": [round(lo * HOPS_PER_S / 1e6, 1), round(hi * HOPS_PER_S / 1e6, 1)],
                       "MHz_with_V4_overhead": [round(lo * HOPS_PER_S / 1e6 * 1.03 + 0.5, 1), round(hi * HOPS_PER_S / 1e6 * 1.08 + 0.5, 1)],
                       "per_function": fns, "code_bytes_used": sum(size.get(k, 0) for k in used),
-                      "vector": vector, "hops_measured": dh, "v4": V4[v]}
+                      "vector": vector, "hops_measured": dh, "v4": V4[v], "interp": "FMAC (+driver est %s)" % FMAC_DRIVER_EST if fmac else "CPU float"}
     return res
 
 
@@ -196,6 +203,7 @@ def main(argv=None):
     ap.add_argument("--json", type=Path)
     a = ap.parse_args(argv)
     res = estimate()
+    res.update({f"{v}_cpu": r for v, r in estimate(fmac=False).items()})
     for v, r in res.items():
         print(f"{v:5s} cycles/hop {r['cycles_hop']}  DSP {r['MHz_dsp']} MHz  +V4 overhead {r['MHz_with_V4_overhead']} MHz   V4 {r['v4']['MHz']} ({r['v4']['cfg']})  code {r['code_bytes_used']} B")
         print("      top:", ", ".join(f"{k} {x[0]}-{x[1]}" for k, x in list(r["per_function"].items())[:7]))

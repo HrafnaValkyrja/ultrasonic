@@ -129,10 +129,48 @@ def study(tpp=10, ceiling_dbfs=-12.0):
             "acc_limit": 8.0, "assumptions": ["A1 product truncated (floor) into q4.22", "A2 output floor of bits [22..7] after the gain"], "cases": rows}
 
 
+def check_c(n_trials=200, seed=7):
+    """the firmware's C model (fw/core/fmac_model.c via sim/fw/fwlib.py) == this Python model, bit for bit, on random banks incl.
+    extreme values (saturation, -32768 x -32768, accumulator wrap) and every gain R"""
+    import ctypes as C
+    import fwlib
+    L = fwlib.lib()
+    I16 = np.ctypeslib.ndpointer(np.int16, flags="C_CONTIGUOUS")
+    L.shim_fmac_bank.argtypes = [I16, C.c_uint32, C.c_uint32, C.c_uint32, I16, C.c_uint32, I16]
+    rng = np.random.default_rng(seed)
+    bad = 0
+    for i in range(n_trials):
+        taps, nph, n_new, R = int(rng.integers(2, 128)), int(rng.integers(1, 17)), int(rng.integers(1, 17)), int(rng.integers(0, 8))
+        if i % 4 == 0:
+            coef = rng.choice([-32768, 32767, -1, 0, 1], size=nph * taps).astype(np.int16)
+            x = rng.choice([-32768, 32767, -1, 0, 1], size=taps - 1 + n_new).astype(np.int16)
+        else:
+            coef = rng.integers(-32768, 32768, nph * taps).astype(np.int16)
+            x = rng.integers(-32768, 32768, taps - 1 + n_new).astype(np.int16)
+        y = np.zeros(n_new * nph, np.int16)
+        L.shim_fmac_bank(coef, nph, taps, R, x, n_new, y)
+        for p in range(nph):
+            ref = fmac_fir(x.astype(np.int64), coef[p * taps:(p + 1) * taps].astype(np.int64), R)[taps - 1:]
+            bad += int(np.sum(ref != y[p::nph]))
+    return bad
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser()
     ap.add_argument("--json", type=Path)
+    ap.add_argument("--check", action="store_true", help="C model vs Python model, bit-exact; exit 1 on any mismatch")
+    ap.add_argument("--bench", action="store_true", help="expected read-back words of the backlog FMAC-RM-UNKNOWNS bench test")
     a = ap.parse_args(argv)
+    if a.bench:
+        x = np.array([0x0001, 0x007F, 0x0080, 0x00FF, -1, -127, -128, -255], np.int64)
+        for name, b0, R in (("A1 (R=7, b0=0x0001)", 1, 7), ("A2 (R=0, b0=0x0100)", 0x100, 0)):
+            y = [int(fmac_fir(np.array([v]), np.array([b0]), R)[0]) for v in x]
+            print(f"{name}: x={[hex(v & 0xFFFF) for v in x]} -> y={y}")
+        return 0
+    if a.check:
+        bad = check_c()
+        print(f"fmac_model C vs Python: {bad} mismatching outputs")
+        return 1 if bad else 0
     r = study()
     print(json.dumps(r, indent=1))
     if a.json:
@@ -140,4 +178,4 @@ def main(argv=None):
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

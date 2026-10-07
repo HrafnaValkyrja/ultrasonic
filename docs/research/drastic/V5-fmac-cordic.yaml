@@ -54,6 +54,11 @@ cordic:
   synthesis_sin: {use: "oscillator bank sin(phase): the uint32 phase IS the CORDIC q1.31 angle (theta/pi) - write phase, read sin, VCVT #31", cost: "~8-10 cycles per sample (6-cycle CORDIC, store/load overlap) vs ~11-13 for the table + interpolation", saves: "~0.7k cycles/hop (B), ~0.4k (slim)", precision: "q1.31 ~2^-19 after 24 iterations, better than the table's 4.7e-6", verdict: "small win, later (changes L1 at the 1e-6 level; dsp_out_err stays < -60 dB [M])"}
   other: "sqrt (VSQRT 14 cycles in b_update, 28/hop) and ln (already replaced by the per-band series) gain nothing"
 
+implemented_2026_10_07:
+  what: "FW_INTERP_FMAC=1 (default): fw/core/dsp.c out_interp_fmac (+6 dB guard, q1.15 at 0.999/(2 ceiling kappa), hal_fmac_fir_bank 16 phases x 10 taps, q1.15 -> float, true-peak limiter after it); fallback to the CPU interpolator on any HAL error (fmac_faults). fw/hal/hal_fmac.h; fw/core/fmac_model.c (C twin of sim/fw/fmac_model.py, bit-exact by fwsim row dsp.fmac_model_c_vs_py); ports: fake, QEMU, U575 (model until the register driver, E4)"
+  measured: "CPU saving 4.0-4.4k cycles/hop static (less than the 5.4k estimate: the q1.15 -> float conversion of 128 outputs costs ~1.8k); L2 D17.chain_thdn_m40_db -49.20 dB (CPU build -49.29; model predicted -48.9); QEMU instructions/hop B 36.3k -> 32.8k"
+  open: "register/GPDMA driver on the U575 (E4); RM unknowns A1/A2: backlog FMAC-RM-UNKNOWNS"
+
 integration_map_crosscheck:
   touches: [docs/sim/firmware-emulation.yaml FWSIM-R47, R14 F1 (limiter placement), R15 (true-peak bound kept by the CPU check), docs/system/sub-processing.md (DMA channel use, FMAC/CORDIC currently unused peripherals)]
   design_change: "none yet (research). Adopting it is a firmware change (two-stage limiter, GPDMA 2 channels, FMAC clock enable); no hardware or pin change"

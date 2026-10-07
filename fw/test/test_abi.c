@@ -61,7 +61,11 @@ void test_abi_pure(void)
     fw_event(&st, FW_EV_BUTTON_SHORT, 1, 20u);
     (void)fw_cdc_rx(&st, buf, sizeof buf, NULL, 0u);
     (void)fw_state_hash(&st);
-    TF_CHECK_EQ(fake_log_len(), 0);
+    /* the one exemption: the FMAC math accelerator (pure function of its arguments, hal_fmac.h) */
+    uint32_t non_fmac = 0;
+    for (uint32_t i = 0; i < fake_log_len(); i++)
+        non_fmac += fake_log_at(i)->fn != (uint16_t)FAKE_FN_hal_fmac_fir_bank;
+    TF_CHECK_EQ(non_fmac, 0);
 }
 
 void test_abi_power_on_hold(void)

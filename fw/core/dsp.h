@@ -13,6 +13,9 @@
 #include "knobs.h"
 #include "out_clamp.h"
 
+#ifndef FW_INTERP_FMAC
+#define FW_INTERP_FMAC 1                         /* 1: +6 dB guard + FMAC x16 interpolator (hal_fmac); 0: CPU float interpolator */
+#endif
 #define FW_DSP_NFFT 256u
 #define FW_DSP_NB_MAX 28u
 #define FW_DSP_HB_HIST (31u - 1u + 256u)
@@ -45,6 +48,9 @@ typedef struct {
     float hb_hist[FW_DSP_HB_HIST];
     /* ---- output stage */
     float ihist[FW_INTERP_TPP];
+    int16_t xq[FW_INTERP_TPP - 1u + 8u];          /* FMAC input history, q1.15 */
+    float guard_g, fmac_in_scale, fmac_out_scale;
+    uint32_t fmac_faults;
     float lim_g, e1, e2, e3, sq_env;
     uint32_t dither, sq_quiet;
 } fw_dsp_t;

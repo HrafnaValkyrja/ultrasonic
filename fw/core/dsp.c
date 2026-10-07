@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "dsp_math.h"
+#include "hal_fmac.h"
 
 #define NOINL __attribute__((noinline))
 #define FS_HZ 200000.0f
@@ -145,6 +146,13 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr)
     d->lim_c = fw_db20_to_lin((float)k->ceiling_cdb * 0.01f);
     d->lim_rel = fw_om_exp(1000.0f / (FS_OUT_HZ * (float)k->limiter_release_ms));
     d->lim_g = 1.0f;
+    d->guard_g = 1.0f;
+    {
+        static const float kappa[FW_DSP_INTERP_KAPPA_N] = FW_DSP_INTERP_KAPPA_INIT;
+        float sc = 0.999f / (2.0f * d->lim_c * kappa[0]);       /* +6 dB guard: |input| <= 2 ceiling -> |FMAC input| <= 0.999 / kappa */
+        d->fmac_in_scale = sc * 32768.0f;
+        d->fmac_out_scale = 1.0f / (sc * 32768.0f);
+    }
     d->sq_thr2 = fw_db20_to_lin((float)k->squelch_cdb * 0.02f);    /* power threshold 10^(dB/10) */
     d->sq_a = 1.0f / 62.5f;                                         /* 5 ms one-pole power average (PwmShaper: 5 ms rms) */
     d->sq_quiet = d->hold_samples;                                  /* start squelched: silence is an exact 50 % square wave */
@@ -482,6 +490,65 @@ void fw_dsp_algo(fw_dsp_t *d, const float pcm[128], float y8[8], float *band_ene
         n++;                                                                                          \
     } while (0)
 
+/* x16 interpolation of the hop's 8 samples -> v[128] (interleaved: v[16 s + p]).
+ * FW_INTERP_FMAC = 1 (default): +6 dB scaling guard (sample-domain gain limiter at 2 x ceiling, same law as the true-peak limiter) ->
+ * q1.15 at scale 0.999 / (2 ceiling kappa) -> FMAC polyphase bank (hal_fmac_fir_bank; bit-accurate model on host/QEMU) -> float.
+ * docs/research/drastic/V5-fmac-cordic.yaml: in-band error -99.9 dBFS, D17 THD+N at -40 dBFS -49.3 -> -48.9 dB. On an FMAC error the
+ * CPU float path runs for that hop (counted in fmac_faults). FW_INTERP_FMAC = 0: CPU float polyphase only (A/B build option). */
+NOINL static void out_interp_cpu(fw_dsp_t *d, const float y8[8], float *v)
+{
+    for (uint32_t s = 0; s < 8u; s++) {
+        for (uint32_t t = FW_INTERP_TPP - 1u; t > 0u; t--)
+            d->ihist[t] = d->ihist[t - 1u];
+        d->ihist[0] = y8[s];
+        float h0 = d->ihist[0], h1_ = d->ihist[1], h2_ = d->ihist[2], h3 = d->ihist[3], h4 = d->ihist[4], h5 = d->ihist[5], h6 = d->ihist[6],
+              h7 = d->ihist[7];
+#if FW_INTERP_TPP >= 10
+        float h8 = d->ihist[8], h9 = d->ihist[9];
+#endif
+#if FW_INTERP_TPP >= 12
+        float h10 = d->ihist[10], h11 = d->ihist[11];
+#endif
+        for (uint32_t p = 0; p < UP; p++)
+            v[s * UP + p] = INTERP_DOT(&interp[p * FW_INTERP_TPP]);
+    }
+}
+
+#if FW_INTERP_FMAC
+static const int16_t interp_q15[FW_DSP_INTERP_Q15_N] = FW_DSP_INTERP_Q15_INIT;
+
+NOINL static void out_interp_fmac(fw_dsp_t *d, const float y8[8], float *v)
+{
+    int16_t *xq = d->xq;                                         /* [TPP-1 history | 8 new], oldest first */
+    float lim = 2.0f * d->lim_c;
+    for (uint32_t s = 0; s < 8u; s++) {
+        float y = y8[s], a = fabsf(y);
+        float g = d->guard_g + d->lim_rel * (1.0f - d->guard_g); /* +6 dB guard: same instant attack / release law */
+        if (a * g > lim)
+            g = lim / a;
+        d->guard_g = g;
+        float q = y * g * d->fmac_in_scale;                      /* |q| <= 0.999 x 32768 / kappa */
+        int32_t qi = (int32_t)(q + (q >= 0.0f ? 0.5f : -0.5f));
+        qi = qi > 32767 ? 32767 : (qi < -32768 ? -32768 : qi);
+        xq[FW_INTERP_TPP - 1u + s] = (int16_t)qi;
+    }
+    int16_t yq[8u * UP];
+    if (hal_fmac_fir_bank(interp_q15, UP, FW_INTERP_TPP, 0u, xq, 8u, yq) == HAL_OK) {
+        float sc = d->fmac_out_scale;
+        for (uint32_t i = 0; i < 8u * UP; i += 4u) {             /* q1.15 -> float, 4 per line */
+            v[i] = (float)yq[i] * sc; v[i + 1u] = (float)yq[i + 1u] * sc; v[i + 2u] = (float)yq[i + 2u] * sc; v[i + 3u] = (float)yq[i + 3u] * sc;
+        }
+        for (uint32_t t = FW_INTERP_TPP; t-- > 0u;)            /* keep the float history in step for a later fallback hop */
+            d->ihist[t] = t >= 8u ? d->ihist[t - 8u] : y8[7u - t];
+    } else {
+        d->fmac_faults++;
+        out_interp_cpu(d, y8, v);
+    }
+    for (uint32_t i = 0; i < FW_INTERP_TPP - 1u; i++)
+        xq[i] = xq[8u + i];
+}
+#endif
+
 NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8[8], uint32_t force_squelch, const fw_ccr_bounds_t *b, uint16_t *ccr, fw_out_info_t *info)
 {
     size_t n = 0;
@@ -490,6 +557,12 @@ NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8[8], uint32_t force_squelch, 
     float e1 = d->e1, e2 = d->e2, e3 = d->e3, h1 = d->h1, h2 = d->h2, step = d->step, inv_step = d->inv_step;
     float dscale = d->dither_on ? step * 0x1p-16f : 0.0f;       /* TPDF: two 16-bit uniforms of one xorshift32 draw, x 1 LSB */
     uint16_t centre = fw_ccr_from_level(0, b, &hits);
+    float vall[8u * UP];
+#if FW_INTERP_FMAC
+    out_interp_fmac(d, y8, vall);
+#else
+    out_interp_cpu(d, y8, vall);
+#endif
     for (uint32_t s = 0; s < 8u; s++) {
         float y = y8[s];
         /* squelch (stages.PwmShaper): 5 ms power below threshold for squelch_hold_ms -> exact zero, dither off, shaper reset */
@@ -501,23 +574,10 @@ NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8[8], uint32_t force_squelch, 
             d->sq_quiet = 0u;
         }
         sq = (force_squelch || d->sq_quiet >= d->hold_samples) ? 1u : 0u;
-        /* x16 polyphase interpolation (zero-stuffed taps skipped: TPP taps per output) */
-        for (uint32_t t = FW_INTERP_TPP - 1u; t > 0u; t--)
-            d->ihist[t] = d->ihist[t - 1u];
-        d->ihist[0] = y;
-        float h0 = d->ihist[0], h1_ = d->ihist[1], h2_ = d->ihist[2], h3 = d->ihist[3], h4 = d->ihist[4], h5 = d->ihist[5], h6 = d->ihist[6],
-              h7 = d->ihist[7];
-#if FW_INTERP_TPP >= 10
-        float h8 = d->ihist[8], h9 = d->ihist[9];
-#endif
-#if FW_INTERP_TPP >= 12
-        float h10 = d->ihist[10], h11 = d->ihist[11];
-#endif
-        float v[UP], pk = 0.0f;
+        const float *v = &vall[s * UP];
+        float pk = 0.0f;
         for (uint32_t p = 0; p < UP; p++) {
-            float acc = INTERP_DOT(&interp[p * FW_INTERP_TPP]);
-            v[p] = acc;
-            float a = fabsf(acc);
+            float a = fabsf(v[p]);
             pk = a > pk ? a : pk;
         }
         /* true-peak limiter at the ceiling (FWSIM-R14 F1): instant attack from the 16 interpolated samples, slow release;

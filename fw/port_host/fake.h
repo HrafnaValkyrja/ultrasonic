@@ -19,7 +19,8 @@
     X(hal_flash_erase_page) X(hal_flash_program_qw) X(hal_flash_read) \
     X(hal_wdt_start) X(hal_wdt_kick) \
     X(hal_time_us) X(hal_time_cycles) \
-    X(hal_irq_save) X(hal_irq_restore)
+    X(hal_irq_save) X(hal_irq_restore) \
+    X(hal_fmac_fir_bank)
 
 #define FAKE_FN_ID(f) FAKE_FN_##f,
 typedef enum { FAKE_HAL_FUNCS(FAKE_FN_ID) FAKE_FN_COUNT } fake_fn_t;

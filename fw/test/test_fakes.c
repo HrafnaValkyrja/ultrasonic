@@ -47,6 +47,10 @@ static void call_every_hal_function(void)
     (void)hal_time_us();
     (void)hal_time_cycles();
     hal_irq_restore(hal_irq_save());
+    {
+        int16_t c[2] = {16384, 0}, x[3] = {0, 1000, 2000}, y[2] = {0, 0};
+        (void)hal_fmac_fir_bank(c, 1u, 2u, 0u, x, 2u, y);
+    }
 }
 
 void test_fakes_coverage(void)
@@ -60,7 +64,7 @@ void test_fakes_coverage(void)
         TF_CHECK(fake_log_find((fake_fn_t)f, 0u) >= 0);
     }
     TF_CHECK_EQ(fake_log_len(), FAKE_FN_COUNT);
-    TF_CHECK_EQ(FAKE_FN_COUNT, 37);
+    TF_CHECK_EQ(FAKE_FN_COUNT, 38);
 }
 
 void test_fakes_fault_injection(void)

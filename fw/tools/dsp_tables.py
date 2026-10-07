@@ -36,7 +36,7 @@ def arr(name, vals, per=6, ctype="float"):
     out = [f"#define {name}_N {len(vals)}u", f"#define {name}_INIT {{ \\"]
     for i in range(0, len(vals), per):
         chunk = vals[i:i + per]
-        out.append("    " + ", ".join(hexf(v) if ctype == "float" else f"{int(v)}u" for v in chunk) + ", \\")
+        out.append("    " + ", ".join(hexf(v) if ctype == "float" else (f"{int(v)}" if ctype == "i16" else f"{int(v)}u") for v in chunk) + ", \\")
     out.append("}")
     return out
 
@@ -128,6 +128,11 @@ def generate(hdr):
         o.append(f"{'#if' if first else '#elif'} FW_INTERP_TPP == {tpp}   /* image rejection 8.25-16 kHz: {rej:.1f} dB */")
         o.append(f"#define FW_INTERP_REJ_DB_X10 {int(rej * 10)}")
         o += arr("FW_DSP_INTERP", poly.ravel())
+        q = np.clip(np.round(poly * 32768.0), -32768, 32767)
+        assert np.max(np.abs(poly)) < 32767 / 32768, "FMAC coefficients need a 2^-R pre-scale"
+        o.append("/* the same phases as FMAC q1.15 coefficients (round), R = 0; kappa = max_p sum_t |h_p[t]| (worst-case overshoot) */")
+        o += arr("FW_DSP_INTERP_Q15", q.ravel(), per=16, ctype="i16")
+        o += arr("FW_DSP_INTERP_KAPPA", [float(np.max(np.sum(np.abs(poly), axis=1)))])
         first = False
     o.append("#else\n#error \"FW_INTERP_TPP: 8, 10 or 12\"\n#endif")
     # half-band D2

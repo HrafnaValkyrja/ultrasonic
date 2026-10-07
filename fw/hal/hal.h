@@ -14,4 +14,5 @@
 #include "hal_wdt.h"
 #include "hal_time.h"
 #include "hal_irq.h"
+#include "hal_fmac.h"
 #endif

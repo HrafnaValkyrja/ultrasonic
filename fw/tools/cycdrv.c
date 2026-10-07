@@ -4,7 +4,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "fmac_model.h"
 #include "fw.h"
+#include "hal_fmac.h"
+
+/* host stand-in for the FMAC HAL (same model as the fake); fmac_model.c is outside the costed sources */
+hal_status_t hal_fmac_fir_bank(const int16_t *coef, uint32_t n_phase, uint32_t taps, uint32_t r_gain, const int16_t *x, uint32_t n_new, int16_t *y)
+{
+    fw_fmac_model_bank(coef, n_phase, taps, r_gain, x, n_new, y);
+    return HAL_OK;
+}
 
 int main(int argc, char **argv)
 {

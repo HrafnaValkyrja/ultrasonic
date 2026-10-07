@@ -2,6 +2,7 @@
  * fw/core objects as the product build (fwsim ARM_FLAGS) over a golden vector and writes every CCR word and tap through semihosting;
  * sim/fw/l0_arm.py compares the bytes with the host build. Not product firmware: no HAL, no peripherals.
  * l0_in.bin : u32 magic 'FWL0', n_hops, d2 (bit 0; bits 8..: hops not counted in L0_COUNT builds), t0_us_lo, t0_us_hi, n_knobs, then n_knobs x (u32 id, i32 value), then the words.
+ * l0_count.bin (L0_COUNT): u64 ticks in fw_hop, u32 hops counted, u32 calibration ticks (2 x 65536 instructions), u32 ticks inside the FMAC model.
  * l0_out.bin: per hop: u16 ccr[n] (n = 128*200/ARR), f32 dsp[8], band[28], floor[28], peak, norm[3], u32 sq, clamp. */
 #include <stdint.h>
 #include <string.h>
@@ -44,6 +45,7 @@ static void s_exit(uint32_t code)
 #define SYST_RVR (*(volatile uint32_t *)0xE000E014u)
 #define SYST_CVR (*(volatile uint32_t *)0xE000E018u)
 static uint32_t ticks_between(uint32_t a, uint32_t b) { return (a - b) & 0xFFFFFFu; }   /* down-counter */
+extern uint32_t l0_fmac_ticks;                                     /* hal_fmac_qemu.c: ticks inside the FMAC model */
 #endif
 
 static fw_state_t st;
@@ -74,7 +76,7 @@ int main(void)
     uint32_t c0 = SYST_CVR;
     __asm__ volatile("mov r0, #0x10000\n1: subs r0, r0, #1\n bne 1b" ::: "r0", "cc");   /* 65536 x 2 instructions */
     uint32_t calib = ticks_between(c0, SYST_CVR);
-    uint64_t ticks = 0u;
+    uint64_t ticks = 0u, fmac_ticks = 0u;
     uint32_t counted = 0u, skip = hdr[2] >> 8;                     /* hops before `skip` (power-on hold) are not counted */
 #endif
     uint32_t per_in = (hdr[2] & 1u) ? 2u * FW_HOP_N : FW_HOP_N, fill = 0;
@@ -85,6 +87,7 @@ int main(void)
         uint16_t ccr[FW_CCR_MAX_PER_HOP];
         fw_taps_t t;
 #if defined(L0_COUNT)
+        l0_fmac_ticks = 0u;
         uint32_t a = SYST_CVR;
 #endif
         size_t n = (hdr[2] & 1u) ? fw_hop_d2(&st, words, ccr, FW_CCR_MAX_PER_HOP, &t) : fw_hop(&st, words, ccr, FW_CCR_MAX_PER_HOP, &t);
@@ -92,6 +95,7 @@ int main(void)
         uint32_t bb = SYST_CVR;
         if (h >= skip) {
             ticks += ticks_between(a, bb);
+            fmac_ticks += l0_fmac_ticks;
             counted++;
         }
 #endif
@@ -113,7 +117,7 @@ int main(void)
     }
     s_write(ho, obuf, fill);
 #if defined(L0_COUNT)
-    uint32_t rec[4] = {(uint32_t)ticks, (uint32_t)(ticks >> 32), counted, calib};
+    uint32_t rec[5] = {(uint32_t)ticks, (uint32_t)(ticks >> 32), counted, calib, (uint32_t)fmac_ticks};
     int32_t hc = s_open("l0_count.bin", 5u);
     s_write(hc, rec, sizeof rec);
 #endif

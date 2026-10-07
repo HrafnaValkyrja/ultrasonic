@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "hal.h"
+#include "fmac_model.h"
 
 #define DEMCR      (*(volatile uint32_t *)0xE000EDFCu)
 #define DWT_CTRL   (*(volatile uint32_t *)0xE0001000u)
@@ -94,4 +95,14 @@ uint32_t hal_irq_save(void)
 void hal_irq_restore(uint32_t state)
 {
     __asm volatile("msr primask, %0" ::"r"(state) : "memory");
+}
+
+/* FMAC (RM0456 s26): register driver (polling or GPDMA, docs/research/drastic/V5-fmac-cordic.yaml dma_timing_plan) lands with bring-up
+ * (E4). Until then the target runs the bit-accurate model in software, so the ELF behaves exactly like host and QEMU (FWSIM-R7 L0). */
+hal_status_t hal_fmac_fir_bank(const int16_t *coef, uint32_t n_phase, uint32_t taps, uint32_t r_gain, const int16_t *x, uint32_t n_new, int16_t *y)
+{
+    if (coef == NULL || x == NULL || y == NULL || taps == 0u || taps > 127u || r_gain > 7u)
+        return HAL_EINVAL;
+    fw_fmac_model_bank(coef, n_phase, taps, r_gain, x, n_new, y);
+    return HAL_OK;
 }

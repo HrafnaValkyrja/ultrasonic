@@ -89,3 +89,10 @@ int32_t shim_out(fw_state_t *st, const float *y, uint32_t n_hops, uint16_t *ccr,
     FTZ_OFF();
     return 0;
 }
+
+#include "fmac_model.h"
+/* the C FMAC model, for the C-vs-Python bit-exactness check (sim/fw/fmac_model.py --check) */
+void shim_fmac_bank(const int16_t *coef, uint32_t n_phase, uint32_t taps, uint32_t r_gain, const int16_t *x, uint32_t n_new, int16_t *y)
+{
+    fw_fmac_model_bank(coef, n_phase, taps, r_gain, x, n_new, y);
+}

@@ -309,6 +309,14 @@ def stage_dsp(cfg):
                         src="FWSIM-R7, FWSIM-R4", detail="\n".join(r["mismatches"]) or None, wall=w))
     else:
         rows.append(row("dsp.L0.arm_qemu_vs_host", "FAIL", f"exit {rc}", "all bit-exact", src="FWSIM-R7", detail=tail(se + so, 15), wall=w))
+    # FMAC model: C (fw/core/fmac_model.c, what host/QEMU run behind hal_fmac) == Python twin (sim/fw/fmac_model.py), bit-exact
+    rc, so, se, w = run([sys.executable, REPO / "sim/fw/fmac_model.py", "--check"], timeout=600)
+    rows.append(row("dsp.fmac_model_c_vs_py", "PASS" if rc == 0 else "FAIL", (so.strip().splitlines() or ["?"])[-1], "0 mismatches",
+                    basis="200 random banks (taps 2-127, 1-16 phases, R 0-7, extremes incl. accumulator wrap and saturation)", src="FWSIM-R7, FWSIM-R47",
+                    detail=None if rc == 0 else tail(se + so), wall=w))
+    # A/B build option: CPU float interpolator (FW_INTERP_FMAC=0) passes the host tests too
+    r_cpu, _ = host_build_and_test("host_gcc_interp_cpu", GCC, HOST_FLAGS, ("-DFW_INTERP_FMAC=0",), req="FWSIM-R13")
+    rows.append(r_cpu)
     # FWSIM-R15 ceiling property
     d = OUT / "prop"
     d.mkdir(parents=True, exist_ok=True)
