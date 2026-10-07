@@ -133,6 +133,15 @@ def stage_analyzer():
 
 
 # ------------------------------------------------------------------------------------------- ARM build, sizes, stack
+def build_id():
+    """FW_BUILD_ID for HELLO (bringup.yaml D2): the first 8 hex digits of HEAD (the tree may be dirty; the image header CRC pins the bytes)."""
+    try:
+        sha = subprocess.run(["git", "-C", str(REPO), "rev-parse", "--short=8", "HEAD"], capture_output=True, text=True, check=True).stdout.strip()
+        return [f"-DFW_BUILD_ID=0x{sha}u"]
+    except (subprocess.CalledProcessError, OSError):
+        return []
+
+
 def arm_build(name, defines=(), stack=False):
     d = OUT / name
     if d.exists():
@@ -143,7 +152,7 @@ def arm_build(name, defines=(), stack=False):
     for src in CORE + ARM_PORT + VENDOR:
         o = d / "obj" / f"{src.parent.name}_{src.stem}.o"
         warn = ["-w"] if src in VENDOR else WARN               # vendored TinyUSB is not held to the fw warning set
-        rc, _, se, w = run([ARMCC, *ARM_FLAGS, *warn, *defines, *INC, *INC_USB, *extra, "-c", src, "-o", o])
+        rc, _, se, w = run([ARMCC, *ARM_FLAGS, *warn, *defines, *build_id(), *INC, *INC_USB, *extra, "-c", src, "-o", o])
         wall += w
         objs.append(o)
         if rc != 0:
@@ -171,6 +180,14 @@ def stage_arm(cfg):
     rows.append(stage_stack(b))
     rows.append(stage_image(b))
     rows.append(stage_stub())
+    bb = arm_build("arm_bringup", defines=("-DFW_BRINGUP=1",))    # bring-up image (bringup.yaml D-E): bridge only in the docked self-test
+    if bb["ok"]:
+        img = stage_image(bb)
+        rows.append(row("arm.bringup_build", img["status"], f"flash {bb['flash']} B; {img['last']}", "builds + valid header", op="",
+                        basis="-DFW_BRINGUP=1: listening output gated off, CDC diagnostics HELLO/RAILS/CHG/CLK + ST_ARM self-test; fw/out/arm_bringup/fw.bin",
+                        src="FWSIM-R21, FWSIM-R58", wall=bb["wall"]))
+    else:
+        rows.append(row("arm.bringup_build", "FAIL", "error", "builds", basis="-DFW_BRINGUP=1", src="FWSIM-R58", detail=bb["err"], wall=bb["wall"]))
     return rows, b
 
 

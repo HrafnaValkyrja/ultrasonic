@@ -14,7 +14,7 @@
     T(test_dsp_math, "FWSIM-R4") T(test_dsp_silence_exact_centre, "FWSIM-R14") T(test_dsp_whines_only_squelched, "FWSIM-R14") \
     T(test_dsp_tone_passes_full_mode, "FWSIM-R13") T(test_dsp_variants, "FWSIM-R13") T(test_dsp_ceiling_short, "FWSIM-R15") \
     T(test_fsm_random_walk, "FWSIM-R18") T(test_gestures_b, "FWSIM-R29") T(test_rematch_two_presses, "FWSIM-R18") \
-    T(test_docked_interlock, "FWSIM-R19") T(test_cdc_paths_clamp, "FWSIM-R64") T(test_cdc_frame_stream, "FWSIM-R28") T(test_usb_cdc_lifecycle_clamp, "FWSIM-R28") T(test_usb_ilim, "FWSIM-R20") T(test_dfu_handoff, "FWSIM-R21") T(test_charger_plan, "FWSIM-R20") \
+    T(test_docked_interlock, "FWSIM-R19") T(test_cdc_paths_clamp, "FWSIM-R64") T(test_cdc_frame_stream, "FWSIM-R28") T(test_usb_cdc_lifecycle_clamp, "FWSIM-R28") T(test_usb_ilim, "FWSIM-R20") T(test_dfu_handoff, "FWSIM-R21") T(test_usb_diag, "FWSIM-R58") T(test_charger_plan, "FWSIM-R20") \
     T(test_charger_watchdog_faults, "FWSIM-R20") T(test_break_always_on, "FWSIM-R65") \
     T(test_stop2_sequence, "FWSIM-R23") T(test_led_duty, "FWSIM-R29") T(test_volume_ticks, "FWSIM-R29") T(test_idle_detector, "FWSIM-R18")
 #define FW_TEST_DECL(fn, req) void fn(void);

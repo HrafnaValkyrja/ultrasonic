@@ -686,3 +686,45 @@ void test_dfu_handoff(void)
     TF_CHECK_EQ(app.st.sys.mode, FW_ST_DOCKED_SELFTEST);
 #endif
 }
+
+/* bring-up diagnostics over CDC (bringup.yaml D2/E1/E2/E6): framed replies with the right values, and read-only (no output, no charger
+ * write, no FSM change) */
+void test_usb_diag(void)
+{
+    static fw_app_t app;
+    app_boot_docked(&app, 2);
+    fake_vbus(true);
+    app_run(&app, 60u);
+    uint8_t tx[64];
+    while (fake_usb_tx(tx, sizeof tx)) {
+    }
+    uint32_t w0 = fake_calls(FAKE_FN_hal_i2c_write), p0 = fake_calls(FAKE_FN_hal_pwm_start), mode0 = app.st.sys.mode;
+    static const uint8_t hello[3] = {0xA5u, 0x10u, 0u}, rails[3] = {0xA5u, 0x11u, 0u}, chg[3] = {0xA5u, 0x12u, 0u}, clk[3] = {0xA5u, 0x13u, 0u};
+    fake_usb_rx(hello, 3u);
+    app_run(&app, 1u);
+    size_t n = fake_usb_tx(tx, sizeof tx);
+    TF_CHECK(n == 16u && tx[0] == 0xA5u && tx[1] == 0x90u && tx[2] == 13u);
+    TF_CHECK_EQ(tx[7], (uint8_t)FW_ABI_VERSION);
+    uint16_t vb[1] = {1850u};
+    fake_adc_script(HAL_ADC_VBAT_SENSE, vb, 1u);
+    fake_usb_rx(rails, 3u);
+    app_run(&app, 1u);
+    n = fake_usb_tx(tx, sizeof tx);
+    TF_CHECK(n == 13u && tx[1] == 0x91u && tx[2] == 10u);
+    TF_CHECK_EQ((uint32_t)tx[5] | (uint32_t)tx[6] << 8, 1850u);               /* VBAT_SENSE = channel 1 */
+    fake_usb_rx(chg, 3u);
+    app_run(&app, 1u);
+    n = fake_usb_tx(tx, sizeof tx);
+    const uint8_t *r = fake_i2c_regs(0x6Au);
+    TF_CHECK(n == 16u && tx[1] == 0x92u && tx[3u + 0x08u] == r[0x08] && tx[3u + 0x0Bu] == r[0x0B] && tx[15] == 1u);
+    fake_usb_rx(clk, 3u);
+    app_run(&app, 1u);
+    n = fake_usb_tx(tx, sizeof tx);
+    TF_CHECK(n == 12u && tx[1] == 0x93u);
+    TF_CHECK_EQ((uint32_t)tx[3] | (uint32_t)tx[4] << 8 | (uint32_t)tx[5] << 16 | (uint32_t)tx[6] << 24, hal_clock_hclk_hz());
+    TF_CHECK_EQ((uint32_t)tx[8] | (uint32_t)tx[9] << 8, 200u);
+    TF_CHECK_EQ((uint32_t)tx[10] | (uint32_t)tx[11] << 8, app.st.arr);
+    TF_CHECK_EQ(fake_calls(FAKE_FN_hal_i2c_write), w0);              /* read-only */
+    TF_CHECK_EQ(fake_calls(FAKE_FN_hal_pwm_start), p0);
+    TF_CHECK_EQ(app.st.sys.mode, mode0);
+}

@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "hal.h"
+#include "knobs_def.h"
 #include "variant_config.h"
 
 void fw_app_boot(fw_app_t *app)
@@ -42,6 +43,12 @@ static void apply_outputs(fw_app_t *app)
         fw_brk_clear_done(&app->st);
         app->brk_reported = 0u;
     }
+#if defined(FW_BRINGUP) && FW_BRINGUP
+    /* bring-up image (docs/build/bringup.yaml stages D-E): the bridge runs only for the docked self-test that pod_test.py commands
+     * (E7/E8 on a resistor, gate G4); no listening output on battery before E7 passes */
+    if (app->st.sys.mode != (uint32_t)FW_ST_DOCKED_SELFTEST)
+        o.bridge_run = 0u;
+#endif
     if (o.bridge_run && !app->bridge_on) {
         if (hal_brk_arm(fw_app_brk_threshold_ma(app)) == HAL_OK && hal_pwm_start() == HAL_OK)
             app->bridge_on = 1u;
@@ -150,6 +157,72 @@ static void service_charger(fw_app_t *app, uint32_t force)
     app->chg_ok = fw_chg_service(&app->chg, &app->st.knobs, &p, hal_time_us(), force);
 }
 
+/* Read-only bring-up diagnostics over CDC (docs/build/bringup.yaml D2, E1, E2, E6; FWSIM-R58 subset). Request 0xA5, type, 0; reply
+ * 0xA5, type | 0x80, len, payload (little-endian). Nothing here writes a register or drives an output, so they exist in every build.
+ *   0x10 HELLO  {u32 build id (git sha prefix, -DFW_BUILD_ID), u32 FW_ABI_VERSION, u32 FW_KNOBS_LAYOUT_HASH, u8 bringup build}
+ *   0x11 RAILS  {u16 mV x 5 in hal_adc_ch_t order: I_SENSE, VBAT_SENSE, VBUS_SENSE, TS, VREFINT; 0xFFFF = not readable now}
+ *   0x12 CHG    {12 BQ25180 registers 0x00-0x0B as last read + u8 verified}
+ *   0x13 CLK    {u32 HCLK Hz, u8 clock plan, u16 effective PWM kHz, u16 ARR} */
+#ifndef FW_BUILD_ID
+#define FW_BUILD_ID 0u
+#endif
+static void put32(uint8_t *p, uint32_t v)
+{
+    p[0] = (uint8_t)v;
+    p[1] = (uint8_t)(v >> 8);
+    p[2] = (uint8_t)(v >> 16);
+    p[3] = (uint8_t)(v >> 24);
+}
+
+static size_t diag_rx(fw_app_t *app, uint8_t type, uint8_t *rep)
+{
+    uint8_t *p = &rep[3];
+    size_t n = 0u;
+    switch (type) {
+    case 0x10u:
+        put32(&p[0], (uint32_t)FW_BUILD_ID);
+        put32(&p[4], (uint32_t)FW_ABI_VERSION);
+        put32(&p[8], (uint32_t)FW_KNOBS_LAYOUT_HASH);
+#if defined(FW_BRINGUP) && FW_BRINGUP
+        p[12] = 1u;
+#else
+        p[12] = 0u;
+#endif
+        n = 13u;
+        break;
+    case 0x11u:
+        for (uint32_t ch = 0; ch < (uint32_t)HAL_ADC_CH_COUNT; ch++) {
+            uint16_t mv = 0xFFFFu;
+            if (hal_adc_read_mv((hal_adc_ch_t)ch, &mv) != HAL_OK)
+                mv = 0xFFFFu;
+            p[2u * ch] = (uint8_t)mv;
+            p[2u * ch + 1u] = (uint8_t)(mv >> 8);
+        }
+        n = 2u * (size_t)HAL_ADC_CH_COUNT;
+        break;
+    case 0x12u:
+        memcpy(p, app->chg.seen, FW_CHG_NREG);
+        p[FW_CHG_NREG] = app->chg_ok ? 1u : 0u;
+        n = FW_CHG_NREG + 1u;
+        break;
+    default: {                                   /* 0x13 */
+        put32(&p[0], hal_clock_hclk_hz());
+        p[4] = (uint8_t)app->st.knobs.clock_plan;
+        uint32_t khz = 200u * app->st.pwm_reps;
+        p[5] = (uint8_t)khz;
+        p[6] = (uint8_t)(khz >> 8);
+        p[7] = (uint8_t)app->st.arr;
+        p[8] = (uint8_t)(app->st.arr >> 8);
+        n = 9u;
+        break;
+    }
+    }
+    rep[0] = FW_CDC_SOF;
+    rep[1] = (uint8_t)(type | 0x80u);
+    rep[2] = (uint8_t)n;
+    return n + 3u;
+}
+
 /* FWSIM-R28: USB core and pins only while PA1 shows VBUS; CDC bytes reassembled into frames, each answered (ACK/NACK). Every drive
  * a frame can cause goes through fw_ccr_from_amp (FWSIM-R64) in fw_hop / fw_selftest_hop. */
 static void service_usb(fw_app_t *app, uint32_t pa1)
@@ -173,8 +246,9 @@ static void service_usb(fw_app_t *app, uint32_t pa1)
         size_t flen = 0u;
         used += fw_cdc_frame_push(&app->cdc, &rx[used], n - used, hal_time_us(), &flen);
         if (flen) {
-            uint8_t rep[4];
-            size_t r = fw_cdc_rx(&app->st, app->cdc.buf, flen, rep, sizeof rep);
+            uint8_t rep[3u + 32u];
+            size_t r = app->cdc.buf[1] >= 0x10u && app->cdc.buf[1] <= 0x13u ? diag_rx(app, app->cdc.buf[1], rep)
+                                                                            : fw_cdc_rx(&app->st, app->cdc.buf, flen, rep, sizeof rep);
             app->cdc_replies += (uint32_t)hal_usb_cdc_write(rep, r);
         }
     }
