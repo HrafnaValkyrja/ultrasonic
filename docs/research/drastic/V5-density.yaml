@@ -1,0 +1,83 @@
+# V5 placement-only density trial (synthesis.md section 3 item V5). AI-facing. Run 2026-10-07 by Claude (Opus 5.5 subagent).
+# NO routing was run (no FreeRouting, no autorouter). Script: hw/pod/density_trial.py; raw: hw/pod/density/results.json;
+# boards: hw/pod/density/<variant>_L<len>.kicad_pcb; picture: docs/diagrams/density-trial.png (today + target + shortest legal).
+# Confidence: H = measured by the script; M = derived from a proxy; L = inference.
+meta:
+  task: "V5: can K3's board shrink to ~16 mm two-face; unlocks K3 length (40 vs 44 mm)"
+  date: 2026-10-07
+  netlist: hw/pod/pod_mz2.net (mz2 packages, 72 parts)
+  board: {H_mm: 12 (O27 fixed), corner_r_mm: 1.0, faces: two (F + B), thickness_mm: 0.8, stack_assumed: "4 layers F sig / In1 GND / In2 +3V0 / B sig (today's)"}
+  glossary:
+    WLCSP-90: "wafer-level chip-scale package, 90 solder balls, 0.4 mm staggered pitch, 4.2 x 3.95 mm"
+    UFQFPN32/48: "thin quad flat no-lead package, 32 pins 5x5 mm / 48 pins 7x7 mm, exposed pad"
+    STM32U575: "ST Cortex-M33 MCU, today's part (QFN48 SMPS variant U575CIU6Q)"
+    STM32U3: "ST U375/U385, newer low-power M33; QFN32 has no SMPS (V3-stm32u3.yaml)"
+    courtyard: "keep-out rectangle/circle round a part that no other part may enter"
+    ratsnest: "sum of minimum-spanning-tree pad-to-pad distances per net (GND excluded): unrouted wire length"
+    via-in-pad: "a via drilled into a solder pad, filled and capped; needed to escape inner BGA/WLCSP balls"
+sourcing_jlc:   # tools/jlc.py, JLCPCB parts API, query 2026-10-07T14:56Z
+  STM32U575OIY6QTR: {lcsc: C5271033, class: Extended, stock: 10, usd: 15.14, pkg: WLCSP-90, note: "only U575 WLCSP; 1 MB OGY6QTR: none in stock"}
+  STM32U385KGU6: {lcsc: C45066903, class: Extended, stock: 7, usd: 7.71, pkg: UFQFPN-32}
+  STM32U375KGU6: {lcsc: C45338536, class: Extended, stock: 4, usd: 7.26, pkg: UFQFPN-32, note: "U375KEU6: none in stock"}
+  STM32U575CIU6Q: {lcsc: C5271013, class: Extended, stock: 26, usd: 9.02, pkg: UFQFPN-48, note: "today's part"}
+  kicad_footprints: {a: "Package_CSP:ST_WLCSP-90_4.2x3.95mm_Layout18x10_P0.4mm_Stagger (stock KiCad 10)", b: "Package_DFN_QFN:QFN-32-1EP_5x5mm_P0.5mm_EP3.45x3.45mm (EP size not checked vs DS14830)", c: "unchanged QFN-48 7x7 EP5.6"}
+method:
+  packer: "deterministic greedy: mic U2 fixed (port x 1.88, y 6.0, B); MCU (B) pose searched over x step 1 mm, y 5/6/7, 4 rotations on a 0.2 mm grid, best 4 re-packed on 0.1 mm; then each part in a fixed priority order (MCU support, noisy L1/Q1/Q2, SW1, bridge, wire pads, charger/LDO/ESD, test pads) takes the legal grid position (either face, 4 rotations) that minimises its ratsnest increment (+0.3 mm per face change); wire pads pulled to the far end. Least-violation position if none is legal."
+  rules: "place_r2.py set adapted to two faces: fit (courtyards inside, pads >= 0.3 mm from edge, no courtyard overlap, pads >= 0.12 mm), axis (port + SW1 on centre line), near (NEAR table, MCU pins remapped), escape (0.6 mm ring round MCU pads, same face, only its support parts), far (L1/Q1/Q2 centre >= 10 mm from port), pads (wire pads >= 0.8 mm, J3-J5 >= 2.0 mm, same face), port (no F copper < 1.6 mm; ADDED: no F courtyard < 1.6 mm, duct seat), lse (Y1/C11/C12 on MCU face, no LSE vias), face (SW1 F, U2 B; everything else free)"
+  final_check: "every result re-checked in pcbnew with real courtyard polygons (place.courtyard_overlaps, pad_clashes) + all rules above; 'legal' = zero violations"
+  variant_changes:
+    a: "U575 WLCSP-90; ALL parts kept (SMPS). Ball map SYNTHETIC: each QFN48 pin -> nearest-angle free ball of the two outer rings, EP -> 6 central balls; ST ballout NOT read -> ratsnest conf L-M"
+    b: "U3 QFN32 pin map from V3 (TIM1 PA7/PA8/PB1/PA10, USB PA11/12, ADF PB3/PB4, SWD PA13/14, I2C PB6 + PA1 (I3C1_SDA in I2C mode), ADC PA2-PA5, BTN PA0, MIC_VDD PA6, CHG_INT PA15, TX PA9, LED PB0, BOOT0 PB7); dropped L1 + C7 (no SMPS on QFN32), C3 (2 VDD pins only), TP8/TP9 (MDF test dots); VDD11 -> VCAP pin 31 keeps C8+C9 (conservative)"
+    c: "netlist and footprints unchanged"
+  wlcsp_courtyard: "library courtyard is body + 1.05 mm (6.29 x 6.05); trial uses body + 0.25 mm (4.7 x 4.45) because the 0.6 mm escape ring is checked separately. Using the library courtyard would cost ~1.5 mm of length."
+  routability_proxy:
+    definition: "demand = signal ratsnest (GND, +3V0 excluded: planes) x 0.2 mm track pitch + vias (one per GND/+3V0 pad, two per signal net spanning both faces) x 0.55^2 mm2 x 2 outer layers; supply = 2 outer layers x board area - pad area (+0.1 mm clearance). load = demand/supply."
+    calibration: "today's Phase-2 board (30 x 12, one face, 4 layers) = load 0.222 = x1.00. It DID route, but needed two FreeRouting passes plus local fixes (ECR-0018, 20bd842): x1.00 is the proven ceiling, not a comfortable point."
+    verdict_bands: {likely: "<= x1.15", possible: "x1.15-1.5 (via-in-pad / 6 layers / hand routing)", unlikely: "> x1.5"}
+    six_layer_variant: "same demand, supply + 2 x area (two inner signal layers; GND + +3V0 planes kept)"
+    conf: "M-L: one scalar; ignores that two-face lets routing pass under parts on the other face, and that demand is a ratsnest not a route. Good for ranking, +-25 % on the absolute."
+today:   # hw/pod/draft_r2/out/placed.kicad_pcb / routed.kicad_pcb, conf H
+  L_mm: 30
+  board_mm2: 359.1
+  utilisation: {F: 0.04, B: 0.541, both_faces: 0.291}
+  pins: 195
+  pins_per_mm2: 0.543
+  ratsnest_mm: 383.4
+  routed: {track_mm_F: 270.1, track_mm_B: 260.9, vias: 132}
+  load: x1.00 (0.222)
+results:   # conf H for legal/U/pins/ratsnest (as packed); load conf M
+  a_wlcsp90_u575:
+    target_16mm: {legal: true, U_F: 0.375, U_B: 0.483, U_both: 0.429, pins_per_mm2: 1.046 (x1.93 today), ratsnest_mm: 182.2, cross_face_nets: 25, load_4L: x1.94, load_6L: x0.77, verdict_4L: unlikely, verdict_6L: likely}
+    shortest_legal_mm: 15     # 15: U 0.458, load_4L x2.27, 6L x0.88. 14: fails (SW1 cannot sit on the centre line)
+    sweep_load_4L: {15: 2.27, 16: 1.94, 17: 1.77, 18: 1.59, 19: 1.54, 20: 1.34}
+    extra_risk: "0.4 mm staggered balls with 0.225 mm pads leave 0.175 mm between balls: no 0.1/0.1 track escapes between them, so every second-ring and inner ball (signals AND the VDD/VSS balls) needs a filled, capped via-in-pad. Fab capability/cost for that at JLC NOT checked here. Not hand-reworkable or probeable (O18/O19)."
+  b_qfn32_u3:
+    target_16mm: {legal: false, violation: "axis: SW1 cannot be put on the centre line (greedy packer: the F face mid-zone was already filled)", U_both: 0.446, pins_per_mm2: 0.921 (x1.70), ratsnest_mm: 173.1, load_4L: x1.85, load_6L: x0.71}
+    hand_fix_judgement: "the only violation is SW1's centre-line slot; a hand reshuffle on F (move 2-3 0201s) very likely clears it. conf M. 16 mm is placeable in practice; the packer just did not find it."
+    shortest_legal_mm: 17     # 17: U 0.42, pins/mm2 0.866 (x1.60), load_4L x1.64, 6L x0.64. 18 failed on one pad clash R10/SW1 (packer noise, not a wall)
+    sweep_load_4L: {16: 1.85, 17: 1.64, 18: 1.51, 19: 1.38, 20: 1.26}
+    notes: "fewest pins (176) and shortest ratsnest (153-173 mm) of the three: drops the SMPS coil + 2 caps; but costs ~3x MCU current/MHz and ~3x Stop-2 current (LDO only, V3)"
+  c_qfn48_u575:
+    target_20mm: {legal: true, U_F: 0.347, U_B: 0.527, U_both: 0.437, pins_per_mm2: 0.815 (x1.50), ratsnest_mm: 211.9, cross_face_nets: 29, load_4L: x1.85, load_6L: x0.68, verdict_4L: unlikely, verdict_6L: likely}
+    shortest_legal_mm: 17     # 17: U 0.514, pins/mm2 0.96, load_4L x2.46, 6L x0.83. 16 fails (SW1 axis + C21 in the escape ring); 15 fails (charger caps too far)
+    sweep_load_4L: {17: 2.46, 18: 2.21, 19: 2.14, 20: 1.85, 21: 1.65, 22: 1.57, 23: 1.41, 24: 1.35}
+findings:
+  - "PLACEMENT IS NOT THE WALL. All three MCU options place legally on a 12 mm high two-face board at 15-17 mm; even today's QFN48 places at 17 mm. All rules hold (mic port at x 1.88, L1/Q1/Q2 >= 10 mm from it, which pushes the noisy parts into the last ~4-5 mm of a 16 mm board). conf H (as a placement; packer is greedy, so shorter may exist)"
+  - "ROUTING ON 4 LAYERS IS THE WALL. Two faces fill both outer layers with pads, and both inner layers are planes. Every two-face variant up to 20 mm (and QFN48 up to 24 mm) needs 1.3-2.5x today's routing load, and today's 1.0x already needed two router passes plus hand fixes. On 4 layers the 16 mm board is 'unlikely' for every MCU option. conf M"
+  - "ON 6 LAYERS (two inner signal layers added, planes kept) the loads fall to 0.64-0.88x today at 15-17 mm: 'likely' for all three, at the same placement. conf M. 6-layer 0.8 mm JLC price and lead time NOT checked."
+  - "The MCU package matters less than expected: WLCSP saves ~1-2 mm of length over QFN48 (15 vs 17 shortest legal; same 0.8x at 6 layers) but adds via-in-pad on nearly every ball and kills rework/probing (O18/O19). The U3 QFN32 gives the lightest routing (fewest nets, no SMPS) but loses the SMPS power numbers K3 relies on (V3)."
+  - "Pin density at 16 mm: WLCSP 1.05/mm2 (x1.93 today), QFN32 0.92 (x1.70), QFN48 at 17 mm 0.96 (x1.77). Each is far above the density today's board was proven at."
+k3_length_answer:
+  with_6_layers: "board 16 mm (WLCSP; or QFN32 after a hand fix) -> K3 L ~40.1 mm as synthesis assumed; with today's QFN48 the board is 17 mm -> ~41 mm. conf M"
+  with_4_layers: "no two-face board <= 20 mm reaches today's proven load; a 20 mm QFN48 board (K3 ~44 mm) is still x1.85 -> 'unlikely' without 6 layers. conf M"
+  recommendation_inputs:
+    option_1: "K3 at 17 mm with today's QFN48 + 6 layers: no MCU port, no WLCSP, 1 mm longer than the K3 sketch. (Claude's lean, conf M: smallest change of silicon for ~all of the gain)"
+    option_2: "K3 at 16 mm with WLCSP-90 + 6 layers + via-in-pad: shortest, not reworkable, extra fab risk"
+    option_3: "K3 at 16 mm with U3 QFN32 + 6 layers: lightest routing, but loses the SMPS (LDO only, ~3x run and Stop-2 current, V3) and needs a firmware port"
+    owner_decides: true
+open_items:
+  - "real routing trial of the chosen variant on 6 layers (lead session only; FreeRouting is forbidden for parallel agents)"
+  - "U575 WLCSP-90 ballout from the ST datasheet (synthetic map here)"
+  - "JLC 6-layer 0.8 mm board + via-in-pad capability, price, dated"
+  - "two-face assembly: second reflow side for 0201 parts; and whether the mic/duct and SW1 on F fit the K3 shell (not modelled)"
+  - "QFN32 exposed-pad size vs DS14830 package drawing"
