@@ -10,7 +10,9 @@
     T(test_replay_state_hash, "FWSIM-R3") \
     T(test_fakes_coverage, "FWSIM-R2") T(test_fakes_fault_injection, "FWSIM-R2") T(test_fakes_state, "FWSIM-R2") \
     T(test_fakes_adf_isr_ring, "FWSIM-R3") \
-    T(test_app_loop, "FWSIM-R2") T(test_board_config, "FWSIM-R5")
+    T(test_app_loop, "FWSIM-R2") T(test_board_config, "FWSIM-R5") \
+    T(test_dsp_math, "FWSIM-R4") T(test_dsp_silence_exact_centre, "FWSIM-R14") T(test_dsp_whines_only_squelched, "FWSIM-R14") \
+    T(test_dsp_tone_passes_full_mode, "FWSIM-R13") T(test_dsp_variants, "FWSIM-R13") T(test_dsp_ceiling_short, "FWSIM-R15")
 #define FW_TEST_DECL(fn, req) void fn(void);
 FW_TESTS(FW_TEST_DECL)
 #undef FW_TEST_DECL

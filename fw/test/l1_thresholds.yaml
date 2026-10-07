@@ -1,0 +1,72 @@
+meta:
+  what: FWSIM-R7 L1 thresholds (firmware host build vs sim/dsp float64 reference on the golden vectors)
+  frozen: '2026-10-07'
+  by: sim/fw/gen_vectors.py --freeze (measured worst + margin; proposed starting values kept where they hold)
+  proposed: band energy <= 0.1 dB steady state; 12.5 kS/s output error <= -60 dB re signal rms; squelch decisions equal on >= 99.9 % of hops
+  rule: changing a value needs a stated reason in docs/sim/firmware-emulation.yaml change_log
+thresholds:
+  B:
+    dsp_out_err_db:
+      op: <=
+      thr: -60.0
+      measured: -72.97
+    band_db_err_p99:
+      op: <=
+      thr: 0.1
+      measured: 0.0001
+    band_db_err_max:
+      op: <=
+      thr: 0.008
+      measured: 0.0023
+    floor_db_err_p99:
+      op: <=
+      thr: 0.006
+      measured: 0.0006
+    floor_db_err_max:
+      op: <=
+      thr: 0.008
+      measured: 0.0023
+    squelch_agree:
+      op: '>='
+      thr: 0.977
+      measured: 0.98205
+    sweep_map_err_bands:
+      op: <=
+      thr: 1.0
+      measured: 0.347
+      src: 'FWSIM-R13: tone sweep maps within one band'
+  slim:
+    dsp_out_err_db:
+      op: <=
+      thr: -60.0
+      measured: -72.54
+    band_db_err_p99:
+      op: <=
+      thr: 0.1
+      measured: 0.0001
+    band_db_err_max:
+      op: <=
+      thr: 0.005
+      measured: 0.0002
+    floor_db_err_p99:
+      op: <=
+      thr: 0.005
+      measured: 0.0
+    floor_db_err_max:
+      op: <=
+      thr: 0.005
+      measured: 0.0
+    squelch_agree:
+      op: '>='
+      thr: 0.978
+      measured: 0.98333
+    sweep_map_err_bands:
+      op: <=
+      thr: 1.0
+      measured: 0.182
+      src: 'FWSIM-R13: tone sweep maps within one band'
+  A:
+    dsp_out_err_db:
+      op: <=
+      thr: -60.0
+      measured: -90.32

@@ -44,9 +44,9 @@ LD = FW / "port_u575/u575.ld"
 INC = [f"-I{FW / d}" for d in ("hal", "core", "gen")]
 INC_HOST = INC + [f"-I{FW / 'port_host'}", f"-I{FW / 'test'}"]
 WARN = ["-Wall", "-Wextra", "-Wconversion", "-Wshadow", "-Wdouble-promotion", "-Werror"]
-HOST_FLAGS = ["-std=c11", "-O2", "-msse2", "-mfpmath=sse", "-mno-fma", "-ffp-contract=off", "-fexcess-precision=standard"]
-ARM_FLAGS = ["-std=c11", "-O2", "-mcpu=cortex-m33", "-mthumb", "-mfloat-abi=hard", "-mfpu=fpv5-sp-d16", "-ffp-contract=off",
-             "-ffunction-sections", "-fdata-sections"]
+HOST_FLAGS = ["-std=c11", "-O2", "-msse2", "-mfpmath=sse", "-mno-fma", "-ffp-contract=off", "-fexcess-precision=standard", "-fno-math-errno"]
+ARM_FLAGS = ["-std=c11", "-O2", "-mcpu=cortex-m33", "-mthumb", "-mfloat-abi=hard", "-mfpu=fpv5-sp-d16", "-ffp-contract=off", "-fno-math-errno",
+             "-fno-tree-loop-distribute-patterns", "-ffunction-sections", "-fdata-sections"]
 ARM_LINK = ["-T", str(LD), "-nostartfiles", "--specs=nano.specs", "-Wl,--gc-sections"]
 GCC, CLANG, ARMCC = "gcc", "clang-18", "arm-none-eabi-gcc"
 ALLOC_SYMS = {"malloc", "calloc", "realloc", "free", "_malloc_r", "_free_r", "_calloc_r", "_realloc_r", "_sbrk", "_sbrk_r", "aligned_alloc", "posix_memalign"}

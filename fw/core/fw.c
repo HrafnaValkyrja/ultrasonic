@@ -23,27 +23,55 @@ void fw_init(fw_state_t *st, const fw_knobs_t *knobs, uint64_t now_us)
     st->boot_us = now_us;
     st->squelched = 1u;
     apply_knobs(st);
+    fw_dsp_init(&st->dsp, &st->knobs, st->arr);
+}
+
+static size_t hop_pcm(fw_state_t *st, const float pcm[FW_HOP_N], uint16_t *ccr, fw_taps_t *taps)
+{
+    float y8[FW_DSP_OUT_N];
+    fw_out_info_t oi;
+    if (taps != NULL)
+        memset(taps, 0, sizeof *taps);
+    fw_dsp_algo(&st->dsp, pcm, y8, taps ? taps->band_energy : NULL, taps ? taps->floor : NULL);
+    fw_ccr_bounds_t b = fw_ccr_bounds((uint16_t)st->arr, st->amp_max_ppm);
+    size_t n = fw_dsp_out(&st->dsp, y8, st->squelched, &b, ccr, &oi);
+    st->clamp_hits += oi.clamp_hits;
+    st->hop_count++;
+    if (taps != NULL) {
+        memcpy(taps->dsp_out, y8, sizeof y8);
+        taps->pre_q_true_peak = oi.true_peak;
+        memcpy(taps->shaper_norm, oi.shaper_norm, sizeof taps->shaper_norm);
+        taps->squelch_state = oi.squelched;
+        taps->n_ccr = (uint32_t)n;
+        taps->clamp_hits = oi.clamp_hits;
+    }
+    return n;
 }
 
 size_t fw_hop(fw_state_t *st, const int32_t in[FW_HOP_N], uint16_t *ccr, size_t ccr_cap, fw_taps_t *taps)
 {
     size_t n = (size_t)FW_HOP_N * 200u / st->arr;
-    if (ccr == NULL || ccr_cap < n)
+    if (in == NULL || ccr == NULL || ccr_cap < n)
         return 0u;
-    (void)in;                                  /* DSP (FWSIM-R13/R14) lands here; until then: silence */
-    fw_ccr_bounds_t b = fw_ccr_bounds((uint16_t)st->arr, st->amp_max_ppm);
-    uint32_t hits = 0u;
-    for (size_t i = 0; i < n; i++)
-        ccr[i] = fw_ccr_from_amp(0.0f, &b, &hits);
-    st->clamp_hits += hits;
-    st->hop_count++;
-    if (taps != NULL) {
-        memset(taps, 0, sizeof *taps);
-        taps->squelch_state = st->squelched;
-        taps->n_ccr = (uint32_t)n;
-        taps->clamp_hits = hits;
-    }
-    return n;
+    float pcm[FW_HOP_N];
+    for (size_t i = 0; i < FW_HOP_N; i++)
+        pcm[i] = (float)in[i];                 /* exact: 24-bit sample << 8 fits the float32 mantissa */
+    return hop_pcm(st, pcm, ccr, taps);
+}
+
+size_t fw_hop_d2(fw_state_t *st, const int32_t in400[2u * FW_HOP_N], uint16_t *ccr, size_t ccr_cap, fw_taps_t *taps)
+{
+    size_t n = (size_t)FW_HOP_N * 200u / st->arr;
+    if (in400 == NULL || ccr == NULL || ccr_cap < n)
+        return 0u;
+    float pcm[FW_HOP_N];
+    fw_dsp_halfband(&st->dsp, in400, pcm);
+    return hop_pcm(st, pcm, ccr, taps);
+}
+
+int fw_set_noise_cal(fw_state_t *st, const float *band_energy, uint32_t n)
+{
+    return fw_dsp_set_noise(&st->dsp, band_energy, n);
 }
 
 void fw_poll(fw_state_t *st, uint64_t now_us)

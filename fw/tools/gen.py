@@ -6,6 +6,7 @@
   variant_config.h  per-cell and per-exemption constants from fw/variants.yaml (incl. the FWSIM-R64 output current clamp)
   knobs_def.h       fw_knobs_t X-macro + hard clamps from fw/spec/knobs.yaml
   tables.h          float32 hex-literal tables (dB -> amplitude), so core never calls powf (determinism rules)
+  dsp_tables.h      DSP filters + tables (window, mic EQ, noise calibration, sine, FFT, interpolator, half-band, algorithm A, NTF)
 
   python3 fw/tools/gen.py           regenerate
   python3 fw/tools/gen.py --check   regenerate into memory, exit 1 if any committed fw/gen file differs (fwsim stage gen)
@@ -207,12 +208,21 @@ def tables():
     return "\n".join(out), ["fw/tools/gen.py"]
 
 
+# ------------------------------------------------------------------------------------------- dsp_tables.h
+def dsp_tables():
+    sys.path.insert(0, str(FW / "tools"))
+    import dsp_tables as dt                                          # noqa: E402
+    srcs = [FW / "tools/dsp_tables.py", REPO / "sim/dsp/pipeline.py", REPO / "sim/data/sph0641_ultrasonic_response.json"]
+    hdr = HDR.format(src="fw/tools/dsp_tables.py (filters + tables from sim/dsp/pipeline.py, sim/e2e/stages.py)", h=inputs_hash(srcs))
+    return dt.generate(hdr), [str(Path(s).relative_to(REPO)) for s in srcs]
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--check", action="store_true", help="exit 1 if a committed fw/gen file differs from a fresh generation")
     ap.add_argument("--json", type=Path, help="write a result row here")
     a = ap.parse_args(argv)
-    outputs = {"board_config.h": board_config, "variant_config.h": variant_config, "knobs_def.h": knobs_def, "tables.h": tables}
+    outputs = {"board_config.h": board_config, "variant_config.h": variant_config, "knobs_def.h": knobs_def, "tables.h": tables, "dsp_tables.h": dsp_tables}
     stale, srcs = [], {}
     for name, fn in outputs.items():
         text, s = fn()

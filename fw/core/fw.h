@@ -10,6 +10,7 @@
 #define FW_CORE_FW_H
 #include <stddef.h>
 #include <stdint.h>
+#include "dsp.h"
 #include "knobs.h"
 
 #define FW_ABI_VERSION 1u
@@ -59,12 +60,19 @@ typedef struct {
     uint32_t last_event;
     int32_t last_arg;
     uint32_t event_count[FW_EV_COUNT];
+    fw_dsp_t dsp;             /* DSP chain state (FWSIM-R13): front end, algorithm, interpolator, limiter, shaper */
 } fw_state_t;
 
 void fw_init(fw_state_t *st, const fw_knobs_t *knobs, uint64_t now_us);
 /* One hop. Writes n = 128 * 200 / ARR CCR words if ccr_cap >= n and returns n; else writes nothing and returns 0.
- * taps may be NULL. Foundation stub: passes silence (CCR = ARR/2 through the clamp); the DSP lands behind this signature. */
+ * taps may be NULL. in = D1 front end: 128 ADF1 words at 200 kS/s. Output squelched (CCR = ARR/2) while the power-on hold runs
+ * (released by fw_poll with injected time, e2e F4). */
 size_t fw_hop(fw_state_t *st, const int32_t in[FW_HOP_N], uint16_t *ccr, size_t ccr_cap, fw_taps_t *taps);
+/* Same hop for the D2 front end (knob adf_front = 2): 256 ADF1 words at 400 kS/s (CIC /10), CPU half-band to 200 kS/s.
+ * Additive entry point: fw_hop's ABI is unchanged (FW_ABI_VERSION 1). The port calls the one its ADF1 configuration feeds. */
+size_t fw_hop_d2(fw_state_t *st, const int32_t in400[2u * FW_HOP_N], uint16_t *ccr, size_t ccr_cap, fw_taps_t *taps);
+/* Load the unit's mic self-noise band energies (production / boot calibration); n = 28 (spec B) or 16 (slim B). 0 = ok. */
+int fw_set_noise_cal(fw_state_t *st, const float *band_energy, uint32_t n);
 void fw_poll(fw_state_t *st, uint64_t now_us);
 void fw_event(fw_state_t *st, fw_event_id_t id, int32_t arg, uint64_t now_us);
 size_t fw_cdc_rx(fw_state_t *st, const uint8_t *buf, size_t len, uint8_t *reply, size_t reply_cap);   /* FWSIM-R57 codec: later */

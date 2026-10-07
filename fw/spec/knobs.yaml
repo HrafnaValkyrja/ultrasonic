@@ -7,8 +7,8 @@
 # Coverage: the knobs_required ids of docs/sim/firmware-emulation.yaml that the foundation needs; the rest are added with their
 # feature (FWSIM-R6 status lists them). Adding, removing or retyping a knob bumps `version` (stored records then load as defaults + event).
 schema: 1
-version: 1
-updated: 2026-10-07
+version: 2
+updated: 2026-10-07   # v2: DSP knobs (b_variant, transient_only, volume_cdb, noise_margin_cdb, a_lo_hz, limiter_release_ms); squelch_hold_ms default 20
 assumed: "assumed (no source yet; FWSIM knobs_required lists the id only)"
 
 hard_clamps:
@@ -31,7 +31,9 @@ knobs:
   - {id: ceiling_cdb, def: -1200, min: -4000, max: -1200, hard: {max: HC_CEILING_CDB_MAX}, unit: cdBFS, src: "spec D17; e2e F1; shared-params#ceiling (true peak of the pre-quantiser x16 stream)"}
   - {id: out_i_peak_ma, def: FW_VAR_I_PEAK_MA_MAX, min: 0, max: FW_VAR_I_PEAK_MA_MAX, hard: {max: HC_I_PEAK_MA_MAX}, unit: mA, src: "FWSIM-R64 output current clamp (may only be lowered)"}
   - {id: squelch_cdb, def: -6800, min: -9000, max: -4000, unit: cdBFS, src: "e2e-chain.yaml design_binding squelch -68 dBFS (assumed knob, F3)"}
-  - {id: squelch_hold_ms, def: 50, min: 0, max: 1000, unit: ms, src: assumed}
+  - {id: squelch_hold_ms, def: 20, min: 0, max: 1000, unit: ms, src: "sim/e2e/stages.py PwmShaper (5 ms rms below threshold for 20 ms; value assumed, e2e F3)"}
+  - {id: limiter_release_ms, def: 60, min: 5, max: 1000, unit: ms, src: "sim/dsp/pipeline.py limiter release_ms 60 (attack is instant on the x16 true peak: FWSIM-R14 F1)"}
+  - {id: volume_cdb, def: 0, min: -3200, max: 1600, unit: cdB, src: "spec D3 L123-L124 (volume steps ~4 dB around the fixed gain); e2e volume_db"}
   - {id: power_on_hold_ms, def: 300, min: 300, max: 3000, unit: ms, src: "e2e F4 (0.3 s floor-tracker settle)"}
   - {id: gate_hold_hops, def: 2, min: 1, max: 32, unit: hop, src: "e2e F12/F14 (value assumed)"}
   - {id: volume_step_cdb, def: 400, min: 100, max: 600, unit: cdB, src: "spec D3 L123-L124 (~4 dB)"}
@@ -46,7 +48,11 @@ knobs:
   - {id: band_hi_hz, def: 85000, min: 60000, max: 95000, unit: Hz, src: "sim/dsp/pipeline.py BConfig"}
   - {id: out_lo_hz, def: 1500, min: 500, max: 3000, unit: Hz, src: "spec D9"}
   - {id: out_hi_hz, def: 4000, min: 2000, max: 6000, unit: Hz, src: "spec D9"}
-  - {id: n_bands, def: 28, min: 28, max: 28, unit: band, src: "sim/dsp/pipeline.py BConfig (taps fixed at 28: FWSIM-R10)"}
+  - {id: n_bands, def: 28, min: 28, max: 28, unit: band, src: "sim/dsp/pipeline.py BConfig (taps fixed at 28: FWSIM-R10); b_variant 1 uses 16"}
+  - {id: b_variant, def: 0, min: 0, max: 1, unit: enum, src: "0 = spec B (28 bands, 256-pt frames every 128 samples); 1 = slim B (16 bands, no overlap: frames every 256 samples, 1.28 ms) docs/research/drastic/V4-cycles.yaml B_slim1; listening test E2 chooses"}
+  - {id: transient_only, def: 1, min: 0, max: 1, unit: bool, src: "spec D12 L220-L222 (1 = transient mode, indoor default; 0 = full mode, only the mic self-noise is removed)"}
+  - {id: noise_margin_cdb, def: 600, min: 0, max: 2000, unit: cdB, src: "sim/dsp/pipeline.py BConfig noise_margin_db 6"}
+  - {id: a_lo_hz, def: 38000, min: 20000, max: 80000, unit: Hz, src: "FWSIM knobs_required.dsp lo_hz = 38000 for A; pipeline.algo_a f_lo"}
   - {id: gate_cdb, def: 600, min: 0, max: 2000, unit: cdB, src: "sim/dsp/pipeline.py BConfig gate_db 6"}
   - {id: floor_up_ms, def: 3000, min: 100, max: 30000, unit: ms, src: "sim/dsp/pipeline.py BConfig floor_up_s 3.0"}
   - {id: floor_down_ms, def: 300, min: 10, max: 10000, unit: ms, src: "sim/dsp/pipeline.py BConfig floor_down_s 0.3"}
