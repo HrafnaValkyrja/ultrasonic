@@ -34,3 +34,6 @@ A proof that the parts fit and route. It is not a layout to order. Known issues 
 - **Also for the layout:** one 2.2 µF at **each** VDD11 pin (pin 46 has none); keep the SMPS loop tight.
 
 **Audit claim checked and NOT upheld:** "TPS7A20 footprint pads oversized" (FP-1). The EasyEDA footprint matches KiCad's stock `Texas_X2SON-4_1x1mm_P0.65mm`, which is drawn from TI's DQN0004A drawing: signal pads 0.46 × 0.32 mm vs 0.46 × 0.31 mm, and the smallest pad gap is 0.134 mm vs 0.120 mm. The tight gap is the package's own; JLC's minimum is 0.09 mm. No change.
+
+
+2026-10-07 (CHK-IDENT): the 'LCSC Part' properties were stripped from the 8 footprints in lcsc.pretty (same cleanup as ECR-0012 on the live library): footprints carry no part identity; the BOM comes from gen.py. This draft is superseded (hw/current.yaml); kept because sim/noise/pcbgeom.py cites its stackup lines as a source.
