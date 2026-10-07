@@ -149,10 +149,10 @@
   "SUB-UI": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only",
+   "note": "padboard gen.py docstring only (R14 from VSYS); no circuit change",
    "stamp": {
     "block:UI": "2e30cc3f141e491d",
-    "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
+    "file:hw/padboard/gen.py": "bb668388a096a189",
     "sym:hw/mech/dims_r2.py::POCKET": "75123b323bc1f0df",
     "sym:hw/mech/dims_r2.py::SW": "d595c80a5705b3f3",
     "sym:hw/mech/shell_r2.py::puck": "a8cbd1c96fa6c01e"
