@@ -61,6 +61,16 @@ def main(argv=None):
         res[v] = {"load_MHz": [lo, hi], "clock": f"{f} MHz {rng}", "mcu_mA": [round(x, 2) for x in m], "periph_mA": [round(x, 2) for x in per],
                   "awake_mA": [round(x, 2) for x in aw], "worst_mA": round(aw[2] + LED[2], 2),
                   "hours_worst_design_expected": {c: hours(mah, aw) for c, mah in CELLS.items()}}
+    # awake fraction measured on the e2e scenes with the firmware idle detector driving IDLE (sim/fw/awake.py), nominal currents,
+    # 0.85 usable: hours per scene if the whole day looked like that scene
+    aw = REPO / "sim/out/fw/awake.json"
+    if aw.exists():
+        sc = json.loads(aw.read_text())
+        res["scenes_awake_fraction"] = {n: v["awake_frac_after_3s"] for n, v in sc.items()}
+        for v, key in (("spec B", "B"), ("slim B", "slim"), ("A", "A")):
+            a_nom = res[v]["awake_mA"][1]
+            res[v]["hours_by_scene_nominal"] = {c: {n: round(mah * 0.85 / (f * a_nom + (1 - f) * IDLE[1] + LED[1]), 1)
+                                                    for n, f in res["scenes_awake_fraction"].items()} for c, mah in CELLS.items()}
     print(json.dumps(res, indent=1))
     if a.json:
         a.json.write_text(json.dumps(res, indent=1) + "\n")
