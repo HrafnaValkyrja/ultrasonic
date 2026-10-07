@@ -1,15 +1,14 @@
 # SUB-PROCESSING: MCU, core SMPS, clocks, firmware
-**Current design (2026-10-07): Phase 2, `hw/current.yaml` (ECR-0018); every tool and check defaults to it.** U1 on B at board (10.05, 5.4); Y1 Epson FC-12M X1A0000610006 2.0 x 1.2 (C99009, CL 7 pF) with C11/C12 8p2 C0G 0201 (C161441); 100n decoupling 0201 (C76934); C8/C9 stay 0402 10 V (SMPS loop); netlist `hw/pod/pod_mz2.net`. The body below is the Rev F/G reference design (`ULTRASONIC_DESIGN=revg`) unless it says Phase 2; its Phase-2 rewrite is open.
-Rev F 2026-10-02: leg B on TIM1_CH3/CH3N PA10/PB15 (ECR-0003); R11, R19, C20 removed; PB5 strapped to GND; PA15 internal pull-up; TP7-TP10 debug/MDF dots; free pins now PC13 PH0 PH1 PA3 PA9 PB0.
+Rev MZ-2 2026-10-07: body moved to the Phase-2 design (hw/current.yaml, ECR-0018): U1 + SMPS + LSE on B of the one-face 30 x 12 board, Y1 FC-12M 2012 + 8p2 0201 load caps, 100n 0201 decoupling, +3V0 on the In2 plane, I2C_SCL bridged on In2; layout distances and noise margins re-probed; Rev F draft numbers moved to the reference section. Pins/nets unchanged (pod_mz2.net nets == Rev G).
 
 ```yaml
-status: {schematic: "Rev F (Phase 1 logical simplification, package B3), hw/pod/gen.py docstring L35-60", layout: "draft routed 2026-10-02 (hw/pod/draft_r1/summary.json: 687 tracks, 118 vias, 2 unconnected, DRC 19 = courtyard overlaps only); owner layout session pending (O14)", firmware: "none written; requirements only in docs/sim/firmware-emulation.yaml (FWSIM); Python reference models in sim/dsp", updated: 2026-10-02}
+status: {schematic: "Rev G logic, package set MZ-2 (hw/pod/gen.py MZ2 table L93; POD_PACKAGES=mz2 -> hw/pod/pod_mz2.net); bom_check nets PASS 195 pins / 42 nets (2026-10-07)", layout: "Phase-2 board hw/pod/draft_r2/out/routed.kicad_pcb routed: DRC 0, 0 unconnected (kicad-cli 10.0.6 DRC re-run 2026-10-07; commit f6291e6); owner review pending (O25)", firmware: "none written; requirements only in docs/sim/firmware-emulation.yaml (FWSIM); Python reference models in sim/dsp", updated: 2026-10-07}
 item: SUB-PROCESSING   # docs/system/plm/items.yaml
-src_of_truth: ["hw/pod/gen.py L133-163 (MCU, SMPS, LSE)", "gen.py L282-291 (TP7-TP10, spare pins)", "gen.py L222 (PB5 strap)", "docs/system/pin-contract.yaml (signal per net)", "docs/system/integration-map.md §4 (generated pin map)", "docs/research/A3-u575-plan.md (chip plan)", "docs/spec.md D5 L131, D11 L210, D12 L218, D14 L241, D15 L272, D16 L285, D17 L293, D18 L297, O18 L644, O19 L645"]
-owner_decisions: [O6 (resolved -> D11), O9, O14, O15, O18 (fail informatively), O19 (changes via firmware only), O20 (final size, test access must not cost size)]
-open_ecrs: {ECR-0003: "implemented in Rev F gen.py; file status still 'proposed'", ECR-0005: "+3V0 peak 326 mA > U4 300 mA (MCU shares the rail)", ECR-0008: "MCU reserve, 8 at JLC", ECR-0009: "fw interlocks: no output while docked, ceiling", ECR-0010: "fw tested before board order", ECR-0013: "pin hazards: S1 PB5 strap done in Rev F, S2 UCPD_DBDIS fw, PB4 back-feed, PA2 in DFU"}
-checks: ["python3 tools/checks/interfaces.py [pins] (2026-10-02: WARN, 3 hazards: GB_N PB15, MIC_DATA PB4, TS PA2, all ECR-0013)", "python3 tools/plm.py impact SUB-PROCESSING"]
-abbr: {ADF1: "audio digital filter (PDM->PCM, runs in Stop 2)", MDF1: "multi-function digital filter (ADF fallback)", SMPS: "MCU-internal core buck", LSE: "32.768 kHz crystal oscillator", MSIS: "multi-speed internal RC, PLL-locked to LSE", P80/P48: "clock plan 80.009 MHz / 48 MHz", hop: "DSP frame 128 samples = 0.64 ms", DS: "ST DS13737 Rev 10 (Jul 2024)", ES: "ST ES0499 errata", RM: "ST RM0456 Rev 7", UCPD: "USB-C PD block; dead-battery 5.1k pull-downs at reset", draft: "hw/pod/draft_r1/pod_r1_routed.kicad_pcb"}
+src_of_truth: ["hw/pod/gen.py L178-212 (MCU, SMPS, LSE; Y1 MZ-2 branch L202), L273 (PB5 strap), L335-346 (TP7-TP10, spare pins), MZ2 table L93-108 (Phase-2 packages)", "hw/pod/draft_r2/out/routed.kicad_pcb (positions)", "docs/system/pin-contract.yaml (signal per net)", "docs/system/integration-map.md §4 (generated pin map)", "docs/research/A3-u575-plan.md (chip plan)", "docs/system/plm/ecr/ECR-0018.md (Phase-2 log: MZV-08 LSE, route closure, noise)", "docs/spec.md D5 L131, D11 L210, D12 L218, D14 L241, D15 L272, D16 L285, D17 L293, D18 L297, O18 L644, O19 L645, O25-O27 L651-653"]
+owner_decisions: [O6 (resolved -> D11), O9, O18 (fail informatively), O19 (changes via firmware only), O20 (final size), O25 (Claude lays out, owner reviews), O26 (Phase 2), O27 (thin > short > long)]
+open_ecrs: {ECR-0018: "Phase 2 package set, approved, implementation in progress", ECR-0005: "+3V0 peak 326 mA > U4 300 mA (MCU shares the rail)", ECR-0008: "MCU reserve, 8 at JLC", ECR-0009: "fw interlocks: no output while docked, ceiling", ECR-0010: "fw tested before board order", ECR-0013: "pin hazards: S1 PB5 strap done, S2 UCPD_DBDIS fw, PB4 back-feed, PA2 in DFU"}
+checks: ["python3 tools/checks/interfaces.py [pins] (2026-10-07: WARN, 3 known hazards GB_N PB15, MIC_DATA PB4, TS PA2, all ECR-0013)", "python3 tools/checks/bom_check.py [nets] (2026-10-07: PASS)", "sim/noise/out_r2/budget.json LN-M01/LN-M04 (2026-10-07: PASS)", "python3 tools/plm.py impact SUB-PROCESSING"]
+abbr: {ADF1: "audio digital filter (PDM->PCM, runs in Stop 2)", MDF1: "multi-function digital filter (ADF fallback)", SMPS: "MCU-internal core buck", LSE: "32.768 kHz crystal oscillator", MSIS: "multi-speed internal RC, PLL-locked to LSE", P80/P48: "clock plan 80.009 MHz / 48 MHz", hop: "DSP frame 128 samples = 0.64 ms", DS: "ST DS13737 Rev 10 (Jul 2024)", ES: "ST ES0499 errata", RM: "ST RM0456 Rev 7", UCPD: "USB-C PD block; dead-battery 5.1k pull-downs at reset", board: "hw/pod/draft_r2/out/routed.kicad_pcb (Phase 2, sha256 da4e8b13...)", "F/B": "board faces: F toward the lid, B toward the cell", In2: "inner copper layer 3 = +3V0 plane"}
 ```
 
 ## Purpose
@@ -30,24 +29,25 @@ HSI48 (+ CRS trim) -> USB FS 48 MHz            internal SMPS 3 MHz: VLXSMPS -> L
 - runtime: CPU wakes every hop; GPDMA fills an SRAM ring from ADF1 and feeds TIM1 CCRs (`docs/learn/02-inside-the-chip.png`).
 
 ## Elements
-### Parts (gen.py L133-163; positions from draft, probe 2026-10-02, board coords mm, origin = outline top-left)
-| Ref | Part | LCSC · class | Draft | Why |
+### Parts (gen.py + MZ2 table; positions = footprint centres, probe of the board 2026-10-07; board mm, origin = outline top-left, x from the mic end; all on B)
+| Ref | Part | LCSC · class | Board (B) | Why |
 |---|---|---|---|---|
-| U1 | STM32U575CIU6Q: ST Cortex-M33 MCU, 160 MHz max, FPU+DSP, 2 MB flash, 786 KB SRAM; C=48 pins, I=2 MB, U=UFQFPN 7x7, 6=-40-85 C, Q=SMPS pinout | C5271013 · Ext | F (13.03, 6.53) | D5; ADF1; ~40-45 µA/MHz on SMPS (DS §7) |
-| L1 | DFE201610E-2R2M=P2: Murata 2.2 µH shielded metal-alloy, 2.0x1.6x1.0 mm, ~140 mΩ, 2.4 A | C337891 · Ext | F (20.42, 10.67) | SMPS coil; ST: 2.2 µH ±20 %, Isat > 0.5 A, DCR < 200 mΩ (B-parts-selection.md §3); differs from spec D5 L152 (issue 11) |
-| C8, C9 | 2.2 µF 0402 10 V X5R CL05A225KP5NSNC (Rev G) | C107369 · Ext | F (17.62, 11.53), (20.32, 8.60) | VDD11 COUT; DS13737 Rev 10 p.153 rated >= 10 V: met since Rev G (ECR-0017, O24) |
-| C7 | 10 µF 10 V X5R 0603 (Samsung CL10A106KP8NNNC) | C19702 · Basic | F (18.02, 6.53) | VDDSMPS CIN (DS: 10 µF, >= 10 V, ESR < 10 mΩ) |
-| C1-C3 | 100 nF 16 V X7R 0402 (Samsung CL05B104KO5NNNC), one per VDD pin | C1525 · Basic | F; C1 (9.43, 1.88) | AN5373 Rev 7; C1 also serves VBAT pin 1 (PER-06: <= 1.5 mm from pins 1 and 48; probe 1.43 / 1.12 mm) |
-| C4 | 10 µF 0603 bulk on +3V0 | C19702 · Basic | F (18.82, 3.53) | AN5373: 10 µF typ, 4.7 µF min after DC bias |
-| C5, C6 | 1 µF 25 V X5R + 100 nF on VDDA | C52923, C1525 · Basic | F (8.33, 10.21), (7.33, 10.21) | AN5373 |
-| C10 | 100 nF on NRST | C1525 · Basic | F (8.33, 7.91) | AN5373 |
-| Y1 | Q13FC1350000400: Epson FC-135 32.768 kHz, 3.2x1.5 mm, CL 12.5 pF | C32346 · Basic | F (6.62, 4.23) | D16: pitch matched between unlinked pods |
-| C11, C12 | 15 pF C0G 0402 (Fenghua 0402CG150J500NT) | C1548 · Basic | F | LSE load (B-parts §4) |
-| R1 | 10 k, PH3-BOOT0 to GND; pad = DFU tack point | C25744 · Basic | F (17.02, 1.62) | boot from flash (AN5373) |
+| U1 | STM32U575CIU6Q: ST Cortex-M33 MCU, 160 MHz max, FPU+DSP, 2 MB flash, 786 KB SRAM; C=48 pins, I=2 MB, U=UFQFPN 7x7, 6=-40-85 C, Q=SMPS pinout | C5271013 · Ext | (10.05, 5.4) r-90 | D5; ADF1; QFN kept over WLCSP for rework/probing (ECR-0018 MZD-2, O18/O19) |
+| L1 | DFE201610E-2R2M=P2: Murata 2.2 µH shielded metal-alloy, 2.0x1.6x1.0 mm, ~140 mΩ, 2.4 A | C337891 · Ext | (15.65, 7.0) r-90 | SMPS coil; ST: 2.2 µH ±20 %, Isat > 0.5 A, DCR < 200 mΩ; differs from spec D5 L152 (issue 11); kept in MZ-2 (gen.py L91) |
+| C8, C9 | 2.2 µF 0402 10 V X5R Samsung CL05A225KP5NSNC | C107369 · Ext | (15.4, 9.15), (4.9, 3.86) | VDD11 COUT pins 23 / 46; DS p.153 rated >= 10 V (O24); stay 0402 in MZ-2 (0201 ESR at 3 MHz unproven, gen.py L90) |
+| C7 | 10 µF 10 V X5R 0603 Samsung CL10A106KP8NNNC | C19702 · Basic | (15.6, 10.6) | VDDSMPS CIN (DS: 10 µF, >= 10 V, ESR < 10 mΩ); 0603 kept (ST bulk rule) |
+| C1, C2, C3 | 100 nF 10 V X5R 0201 Murata GRM033R61A104KE15D, one per VDD pin | C76934 · Basic | (6.6, 0.83), (11.97, 10.95), (13.55, 0.83) | AN5373 Rev 7; C1 also serves VBAT pin 1 (PER-06) |
+| C4 | 10 µF 0603 bulk on +3V0 | C19702 · Basic | (9.95, 11.2) | AN5373: 10 µF typ |
+| C5, C6 | 1 µF 25 V X5R 0402 (C52923, Basic, kept for DC bias) + 100 nF 0201 (C76934) on VDDA | Basic | (5.37, 9.5), (13.2, 10.6) | AN5373; both > 8.7 mm from VDDA pin 9 (issue 13) |
+| C10 | 100 nF 0201 on NRST | C76934 · Basic | (9.9, 0.83) | AN5373 |
+| Y1 | X1A0000610006: Epson FC-12M 32.768 kHz, 2.05 x 1.2 mm, CL 7 pF, ESR 90 kΩ (generic Device:Crystal symbol, MPN field) | C99009 · Ext | (4.73, 1.7) r90 | D16: pitch matched between unlinked pods; gm_crit ~0.98 µA/V (ECR-0018 MZV-08) |
+| C11, C12 | 8.2 pF C0G 0201 Murata GRM0335C1H8R2BA01D | C161441 · Basic | (2.84, 2.6), (2.84, 1.0) | LSE load for CL 7 pF assuming ~3 pF stray (CL = C/2 + Cs); ±2 pF stray = ±46 ppm, inside RTC calibration ±487 ppm (MZV-08) |
+| R1 | 10 k 0402, PH3-BOOT0 to GND; pad = DFU tack point | C25744 · Basic | (2.07, 3.85) | boot from flash (AN5373); 0402 kept as a hand hook (O18) |
 - drop_in_alt: STM32U585CIU6Q (same die + crypto), C5271021, 15 in stock, $12.52 (spec D5, 2026-09-30).
-- not_fitted_by_design: VBAT cap (shares C1), PA10 pull-up (ROM loader + R5, see pins), CHG_INT pull-up (PA15 internal), CC sense divider (gen.py L37-40).
+- not_fitted_by_design: VBAT cap (shares C1), PA10 pull-up (ROM loader + R5, see pins), CHG_INT pull-up (PA15 internal), CC sense divider (gen.py L37-41).
+- class/price: docs/build/bom.md (JLC API 2026-10-01; Y1 re-priced 2026-10-07T11:31Z: $0.2125, Extended, stock 23426).
 
-### Pins (integration-map §4, generated 2026-10-02; AF per pin-contract.yaml; 42 of 48 used)
+### Pins (integration-map §4, regenerated for MZ-2 2026-10-07; AF per pin-contract.yaml; 42 of 48 used; unchanged from Rev G)
 ```yaml
 supplies: {1: VBAT +3V0, 9: VDDA, 21: VDDSMPS, 25/36/48: VDD, 20: VLXSMPS, 23/46: VDD11, 8/22/24/35/47/49: GND (49 = exposed pad)}
 clock_reset_boot: {3: PC14 LSE_IN, 4: PC15 LSE_OUT, 7: NRST (C10, TP3), 44: PH3-BOOT0 (N$1, R1)}
@@ -58,7 +58,7 @@ charger: {26: PB13 I2C2_SCL, 27: PB14 I2C2_SDA, 38: PA15 CHG_INT (internal pull-
 usb_debug_ui: {32: PA11 USB_DM, 33: PA12 USB_DP, 34: PA13 SWDIO (TP1), 37: PA14 SWCLK (TP2), 10: PA0 BTN WKUP1, 43: PB7 LED_K TIM4_CH2 open-drain}
 debug_dots: {42: PB6 USART1_TX DBG_TX (TP7), 45: PB8 MDF1_CCK0 MDF_CCK (TP8), 19: PB1 MDF1_SDI0 MDF_SDI (TP9)}   # PER-12, O18
 strap: {41: PB5 -> GND}   # ECR-0013 S1: a high on PB5 would arm the UCPD 5.1k pull-down on PA15
-free_NC: {2: PC13 (keep static, ES §2.2.1), 5: PH0, 6: PH1, 13: PA3 (ADC1_IN8; FWSIM HWC-9 candidate for VSYS/MIC_VDD sense), 18: PB0, 30: PA9 (ROM USART1_TX)}   # gen.py L290
+free_NC: {2: PC13 (keep static, ES §2.2.1), 5: PH0, 6: PH1, 13: PA3 (ADC1_IN8; FWSIM HWC-9 candidate for VSYS/MIC_VDD sense), 18: PB0, 30: PA9 (ROM USART1_TX)}   # gen.py L343-345
 ```
 - cost_of_map: PB3 = mic clock -> no SWO (printf on TP7 instead); PB4 = NJTRST after reset, pull-up back-feeds the unpowered mic in reset/DFU/Off (pin-contract hazards PB4); PA6 = I_SENSE -> TIM1_BKIN on the same pin unusable as a digital break (issue 6).
 - pin_hazards (pin-contract.yaml hazards, ECR-0013): PA15 cleared by PB5 strap; PB15 UCPD 5.1k pull-down armed by PB14 high (I2C_SDA idles high) -> holds GB_N OFF until UCPD_DBDIS (safe default); PB4 back-feed; PA2 driven high by ROM USART2_TX in DFU.
@@ -119,7 +119,7 @@ FW-14: "frequency plan: LED PWM f = n x fs_out or outside 20-96 kHz; mic divider
 | sub-dock-usb | USB_DP PA12, USB_DM PA11, VBUS_SENSE PA1; CC not sensed (R18 Rd + J12 stay; ILIM by enumeration) | USB FS on HSI48 + CRS (DS §3.12 p.51); ROM DFU; boot stub (FW-11, FW-13) | R-PROC-DOCK |
 | sub-ui | BTN PA0, LED_K PB7 | WKUP1/EXTI0; TIM4_CH2 open-drain PWM (FW-14) | R-PROC-UI |
 | sub-debug-test | SWDIO PA13 (TP1), SWCLK PA14 (TP2), NRST (TP3), BOOT0 N$1 (R1 pad), DBG_TX PB6 (TP7), MDF_CCK PB8 (TP8), MDF_SDI PB1 (TP9), MIC_DATA (TP10) | SWD, ROM bootloader, USART1_TX printf, USB self-test (O15) | R-PROC-DEBUG |
-| reg-board | U1 + SMPS on F; exposed pad GND vias to In1 | SMPS loop, decoupling distances (Key numbers) | R-PROC-BOARD |
+| reg-board | U1, SMPS loop (L1, C7, C8/C9), Y1 + C11/C12 all on B; EP GND vias to In1; +3V0 from the In2 plane; I2C_SCL (pin 26) leaves on an 8.98 mm In2 bridge | SMPS loop, decoupling distances (Key numbers); LSE no-via rule broken (issue 14) | R-PROC-BOARD, R-SMPS-BOARD, R-CLOCK-BOARD |
 
 ## Constraints
 - D5 L131: STM32U575CIU6Q. D11 L210: only the core SMPS switches; fixed frequency; owner listening test E11 (full chain, 16 MHz idle, Stop 2); L214: shielded, low-magnetostriction inductor.
@@ -127,8 +127,8 @@ FW-14: "frequency plan: LED PWM f = n x fs_out or outside 20-96 kHz; mic divider
 - D16 L285 crystal reference. D12 L218 modes. D15 L272 toolchain. D17 L293 fixed ceiling, no clicks.
 - DS §5.1.6 p.153: COUT 2 x 2.2 µF ±20 %, ESR < 20 mΩ at 3 MHz, rated >= 10 V; CIN 10 µF, ESR < 10 mΩ, >= 10 V; L 2.2 µH.
 - package UFQFPN48-SMPS: no PB2, PB9, PB10, PB12; no VDDUSB/VREF+ pins (A3 §3; datasheet-provenance.md L48).
-- O14: layout together; draft positions not final. O20 L646: test access must not cost size.
-- O18 L644: rev 1 fails informatively: spare pins to pads (Rev F: PB6/PB8/PB1 on dots TP7-TP9; 6 pins still NC, issue 12), board measures itself, every uncertain value a firmware knob (FWSIM-R6), DFU most-verified. O19 L645: after rev 1 changes via firmware only.
+- O25: Claude lays out, owner reviews (supersedes O14 for rev 1); O26 Phase 2 internals first; O27 thin > short > long. O20 L646: test access must not cost size.
+- O18 L644: rev 1 fails informatively: spare pins to pads (PB6/PB8/PB1 on dots TP7-TP9, on B; 6 pins still NC, issue 12), board measures itself, every uncertain value a firmware knob (FWSIM-R6), DFU most-verified. O19 L645: after rev 1 changes via firmware only.
 - ECR-0009 (proposed): no exciter output while VBUS present, ceiling independent of volume, pop-free start; conflicts with docked self-test (00-whole.md risk 6).
 
 ## Key numbers
@@ -142,23 +142,24 @@ FW-14: "frequency plan: LED PWM f = n x fs_out or outside 20-96 kHz; mic divider
 | run current 80 MHz on SMPS | ~3.3 mA flat out (~41 µA/MHz), interpolated | A3 §5 (DS Rev 8 Table 39) | 2026-09-30 |
 | MCU, alg. B duty-cycled | 2.3 / 2.7 / 3.2 mA | power.py L27 | 2026-09-30 |
 | Stop 2 on SMPS, 3.0 V | 3.90 / 4.25 / 8.55 µA | DS Table 58 | Jul 2024 |
-| LSE margin | gm_crit 2.16 vs Gmcritmax 2.7 µA/V (high drive) = 1.25x | B-parts §4 (DS Table 80) | 2026-09-30 |
+| LSE margin (FC-12M) | gm_crit ~0.98 vs Gmcritmax 2.7 µA/V (high drive) = ~2.8x (FC-135 was 2.16 = 1.25x) | ECR-0018 MZV-08; DS Table 80 | 2026-10-03 |
 | CPU alg. B | 55-81 % of 80 MHz (M4 counts, ±50 %) | C2-cpu-budget.md | 2026-09-30 |
 | CPU idle detector rev 2 | ~3.4 Mcycle/s, ~21 % at 16 MHz | power.py L38; spec §7 | 2026-09-30 |
 | latency target | <= 20 ms end to end | spec §5.3 | 2026-09-30 |
-| draft: VDD11 pin 46 to nearest 2.2 µF | 10.2 mm (C9); pin 23 to C8 2.4 mm | pcbnew probe of draft (pad centres) | 2026-10-02 |
-| draft: VDDSMPS pin 21 to C7 / VLXSMPS copper | 4.6 mm / 6.7 mm | same probe | 2026-10-02 |
-| draft: VDD pin 48 / VBAT pin 1 to C1 | 1.12 / 1.43 mm centre-to-centre (pad edges 0.42 / 1.02 mm, reg-board; PER-06 <= 1.5 met on both metrics) | same probe | 2026-10-02 |
-| draft: VDDA pin 9 to C5 / C6 | 3.2 / 3.7 mm | same probe | 2026-10-02 |
-| draft: LSE copper | LSE_IN 4.5 mm, LSE_OUT 8.0 mm, F only | same probe | 2026-10-02 |
-| draft: L1 to mic U2 | 16.3 mm centre-centre, opposite faces | same probe | 2026-10-02 |
-| draft: unrouted on U1 nets | SWCLK -> TP2, LED_K -> J8 (layout-session items) | `hw/pod/draft_r1/drc.json` | 2026-10-02 20:07 |
-| noise, MCU aggressors on Rev F draft | LN-M01 worst = A05_CPU_HOP 21.875 kHz, 23.1 dB pessimistic (pass >= 0); SMPS A01, A02 margins [TBD]; LN-M04 ADC ref ripple 0.199 mV pk (<= 0.37) at hop 1562 Hz | `sim/noise/smoke.sh on hw/pod/draft_r1/pod_r1_routed.kicad_pcb (sha e159bccb, 2026-10-02 21:20)` | 2026-10-02 21:20 |
+| VDD11 pin 46 / pin 23 to nearest 2.2 µF | 1.25 mm (C9) / 2.07 mm (C8) | pcbnew probe of board, pad centres | 2026-10-07 |
+| VDDSMPS pin 21 to C7 / VLXSMPS copper | 4.17 mm / 2.22 mm, B only, no via | same probe | 2026-10-07 |
+| VDD pin 48 / VBAT pin 1 to C1 (+3V0 pad) | 1.85 / 1.19 mm centre-to-centre; PER-06 rule (pad edge-to-edge <= 1.5, place_r2.py `_gap`) PASS in hw/pod/draft_r2/out/check.json | same probe; place_r2.py L46 | 2026-10-07 |
+| VDD pin 25 / pin 36 to nearest cap | 1.98 mm (C2) / 3.02 mm (C4 10 µF; C2 4.99) | same probe | 2026-10-07 |
+| VDDA pin 9 to C5 / C6 | 9.22 / 8.78 mm (nearest cap C3 2.22 mm; all on the In2 +3V0 plane) | same probe | 2026-10-07 |
+| LSE copper | LSE_IN F 4.53 + B 3.41 mm, 2 vias; LSE_OUT F 3.34 + B 3.54 mm, 2 vias | same probe | 2026-10-07 |
+| L1 to mic U2 / to the mic port | 13.04 mm centre-centre, same face (B) / 13.77 mm nearest pad | same probe | 2026-10-07 |
+| I2C_SCL route | F 9.89 + B 7.18 + In2 8.98 mm, 5 vias (inner bridge 2026-10-07) | same probe; ECR-0018 log | 2026-10-07 |
+| noise, MCU aggressors (Phase-2 board, both planes modelled) | LN-M01 mic supply: A05_CPU_HOP 21.875 kHz 46.5 nominal / 26.5 pessimistic dB (PASS, sign-off >= 10); worst-PSRR case A01_SMPS_IN 28.04 MHz -> 38.96 kHz 14.0 dB; A02_SMPS_VDD11 >= 96 dB; LN-M04 ADC ref ripple 0.127 mV pk (<= 0.37) at hop 1562 Hz | `sim/noise/out_r2/budget.json` (board sha da4e8b13, valid, 195/195 pads) | 2026-10-07 |
 
 ## Open issues (IDs kept stable; other docs cite them)
 1. CLOSED Rev G (ECR-0017, O24): C8/C9 now C107369 10 V. Was: C8/C9 6.3 V (C12530) vs DS §5.1.6 rated >= 10 V; `.pcba-workflow/sourcing-lock.csv` L9 still RECOMMENDED C107369 10 V. Options: (a) C107369 Extended 0402 10 V; (b) Basic 0603 16 V C23630 (2.5x area, conflicts O20); (c) keep, accept deviation. Recommend (a): explicit datasheet line, same footprint, ~$3/order for one more Extended type (`docs/build/bom.md`). Owner.
 2. MCU stock 8 at JLC (2026-10-01): reserve before order or plan U585 drop-in (15 in stock, +$3.59). ECR-0008.
-3. SMPS layout (draft): VDD11 pin 46 has no cap within 10 mm (LD-05); CIN 4.6 mm from VDDSMPS; switch node 6.7 mm. Closes: layout session (O14).
+3. (closed in Phase 2) SMPS layout: VDD11 pin 46 -> C9 1.25 mm, pin 23 -> C8 2.07 mm, VLXSMPS 2.22 mm, CIN C7 4.17 mm (probe 2026-10-07). Residual: C7 > 2 mm from pin 21 (DS asks 'as close as possible'); owner review (O25).
 4. Idle mode: 16 MHz Range 3 run (power.py) vs Stop 2 + ADF + LPDMA (A3 §1.3; Stop 2 makes the SMPS asynchronous while the mic listens). Closes: pick one; E11 listens, E4 measures. FWSIM variant IDLE_PLAN.
 5. CPU budget is an L452 estimate (M4 counts, 2nd-order shaper, 32-48 oscillators) vs design (M33, 3rd-order, 28-32 bands, ADF removes the 5-10 Mcycle/s half-band). 800 kHz PWM option (MP-01, sub-output.md) not costed. Closes: re-cost C2 for U575; benchmark on board 1 (S3); FWSIM cycle_budget.
 6. No hardware bridge-fault input. TIM1_BKIN on this package only on PA6 (ST open pin data `STM32U575CIUxQ.xml`, 2026-10-02), which carries I_SENSE (31 mV at 315 mA, integration-map §5: below a digital threshold); TIM1_BKIN2 only on PA11 (USB). Internal COMP -> break routing [TBD: RM0456 TIM1 break sources]. ES requires faults via BKIN. Closes: decide whether a hardware cut-off is needed.
@@ -166,8 +167,11 @@ FW-14: "frequency plan: LED PWM f = n x fs_out or outside 20-96 kHz; mic divider
 8. USB VDDUSB (bonded to VDD here): DS Table 150 p.304 3.0-3.6 V, functional to 2.7 V with degraded characteristics; +3V0 min 2.955 V; AN2606 3.3 V note is boilerplate (`audit-datasheet-claims.md` row 6). No LDO change; bench-test DFU at 2.95 V. Owned by sub-dock-usb.
 9. Unverified: SMPS 3 MHz synchronous or free-running, and its tolerance (LF-5 whine risk with /20 mic divider); 80 MHz current interpolated (E4).
 10. Missing PNGs: clock tree, MCU pin map (text only).
-11. SMPS inductor differs from spec: D5 L152 names Murata LQM21PN2R2MGHL (0805, C341781); Rev F uses DFE201610E-2R2M=P2 (C337891); D11 L214 asks low-magnetostriction, DFE magnetostriction unpublished (sourcing lock). Closes: owner (spec or schematic); E11 listens for whine incl. dock magnets near L1 (`sub-dock-usb.md`; 00-whole.md risk 7).
-12. O18 "spare pins to pads": PC13, PH0, PH1, PA3, PA9, PB0 are NC with no copper (gen.py L290). PA3 = ADC1_IN8 could read VSYS or MIC_VDD (FWSIM HWC-9). Trade-off vs O20 size; not decided [TBD].
+11. SMPS inductor differs from spec: D5 L152 names Murata LQM21PN2R2MGHL (0805, C341781); Rev F/G and MZ-2 use DFE201610E-2R2M=P2 (C337891); D11 L214 asks low-magnetostriction, DFE magnetostriction unpublished (sourcing lock). Closes: owner (spec or schematic); E11 listens for whine incl. dock magnets near L1 (`sub-dock-usb.md`; 00-whole.md risk 7).
+12. O18 "spare pins to pads": PC13, PH0, PH1, PA3, PA9, PB0 are NC with no copper (gen.py L343-345). PA3 = ADC1_IN8 could read VSYS or MIC_VDD (FWSIM HWC-9). Trade-off vs O20 size; not decided [TBD].
+
+13. VDDA (pin 9) caps C5/C6 sit 8.8-9.2 mm from the pin; the nearest cap is C3 (VDD) at 2.2 mm, and all share the In2 +3V0 plane. place_r2.py `near` rule (L46) measures to any U1 pad on the net, so it does not see this. LN-M04 ADC-ref ripple 0.127 mV PASS on the model. Closes: owner review (O25): move C6 next to pin 9 or accept with the LN-M04 evidence; tighten the rule to `U1.9`.
+14. LSE traces change layer (2 vias each net) and run on F as well as B; A3 clock doc / R-CLOCK-BOARD say "short symmetric traces, no vias, guarded". Lengths 7.9 / 6.9 mm. Closes: re-route Y1 beside pins 3/4 on B only, or accept with a measured LSE start-up + ppm on board 1 (MZV-08 says load error is firmware-trimmable).
 
 ## Before you change this, check
 - pin moves: integration-map §4 (one job per pin); `tools/checks/interfaces.py pins` (AF per pin-contract); ADF only PB3/PB4; TIM1 complementary pairs; ADC4 pins for Stop 2; WKUP1 = PA0; USB fixed PA11/PA12; pin-contract hazards (PA15, PB15, PB4, PA2); ROM loader pin states (AN2606 Table 199); related docs sub-audio-in, sub-output, sub-power, sub-dock-usb, sub-ui, sub-debug-test.
@@ -176,3 +180,8 @@ FW-14: "frequency plan: LED PWM f = n x fs_out or outside 20-96 kHz; mic divider
 - algorithm, PWM rate, clock per mode: issue 5, `sub-power.md` budget, MP-01 (`sub-output.md`).
 - MCU swap: U585 drop-in; anything else redoes A3.
 - run integration-map §10 cross-check; `python3 tools/plm.py impact SUB-PROCESSING`; afterwards `tools/plm.py status`.
+- B-face crowding: any U1-area move must keep the 0.6 mm escape ring (place_r2.py ESCAPE L55) and re-run `place_r2.py check` (owner/lead only; never as a parallel agent).
+
+## Reference design (Rev F/G, `ULTRASONIC_DESIGN=revg`)
+- U1 + SMPS + Y1 on F of the 34 x 13 board hw/pod/draft_r1/pod_r1_routed.kicad_pcb, U1 at (13.03, 6.53); Y1 Epson FC-135 Q13FC1350000400 3.2 x 1.5, CL 12.5 pF (C32346) + 15 pF 0402 C0G (C1548); 100 nF 0402 X7R (C1525).
+- Draft probe 2026-10-02: VDD11 pin 46 to C9 10.2 mm (LD-05), CIN 4.6 mm, switch node 6.7 mm; C1 1.12 / 1.43 mm; LSE F only (4.5 / 8.0 mm); L1 16.3 mm from U2 on the opposite face; 2 unconnected (SWCLK, LED_K); noise LN-M01 23.1 dB, LN-M04 0.199 mV (sha e159bccb).

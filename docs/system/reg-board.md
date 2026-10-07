@@ -1,197 +1,176 @@
 # REG-BOARD: the pod board (PCB region)
-Rev F 2026-10-02: Phase 1 logical simplification placed + routed (52 parts, J4/J6 merged, D5 at J3, debug dots, charger +2.5 mm, ECR-0003/0004/0011 in the board, 0.8 mm set); Rev E facts deleted.
-Status: **routed draft for the owner's board review, not the layout.** `place_r1.py` + one fenced FreeRouting pass on Rev F (commit 4b2c058, 2026-10-02 20:07): 2 unconnected, 19 DRC errors (courtyards only). Real layout = together with the owner (O14), after her review (two-phase plan: Phase 1 logic -> owner review -> Phase 2 miniaturization, which re-sizes the outline per O20). Updated 2026-10-02.
-Phase 2 2026-10-03 (ECR-0018, owner O25/O26): NEW BOARD hw/pod/draft_r2/. Since 2026-10-07 it is THE CURRENT DESIGN: `hw/current.yaml` names its board, netlist, BOM and shell and every tool and check defaults to it (`tools/current.py`). Rev G draft_r1 below = reference design (env `ULTRASONIC_DESIGN=revg`).
+Rev MZ-2 2026-10-07: body moved to the Phase-2 board (hw/current.yaml, ECR-0018): one-face 30 x 12 x 0.8, 4 layers with In1 GND + In2 +3V0 planes, every part on B except SW1 + TP1-TP6 on F, routed DRC 0 / 0 unconnected, I2C_SCL inner bridge, R21 Kelvin vias; Rev F/G board moved to the reference section.
+Status: **routed Phase-2 board for the owner's review (O25), not frozen.** hw/pod/draft_r2/out/routed.kicad_pcb (commit f6291e6, 2026-10-07): DRC 0 violations, 0 unconnected (kicad-cli 10.0.6 re-run 2026-10-07); bom_check refs/netlist/footprints/nets PASS; interfaces.py outline/inside/heights/clamp-bands(VHB)/board-nets/mic-port PASS, switch WARN. Updated 2026-10-07.
 
 ```yaml
-phase2_board:   # src: ECR-0018 implementation log; hw/pod/draft_r2/out/check.json; 2026-10-03
-  outline: {W: 30.0, H: 12.0, corner: 1.0, thickness: 0.8}          # Rev F/G 34 x 13
-  faces: {B: "every part (cell side)", F: "SW1 + bare TP1-TP6 (SWD/NRST/3V0/GND/VSYS) + mic-port silk motif"}
-  stackup: [F sig, In1 GND plane, In2 +3V0 plane, B sig]          # +3V0 plane: the 51 mm +3V0 net blocked FreeRouting
-  netlist: hw/pod/pod_mz2.net (gen.py POD_PACKAGES=mz2; nets == Rev G)
-  placement: {file: hw/pod/draft_r2/placement.yaml, origin: "judge panel wf_15c06049-5a5, strategy linear", U_B: 0.56, ratsnest_mm: 411, mic_port: [1.98, 6.0], SW1: [18.5, 6.0], noisy_to_port_mm: ">= 13 (L1, Q1, Q2)"}
-  rules: "hw/pod/place_r2.py check: face, fit, centre line, near (decoupling), escape ring (U1 0.6 mm), far (>= 10 mm from port), wire-pad gaps >= 0.8 mm"
-  vias: {d: 0.35, drill: 0.15}        # 0.30 broke the 0.2 mm hole clearance
-  route: {tool: "FreeRouting 2 passes, clearance 0.11 + close_gaps.py + inner_bridge.py", drc_errors: 0, unconnected: 0, closed: "2026-10-07: I2C_SCL U1.26 via In2 (8.97 mm, 14 segments, via 12.46/9.42 -> 18.58/3.35); In2 +3V0 plane stays 1 island, 286.2 -> 282.2 mm2"}
-  silk: "hw/pod/silk.py one-face mode: port motif + STEREO/ULTRASOUND/PHASE 2 on F; refs on Fab; pin-1 dots U1 U3 U4 U6"
-  acoustics: {scenario: phase2_r2, mean_20_96_db_p50: 4.51, peak: "63 kHz Q6.4 (EQ notch target)", r14_pass_fraction: 0.70}
-  noise_model: {date: 2026-10-07, out: sim/noise/out_r2/budget.json, planes: "In1 GND + In2 +3V0", LN-M01_db: 26.5, LN-M01_worst_db: 14.0, LN-M02_db: 20.1, LN-M03_pct: 1.29 (PASS after hw/pod/kelvin_r21.py; was 3.31), LN-M04_mv: 0.127, LN-M05_uv: 8.7}
-  shell: "hw/mech/shell_r2.py: hung from the lid on full-face VHB, x-stop, duct D1.0, SW1 pocket + puck kit, 6211 mm3"
-  defaults: "2026-10-07: hw/current.yaml (board draft_r2/out/routed, netlist pod_mz2.net, bom bom_jlc_mz2.csv, shell shell_r2 / dims_r2) -> sim/noise, sim/acoustics, tools/checks, plm watches, sch.py, board_map, render_board"
-  checks_2026-10-07: {interfaces: "PASS mic-port/outline/inside/heights/board-nets; PASS clamp-bands (per-pad VHB cut-outs, 91 % bonded); WARN switch stack, pins, rails, frame", bom_check: "PASS refs/netlist/footprints/nets/jlc-bom/selftest 61; PASS cost-bom (MZ-2 parts re-priced 2026-10-07T11:31Z)"}
-  open: ["re-price docs/build/bom.py for the MZ-2 parts (Y1, RT1, D4, R21; cost-bom WARN)", "Phase-2 rewrite of the docs/system bodies (pointer lines added 2026-10-07)"]
-```
-
-
-```yaml
-abbrev: {F: F.Cu outer face (toward the lid), B: B.Cu inner face (toward the cell), In1/In2: inner copper layers 2/3, "J*": hand-soldered wire pads, "TP*": probe pads / test dots, DNP: footprint not fitted}
+abbrev: {F: F.Cu outer face (toward the lid), B: B.Cu inner face (toward the cell), In1/In2: inner copper layers 2/3, "J*": hand-soldered wire pads, "TP*": probe pads / test dots, DNP: footprint not fitted, VHB: 3M 4914 acrylic foam tape 0.25 mm, NPTH: non-plated hole, LN-M*: layout-noise metrics (docs/sim/layout-noise.yaml), MZ-2: Phase-2 package set (ECR-0018)}
 item: REG-BOARD                      # docs/system/plm/items.yaml
+design: "hw/current.yaml id phase2 (packages mz2, ECR-0018, O26)"
 sources_of_truth:
-  placement: hw/pod/place_r1.py::PLACE (+ gnd_plane L81, gnd_fanout L113, build L195 thickness)   # until the owner's KiCad board takes over (O14)
-  outline_rules: hw/pod/place.py::outline L93, ::rules L112; place_r1.py L30 (P.W, P.H, P.CORNER)
-  netlist: hw/pod/gen.py Rev F (docstring L35-60 = every Rev F change + kept-on-purpose list) -> hw/pod/pod.net, hw/pod/bom_jlc.csv
-  footprints: hw/lib/pod.pretty/ (TestPoint_Pad_D0.7mm, TestDot_D0.5mm, WirePad_1.0x2.0mm, Nexperia_SOT1216_DFN1010B-6), hw/lib/lcsc/
-  silkscreen: hw/pod/silk.py (post-route, never touches copper; refs -> Fab layers, pin-1/polarity marks, port motif, name; JLC legend rules read 2026-10-02)
-  pins_nets_blocks: docs/system/integration-map.md (generated by hw/pod/system_map.py), docs/system/pin-contract.yaml
-results: hw/pod/draft_r1/summary.json, drc.json (2026-10-02T20:07:15), pod_r1_routed.kicad_pcb
-owner_map: tools/board_map.py -> docs/diagrams/board-map-revF.png (build output, gitignored); docs/diagrams/revF-changes.svg (Rev E -> F sheet)
-stale_diagrams: [docs/diagrams/board-regions.svg (Rev E, 2026-10-01), pcb-floorplan-rev1.svg (28 x 13), routing-congestion.png (Rev E baseline, 12 unrouted)]
-owner_decisions: [O9 test pads + snap-off frame, O13 double-sided, O14 layout together, O15 (superseded in part by O20), O16-5 mic+switch on centre line, O16-6 no screws, O18 spare pins to pads, O19 personal device, O20 re-size, O21 no orders before freeze, O22 freeze = evidence gate]
-ecr_open: {ECR-0002: "routing fixes; items 1 (pull-ups beside U3) and 2 (C15/C16 each beside its own ball) are in Rev F PLACE L63/L66, item 4 moot (R11 removed), item 3 (C7 move) not done; file still 'proposed'", ECR-0003: "implemented in Rev F (gen.py docstring L50-52, legs L180; PLACE unchanged), file still 'proposed'", ECR-0004: "implemented (bom_jlc.csv Q1/Q2 footprint Nexperia_SOT1216_DFN1010B-6), file still 'proposed'", ECR-0012: "SW1 EasyEDA footprint carries wrong LCSC property C221708 (ours C221707); board-based BOM/CPL tools must not be used", ECR-0013: "S1 done (PB5 strapped to GND, gen.py L224); S2 = firmware order (UCPD_DBDIS), open; S3 partial (C15 25 V, C21 SYS still 10 V C19702)", ECR-0014/0015/0016: "simplification packages; Rev F = B3 per gen.py L35"}
-ecr_implemented: {ECR-0011: "mic PORT at (3.9, 6.5): U2 origin at 4.67 (PLACE L61); awaiting owner review"}
+  board: hw/pod/draft_r2/out/routed.kicad_pcb       # positions, copper, zones (read only for every tool); sha256 da4e8b13...
+  placement: hw/pod/draft_r2/placement.yaml (judge panel wf_15c06049-5a5 'linear' + route-closure v6 edits; the routed board is newer where they differ)
+  placement_rules: hw/pod/place_r2.py (NEAR L44-47, ESCAPE L55, check(): face, fit, centre line, near, escape ring, far, wire-pad gaps)   # never run as a parallel agent
+  post_route: [hw/pod/close_gaps.py, hw/pod/inner_bridge.py (I2C_SCL on In2), hw/pod/kelvin_r21.py (R21 GND vias)]
+  netlist: hw/pod/gen.py POD_PACKAGES=mz2 (MZ2 table L93-108) -> hw/pod/pod_mz2.net, hw/pod/bom_jlc_mz2.csv (nets == Rev G)
+  footprints: hw/lib/pod.pretty/ (TestPoint_Pad_D0.7mm, TestDot_D0.5mm, WirePad_1.0x2.0mm, Nexperia_SOT1216_DFN1010B-6), hw/lib/lcsc/, KiCad std (0201/0402/0603, Crystal 2012, D_SOD-882)
+  silkscreen: hw/pod/silk.py one-face mode (port motif + name block + 'PHASE 2' on F; refs on Fab; pin-1 dots U1 U3 U4 U6; commit b223d76)
+  shell_facts: hw/mech/dims_r2.py (PCB, B_GAP, F_GAP, POCKET, PAD_ZONE, board_mic())
+  pins_nets_blocks: docs/system/integration-map.md (generated by hw/pod/system_map.py, mz2), docs/system/pin-contract.yaml
+results: [hw/pod/draft_r2/out/check.json (placement check v6: pass), sim/noise/out_r2/budget.json (2026-10-07, valid), sim/acoustics phase2_r2 (docs/sim/acoustics.yaml)]
+owner_map: docs/diagrams/board-map-phase2.png (tools/board_map.py)
+stale_diagrams: [docs/diagrams/board-regions.svg (Rev E), pcb-floorplan-rev1.svg (28 x 13), routing-congestion.png (Rev E)]
+owner_decisions: [O9 test pads + snap-off frame, O13 double-sided (Phase 2 uses one face + SW1), O16-5 mic+switch on centre line, O16-6 no screws, O18 spare pins to pads, O19 personal device, O20 final size, O21 no orders before freeze, O22 freeze = evidence gate, O23 black mask, O24 sealed duct D1.0, O25 Claude lays out / owner reviews (supersedes O14), O26 Phase 2, O27 thin > short > long]
+ecr_open: {ECR-0018: "Phase 2 MZ-2 package set: approved, implementation in progress, owner review in 1-2 weeks", ECR-0005: "+3V0 peak 326 mA vs U4 300 mA", ECR-0013: "S1 done (PB5 strap); S2 UCPD_DBDIS firmware open"}
+ecr_awaiting_owner_review: [ECR-0002, ECR-0003, ECR-0004, ECR-0011, ECR-0012, ECR-0013]
+checks: ["tools/checks/interfaces.py [outline] [inside] [clamp-bands] [heights] [board-nets] [mic-port] PASS, [switch] WARN (2026-10-07)", "tools/checks/bom_check.py [refs] [netlist] [footprints] [fp-library] [nets] [jlc-bom] [assembly-tier] PASS (2026-10-07)", "kicad-cli pcb drc: 0 / 0 (2026-10-07)", "hw/pod/place_r2.py check (check.json: pass)"]
 ```
 
 ## Purpose
 - Carries every electrical function F1-F15 (integration-map §1). Every integration-map §2 block lives here except the cell, dock target, exciter and pad LED.
-- Fits the rev-1 shell pocket 34 x 13 x 0.8 at pod x 30.6-64.6 (`hw/mech/shell_r1.py` PCB; [outline] PASS 2026-10-02).
-- Mic port + SW1 on the centre line y 6.5 -> one board serves both pods (O16-5).
-- 0.6 mm top/bottom edge bands clear on both faces: lid ribs + foam strips clamp there, no screws (O16-6).
-- Hand access: J wire pads + TP1-TP6 pogo row on F; TP7 on F; TP8-TP10 dots on B (O9, O18, PER-12).
+- Fits the Phase-2 shell: 30 x 12 x 0.8 at pod x 30.55-60.55, hung from the lid on VHB (dims_r2.py PCB; [outline] PASS, 0.25 mm min clearance to the cavity, interfaces.py 2026-10-07).
+- One face (O27 thin first): every part on B (cell side); F stays flat for the VHB except SW1 (in a lid pocket) and bare TP1-TP6 (in VHB cut-outs) (ECR-0018 MZD-1).
+- Mic port + SW1 on the centre line y 6.0 -> one board serves both pods (O16-5).
+- Hand access: J wire pads on B; TP1-TP6 bare pads on F (bench SWD before the lid bond); TP7-TP10 dots on B; R1 pad = DFU tack point (O9, O18, PER-12).
 
-## Floorplan (Rev F routed board; extents = courtyard bbox, board mm, probe of pod_r1_routed.kicad_pcb 2026-10-02)
-Coordinates: x = 0 front (mic end) running back; y = 0 KiCad top edge; centre line y 6.5. Left pod sees KiCad top view; right pod = top view rotated 180° (TP edge at the bottom) ([physical.md](physical.md), derived, issue 9).
+## Floorplan (routed board, footprint centres, probe 2026-10-07; board mm)
+Coordinates: x = 0 front (mic end) running back; y = 0 KiCad top edge; centre line y 6.0. Board -> pod (right pod): pod (x, z) = (30.55 + x, -8.45 + y) (dims_r2.py `bpt`, board +y = pod +z; the left pod mirrors it, [physical.md](physical.md)). Picture: `docs/diagrams/board-map-phase2.png`.
 
-| Region | Face | x / y | Parts (gloss in subsystem docs) | Why there |
+| Region | Face | x / y (centres) | Parts (gloss in subsystem docs) | Why there |
 |---|---|---|---|---|
-| Mic port strip | F | 0.6-5.5 / full | none; port NPTH Ø0.6 at (3.9, 6.5) | keep port area flat |
-| Mic | B | 2.6-9.1 / 2.6-9.8 | U2 SPH0641LU4H-1 (ultrasonic PDM MEMS mic) origin (4.67, 6.5) r90, R2 33 Ω clock series, C13; TP8 MDF_CCK (8.7, 9.4), TP9 MDF_SDI (8.7, 3.6), TP10 MIC_DATA (7.3, 3.0) | quiet front; centre line; fallback dots next to the mic nets (PER-12, PLACE L60) |
-| Clock | F | 5.7-8.8 / 2.3-6.5 | Y1 32.768 kHz crystal, C11, C12 | beside PC14/PC15 (U1 pins 3/4) |
-| MCU | F | 6.8-19.6 / 0.9-11.1 | U1 STM32U575CIU6Q (QFN-48 7 x 7) at (13.0, 6.5), C1-C7, C10, R1; TP7 DBG_TX (13.2, 1.5) | centre; caps on every side. C1 (9.4, 1.85) serves VDD pin 48 AND VBAT pin 1 (PER-06; pad edges 0.42 / 1.02 mm, PLACE L56 comment; centre-to-centre 1.12 / 1.43 mm, sub-processing.md) |
-| I_SENSE filter | F | 9.6-13.6 / 11.1-12.1 | R22 1 kΩ / C22 10 nF | under PA6 = pin 16 |
-| Core SMPS | F | 16.6-21.4 / 8.1-12.0 | L1 DFE201610E 2.2 µH, C8, C9; C7 VDDSMPS input at (18.0, 6.5) | next to VLXSMPS pin 20, VDD11 pin 23; only switcher (D11) |
-| UI | F | 20.5-24.0 / 5.2-10.0 | SW1 KMT022 (C&K IP68 tact switch), R10 2.2 kΩ | fixed by the lid plunger at (22.0, 6.5) |
-| Test pads | F | 23.8-31.4 / 0.7-1.9 | TP1-TP6, 0.7 mm, 1.27 mm pitch, y 1.3 | one pogo row outside the clamp band (exempt in [clamp-bands]) |
-| Dock ESD | F | 29.6-30.2 / 2.7-3.7 (courtyard; copper y 2.4-4.0) | D5 TPD1E10B06 (TI bidirectional ESD, 5.5 V working) at (29.9, 3.2) r90; pads 0.6 × 0.6 at ±0.50 mm = 1.0 mm pitch although the footprint name says P0.65 (hw/lib/lcsc/lcsc.pretty/X1SON-2_L1.0-W0.6-P0.65-BI-1.kicad_mod); TI DPY land pattern [TBD: tpd1e10b06.pdf not read], layout-session item | AT the exposed J3 DOCK_VBUS contact (Q31) |
-| Wire pads | F | 30.4-34.0 / 2.0-12.0 | J1-J5, J7-J12 (11 pads, 2 columns x 31.4 / 33.0) | rear edge, where wires rise |
-| Free | F | ~24.0-29.5 / 2.0-12.3 | tracks only | derived from the rows above |
-| VBAT sense | B | 9.5-12.5 / 1.0-3.0 | R8, R9 (1 MΩ / 1 MΩ), C19 | - |
-| Charger | B | 17.3-24.8 / 1.2-5.7 | U3 BQ25180 (TI I2C power-path charger, DSBGA-8 0.4 mm balls) at (19.5, 3.0); C16 (17.8, 2.2) west, C15 25 V (21.2, 2.2) east, C21 (23.25, 2.0), RT1 NTC (22.3, 4.3); I2C pull-ups R16 (18.8, 4.75), R15 (20.0, 4.75) | cluster shifted +2.5 mm in x so MCU pins 26-38 get a via field between U1's edge (x 16.5) and U3 (PLACE L64-66 comment) |
-| H-bridge | B | 14.5-22.8 / 5.3-12.2 | Q1, Q2 PMCXB290UE (Nexperia N+P MOSFET pairs, DFN1010B-6) at (15.8 / 18.6, 8.0), R3-R6 gate pulls (R4/R6 kept, Q19), C14 22 µF, R21 0.1 Ω 1206 shunt (21.6, 7.6) | rear-middle, far from the mic |
-| LDO | B | 22.4-25.2 / 5.4-11.9 | U4 TPS7A2030 (TI 3.0 V LDO), C17, C18, R20 0 Ω link | - |
-| Dock / USB protection | B | 24.8-28.9 / 1.2-12.3 | D4 1N5819WS (reverse-dock Schottky), U6 TPD2E2U06 (TI D+/D- ESD), R12/R13 VBUS sense, R18 5.1 kΩ Rd, R14 2.2 kΩ LED resistor | next to J3, J10-J12 |
-| Free | B | ~9.2-14.4 / 3.1-12.3 (under U1, GND fan-out vias only); ~29.0-34.0 / full (under the J pads) | - | derived |
+| Mic | B | 1.9-5.5 / 3.8-9.4 | U2 SPH0641LU4H-1 (ultrasonic PDM MEMS mic) at (2.65, 6.0) r90, port NPTH Ø0.6 at (1.88, 6.0); R2 33 Ω clock series (5.48, 7.75); C13 (5.12, 5.4); TP7 DBG_TX (4.25, 9.35), TP8 MDF_CCK (3.5, 3.85), TP9 MDF_SDI (2.05, 8.25), TP10 MIC_DATA (3.1, 8.25); R1 BOOT0 (2.07, 3.85) | quiet front; port on the centre line under the lid duct; fallback dots by the mic nets (PER-12) |
+| Clock | B | 2.8-4.7 / 1.0-2.6 | Y1 FC-12M 32.768 kHz (4.73, 1.7) r90, C11 (2.84, 2.6), C12 (2.84, 1.0) | front-top corner, beside PC14/PC15 (U1 pins 3/4 at (8.3/8.8, 1.96)) |
+| MCU | B | 4.9-13.6 / 0.8-11.2 | U1 STM32U575CIU6Q QFN-48 7 x 7 at (10.05, 5.4) r-90; C1 (6.6, 0.83), C2 (11.97, 10.95), C3 (13.55, 0.83), C4 (9.95, 11.2), C5 (5.37, 9.5), C6 (13.2, 10.6), C9 (4.9, 3.86), C10 (9.9, 0.83) | centre-front; 0.6 mm escape ring (place_r2 ESCAPE) |
+| Core SMPS | B | 15.4-15.7 / 7.0-10.6 | L1 DFE201610E 2.2 µH (15.65, 7.0), C8 (15.4, 9.15), C7 VDDSMPS (15.6, 10.6) | beside VLXSMPS pin 20 / VDD11 pin 23 (U1 east side); only switcher (D11); 13.8 mm from the port |
+| Sense column | B | 15.4 / 1.0-4.4 | R9, R8, C19 VBAT divider (y 1.0-2.7); R22 / C22 I_SENSE filter (3.55, 4.4) | between U1 and U3 |
+| Support column | B | 17.3-17.4 / 1.0-6.4 | R15/R16 I2C pull-ups (1.0, 1.85), RT1 NTC (2.7), R13/R12 VBUS sense (3.55, 4.4), R10 BTN pull-down (17.3, 6.4) | next to U3 and SW1 |
+| Charger | B | 19.2-20.9 / 0.9-3.4 | U3 BQ25180 (TI I2C power-path charger, DSBGA-8 0.4 mm balls) at (19.2, 2.6) r90; C16 (20.9, 2.3), C15 25 V (20.9, 3.4), C21 (20.2, 0.9) | top-rear quarter |
+| H-bridge + shunt | B | 17.9-21.0 / 6.45-10.8 | Q1 (17.9, 9.0), Q2 (21.0, 9.0) PMCXB290UE (Nexperia N+P MOSFET pairs, DFN1010B-6); R3/R4 (17.9, 10.8/7.35), R5/R6 (21.0, 10.8/7.35) gate pulls; C14 22 µF 0603 (19.45, 9.0); R21 0.1 Ω 0402 shunt (19.45, 6.45) | rear-middle, >= 15.9 mm from the port |
+| LDO | B | 23.0 / 6.5-11.0 | U4 TPS7A2030 (TI 3.0 V LDO) (23.0, 8.0), C17 (9.6), C18 (6.5), R20 0 Ω link (11.0) | - |
+| Dock / USB protection | B | 22.9-25.1 / 1.0-8.3 | D4 PMEG3005EL (Nexperia 30 V Schottky, reverse dock) (22.9, 1.0); D5 (25.0, 3.5) / D6 (25.0, 4.35) TPD1E10B06 (TI 1-line ESD) for J3 / J12; R18 5.1 kΩ Rd (25.0, 5.25); U6 TPD2E2U06 (TI D+/D- ESD) (25.1, 6.8); R14 2.2 kΩ LED (25.0, 8.3) | next to the dock pads |
+| Wire pads | B | 25.1-28.9 / 1.1-10.95 | J4 GND 1.0 x 2.0 (25.1, 1.7); inner column x 27.0, outer column x 28.9 (table below) | rear edge, PAD_ZONE x 25-30 (dims_r2.py), wires stow behind the board |
+| UI | F | 18.5 / 6.0 | SW1 KMT022 (C&K IP68 tact switch, 3.0 x 2.6 x 0.65) | under the lid pocket + puck, centre line |
+| Test pads | F | 1.6-24.0 / 2.9-11.3 | TP1-TP6 bare Ø0.7 pads (table below) | in per-pad VHB cut-outs; reachable before the lid bond |
 
 ```yaml
-counts:  # probe of pod_r1_routed.kicad_pcb 2026-10-02; bom_jlc.csv
-  placed_parts: {total: 52, F: 21, B: 31}
-  copper_only: {F: "J1-J5, J7-J12 (11) + TP1-TP7 (7)", B: "TP8-TP10 (3)"}
-  interfaces_py_board_parts: 73          # 52 + 21 pads/dots, [board-nets] PASS 2026-10-02
-  dnp: none                              # PLACE L98: D1/D2 footprints removed (OUT-04)
-  removed_vs_RevE: [R11, R17, R19, C20, D1, D2, D3, J6]    # gen.py L37-43; D3 -> D5, J6 -> J4
+counts:  # bom_check 2026-10-07; board probe 2026-10-07
+  footprints: 74                       # == schematic parts
+  placed_parts: {total: 53, F: 1 (SW1), B: 52}
+  copper_only: {F: "TP1-TP6 (6)", B: "J1-J5, J7-J12 (11) + TP7-TP10 (4)"}
+  bom_lines: 31                        # bom_jlc_mz2.csv
+  assembly: "double-sided Standard PCBA (SW1 alone on F); U3 0.40 mm BGA needs Standard anyway (bom_check assembly-tier PASS)"
+  dnp: none
+  utilisation: {board_mm2: 359.1, courtyard_B_mm2: 194.5, courtyard_F_mm2: 14.4, U_B: 0.541}   # check.json v6
 ```
 
-### Wire pads (F) and test pads
-| Pad | Net | (x, y) | Pad | Source |
+### Wire pads (B) and test pads (probe 2026-10-07)
+| Pad | Net | (x, y) | Face / pad | Edge gap to nearest neighbour |
 |---|---|---|---|---|
-| J3 | DOCK_VBUS | (31.4, 3.0) | Ø1.0 | PLACE L51 |
-| J4 | GND (dock GND + cell −, shared) | (31.4, 5.1) | 1.0 x 2.0 WirePad | L51; ASM-09 |
-| J5 | VBAT (cell +) | (31.4, 7.2) | Ø1.0 | L53 |
-| J9 | TS (cell NTC option) | (31.4, 8.8) | Ø1.0 | L52 |
-| J7 | LED_A | (31.4, 10.4) | Ø1.0 | L54 |
-| J10 | USB_DP | (33.0, 3.0) | Ø1.0 | L51 |
-| J11 | USB_DM | (33.0, 4.6) | Ø1.0 | L52 |
-| J12 | CC | (33.0, 6.2) | Ø1.0 | L52 |
-| J1 | OUT_A | (33.0, 7.8) | Ø1.0 | L53 |
-| J2 | OUT_B | (33.0, 9.4) | Ø1.0 | L54 |
-| J8 | LED_K | (33.0, 11.0) | Ø1.0 | L54 |
-| TP1-TP6 | SWDIO, SWCLK, NRST, +3V0, GND, VSYS | x 24.4 + 1.27k, y 1.3 | Ø0.7 | L49; integration-map F14 |
-| TP7 | DBG_TX (PB6 USART1_TX) | (13.2, 1.5) F | Ø0.5 dot | L57 |
-| TP8 / TP9 / TP10 | MDF_CCK (PB8) / MDF_SDI (PB1) / MIC_DATA | B, see Mic row | Ø0.5 dot | L60 |
+| J4 | GND (dock GND + cell −, shared) | (25.1, 1.7) | B 1.0 x 2.0 WirePad | 0.90 to J3 DOCK_VBUS |
+| J3 | DOCK_VBUS | (27.0, 2.15) | B Ø1.0 | 1.17 to J5 |
+| J12 | CC | (27.0, 4.35) | B Ø1.0 | 1.17 to J9 |
+| J11 | USB_DM | (27.0, 6.55) | B Ø1.0 | 1.17 to J10 |
+| J8 | LED_K | (27.0, 8.75) | B Ø1.0 | 1.17 to J7 |
+| J2 | OUT_B | (27.0, 10.95) | B Ø1.0 | 1.17 to J1 |
+| J5 | VBAT (cell +) | (28.9, 1.1) | B Ø1.0 | 1.17 to J3 |
+| J9 | TS (cell NTC option) | (28.9, 3.3) | B Ø1.0 | 1.17 to J12 |
+| J10 | USB_DP | (28.9, 5.5) | B Ø1.0 | 1.17 to J11 |
+| J7 | LED_A | (28.9, 7.7) | B Ø1.0 | 1.17 to J8 |
+| J1 | OUT_A | (28.9, 9.9) | B Ø1.0 | 1.17 to J2 |
+| TP1 / TP2 / TP4 / TP5 | SWDIO / SWCLK / +3V0 / GND | (6.1 / 4.6 / 3.1 / 1.6, 11.3) | F Ø0.7 bare | 1.5 mm pitch row |
+| TP3 | NRST | (9.3, 2.9) | F Ø0.7 bare | over U1 |
+| TP6 | VSYS | (24.0, 10.9) | F Ø0.7 bare | near U3/U4 |
+| TP7 / TP8 / TP9 / TP10 | DBG_TX (PB6) / MDF_CCK (PB8) / MDF_SDI (PB1) / MIC_DATA | see Mic row | B Ø0.5 dot | - |
 
-Arm pads: J1, J2, J8 outer column x 33.0; **J7 inner column x 31.4** (its wire crosses the outer column, between J2 and J8; derived from PLACE).
+All wire-pad edge gaps >= 0.90 mm (MZD-10 asks >= 0.8 between pads whose bridge would harm; gaps = circle centre distance − radii, J4 by bounding box; probe 2026-10-07). Arm pads J1/J2/J7/J8 are the lowest pair rows (y 7.7-10.95), dock pads J3/J10/J11/J12 + J4 the upper rows.
 
 ## Outline, stack-up, rules
 | Item | Value | Source (date) |
 |---|---|---|
-| Outline | 34.0 x 13.0, corner r 1.0 | place_r1.py L30; place.py outline L93; [outline] PASS, 0.30 mm to cavity (interfaces.py 2026-10-02) |
-| Thickness | 0.8 mm set in the board | place_r1.py L195; pod_r1_routed.kicad_pcb L6 |
-| Dielectric stack-up | **not in the board file** (no `(stackup)` block); layout-noise uses DEFAULT_STACKUP, unverified vs JLC | grep 2026-10-02; docs/sim/layout-noise.yaml L42 |
-| Layers | 4: F parts + short signals; In1 solid GND zone (0.2 clearance, min width 0.2); In2 signals, no plane; B parts | gnd_plane L81; board probe |
-| Design rules | 0.1 track/space; via 0.35 / 0.15 drill; DRC at 0.09 clearance; via ≥ 0.30, annular ≥ 0.075; hole clearance 0.2; copper-edge 0.2; FreeRouting outline inset 0.2 | place.py rules L112; place_r1.py main |
-| GND fan-out | each GND pad -> own via to In1 before routing (0.12 mm keep); 3 x 3 grid in U1's exposed pad; ring GND pins stubbed onto the EP | gnd_fanout L113-; routed board: 45 of 118 vias on GND (probe 2026-10-02) |
-| Silkscreen | refs on Fab; silk = pin-1/polarity, port keep-clear motif, name; JLC legend ≥ 0.15 line, ≥ 1.0 text | silk.py docstring (2026-10-02) |
+| Outline | 30.0 x 12.0, corner r 1.0, 0.8 mm | dims_r2.py PCB_L/H/R; board Edge.Cuts bbox 30.05 x 12.05 incl. line width (probe); [outline] PASS (interfaces.py 2026-10-07) |
+| Layers | 4: F signals (SW1, TP pads, 277.4 mm of track); In1 solid GND zone 296.96 mm²; In2 +3V0 zone 281.84 mm² + I2C_SCL bridge 8.98 mm; B parts + signals (251.9 mm) | board probe 2026-10-07; ECR-0018 stack-up 2026-10-03 (the 51 mm +3V0 net blocked the router without the plane) |
+| Dielectric stack-up | **not in the board file** (no `(stackup)` block); sim/noise uses hw/pod/kicad-draft/pod.kicad_pcb L39-55 (JLC 0.8 mm 4L as entered 2026-09-30), unverified vs JLC | grep 2026-10-07; budget.json `board.stackup` |
+| Tracks | 610 segments: 540 x 0.10, 68 x 0.15, 2 x 0.25 mm | board probe 2026-10-07 |
+| Vias | 136, all 0.35 / 0.15 drill (49 GND, 24 +3V0); 0.30 broke the 0.2 hole clearance | board probe; ECR-0018 log 2026-10-03 |
+| Design rules | min clearance 0.09, track 0.09, via ≥ 0.30, annular ≥ 0.075, hole clearance 0.2, hole-to-hole 0.25, copper-edge 0.2; routing clearance 0.11 (FreeRouting rounds ~8 µm under) | hw/pod/draft_r2/out/routed.kicad_pro rules (untracked file, issue 18); ECR-0018 log |
+| Height bands | B 1.4 (pod y 10.7-12.1, gap to the cell); F 0.30 (pod y 12.9-13.2, VHB gap to the lid); SW1 pocket 0.90 (ceiling pod y 13.8) | dims_r2.py B_GAP, F_GAP, POCKET |
+| Silkscreen | black mask, white legend (O23); refs on Fab; F: port motif, name block, 'PHASE 2'; pin-1 dots | silk.py (b223d76) |
 
 ## Key numbers
 | Quantity | Value | Source (date) |
 |---|---|---|
-| Position | pod x 30.6-64.6, y 12.1-12.9, ZC −2.1 | shell_r1.py PCB (2026-10-01) |
-| Height bands | B: pod y 10.9-12.1; F: pod y 12.9-14.1 (1.2 mm each) | shell_r1.py PARTS |
-| Heights | [heights] PASS: F tallest L1 1.00 (margin 0.20); B tallest U2 1.08 (margin 0.12) | interfaces.py + tools/checks/part_heights.yaml (2026-10-02) |
-| Clamp bands | [clamp-bands] PASS, closest R14 (B) 0.73 mm from a band | interfaces.py 2026-10-02 |
-| Inside outline | [inside] PASS, closest J1 0.25 mm from an edge | interfaces.py 2026-10-02 |
-| Mic port | [mic-port] 0.000 mm from lid port; WARN = nominal only (board unlocated in cavity, reg-pod-body issue 2) | interfaces.py 2026-10-02 |
-| Switch | [switch] WARN: nominal 0.000 mm; worst-case stack exceeds 0.15 limit by 0.05 | interfaces.py 2026-10-02 |
-| Route | Rev G (ECR-0017, D6 added, re-placed + FreeRouting 80 s, 2026-10-02 23:5x): 694 track segments, 118 vias; 1 unconnected (I2C_SDA, router variance); DRC 19 courtyard + 1 clearance 0.0892 vs 0.09 mm (router rounding). Rev F figures below: 687 segments, F.Cu 199.0 / In2 312.3 / B.Cu 175.5 mm; 2 unconnected | summary.json; board probe (2026-10-02) |
-| DRC | 19 errors, all courtyards_overlap: 18 J-pad ring pairs + 1 C1↔U1 | drc.json 2026-10-02T20:07:15 |
-| ERC | 0 errors / 311 warnings | hw/pod/gen.erc 2026-10-02 20:01 |
-| Distances | port -> nearest Q1 pad 11.6; -> L1 pad 16.0; -> U3 pad 15.4; RT1↔U3 centres 3.09 | board probe 2026-10-02 |
-| Layout noise (Rev F routed board, sha e159bccb = commit e25f35f) | LN-M01 23.1 dB ok; LN-M02 12.2 dB vs ≥ 12 ok (0.2 dB margin); **LN-M03 I_SENSE Kelvin error 5.2 % vs ≤ 2 % FAIL**; LN-M04 0.199 mV ok; LN-M05 14.3 µV ok; LN-M06 0.167 mV ok | sim/noise/smoke.sh on hw/pod/draft_r1/pod_r1_routed.kicad_pcb (sha e159bccb, 2026-10-02 21:20); limits docs/sim/layout-noise.yaml L118-123 |
+| Position | pod x 30.55-60.55, y 12.1-12.9 (B face 12.1), z -8.45..3.55 (centre -2.45) | dims_r2.py PCB (2026-10-07) |
+| Heights | [heights] PASS: F tightest SW1 0.65 (band 0.90, margin 0.25); B tightest U2 1.08 (band 1.40, margin 0.32) | interfaces.py + part_heights.yaml (2026-10-07) |
+| VHB face | [clamp-bands] PASS: no clamp ribs; all 7 F parts in VHB cut-outs (TP cut r 0.9 = 1.8 mm); 91 % of the VHB bonded | interfaces.py 2026-10-07 (commit c348661) |
+| Inside outline | [inside] PASS, closest C4 at 0.07 mm (courtyard) from an edge | interfaces.py 2026-10-07 |
+| Mic port | [mic-port] PASS: hole (1.88, 6.0) = pod (32.43, -2.45), 0.000 mm from the lid duct D1.0; gauge pin worst 0.115 <= 0.20 | interfaces.py; dims_r2.py duct_offsets (2026-10-07) |
+| Switch | [switch] WARN: nominal 0.000 mm; worst-case stack 0.20 exceeds the 0.15 limit by 0.05 (owned by sub-ui / reg-pod-body) | interfaces.py 2026-10-07 |
+| Route | DRC 0, unconnected 0 | kicad-cli 10.0.6 2026-10-07; commits e9bb863, f6291e6 |
+| ERC / nets | 195 pins on 42 nets == gen.py; 203 numbered pads on circuit nets | bom_check [nets]; interfaces [board-nets] 2026-10-07 |
+| Distances port -> nearest pad | L1 13.77, C7 13.74, Q1 15.88, R21 17.07, U3 17.35, Q2 18.95, U4 20.76; C9 3.32, Y1 4.59, U1 4.73 | board probe 2026-10-07 |
+| Layout noise (Phase-2 board, sha da4e8b13, planes In1 GND + In2 +3V0 modelled, 195/195 pads) | LN-M01 26.5 dB pessimistic (nominal 46.5, worst 14.0) PASS; LN-M02 20.1 dB vs ≥ 12 PASS/REVIEW (F03 PDM clock -> MIC_CLK magnetic); LN-M03 Kelvin 1.29 % vs ≤ 2 % PASS; LN-M04 0.127 mV vs 0.37 PASS; LN-M05 8.72 µV vs 50 PASS | sim/noise/out_r2/budget.json (2026-10-07) |
+| DC paths | U4.1 -> Q1.4 / Q2.4 40.4 / 39.5 mΩ; U4.1 -> U1 VDD 42.8-45.0 mΩ; R21.2 -> U1.8 (VSSA) 5.9 mΩ; shunt GND -> cell − 2.1 mΩ | budget.json dc_rail_paths_mohm / dc_plane_mohm (2026-10-07) |
+| Acoustics (duct on this board) | phase2_r2 mean 20-96 kHz +5.6 dB (MC p05/p50/p95 -0.06/4.51/8.43); peak 63.0 kHz Q6.4 +18.5 dB (EQ notch target); notch 26.0 kHz -7.8 dB | sim/acoustics (v_aco run 2026-10-07; ECR-0018 log) |
 
-### Routing state (drc.json 2026-10-02T20:07:15)
-| # | Net | Between | Length | Closes |
-|---|---|---|---|---|
-| 1 | SWCLK | TP2 pad (25.67, 1.3) F ↔ SWCLK track F | ~10 mm (commit 4b2c058) | layout session (O14) |
-| 2 | LED_K | U1 PB7 stub end (14.27, 1.20) F ↔ J8 stub end (32.44, 11.56) F | ~20.9 mm (commit 4b2c058) | layout session (O14) |
+### Routing state (2026-10-07)
+- Complete: 0 unconnected. Last closure: I2C_SCL at U1.26 (boxed in on F and B) maze-routed 8.97 mm on In2 from a via at (12.46, 9.42) to the SCL via at (18.58, 3.35) (hw/pod/inner_bridge.py; +3V0 plane stays one island, -4 mm², 1.4 %); pin swap ruled out (no free right-edge pin has I2C SCL: PA3/PB0/PA9, DS AF table). SCL is a slow line over intact In1 GND; included in the noise model.
+- R21 Kelvin: the 0.55 mm B.Cu GND stub (48 % of the old 3.31 %) replaced by two pad-hugging GND vias (hw/pod/kelvin_r21.py; options scored: stub 3.31 / 1 via 2.38 / 2 vias 1.29 chosen / via-in-pad 1.54 % but needs filled vias).
 
 ## Interfaces
 | To | Crosses (integration-map names) | Invariant / state | Relation |
 |---|---|---|---|
-| [sub-audio-in](sub-audio-in.md) | U2 B, origin (4.67, 6.5), port (3.9, 6.5); N$2 -> R2 -> MIC_CLK, MIC_DATA, MIC_VDD from U1 F via vias; TP8-TP10 | PORT aligned with lid bore (ECR-0011) | R-AUDIO-BOARD |
-| [sub-processing](sub-processing.md) | U1 F: pins 1-12 W, 13-24 S, 25-36 E, 37-48 N; Y1 W; SMPS SE; C1 shared VDD/VBAT cap | C1↔U1 courtyard overlap (DRC) | R-PROC-BOARD |
-| [sub-power](sub-power.md) | U3 + U4 clusters B; VBAT/VSYS/VBUS; R8/R9/C19 | 0.4 mm ball escape rule (Constraints); RT1 3.09 mm from U3 | R-PWR-BOARD |
-| [sub-output](sub-output.md) | Q1/Q2 B; OUT_A/OUT_B to J1/J2 (x 33.0); BRIDGE_RTN -> R21; leg B on PA10/PB15 (TIM1_CH3/CH3N, ECR-0003) | 200 kHz edges stay in the rear half; LN-M03 Kelvin path R21.2 -> U1.8 | R-OUT-BOARD |
-| [sub-dock-usb](sub-dock-usb.md) | J3/J4/J10/J11/J12; D5 at J3 on F; D4/U6/R12/R13/R18 on B x 24.8-28.9 | D5 at the exposed contact; USB_DP/USB_DM as a pair | R-DOCK-BOARD |
-| [sub-ui](sub-ui.md) | SW1 F (22.0, 6.5); R10; R14 B (26.42, 11.8); J7/J8 | LED_K unrouted (Routing #2) | - |
-| [sub-debug-test](sub-debug-test.md) | TP1-TP6 row; TP7; TP8-TP10; R20 (23.4, 11.4) B; R21 (21.6, 7.6) B; R1 pad = DFU tack point | row outside the clamp band, 1.27 mm pitch; SWCLK unrouted (Routing #1) | R-DEBUG-BOARD |
-| [reg-pod-body](reg-pod-body.md) | pocket 34 x 13 at pod x 30.6-64.6; ribs on F bands, foam on B bands; lid bore Ø1.0 over (3.9, 6.5); plunger bore Ø3.2 over (22.0, 6.5) | O20: re-size in Phase 2 | R-BOARD-BODY |
-| [reg-arm](reg-arm.md) | J1 (33.0, 7.8), J2 (33.0, 9.4), J7 (31.4, 10.4), J8 (33.0, 11.0); wires rise in the 2.1 mm gap behind x 34 | J7 is in the inner column | R-BOARD-ARM |
-| Cost ([bom.md](../build/bom.md)) | 30 BOM lines; 52 placements; both faces = double-sided assembly; Extended types: pod board 11 (U1, U2, U3, U4, U6, Q1/Q2, L1, D5, RT1, SW1, C15) + pad-board LED = 12 per order | JLC Standard PCBA charges per BOM line ($1.53, Basic or Extended) + setup/stencil/X-ray, not per Extended type (simplification-study.md ASM-11; JLC fee page read 2026-10-02 22:30Z). D5 Extended: sourcing-lock.csv 2026-09-30T06:48Z; C15 Extended: bom.py JLC API 2026-10-02T23:50Z; rest: 2026-10-02T22:51Z audit; count derived | R-COST-BOARD |
-| [reg-pad](reg-pad.md) | separate 2-layer pad board (LED), same JLC order | LED stays on the pad (PER-07 off, gen.py L56) | - |
-| [physical](physical.md) | board <-> pod mapping per pod; height bands; wire stowage behind the rear edge | right pod's board sits at a different height than the left for anything off the centre line | - |
+| [sub-audio-in](sub-audio-in.md) | U2 B (2.65, 6.0) r90, port NPTH Ø0.6 (1.88, 6.0); N$2 -> R2 -> MIC_CLK (B, 9.5 mm, no via), MIC_DATA (B, 4.6 mm), MIC_VDD (F+B, 2 vias); TP8-TP10 | PORT is what is placed: dims_r2 reads it from this board (board_mic) | R-AUDIO-BOARD |
+| [sub-processing](sub-processing.md) | U1 B (10.05, 5.4); SMPS L1/C7/C8/C9; Y1 + C11/C12 at the front; EP GND to In1; +3V0 from In2 | VDDA caps far from pin 9; LSE nets use vias (sub-processing issues 13, 14) | R-PROC-BOARD, R-SMPS-BOARD, R-CLOCK-BOARD |
+| [sub-power](sub-power.md) | U3 cluster (19.2, 2.6), U4 cluster (23.0, 8.0); VBAT/VSYS/VBUS; R8/R9/C19 | 0.4 mm ball escape rule (Constraints) | R-PWR-BOARD |
+| [sub-output](sub-output.md) | Q1/Q2 B; OUT_A/OUT_B to J1 (28.9, 9.9) / J2 (27.0, 10.95); BRIDGE_RTN -> R21 (19.45, 6.45) | 200 kHz edges in the rear half; LN-M03 1.29 % | R-OUT-BOARD |
+| [sub-dock-usb](sub-dock-usb.md) | J3/J4/J10/J11/J12 on B; D5 (J3), D6 (J12), U6, D4, R12/R13, R18 on B x 22.9-25.1 | USB_DP/USB_DM as a pair (F 18.6/15.7 + B 4.8/7.5 mm, 2 vias each) | R-DOCK-BOARD |
+| [sub-ui](sub-ui.md) | SW1 F (18.5, 6.0); R10 (17.3, 6.4); R14 (25.0, 8.3); J7/J8 | SW1 alone on F, centre line | R-UI-BOARD |
+| [sub-debug-test](sub-debug-test.md) | TP1-TP6 F; TP7-TP10 B; R20 (23.0, 11.0); R21; R1 pad = DFU tack point | TPs in VHB cut-outs | R-DEBUG-BOARD |
+| [reg-pod-body](reg-pod-body.md) | board hung from the lid on full-face VHB with per-pad cut-outs; x-stop 0.25 at the front skirt; lid duct D1.0 over (1.88, 6.0); SW1 pocket 4.3 x 3.1 over (18.5, 6.0); B gap 1.4 to the cell | no clamp ribs, no foam | R-BOARD-BODY |
+| [reg-arm](reg-arm.md) | J1 (28.9, 9.9), J2 (27.0, 10.95), J7 (28.9, 7.7), J8 (27.0, 8.75) on B; wires reach them through the stowage gap pod x 60.55-66.7 above the cell | - | R-BOARD-ARM |
+| Cost ([bom.md](../build/bom.md)) | 31 BOM lines; 53 placements; double-sided assembly (SW1 on F) | JLC Standard PCBA per BOM line + setup/stencil/X-ray | R-COST-BOARD |
+| [reg-pad](reg-pad.md) | separate 2-layer pad board (LED), same JLC order | LED stays on the pad (O8) | - |
+| [physical](physical.md) | board <-> pod mapping per pod; height bands; wire stowage | off-centre parts land at different heights in the two pods | - |
 | Firmware | pins per pin-contract.yaml; PB5 strapped to GND (ECR-0013 S1) | - | - |
 
 ## Constraints
-- spec §8: board ≤ 0.8 mm (mic ports through it); port 0.6-1.0 mm, short and wide.
-- D8 JLC assembly; D11 core SMPS is the only switcher; switching parts at the rear, away from the mic (audit MP-01).
-- O13 double-sided; O9 test pads + snap-off frame; O14 layout together; O16-5 mic + switch on the centre line; O20 test access must not cost size.
-- Mechanical (shell_r1.py; integration-map §7; checked by tools/checks/interfaces.py [clamp-bands] [heights] [inside] [outline] [mic-port] [switch]):
-  - 0.6 mm clamp bands y 0-0.6 and 12.4-13.0, both faces, no parts (TP pads exempt).
-  - parts ≤ 1.2 mm tall per face.
-  - 0.3 mm to the cavity walls front/top/bottom; 2.1 mm wire gap behind the rear edge.
-- JLC capability = rules above (place.py rules; edge clearance 0.2 per JLC capabilities page fetched 2026-09-30, pcb-mech-interface.md §2).
-- U3 0.4 mm DSBGA: ball pads 0.184 -> 0.216 mm between balls; 0.1 track + 2 x 0.09 clearance needs 0.28 -> **no track between balls**; every ball escapes outward; cap order decides (derived from the footprint).
-- PER-06: C1 within 1.5 mm of both U1 pin 1 (VBAT) and pin 48 (VDD).
+- spec §8: board ≤ 0.8 mm (mic port through it); port 0.6-1.0 mm, short and wide (O24: sealed duct D1.0 onto the D0.6 hole).
+- D8 JLC assembly; D11 core SMPS is the only switcher; switching parts in the rear half, away from the mic (audit MP-01; place_r2 `far` >= 10 mm from the port).
+- ECR-0018: MZD-1 one face (SW1 alone on F), MZD-2 QFN48 kept, MZD-3 0201 set (R1/R20 0402 hooks, C8/C9 0402 10 V), MZD-4 R21 0402 at the board edge for lifting, MZD-6 4 layers 0.8 mm, MZD-10 wire pads on B 1.0 mm with ≥ 0.8 mm gaps.
+- O9 test pads + snap-off frame; O16-5 mic + switch on the centre line; O20 test access must not cost size; O27 thin first.
+- Mechanical (dims_r2.py; checked by tools/checks/interfaces.py [outline] [inside] [clamp-bands] [heights] [mic-port] [switch]):
+  - F face flat except SW1 (≤ 0.90 pocket) and bare pads; nothing else on F (VHB bond).
+  - B parts ≤ 1.4 mm (gap to the cell).
+  - outline 30 x 12 (-0.05/+0.00), x-stop 0.25 mm, 0.45 mm to the cavity walls top/bottom ((12.9 - 12)/2, dims_r2 CAV).
+  - wire pads in PAD_ZONE x 25-30.
+- JLC capability = rules above (edge clearance 0.2 per JLC capabilities page fetched 2026-09-30, pcb-mech-interface.md §2).
+- U3 0.4 mm DSBGA: ball pads 0.184 -> 0.216 mm between balls; 0.1 track + 2 x 0.09 clearance needs 0.28 -> **no track between balls**; every ball escapes outward (derived from the footprint).
+- PER-06: C1 within 1.5 mm (pad edge-to-edge) of both U1 pin 1 (VBAT) and pin 48 (VDD): place_r2 NEAR L46, check.json pass.
 
 ## Open issues (IDs stable: other docs cite "reg-board issue N"; gaps = closed, see git)
-1. **2 unconnected** (Routing state). Closes: layout session (O14).
-2. **No dielectric stack-up in the board file.** Thickness is now 0.8 mm (`place_r1.py` L195; the Rev E file said 1.6 mm). Closes: enter JLC's 0.8 mm 4-layer stack before release; re-run layout noise if it differs from DEFAULT_STACKUP.
-3. (closed in Rev F) Mic port was 0.77 mm off the lid bore: ECR-0011 moved U2 to x 4.67; [mic-port] 0.000 mm nominal (interfaces.py 2026-10-02).
-4. **Wire-pad neighbours a solder bridge turns into a fault** (copper gap = centre distance − pad size, derived from PLACE L51-54; the same 18 pairs are the J-pad courtyard DRC entries, drc.json 2026-10-02T20:07:15):
-   - fixed by Rev F: J3 DOCK_VBUS and J5 VBAT are separated by J4 GND (3.2 mm edge gap; ASM-09 holds for J3 only). Residual J5 pairs: J4↔J5 at 0.60 and J5↔J12 at 0.89 (below).
-   - 0.60 mm: J3 DOCK_VBUS↔J4 GND (dock 5 V to GND); J4 GND↔J5 VBAT (cell short through its PCM); J4 GND↔J11 USB_DM; J4 GND↔J12 CC; J3 DOCK_VBUS↔J10 USB_DP (5 V onto D+/U6/PA12); J10 USB_DP↔J11 USB_DM; J11 USB_DM↔J12 CC; J5 VBAT↔J9 TS (cell voltage on TS and PA2; abs-max [TBD]); J12 CC↔J1 OUT_A; J1 OUT_A↔J2 OUT_B (exciter shorted across the bridge); J2 OUT_B↔J8 LED_K (200 kHz onto PB7, reg-arm issue 8); J9 TS↔J7 LED_A.
-   - 0.71 mm: J5 VBAT↔J1 OUT_A; J7 LED_A↔J8 LED_K; J2 OUT_B↔J9 TS.
-   - 0.89 mm: J12 CC↔J5 VBAT (VBAT on the exposed CC contact); J7 LED_A↔J2 OUT_B; J9 TS↔J1 OUT_A.
-   - Closes: re-order in the layout session; meter every adjacent pair in bring-up step 1 (sub-debug-test).
-5. **Rear edge: 12 wires on 11 pads** (4 arm, 5 dock, 2 cell, 1 NTC; J4 takes dock GND + cell −; simplification-study.md B3 '12 wires / 11 pads'). Only the 4 arm litz were checked in the 2.1 mm gap (tolerances.md). Dock route from the belly (sub-dock-usb issue 5) and cell lead exit (sub-power issue 10) undesigned. Closes: wire-route design ([physical.md](physical.md)).
-6. (closed) Part heights unchecked against the 1.2 mm bands: [heights] PASS (interfaces.py + part_heights.yaml 2026-10-02).
-7. **Layer use vs lesson:** `docs/learn/03-four-layer-board.svg` says L3 = "+3V0 plane + a few signals"; the board uses In2 for signals only, +3V0 as tracks. Closes: decide in the layout session; update the lesson or the generator.
-8. **No panel / snap-off test frame for 34 x 13** (pcb-mech-interface.md §8 covers only 20 x 11.5; O9). Closes: panel design before release.
-9. **Which pod has the TP row up is derived, not checked** ([physical.md](physical.md)). Closes: KiCad 3D render placed in the CAD.
-10. **Stale pointers:** place_r1.py L1 "from pod.net (Rev E)", L7 -> pcb-floorplan-rev1.svg; board-regions.svg and routing-congestion.png show Rev E. Closes: next commit touching them.
-11. **O20 re-size.** 34 x 13 was grown under O15; Phase 1 kept it; Phase 2 (miniaturization, after the owner's board review) sets the new outline (ECR-0015 proposes 28 x 12). Every mechanical doc follows (reg-pod-body, physical, reg-arm).
-12. **LN-M03 I_SENSE Kelvin error 5.2 % vs ≤ 2 %** (sim/noise/smoke.sh on hw/pod/draft_r1/pod_r1_routed.kicad_pcb (sha e159bccb, 2026-10-02 21:20), budget.json metrics). R21's pad-2 GND stub + via = 4.6 of the 5.2 mΩ on Rev F (layout-noise.yaml LF-1, unchanged from Rev E; budget.json kelvin.features). Closes: Kelvin-route R21.2 -> U1 VSSA in the layout session, re-run sim/noise.
-13. **J-pad courtyard rings overlap** (18 DRC errors): `TestPoint_Pad_D1.0mm` rings ~2.1 mm on 1.6 mm pitch. Closes: a wire-pad footprint with a pad-sized courtyard, or a DRC exclusion with reason, in the layout session.
-14. **C1↔U1 courtyard overlap** (1 DRC error) from the PER-06 position. Closes: layout session (confirm assembly clearance or nudge C1 within the 1.5 mm rule).
-15. **ECR files lag the design:** ECR-0003, ECR-0004 implemented by Rev F but still `Status: proposed`; ECR-0002 partly overtaken. Closes: plm ECR status update.
+1. (closed in Phase 2) Unconnected nets: 0 (2026-10-07).
+2. **No dielectric stack-up in the board file.** Thickness 0.8 mm is set; sim/noise borrows the Rev E draft's stack. Closes: enter JLC's 0.8 mm 4-layer stack before release; re-run sim/noise if it differs.
+4. **Wire-pad neighbours a solder bridge turns into a fault.** All gaps now ≥ 0.90 mm (MZD-10 met, probe 2026-10-07); the harmful pairs at 0.90-1.22: J3 DOCK_VBUS↔J4 GND 0.90; J3↔J5 VBAT 1.17 (dock 5 V onto the cell); J1 OUT_A↔J2 OUT_B 1.17 (exciter shorted); J2 OUT_B↔J8 LED_K 1.20 (200 kHz onto PB7); J12 CC↔J9 TS 1.17; J10↔J11 1.17 (USB pair). Closes: meter every adjacent pair in bring-up step 1 (sub-debug-test).
+5. **Rear edge: 12 wires on 11 pads** (4 arm, 5 dock, 2 cell, 1 NTC; J4 takes dock GND + cell −), all on B in PAD_ZONE; they stow in the gap pod x 60.55-66.7 above the cell (reg-pod-body stowage 277 mm³). Dock route from the belly (sub-dock-usb) and cell lead exit (sub-power) not drawn. Closes: wire-route drawing ([physical.md](physical.md)).
+8. **No panel / snap-off test frame for 30 x 12** (pcb-mech-interface.md §8 covers only 20 x 11.5; O9). Closes: panel design before release.
+9. **Which pod has which edge up is derived, not checked** (dims_r2 `bpt` models the right pod; the left mirrors it, [physical.md](physical.md)). Closes: KiCad 3D render placed in the CAD.
+10. **Stale pictures:** board-regions.svg, pcb-floorplan-rev1.svg, routing-congestion.png show Rev E; the current picture is board-map-phase2.png. Closes: redraw or delete in the next commit touching them.
+16. **VDDA caps C5/C6 8.8-9.2 mm from U1 pin 9** (sub-processing issue 13). Closes: owner review (O25).
+17. **LSE_IN / LSE_OUT use 2 vias each and run on F + B** (sub-processing issue 14; R-CLOCK-BOARD says no vias). Closes: owner review or re-route.
+18. **DRC rules live in hw/pod/draft_r2/out/routed.kicad_pro, which is untracked** (git status 2026-10-07); a fresh clone runs DRC with KiCad defaults. Closes: commit the .kicad_pro (or write the rules from place_r2.py into the board) before release.
+19. **Board Value fields hold footprint names** (bom_check [values] WARN, "no ECR yet"; ECR-0012 covered the wrong SW1 LCSC property). JLC files must come from gen.py (bom_jlc_mz2.csv), never from a board-based BOM tool. Closes: write values into the board.
 
 ## Before you change this, check
-- U2 or SW1 moves: lid bore + plunger in **both** pods; reg-pod-body, sub-audio-in, sub-ui; `interfaces.py` [mic-port] [switch].
-- Within 0.6 mm of the top/bottom edge, either face: ribs + foam. Within 0.3 mm of any edge: cavity wall. `[clamp-bands] [inside]`.
-- Over 1.2 mm tall: lid (F) or cell (B). `[heights]` + add the part to part_heights.yaml.
-- U3 cluster: 0.4 mm escape rule; RT1 distance (sub-power issue 4); MCU east-pin via field left by the +2.5 mm shift.
-- Bridge, SMPS, OUT_A/OUT_B: rear half, away from U2, Y1, mic nets (D11, MP-01); R21 Kelvin (LN-M03).
-- J pads: wire count + neighbour faults (issues 4, 5); dock pairs together; J4 stays between J3 and J5 (ASM-09); D5 stays at J3.
+- U2 or SW1 moves: lid duct + pocket in **both** pods (dims_r2 reads U2 from this board); reg-pod-body, sub-audio-in, sub-ui; `interfaces.py` [mic-port] [switch]; the acoustic scenario phase2_r2.
+- Anything new on F: VHB cut-out and bond fraction ([clamp-bands]); F band 0.30.
+- B parts over 1.4 mm: cell gap ([heights]; add to part_heights.yaml).
+- U3 cluster: 0.4 mm escape rule; RT1 distance (sub-power).
+- Bridge, SMPS, OUT_A/OUT_B: rear half, away from U2, Y1, mic nets (D11, MP-01); R21 Kelvin vias (LN-M03).
+- In2 is the +3V0 plane: any new inner route cuts it; keep it one island and re-run sim/noise (it models both planes).
+- J pads: wire count + neighbour faults (issues 4, 5); ≥ 0.8 mm gaps (MZD-10); D5/D6 stay at J3/J12.
 - C1: ≤ 1.5 mm from U1 pins 1 and 48 (PER-06).
-- TP row: 1.27 mm pogo pitch, outside the clamp band.
-- Stack-up / thickness: mic port duct (sub-audio-in), shell pocket, layout-noise stack.
-- Run `python3 tools/plm.py impact REG-BOARD`, `python3 tools/checks/interfaces.py`; walk integration-map §10. **Never run `place_r1.py` or FreeRouting as a parallel agent** (CLAUDE.md).
+- Stack-up / thickness: mic duct (sub-audio-in), shell (dims_r2 PCB_T), layout-noise stack.
+- Run `python3 tools/plm.py impact REG-BOARD`, `python3 tools/checks/interfaces.py`, `python3 tools/checks/bom_check.py`; walk integration-map §10. **Never run `place_r2.py`, `place_r1.py` or FreeRouting as a parallel agent** (CLAUDE.md).
+
+## Reference design (Rev F/G, `ULTRASONIC_DESIGN=revg`)
+- hw/pod/draft_r1/pod_r1_routed.kicad_pcb from hw/pod/place_r1.py: 34 x 13 x 0.8, parts on both faces (21 F / 31 B), In2 signals only, clamp ribs + foam on 0.6 mm edge bands, pod x 30.6-64.6; mic port (3.9, 6.5), SW1 (22.0, 6.5), TP1-TP6 pogo row on F y 1.3, J pads on F x 31.4/33.0 with 0.60 mm gaps.
+- Rev G route (2026-10-02): 1 unconnected, DRC 19 courtyard + 1 clearance; layout noise (sha e159bccb) LN-M01 23.1 dB, LN-M02 12.2 dB, LN-M03 5.2 % FAIL, LN-M04 0.199 mV, LN-M05 14.3 µV. Details: git history of this file before 2026-10-07.
