@@ -421,3 +421,13 @@
 - 2026-10-07 13:20 review REG-POD-BODY by backlog-agent: RPB-16: gauge pin options (A pin gauge + 20G sleeve, rec; B micro-turned; C tooling holes); docs only
 - 2026-10-07 13:20 review R-AUDIO-BODY by backlog-agent: RPB-16: gauge pin options (A pin gauge + 20G sleeve, rec; B micro-turned; C tooling holes); docs only
 - 2026-10-07 13:20 checkin REG-POD-BODY by backlog-agent
+- 2026-10-07 13:22 checkout PHYSICAL by backlog-agent: RPB-14 service slack + stale rows
+- 2026-10-07 13:22 checkout SUB-DEBUG-TEST by backlog-agent: RPB-14 service slack + stale rows
+- 2026-10-07 13:22 checkout REG-POD-BODY by backlog-agent: RPB-14 service slack + stale rows
+- 2026-10-07 13:22 review PHYSICAL by backlog-agent: RPB-14/DBG-17: lid-lift wire slack computed (dock_route.py lid_open_extra_mm; arm from heel); stale mass + interface rows refreshed
+- 2026-10-07 13:22 review SUB-DEBUG-TEST by backlog-agent: RPB-14/DBG-17: lid-lift wire slack computed (dock_route.py lid_open_extra_mm; arm from heel); stale mass + interface rows refreshed
+- 2026-10-07 13:22 review REG-POD-BODY by backlog-agent: RPB-14/DBG-17: lid-lift wire slack computed (dock_route.py lid_open_extra_mm; arm from heel); stale mass + interface rows refreshed
+- 2026-10-07 13:22 review R-DOCK-BODY by backlog-agent: RPB-14/DBG-17: lid-lift wire slack computed (dock_route.py lid_open_extra_mm; arm from heel); stale mass + interface rows refreshed
+- 2026-10-07 13:22 checkin PHYSICAL by backlog-agent
+- 2026-10-07 13:22 checkin SUB-DEBUG-TEST by backlog-agent
+- 2026-10-07 13:22 checkin REG-POD-BODY by backlog-agent

@@ -228,6 +228,7 @@ option_bytes: "set nSWBOOT0=0, nBOOT0=1 only once a write-protected boot stub wo
 - id: DBG-17
   t: "B-face access while the board hangs from the lid relies on the arm/dock/cell wires' slack (lid lifts the board on its wires); slack length not designed"
   close: "wire-route design (physical.md, reg-board stowage zone)"
+  status: "slack computed 2026-10-07: arm needs 2.65/3.04 mm (5 mm loop in heel.md); dock ribbon 0.0 worst (2 mm loop recommended); physical.md Service"
 ```
 
 ## Before changing this, check

@@ -130,8 +130,21 @@ def main():
                           clear_to_arm_bundle=round(cb - BUNDLE_D / 2 - rw, 3), clear_to_arm_wires=round(ca - rw, 3),
                           clear_to_cell=round(cell_c, 3), clear_to_cavity_walls=round(cav_in, 3))
             curves[(pod, ref)] = w["pts"]
+        # lid opened 180 deg about the rear seam edge (x CAV x1, y Y_SPLIT): the board lands mirrored behind the pod, B up.
+        # Wire from its last tub anchor (taped at the cell's rear-top edge, point 3 of the route) to the seam edge, then
+        # straight to the mirrored pad. Extra length needed vs closed = service loop (DBG-17).
+        x_h, y_h = CAV["x1"], D.Y_SPLIT
+        for k2, ref in enumerate(DOCK_PADS):
+            pts = curves[(pod, ref)]
+            anchor = pts[2]
+            closed_from_anchor = plen(pts[2:])
+            q = pts[-1]
+            qm = np.array([2 * x_h - q[0], q[1], q[2]])
+            open_len = float(np.linalg.norm(np.array([x_h, y_h, anchor[2]]) - anchor) + np.linalg.norm(qm - np.array([x_h, y_h, anchor[2]])))
+            r[ref]["lid_open_extra_mm"] = round(open_len - closed_from_anchor, 1)
         worst = {k: min(v[k] for v in r.values()) for k in ("clear_to_arm_bundle", "clear_to_arm_wires", "clear_to_cell", "clear_to_cavity_walls")}
-        res[pod] = dict(wires=r, worst=worst, pass_all=all(v >= 0.0 for v in worst.values()),
+        worst["service_loop_needed_mm"] = max(v["lid_open_extra_mm"] for v in r.values())
+        res[pod] = dict(wires=r, worst=worst, pass_all=all(v >= 0.0 for k, v in worst.items() if k.startswith("clear")),
                         arm_pads_z=[round(pz(by, pod), 2) for by in ARM_PADS.values()])
         curves[(pod, "bundle")] = bundle
     (HERE / "out").mkdir(exist_ok=True)

@@ -128,7 +128,7 @@ Sequence from `hw/mech/notes/shell_r2.md` assembly_sequence (2026-10-07), merged
 | Board swap / SWD on a bricked board | as cell swap, then warm 60-80 °C and saw the board VHB from the rear (no parts on F except SW1); accept a lid reprint (~1 g resin) | 1 | destroyed |
 | Firmware | dock, USB DFU | 0 | – |
 
-Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
+Wire slack for lifting the lid with the board on its wires (DBG-17, computed 2026-10-07): lid opened 180° about the rear seam edge. Arm wires need 2.65 (right) / 3.04 mm (left) extra: the 5 mm service loop in heel.md covers it. Dock ribbon, anchored at the cell's rear-top edge (step 11): 0.0 mm extra in the worst case (right J3), others −0.1 to −4.6, so the routed length already suffices; cut each dock wire 2 mm long as a loop so the lid never tensions a pad (`hw/mech/dock_route.py` lid_open_extra_mm). Tools: fine blade for the rebate, floss for the cell VHB, hot-air 60-80 °C only for a board swap. Cycle count the seam survives: unknown until the spray coupon is opened and rebonded 3× (sealing-and-service.md test plan).
 
 ## Interfaces between regions
 | # | Between (docs) | What crosses | Geometry | Nets / F-rows |
@@ -137,7 +137,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 | 2 | [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) ([sub-ui](sub-ui.md)) | finger force | skin → puck D2.3 (selective fit) → SW1 at board (18.5, 6.0) = pod 49.05; press loads the VHB in tension | F11: BTN → PA0 |
 | 3 | [reg-pad](reg-pad.md) ↔ [reg-arm](reg-arm.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) ([sub-output](sub-output.md), [sub-ui](sub-ui.md)) | 4 litz wires | strut bore Ø1.2 → tube → heel Ø1.0 → exit Ø0.8 (66.20, 5.15, −5.50) → 1.1 gap behind the cell (on the rear wall) → upper stowage → B pads J1/J2 (board 28.9/27.0) and J7/J8 | F3: OUT_A/OUT_B → J1/J2 · F12: LED_A/LED_K → J7/J8 |
 | 4 | [reg-pod-body](reg-pod-body.md) (heel) ↔ [reg-arm](reg-arm.md) ↔ [reg-pad](reg-pad.md) | spring force (≥ 1 N) | NiTi Ø0.80; sockets 4.0 / 3.5 deep; M1.4 set screws (unchanged) | – |
-| 5 | [sub-dock-usb](sub-dock-usb.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) | charge + USB | YZT0675 flush in the belly; 5 wires under the cell (0.8) to the rear gap, up to J3/J4/J10/J11/J12 (B, board x 25.1-28.9) | F5, F9, F10, F15 |
+| 5 | [sub-dock-usb](sub-dock-usb.md) ↔ [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) | charge + USB | YZT0675 flush in the belly; 5 enamelled wires (32/36 AWG, DK-16) flat under the cell (0.8), up the rear gap low, over the cell's rear-top edge, up behind the board, to J3/J4/J10/J11/J12 (B, board x 25.1-28.9); both pods routed (`hw/mech/dock_route.py` v2) | F5, F9, F10, F15 |
 | 6 | [sub-power](sub-power.md) (cell) ↔ [reg-board](reg-board.md) | battery | leads to J5 (28.9, 1.1) / J4 (27.0, 1.9); optional NTC to J9 (28.9, 3.3) | F5-F8 |
 | 7 | [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) | retention | full-face VHB on F (91 % bonded), x-stop 0.25, long edges free 0.45 | – |
 | 8 | [reg-pod-body](reg-pod-body.md) (tub ↔ lid) | seal + access | seam y 12.1, tongue/groove, belly all tub, rebate tub-only | – |
@@ -162,7 +162,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 - {q: stowage, v: "277 mm3 (198 behind board + 79 behind cell) vs need 107-142 for 12 loops", src: "checks.json stowage"}
 - {q: VHB bonded, v: "~314 mm2 = 91 % of the tape outline", src: "interfaces.py clamp-bands; checks.json vhb_area_mm2 313.9"}
 - {q: pad contact below the temple centre, v: "z -25.0 (skin at y -3.0)", src: "frame.py PAD_CONTACT"}
-- {q: mass per pod, v: ">= ~9.5 g lower bound [derived] vs ~8 g target", src: "reg-pod-body Key numbers 2026-10-07"}
+- {q: mass per side worn, v: "11.2-13.2 g (pod body 8.7-10.1) vs ~8 g target", src: "sim/checks/pod_mass.py 2026-10-07 (issue 8)"}
 ```
 
 ## Open issues (IDs stable; gaps = closed)
