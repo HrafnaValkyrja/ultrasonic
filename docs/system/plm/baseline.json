@@ -49,9 +49,9 @@
   "REG-BOARD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model",
+   "note": "RB-19: 74 board Value fields set to schematic values (pcbnew), only Value lines changed; DRC same 3 pre-existing warnings, 0 errors",
    "stamp": {
-    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "9e7627860783b952",
+    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "d1e31020b154d34a",
     "file:hw/pod/draft_r2/placement.yaml": "568be76a2d8a482d",
     "glob:hw/lib/pod.pretty/*.kicad_mod": "9fa247f977b33b6d",
     "sym:hw/pod/place.py::rules": "cf2bb252c4b5e5fa"
@@ -344,11 +344,11 @@
    }
   },
   "R-OUT-BOARD": {
-   "by": "claude",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "B-DOC-AUDIT-0007 local re-route (20bd842): R21 unchanged mid-board (19.45,6.45) with the two Kelvin vias; LN-M03 1.29 % unchanged; MZD-4 edge position tried and rejected (2.48 % / unroutable BRIDGE_RTN), reg-board issue 20, sub-output updated",
+   "note": "RB-19: 74 board Value fields set to schematic values (pcbnew), only Value lines changed; DRC same 3 pre-existing warnings, 0 errors",
    "stamp": {
-    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "9e7627860783b952",
+    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "d1e31020b154d34a",
     "ref:Q1": "9e9cfa60e1e11081",
     "ref:R21": "a66fda4215076577",
     "yaml:hw/pod/draft_r2/placement.yaml::Q1": "f320227ba3fc460a",

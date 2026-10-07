@@ -479,3 +479,7 @@
 - 2026-10-07 13:34 checkin PHYSICAL by backlog-agent
 - 2026-10-07 13:36 review R-COST-BOARD by backlog-agent: CHK-STOCK: lock rows dated for all used parts; bom_jlc_mz2.csv sourcing column regenerated (dated lookup -> yes); no part changed
 - 2026-10-07 13:36 review COST by backlog-agent: CHK-STOCK: lock rows dated for all used parts; bom_jlc_mz2.csv sourcing column regenerated (dated lookup -> yes); no part changed
+- 2026-10-07 13:38 checkout REG-BOARD by backlog-agent: RB-19 board Value fields
+- 2026-10-07 13:39 review REG-BOARD by backlog-agent: RB-19: 74 board Value fields set to schematic values (pcbnew), only Value lines changed; DRC same 3 pre-existing warnings, 0 errors
+- 2026-10-07 13:39 review R-OUT-BOARD by backlog-agent: RB-19: 74 board Value fields set to schematic values (pcbnew), only Value lines changed; DRC same 3 pre-existing warnings, 0 errors
+- 2026-10-07 13:39 checkin REG-BOARD by backlog-agent
