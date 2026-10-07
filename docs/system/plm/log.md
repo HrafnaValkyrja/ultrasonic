@@ -374,3 +374,15 @@
 - 2026-10-07 13:06 review R-DOCK-BODY by backlog-agent: DK-16: dock wire picked (32/36 AWG enamelled, Elektrisola data), fill check; docs only
 - 2026-10-07 13:06 checkin SUB-DOCK-USB by backlog-agent
 - 2026-10-07 13:07 checkin PHYSICAL by backlog-agent
+- 2026-10-07 13:09 checkout SUB-DOCK-USB by backlog-agent: DK-05 dock route both pods (hw/mech/dock_route.py)
+- 2026-10-07 13:09 checkout PHYSICAL by backlog-agent: DK-05 dock route both pods (hw/mech/dock_route.py)
+- 2026-10-07 13:09 checkout REG-BOARD by backlog-agent: DK-05 dock route both pods (hw/mech/dock_route.py)
+- 2026-10-07 13:09 review SUB-DOCK-USB by backlog-agent: DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights
+- 2026-10-07 13:09 review PHYSICAL by backlog-agent: DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights
+- 2026-10-07 13:09 review REG-BOARD by backlog-agent: DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights
+- 2026-10-07 13:09 review R-DOCK-BODY by backlog-agent: DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights
+- 2026-10-07 13:09 review R-DOCK-BOARD by backlog-agent: DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights
+- 2026-10-07 13:09 review R-BOARD-BODY by backlog-agent: DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights
+- 2026-10-07 13:09 checkin SUB-DOCK-USB by backlog-agent
+- 2026-10-07 13:09 checkin PHYSICAL by backlog-agent
+- 2026-10-07 13:09 checkin REG-BOARD by backlog-agent

@@ -22,7 +22,7 @@
   "PHYSICAL": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-16: dock wire picked (32/36 AWG enamelled, Elektrisola data), fill check; docs only",
+   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
@@ -49,7 +49,7 @@
   "REG-BOARD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
+   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
    "stamp": {
     "file:hw/pod/draft_r2/out/routed.kicad_pcb": "9e7627860783b952",
     "file:hw/pod/draft_r2/placement.yaml": "568be76a2d8a482d",
@@ -109,7 +109,7 @@
   "SUB-DOCK-USB": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-16: dock wire picked (32/36 AWG enamelled, Elektrisola data), fill check; docs only",
+   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"
@@ -232,9 +232,9 @@
    }
   },
   "R-BOARD-BODY": {
-   "by": "ultrasonic-lead",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: VHB cut-outs per test pad (shell_r2 vhb(), interfaces vhb_cutouts): bond 31 -> 91 %; both sides' text updated",
+   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
    "stamp": {
     "sym:hw/mech/dims_r2.py::B_GAP": "9e0415c00f9dc49a",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
@@ -305,9 +305,9 @@
    }
   },
   "R-DOCK-BOARD": {
-   "by": "claude",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "B-DOC-AUDIT-0007 (20bd842): J3 DOCK_VBUS (25.1,1.7) / J4 GND (27.0,1.9) swapped, J4 between J3 and J5 (ASM-09), J3-J5 2.85 mm, all wire-pad gaps >= 0.90; D5 1.0 mm from J3; sub-dock-usb, sub-power PWR-I17, reg-board, physical, sub-debug-test updated",
+   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
    "stamp": {
     "yaml:hw/pod/draft_r2/placement.yaml::D4": "26c4340c270a1106",
     "yaml:hw/pod/draft_r2/placement.yaml::D5": "336d59a8a0dc39ec",
@@ -324,7 +324,7 @@
   "R-DOCK-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-16: dock wire picked (32/36 AWG enamelled, Elektrisola data), fill check; docs only",
+   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
    "stamp": {
     "sym:hw/mech/dims_r2.py::BAY": "d933f8dc8c3634dd",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9",
