@@ -56,7 +56,7 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
   rel: R-AUDIO-BODY
 - to: sub-ui
   crosses: "SW1 pocket 4.3 x 3.1 + D2.6 bore + puck + skin over board (18.5, 6.0) = pod 49.05"
-  invariant: "selective fit puck top -> skin 0.005..0.135 (PASS); fixed puck worst -0.185 pre-presses (FAIL, why the kit exists); interfaces.py switch WARN: lateral stack 0.20 vs 0.15 limit"
+  invariant: "selective fit puck top -> skin 0.005..0.135 (PASS); fixed puck worst -0.198 pre-presses (FAIL, why the kit exists); interfaces.py switch WARN: lateral stack 0.20 vs 0.15 limit"
   rel: R-UI-BODY
 - to: sub-dock-usb
   crosses: "DOCK box + window in the tub belly, BAY; 5 dock wires target -> J3/J4/J10/J11/J12 (B, board x 25-29)"
@@ -103,7 +103,7 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
 - {q: pod mass lower bound, v: ">= ~9.5 g before parts, dock target, adapter, wires: shell 2.58 + cell ~4.2 + pad 2.19 + bare board 0.53 (30 x 12 x 0.8 at 1.85 g/cm3); target ~8 g", src: "derived; pad checks.json; sub-power"}
 - {q: clearances, v: "board: front 0.25 (x-stop), long edges 0.45, rear 6.15 (stowage); cell: inner 0.3 (tape), top 0.1, bottom 0.8 (dock tails), rear 1.1; B gap 1.4 (margin 0.32 over U2 1.08); F gap 0.30 (VHB 0.25 + 0.05)", src: "checks.json board_in_cavity/B_gap/F_gap; dims_r2 CAV/CELL"}
 - {q: duct offset, v: "nominal 0.000; gauge pin worst 0.115 PASS (limit 0.20 = (1.0-0.6)/2); walls-only 0.86 FAIL", src: "dims_r2.duct_offsets(); checks.json duct"}
-- {q: switch stack, v: "puck 0.83 nominal, kit 0.73-0.93; selective fit 0.005..0.135 PASS; fixed worst -0.185..0.275 (pre-press); pocket ceiling clear 0.25 nom / 0.095 worst", src: "dims_r2.switch_stack(); checks.json SW1_pocket"}
+- {q: switch stack, v: "puck 0.83 nominal, kit 0.73-0.93; selective fit 0.005..0.135 PASS; fixed worst -0.198..0.287 (pre-press); pocket ceiling clear 0.25 nom / 0.082 worst", src: "dims_r2.switch_stack(); checks.json SW1_pocket"}
 - {q: stowage, v: "277.3 mm3 (198.3 behind board + 78.9 behind cell), zone 6.15 long, need 107-142", src: "checks.json stowage"}
 - {q: interference, v: "tub/lid x {pcb, parts_B, u2_mic, sw1, cell, vhb, dock}, tub/lid, parts_B/cell, puck/lid, puck/sw1: all 0 mm3; drop-in corridors (cell, lid+board) 0", src: "checks.json 2026-10-07"}
 - {q: lid thickness at duct/puck, v: "0.8 + 0.7 plate = 1.5", src: dims_r2 LID_T, PLATE_T}
@@ -139,7 +139,7 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
 15. **SWD after the lid bond needs a peel:** TP1-TP6 face the lid (checks.json F_face_pads reachable_assembled false). Field recovery = ROM DFU via the dock (sub-debug-test). Closes: owner decision at review (accept, or TPs back on B).
 16. **Gauge pin** (D0.98/D0.50 stepped, turned) not sourced; alternative = 2 NPTH + 2 lid pins (board change). Closes: source/turn one; else ECR.
 17. **SW1 press loads the F VHB in tension** with no B back-stop (option A). Computed 2026-10-07 (`sim/checks/sw1_press_fem.py`, sub-ui issue 2): the load does not spread evenly (the old "2 N on 314 mm², >100× margin" was wrong); peak tension at the pocket edge is 12-52 kPa at 2 N = 1.6-7× under 3M's 85 kPa dynamic design factor (TDS 2024-09), 17-75× under the 900 kPa normal tensile; a 10 N jab reaches 59-261 kPa. Closes: coupon 600k presses + drop (MZD-7).
-18. **[A] tolerances unverified:** JLC outline ±0.2 and NPTH ±0.05, VHB thickness, resin ±0.05, KMT022 height; `docs/build/tolerances.md` has no Phase-2 rows. Closes: dated sources, then a tolerances.md Phase-2 section.
+18. **[A] tolerances unverified:** JLC outline ±0.2 and NPTH ±0.05, resin ±0.05, KMT022 height (VHB thickness now sourced: 4914 0.25 ±15 % = ±0.0375, 3M TDS 2024-09, in `switch_stack()` since 2026-10-07); `docs/build/tolerances.md` has no Phase-2 rows. Closes: dated sources, then a tolerances.md Phase-2 section.
 
 19. (closed 2026-10-07, 20bd842) R-ACO-P6 duct-seat keep-out: MDF_SDI re-routed; an F.Cu rule area r 1.6 now keeps every F track and via out (DRC-enforced); nearest 1.87 mm.
 

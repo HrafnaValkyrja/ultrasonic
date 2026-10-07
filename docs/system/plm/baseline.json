@@ -20,9 +20,9 @@
    }
   },
   "PHYSICAL": {
-   "by": "claude-ecr0001",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "ECR-0001 (72b0856): doc updated for frame.pod_facts / pod.py from dims, heel checks on the real cell",
+   "note": "VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change",
    "stamp": {
     "file:docs/build/tolerances.md": "13099f559e727c93",
     "file:hw/mech/frame.py": "c7981bfec8a45660",
@@ -70,10 +70,10 @@
   "REG-POD-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change",
+   "note": "VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change",
    "stamp": {
     "file:hw/mech/blade.py": "20e890c775848522",
-    "file:hw/mech/dims_r2.py": "2e56e5d5e9675ad1",
+    "file:hw/mech/dims_r2.py": "e5863607c701dddf",
     "file:hw/mech/shell_r2.py": "6ecadd65f1af5dbe",
     "file:hw/mech/styles.py": "23dcb6bfe495f82f"
    }
@@ -149,7 +149,7 @@
   "SUB-UI": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change",
+   "note": "VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change",
    "stamp": {
     "block:UI": "2e30cc3f141e491d",
     "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
@@ -587,13 +587,13 @@
   "R-UI-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change",
+   "note": "VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change",
    "stamp": {
     "ref:SW1": "6a5226a0b24dd9c5",
     "sym:hw/mech/dims_r2.py::POCKET": "75123b323bc1f0df",
     "sym:hw/mech/dims_r2.py::PUCK_L": "2835136689be5bb9",
     "sym:hw/mech/dims_r2.py::SW": "d595c80a5705b3f3",
-    "sym:hw/mech/dims_r2.py::switch_stack": "832a6b7691107725",
+    "sym:hw/mech/dims_r2.py::switch_stack": "cb03b6eb9a581066",
     "sym:hw/mech/shell_r2.py::puck": "a8cbd1c96fa6c01e",
     "yaml:hw/pod/draft_r2/placement.yaml::SW1": "bd42ba43c86e5ab1"
    }

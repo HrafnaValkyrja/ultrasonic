@@ -236,3 +236,13 @@
 - 2026-10-07 12:30 review REG-POD-BODY by backlog-agent: sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change
 - 2026-10-07 12:30 checkin SUB-UI by backlog-agent
 - 2026-10-07 12:30 checkin REG-POD-BODY by backlog-agent
+- 2026-10-07 12:31 checkout REG-POD-BODY by backlog-agent: VHB-TOL: VHB 4914 thickness tol +-15 % (TDS 2024-09) into dims_r2.switch_stack
+- 2026-10-07 12:31 checkout PHYSICAL by backlog-agent: VHB-TOL: VHB 4914 thickness tol +-15 % (TDS 2024-09) into dims_r2.switch_stack
+- 2026-10-07 12:31 checkout SUB-UI by backlog-agent: VHB-TOL: VHB 4914 thickness tol +-15 % (TDS 2024-09) into dims_r2.switch_stack
+- 2026-10-07 12:32 review R-UI-BODY by backlog-agent: VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change
+- 2026-10-07 12:32 review REG-POD-BODY by backlog-agent: VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change
+- 2026-10-07 12:32 review PHYSICAL by backlog-agent: VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change
+- 2026-10-07 12:32 review SUB-UI by backlog-agent: VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change
+- 2026-10-07 12:32 checkin REG-POD-BODY by backlog-agent
+- 2026-10-07 12:32 checkin PHYSICAL by backlog-agent
+- 2026-10-07 12:32 checkin SUB-UI by backlog-agent

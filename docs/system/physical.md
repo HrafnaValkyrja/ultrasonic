@@ -74,9 +74,9 @@ Total T 10.4 (Rev F 11.8; O27 thin first). The heel sits under the temple and ad
 | Board long edges ↔ cavity | 0.45 each | free (nothing clamps the edges) | checks.json side_gap_z |
 | Board rear edge ↔ rear wall | 6.15 | stowage zone | checks.json stowage zone_len_x |
 | B parts ↔ cell | 1.4 − 1.08 = 0.32 | OK | checks.json B_gap |
-| F face ↔ lid | 0.30 for VHB 0.25 | 0.05 slack (VHB tol ±0.025 [A]) | checks.json F_gap |
-| SW1 ↔ pocket ceiling | 0.25 nominal, 0.095 worst | OK | dims_r2.switch_stack |
-| Puck top ↔ skin underside | selective fit 0.005-0.135 (fixed puck worst −0.185 = pre-pressed) | OK with the kit | dims_r2.switch_stack |
+| F face ↔ lid | 0.30 for VHB 0.25 | 0.05 slack nominal, 0.0125 at the thickest tape (VHB 4914 ±15 % = ±0.0375, 3M TDS 2024-09) | checks.json F_gap |
+| SW1 ↔ pocket ceiling | 0.25 nominal, 0.082 worst | OK | dims_r2.switch_stack |
+| Puck top ↔ skin underside | selective fit 0.005-0.135 (fixed puck worst −0.198 = pre-pressed) | OK with the kit | dims_r2.switch_stack |
 | Duct axis ↔ board hole | 0.000 nominal; 0.115 worst with the gauge pin; 0.86 walls-only | PASS with pin (limit 0.20) | dims_r2.duct_offsets |
 | Cell ↔ tub | 0.3 tape side; 0.1 top; 0.8 bottom (dock tails); 1.1 rear; ~0.07 at the strut-relief fill | tight: dry-fit | dims_r2 CAV/CELL; tolerances L16 |
 | Dock target top ↔ cell bottom | 0.85 (z −8.95 → −8.1) for flat tails + wires | tight (issue 3) | dims_r2 DOCK, CELL |

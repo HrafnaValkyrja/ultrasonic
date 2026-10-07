@@ -133,8 +133,9 @@ def duct_offsets():
 
 
 def switch_stack():
-    """Puck top -> skin underside. Negative = switch pre-pressed. Tolerances [A] (C&K gives 0.65 nominal only)."""
-    t = dict(vhb=0.025, sw_h=0.05, solder_lift=(0.0, 0.05), puck_print=0.05, recess_floor=0.05, lid_face=0.03)
+    """Puck top -> skin underside. Negative = switch pre-pressed. Tolerances [A] (C&K gives 0.65 nominal only)
+    except vhb: 3M VHB 4914 TDS (rev 2024-09, SHA-256 prefix 2fc355523c5e5dff) thickness 0.25 mm +-15 % = +-0.0375."""
+    t = dict(vhb=round(0.15 * VHB_T, 4), sw_h=0.05, solder_lift=(0.0, 0.05), puck_print=0.05, recess_floor=0.05, lid_face=0.03)
     sym = t["vhb"] + t["sw_h"] + t["puck_print"] + t["recess_floor"] + t["lid_face"]
     g_min, g_max = PRE_GAP - sym - t["solder_lift"][1], PRE_GAP + sym
     rss = math.sqrt(t["vhb"] ** 2 + t["sw_h"] ** 2 + t["puck_print"] ** 2 + t["recess_floor"] ** 2 + t["lid_face"] ** 2 + 0.025 ** 2)
