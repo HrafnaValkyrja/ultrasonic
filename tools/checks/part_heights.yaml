@@ -1,6 +1,8 @@
 # Part facts from manufacturer datasheets: the maximum height of every part on the pod board, and where the mic's acoustic port is.
-# Read by tools/checks/interfaces.py [heights] [mic-port] [clamp-bands]: every part must stay inside the 1.2 mm height band of its
-# face (hw/mech/shell_r1.py PARTS: B face pod y 10.9-12.1, F face pod y 12.9-14.1). The band comes from the shell, not from this file.
+# Read by tools/checks/interfaces.py [heights] [mic-port] [clamp-bands]: every part must stay inside the height band of its face.
+# The band comes from the CURRENT design's shell (hw/current.yaml), not from this file: Phase 2 (hw/mech/dims_r2.py, 2026-10-07)
+# B 1.4 (board B face to cell), F 0.30 (VHB gap to the lid), SW1 0.90 in its lid pocket; revg (hw/mech/shell_r1.py PARTS) 1.2 / 1.2.
+# Rows cover both package sets (Rev G and MZ-2 'Balanced').
 #
 # max_mm  height above the board surface, MAXIMUM (nominal + the datasheet's upper tolerance), solder fillet not included.
 # Lookup order for a board footprint: its schematic LCSC number (by_lcsc) -> its footprint item name (by_footprint) -> unknown.

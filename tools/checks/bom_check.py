@@ -4,8 +4,10 @@
     source tools/env.sh        # optional: the script re-executes itself under the harness venv if skidl/pcbnew are missing
     python3 tools/checks/bom_check.py [--board PATH | --no-board] [--json] [-v] [--strict] [--no-selftest]
 
-Layout-agnostic and read-only: it reads whatever board exists (default: the newest hw/pod/*/pod_*_placed.kicad_pcb),
-the SKiDL circuit (hw/pod/system_map.py build(), which runs gen.build()), hw/pod/pod.net, hw/pod/bom_jlc.csv,
+Layout-agnostic and read-only. Default inputs = the current design in hw/current.yaml (tools/current.py, 2026-10-07; Phase 2:
+hw/pod/draft_r2/out/routed.kicad_pcb, hw/pod/pod_mz2.net, hw/pod/bom_jlc_mz2.csv, and gen.py built with POD_PACKAGES=mz2;
+env ULTRASONIC_DESIGN=revg checks the Rev G reference). It reads the board, the SKiDL circuit (hw/pod/system_map.py build(),
+which runs gen.build()), the design netlist and JLC BOM,
 docs/build/bom.py, .pcba-workflow/sourcing-lock.csv and the footprint libraries in hw/lib. It never edits them.
 One line per check, "PASS|WARN|FAIL <id> <message>" (200 characters at most); exit 1 if any FAIL, exit 2 if no board
 could be found (an explicit --board that does not exist, or none in hw/pod; --no-board opts out). -v adds detail lines
@@ -48,6 +50,7 @@ import csv
 import datetime as dt
 import functools
 import importlib.util
+import io
 import json
 import math
 import os
@@ -60,9 +63,13 @@ import traceback
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-BOARD_GLOB = "hw/pod/*/pod_*_placed.kicad_pcb"
-NETLIST = REPO / "hw/pod/pod.net"
-JLC_BOM = REPO / "hw/pod/bom_jlc.csv"
+try:                                    # the ONE design pointer (hw/current.yaml); yaml may be missing before the venv re-exec
+    sys.path.insert(0, str(REPO / "tools"))
+    from current import apply_env, current
+    DESIGN = apply_env(current())       # also sets POD_PACKAGES so gen.build() builds this design's package set
+    DEFAULT_BOARD, NETLIST, JLC_BOM, GENERATE = DESIGN.board, DESIGN.netlist, DESIGN.bom, DESIGN.generate
+except ImportError:
+    DESIGN, DEFAULT_BOARD, NETLIST, JLC_BOM, GENERATE = None, Path("/nonexistent"), Path("/nonexistent"), Path("/nonexistent"), "hw/pod/gen.py"
 COST_BOM = REPO / "docs/build/bom.py"
 COST_CSV = REPO / "docs/build/bom.csv"
 LOCK = REPO / ".pcba-workflow/sourcing-lock.csv"
@@ -106,7 +113,8 @@ KNOWN_FOOTPRINT = {
 }
 # Issues this checker found and the ECR that tracks each (None: none raised yet, the line says "no ECR yet").
 # Keys: values, cost-qty, lock-gaps, lock-unused, lock-note:<LCSC>, stock:<LCSC>. Set the ECR here once it exists.
-ISSUE_ECR = {"stock:C5271013": "ECR-0008", "stale-lcsc": "ECR-0012"}
+ISSUE_ECR = {"stock:C5271013": "ECR-0008", "stale-lcsc": "ECR-0012",
+             "cost-design": "ECR-0018"}     # docs/build/bom.py still prices the Rev G part where Phase 2 (MZ-2) swapped it
 
 # LCSC number -> (MPN, package, value): an offline second source for what each LCSC number is, so gen.py's own numbers are
 # checked against something that does not derive from gen.py. From the JLC parts API via tools/jlc.py, queried
@@ -332,7 +340,7 @@ def read_schematic():
     for p in circ.parts:
         fp = p.footprint or ""
         parts[p.ref] = dict(ref=p.ref, value=str(p.value), name=str(p.name), footprint=fp, lib=fp.rpartition(":")[0],
-                            fp_name=fp.rpartition(":")[2], lcsc=p.fields.get("LCSC", ""), dnp=p.fields.get("DNP_BOM", ""),
+                            fp_name=fp.rpartition(":")[2], lcsc=p.fields.get("LCSC", ""), dnp=p.fields.get("DNP_BOM", ""), mpn=p.fields.get("MPN", ""),
                             pins={str(pin.num): pin_net(pin) for pin in p.pins})
     _SCHEMATIC = parts
     return parts
@@ -513,8 +521,8 @@ def check_netlist(c):
     nets = net_diffs(sch_pin_nets(sch), pin_nets, "pod.net")
     if diffs or nets:
         return Result("netlist", FAIL, f"pod.net is stale vs gen.py ({len(diffs)} part, {len(nets)} pin-net differences; first: {(diffs + nets)[0]}): "
-                      "regenerate with python3 hw/pod/gen.py", diffs + nets)
-    return Result("netlist", PASS, f"pod.net == SKiDL for all {len(net)} parts (values, footprints, LCSC, DNP_BOM) and {len(pin_nets)} pin-net assignments")
+                      f"regenerate with {GENERATE}", diffs + nets)
+    return Result("netlist", PASS, f"{NETLIST.name} == SKiDL for all {len(net)} parts (values, footprints, LCSC, DNP_BOM) and {len(pin_nets)} pin-net assignments")
 
 
 def check_footprints(c):
@@ -769,8 +777,8 @@ def table_findings(sch, by_lcsc):
                 wrong.append(f"{ref}: gen.py value '{p['value']}', but {p['lcsc']} is {mpn} ({val})")
             elif pkg not in p["fp_name"]:
                 wrong.append(f"{ref}: gen.py footprint {p['fp_name']}, but {p['lcsc']} is {mpn} in {pkg}")
-        elif not any(mpn_match(mpn, x) for x in (p["name"], p["value"]) if x):
-            wrong.append(f"{ref}: gen.py names '{p['name']}' / '{p['value']}', but {p['lcsc']} is {mpn}")
+        elif not any(mpn_match(mpn, x) for x in (p["name"], p["value"], p.get("mpn")) if x):     # MPN field: generic symbols (mz2 Y1)
+            wrong.append(f"{ref}: gen.py names '{p['name']}' / '{p['value']}'" + (f" / MPN '{p['mpn']}'" if p.get("mpn") else "") + f", but {p['lcsc']} is {mpn}")
     for lcsc, row in sorted(by_lcsc.items()):
         t = LCSC_IDENTITY.get(lcsc)
         if t and not mpn_match(t[0], row.get("mpn", "")):
@@ -899,7 +907,7 @@ def check_jlc_bom(c):
             d.append(f"BOM refs != CPL refs: only in BOM {refs_str(set(in_csv) - cpl) or '-'}; only in CPL {refs_str(cpl - set(in_csv)) or '-'}")
     if d:
         return Result("jlc-bom", FAIL, f"{len(d)} disagreement(s): " + d[0] + (" ..." if len(d) > 1 else ""), d)
-    return Result("jlc-bom", WARN if degraded else PASS, f"bom_jlc.csv: {len(rows)} lines, {len(placed)} parts == schematic placed parts (value, footprint, LCSC); DNP/pads absent; {note}")
+    return Result("jlc-bom", WARN if degraded else PASS, f"{JLC_BOM.name}: {len(rows)} lines, {len(placed)} parts == schematic placed parts (value, footprint, LCSC); DNP/pads absent; {note}")
 
 
 @functools.cache
@@ -910,9 +918,23 @@ def load_cost_items(path):
     return mod.ITEMS
 
 
+def reference_lcsc():
+    """ref -> LCSC of the reference design's JLC BOM (hw/current.yaml `reference`), {} when the current design IS the reference."""
+    if DESIGN is None or DESIGN.is_reference:
+        return {}
+    ref_bom = current("reference").bom
+    out = {}
+    for row in read_csv(ref_bom) if ref_bom.exists() else []:
+        for r in row["Designator"].replace('"', "").split(","):
+            out[r.strip()] = row["LCSC Part #"]
+    return out
+
+
 def check_cost_bom(c):
     sch = c.sch
     items = load_cost_items(COST_BOM)
+    ref_lcsc = reference_lcsc()
+    d_design = []                         # bom.py prices the reference (Rev G) part, the current design swapped it: WARN under ECR-0018
     fitted = {r: p for r, p in sch.items() if not p["dnp"]}
     named, d_fail, d_warn, generic = set(), [], [], []
     for _blk, part, ref, src, qty, _unit, status, _note in items:
@@ -928,7 +950,8 @@ def check_cost_bom(c):
         named.update(refs)
         for r in refs:
             if lcsc and sch[r]["lcsc"] and sch[r]["lcsc"] != lcsc:
-                d_fail.append(f"bom.py '{part}' ({ref}) says {lcsc}, the schematic has {sch[r]['lcsc']} on {r}")
+                line = f"bom.py '{part}' ({ref}) says {lcsc}, the schematic has {sch[r]['lcsc']} on {r}"
+                (d_design if ref_lcsc.get(r) == lcsc else d_fail).append(line + (" (bom.py = the reference design's part)" if ref_lcsc.get(r) == lcsc else ""))
         want = sum(1 for r in refs if r in fitted and sch[r]["lcsc"])
         if lcsc and want != qty:
             d_warn.append(f"bom.py '{part}' ({ref}) qty {qty}, the schematic fits {want}")
@@ -944,7 +967,11 @@ def check_cost_bom(c):
         if csv_rows != [(i[1], i[2], i[3], str(i[4])) for i in items]:
             d_warn.append("docs/build/bom.csv is stale vs bom.py ITEMS: run python3 docs/build/bom.py")
     if d_fail:
-        return Result("cost-bom", FAIL, f"{len(d_fail)} LCSC number(s) in docs/build/bom.py disagree with the schematic: " + d_fail[0], d_fail + d_warn)
+        return Result("cost-bom", FAIL, f"{len(d_fail)} LCSC number(s) in docs/build/bom.py disagree with the schematic: " + d_fail[0], d_fail + d_design + d_warn)
+    if d_design:
+        status, tag = issue("cost-design")
+        return Result("cost-bom", status, f"{len(d_design)} cost line(s) still price the {current('reference').id} part, {DESIGN.id} swapped it ({tag}): re-price docs/build/bom.py; "
+                      + d_design[0], d_design + d_warn)
     if d_warn:
         status, tag = issue("cost-qty")
         return Result("cost-bom", status, f"LCSC numbers agree, but {len(d_warn)} quantity/coverage mismatch(es) ({tag}): " + d_warn[0], d_warn)
@@ -1170,6 +1197,9 @@ def selftest_cases():
     """(what is broken, [(check, statuses it may give)], how to break it): the failures a past review missed, plus the false alarms to avoid."""
     F, P, W, OK = {FAIL}, {PASS}, {WARN}, {PASS, WARN}
     sch_set = lambda ref, **kv: lambda w: w.sch[ref].update(kv)                       # noqa: E731
+    sch0 = read_schematic()                     # the design under test (hw/current.yaml): its own LCSC numbers, not Rev G literals
+    r3_lcsc, c2_lcsc = sch0["R3"]["lcsc"], sch0["C2"]["lcsc"]
+    other_lcsc = "C25744" if r3_lcsc != "C25744" else "C25741"                       # a real resistor LCSC that is not R3's
     # Rev F: Q1/Q2 moved to the clean pod:Nexperia footprint, so the pre-cleanup copy is exercised on SW1 (lcsc footprint)
     stale_q1 = lambda w: w.set_field("SW1", "LCSC Part", "C221708")                  # noqa: E731
 
@@ -1203,7 +1233,7 @@ def selftest_cases():
             p.SetLayerSet(ls)
 
     def swapped(w):
-        a, b = w.pads("R3")
+        a, b = [p for p in w.pads("R3") if p.GetNumber()]       # KiCad 0201 footprints add unnumbered paste-aperture pads
         a.SetNumber("2")
         b.SetNumber("1")
 
@@ -1216,7 +1246,22 @@ def selftest_cases():
         p.SetPosition(w.pcbnew.VECTOR2I(p.GetPosition().x + 500000, p.GetPosition().y))
 
     def net_moved(w):
-        w.pads("R3")[1].SetNet(w.board.FindNet("GND") if w.pads("R3")[1].GetNetname() != "GND" else w.board.FindNet("+3V0"))
+        p2 = next(p for p in w.pads("R3") if p.GetNumber() == "2")
+        p2.SetNet(w.board.FindNet("GND") if p2.GetNetname() != "GND" else w.board.FindNet("+3V0"))
+
+    def split_group(t):
+        """the first BOM row with >= 4 designators split over two rows (same part): must still PASS"""
+        lines = t.splitlines(keepends=True)
+        for i, line in enumerate(lines[1:], 1):
+            row = next(csv.reader([line]))
+            refs = row[1].split(",")
+            if len(refs) >= 4:
+                a, b = refs[:len(refs) // 2], refs[len(refs) // 2:]
+                buf = io.StringIO()
+                csv.writer(buf).writerows([[row[0], ",".join(a), row[2], row[3], str(len(a)), *row[5:]], [row[0], ",".join(b), row[2], row[3], str(len(b)), *row[5:]]])
+                out = buf.getvalue()
+                return "".join(lines[:i]) + out + "".join(lines[i + 1:])
+        raise LookupError("no BOM row with >= 4 designators")
 
     def flags(**kv):
         return lambda w: [getattr(w.fp("R3"), f"Set{k}")(v) for k, v in kv.items()]
@@ -1308,21 +1353,21 @@ def selftest_cases():
         ("1M resistors given the 10k LCSC everywhere", [("identity", F, "R8: gen.py value '1M'")], lambda w: [w.sch[r].update(lcsc="C25744") for r in ("R8", "R9")]),
         ("every 100n capacitor given the 10u 0603 LCSC", [("identity", F, "gen.py value '100n'")], lambda w: [p.update(lcsc="C19702") for p in w.sch.values() if p["value"] == "100n"]),
         ("a part with an LCSC the table does not know", [("identity", W, "no row in LCSC_IDENTITY")], sch_set("R3", lcsc="C99999")),
-        ("a placed part with no LCSC", [("jlc-bom", F, "C2 is placed but has no LCSC")], lambda w: (w.sch["C2"].update(lcsc=""), w.edit("JLC_BOM", lambda t: t.replace(",C1525,", ",,", 1)))),
+        ("a placed part with no LCSC", [("jlc-bom", F, "C2 is placed but has no LCSC")], lambda w: (w.sch["C2"].update(lcsc=""), w.edit("JLC_BOM", lambda t: t.replace(f",{c2_lcsc},", ",,", 1)))),
         ("an unknown DNP_BOM kind", [("jlc-bom", F, "DNP_BOM='maybe'")], sch_set("R3", dnp="maybe")),
         ("BOM csv with a byte-order mark", [("jlc-bom", P)], csv_edit(lambda t: "\ufeff" + t)),
         ("BOM csv designators with spaces", [("jlc-bom", P)], csv_edit(lambda t: t.replace('"C1,C10,C13', '"C1, C10, C13', 1))),
-        ("BOM csv group split over two rows", [("jlc-bom", P)], csv_edit(lambda t: t.replace('"C1,C10,C13,C19,C2,C3,C6",C_0402_1005Metric,C1525,7,yes', '"C1,C10,C13,C19",C_0402_1005Metric,C1525,4,yes\n100n,"C2,C3,C6",C_0402_1005Metric,C1525,3,yes', 1))),
-        ("BOM csv with a wrong LCSC", [("jlc-bom", F, "R3: BOM LCSC Part #")], csv_edit(lambda t: t.replace(",C25741,", ",C25744,", 1))),
+        ("BOM csv group split over two rows", [("jlc-bom", P)], csv_edit(split_group)),
+        ("BOM csv with a wrong LCSC", [("jlc-bom", F, "R3: BOM LCSC Part #")], csv_edit(lambda t: t.replace(f",{r3_lcsc},", f",{other_lcsc},", 1))),
         ("BOM csv with a renamed header", [("jlc-bom", F, "lacks column")], csv_edit(lambda t: t.replace("LCSC Part #", "LCSC", 1))),
         ("sourcing lock deleted", [("stock-lock", F, "missing or empty"), ("lock-drift", W, "no sourcing lock")], lambda w: w.paths["LOCK"].unlink()),
-        ("a lock row with an empty queried_utc", [("stock-lock", W, "unreadable")], lock_rows(lock_row("C25741", queried_utc=""))),
-        ("a lock row with stock 0", [("stock-lock", F, "stock 0")], lock_rows(lock_row("C25741", stock="0"))),
-        ("a lock row with stock n/a", [("stock-lock", W, "not a number")], lock_rows(lock_row("C25741", stock="n/a"))),
-        ("a lock row with status 'rejected'", [("stock-lock", F, "REJECTED")], lock_rows(lock_row("C25741", status="rejected"))),
+        ("a lock row with an empty queried_utc", [("stock-lock", W, "unreadable")], lock_rows(lock_row(r3_lcsc, queried_utc=""))),
+        ("a lock row with stock 0", [("stock-lock", F, "stock 0")], lock_rows(lock_row(r3_lcsc, stock="0"))),
+        ("a lock row with stock n/a", [("stock-lock", W, "not a number")], lock_rows(lock_row(r3_lcsc, stock="n/a"))),
+        ("a lock row with status 'rejected'", [("stock-lock", F, "REJECTED")], lock_rows(lock_row(r3_lcsc, status="rejected"))),
         ("an older REJECTED row before a newer RECOMMENDED one", [("stock-lock", W, "different statuses")], lock_rows(two_rows(True))),
         ("an older REJECTED row after a newer RECOMMENDED one", [("stock-lock", W, "different statuses")], lock_rows(two_rows(False))),
-        ("a lock MPN swapped", [("identity", F, "lock row C25741")], lock_rows(lock_row("C25741", mpn="0402WGF2202TCE"))),
+        ("a lock MPN swapped", [("identity", F, f"lock row {r3_lcsc}")], lock_rows(lock_row(r3_lcsc, mpn="0402WGF2202TCE"))),
         ("a library footprint with a 'Vendor PN' property", [("identity", F, "Vendor PN")], lambda w: w.edit_lib("L0806", lambda t: t.replace("(layer F.Cu)", '(layer F.Cu)\n  (property "Vendor PN" "C337891")', 1))),
         ("a library footprint with an LCSC number in its description", [("identity", F, "(text)")], lambda w: w.edit_lib("L0806", lambda t: t.replace("(layer F.Cu)", '(layer F.Cu)\n  (descr "LCSC C337891")', 1))),
         ("a library footprint with a JLC offset property", [("identity", OK)], lambda w: w.edit_lib("L0806", lambda t: t.replace("(layer F.Cu)", '(layer F.Cu)\n  (property "JLCPCB Rotation Offset" "90")', 1))),
@@ -1339,10 +1384,10 @@ def _text(w, content):
 
 def driver_cases():
     """(what is broken, whether the driver reacted correctly): board lookup and crash containment."""
-    with patched(BOARD_GLOB="no/such/dir/*.kicad_pcb"):
+    with patched(DEFAULT_BOARD=Path("no/such/dir/board.kicad_pcb")):
         none_found = resolve_board(None, False)
     crashed = safe("x", lambda c: 1 / 0, None)
-    return [("no placed board anywhere in hw/pod", none_found[0] is None and "no placed board" in (none_found[1] or "")),
+    return [("the hw/current.yaml board is missing", none_found[0] is None and "no board at" in (none_found[1] or "")),
             ("an explicit --board that does not exist", resolve_board(Path("/no/such.kicad_pcb"), False)[1] is not None),
             ("--no-board", resolve_board(None, True) == (None, None)),
             ("a check that raises", crashed.status == FAIL and "check crashed" in crashed.msg)]
@@ -1405,13 +1450,13 @@ def run_checks(c, only=None):
 
 
 def resolve_board(arg, no_board):
-    """(path, error): an explicit --board must exist; otherwise the newest placed board under hw/pod."""
+    """(path, error): an explicit --board must exist; otherwise the current design's board (hw/current.yaml)."""
     if no_board:
         return None, None
     if arg:
         return (arg, None) if arg.is_file() else (None, f"no such board file: {arg}")
-    found = sorted(REPO.glob(BOARD_GLOB), key=lambda p: p.stat().st_mtime)
-    return (found[-1], None) if found else (None, f"no placed board found ({BOARD_GLOB}); pass --board PATH, or --no-board to skip the board checks")
+    return (DEFAULT_BOARD, None) if DEFAULT_BOARD.is_file() else \
+        (None, f"no board at {DEFAULT_BOARD} (hw/current.yaml {getattr(DESIGN, 'id', '?')}); pass --board PATH, or --no-board to skip the board checks")
 
 
 def run(board_path, board_err, do_selftest=True):
@@ -1432,7 +1477,7 @@ def run(board_path, board_err, do_selftest=True):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--board", type=Path, help="placed or routed .kicad_pcb to check (default: the newest hw/pod/*/pod_*_placed.kicad_pcb)")
+    ap.add_argument("--board", type=Path, help="placed or routed .kicad_pcb to check (default: hw/current.yaml board)")
     ap.add_argument("--no-board", action="store_true", help="skip the board checks (a WARN says so)")
     ap.add_argument("--json", action="store_true", help="machine-readable results")
     ap.add_argument("-v", "--verbose", action="store_true", help="print detail lines under each non-PASS result")
@@ -1448,8 +1493,9 @@ def main(argv=None):
                 r.status, r.msg = FAIL, r.msg + " [--strict]"
     if args.json:
         counts = {s: sum(r.status == s for r in results) for s in (PASS, WARN, FAIL)}
-        print(json.dumps({"date": TODAY.isoformat(), "board": str(path) if path else None, "counts": counts, "checks": [r.as_dict() for r in results]}, indent=2))
+        print(json.dumps({"date": TODAY.isoformat(), "design": getattr(DESIGN, "id", None), "board": str(path) if path else None, "netlist": str(NETLIST), "bom": str(JLC_BOM), "counts": counts, "checks": [r.as_dict() for r in results]}, indent=2))
     else:
+        print(f"INFO design {getattr(DESIGN, 'id', '?')}: board {rel(path) if path else 'none'}, netlist {rel(NETLIST)}, bom {rel(JLC_BOM)}")
         for r in results:
             print(f"{r.status} {r.id} {r.msg}")
             if args.verbose and r.status != PASS:

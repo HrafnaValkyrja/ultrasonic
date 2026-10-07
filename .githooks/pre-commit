@@ -9,6 +9,7 @@ source tools/env.sh >/dev/null 2>&1 || { echo "pre-commit: tools/env.sh failed, 
 fence=(systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0)
 command -v systemd-run >/dev/null 2>&1 || fence=()
 rc_all=0
+python3 tools/current.py 2>/dev/null | head -1 | sed 's/^/pre-commit: checks run on /'   # hw/current.yaml (ULTRASONIC_DESIGN overrides)
 for c in ${PRECOMMIT_CHECKS:-interfaces bom_check vcrm}; do
   out=$("${fence[@]}" python3 "tools/checks/$c.py" 2>&1); rc=$?
   if [ "$rc" -ne 0 ]; then

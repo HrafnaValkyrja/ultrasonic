@@ -6,9 +6,11 @@
                                        [--baseline FILE | --write-baseline FILE]
     (--contract --budget --heights --netlist --ecr-dir --mech-dir override one input each; --root re-bases all of them)
 
-Layout-agnostic and read-only. It reads whatever board exists (default hw/pod/draft_r1/pod_r1_placed.kicad_pcb, through
-pcbnew), the SKiDL circuit (hw/pod/system_map.py build(), which runs gen.build()), hw/pod/pod.net, the mechanical constants in
-hw/mech/shell_r1.py, frame.py and pod.py (parsed with ast, never imported: importing them pulls in the CAD kernel), ST's open
+Layout-agnostic and read-only. Default inputs = the current design in hw/current.yaml (tools/current.py, 2026-10-07): Phase 2 =
+hw/pod/draft_r2/out/routed.kicad_pcb, hw/pod/pod_mz2.net, the SKiDL circuit built with POD_PACKAGES=mz2 (hw/pod/system_map.py
+build(): gen.build() + gen.apply_packages()), and the shell facts from hw/mech/dims_r2.py (CAD-free constants of shell_r2.py,
+imported). env ULTRASONIC_DESIGN=revg checks the Rev G/F reference: hw/pod/draft_r1/pod_r1_routed.kicad_pcb, hw/pod/pod.net and
+hw/mech/shell_r1.py (parsed with ast, never imported: importing it pulls in the CAD kernel). Always read: frame.py, pod.py (ast), ST's open
 pin data (tools/data/stm32_open_pin_data) and three tables kept next to the thing they describe. It never edits any of them and
 moves nothing on the board. One line per check, "PASS|WARN|FAIL <id> <message>"; exit 1 if any FAIL (2 if the tool environment
 is missing: run `source tools/env.sh`). -v adds detail lines under each non-PASS result, -vv under every result, --json prints
@@ -26,9 +28,12 @@ Checks
   switch       SW1's actuator centre is within the plunger-bore clearance of the plunger axis, with the same stack; SW1 on F
   outline      board outline == the shell's PCB x/z extents (-0.05 / +0.00), >= 0.3 mm to the cavity, board thickness
   inside       every part (courtyard and pads; J and TP pads by their copper) lies inside the board outline
-  clamp-bands  no part (courtyard or pad, either face; J wire pads with their solder) within 0.6 mm of the long edges the
-               lid ribs press; only TP probe pads are exempt
-  heights      every part's maximum height fits the 1.2 mm band of its face (tools/checks/part_heights.yaml, from datasheets)
+  clamp-bands  revg: no part (courtyard or pad, either face; J wire pads with their solder) within 0.6 mm of the long edges the
+               lid ribs press; only TP probe pads are exempt. Phase 2 (no ribs: the board hangs from the lid on full-face VHB): every
+               F-face part sits in a VHB cut-out (SW1 in the lid pocket, TP pads in the test-pad cut-out); WARN when the cut-outs
+               leave less than VHB_MIN_BOND of the VHB outline bonded (ASSUMED threshold)
+  heights      every part's maximum height fits the band of its face (tools/checks/part_heights.yaml, from datasheets): revg 1.2 / 1.2;
+               Phase 2 B 1.4 (gap to the cell), F 0.30 (VHB gap), SW1 0.90 in the lid pocket
   board-nets   the board's pad-to-net wiring == the circuit's, for every pad of every part; same parts on both sides
   pins         every functional net on U1 sits on a pin that provides its signal (docs/system/pin-contract.yaml vs ST's data);
                the netlist's pin numbers match the package; hw/pod/pod.net (what the placer reads) matches the SKiDL circuit;
@@ -37,11 +42,12 @@ Checks
   rails        declared rail loads vs ratings (docs/system/rail-budget.yaml), resistive loads computed from the schematic's
                values; D11 (one switching regulator, the MCU's) enforced on the whole circuit; open overloads WARN, cite
                their ECR and stay under the waiver's ceiling
-  frame        the mechanical constant files (frame.py, pod.py) vs the live shell_r1.py on the shared facts (ECR-0001)
+  frame        the mechanical constant files (frame.py, pod.py) vs the live shell (dims_r2.py | shell_r1.py) on the shared facts (ECR-0001)
   selftest     each rule above must fire on a deliberately broken copy (and stay quiet on a harmless one: a board dragged to
                another KiCad origin, rails listed in another order, a loosely formatted ECR status)
 
-Board <-> pod frame (checked 2026-10-02 against hw/mech/shell_r1.py and docs/system/physical.md "Coordinate frame")
+Board <-> pod frame (checked 2026-10-02 against hw/mech/shell_r1.py and docs/system/physical.md "Coordinate frame"; Phase 2 uses
+the same two mappings: dims_r2.bpt is pod z = PCB z0 + board y, its mirror pod z = PCB z1 - board y)
   The board file may sit anywhere in KiCad's sheet: every board coordinate is measured from the outline's min corner (the
   corner's file position is shown in the outline details), so a select-all drag or a new origin changes nothing.
   x     pod x = PCB["x0"] + board x. Board x 0 is the front (mic) edge, on both pods. The outline is (0, 0)-(34, 13).
@@ -108,12 +114,21 @@ DOC_ISSUES = {
     "stackup": {"doc": "reg-board.md issue 2", "ecr": None, "max_mm": 1.6},
     "locating": {"doc": "reg-pod-body.md issue 2", "ecr": None},
 }
+VHB_MIN_BOND = 0.5              # Phase 2: fraction of the VHB outline that must stay bonded after the cut-outs (ASSUMED, no source)
+
+sys.path.insert(0, str(REPO / "tools"))
+try:                                                                # the ONE design pointer (hw/current.yaml)
+    from current import apply_env, current
+    DESIGN = apply_env(current())                                   # POD_PACKAGES for gen.py (system_map.build applies it)
+except ImportError:                                                 # yaml missing before the venv re-exec (ensure_env)
+    DESIGN = None
 
 
 # ------------------------------------------------------------------------------------------- configuration
 class Config:
     """Where every input lives. Defaults sit under `root`; each can be overridden (CLI: --root, --board, --contract, ...)."""
-    DEFAULTS = dict(board="hw/pod/draft_r1/pod_r1_placed.kicad_pcb", netlist="hw/pod/pod.net", mech="hw/mech",
+    DEFAULTS = dict(board=DESIGN.rel["board"] if DESIGN else "hw/current.yaml", netlist=DESIGN.rel["netlist"] if DESIGN else "hw/current.yaml",
+                    shell=DESIGN.rel["shell_dims"] if DESIGN else "hw/current.yaml", mech="hw/mech",
                     heights="tools/checks/part_heights.yaml", contract="docs/system/pin-contract.yaml",
                     budget="docs/system/rail-budget.yaml", ecr_dir="docs/system/plm/ecr")
 
@@ -300,8 +315,34 @@ def cylinder_diameters(tree, env, func, anchor):
 
 
 def read_shell():
-    """The shell_r1.py facts the board interfaces rest on. Raises ValueError so a refactor of the shell fails loudly."""
-    env, tree, src = module_constants(CFG.mech / "shell_r1.py")
+    """The shell facts the board interfaces rest on: a CAD-free dims module (Phase 2, hw/mech/dims_r2.py: interface_facts()) or
+    shell_r1.py by ast (revg). Raises ValueError so a refactor of the shell fails loudly."""
+    if CFG.shell.name != "shell_r1.py":
+        return read_dims(CFG.shell)
+    return read_shell_r1(CFG.shell)
+
+
+def read_dims(path):
+    """Phase 2: import the dims module by path (numpy only) and take its interface_facts()."""
+    spec = importlib.util.spec_from_file_location(Path(path).stem, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    if not hasattr(mod, "interface_facts"):
+        raise ValueError(f"{Path(path).name}: no interface_facts()")
+    sh = mod.interface_facts()
+    missing = [n for n in ("PCB", "CAV", "MIC", "SWITCH", "ZC", "mic_port_d", "switch_bore_d", "plunger_head_d", "bands", "pocket", "vhb") if n not in sh]
+    if missing:
+        raise ValueError(f"{Path(path).name}: interface_facts() lacks {', '.join(missing)}")
+    do = mod.duct_offsets()
+    sh.update(name=Path(path).name, design="phase2", env=dict(sh), clamp_band=None,
+              cavity_clearance=do["tolerances"]["outline_to_hole"], cavity_clearance_src=f"{Path(path).name}:duct_offsets outline_to_hole (walls never fight the gauge pin)",
+              locating=dict(method="stepped gauge pin through the reamed bore into the board hole while bonding", worst=do["worst_with_gauge_pin"],
+                            limit=do["limit_R_ACO_P5"], ok=bool(do["worst_with_gauge_pin_pass"]), src=f"{Path(path).name}:duct_offsets ([A] tolerances)"))
+    return sh
+
+
+def read_shell_r1(path):
+    env, tree, src = module_constants(path)
     missing = [n for n in ("PCB", "CAV", "PARTS", "MIC", "SWITCH", "ZC") if n not in env]
     if missing:
         raise ValueError(f"shell_r1.py: cannot read {', '.join(missing)}")
@@ -312,7 +353,7 @@ def read_shell():
         raise ValueError("shell_r1.py: cannot find the mic port, plunger bore or plunger head Cylinder() calls")
     band = re.search(r'PCB\["z1"\]\s*-\s*([0-9.]+)', src)
     sh = {k: env[k] for k in ("PCB", "CAV", "PARTS", "MIC", "SWITCH", "ZC")}
-    sh.update(env=env, mic_port_d=max(mic, key=lambda c: c[2])[1], switch_bore_d=max(bore, key=lambda c: c[2])[1],
+    sh.update(name=Path(path).name, design="revg", cavity_clearance=CAVITY_CLEARANCE, cavity_clearance_src="physical.md Clearances", env=env, mic_port_d=max(mic, key=lambda c: c[2])[1], switch_bore_d=max(bore, key=lambda c: c[2])[1],
               plunger_head_d=head[0][1], clamp_band=float(band[1]) if band else CLAMP_BAND)
     sh["bands"] = face_bands(sh)
     return sh
@@ -571,7 +612,13 @@ def fit_stack(nominal, limit):
 
 
 def locating_warning(sh):
-    """The WARN every nominal alignment result carries while nothing locates the board in the cavity (DOC_ISSUES['locating'])."""
+    """The WARN every nominal alignment result carries while nothing locates the board in the cavity (DOC_ISSUES['locating']).
+    Phase 2: the gauge pin locates board and VHB to the reamed bore; PASS while its worst residual fits the duct limit."""
+    if sh.get("locating"):
+        lo = sh["locating"]
+        if lo["ok"]:
+            return PASS, "", f"located by the {lo['method']}: worst {lo['worst']:.3f} mm <= {lo['limit']:.2f} ({lo['src']})"
+        return WARN, "gauge pin", f"gauge pin locating residual {lo['worst']:.3f} mm exceeds the duct limit {lo['limit']:.2f} ({lo['src']})"
     px, pz = free_play(sh)
     level, tag = known_issue("locating")
     return level, tag, f"nominal only: nothing locates the board in the cavity (free play {px:.1f} mm in x, {pz:.1f} in z), known open issue {tag}"
@@ -602,7 +649,7 @@ def check_mic(sh, brd, table, sch):
     bad, off = worst_offset(sh, hole.x, hole.y, lid)
     origin = math.hypot(hole.x - u2.x, hole.y - u2.y)
     d = [f"board hole D{hole.drill:.2f} at board ({hole.x:.3f}, {hole.y:.3f}); {MIC_REF} origin at ({u2.x:.3f}, {u2.y:.3f}), {origin:.2f} mm from the port",
-         f"lid port D{lid_d:.2f} at pod (x {lid[0]:.3f}, z {lid[1]:.3f}) = shell_r1 MIC; offset left pod {off['left']:.3f}, right pod {off['right']:.3f} mm"]
+         f"lid port D{lid_d:.2f} at pod (x {lid[0]:.3f}, z {lid[1]:.3f}) = {sh.get('name', 'shell')} MIC; offset left pod {off['left']:.3f}, right pod {off['right']:.3f} mm"]
     fails, warns, wids = [], [], []
     if u2.face != "B":
         fails.append(f"{MIC_REF} is on {u2.face}: the mic must be on B (bottom port through the board, cell side)")
@@ -639,6 +686,8 @@ def check_mic(sh, brd, table, sch):
     if level != PASS:
         warns.append(text)
         wids.append("mic-port:locating")
+    else:
+        d.append(text)
     x, z = pod_xz(sh, hole.x, hole.y)["left"]
     msg = (f"{MIC_REF} on B, port hole D{hole.drill:.1f} at pod ({x:.2f}, {z:.2f}) is {bad:.3f} mm from the lid port D{lid_d:.1f} (limit {tol:.2f}); "
            f"{short}{ap_txt}; the footprint origin is {origin:.2f} mm away, so the PORT is what is placed (ECR-0011)")
@@ -662,7 +711,7 @@ def check_switch(sh, brd):
     bad, off = worst_offset(sh, cx, cy, sh["SWITCH"])
     origin = math.hypot(cx - sw.x, cy - sw.y)
     d = [f"actuator centre (pad bbox centre) board ({cx:.3f}, {cy:.3f}); footprint origin ({sw.x:.3f}, {sw.y:.3f}), {origin:.3f} mm apart",
-         f"plunger axis pod (x {sh['SWITCH'][0]:.3f}, z {sh['SWITCH'][1]:.3f}) = shell_r1 SWITCH; offset left pod {off['left']:.3f}, right pod {off['right']:.3f} mm; "
+         f"plunger axis pod (x {sh['SWITCH'][0]:.3f}, z {sh['SWITCH'][1]:.3f}) = {sh.get('name', 'shell')} SWITCH; offset left pod {off['left']:.3f}, right pod {off['right']:.3f} mm; "
          f"limit {tol:.2f} = (bore D{sh['switch_bore_d']:.1f} - plunger head D{sh['plunger_head_d']:.1f}) / 2"]
     fails, warns, wids = [], [], []
     if sw.face != "F":
@@ -698,18 +747,19 @@ def check_outline(sh, brd):
     msgs = []
     for what, got, want in (("wide", w, exp_w), ("tall", h, exp_h)):
         if got > want + EPS:
-            msgs.append(f"outline is {got:.2f} mm {what}, {got - want:.2f} mm over the shell's PCB {want:.2f}: oversize has no tolerance, the 0.3 mm cavity clearance cannot absorb it")
+            msgs.append(f"outline is {got:.2f} mm {what}, {got - want:.2f} mm over the shell's PCB {want:.2f}: oversize has no tolerance, the {sh['cavity_clearance']} mm cavity clearance cannot absorb it")
         elif got < want - OUTLINE_UNDER - EPS:
-            msgs.append(f"outline is {got:.2f} mm {what}, shell_r1 PCB is {want:.2f} (undersize allowed {OUTLINE_UNDER} mm)")
+            msgs.append(f"outline is {got:.2f} mm {what}, {sh.get('name', 'shell')} PCB is {want:.2f} (undersize allowed {OUTLINE_UNDER} mm)")
     z_all = [z for by in (oy0, oy1) for _, z in pod_xz(sh, 0, by).values()]            # both pods, both long edges
     clear = {"front": pcb["x0"] + ox0 - cav["x0"], "rear": cav["x1"] - (pcb["x0"] + ox1), "top": cav["z1"] - max(z_all), "bottom": min(z_all) - cav["z0"]}
-    d = ["clearance to the cavity (pod, shell_r1 CAV): " + ", ".join(f"{k} {v:.2f}" for k, v in clear.items())
-         + f" mm (limit {CAVITY_CLEARANCE}; the rear is the arm-wire gap of physical.md Clearances)"]
+    lim = sh["cavity_clearance"]
+    d = [f"clearance to the cavity (pod, {sh.get('name', 'shell')} CAV): " + ", ".join(f"{k} {v:.2f}" for k, v in clear.items())
+         + f" mm (limit {lim}: {sh['cavity_clearance_src']}; the rear is the wire gap)"]
     if abs(brd.origin[0]) > EPS or abs(brd.origin[1]) > EPS:
         d.append(f"the outline's corner sits at ({brd.origin[0]:.2f}, {brd.origin[1]:.2f}) in the file; every check measures from it")
-    tight = [f"{k} {v:.2f}" for k, v in clear.items() if v < CAVITY_CLEARANCE - EPS]
+    tight = [f"{k} {v:.2f}" for k, v in clear.items() if v < lim - EPS]
     if tight:
-        msgs.append(f"board is closer than {CAVITY_CLEARANCE} mm to the cavity wall: {', '.join(tight)}")
+        msgs.append(f"board is closer than {lim} mm to the cavity wall: {', '.join(tight)}")
     want = pcb["y1"] - pcb["y0"]
     stack_i = DOC_ISSUES["stackup"]
     thick_bad = brd.thickness < want - 0.01 or brd.thickness > stack_i["max_mm"] + 0.01
@@ -720,7 +770,7 @@ def check_outline(sh, brd):
     base = f"outline {w:.2f} x {h:.2f} mm = shell PCB (-{OUTLINE_UNDER} / +0.00), min clearance to the cavity {min(clear.values()):.2f} mm"
     if abs(brd.thickness - want) > 0.01:
         level, tag = known_issue("stackup")
-        d.append(f"board file thickness {brd.thickness:.2f} mm, shell_r1 PCB y {pcb['y0']}-{pcb['y1']} = {want:.2f} mm")
+        d.append(f"board file thickness {brd.thickness:.2f} mm, {sh.get('name', 'shell')} PCB y {pcb['y0']}-{pcb['y1']} = {want:.2f} mm")
         return Result("outline", level, f"{base}; but the board file says {brd.thickness:.2f} mm thick and the shell and the mic port need {want:.2f} "
                       f"({brd.thickness / want:.1f}x): known open issue {tag}; set the stack-up before release", d, [f"outline:thickness {tag}"])
     return Result("outline", PASS, f"{base}, {brd.thickness:.2f} mm thick", d)
@@ -753,7 +803,74 @@ def check_inside(sh, brd, table):
 
 
 # ------------------------------------------------------------------------------------------- [clamp-bands]
+def vhb_cutouts(sh):
+    """Phase 2 VHB cut-outs in board mm (x0, y0, x1, y1, what), as dims_r2/shell_r2 vhb() cuts them: SW1 pocket, one box round
+    every bare F pad, and the duct hole (as its bounding square, for area only)."""
+    pcb, v, pk = sh["PCB"], sh["vhb"], sh["pocket"]
+    bx, by = pk["centre"][0] - pcb["x0"], pk["centre"][1] - pcb["z0"]
+    cuts = [(bx - pk["dx"] / 2, by - pk["dz"] / 2, bx + pk["dx"] / 2, by + pk["dz"] / 2, f"{pk['ref']} pocket")]
+    if v["f_pads"]:
+        r = v["tp_cut_r"]
+        xs, ys = [xy[0] for xy in v["f_pads"].values()], [xy[1] for xy in v["f_pads"].values()]
+        cuts.append((min(xs) - r, min(ys) - r, max(xs) + r, max(ys) + r, "test-pad cut-out (" + ",".join(sorted(v["f_pads"], key=nat)) + ")"))
+    mx, mz = sh["MIC"][0] - pcb["x0"], sh["MIC"][1] - pcb["z0"]
+    cuts.append((mx - v["duct_d"] / 2, mz - v["duct_d"] / 2, mx + v["duct_d"] / 2, mz + v["duct_d"] / 2, "duct hole"))
+    return cuts
+
+
+def bonded_fraction(sh, cuts, pitch=0.05):
+    """Fraction of the VHB outline (board inset by vhb.inset) left after the cut-outs, by a 0.05 mm raster (union of boxes)."""
+    pcb, ins = sh["PCB"], sh["vhb"]["inset"]
+    w, h = pcb["x1"] - pcb["x0"] - 2 * ins, pcb["z1"] - pcb["z0"] - 2 * ins
+    nx, ny = int(round(w / pitch)), int(round(h / pitch))
+    kept = 0
+    for i in range(nx):
+        x = ins + (i + 0.5) * pitch
+        col = [c for c in cuts if c[0] <= x <= c[2]]
+        for j in range(ny):
+            y = ins + (j + 0.5) * pitch
+            kept += not any(c[1] <= y <= c[3] for c in col)
+    return kept / (nx * ny)
+
+
+def check_vhb(sh, brd, table):
+    """Phase 2 replacement of the clamp bands: nothing presses the long edges; the board hangs on full-face VHB, so every F part
+    must sit in a VHB cut-out, and the cut-outs must leave enough tape bonded."""
+    if brd.outline is None:
+        return Result("clamp-bands", FAIL, "no Edge.Cuts outline to measure the VHB face from")
+    if not brd.fps:
+        return Result("clamp-bands", FAIL, "the board has no footprints")
+    cuts = vhb_cutouts(sh)
+    inside = lambda e, c: e[0] >= c[0] - EPS and e[1] >= c[1] - EPS and e[2] <= c[2] + EPS and e[3] <= c[3] + EPS  # noqa: E731
+    bad, ok_ = [], []
+    for f in sorted(brd.fps.values(), key=lambda f: nat(f.ref)):
+        if f.face != "F":
+            continue
+        e = extent(f, solder_margin(table))
+        allowed = cuts[:1] if f.ref == sh["pocket"]["ref"] else cuts[:-1]     # the switch body needs its pocket, pads any cut-out
+        hit = next((c for c in allowed if inside(e, c)), None)
+        if hit is None and f.ref == sh["pocket"]["ref"]:
+            bad.append((f.ref, f"{f.ref} (F) extent {e[0]:.2f},{e[1]:.2f} to {e[2]:.2f},{e[3]:.2f} is not inside its lid pocket {cuts[0][0]:.2f},{cuts[0][1]:.2f} to {cuts[0][2]:.2f},{cuts[0][3]:.2f}"))
+        elif hit is None:
+            bad.append((f.ref, f"{f.ref} (F) extent {e[0]:.2f},{e[1]:.2f} to {e[2]:.2f},{e[3]:.2f} lies under the VHB (no cut-out holds it)"))
+        else:
+            ok_.append(f"{f.ref} in the {hit[4]}")
+    frac = bonded_fraction(sh, cuts)
+    d = [b[1] for b in bad] + ok_ + [f"cut-out {c[4]}: board x {c[0]:.2f}-{c[2]:.2f}, y {c[1]:.2f}-{c[3]:.2f}" for c in cuts] + \
+        [f"VHB bonded after the cut-outs: {100 * frac:.0f} % of the {sh['vhb']['t']} mm tape outline (threshold {100 * VHB_MIN_BOND:.0f} %, ASSUMED)"]
+    nf = sum(f.face == "F" for f in brd.fps.values())
+    if bad:
+        return Result("clamp-bands", FAIL, f"{len(bad)} F-face part(s) under the full-face VHB, outside every cut-out: {refs_str([b[0] for b in bad])}", d)
+    head = f"Phase 2 (no clamp ribs; board on full-face VHB): all {nf} F-face parts sit in VHB cut-outs; {100 * frac:.0f} % of the VHB stays bonded"
+    if frac < VHB_MIN_BOND:
+        return Result("clamp-bands", WARN, head + f" (< {100 * VHB_MIN_BOND:.0f} % ASSUMED threshold: the one test-pad cut-out spans "
+                      f"{cuts[1][2] - cuts[1][0]:.1f} x {cuts[1][3] - cuts[1][1]:.1f} mm; cut per pad or regroup the TPs; no ECR yet)", d, ["clamp-bands:vhb-bond"])
+    return Result("clamp-bands", PASS, head, d)
+
+
 def check_clamp(sh, brd, table):
+    if sh.get("vhb"):
+        return check_vhb(sh, brd, table)
     band = sh["clamp_band"]
     if brd.outline is None:
         return Result("clamp-bands", FAIL, "no Edge.Cuts outline to measure the bands from")
@@ -795,21 +912,33 @@ def part_height(f, sch, table):
     return None, None
 
 
+def band_of(sh, f):
+    """Height band (mm) of a footprint: its face's band, or the lid pocket's when the part's footprint body lies inside the pocket
+    outline (Phase 2 SW1; position-based, so a switch moved out of its pocket meets the 0.30 mm F gap)."""
+    pk = sh.get("pocket")
+    if pk and f.face == "F" and f.courtyard:
+        c = vhb_cutouts(sh)[0]
+        e = f.courtyard
+        if e[0] >= c[0] - EPS and e[1] >= c[1] - EPS and e[2] <= c[2] + EPS and e[3] <= c[3] + EPS:
+            return pk["band"]
+    return sh["bands"][f.face]
+
+
 def check_heights(sh, brd, sch, table):
     if not brd.fps:
         return Result("heights", FAIL, "the board has no footprints")
-    bands = sh["bands"]
     tall, over, unknown = {}, [], []
     for f in brd.fps.values():
         h, src = part_height(f, sch, table)
         if h is None:
             unknown.append((f.ref, f"unknown height: {f.ref} ({f.name}, LCSC {sch.parts.get(f.ref, {}).get('lcsc') or 'none'})"))
             continue
-        if h > bands[f.face] + EPS:
-            over.append((f.ref, f"{f.ref} ({f.face}) is {h:.2f} mm tall, band {bands[f.face]:.2f} mm ({src})"))
-        if f.face not in tall or h > tall[f.face][1]:
-            tall[f.face] = (f.ref, h)
-    summ = "; ".join(f"{face} tallest {tall[face][0]} {tall[face][1]:.2f} mm (band {bands[face]:.2f}, margin {bands[face] - tall[face][1]:.2f})"
+        band = band_of(sh, f)
+        if h > band + EPS:
+            over.append((f.ref, f"{f.ref} ({f.face}) is {h:.2f} mm tall, band {band:.2f} mm ({src})"))
+        if f.face not in tall or band - h < tall[f.face][2]:
+            tall[f.face] = (f.ref, h, band - h, band)
+    summ = "; ".join(f"{face} tightest {tall[face][0]} {tall[face][1]:.2f} mm (band {tall[face][3]:.2f}, margin {tall[face][2]:.2f})"
                      for face in ("F", "B") if face in tall) or "no part with a known height"
     d = [o[1] for o in over] + [u[1] for u in unknown]
     if over:
@@ -1337,11 +1466,11 @@ def check_frame(sh):
         flat = lambda v: v if isinstance(v, tuple) else (v,)
         diff = [f"{n} {rnd(v)}" for n, v in others if any(abs(x - y) > 0.01 for x, y in zip(flat(a), flat(v)))]
         if diff:
-            rows.append(f"{what}: shell_r1.py {rnd(a)}; " + "; ".join(diff))
+            rows.append(f"{what}: {sh.get('name', 'shell')} {rnd(a)}; " + "; ".join(diff))
     if not rows:
-        return Result("frame", PASS, f"frame.py and pod.py agree with shell_r1.py on all {len(FRAME_FACTS)} shared facts")
+        return Result("frame", PASS, f"frame.py and pod.py agree with {sh.get('name', 'the shell')} on all {len(FRAME_FACTS)} shared facts")
     level, tag = known("ECR-0001")
-    return Result("frame", level, f"frame.py / pod.py disagree with shell_r1.py on {len(rows)} of {len(FRAME_FACTS)} shared facts "
+    return Result("frame", level, f"frame.py / pod.py disagree with {sh.get('name', 'the shell')} on {len(rows)} of {len(FRAME_FACTS)} shared facts "
                   f"(pod centre z, board size, mic and button position, ...): known open issue {tag}; heel.py's clearance checks read frame.PCB and CELL, "
                   "and blade.py's rail and adapter read pod.POD_ZC (ECR-0001 names frame.py only)", rows, [f"frame:{tag}"] if level == WARN else [])
 
@@ -1503,10 +1632,21 @@ def selftest_cases(ctx):
         return Case("mic-port: the hole 0.12 mm off the datasheet port (still inside the lid port)", run, FAIL, "datasheet port")
 
     def mic_locating():
+        if sh.get("locating"):                                     # Phase 2: the gauge pin locates; a pin residual over the limit must warn
+            bad = {**sh, "locating": {**sh["locating"], "worst": sh["locating"]["limit"] + 0.05, "ok": False}}
+            return Case("mic-port: gauge-pin locating residual 0.05 mm over the duct limit", lambda: check_mic(bad, brd, table, sch), WARN, "gauge pin")
         return Case("mic-port: a perfectly placed mic still warns while nothing locates the board in the cavity", lambda: check_mic(sh, brd, table, sch), WARN, "nothing locates the board")
+
+    def mic_located():
+        if not sh.get("locating"):
+            raise LookupError("revg: nothing locates the board")
+        return Case("mic-port: a perfectly placed mic on a gauge-pin-located board passes", lambda: check_mic(sh, brd, table, sch), PASS)
 
     def switch_locating():
         brd.fps[SWITCH_REF]
+        if sh.get("locating"):
+            bad = {**sh, "locating": {**sh["locating"], "worst": sh["locating"]["limit"] + 0.05, "ok": False}}
+            return Case("switch: the same gauge-pin warning", lambda: check_switch(bad, brd), WARN, "gauge pin")
         return Case("switch: the same locating warning", lambda: check_switch(sh, brd), WARN, "nothing locates the board")
 
     def switch_off():
@@ -1566,11 +1706,33 @@ def selftest_cases(ctx):
         dx = (ox1 + 1.5) - extent(f)[2]
         return Case(f"inside: {f.ref} hanging 1.5 mm past the rear edge", lambda: check_inside(sh, moved(brd, f.ref, dx=dx), table), FAIL, "past the rear edge")
 
+    def vhb_flip():
+        if not sh.get("vhb"):
+            raise LookupError("revg: clamp ribs, no VHB face")
+        v = next(f for r, f in sorted(brd.fps.items(), key=lambda kv: nat(kv[0])) if f.face == "B" and not f.copper_only and f.courtyard)
+        return Case(f"clamp-bands: {v.ref} turned onto the F face, under the VHB", lambda: check_clamp(sh, dataclasses.replace(brd, fps={**brd.fps, v.ref: dataclasses.replace(v, face="F")}), table),
+                    FAIL, "under the vhb")
+
+    def vhb_pocket():
+        if not sh.get("vhb"):
+            raise LookupError("revg: no SW1 pocket")
+        return Case(f"clamp-bands: {SWITCH_REF} moved 2.5 mm, out of its lid pocket", lambda: check_clamp(sh, moved(brd, SWITCH_REF, dx=2.5), table), FAIL, SWITCH_REF)
+
+    def vhb_bond():
+        if not sh.get("vhb"):
+            raise LookupError("revg: no VHB")
+        big = {**sh, "vhb": {**sh["vhb"], "f_pads": {"TPa": (0.3, 0.3), "TPb": (sh["PCB"]["x1"] - sh["PCB"]["x0"] - 0.3, sh["PCB"]["z1"] - sh["PCB"]["z0"] - 0.3)}}}
+        return Case("clamp-bands: test pads in opposite corners: one cut-out box removes the whole VHB", lambda: check_clamp(big, brd, table), WARN, "stays bonded")
+
     def clamp_body():
+        if sh.get("vhb"):
+            raise LookupError("Phase 2: no clamp bands")
         v = next(f for f in brd.fps.values() if not f.copper_only and f.courtyard and not is_test_pad(f.ref))   # TPs are exempt by rule
         return Case(f"clamp-bands: {v.ref} dragged into the top band", lambda: check_clamp(sh, moved(brd, v.ref, dy=0.3 - (extent(v)[1] - oy0)), table), FAIL, "clamp bands")
 
     def clamp_tiny():
+        if sh.get("vhb"):
+            raise LookupError("Phase 2: no clamp bands")
         v = max((f for f in brd.fps.values() if not f.copper_only and f.courtyard), key=lambda f: extent(f)[3] - extent(f)[1])
 
         def run():
@@ -1580,6 +1742,8 @@ def selftest_cases(ctx):
         return Case(f"clamp-bands: {v.ref} with a 0.1 mm courtyard but its pads 0.43 mm from the edge", run, FAIL, "clamp bands")
 
     def clamp_wire_pad():
+        if sh.get("vhb"):
+            raise LookupError("Phase 2: no clamp bands")
         j = next(f for f in brd.fps.values() if is_wire_pad(f))
         dy = (oy1 - 0.2) - max(p.box[3] for p in j.pads)
         return Case(f"clamp-bands: wire pad {j.ref} 0.2 mm from the long edge", lambda: check_clamp(sh, moved(brd, j.ref, dy=dy), table), FAIL, "clamp bands")
@@ -1588,8 +1752,14 @@ def selftest_cases(ctx):
         f = max((f for f in brd.fps.values() if part_height(f, sch, table)[0] is not None), key=lambda f: part_height(f, sch, table)[0])
         tall, lcsc = copy.deepcopy(table), sch.parts.get(f.ref, {}).get("lcsc")
         section, key = ("by_lcsc", lcsc) if lcsc in table.get("by_lcsc", {}) else ("by_footprint", f.name)
-        tall[section][key]["max_mm"] = sh["bands"][f.face] + 0.1
-        return Case(f"heights: {f.ref} {sh['bands'][f.face] + 0.1:.2f} mm tall, 0.10 mm over its band", lambda: check_heights(sh, brd, sch, tall), FAIL, "taller than the band")
+        tall[section][key]["max_mm"] = band_of(sh, f) + 0.1
+        return Case(f"heights: {f.ref} {band_of(sh, f) + 0.1:.2f} mm tall, 0.10 mm over its band", lambda: check_heights(sh, brd, sch, tall), FAIL, "taller than the band")
+
+    def heights_pocket():
+        if not sh.get("pocket"):
+            raise LookupError("revg: no lid pocket")
+        sw = brd.fps[SWITCH_REF]
+        return Case(f"heights: {SWITCH_REF} moved 2.5 mm out of its lid pocket meets the 0.30 mm F gap", lambda: check_heights(sh, moved(brd, sw.ref, dx=2.5), sch, table), FAIL, SWITCH_REF)
 
     def heights_empty():
         return Case("heights: a board with no footprints", lambda: check_heights(sh, dataclasses.replace(brd, fps={}), sch, table), FAIL, "no footprints")
@@ -1822,8 +1992,8 @@ def selftest_cases(ctx):
                 return check_frame(sh)
         return Case("frame: ECR-0001 closed while frame.py still disagrees", run, FAIL, "ECR-0001")
 
-    for build in (mic_origin, mic_stack, mic_lid, mic_face, mic_ap, mic_locating, switch_locating, switch_off, switch_stack, outline_wide, outline_tall, outline_thick, outline_drag, round_trip_mic,
-                  dup_ref, inside_far, inside_rear, clamp_body, clamp_tiny, clamp_wire_pad, heights, heights_empty, nets_swap, nets_missing,
+    for build in (mic_origin, mic_stack, mic_lid, mic_face, mic_ap, mic_locating, mic_located, switch_locating, switch_off, switch_stack, outline_wide, outline_tall, outline_thick, outline_drag, round_trip_mic,
+                  dup_ref, inside_far, inside_rear, clamp_body, clamp_tiny, clamp_wire_pad, vhb_flip, vhb_pocket, vhb_bond, heights, heights_pocket, heights_empty, nets_swap, nets_missing,
                   pin_wrong, pair, power_pin, ep, netlist, hazard_expired, hazard_mitigated_closed, rows_deleted, contract_empty, power_rows_deleted, unconstrained, budget_unusable, budget_no_d11, hazards_deleted, absent_wrong, absent_removed,
                   ecr_format, waiver_removed, waiver_expired, overload, waiver_ceiling, hard_limit, assumes, derive, calc_moves, rail_order_, d11_inductor, d11_vdd11,
                   new_rail, topology, frame_expired):
@@ -1932,9 +2102,9 @@ def ensure_env():
 
 def build_parser():
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--board", type=Path, help="placed or routed .kicad_pcb to check (default: hw/pod/draft_r1/pod_r1_placed.kicad_pcb)")
+    ap.add_argument("--board", type=Path, help="placed or routed .kicad_pcb to check (default: hw/current.yaml board)")
     ap.add_argument("--root", type=Path, default=REPO, help="re-base every input (a copy of the repo tree) instead of this checkout")
-    for key in ("contract", "budget", "heights", "netlist", "ecr-dir", "mech-dir"):
+    for key in ("contract", "budget", "heights", "netlist", "shell", "ecr-dir", "mech-dir"):
         ap.add_argument(f"--{key}", type=Path, help=f"override the {key.replace('-', ' ')} input")
     ap.add_argument("--json", action="store_true", help="machine-readable results")
     ap.add_argument("-v", "--verbose", action="count", default=0, help="-v: detail lines under each non-PASS result; -vv: under every result")
@@ -1948,7 +2118,8 @@ def build_parser():
 def main(argv=None):
     ensure_env()
     args = build_parser().parse_args(argv)
-    cfg = Config(args.root, board=args.board, contract=args.contract, budget=args.budget, heights=args.heights, netlist=args.netlist, ecr_dir=args.ecr_dir, mech=args.mech_dir)
+    cfg = Config(args.root, board=args.board, contract=args.contract, budget=args.budget, heights=args.heights, netlist=args.netlist, shell=args.shell,
+                 ecr_dir=args.ecr_dir, mech=args.mech_dir)
     results = run(cfg, not args.no_selftest)
     warn_ids = sorted({w for r in results for w in r.wids})
     if args.write_baseline:
@@ -1969,8 +2140,10 @@ def main(argv=None):
                 r.status, r.msg = FAIL, r.msg + " [--strict]"
     if args.json:
         counts = {s: sum(r.status == s for r in results) for s in (PASS, WARN, FAIL)}
-        print(json.dumps({"date": TODAY.isoformat(), "board": str(cfg.board), "counts": counts, "checks": [r.as_dict() for r in results]}, indent=2))
+        print(json.dumps({"date": TODAY.isoformat(), "design": getattr(DESIGN, "id", None), "board": str(cfg.board), "netlist": str(cfg.netlist), "shell": str(cfg.shell), "counts": counts, "checks": [r.as_dict() for r in results]}, indent=2))
     else:
+        rel_ = lambda p: str(p.relative_to(cfg.root)) if p.is_relative_to(cfg.root) else str(p)  # noqa: E731
+        print(f"INFO design {getattr(DESIGN, 'id', '?')}: board {rel_(cfg.board)}, netlist {rel_(cfg.netlist)}, shell {rel_(cfg.shell)}")
         for r in results:
             print(f"{r.status} {r.id} {r.msg}")
             if args.verbose >= 2 or (args.verbose and r.status != PASS):

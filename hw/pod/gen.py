@@ -1,6 +1,7 @@
 """Pod board, one per side: schematic source of truth (SKiDL 2.3, KiCad 10 mode).
 
     source tools/env.sh && python3 hw/pod/gen.py      # -> hw/pod/pod.net, hw/pod/bom_jlc.csv
+    (Rev G reference outputs; the CURRENT design is named in hw/current.yaml: Phase 2 = POD_PACKAGES=mz2 -> pod_mz2.net, bom_jlc_mz2.csv)
 
 Blocks (spec §4, §7, §9; parts and LCSC numbers from .pcba-workflow/sourcing-lock.csv, JLC stock
 2026-09-30):
@@ -201,6 +202,7 @@ def build():
     if PACKAGES == "mz2":   # Epson FC-12M X1A0000610006: 2.05 x 1.2 mm, CL 7 pF, ESR 90k -> gmcrit ~0.98 uA/V (vs 2.16 for FC-135)
         y1 = Part("Device", "Crystal", value="32.768k 7pF", footprint="Crystal:Crystal_SMD_2012-2Pin_2.0x1.2mm", ref="Y1", tag="Y1")
         y1.fields["LCSC"] = "C99009"
+        y1.fields["MPN"] = "X1A0000610006"   # generic Device:Crystal symbol: the MPN lives here (bom_check identity, 2026-10-07)
     else:
         y1 = Part("lcsc", "Q13FC1350000400", value="32.768k", ref="Y1", tag="Y1")
         y1.fields["LCSC"] = "C32346"

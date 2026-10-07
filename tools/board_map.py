@@ -202,10 +202,13 @@ def place_labels(ax, anchors, w, h, bottom):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("board", nargs="?", default=str(REPO / "hw/pod/draft_r1/pod_r1_routed.kicad_pcb"))
-    ap.add_argument("out", nargs="?", default=str(REPO / "docs/diagrams/board-map-revF.png"))
-    ap.add_argument("--title", default="Pod board, Rev F: what each part does")
-    ap.add_argument("--changed", default="D5,J4,TP7,TP8,TP9,TP10,Q1,Q2,C15,C1")
+    sys.path.insert(0, str(REPO / "tools"))
+    from current import current      # hw/current.yaml: the ONE design pointer (2026-10-07)
+    d = current()
+    ap.add_argument("board", nargs="?", default=str(d.board))
+    ap.add_argument("out", nargs="?", default=str(REPO / ("docs/diagrams/board-map-revF.png" if d.is_reference else f"docs/diagrams/board-map-{d.id}.png")))
+    ap.add_argument("--title", default="Pod board, Rev F: what each part does" if d.is_reference else f"Pod board, {d.id} ({d.ecr}): what each part does")
+    ap.add_argument("--changed", default="D5,J4,TP7,TP8,TP9,TP10,Q1,Q2,C15,C1" if d.is_reference else "", help="refs to highlight (default: the Rev F changes for revg, none otherwise)")
     ap.add_argument("--style", choices=["plain", "tech"], default="plain")
     a = ap.parse_args()
     global LABELS

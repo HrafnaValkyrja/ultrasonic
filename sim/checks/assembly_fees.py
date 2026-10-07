@@ -112,7 +112,9 @@ def cmd_fees():
 def measure_faces() -> dict:
     import pcbnew
     mm = pcbnew.ToMM
-    b = pcbnew.LoadBoard(str(REPO / "hw/pod/draft_r1/pod_r1_placed.kicad_pcb"))
+    sys.path.insert(0, str(REPO / "tools"))
+    from current import current      # hw/current.yaml (2026-10-07): the current design's board; revg via ULTRASONIC_DESIGN
+    b = pcbnew.LoadBoard(str(current().board))
     res = {"F": dict(parts=0, area=0.0, pads=0, pad_area=0.0), "B": dict(parts=0, area=0.0, pads=0, pad_area=0.0)}
     tall = {"F": [], "B": []}
     for f in b.GetFootprints():

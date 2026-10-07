@@ -16,6 +16,7 @@ import argparse
 import os
 import re
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
 
@@ -93,7 +94,9 @@ def label(im: Image.Image, text: str) -> Image.Image:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("board", nargs="?", default=str(REPO / "hw/pod/draft_r1/pod_r1_routed.kicad_pcb"))
+    sys.path.insert(0, str(REPO / "tools"))
+    from current import current      # hw/current.yaml: the ONE design pointer (2026-10-07)
+    ap.add_argument("board", nargs="?", default=str(current().board))
     ap.add_argument("--out", default=str(REPO / "docs/diagrams/renders"))
     ap.add_argument("--masks", default="Black")       # owner 2026-10-02: black mask (spec O23)
     ap.add_argument("--views", default="top,bottom,iso")

@@ -138,6 +138,7 @@ def build():
     import gen                                           # noqa: E402  (sets SKiDL lib paths)
     with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
         gen.build()
+        gen.apply_packages()                             # the package set of env POD_PACKAGES (mz2 = Phase 2; tools/current.py apply_env sets it)
     return builtins.default_circuit
 
 
