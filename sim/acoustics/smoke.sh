@@ -10,10 +10,10 @@ python3 tools/current.py | head -1   # which design this run uses
 BOARD_ARG=()
 [ $# -ge 1 ] && BOARD_ARG=(--board "$1")
 exec systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 \
-  timeout 60 /usr/bin/time -f 'wall %es  max RSS %M KB' bash -c '
+  timeout 180 /usr/bin/time -f 'wall %es  max RSS %M KB' bash -c '
     set -e
     python3 sim/acoustics/selfcheck.py > /dev/null
-    python3 sim/acoustics/run_port.py --mc 40 "$@" 2>&1 | grep -v "Debug:\|property.h" > /dev/null
+    python3 sim/acoustics/run_port.py --mc 60 "$@" 2>&1 | grep -v "Debug:\|property.h" > /dev/null
     python3 sim/acoustics/bone.py > /dev/null
     python3 sim/acoustics/headline.py
   ' _ "${BOARD_ARG[@]}"
