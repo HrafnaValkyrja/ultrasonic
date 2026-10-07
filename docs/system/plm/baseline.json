@@ -49,9 +49,9 @@
   "REG-BOARD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RB-19: 74 board Value fields set to schematic values (pcbnew), only Value lines changed; DRC same 3 pre-existing warnings, 0 errors",
+   "note": "CHK-DRCWARN: 2 dangling vias deleted (GND In1-only, NRST unused pre-via); DRC 0 errors/0 unconnected/1 warning (hole_to_hole +3V0 pair, real, router); noise smoke 6 metrics identical, LN-M03 1.29 %",
    "stamp": {
-    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "d1e31020b154d34a",
+    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "36d088d48e70d239",
     "file:hw/pod/draft_r2/placement.yaml": "568be76a2d8a482d",
     "glob:hw/lib/pod.pretty/*.kicad_mod": "9fa247f977b33b6d",
     "sym:hw/pod/place.py::rules": "cf2bb252c4b5e5fa"
@@ -346,9 +346,9 @@
   "R-OUT-BOARD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RB-19: 74 board Value fields set to schematic values (pcbnew), only Value lines changed; DRC same 3 pre-existing warnings, 0 errors",
+   "note": "CHK-DRCWARN: 2 dangling vias deleted (GND In1-only, NRST unused pre-via); DRC 0 errors/0 unconnected/1 warning (hole_to_hole +3V0 pair, real, router); noise smoke 6 metrics identical, LN-M03 1.29 %",
    "stamp": {
-    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "d1e31020b154d34a",
+    "file:hw/pod/draft_r2/out/routed.kicad_pcb": "36d088d48e70d239",
     "ref:Q1": "9e9cfa60e1e11081",
     "ref:R21": "a66fda4215076577",
     "yaml:hw/pod/draft_r2/placement.yaml::Q1": "f320227ba3fc460a",

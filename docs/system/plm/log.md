@@ -483,3 +483,7 @@
 - 2026-10-07 13:39 review REG-BOARD by backlog-agent: RB-19: 74 board Value fields set to schematic values (pcbnew), only Value lines changed; DRC same 3 pre-existing warnings, 0 errors
 - 2026-10-07 13:39 review R-OUT-BOARD by backlog-agent: RB-19: 74 board Value fields set to schematic values (pcbnew), only Value lines changed; DRC same 3 pre-existing warnings, 0 errors
 - 2026-10-07 13:39 checkin REG-BOARD by backlog-agent
+- 2026-10-07 15:53 checkout REG-BOARD by backlog-agent: CHK-DRCWARN: delete 2 dangling vias (coordinator-authorised board edit)
+- 2026-10-07 15:54 review REG-BOARD by backlog-agent: CHK-DRCWARN: 2 dangling vias deleted (GND In1-only, NRST unused pre-via); DRC 0 errors/0 unconnected/1 warning (hole_to_hole +3V0 pair, real, router); noise smoke 6 metrics identical, LN-M03 1.29 %
+- 2026-10-07 15:54 review R-OUT-BOARD by backlog-agent: CHK-DRCWARN: 2 dangling vias deleted (GND In1-only, NRST unused pre-via); DRC 0 errors/0 unconnected/1 warning (hole_to_hole +3V0 pair, real, router); noise smoke 6 metrics identical, LN-M03 1.29 %
+- 2026-10-07 15:54 checkin REG-BOARD by backlog-agent
