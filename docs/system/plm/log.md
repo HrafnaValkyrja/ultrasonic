@@ -468,3 +468,12 @@
 - 2026-10-07 13:32 review SUB-UI by backlog-agent: DIAG: arm-wiring.svg redrawn, button-stack.svg added (generated from dims_r2); docs only
 - 2026-10-07 13:32 checkin REG-ARM by backlog-agent
 - 2026-10-07 13:32 checkin SUB-UI by backlog-agent
+- 2026-10-07 13:34 checkout REG-BOARD by backlog-agent: RB-9 board in both pods
+- 2026-10-07 13:34 checkout PHYSICAL by backlog-agent: RB-9 board in both pods
+- 2026-10-07 13:34 review REG-BOARD by backlog-agent: RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model
+- 2026-10-07 13:34 review PHYSICAL by backlog-agent: RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model
+- 2026-10-07 13:34 review R-BOARD-BODY by backlog-agent: RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model
+- 2026-10-07 13:34 review R-UI-BOARD by backlog-agent: RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model
+- 2026-10-07 13:34 review R-AUDIO-BOARD by backlog-agent: RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model
+- 2026-10-07 13:34 checkin REG-BOARD by backlog-agent
+- 2026-10-07 13:34 checkin PHYSICAL by backlog-agent

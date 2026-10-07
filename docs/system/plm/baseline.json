@@ -22,7 +22,7 @@
   "PHYSICAL": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RPB-14/DBG-17: lid-lift wire slack computed (dock_route.py lid_open_extra_mm; arm from heel); stale mass + interface rows refreshed",
+   "note": "RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
@@ -49,7 +49,7 @@
   "REG-BOARD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
+   "note": "RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model",
    "stamp": {
     "file:hw/pod/draft_r2/out/routed.kicad_pcb": "9e7627860783b952",
     "file:hw/pod/draft_r2/placement.yaml": "568be76a2d8a482d",
@@ -182,7 +182,7 @@
   "R-AUDIO-BOARD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D",
+   "note": "RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model",
    "stamp": {
     "ref:U2": "60848b99c7f48774",
     "yaml:hw/pod/draft_r2/placement.yaml::U2": "dcd1bfdae196d15e"
@@ -234,7 +234,7 @@
   "R-BOARD-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
+   "note": "RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model",
    "stamp": {
     "sym:hw/mech/dims_r2.py::B_GAP": "9e0415c00f9dc49a",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
@@ -577,7 +577,7 @@
   "R-UI-BOARD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "sub-ui issue 2 analysed (sim/checks/sw1_press_fem.py): 2 N press moves SW1 1.4-20 um, VHB peak 12-52 kPa vs 3M 85 kPa dynamic factor (TDS 2024-09), board strain <=196 ue; no geometry change",
+   "note": "RB-9: board_in_pod.py places the KiCad 3D export in both pods: PASS (SW1 axis 0.000, Q1 flip confirmed, B models 0.41 to the cell); SW1 model 0.39 vs 0.65, U2 no model",
    "stamp": {
     "net:BTN": "0900cf1931215b5e",
     "ref:SW1": "6a5226a0b24dd9c5",
