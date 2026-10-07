@@ -39,7 +39,7 @@
   "REG-ARM": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it",
+   "note": "ARM-7: build notes corrected (rear-side conductor route, strut bore 1.2 + counterbores, set-screw drill depth rule, cup pilot 1.0); padboard gen.py docstring VSYS; docs/comments only",
    "stamp": {
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
     "file:hw/mech/heel.py": "9f6115b83b778544",
@@ -60,10 +60,10 @@
   "REG-PAD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
+   "note": "ARM-7: build notes corrected (rear-side conductor route, strut bore 1.2 + counterbores, set-screw drill depth rule, cup pilot 1.0); padboard gen.py docstring VSYS; docs/comments only",
    "stamp": {
     "file:hw/mech/pad.py": "8f91343799a69ead",
-    "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
+    "file:hw/padboard/gen.py": "bb668388a096a189",
     "file:hw/padboard/mech.py": "63ebe69b0207a26c"
    }
   },
@@ -171,7 +171,7 @@
   "R-ARM-PAD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected",
+   "note": "ARM-7: build notes corrected (rear-side conductor route, strut bore 1.2 + counterbores, set-screw drill depth rule, cup pilot 1.0); padboard gen.py docstring VSYS; docs/comments only",
    "stamp": {
     "file:hw/mech/pad.py": "8f91343799a69ead",
     "sym:hw/mech/frame.py::PAD_CONTACT": "a9817b30cc013f18",
@@ -599,11 +599,11 @@
    }
   },
   "R-UI-PAD": {
-   "by": "claude-ecr0001",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "ECR-0001: padboard/mech.py pod-side checks now read the frozen pre-rev-1 pod (shell.py PRE_R1); all checks/geometry outputs identical before/after; pad board and LED untouched",
+   "note": "ARM-7: build notes corrected (rear-side conductor route, strut bore 1.2 + counterbores, set-screw drill depth rule, cup pilot 1.0); padboard gen.py docstring VSYS; docs/comments only",
    "stamp": {
-    "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
+    "file:hw/padboard/gen.py": "bb668388a096a189",
     "file:hw/padboard/mech.py": "63ebe69b0207a26c",
     "net:LED_A": "a7463c1e8bb60b81",
     "net:LED_K": "0443cd1bf2f94b91"

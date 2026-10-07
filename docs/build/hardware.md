@@ -61,7 +61,7 @@
 | M1.4 set screw | – | 1 × 3 mm | 1 × 2 mm | **2** | 2 + 2 | 6 of each length |
 | M1.2 × 4 pan | – | – | 1 (cup closure) | **1** | 2 | 10+ (kit) |
 | NiTi, cut 20 mm | – | 4.0 mm in socket | 3.5 mm in socket | **1 arm** | 2 | 5 ft (76 arms) |
-| Litz 7/44 | – | through Ø1.2 channel | through Ø1.0 channel | **4 × ~80 mm** | 0.64 m | 10 m |
+| Litz 7/44 | – | through the heel Ø1.0 channel (Ø1.6 counterbore) | through the strut Ø1.2 bore (Ø1.6 counterbore) | **4 × ~80 mm** | 0.64 m | 10 m |
 | 30 AWG silicone wire | 2 × 35 mm (nut → VBUS / GND_CHG) | – | – | **70 mm** | 0.14 m | 2 m red + 2 m black |
 | VHB 4914 0.25 mm | cell → wall | – | – | 1 patch | 2 | 1 roll |
 | PE foam ~1.5 mm | 2 strips 1.1 × 17.5 | – | – | 2 | 4 | 1 sheet |
@@ -483,7 +483,7 @@ Prices as read on 2026-09-30, before shipping and tax. Counts per pod come from 
    - Alternative: M1.6 × 3 cup point. It uses the same 0.7 key but needs pilot ~1.25 and +0.2 mm wall.
 4. `NITI_D` bench set: change "0.75 / 0.80 / 0.85" to "**0.75 / 0.80 (stock), 0.838 (quote)**".
    - Make `SOCKET_D` "**measured wire + 0.05, drilled after cure**" rather than a fixed 0.85.
-5. ~~Arm conductors need their own path~~. **Done** by the module agents: the heel has a Ø1.2 channel and the pad strut a Ø1.0 channel, beside the sockets. Litz fits both with ≥ 0.49 mm margin (§3).
+5. ~~Arm conductors need their own path~~. **Done** by the module agents: the heel has a Ø1.0 channel and the pad strut a Ø1.2 bore, both on the rear side of the sockets with Ø1.6 counterbores for the shrink tube (corrected 2026-10-07). Litz fits both with ≥ 0.49 mm margin (§3).
 6. **Dock hold-down:** the A2 lid screws are non-magnetic. Either add a hidden steel disc (~Ø3 × 0.3 mm) for a dock magnet, or rely on a cradle.
 7. **Circuit (not frame):**
    - ~~Confirm the charger blocks battery back-feed onto VBUS~~. The electronics note answers this: ≤ 0.4 V on the undocked screw.

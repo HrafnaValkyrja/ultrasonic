@@ -91,11 +91,11 @@ This is the layout in `hw/padboard/layout.py` as of 23:37, read live by pad.py. 
 After curing, ream with the pin vise:
 | Feature | Drill | Depth / note |
 |---|---|---|
-| Cup screw pilot | 0.95 | 3.4 mm, no deeper: leaves a 1.2 mm floor under the skin face |
+| Cup screw pilot | 1.0 | 3.4 mm, no deeper: leaves a 1.2 mm floor under the skin face (1.0 since 2026-10-07, PAD-5: 0.95 splits the boss) |
 | Cap closure hole | 1.4 | Through |
 | NiTi socket | 0.85 | Push the drill down the strut's channel from its top. It runs straight, 3.5 mm past the mouth |
-| Conductor channel | 1.0 | From the strut top, straight through into the riser (~10 mm) |
-| Set-screw hole | 1.6 | From the rear flat of the collar, through the wall and the nut slot, until it reaches the socket. **Max 3.3 mm deep**: further breaks into the conductor channel on the front side |
+| Conductor bore | 1.2 | From the strut top straight into the riser (~10 mm), on the strut's REAR side; then a 1.6 drill 1.7 mm deep at the top for the shrink-tube counterbore |
+| Set-screw hole | 1.6 | From the collar's set-screw flat, through the wall and the nut slot, **stop when the drill reaches the socket** (feel it break through; the conductor bore lies beyond the socket: never drill past it) |
 
 ## Tolerances built in
 - **Transducer:** cavity 6.3 × 12.9 for a 6.0 × 12.6 part (0.15/side).
@@ -138,8 +138,7 @@ After curing, ream with the pin vise:
    - Slide the wire's pad end into the strut's raked top opening, flat toward the **rear** (the set-screw side), down to the bottom of the socket (3.5 mm).
    - Drive the M1.4 × 2 set screw with the 0.7 key until it bites the flat, then a quarter turn more and no further.
 10. **The arm's other end goes into the heel** (heel module notes).
-    - The 4 conductors cross the 3 mm flex zone as a loose loop from the strut's front exit to the heel's channel entry, 4.7 mm apart in a straight line. Allow ~7 mm of wire there.
-    - Run the loop on the **head side** of the NiTi. Relative to the pad, the wire only ever moves outward, so the loop isn't rubbed.
+    - The 4 conductors leave the strut top through the Ø1.6 counterbore on the **REAR side** of the NiTi and cross the 3 mm flex zone inside the pre-shrunk tube as a loose S (~2 mm slack) into the heel's counterbore (current route, fixed 2026-10-01; notes corrected 2026-10-07, reg-arm issue 7). They never cross over the NiTi.
     - Put a dab of RTV at the strut exit.
 11. **Bench check:**
     - The ring glows evenly.
@@ -228,7 +227,7 @@ After curing, ream with the pin vise:
 - **A2:** conductors outside the strut, in a thin silicone tube alongside it.
   - The strut drops to ~2.6 × 3.15, tapering to 2.35. It can be printed 3.2 wide for the look.
   - The wires are exposed for ~9 mm.
-- **A3:** conductors under the wire, on the head side.
+- (Design history, superseded 2026-10-01 by the rear-side bore; not build instructions.) **A3:** conductors under the wire, on the head side.
   - 2.5 × 4.7: a deep fin that brings the inner face ~1.4 mm closer to the head. No.
 - **Not done: the heel agent's request** to put the conductor exit at the strut's rear-inboard corner. I measured it.
   - Mirroring the strut so the channel sits behind the wire moves 1.6 mm of strut rearward and up.

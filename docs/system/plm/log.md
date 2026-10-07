@@ -434,3 +434,11 @@
 - 2026-10-07 13:24 checkout SUB-DOCK-USB by backlog-agent: DK-09 cable note + diagram
 - 2026-10-07 13:24 review SUB-DOCK-USB by backlog-agent: DK-09 cable note + dock-cable.svg; docs only
 - 2026-10-07 13:24 checkin SUB-DOCK-USB by backlog-agent
+- 2026-10-07 13:25 checkout REG-ARM by backlog-agent: ARM-7 stale build notes
+- 2026-10-07 13:25 checkout REG-PAD by backlog-agent: ARM-7 stale build notes
+- 2026-10-07 13:25 review REG-ARM by backlog-agent: ARM-7: build notes corrected (rear-side conductor route, strut bore 1.2 + counterbores, set-screw drill depth rule, cup pilot 1.0); padboard gen.py docstring VSYS; docs/comments only
+- 2026-10-07 13:25 review REG-PAD by backlog-agent: ARM-7: build notes corrected (rear-side conductor route, strut bore 1.2 + counterbores, set-screw drill depth rule, cup pilot 1.0); padboard gen.py docstring VSYS; docs/comments only
+- 2026-10-07 13:25 review R-ARM-PAD by backlog-agent: ARM-7: build notes corrected (rear-side conductor route, strut bore 1.2 + counterbores, set-screw drill depth rule, cup pilot 1.0); padboard gen.py docstring VSYS; docs/comments only
+- 2026-10-07 13:25 review R-UI-PAD by backlog-agent: ARM-7: build notes corrected (rear-side conductor route, strut bore 1.2 + counterbores, set-screw drill depth rule, cup pilot 1.0); padboard gen.py docstring VSYS; docs/comments only
+- 2026-10-07 13:25 checkin REG-ARM by backlog-agent
+- 2026-10-07 13:25 checkin REG-PAD by backlog-agent

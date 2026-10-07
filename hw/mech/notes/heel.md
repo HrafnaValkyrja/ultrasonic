@@ -101,11 +101,11 @@ Wire length: the heel takes **4.0 mm** of it. The full cut length is socket 4.0 
    - Tape the 4 conductor ends to the fish and pull them from the land opening up into the rear gap.
      Do it with the tub **empty** (no cell yet). Pull out the cut length in the last section
      (21-24 mm from the exit to each pad, plus solder ends).
-   - Where they leave the strut top, they cross the 1.5 mm gap to the heel. Route them round the
-     **inboard (head) side** of the NiTi. The wire only ever moves outboard, so it never pinches
-     them there.
-   - Leave a slack loop of about 1 mm in the gap.
-   - Optional: a 4 mm piece of black Ø1.0 mm ID silicone tube over the bundle in the gap, to hide it.
+   - Between the strut top and the heel the 4 conductors stay on the **REAR side** of the NiTi (current route, fixed 2026-10-01; notes corrected 2026-10-07, reg-arm issue 7):
+     strut bore Ø1.2 → Ø1.6 counterbore at the strut top → the **pre-shrunk** tube (≤ 1.1 OD, ~5 mm,
+     slid on BEFORE fishing, reg-arm issue 12) across the 3 mm flex zone as a loose S with ~2 mm slack →
+     Ø1.6 counterbore on the heel land → heel channel Ø1.0. They never cross over the NiTi.
+   - Seat both tube ends in their counterbores. Never heat the tube on the arm.
 4. **Nut and screw.**
    - Slide the nut into the inboard slot.
    - Start the set screw in through the front access hole, 1-2 turns into the nut. It is now
@@ -235,7 +235,7 @@ not the heel's. The heel itself clears by 1.52.
        the pod sliding forward off.
      - The heel is clear of the adapter in **either** sliding direction (checked swept, 0.4 mm), so
        fixing this doesn't touch the heel.
-- **Conductors cross the 1.5 mm gap in a loop of about 4 mm.**
+- **(Superseded 2026-10-01 by the rear-side route with counterbores + shrink tube; history only.)** Conductors cross the 1.5 mm gap in a loop of about 4 mm.
   - pad.py's strut puts the conductor exit on the strut's front side (lateral -1.8). The heel's
     channel starts behind the wire (+2.25).
   - I could not start the channel in front: the set-screw nut sits there, 1.6 mm above the land, and

@@ -9,7 +9,7 @@ meet the transducer's two leads, and it carries the power-indicator LED.
 
   arm wire OUT_A  -> J1 --+-- J5 -> transducer lead A
   arm wire OUT_B  -> J2 --+-- J6 -> transducer lead B
-  arm wire LED+   -> J3 ----- D1 anode     (R14 2k2 from VBAT sits on the POD board, not here)
+  arm wire LED+   -> J3 ----- D1 anode     (R14 2k2 from VSYS sits on the POD board, not here)
   arm wire LED-   -> J4 ----- D1 cathode   (to PB7 on the pod board)
 
 D1 = Everlight 16-213/BHC-AN1P2/3T: a blue 0402 (1.0 x 0.5 x 0.45 mm) chip LED, InGaN die
