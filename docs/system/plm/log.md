@@ -339,3 +339,27 @@
 - 2026-10-07 12:59 checkin PHYSICAL by backlog-agent
 - 2026-10-07 12:59 checkin SUB-UI by backlog-agent
 - 2026-10-07 12:59 checkin SUB-DEBUG-TEST by backlog-agent
+- 2026-10-07 13:02 checkout SUB-AUDIO-IN by backlog-agent: record coordinator decisions 2026-10-07 (decisions-log 9330d9c)
+- 2026-10-07 13:02 checkout REG-BOARD by backlog-agent: record coordinator decisions 2026-10-07 (decisions-log 9330d9c)
+- 2026-10-07 13:02 checkout SUB-DOCK-USB by backlog-agent: record coordinator decisions 2026-10-07 (decisions-log 9330d9c)
+- 2026-10-07 13:02 checkout SUB-OUTPUT by backlog-agent: record coordinator decisions 2026-10-07 (decisions-log 9330d9c)
+- 2026-10-07 13:02 checkout SUB-PROCESSING by backlog-agent: record coordinator decisions 2026-10-07 (decisions-log 9330d9c)
+- 2026-10-07 13:02 checkout REG-ARM by backlog-agent: record coordinator decisions 2026-10-07 (decisions-log 9330d9c)
+- 2026-10-07 13:02 checkout REG-PAD by backlog-agent: record coordinator decisions 2026-10-07 (decisions-log 9330d9c)
+- 2026-10-07 13:02 checkout REG-POD-BODY by backlog-agent: record coordinator decisions 2026-10-07 (decisions-log 9330d9c)
+- 2026-10-07 13:02 review SUB-AUDIO-IN by backlog-agent: coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only
+- 2026-10-07 13:02 review REG-BOARD by backlog-agent: coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only
+- 2026-10-07 13:02 review SUB-DOCK-USB by backlog-agent: coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only
+- 2026-10-07 13:02 review SUB-OUTPUT by backlog-agent: coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only
+- 2026-10-07 13:02 review SUB-PROCESSING by backlog-agent: coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only
+- 2026-10-07 13:02 review REG-ARM by backlog-agent: coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only
+- 2026-10-07 13:02 review REG-PAD by backlog-agent: coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only
+- 2026-10-07 13:02 review REG-POD-BODY by backlog-agent: coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only
+- 2026-10-07 13:02 checkin SUB-AUDIO-IN by backlog-agent
+- 2026-10-07 13:03 checkin REG-BOARD by backlog-agent
+- 2026-10-07 13:03 checkin SUB-DOCK-USB by backlog-agent
+- 2026-10-07 13:03 checkin SUB-OUTPUT by backlog-agent
+- 2026-10-07 13:03 checkin SUB-PROCESSING by backlog-agent
+- 2026-10-07 13:03 checkin REG-ARM by backlog-agent
+- 2026-10-07 13:03 checkin REG-PAD by backlog-agent
+- 2026-10-07 13:03 checkin REG-POD-BODY by backlog-agent

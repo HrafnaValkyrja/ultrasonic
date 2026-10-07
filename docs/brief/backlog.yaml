@@ -11,7 +11,7 @@
 # Maintenance: when an item closes, set st + evidence (commit) here AND in its source doc in the same commit.
 schema: 1
 date: 2026-10-07
-counts: {total: 111, unblocked: 33, owner: 28, hardware: 34, router: 3, fw_agent: 7, item_dep: 4, stale_closed: 2}   # entries (dups folded); update on every close
+counts: {total: 111, unblocked: 38, owner: 22, hardware: 34, router: 4, fw_agent: 7, item_dep: 4, stale_closed: 2}   # entries (dups folded); update on every close
 progress_2026-10-07: {done: [UI-2, DK-18, OUT-1, ARM-6, PHYS-8, PROC-6R, PROC-9, VHB-TOL, RB-TOL, UI-1, PAD-5, DBG-16], partly: [RPB-12, DK-17, PWR-I9], blocked_now: [PWR-I14, PWR-I6, RB-2, DK-17, DK-05], still_open_unblocked: [SAI-3, DK-16, UI-3, RPB-5, RPB-14, RPB-16, DK-01, CHK-STOCK, CHK-IDENT, RB-19, ARM-7, DIAG, RB-9, DK-09], stale_closed_in_doc: [RB-18, SAI-14]}
 
 unblocked:   # value order; rank 1 = do first
@@ -49,6 +49,13 @@ unblocked:   # value order; rank 1 = do first
   - {id: RB-9, rank: 31, cls: hygiene, src: reg-board.md#9, dup: [PHYS-5], t: "which pod has which edge up is derived, not checked", close: "KiCad 3D render placed in the CAD for both pods", blk: none, st: open}
   - {id: DK-09, rank: 32, cls: hygiene, src: sub-dock-usb.md DK-09, t: "cable side undocumented (plug, CC, length, strain relief)", close: "dock/cable note + diagram", blk: none, st: open}
 
+  # decided by the coordinator 2026-10-07, doc parts done (moved from owner)
+  - {id: RB-20, cls: decision, t: "R21 mid-board vs MZD-4 edge", opts: "accept (rec) / 0603 shunt at edge + wider Kelvin pour (router)", st: "decided 2026-10-07 (coordinator, decisions-log 9330d9c); accepted; doc updated (reg-board issue 20)"}
+  - {id: OUT-6, cls: decision, dup: [PROC-6, PROC-6R], t: "bridge fault cut-off: always-on hardware break during playback, or self-test only", opts: "A ADC1->MDF1 out-of-limit->TIM1 break, always on in playback (rec; firmware-only, +0.15-0.34 mA + MDF clock) / B self-test-only over-current (today) / C software ADC1 guard (ISR latency, dies with the CPU)", st: "decided 2026-10-07 (coordinator, decisions-log 9330d9c); option A always-on MDF break; docs updated; FWSIM-R65 appended (dd9c6fb); implementation = fw-agent"}
+  - {id: ARM-6D, cls: decision, src: reg-arm.md#6, t: "strut to real tub 1.176 mm (worn) vs SHROUD_CLEARANCE 1.4; binding = strut-relief chamfer at the cell's rear end, wall already at the 0.6 resin min", opts: "A accept 1.18 (rec; all wear states modelled; confirm with E12) / B move pad.py strut top 0.25 rear/outboard (re-solves strut + Ear clearance) / C deeper relief behind the cell only with a local 0.45 wall (below resin min)", st: "decided 2026-10-07 (coordinator, decisions-log 9330d9c); accepted 1.18 mm; docs updated (reg-arm 6, reg-pad 6)"}
+  - {id: RPB-15, cls: decision, t: "SWD needs a peel after the lid bond", opts: "accept, DFU recovery (rec per DBG-16 gate) / TPs back on B (router)", st: "decided 2026-10-07 (coordinator, decisions-log 9330d9c); accepted; DFU gate already in physical.md step 8"}
+  - {id: RPB-4, cls: decision, dup: [CHK-SWITCH, UI lateral], t: "switch lateral stack 0.20 worst vs 0.15 (interfaces WARN, 0.05 over)", opts: "accept with selective fit / tighten board-lid tolerance (gauge pin also locates SW1) / larger bore", st: "decided 2026-10-07 (coordinator, decisions-log 9330d9c); selective fit (physical.md step 9); WARN kept visible"}
+
 stale_closed:   # listed open in a doc but already fixed; close in the doc
   - {id: RB-18, src: reg-board.md#18, t: "DRC rules in untracked routed.kicad_pro", evidence: "git ls-files: hw/pod/draft_r2/out/routed.kicad_pro tracked (B-DOC-AUDIT-0007 item 4)", st: "closed in doc 2026-10-07", commit: 3b8fa36}
   - {id: SAI-14, src: sub-audio-in.md#14, t: "MC on disk n 40 vs log n 60", evidence: "sim/acoustics/out/port_results.json phase2 MC n 60 (B-DOC-AUDIT-0007 item 6)", st: "closed in doc 2026-10-07", commit: 3b8fa36}
@@ -58,13 +65,9 @@ owner:   # decisions; spec §0: options + rec live in the source doc or here
   - {id: ECR-0009, dup: [OUT-12, PWR-I5, DBG-12, 00-whole risk 6], t: "no output while docked vs docked self-test", opts: "a capped self-test exemption <= -12 dBFS (rec) / b sweep on battery, read back", blk: owner}
   - {id: ECR-0014/15/16, t: "simplification packages A/B/C still 'proposed'; superseded in practice by ECR-0018 (O25/O26)", opts: "close as superseded (rec) / keep open for the cherry-picks not in MZ-2", blk: owner}
   - {id: ECR-0018, t: "Phase-2 MZ-2 approved, implementation in progress, owner review in 1-2 weeks", blk: "owner (A-PHASE2-REVIEW)"}
-  - {id: OUT-6, dup: [PROC-6, PROC-6R], t: "bridge fault cut-off: always-on hardware break during playback, or self-test only", opts: "A ADC1->MDF1 out-of-limit->TIM1 break, always on in playback (rec; firmware-only, +0.15-0.34 mA + MDF clock) / B self-test-only over-current (today) / C software ADC1 guard (ISR latency, dies with the CPU)", blk: owner}
-  - {id: RB-20, t: "R21 mid-board vs MZD-4 edge", opts: "accept (rec) / 0603 shunt at edge + wider Kelvin pour (router)", blk: owner}
-  - {id: RPB-4, dup: [CHK-SWITCH, UI lateral], t: "switch lateral stack 0.20 worst vs 0.15 (interfaces WARN, 0.05 over)", opts: "accept with selective fit / tighten board-lid tolerance (gauge pin also locates SW1) / larger bore", blk: owner}
-  - {id: RPB-15, t: "SWD needs a peel after the lid bond", opts: "accept, DFU recovery (rec per DBG-16 gate) / TPs back on B (router)", blk: owner}
-  - {id: UI-5, t: "gesture model holes", opts: "A spec + timings / B short=mode, double=vol, hold=Off (rec) / C three holds", blk: owner}
+  - {id: UI-5, t: "gesture model holes", opts: "A spec + timings / B short=mode, double=vol, hold=Off (rec) / C three holds", blk: owner, packet: "in packet 2 (coordinator, 2026-10-07)"}
   - {id: UI-8, dup: [PAD-13, ARM-8, 00-whole risk 3], t: "PB7 unprotected; pad-board LED_K 0.45 mm from OUT_B", opts: "A reorder pad-board pads / B R14 split / C both (rec)", blk: owner}
-  - {id: PAD-1, dup: [PHYS-9], t: "contact face 50 mm2 vs O16(4) 100-150", opts: "A Sugru over whole cup face (rec) / B grow cup / C pre-made", blk: owner}
+  - {id: PAD-1, dup: [PHYS-9], t: "contact face 50 mm2 vs O16(4) 100-150", opts: "A Sugru over whole cup face (rec) / B grow cup / C pre-made", blk: owner, packet: "in packet 2 (coordinator, 2026-10-07)"}
   - {id: PAD-3, t: "pad sealing", opts: "A dry test build, RTV final (rec) / B gasket / C pot", blk: owner}
   - {id: PAD-9, t: "pad board panel vs separate order", blk: "owner (JLC quote)"}
   - {id: SAI-4, t: "acoustic coupons vs O9", opts: "a JLC coupon panel / b rev-1 board + printed lids (rec) / c both", blk: owner}
@@ -73,13 +76,11 @@ owner:   # decisions; spec §0: options + rec live in the source doc or here
   - {id: PROC-2, dup: [ECR-0008], t: "MCU stock 8 at JLC; reserve vs U585 drop-in", blk: "owner (O21)"}
   - {id: PROC-3, t: "C7 CIN > 2 mm from pin 21", blk: "owner review O25"}
   - {id: DK-04, t: "sealed-pod update path", opts: "A write-protected boot stub + ROM DFU (rec) / B dual bank / C SWD-only", blk: owner}
-  - {id: DK-10, dup: [A-USBC-SPACE], t: "USB-C fallback space not in shell_r2", opts: "clip-on adapter outside the pod (rec) / re-add keep-out", blk: owner}
+  - {id: DK-10, dup: [A-USBC-SPACE], t: "USB-C fallback space not in shell_r2", opts: "clip-on adapter outside the pod (rec) / re-add keep-out", blk: owner, packet: "in packet 2 (coordinator, 2026-10-07)"}
   - {id: DBG-1, t: "first-flash path", opts: "B DFU-first (rec) / C DFU + probe (FWSIM rec) / A probe", blk: owner}
   - {id: DBG-3, dup: [RB-8], t: "panel / snap-off frame for 30 x 12", opts: "A header tab / B no-wire jig on tooling holes (rec) / C none", blk: "owner (O9)"}
   - {id: PWR-I3, t: "charger watchdog policy B (triage default) awaits the safety packet", blk: "owner (A-SAFETY-REVIEW)"}
-  - {id: ARM-6D, src: reg-arm.md#6, t: "strut to real tub 1.176 mm (worn) vs SHROUD_CLEARANCE 1.4; binding = strut-relief chamfer at the cell's rear end, wall already at the 0.6 resin min", opts: "A accept 1.18 (rec; all wear states modelled; confirm with E12) / B move pad.py strut top 0.25 rear/outboard (re-solves strut + Ear clearance) / C deeper relief behind the cell only with a local 0.45 wall (below resin min)", blk: owner}
   - {id: PHYS-8D, src: physical.md#8, t: "mass 11.2-13.2 g per side worn vs ~8 g target (D18); cell 4.2 g is 37 %", opts: "A (rec) decide after the owner's ~12 g wear test (A-TODAY-MASS-TARGET): if comfortable, set the ceiling ~12.5 g and accept / B trim inside the design: drop the armour plate (A-PHASE2-REVIEW Q2), lighter dock target (weigh it) / C smaller cell (drastic K1; runtime cost)", blk: owner}
-  - {id: SAI-15D, src: sub-audio-in.md#15, t: "D0.6 mic-port NPTH finishes 0.52-0.73 at JLC: below spec section 8 hole rule 0.6-1.0", opts: "A D0.6 + JLC press-fit +-0.05 (0.55-0.65, still 0.05 under) / B (rec) D0.65 + press-fit (0.60-0.70, duct limit 0.175 vs pin 0.14 PASS; footprint hole edit only, re-run acoustics) / C D0.7 regular (pin worst 0.205 > limit 0.15: fails)", blk: owner}
   - {id: Q-A-SAFETY-REVIEW, t: "ECR-0013/0009 safety read vs SLUSE99C", blk: owner}
   - {id: Q-B-FOSS-INSTALL-DEFAULT, t: "FOSS install rule reading", blk: owner}
 
@@ -120,7 +121,8 @@ hardware:   # parts / bench / built board (O21: nothing ordered before freeze)
   - {id: Q-A-PHYSICAL-FIRSTWINS, t: "E1/E2/dummy wear"}
 
 router:   # needs placement/re-route (forbidden to parallel agents)
-  - {id: DK-17D, t: "ROM DFU VBUS sensing insurance: PA9 (USB_OTG_FS_VBUS) is NC", opts: "A (rec) add a 0201 series R DOCK_VBUS -> PA9 at the next layout pass / B read AN2606 in a browser first, add only if needed / C leave NC, test at bring-up step 6 (QFN bodge hard)", blk: "router + owner review (O25)"}
+  - {id: SAI-15D, src: sub-audio-in.md#15, t: "D0.6 mic-port NPTH finishes 0.52-0.73 at JLC: below spec section 8 hole rule 0.6-1.0", opts: "A D0.6 + JLC press-fit +-0.05 (0.55-0.65, still 0.05 under) / B (rec) D0.65 + press-fit (0.60-0.70, duct limit 0.175 vs pin 0.14 PASS; footprint hole edit only, re-run acoustics) / C D0.7 regular (pin worst 0.205 > limit 0.15: fails)", blk: router, packet: "in packet 2 (coordinator, 2026-10-07)", st: "decided 2026-10-07 (coordinator, decisions-log 9330d9c): option B D0.65 + press-fit; footprint hole edit + acoustics re-run at the next layout pass"}
+  - {id: DK-17D, t: "ROM DFU VBUS sensing insurance: PA9 (USB_OTG_FS_VBUS) is NC", opts: "A (rec) add a 0201 series R DOCK_VBUS -> PA9 at the next layout pass / B read AN2606 in a browser first, add only if needed / C leave NC, test at bring-up step 6 (QFN bodge hard)", blk: "router + owner review (O25)", st: "decided 2026-10-07 (coordinator, decisions-log 9330d9c): option A, add the resistor at the next layout pass"}
   - {id: OUT-1B, t: "add option (B) offset resistor 100k +3V0 -> I_SENSE (0201) in gen.py + place/route near R22/C22; required by the verified option D (sim/checks/selftest_lockin.py)"}
   - {id: DBG-2, t: "TP row +3V0 beside GND (TP4|TP5 0.8 mm): reorder at the next placement edit"}
 

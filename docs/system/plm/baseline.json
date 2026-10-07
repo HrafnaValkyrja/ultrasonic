@@ -39,7 +39,7 @@
   "REG-ARM": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected",
+   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
    "stamp": {
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
     "file:hw/mech/heel.py": "343c7dac129c06c9",
@@ -49,7 +49,7 @@
   "REG-BOARD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D",
+   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
    "stamp": {
     "file:hw/pod/draft_r2/out/routed.kicad_pcb": "9e7627860783b952",
     "file:hw/pod/draft_r2/placement.yaml": "568be76a2d8a482d",
@@ -60,7 +60,7 @@
   "REG-PAD": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected",
+   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
    "stamp": {
     "file:hw/mech/pad.py": "8f91343799a69ead",
     "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
@@ -70,7 +70,7 @@
   "REG-POD-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D",
+   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
    "stamp": {
     "file:hw/mech/blade.py": "20e890c775848522",
     "file:hw/mech/dims_r2.py": "b512a30ef4e4f769",
@@ -89,7 +89,7 @@
   "SUB-AUDIO-IN": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D",
+   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
    "stamp": {
     "block:MIC": "3b3b0512fc8e5584",
     "sym:hw/mech/dims_r2.py::DUCT_D": "3fbb6d185c33173c",
@@ -109,7 +109,7 @@
   "SUB-DOCK-USB": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-17 corrected: PA9 is USB_OTG_FS_VBUS on QFN48 (left NC); RM0456 B-session override exists; ROM USB path unproven; options DK-17D (A add series R, rec)",
+   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"
@@ -118,7 +118,7 @@
   "SUB-OUTPUT": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "OUT-1/DBG-5: option D (2f lock-in on R21 supply current + 100k offset) verified in sim/checks/selftest_lockin.py: -12 dBFS |Z|<=1.9 %, phase<=0.7 deg; -22 dBFS <=3 %/3.4 deg at 0.25 s; -32 unusable; offset R still to add (router item OUT-1B)",
+   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
    "stamp": {
     "block:BRIDGE": "cfe0c5bab46b5005",
     "block:SELFTEST": "b91fae734845754d"
@@ -138,7 +138,7 @@
   "SUB-PROCESSING": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "PROC-9: SMPS has no clock/sync control in RM0456 Rev 7 (free-running 3 MHz typ); lever REGSEL; docs only",
+   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
    "stamp": {
     "block:CLOCK": "2ac3a525f62269dc",
     "block:CORE_SMPS": "c2e952ea730a4765",
