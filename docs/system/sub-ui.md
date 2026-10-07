@@ -7,6 +7,9 @@ Status: schematic = Rev G nets, MZ-2 packages (`hw/pod/pod_mz2.net`, bom_check n
 
 > 2026-10-07 round 11 (NON-DEFAULT, packet Q1/Q2): K1 duct options (K1_DUCT, sim/acoustics/duct_options.py), k1t (walls/lid 0.6), 0.6 wall coupon (hw/mech/coupon_wall06.py). Phase 2 unchanged (dims snapshot: only new names REAR_GAP; shell checks add info fields puck_feasible / puck_guide_bore / pocket_breaks_outer_face). Facts: reg-pod-body.md Variants.
 
+
+> 2026-10-07 round 12 (NON-DEFAULT, packet Q2): K1-thin button concepts (sim/checks/button_concepts.py, K1_BUTTON=dome in dims_k1). Recommended: Phi4 metal dome on new F pads (board F-copper edit only); fallback: skin 0.20 proud over KMT022 (no board change). Phase 2 unchanged (dims snapshot identical; shell adds info field trace_groove).
+
 ## Purpose
 - Carries **F11** Wake / button and **F12** Power LED (solid) (`integration-map.md` §1).
 - **One button does everything (D3, §5.4):** modes, volume, reset, and wake from Off. The wearer's only feedback is **ticks played through the exciter** (D3). The LED faces outward, so she never sees it while wearing the pod (`pad-led.md` L63). It tells other people, and her with the pod in her hand, that the pod is on (O8).

@@ -8,6 +8,9 @@ Status: Phase-2 shell `hw/mech/shell_r2.py` / `dims_r2.py` (checks.json all clas
 
 > 2026-10-07 round 11 (NON-DEFAULT, packet Q1/Q2): K1 duct options (K1_DUCT, sim/acoustics/duct_options.py), k1t (walls/lid 0.6), 0.6 wall coupon (hw/mech/coupon_wall06.py). Phase 2 unchanged (dims snapshot: only new names REAR_GAP; shell checks add info fields puck_feasible / puck_guide_bore / pocket_breaks_outer_face). Facts: reg-pod-body.md Variants.
 
+
+> 2026-10-07 round 12 (NON-DEFAULT, packet Q2): K1-thin button concepts (sim/checks/button_concepts.py, K1_BUTTON=dome in dims_k1). Recommended: Phi4 metal dome on new F pads (board F-copper edit only); fallback: skin 0.20 proud over KMT022 (no board change). Phase 2 unchanged (dims snapshot identical; shell adds info field trace_groove).
+
 ## Purpose
 Keeps every region (pod body, board, cell, arm, pad) in one coordinate frame, so a change in one can be checked against the others: what sits where, what touches what, how water gets in, and in what order it all goes together. It carries no F-row of its own; it is the mechanical counterpart of every F-row in [integration-map.md](integration-map.md) §1 and the keep-outs in §7.
 

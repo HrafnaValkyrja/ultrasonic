@@ -34,6 +34,16 @@ DUCT_OPTIONS = {
     "flush0.1": dict(HEX_DEPTH=0.1, note="mesh ~flush: 0.1 counterbore, bore 0.9"),
     "rec": dict(HEX_DEPTH=0.3, SKIN_T=0.1, note="RECOMMENDED: R1.9 seat 0.3 + skin recess 0.1 (0.25 skin stands 0.15 proud): mic bore 0.7, puck guide 0.30"),
 }
+# Button options for the thin lid (round 12, sim/checks/button_concepts.py): env K1_BUTTON=<name>.
+BUTTON_OPTIONS = {
+    "dome": dict(SW1_BODY=(4.0, 4.0), SW1_PADS=(4.4, 4.4), SW1_H=0.275, SW1_TRAVEL=(0.10, 0.15, 0.20),
+                 POCKET_DX=4.6, POCKET_DZ=4.6, POCKET_H=0.10,
+                 note="HYP 600-415S Phi4 metal dome (H 0.20 +-0.05, drawing 600-0000-000 rev F) + 0.075 PSA overlay on F pads in "
+                      "place of KMT022; sits inside the 0.30 F gap; VHB cut 4.6 square; 0.10 lid relief (dome cap under the bore edge stays clear at worst case); puck + skin as today"),
+}
+BUTTON = (os.environ.get("K1_BUTTON") or "").strip()
+if BUTTON and BUTTON not in BUTTON_OPTIONS:
+    raise ValueError(f"K1_BUTTON={BUTTON!r}: use one of {sorted(BUTTON_OPTIONS)}")
 DUCT = (os.environ.get("K1_DUCT") or "").strip()
 if DUCT and DUCT not in DUCT_OPTIONS:
     raise ValueError(f"K1_DUCT={DUCT!r}: use one of {sorted(DUCT_OPTIONS)}")
@@ -49,7 +59,9 @@ _OVERRIDES = dict(CELL_T=CELL_SPEC["T"], CELL_W=CELL_SPEC["W"], CELL_L=CELL_SPEC
                   **{k: v for k, v in VARIANTS[VARIANT].items() if k != "note"})
 if DUCT:
     _OVERRIDES.update({k: v for k, v in DUCT_OPTIONS[DUCT].items() if k != "note"})
-OUT_TAG = f"_{DUCT}" if DUCT else ""   # hw/mech/dims.py appends it to the output folder
+if BUTTON:
+    _OVERRIDES.update({k: v for k, v in BUTTON_OPTIONS[BUTTON].items() if k != "note"})
+OUT_TAG = (f"_{DUCT}" if DUCT else "") + (f"_{BUTTON}" if BUTTON else "")   # hw/mech/dims.py appends it to the output folder
 
 _DOC = __doc__
 exec(compile((HERE / "dims_r2.py").read_text(), str(HERE / "dims_r2.py"), "exec"), globals())   # noqa: S102  (variant hook)

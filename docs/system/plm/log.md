@@ -598,3 +598,18 @@
 - 2026-10-07 17:32 review PHYSICAL by claude-backlog: round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks
 - 2026-10-07 17:32 review SUB-UI by claude-backlog: round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks
 - 2026-10-07 17:32 review REG-POD-BODY by claude-backlog: round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks
+- 2026-10-07 17:44 checkout REG-POD-BODY by claude-backlog: round 12: K1-thin button concepts (non-default)
+- 2026-10-07 17:44 checkout SUB-UI by claude-backlog: round 12: K1-thin button concepts (non-default)
+- 2026-10-07 17:44 checkout PHYSICAL by claude-backlog: round 12: K1-thin button concepts (non-default)
+- 2026-10-07 17:44 checkout REG-BOARD by claude-backlog: round 12: K1-thin button concepts (non-default)
+- 2026-10-07 17:44 checkin REG-POD-BODY by claude-backlog
+- 2026-10-07 17:44 checkin SUB-UI by claude-backlog
+- 2026-10-07 17:44 checkin PHYSICAL by claude-backlog
+- 2026-10-07 17:44 checkin REG-BOARD by claude-backlog
+- 2026-10-07 17:44 review R-AUDIO-BODY by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT
+- 2026-10-07 17:44 review R-UI-BODY by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT
+- 2026-10-07 17:44 review R-DOCK-BODY by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT
+- 2026-10-07 17:44 review R-BOARD-BODY by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT
+- 2026-10-07 17:44 review R-BODY-ARM by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT
+- 2026-10-07 17:44 review SUB-UI by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT
+- 2026-10-07 17:44 review REG-POD-BODY by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT

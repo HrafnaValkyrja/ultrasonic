@@ -76,7 +76,8 @@ def tongue(g=0.0):
         (c["x0"] - t, c["x0"] + g, c["z0"] + 0.4, Z1 - k),           # front (above the belly step)
     ]
     # belly step land (x < X_BELLY, z = CAV z0): tub's belly outer wall tongues up into the lid face, inner side
-    step = box(X0 + k, X_BELLY - 0.4, Y_LID_IN - g, Y_LID_IN + t, c["z0"] - 0.01, c["z0"] + STEP_H + g)
+    key_y = min(t, LID_T + PLATE_T - 0.3 + g)   # phase2/k1: t (0.35 + g); a 0.6 lid (k1t) keeps 0.3 above the key (0.4 cut a sliver loose)
+    step = box(X0 + k, X_BELLY - 0.4, Y_LID_IN - g, Y_LID_IN + key_y, c["z0"] - 0.01, c["z0"] + STEP_H + g)
     s = step
     for xa, xb, za, zb in runs:
         r = box(xa, xb, y0, y1, za, zb)
@@ -118,7 +119,7 @@ def tub(heel_mod=None):
     t = t + (tongue() & outer_body())
     if PLATE_T > 0:
         t = t + (_plate(Y_OUT, PLATE_T, 0.3) & tub_region())             # armour plate below the belly step
-    t = t - slot(TRACE, Y_TOP, 0.7, 0.45)                                 # trace continues across the step
+    t = t - slot(TRACE, Y_TOP, 0.7, TRACE_DEPTH) if TRACE_DEPTH > 0 else t                                 # trace continues across the step
     return t - seam_rebate()
 
 
@@ -140,13 +141,14 @@ def _zmap(z):
 PLATE_PTS = [(_xmap(x), _zmap(z)) for x, z in [(31.8, 4.0), (46.0, 4.0), (47.8, 5.0), (66.2, 5.0), (66.2, -8.2), (61.0, -9.3),
                                          (55.0, -9.3), (53.5, -12.4), (34.5, -12.4), (31.8, -10.0)]]
 TRACE = [(_xmap(x), _zmap(z)) for x, z in [(36.5, -11.0), (51.0, -11.0), (55.5, -6.0), (63.8, -6.0), (63.8, 2.6)]]
+TRACE_DEPTH = 0.45 if LID_T + PLATE_T >= 0.75 else 0.0   # decorative groove; dropped on a 0.6 lid (k1t): it would halve the wall and cut a sliver loose at the belly step
 
 
 def lid_base():
     l = outer_body() - tub_region()
     if PLATE_T > 0:
         l = l + (_plate(Y_OUT, PLATE_T, 0.3) - tub_region())
-    l = l - slot(TRACE, Y_TOP, 0.7, 0.45)
+    l = l - slot(TRACE, Y_TOP, 0.7, TRACE_DEPTH) if TRACE_DEPTH > 0 else l
     l = l - cavity()
     l = l - tongue(GROOVE_CL)
     # mic duct: reamed D1.0 bore from the lid inner face to the hex window floor; hex window = mesh seat
@@ -248,7 +250,7 @@ def main():
     c["SW1_pocket"] = dict(pocket=[POCKET["dx"], POCKET["dz"]], need_skeptic=[4.1, 2.9], pads=list(SW1["pads"]),
                            ok=POCKET["dx"] >= 4.1 and POCKET["dz"] >= 2.9, **switch_stack(),
                            puck_feasible=PUCK_L > NUB_H + 0.02, puck_guide_bore=round(SKIN_FLOOR - POCKET["top"], 3),
-                           pocket_breaks_outer_face=POCKET["top"] >= Y_TOP - 1e-6)
+                           pocket_breaks_outer_face=POCKET["top"] >= Y_TOP - 1e-6, trace_groove=TRACE_DEPTH)
     # 4 duct axis vs board hole
     c["duct"] = duct_offsets()
     # 5 stowage

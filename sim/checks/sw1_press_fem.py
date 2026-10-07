@@ -33,6 +33,7 @@ from skfem.helpers import dd, ddot, eye, trace
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "hw/mech"))
 import dims as D  # noqa: E402  (selected design: dims_r2 | dims_k1)
+TAG = "" if D.DESIGN.id == "phase2" else f"_{D.OUT_DIR.name}"   # variants write their own outputs (e.g. _k1t_dome)
 
 BW, BH, T = 30.0, 12.0, D.PCB_T if hasattr(D, "PCB_T") else 0.8
 E_PCB, NU = 20e3, 0.15            # N/mm2
@@ -129,7 +130,7 @@ def main():
                results=results)
     od = ROOT / "sim/out/mech"
     od.mkdir(parents=True, exist_ok=True)
-    (od / "sw1_press_fem.json").write_text(json.dumps(out, indent=1))
+    (od / f"sw1_press_fem{TAG}.json").write_text(json.dumps(out, indent=1))
     for r in results:
         print(r)
     if plot_case is not None:
@@ -155,7 +156,7 @@ def main():
             ax.set_ylabel("board y (mm)")
             ax.set_title(f"SW1 press 2.0 N, VHB E {E_VHB[0]} MPa (softest case); white = VHB cut-out edges")
             fig.tight_layout()
-            fig.savefig(od / "sw1_press_fem.png", dpi=130)
+            fig.savefig(od / f"sw1_press_fem{TAG}.png", dpi=130)
         except Exception as e:  # plotting is a convenience
             print("plot skipped:", e)
 

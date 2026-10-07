@@ -70,11 +70,11 @@
   "REG-POD-BODY": {
    "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks",
+   "note": "round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT",
    "stamp": {
     "file:hw/mech/blade.py": "ad6b4d86e46c5d84",
-    "file:hw/mech/dims_r2.py": "22940214b7d9aed9",
-    "file:hw/mech/shell_r2.py": "ce712abbd6283ea9",
+    "file:hw/mech/dims_r2.py": "d5e3fa6b93c2df7d",
+    "file:hw/mech/shell_r2.py": "1c3627a79b7b8cbd",
     "file:hw/mech/styles.py": "23dcb6bfe495f82f"
    }
   },
@@ -149,11 +149,11 @@
   "SUB-UI": {
    "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks",
+   "note": "round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT",
    "stamp": {
     "block:UI": "2e30cc3f141e491d",
     "file:hw/padboard/gen.py": "bb668388a096a189",
-    "sym:hw/mech/dims_r2.py::POCKET": "75123b323bc1f0df",
+    "sym:hw/mech/dims_r2.py::POCKET": "0db9572e173f92f4",
     "sym:hw/mech/dims_r2.py::SW": "d595c80a5705b3f3",
     "sym:hw/mech/shell_r2.py::puck": "dc81383881142193"
    }
@@ -191,7 +191,7 @@
   "R-AUDIO-BODY": {
    "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
+   "note": "round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT",
    "stamp": {
     "file:hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod": "fd075bbf72c0acf7",
     "grep:hw/pod/gen.py::Knowles_LGA-5": "73caaeee4d912b22",
@@ -200,7 +200,7 @@
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
     "sym:hw/mech/dims_r2.py::board_mic": "77fd09bdb9b1c0b8",
     "sym:hw/mech/dims_r2.py::duct_offsets": "30a50ae64b7249cf",
-    "sym:hw/mech/shell_r2.py::lid_base": "6b2515fec8f3bc33",
+    "sym:hw/mech/shell_r2.py::lid_base": "b3f14757200fa811",
     "yaml:hw/pod/draft_r2/placement.yaml::U2": "dcd1bfdae196d15e"
    }
   },
@@ -234,14 +234,14 @@
   "R-BOARD-BODY": {
    "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
+   "note": "round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT",
    "stamp": {
     "sym:hw/mech/dims_r2.py::B_GAP": "1e9c268f1cee6301",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
-    "sym:hw/mech/dims_r2.py::POCKET": "75123b323bc1f0df",
+    "sym:hw/mech/dims_r2.py::POCKET": "0db9572e173f92f4",
     "sym:hw/mech/dims_r2.py::VHB_T": "64d2b9d2ed88b422",
     "sym:hw/mech/dims_r2.py::X_STOP_GAP": "bf5c979b74f48fe8",
-    "sym:hw/mech/shell_r2.py::lid_base": "6b2515fec8f3bc33",
+    "sym:hw/mech/shell_r2.py::lid_base": "b3f14757200fa811",
     "sym:hw/mech/shell_r2.py::vhb": "aea744df4a11fad9",
     "yaml:hw/pod/draft_r2/placement.yaml::TP1": "8a363c7933bedfb6",
     "yaml:hw/pod/draft_r2/placement.yaml::TP2": "9634ad1c945b1616",
@@ -254,12 +254,12 @@
   "R-BODY-ARM": {
    "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
+   "note": "round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT",
    "stamp": {
     "sym:hw/mech/frame.py::E": "e41a5d539abd8437",
     "sym:hw/mech/heel.py::heel_add": "f10d6b9f6e8fecbf",
     "sym:hw/mech/heel.py::heel_cut": "438d7b8d3da63352",
-    "sym:hw/mech/shell_r2.py::tub": "7f3d2ef68fbc2f95"
+    "sym:hw/mech/shell_r2.py::tub": "8d92edde67354657"
    }
   },
   "R-CLOCK-BOARD": {
@@ -324,11 +324,11 @@
   "R-DOCK-BODY": {
    "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 10 K1 variant hook: phase2 values identical (dims snapshot 74 names; shell/heel/dock/board_in_pod/mass/interfaces regressions = 0 diffs besides new info fields); K1 is NON-DEFAULT (ULTRASONIC_DESIGN=k1|k1p)",
+   "note": "round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT",
    "stamp": {
     "sym:hw/mech/dims_r2.py::BAY": "d933f8dc8c3634dd",
     "sym:hw/mech/dims_r2.py::DOCK": "9f3e8ca2743ae3a7",
-    "sym:hw/mech/shell_r2.py::tub": "7f3d2ef68fbc2f95"
+    "sym:hw/mech/shell_r2.py::tub": "8d92edde67354657"
    }
   },
   "R-OUT-ARM": {
@@ -587,10 +587,10 @@
   "R-UI-BODY": {
    "by": "claude-backlog",
    "date": "2026-10-07",
-   "note": "round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks",
+   "note": "round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT",
    "stamp": {
     "ref:SW1": "6a5226a0b24dd9c5",
-    "sym:hw/mech/dims_r2.py::POCKET": "75123b323bc1f0df",
+    "sym:hw/mech/dims_r2.py::POCKET": "0db9572e173f92f4",
     "sym:hw/mech/dims_r2.py::PUCK_L": "2835136689be5bb9",
     "sym:hw/mech/dims_r2.py::SW": "d595c80a5705b3f3",
     "sym:hw/mech/dims_r2.py::switch_stack": "cb03b6eb9a581066",

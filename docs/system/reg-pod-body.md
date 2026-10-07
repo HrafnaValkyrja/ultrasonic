@@ -136,6 +136,12 @@ duct_fix_round11: {src: "sim/acoustics/duct_options.py -> sim/out/mech/duct_opti
 k1t: {what: "walls 0.6 + lid 0.6, no plate, mesh seat 0.1 (ULTRASONIC_DESIGN=k1t)", T: 8.5, H: 14.8, L: "33.8 (not 33.6: the cell's rear end is pinned by the heel exit, so the thinner rear wall widens the rear gap; dims_r2 REAR_GAP)", env_mm3: "4779 (-23 %)", worn_g: [9.6, 11.5],
   blockers: ["SW1 button: pocket 0.6 tall = the whole lid -> pocket breaks the outer face (lid prints as 2 solids), no puck (needs a new button stack, e.g. skin straight over SW1 through a window)", "duct: lid 0.6 fails R14 nominally in every option; flush0.1 MC 0.63 / 0.70 with the mesh", "0.6 walls: corner under the 1.0 chamfer 0.14 mm, lid groove lip 0.2, rebate wall 0.4 (all < resin min 0.6): coupon hw/mech/coupon_wall06.py + notes/coupon_wall06.md"],
   passes: "0 clashes, heel = phase2 flags, wires 0.3 both pods, interfaces 7/4/0, stowage 164"}
+k1t_button_round12: {src: "sim/checks/button_concepts.py -> sim/out/mech/button_concepts.json, docs/diagrams/button-concepts.svg; K1_BUTTON=dome",
+  concepts: {A1_thin_tact: "none: LCSC 2026-10-07T21:35Z has no sealed tact switch under KMT022's 0.65", A2_dome: "HYP 600-415S Phi4 dome (H 0.20 +-0.05, 150-250 gf, 1M cycles; drawing 600-0000-000 rev F) on new F pads, inside the 0.30 F gap: flush, puck guide 0.25, cap clear 0.09 worst",
+             B_resin_flex_window: "membrane 0.15: 53 MPa at the clamp > ~15 MPa fatigue [A]: rejected", C_proud_skin: "skin straight over KMT022: 0.20 proud needed (0.10 pre-presses at worst); no board change",
+             D_side_switch: "SKTDLDE010 1.55 tall > B gap 1.4; mirrored pod needs 2: rejected", E_B_face: "user can't reach it; board+lid move as one: rejected"},
+  k1t_dome_checks: "0 clashes, all parts print as 1 solid, selective-fit puck kit 0.20-0.40, heel/wires = phase2, mass 9.6-11.5 g, press FEM 2 N: board 0.020 mm, VHB 12 kPa (10 N: 61 kPa < 85); interfaces heights FAIL until the board's F footprint is changed (board still carries KMT022 0.65 vs band 0.40)",
+  thin_lid_consequences: "decorative trace groove dropped on a 0.6 lid; belly-step key capped at lid - 0.3 (both cut a sliver loose)"}
 ```
 
 ## Open issues (IDs stable; gaps = closed)

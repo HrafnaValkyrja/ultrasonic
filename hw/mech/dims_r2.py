@@ -93,7 +93,7 @@ U2_XY, MIC_XY = board_mic()            # 2026-10-07: (2.65, 6.0) / (1.88, 6.0) a
 MIC = bpt(*MIC_XY)                     # board hole = duct axis (nominal offset 0)
 SW = bpt(18.5, 6.0)
 U2 = dict(c=bpt(*U2_XY), dx=2.65, dz=3.5, h=1.08)          # Knowles LGA 3.5 x 2.65, rot 90; tallest B part
-SW1 = dict(body=(3.0, 2.6), pads=(3.8, 2.6), h=0.65, travel=(0.05, 0.15, 0.25))  # KMT022: 3.0x2.6x0.65; travel 0.15+-0.1
+SW1 = dict(body=_o("SW1_BODY", (3.0, 2.6)), pads=_o("SW1_PADS", (3.8, 2.6)), h=_o("SW1_H", 0.65), travel=_o("SW1_TRAVEL", (0.05, 0.15, 0.25)))  # KMT022: 3.0x2.6x0.65; travel 0.15+-0.1
 B_MAX = 1.08                           # tools/checks/part_heights.yaml: U2
 PAD_ZONE = (25.0, 30.0)                # rear wire pads, board x
 
@@ -114,7 +114,7 @@ TP_PAD_D, TP_CUT_MARGIN = 1.0, 0.4     # [A] test-pad copper D1.0; VHB kept 0.4 
 # ---------------------------------------------------------------- lid features
 DUCT_D = 1.0                           # O24: ID 1.0; bore printed undersize and reamed with a 1.0 drill
 HEX_R, HEX_DEPTH = _o("HEX_R", 1.9), _o("HEX_DEPTH", 0.8)   # r1 window (mesh seat), cut down from the plate top (variant hook: duct options)
-POCKET = dict(dx=4.3, dz=3.1, top=Y_LID_IN + 0.6)     # SW1 pocket: 4.3 x 3.1, ceiling at y 13.8
+POCKET = dict(dx=_o("POCKET_DX", 4.3), dz=_o("POCKET_DZ", 3.1), top=Y_LID_IN + _o("POCKET_H", 0.6))     # SW1 pocket: 4.3 x 3.1, ceiling at y 13.8
 BORE_D, PUCK_D, NUB_D, NUB_H = 2.6, 2.3, 1.0, 0.10
 SKIN_D, SKIN_T = 4.6, _o("SKIN_T", 0.25)   # SKIN_T = recess depth (= skin thickness in Phase 2; a K1 option sinks a 0.25 skin only 0.1)
 SKIN_FLOOR = Y_TOP - SKIN_T            # 14.45

@@ -27,6 +27,9 @@ ecr_awaiting_owner_review: [ECR-0002, ECR-0003, ECR-0004, ECR-0011, ECR-0012, EC
 checks: ["tools/checks/interfaces.py [outline] [inside] [clamp-bands] [heights] [board-nets] [mic-port] PASS, [switch] WARN (2026-10-07)", "tools/checks/bom_check.py [refs] [netlist] [footprints] [fp-library] [nets] [jlc-bom] [assembly-tier] PASS (2026-10-07)", "kicad-cli pcb drc: 0 / 0 (2026-10-07)", "hw/pod/place_r2.py check (check.json: pass)"]
 ```
 
+
+> 2026-10-07 round 12 (NON-DEFAULT, packet Q2): K1-thin button concepts (sim/checks/button_concepts.py, K1_BUTTON=dome in dims_k1). Recommended: Phi4 metal dome on new F pads (board F-copper edit only); fallback: skin 0.20 proud over KMT022 (no board change). Phase 2 unchanged (dims snapshot identical; shell adds info field trace_groove).
+
 ## Purpose
 - Carries every electrical function F1-F15 (integration-map §1). Every integration-map §2 block lives here except the cell, dock target, exciter and pad LED.
 - Fits the Phase-2 shell: 30 x 12 x 0.8 at pod x 30.55-60.55, hung from the lid on VHB (dims_r2.py PCB; [outline] PASS, 0.25 mm min clearance to the cavity, interfaces.py 2026-10-07).
