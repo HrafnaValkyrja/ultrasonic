@@ -253,3 +253,9 @@
 - 2026-10-07 12:36 review SUB-OUTPUT by backlog-agent: PROC-6R: RM0456 Rev 7 TIM1 break sources read: ADC1(PA6)->MDF1 out-of-limit->mdf1_break0->TIM1 BKCMP7E is a CPU-independent fault break with no board change; COMP excluded (PA6 not a COMP input); ocref_clr path rejected (ES0499 2.16.2); ADC1 dedicated while guarding (VBAT to ADC4). Docs only, decision stays with owner
 - 2026-10-07 12:36 checkin SUB-PROCESSING by backlog-agent
 - 2026-10-07 12:36 checkin SUB-OUTPUT by backlog-agent
+- 2026-10-07 12:37 checkout REG-BOARD by backlog-agent: close stale issue (already fixed)
+- 2026-10-07 12:37 checkout SUB-AUDIO-IN by backlog-agent: close stale issue (already fixed)
+- 2026-10-07 12:37 review REG-BOARD by backlog-agent: stale issues closed in doc (reg-board 18 kicad_pro tracked; sub-audio-in 14 MC n 60 on disk); no design change
+- 2026-10-07 12:37 review SUB-AUDIO-IN by backlog-agent: stale issues closed in doc (reg-board 18 kicad_pro tracked; sub-audio-in 14 MC n 60 on disk); no design change
+- 2026-10-07 12:37 checkin REG-BOARD by backlog-agent
+- 2026-10-07 12:37 checkin SUB-AUDIO-IN by backlog-agent

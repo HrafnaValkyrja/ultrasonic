@@ -112,7 +112,7 @@ Firmware dependencies (integration-map §8): ADF1 on PB3/PB4 at 4 MHz; PA5 is a 
 11. **Unpowered-mic back-feed.** Park PB3/PB4 low/analog when PA5 is low (proposed firmware rule). Firmware can't cover **reset and ROM DFU**, where PB4 is NJTRST with an internal pull-up and back-feeds MIC_DATA while MIC_VDD floats (sub-debug-test ROM table). Breaks "Off really is off" (D12) only in those states. *Closes it:* meter C13 pad (5.12, 5.08) and TP10 in reset and DFU at bring-up (sub-debug-test step 6).
 12. **Acoustic diagram:** `sim/acoustics/out/port_path.png` plots the modelled path; no dimensioned CAD cross-section (lid, window, bore, VHB, board, mic) for the owner yet. `pcb-floorplan-rev1.png` is outdated.
 13. **63 kHz duct resonance is the EQ target** (O24 named ~84.7 kHz for the Rev F chimney; Phase 2 moves it to 63.0 kHz, Q6.4). *Closes it:* firmware EQ notch constant set from a bench sweep on board 1 (O18 knob); spec O24 text still says 84.7 kHz (owner's record, not edited here).
-14. **MC run on disk (n 40) differs from the ECR-0018 log (n 60).** p50 4.30 vs 4.51 dB, R14 all-pass 0.57 vs 0.70. *Closes it:* re-run `sim/acoustics` MC at n 60 (fenced) and quote one run everywhere (reg-board phase2_board.acoustics too).
+14. (closed 2026-10-07) MC on disk is n 60 (`sim/acoustics/out/port_results.json`, phase2 scenario), matching the ECR-0018 log (B-DOC-AUDIT-0007 item 6).
 15. **Gauge-pin and hole tolerances are assumed** ([A] in `dims_r2.duct_offsets()`: JLC NPTH +-0.05, outline +-0.2, print bore position 0.05). *Closes it:* JLC capability page read + measured bore on a print before freeze.
 
 ## Before you change this, check

@@ -164,7 +164,7 @@ All wire-pad edge gaps >= 0.90 mm (MZD-10 asks >= 0.8 between pads whose bridge 
 16. (closed 2026-10-07, 20bd842) VDDA caps: C6 100 nF 1.13 mm and C5 1 µF 2.32 mm from U1 pin 9 (centre-to-centre, +3V0 pads); place_r2 NEAR now per pin (C6 U1.9 1.0, C5 U1.9 2.5).
 17. (closed 2026-10-07, 20bd842) LSE: B only, 0 vias, 7.72 / 7.43 mm (pre-routed, locked).
 20. **R21 is mid-board, not at a board edge (MZD-4 "at the board edge for lifting")**. Tried 2026-10-07: R21 at (19.45, 10.9) between R3/R5 at the bottom edge (courtyard 0.18 mm from the edge): GND pad at the edge -> LN-M03 3.62 % with the one Kelvin via that fit, 2.48 % with two (limit 2 %; mid-board 1.29 %); flipped (GND pad inward, 3 vias) -> BRIDGE_RTN unroutable except by a 54.6 mm, 6-via detour. Kept mid-board (19.45, 6.45); lifting R21 needs the lid off and a fine tip (it sits under SW1's footprint on the other face). Closes: owner review (O25): accept, or trade e.g. a 0603 shunt at the edge with a wider Kelvin pour.
-18. **DRC rules live in hw/pod/draft_r2/out/routed.kicad_pro, which is untracked** (git status 2026-10-07); a fresh clone runs DRC with KiCad defaults. Closes: commit the .kicad_pro (or write the rules from place_r2.py into the board) before release.
+18. (closed 2026-10-07) DRC rules file `hw/pod/draft_r2/out/routed.kicad_pro` is tracked (git ls-files 2026-10-07; B-DOC-AUDIT-0007 item 4).
 19. **Board Value fields hold footprint names** (bom_check [values] WARN, "no ECR yet"; ECR-0012 covered the wrong SW1 LCSC property). JLC files must come from gen.py (bom_jlc_mz2.csv), never from a board-based BOM tool. Closes: write values into the board.
 
 ## Before you change this, check

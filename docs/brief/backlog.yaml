@@ -49,8 +49,8 @@ unblocked:   # value order; rank 1 = do first
   - {id: DK-09, rank: 32, cls: hygiene, src: sub-dock-usb.md DK-09, t: "cable side undocumented (plug, CC, length, strain relief)", close: "dock/cable note + diagram", blk: none, st: open}
 
 stale_closed:   # listed open in a doc but already fixed; close in the doc
-  - {id: RB-18, src: reg-board.md#18, t: "DRC rules in untracked routed.kicad_pro", evidence: "git ls-files: hw/pod/draft_r2/out/routed.kicad_pro tracked (B-DOC-AUDIT-0007 item 4)", st: open-in-doc}
-  - {id: SAI-14, src: sub-audio-in.md#14, t: "MC on disk n 40 vs log n 60", evidence: "sim/acoustics/out/port_results.json phase2 MC n 60 (B-DOC-AUDIT-0007 item 6)", st: open-in-doc}
+  - {id: RB-18, src: reg-board.md#18, t: "DRC rules in untracked routed.kicad_pro", evidence: "git ls-files: hw/pod/draft_r2/out/routed.kicad_pro tracked (B-DOC-AUDIT-0007 item 4)", st: "closed in doc 2026-10-07"}
+  - {id: SAI-14, src: sub-audio-in.md#14, t: "MC on disk n 40 vs log n 60", evidence: "sim/acoustics/out/port_results.json phase2 MC n 60 (B-DOC-AUDIT-0007 item 6)", st: "closed in doc 2026-10-07"}
 
 owner:   # decisions; spec §0: options + rec live in the source doc or here
   - {id: ECR-0005, dup: [OUT-3, PWR-I1, CHK-RAILS], t: "U4 300 mA vs 326 mA +3V0 peak", opts: "A OUT-07 clamp + capped self-test (rec) / B 12 ohm exciter (E1) / C bigger LDO", blk: "owner (+hardware E1)"}
