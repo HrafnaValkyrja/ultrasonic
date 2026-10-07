@@ -116,9 +116,9 @@
    }
   },
   "SUB-OUTPUT": {
-   "by": "docs-phase2-rewrite",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "PROC-6R: RM0456 Rev 7 TIM1 break sources read: ADC1(PA6)->MDF1 out-of-limit->mdf1_break0->TIM1 BKCMP7E is a CPU-independent fault break with no board change; COMP excluded (PA6 not a COMP input); ocref_clr path rejected (ES0499 2.16.2); ADC1 dedicated while guarding (VBAT to ADC4). Docs only, decision stays with owner",
    "stamp": {
     "block:BRIDGE": "cfe0c5bab46b5005",
     "block:SELFTEST": "b91fae734845754d"
@@ -136,9 +136,9 @@
    }
   },
   "SUB-PROCESSING": {
-   "by": "docs-phase2-rewrite",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "PROC-6R: RM0456 Rev 7 TIM1 break sources read: ADC1(PA6)->MDF1 out-of-limit->mdf1_break0->TIM1 BKCMP7E is a CPU-independent fault break with no board change; COMP excluded (PA6 not a COMP input); ocref_clr path rejected (ES0499 2.16.2); ADC1 dedicated while guarding (VBAT to ADC4). Docs only, decision stays with owner",
    "stamp": {
     "block:CLOCK": "2ac3a525f62269dc",
     "block:CORE_SMPS": "c2e952ea730a4765",
@@ -425,9 +425,9 @@
    }
   },
   "R-PROC-OUT": {
-   "by": "claude",
-   "date": "2026-10-02",
-   "note": "Rev F doc-sync 2026-10-02: interface holds, 'what' text updated to Rev F (and watches added where the cross-check asked); record docs/system/plm/reviews/2026-10-02-revf-doc-sync.json",
+   "by": "backlog-agent",
+   "date": "2026-10-07",
+   "note": "PROC-6R: RM0456 Rev 7 TIM1 break sources read: ADC1(PA6)->MDF1 out-of-limit->mdf1_break0->TIM1 BKCMP7E is a CPU-independent fault break with no board change; COMP excluded (PA6 not a COMP input); ocref_clr path rejected (ES0499 2.16.2); ADC1 dedicated while guarding (VBAT to ADC4). Docs only, decision stays with owner",
    "stamp": {
     "net:GA_N": "7dc5fe25d4d8a505",
     "net:GA_P": "e203d4d6a1f6e740",

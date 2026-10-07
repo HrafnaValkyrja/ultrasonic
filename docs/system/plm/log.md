@@ -246,3 +246,10 @@
 - 2026-10-07 12:32 checkin REG-POD-BODY by backlog-agent
 - 2026-10-07 12:32 checkin PHYSICAL by backlog-agent
 - 2026-10-07 12:32 checkin SUB-UI by backlog-agent
+- 2026-10-07 12:35 checkout SUB-PROCESSING by backlog-agent: PROC-6R: RM0456 TIM1 break sources read; CPU-independent fault cut-off option without a board change
+- 2026-10-07 12:35 checkout SUB-OUTPUT by backlog-agent: PROC-6R: RM0456 TIM1 break sources read; CPU-independent fault cut-off option without a board change
+- 2026-10-07 12:36 review R-PROC-OUT by backlog-agent: PROC-6R: RM0456 Rev 7 TIM1 break sources read: ADC1(PA6)->MDF1 out-of-limit->mdf1_break0->TIM1 BKCMP7E is a CPU-independent fault break with no board change; COMP excluded (PA6 not a COMP input); ocref_clr path rejected (ES0499 2.16.2); ADC1 dedicated while guarding (VBAT to ADC4). Docs only, decision stays with owner
+- 2026-10-07 12:36 review SUB-PROCESSING by backlog-agent: PROC-6R: RM0456 Rev 7 TIM1 break sources read: ADC1(PA6)->MDF1 out-of-limit->mdf1_break0->TIM1 BKCMP7E is a CPU-independent fault break with no board change; COMP excluded (PA6 not a COMP input); ocref_clr path rejected (ES0499 2.16.2); ADC1 dedicated while guarding (VBAT to ADC4). Docs only, decision stays with owner
+- 2026-10-07 12:36 review SUB-OUTPUT by backlog-agent: PROC-6R: RM0456 Rev 7 TIM1 break sources read: ADC1(PA6)->MDF1 out-of-limit->mdf1_break0->TIM1 BKCMP7E is a CPU-independent fault break with no board change; COMP excluded (PA6 not a COMP input); ocref_clr path rejected (ES0499 2.16.2); ADC1 dedicated while guarding (VBAT to ADC4). Docs only, decision stays with owner
+- 2026-10-07 12:36 checkin SUB-PROCESSING by backlog-agent
+- 2026-10-07 12:36 checkin SUB-OUTPUT by backlog-agent
