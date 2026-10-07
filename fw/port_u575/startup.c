@@ -36,30 +36,15 @@ __attribute__((section(".isr_vector"), used)) const vec_t vector_table[16u + U57
     [16u + 74u ... 16u + U575_IRQ_COUNT - 1u] = Default_Handler,
 };
 
-#define SCB_CPACR (*(volatile uint32_t *)0xE000ED88u)
+/* FWSIM-R21 image header, read by the boot stub (port_u575/boot) at BOOT_APP_BASE + 0x300: length from the linker, CRC-32 patched into
+ * fw.bin by fw/tools/imgcrc.py after the link (0 in the ELF). The DFU flag is handled by the stub, before the app ever runs. */
+extern uint32_t _app_size;
+__attribute__((section(".app_header"), used)) const uint32_t app_header[4] = {0x41444F50u, 1u, (uint32_t)(uintptr_t)&_app_size, 0u};
 
-/* FWSIM-R21 DFU entry: hal_usb_dfu_request left FW_DFU_MAGIC in TAMP_BKP0R and reset. Checked first, with only PWR/RTC-APB clocks
- * turned on; the flag is cleared before the jump so the loader's own reset returns to the application. */
-static void dfu_check(void)
-{
-    volatile uint32_t *const ahb3 = (volatile uint32_t *)0x46020C94u, *const apb3 = (volatile uint32_t *)0x46020CA8u;
-    volatile uint32_t *const dbpr = (volatile uint32_t *)0x46020828u, *const bkp0 = (volatile uint32_t *)0x46007D00u;
-    *ahb3 |= 1u << 2;                                          /* PWREN */
-    *apb3 |= 1u << 21;                                         /* RTCAPBEN */
-    __asm volatile("dsb" ::: "memory");
-    if (*bkp0 != 0xDF00B007u)
-        return;
-    *dbpr |= 1u;
-    *bkp0 = 0u;
-    *dbpr &= ~1u;
-    const volatile uint32_t *rom = (const volatile uint32_t *)0x0BF90000u;
-    uint32_t sp = rom[0], pc = rom[1];
-    __asm volatile("msr msp, %0\n bx %1" ::"r"(sp), "r"(pc) : "memory");
-}
+#define SCB_CPACR (*(volatile uint32_t *)0xE000ED88u)
 
 void Reset_Handler(void)
 {
-    dfu_check();
     SCB_CPACR |= 0xFu << 20;                                  /* CP10/CP11 full access: FPU on */
     __asm volatile("dsb\n isb" ::: "memory");
     uint32_t fpscr;

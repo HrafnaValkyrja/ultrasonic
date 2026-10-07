@@ -16,11 +16,12 @@ ENTRY(Reset_Handler)
 
 SECTIONS
 {
-    .isr_vector : { KEEP(*(.isr_vector)) } > FLASH
+    .isr_vector : { KEEP(*(.isr_vector)) ASSERT(. - ADDR(.isr_vector) <= 0x300, "vector table overlaps the image header"); . = 0x300; KEEP(*(.app_header)) } > FLASH
     .text : { *(.text*) *(.rodata*) . = ALIGN(4); } > FLASH
     .ARM.exidx : { *(.ARM.exidx*) } > FLASH
     _sidata = LOADADDR(.data);
     .data : { _sdata = .; *(.data*) . = ALIGN(4); _edata = .; } > SRAM1 AT > FLASH
+    _app_size = LOADADDR(.data) + SIZEOF(.data) - ORIGIN(FLASH);
     .bss (NOLOAD) : { _sbss = .; *(.bss*) *(COMMON) . = ALIGN(4); _ebss = .; } > SRAM1
     .noinit (NOLOAD) : { *(.noinit*) } > SRAM1
     .stack (NOLOAD) : { . = ALIGN(8); _sstack = .; . = . + _stack_size; } > SRAM1

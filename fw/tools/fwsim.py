@@ -169,7 +169,43 @@ def stage_arm(cfg):
     rows = [row("arm.build", "PASS", f"flash {b['flash']} B, RAM static {b['ram_static']} B + stack {b['stack_region']} B", "builds", op="",
                 basis="arm-none-eabi-gcc 14.2 -mcpu=cortex-m33 -mfloat-abi=hard -O2, same core sources as host", src="FWSIM-R1", wall=b["wall"])]
     rows.append(stage_stack(b))
+    rows.append(stage_image(b))
+    rows.append(stage_stub())
     return rows, b
+
+
+def stage_image(b):
+    """FWSIM-R21: fw.bin with the image header CRC patched (fw/tools/imgcrc.py), then checked the way the stub will check it."""
+    binp = b["dir"] / "fw.bin"
+    rc, _, se, w = run(["arm-none-eabi-objcopy", "-O", "binary", b["elf"], binp])
+    if rc == 0:
+        rc, so, se, w2 = run([sys.executable, FW / "tools/imgcrc.py", binp])
+        w += w2
+        if rc == 0:
+            rc, so, se, w3 = run([sys.executable, FW / "tools/imgcrc.py", "--check", binp])
+            w += w3
+    return row("arm.image_header", "PASS" if rc == 0 else "FAIL", (so.strip() if rc == 0 else tail(se or so)), "valid header + CRC", op="",
+               basis="objcopy -O binary; fw/tools/imgcrc.py patch + --check (zlib CRC-32 = core fw_crc32_update, checked in port_u575.regs)",
+               src="FWSIM-R21", wall=w)
+
+
+def stage_stub():
+    """FWSIM-R21: the boot stub image (page 0, 8 KB) builds and fits."""
+    d = OUT / "arm_stub"
+    if d.exists():
+        shutil.rmtree(d)
+    d.mkdir(parents=True)
+    elf = d / "stub.elf"
+    srcs = [FW / "port_u575/boot/stub.c", FW / "port_u575/boot/boot.c", FW / "core/crc32.c"]
+    rc, _, se, w = run([ARMCC, *ARM_FLAGS, "-Os", *WARN, f"-I{FW / 'core'}", f"-I{FW / 'port_u575/boot'}", *srcs, "-T", FW / "port_u575/boot/stub.ld",
+                        "-nostartfiles", "--specs=nano.specs", "-Wl,--gc-sections", "-o", elf])
+    if rc != 0:
+        return row("arm.stub", "FAIL", "error", "<= 8192 B", basis="stub.ld page 0", src="FWSIM-R21", detail=tail(se), wall=w)
+    _, so, _, _ = run(["arm-none-eabi-size", "-A", elf])
+    sec = {m[1]: int(m[2]) for m in re.finditer(r"^(\.\S+)\s+(\d+)\s+\d+", so, re.M)}
+    size = sum(sec.get(x, 0) for x in (".stub_vectors", ".text"))
+    return row("arm.stub", "PASS" if size <= 8192 else "FAIL", f"stub {size} B", "<= 8192 B", op="<=",
+               basis="port_u575/boot (stub.c + boot.c + core crc32.c), -Os, linked at 0x08000000 by stub.ld", src="FWSIM-R21", wall=w)
 
 
 def callgraph(dirpath):
@@ -333,13 +369,15 @@ def stage_dsp(cfg):
     d = OUT / "port_regs"
     d.mkdir(parents=True, exist_ok=True)
     exe = d / "test_regs"
-    rc, _, se, w = run([GCC, "-std=c11", "-O2", *WARN, "-DFW_REG_RECORD", *INC, f"-I{FW / 'port_u575'}", f"-I{FW / 'port_u575/usb'}", f"-I{FW / 'test/port'}",
-                        FW / "port_u575/hal_u575_periph.c", FW / "port_u575/hal_u575_io.c", FW / "port_u575/hal_u575_sys.c", FW / "port_u575/usb/usb_desc.c", *sorted((FW / "test/port").glob("*.c")), "-o", exe])
+    rc, _, se, w = run([GCC, "-std=c11", "-O2", *WARN, "-DFW_REG_RECORD", *INC, f"-I{FW / 'port_u575'}", f"-I{FW / 'port_u575/usb'}", f"-I{FW / 'port_u575/boot'}", f"-I{FW / 'test/port'}",
+                        FW / "port_u575/hal_u575_periph.c", FW / "port_u575/hal_u575_io.c", FW / "port_u575/hal_u575_sys.c", FW / "port_u575/usb/usb_desc.c",
+                        FW / "port_u575/boot/boot.c", FW / "core/crc32.c", *sorted((FW / "test/port").glob("*.c")), "-o", exe])
     if rc == 0:
-        rc, so, se, w2 = run([exe])
+        fwbin = OUT / "arm/fw.bin"                   # the real image (arm stage ran first in `all`): the stub's decision must be "app"
+        rc, so, se, w2 = run([exe, *([fwbin] if fwbin.exists() else [])])
         w += w2
     rows.append(row("port_u575.regs", "PASS" if rc == 0 else "FAIL", (so.strip().splitlines() or ["?"])[-1] if rc in (0, 1) else f"exit {rc}", "0 fails",
-                    basis="fw/test/port/test_regs.c: GPIO, TIM1 PWM/break, I2C2, ADC1, MDF1 OLD break chain, GPDMA->TIM1 DMAR bursts vs RM0456 Rev 7", src="FWSIM-R16, FWSIM-R20, FWSIM-R46, FWSIM-R65",
+                    basis="fw/test/port/test_regs.c: GPIO, TIM1 PWM/break, I2C2, ADC1/ADC4, MDF1 OLD break chain, GPDMA, clocks, Stop 2/RTC, ADF1, USB descriptors, DFU request, boot stub decision on synthetic images and the real fw.bin, vs RM0456 Rev 7", src="FWSIM-R16, FWSIM-R20, FWSIM-R21, FWSIM-R25, FWSIM-R28, FWSIM-R46, FWSIM-R65",
                     detail=None if rc == 0 else tail(se), wall=w))
     # FWSIM-R15 ceiling property
     d = OUT / "prop"

@@ -6,6 +6,10 @@
 #include "reg.h"
 #include "regfake.h"
 #include "usb_desc.h"
+#include "boot.h"
+#include "crc32.h"
+#include <stdlib.h>
+#include <string.h>
 
 const uint32_t *u575_burst_buf(uint32_t i);
 void u575_dma_tc_isr(void);
@@ -19,7 +23,7 @@ static uint32_t checks, fails;
 #define GB 0x42020400u
 #define T(o) (TIM1_BASE + (o))
 
-int main(void)
+int main(int argc, char **argv)
 {
     /* GPIO: GA_P = PA8 AF1 (TIM1_CH1): AF written before MODER; MODER bits 17:16 = 10 from the 0xABFFFFFF reset */
     rf_reset();
@@ -374,6 +378,50 @@ int main(void)
         CHECK(reg_read(TAMP_BKP0R) == FW_DFU_MAGIC && rf_resets() == r0 + 1u);
         CHECK((reg_read(PWR_DBPR) & 1u) && (reg_read(RCC_APB3ENR) & (1u << 21)));
         CHECK((uint32_t)rf_find(TAMP_BKP0R, 0u) < rf_nlog() && rf_find(PWR_DBPR, 0u) < rf_find(TAMP_BKP0R, 0u));
+    }
+
+    /* ==== round 12: boot stub decision (FWSIM-R21) on synthetic images, then the real fw.bin when fwsim passes it */
+    {
+        CHECK(fw_crc32_update(0u, "123456789", 9u) == 0xCBF43926u);          /* CRC-32 check value = zlib = imgcrc.py */
+        static uint8_t img[4096];
+        memset(img, 0xA5, sizeof img);
+        const uint32_t vec[2] = {0x20030000u, BOOT_APP_BASE + 0x401u};
+        memcpy(img, vec, 8u);
+        boot_hdr_t h = {BOOT_HDR_MAGIC, 1u, 4000u, 0u};
+        memcpy(img + BOOT_HDR_OFFSET, &h, sizeof h);
+        h.crc32 = boot_image_crc(img, 4000u);
+        memcpy(img + BOOT_HDR_OFFSET, &h, sizeof h);
+        CHECK(boot_decide(0u, false, false, img, sizeof img) == BOOT_APP);
+        CHECK(boot_decide(BOOT_DFU_MAGIC, false, false, img, sizeof img) == BOOT_DFU_FLAG);
+        CHECK(boot_decide(0u, true, true, img, sizeof img) == BOOT_DFU_BUTTON);
+        CHECK(boot_decide(0u, true, false, img, sizeof img) == BOOT_APP);      /* button on battery: an ordinary power-on */
+        CHECK(boot_decide(0u, false, true, img, sizeof img) == BOOT_APP);      /* docked without the button: the app */
+        img[3999] ^= 1u;
+        CHECK(boot_decide(0u, false, false, img, sizeof img) == BOOT_DFU_CRC);
+        img[3999] ^= 1u;
+        img[4000] ^= 1u;                                                      /* outside the image: ignored */
+        CHECK(boot_decide(0u, false, false, img, sizeof img) == BOOT_APP);
+        CHECK(boot_decide(0u, false, false, img, 3000u) == BOOT_DFU_NO_APP);   /* length past the readable area */
+        static uint8_t erased[1024];
+        memset(erased, 0xFF, sizeof erased);
+        CHECK(boot_decide(0u, false, false, erased, sizeof erased) == BOOT_DFU_NO_APP);
+        uint32_t bad_sp = 0x20030004u;                                        /* not 8-byte aligned */
+        memcpy(img, &bad_sp, 4u);
+        h.crc32 = 0u;
+        memcpy(img + BOOT_HDR_OFFSET, &h, sizeof h);
+        h.crc32 = boot_image_crc(img, 4000u);
+        memcpy(img + BOOT_HDR_OFFSET, &h, sizeof h);
+        CHECK(boot_decide(0u, false, false, img, sizeof img) == BOOT_DFU_VECTORS);
+        if (argc > 1) {                                                       /* the linked + patched application */
+            FILE *f = fopen(argv[1], "rb");
+            static uint8_t bin[BOOT_APP_MAX];
+            size_t n = f ? fread(bin, 1u, sizeof bin, f) : 0u;
+            if (f)
+                fclose(f);
+            CHECK(n > 1024u && boot_decide(0u, false, false, bin, n) == BOOT_APP);
+            bin[n / 2u] ^= 0x10u;
+            CHECK(boot_decide(0u, false, false, bin, n) == BOOT_DFU_CRC);
+        }
     }
     printf("{\"checks\": %u, \"fails\": %u}\n", checks, fails);
     return fails ? 1 : 0;
