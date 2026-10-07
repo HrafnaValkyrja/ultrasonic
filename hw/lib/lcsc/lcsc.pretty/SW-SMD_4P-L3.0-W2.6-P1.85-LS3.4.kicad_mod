@@ -23,7 +23,7 @@
 	(fp_line (start -1.50 -1.30) (end 1.50 -1.30) (layer F.CrtYd) (width 0.05))
 	(fp_line (start 1.50 -1.30) (end 1.50 1.30) (layer F.CrtYd) (width 0.05))
 	(fp_line (start 1.50 1.30) (end -1.50 1.30) (layer F.CrtYd) (width 0.05))
-	(model "hw/lib/lcsc/lcsc.3dshapes/SW-SMD_4P-L3.0-W2.6-P1.85-LS3.4.wrl"
+	(model "hw/lib/lcsc/lcsc.3dshapes/KMT022NGJLHS_placeholder.step"
 		(offset (xyz 0.000 0.000 0.000))
 		(scale (xyz 1 1 1))
 		(rotate (xyz 0 0 0))

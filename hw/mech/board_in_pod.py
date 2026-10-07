@@ -28,14 +28,24 @@ BOARD = ROOT / "hw/pod/draft_r2/out/routed.kicad_pcb"
 CU = 0.045
 
 
+# CHK-MODELS (2026-10-07): the board's embedded footprints still name the old models until the next library sync;
+# export from a scratch copy with the datasheet placeholders (hw/lib/make_placeholder_models.py) substituted.
+MODEL_SUBST = {"${KICAD10_3DMODEL_DIR}/Sensor_Audio.3dshapes/Knowles_LGA-5_3.5x2.65mm.step": "hw/lib/lcsc/lcsc.3dshapes/SPH0641LU4H-1_placeholder.step",
+               "hw/lib/lcsc/lcsc.3dshapes/SW-SMD_4P-L3.0-W2.6-P1.85-LS3.4.wrl": "hw/lib/lcsc/lcsc.3dshapes/KMT022NGJLHS_placeholder.step"}
+
+
 def export():
     OUT.mkdir(parents=True, exist_ok=True)
+    txt = BOARD.read_text()
+    for a_, b_ in MODEL_SUBST.items():
+        txt = txt.replace(f'(model "{a_}"', f'(model "{ROOT / b_}"')
+    src = OUT / "_board_models_substituted.kicad_pcb"
+    src.write_text(txt)
     jobs = {"full": [], "board": ["--board-only"], "SW1": ["--no-board-body", "--component-filter", "SW1"],
             "Q1": ["--no-board-body", "--component-filter", "Q1"]}
     for n, a in jobs.items():
         f = OUT / f"{n}.stl"
-        if not f.exists() or f.stat().st_mtime < BOARD.stat().st_mtime:
-            subprocess.run(["kicad-cli", "pcb", "export", "stl", *a, "-f", "-o", str(f), str(BOARD)], check=True, capture_output=True)
+        subprocess.run(["kicad-cli", "pcb", "export", "stl", *a, "-f", "-o", str(f), str(src)], check=True, capture_output=True)
 
 
 def tris(p):

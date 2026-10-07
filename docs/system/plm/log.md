@@ -487,3 +487,7 @@
 - 2026-10-07 15:54 review REG-BOARD by backlog-agent: CHK-DRCWARN: 2 dangling vias deleted (GND In1-only, NRST unused pre-via); DRC 0 errors/0 unconnected/1 warning (hole_to_hole +3V0 pair, real, router); noise smoke 6 metrics identical, LN-M03 1.29 %
 - 2026-10-07 15:54 review R-OUT-BOARD by backlog-agent: CHK-DRCWARN: 2 dangling vias deleted (GND In1-only, NRST unused pre-via); DRC 0 errors/0 unconnected/1 warning (hole_to_hole +3V0 pair, real, router); noise smoke 6 metrics identical, LN-M03 1.29 %
 - 2026-10-07 15:54 checkin REG-BOARD by backlog-agent
+- 2026-10-07 15:56 checkout REG-BOARD by backlog-agent: CHK-MODELS placeholders
+- 2026-10-07 15:57 review R-AUDIO-BODY by backlog-agent: CHK-MODELS: only the 3D model path changed in the Knowles/KMT022 library footprints (pads, hole unchanged); interfaces mic-port/heights PASS
+- 2026-10-07 15:57 review REG-BOARD by backlog-agent: CHK-MODELS: only the 3D model path changed in the Knowles/KMT022 library footprints (pads, hole unchanged); interfaces mic-port/heights PASS
+- 2026-10-07 15:57 checkin REG-BOARD by backlog-agent
