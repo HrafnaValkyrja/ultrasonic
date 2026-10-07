@@ -22,7 +22,7 @@
   "PHYSICAL": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only",
+   "note": "DK-16: dock wire picked (32/36 AWG enamelled, Elektrisola data), fill check; docs only",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
@@ -109,7 +109,7 @@
   "SUB-DOCK-USB": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
+   "note": "DK-16: dock wire picked (32/36 AWG enamelled, Elektrisola data), fill check; docs only",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"
@@ -322,9 +322,9 @@
    }
   },
   "R-DOCK-BODY": {
-   "by": "ultrasonic-lead",
+   "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)",
+   "note": "DK-16: dock wire picked (32/36 AWG enamelled, Elektrisola data), fill check; docs only",
    "stamp": {
     "sym:hw/mech/dims_r2.py::BAY": "d933f8dc8c3634dd",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9",

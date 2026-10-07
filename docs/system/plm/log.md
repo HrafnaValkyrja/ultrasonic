@@ -367,3 +367,10 @@
 - 2026-10-07 13:05 review SUB-AUDIO-IN by backlog-agent: SAI-3: mesh picked (Acoustex 042 at the hex-seat floor; mesh_pick.py with mesh inertance); model option m_mesh default 0 keeps earlier results
 - 2026-10-07 13:05 review R-AUDIO-BODY by backlog-agent: SAI-3: mesh picked (Acoustex 042 at the hex-seat floor; mesh_pick.py with mesh inertance); model option m_mesh default 0 keeps earlier results
 - 2026-10-07 13:05 checkin SUB-AUDIO-IN by backlog-agent
+- 2026-10-07 13:06 checkout SUB-DOCK-USB by backlog-agent: DK-16 dock wire pick
+- 2026-10-07 13:06 checkout PHYSICAL by backlog-agent: DK-16 dock wire pick
+- 2026-10-07 13:06 review SUB-DOCK-USB by backlog-agent: DK-16: dock wire picked (32/36 AWG enamelled, Elektrisola data), fill check; docs only
+- 2026-10-07 13:06 review PHYSICAL by backlog-agent: DK-16: dock wire picked (32/36 AWG enamelled, Elektrisola data), fill check; docs only
+- 2026-10-07 13:06 review R-DOCK-BODY by backlog-agent: DK-16: dock wire picked (32/36 AWG enamelled, Elektrisola data), fill check; docs only
+- 2026-10-07 13:06 checkin SUB-DOCK-USB by backlog-agent
+- 2026-10-07 13:07 checkin PHYSICAL by backlog-agent

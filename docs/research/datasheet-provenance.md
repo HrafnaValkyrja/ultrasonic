@@ -66,6 +66,7 @@ The board-parts table above is the 2026-09-30 (Rev E) BOM: U3 is now the TI BQ25
 | Cell | Renata ICP501233PA-02 specification | V03, 08/2019 | c3bb2ebe9c1d78af | 2026-10-01 | sub-power `cell:` block |
 | D5, D6 ESD | TI TPD1E10B06 datasheet SLLSEB1G, https://www.ti.com/lit/ds/symlink/tpd1e10b06.pdf | rev Aug 2024 | 6ffe72cb5f5e607f | 2026-10-07 | sub-dock-usb DK-18 (V_RWM 5.5, I_LEAK 100 nA at 5 V, V_BR 6 V min) |
 | Mic duct mesh | Saatifil Acoustex technical data sheet (distributor copy https://marianinc.com/wp-content/uploads/2024/09/SAATIFIL-ACOUSTEX-RANGE_6.pdf) | PDF modified 2024-09-26 | dba5071d3a0dfcb1 | 2026-10-07 | sub-audio-in issue 3, sim/checks/mesh_pick.py |
+| Dock wire | Elektrisola EnCuWire NEMA-inch data sheet https://www.elektrisola.com/Attachments/TechnicalDataBySize/ELEKTRISOLA_EnCuWire_NEMAinch_Datasheet_eng.pdf | PDF mod 2014-04-07 | 0a275378d995e50b | 2026-10-07 | sub-dock-usb DK-16 (heavy-build OD, ohms/1000 ft) |
 | Board/cell bond | 3M VHB Tape Specialty Tape 4914 TDS, https://multimedia.3m.com/mws/media/2366463O/3M-VHB-Tape-Specialty-Tape-4914.pdf | rev 2024-09 (supersedes 2024-06) | 2fc355523c5e5dff | 2026-10-07 | dims_r2.switch_stack (thickness ±15 %), sim/checks/sw1_press_fem.py (85 kPa dynamic design factor, 900 kPa normal tensile) |
 
 ## To close the gap

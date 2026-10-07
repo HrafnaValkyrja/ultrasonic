@@ -168,7 +168,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 ## Open issues (IDs stable; gaps = closed)
 1. (closed in Phase 2) Mic port unsealed: sealed D1.0 duct (O24); 1b board port vs lid bore: nominal 0.000, gauge pin worst 0.155 (dims_r2.duct_offsets, 2026-10-07). R-ACO-P6 keep-out holds since 2026-10-07 (reg-pod-body issue 19 closed).
 2. (closed 2026-10-07 in CAD) **Heel wire exit vs the cell.** Exit moved to x 66.20 with a Ø0.8 neck (hole 65.80-66.60, 0.20 behind the cell end 65.6, rim-corner 0.36); arm wires 0.39 from the cell; build order in notes/heel.md. Remains: dry fit with the real pouch ([reg-arm](reg-arm.md) issue 1).
-3. **Dock wire route not designed.** 5 wires from the belly to the B pads at board x 25-29: 0.8 under the cell beside the flat tails (0.85 tail-to-cell) or the rear gap; OD ≤ 0.6 needed under the cell (notes/shell_r2.md).
+3. **Dock wire route not designed.** 5 wires from the belly to the B pads at board x 25-29: 0.8 under the cell beside the flat tails (0.85 tail-to-cell) or the rear gap; OD ≤ 0.6 needed under the cell (notes/shell_r2.md). Wire picked 2026-10-07 (sub-dock-usb DK-16): 32 AWG VBUS/GND + 36 AWG D+/D−/CC enamelled, flat bundle 0.98 × 0.25 mm: fits the 0.8 under-cell slack (≥ 0.48 left) or the 1.1 rear gap.
 4. (closed 2026-10-07, ECR-0001) `frame.py` / `pod.py` derive the pod from the current dims; rail and adapter default to the body centre.
 5. **Which pod the CAD is**, and board orientation per pod, are stated two ways (pcb-mech-interface §1 "right"; dims_r2/notes "right = mirror"). Close: one statement in dims_r2 + a KiCad 3D render placed in the CAD for both pods.
 6. **Sealing unverified.** No IP test plan; mesh, skin, tape and adhesive products not chosen.
