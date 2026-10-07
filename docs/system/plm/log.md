@@ -391,3 +391,18 @@
 - 2026-10-07 13:11 review R-BOARD-ARM by backlog-agent: ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it
 - 2026-10-07 13:11 review R-BODY-ARM by backlog-agent: ARM-LEFT: heel.wire_route/route_checks take pod (left = board flipped): left pod pass_0.3, cut lengths 19.4-21.9; right pod unchanged; dock_route uses it
 - 2026-10-07 13:11 checkin REG-ARM by backlog-agent
+- 2026-10-07 13:13 checkout REG-POD-BODY by backlog-agent: RPB-5 sealing note pointers
+- 2026-10-07 13:13 checkout PHYSICAL by backlog-agent: RPB-5 sealing note pointers
+- 2026-10-07 13:13 checkout SUB-DOCK-USB by backlog-agent: RPB-5 sealing note pointers
+- 2026-10-07 13:13 checkout SUB-AUDIO-IN by backlog-agent: RPB-5 sealing note pointers
+- 2026-10-07 13:13 review REG-POD-BODY by backlog-agent: RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only
+- 2026-10-07 13:13 review PHYSICAL by backlog-agent: RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only
+- 2026-10-07 13:13 review SUB-DOCK-USB by backlog-agent: RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only
+- 2026-10-07 13:13 review SUB-AUDIO-IN by backlog-agent: RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only
+- 2026-10-07 13:13 review R-AUDIO-BODY by backlog-agent: RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only
+- 2026-10-07 13:13 review R-DOCK-BODY by backlog-agent: RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only
+- 2026-10-07 13:13 review R-UI-BODY by backlog-agent: RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only
+- 2026-10-07 13:13 checkin REG-POD-BODY by backlog-agent
+- 2026-10-07 13:13 checkin PHYSICAL by backlog-agent
+- 2026-10-07 13:14 checkin SUB-DOCK-USB by backlog-agent
+- 2026-10-07 13:14 checkin SUB-AUDIO-IN by backlog-agent

@@ -36,7 +36,7 @@ unblocked:   # value order; rank 1 = do first
   - {id: UI-1, rank: 17, cls: evidence, src: sub-ui.md#1, t: "puck selective-fit procedure not written", close: "fit procedure in physical.md assembly order", blk: none, st: "done 2026-10-07 (physical.md step 9); test-build run = hardware; stuck flag = fw-agent", commit: 42f45db}
   - {id: UI-3, rank: 18, cls: evidence, src: sub-ui.md#3, t: "nub D1.0 = C&K minimum, not recommendation", close: "decide in CAD vs pocket clearance (worst 0.095)", blk: none, st: open}
   - {id: PAD-5, rank: 19, cls: risk, src: reg-pad.md#5, t: "closure pilot D0.95 in CAD vs D1.0 in hardware.md (92 % vs 74 % engagement, boss split risk)", close: "FASTENERS pilot 1.0 or ream note", blk: none, st: "done 2026-10-07 (pilot 1.0; pad.py: cavity-pilot wall 0.775 -> 0.75, nothing else changed)", commit: 186ea3b}
-  - {id: RPB-5, rank: 20, cls: evidence, src: reg-pod-body.md#5, dup: [PHYS-6, DK-07, PAD-3 research half, UI-4], t: "sealing note missing (O10 cites absent docs/research/sealing-and-service.md); spray-test plan", close: "sealing note + IPX4 test plan (test itself = hardware)", blk: none, st: open}
+  - {id: RPB-5, rank: 20, cls: evidence, src: reg-pod-body.md#5, dup: [PHYS-6, DK-07, PAD-3 research half, UI-4], t: "sealing note missing (O10 cites absent docs/research/sealing-and-service.md); spray-test plan", close: "sealing note + IPX4 test plan (test itself = hardware)", blk: none, st: "done 2026-10-07 (docs/research/sealing-and-service.md; membrane_loss.py: ePTFE membranes fail R14, hydrophobic open mesh instead); products + spray coupon remain"}
   - {id: RPB-14, rank: 21, cls: evidence, src: reg-pod-body.md#14, dup: [PHYS-14], t: "service procedures not in physical.md", close: "write Service section", blk: none, st: open}
   - {id: DBG-16, rank: 22, cls: evidence, src: sub-debug-test.md DBG-16, t: "no lid bond before DFU-via-stub passes on the bare board: gate not written into physical.md", close: "add the gate", blk: none, st: "done 2026-10-07 (physical.md step 8 gate)", commit: 42f45db}
   - {id: RPB-16, rank: 23, cls: evidence, src: reg-pod-body.md#16, t: "stepped gauge pin D0.98/D0.50 not sourced", close: "source or turn; else ECR (2 NPTH + lid pins)", blk: none, st: open}
@@ -138,8 +138,8 @@ fw_agent:   # owned by the firmware agent (fw/, docs/sim/firmware-emulation.yaml
 
 item_dep:   # waits on another item
   - {id: RPB-9, t: "r2 render dump + STEP export", blk: "item:ECR-0018 owner review edits"}
-  - {id: RPB-13, t: "seam corner butt joints: sealant bead or corner key", blk: "item:RPB-5 (sealing note)"}
-  - {id: UI-4, t: "button skin material", blk: "item:RPB-5"}
+  - {id: RPB-13, t: "seam corner butt joints: sealant bead or corner key", blk: "item:RPB-5 (sealing note) -> note done 2026-10-07: rec = RTV fillet bead in each corner (S2); confirm on the spray coupon (hardware)"}
+  - {id: UI-4, t: "button skin material", blk: "item:RPB-5 -> note done 2026-10-07 (S4: 0.2-0.3 silicone + primer or captured under the plate); product pick open (unblocked)"}
   - {id: RPB-3, t: "body-side mic path", blk: "item:SAI-3, SAI-13"}
 
 info_only:   # check WARNs that are tracked elsewhere, not work items

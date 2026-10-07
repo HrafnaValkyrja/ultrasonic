@@ -22,7 +22,7 @@
   "PHYSICAL": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
+   "note": "RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
@@ -70,7 +70,7 @@
   "REG-POD-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "coordinator decisions 2026-10-07 (9330d9c) recorded in the source docs: SAI-15D B, RB-20 accept, DK-17D A, OUT-6 A (FWSIM-R65), ARM-6D accept, RPB-15 accept, RPB-4 selective fit; docs only",
+   "note": "RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only",
    "stamp": {
     "file:hw/mech/blade.py": "20e890c775848522",
     "file:hw/mech/dims_r2.py": "b512a30ef4e4f769",
@@ -89,7 +89,7 @@
   "SUB-AUDIO-IN": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "SAI-3: mesh picked (Acoustex 042 at the hex-seat floor; mesh_pick.py with mesh inertance); model option m_mesh default 0 keeps earlier results",
+   "note": "RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only",
    "stamp": {
     "block:MIC": "3b3b0512fc8e5584",
     "sym:hw/mech/dims_r2.py::DUCT_D": "3fbb6d185c33173c",
@@ -109,7 +109,7 @@
   "SUB-DOCK-USB": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
+   "note": "RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"
@@ -191,7 +191,7 @@
   "R-AUDIO-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "SAI-3: mesh picked (Acoustex 042 at the hex-seat floor; mesh_pick.py with mesh inertance); model option m_mesh default 0 keeps earlier results",
+   "note": "RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only",
    "stamp": {
     "file:hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod": "889862c5c23dd5ca",
     "grep:hw/pod/gen.py::Knowles_LGA-5": "191992f13ef883bf",
@@ -324,7 +324,7 @@
   "R-DOCK-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-05: dock wire route in both pods (hw/mech/dock_route.py): worst 0.19 right / 0.11 left to the arm bundle; left pod swaps arm/dock heights",
+   "note": "RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only",
    "stamp": {
     "sym:hw/mech/dims_r2.py::BAY": "d933f8dc8c3634dd",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9",
@@ -587,7 +587,7 @@
   "R-UI-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only",
+   "note": "RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only",
    "stamp": {
     "ref:SW1": "6a5226a0b24dd9c5",
     "sym:hw/mech/dims_r2.py::POCKET": "75123b323bc1f0df",
