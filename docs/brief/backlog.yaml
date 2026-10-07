@@ -1,0 +1,138 @@
+# ENGINEERING BACKLOG (AI-facing). The queue that proves whether unblocked work exists.
+# Scope: current design hw/current.yaml = phase2 (MZ-2, ECR-0018). Built 2026-10-07 by the backlog agent
+# (session 01Wg997D) from: numbered "Open issues" in docs/system/*.md, `tools/plm.py status` open ECRs,
+# WARN lines of tools/checks/interfaces.py + bom_check.py (run 2026-10-07), docs/brief/queue.yaml tier-B/open non-owner items.
+# Keys: id (doc-prefix + the doc's stable issue id), src, t (one line), blk (blocker), cls (risk|evidence|hygiene),
+#   rank (unblocked only; value order: design risk > evidence gap > hygiene), dup (same issue tracked elsewhere), st (open|done|stale-closed).
+# blk values: none | owner (decision; options+rec in `opts`) | hardware (parts/bench/board; O21 = no orders before freeze)
+#   | router (needs re-route/placement: parallel agents may not) | fw-agent (fw/ + firmware-emulation.yaml owned by another agent) | item:<id>
+# Prefixes: OUT sub-output, PROC sub-processing, PWR sub-power, DK sub-dock-usb, SAI sub-audio-in, DBG sub-debug-test, UI sub-ui,
+#   RB reg-board, RPB reg-pod-body, ARM reg-arm, PAD reg-pad, PHYS physical, ECR plm, CHK checks, Q queue.
+# Maintenance: when an item closes, set st + evidence (commit) here AND in its source doc in the same commit.
+schema: 1
+date: 2026-10-07
+counts: {total: 105, unblocked: 32, stale_closed: 2, owner: 25, hardware: 34, router: 1, fw_agent: 7, item_dep: 4}   # entries (dups folded into one entry); update on every close
+
+unblocked:   # value order; rank 1 = do first
+  - {id: UI-2, rank: 1, cls: risk, src: sub-ui.md#2, dup: [RPB-17, 00-whole risk 12], t: "SW1 press (1.2-2.0 N) reacted only by the 0.8 mm board + VHB; board deflection, VHB stress and whether the KMT022 stroke (0.15+-0.1) survives are uncomputed", close: "scikit-fem plate model of the bonded board under 2.0 N at board (18.5, 6.0)", blk: none, st: open}
+  - {id: PWR-I14, rank: 2, cls: risk, src: sub-power.md PWR-I14, t: "C21 (VSYS) 10 V class-2 cap vs TI's 25 V recommendation; derated value must stay > 1 uF at 4.5 V", close: "DC-bias of C19702 at 4.5 V from the maker's curve, or a 16/25 V Basic swap", blk: none, st: open}
+  - {id: PWR-I6, rank: 3, cls: risk, src: sub-power.md PWR-I6, dup: [DBG-9], t: "R20 0402 0R jumper carries the whole +3V0 rail (326 mA peak); rating unsourced", close: "read the jumper's rated current in the maker datasheet", blk: none, st: open}
+  - {id: DK-18, rank: 4, cls: risk, src: sub-dock-usb.md DK-18, t: "D5 TPD1E10B06 working voltage 5.5 V vs worst-case dock VBUS; leakage near 5.5 V unknown", close: "datasheet I_leak vs V", blk: none, st: open}
+  - {id: RPB-12, rank: 5, cls: risk, src: reg-pod-body.md#12, dup: [PHYS-13], t: "seam rebate 0.2 x 0.3 is below the 0.4 resin recess minimum (may fuse); belly step unmarked", close: "widen to 0.4 in shell_r2, mark the step, re-run shell checks", blk: none, st: open}
+  - {id: OUT-1, rank: 6, cls: evidence, src: sub-output.md#1, dup: [DBG-5], t: "self-test |Z| method option D (2f synchronous detection on R21 supply current + offset) unverified", close: "verify in sim/checks/bridge_spice.py", blk: none, st: open}
+  - {id: ARM-6, rank: 7, cls: evidence, src: reg-arm.md#6, dup: [PAD-6], t: "strut-housing clearance 1.18-1.34 vs 1.4 target; pad checks.json still reports 0.79 FAIL vs an old tub preview", close: "re-run pad.py + heel.py on the shell_r2 tub", blk: none, st: open}
+  - {id: RB-2, rank: 8, cls: evidence, src: reg-board.md#2, dup: [00-whole risk 17], t: "no dielectric stack-up in the board file; sim/noise borrows the Rev E stack", close: "enter JLC 0.8 mm 4-layer stack (dated page read), re-run sim/noise if different", blk: none, st: open}
+  - {id: PHYS-8, rank: 9, cls: evidence, src: physical.md#8, dup: [RPB-10, 00-whole risk 18, D18], t: "pod mass >= ~9.5 g vs ~8 g target; two resin densities in sources", close: "mass from the r2 STLs with one density + parts + wires", blk: none, st: open}
+  - {id: PROC-6R, rank: 10, cls: evidence, src: sub-processing.md#6, dup: [OUT-6], t: "research half of the fault cut-off question: can COMP/ADC watchdog reach TIM1 break internally on U575 (RM0456 TIM1 break sources [TBD])", close: "RM0456 read, options into the backlog for the owner", blk: none, st: open}
+  - {id: DK-17, rank: 11, cls: evidence, src: sub-dock-usb.md DK-17, t: "does the U5 ROM DFU need VBUS sensing on QFN48 (no OTG VBUS pin)?", close: "AN2606 read", blk: none, st: open}
+  - {id: PROC-9, rank: 12, cls: evidence, src: sub-processing.md#9, t: "SMPS 3 MHz synchronous or free-running (whine risk with /20 mic divider) unverified", close: "RM0456/DS read", blk: none, st: open}
+  - {id: RB-TOL, rank: 13, cls: evidence, src: reg-pod-body.md#18, dup: [PHYS-18, SAI-15], t: "Phase-2 [A] tolerances (JLC outline +-0.2, NPTH +-0.05, VHB, resin, KMT022) undated; tolerances.md Rev-1 only", close: "dated sources, tolerances.md Phase-2 section", blk: none, st: open}
+  - {id: SAI-3, rank: 14, cls: evidence, src: sub-audio-in.md#3, t: "no acoustic mesh chosen (S8-mesh FAIL)", close: "pick a mesh with ultrasonic transmission data", blk: none, st: open}
+  - {id: DK-16, rank: 15, cls: evidence, src: sub-dock-usb.md DK-16, t: "dock wire gauge/type unchosen (only OD 0.8 specified; under-cell slack 0.8)", close: "pick <= 0.4 mm OD, record, fill check", blk: none, st: open}
+  - {id: DK-05, rank: 16, cls: evidence, src: sub-dock-usb.md DK-05, dup: [PHYS-3, PHYS-15, RB-5, RPB-7, DBG-17], t: "dock + cell wire route belly -> rear B pads not designed (slack for lid lift)", close: "wire-route sketch with gauges in physical.md", blk: "item:DK-16", st: open}
+  - {id: UI-1, rank: 17, cls: evidence, src: sub-ui.md#1, t: "puck selective-fit procedure not written", close: "fit procedure in physical.md assembly order", blk: none, st: open}
+  - {id: UI-3, rank: 18, cls: evidence, src: sub-ui.md#3, t: "nub D1.0 = C&K minimum, not recommendation", close: "decide in CAD vs pocket clearance (worst 0.095)", blk: none, st: open}
+  - {id: PAD-5, rank: 19, cls: risk, src: reg-pad.md#5, t: "closure pilot D0.95 in CAD vs D1.0 in hardware.md (92 % vs 74 % engagement, boss split risk)", close: "FASTENERS pilot 1.0 or ream note", blk: none, st: open}
+  - {id: RPB-5, rank: 20, cls: evidence, src: reg-pod-body.md#5, dup: [PHYS-6, DK-07, PAD-3 research half, UI-4], t: "sealing note missing (O10 cites absent docs/research/sealing-and-service.md); spray-test plan", close: "sealing note + IPX4 test plan (test itself = hardware)", blk: none, st: open}
+  - {id: RPB-14, rank: 21, cls: evidence, src: reg-pod-body.md#14, dup: [PHYS-14], t: "service procedures not in physical.md", close: "write Service section", blk: none, st: open}
+  - {id: DBG-16, rank: 22, cls: evidence, src: sub-debug-test.md DBG-16, t: "no lid bond before DFU-via-stub passes on the bare board: gate not written into physical.md", close: "add the gate", blk: none, st: open}
+  - {id: RPB-16, rank: 23, cls: evidence, src: reg-pod-body.md#16, t: "stepped gauge pin D0.98/D0.50 not sourced", close: "source or turn; else ECR (2 NPTH + lid pins)", blk: none, st: open}
+  - {id: DK-01, rank: 24, cls: hygiene, src: sub-dock-usb.md DK-01, t: "bom.md pairs the 5-pin target with a 4-pin head (C5126845); 5-pin mate stock 0", close: "fix bom.py; dated stock check of the 5-pin head", blk: none, st: open}
+  - {id: PWR-I9, rank: 25, cls: hygiene, src: sub-power.md PWR-I9, t: "BQ25180 SLUSE99C + Renata V03 rows missing from datasheet-provenance.md", close: "add rows", blk: none, st: open}
+  - {id: CHK-STOCK, rank: 26, cls: hygiene, src: "bom_check stock-lock + lock-drift WARN", t: "8/31 LCSC numbers without lock rows (C25744 undated); D5/D6 C48260 only ALTERNATE; 12 RECOMMENDED rows for unused parts", close: "tools/jlc.py dated rows; prune lock", blk: none, st: open}
+  - {id: CHK-IDENT, rank: 27, cls: hygiene, src: "bom_check identity WARN", t: "8 wrong LCSC properties in superseded hw/pod/kicad-draft", close: "clean or delete the draft", blk: none, st: open}
+  - {id: RB-19, rank: 28, cls: hygiene, src: reg-board.md#19, dup: [CHK-VALUES], t: "74/74 board Value fields hold footprint names", close: "write schematic values into the routed board (no geometry change)", blk: none, st: open}
+  - {id: ARM-7, rank: 29, cls: hygiene, src: reg-arm.md#7, dup: [PAD-10, UI-9, DK-13, DBG-10], t: "stale build notes (heel.md/pad.md/hardware.md/electronics.md/pcb-mech-interface.md/padboard gen.py docstring/learn scripts)", close: "update notes", blk: none, st: open}
+  - {id: DIAG, rank: 30, cls: hygiene, src: "RB-10, PHYS-11, ARM-11, PAD-12, UI-10, SAI-12, DK-14, DBG-11, PROC-10", t: "stale/missing diagrams (Rev E pictures, arm-wiring, button stack, belly bay, test-access map, clock tree, pin map)", close: "redraw (render.sh, dark)", blk: none, st: open}
+  - {id: RB-9, rank: 31, cls: hygiene, src: reg-board.md#9, dup: [PHYS-5], t: "which pod has which edge up is derived, not checked", close: "KiCad 3D render placed in the CAD for both pods", blk: none, st: open}
+  - {id: DK-09, rank: 32, cls: hygiene, src: sub-dock-usb.md DK-09, t: "cable side undocumented (plug, CC, length, strain relief)", close: "dock/cable note + diagram", blk: none, st: open}
+
+stale_closed:   # listed open in a doc but already fixed; close in the doc
+  - {id: RB-18, src: reg-board.md#18, t: "DRC rules in untracked routed.kicad_pro", evidence: "git ls-files: hw/pod/draft_r2/out/routed.kicad_pro tracked (B-DOC-AUDIT-0007 item 4)", st: open-in-doc}
+  - {id: SAI-14, src: sub-audio-in.md#14, t: "MC on disk n 40 vs log n 60", evidence: "sim/acoustics/out/port_results.json phase2 MC n 60 (B-DOC-AUDIT-0007 item 6)", st: open-in-doc}
+
+owner:   # decisions; spec §0: options + rec live in the source doc or here
+  - {id: ECR-0005, dup: [OUT-3, PWR-I1, CHK-RAILS], t: "U4 300 mA vs 326 mA +3V0 peak", opts: "A OUT-07 clamp + capped self-test (rec) / B 12 ohm exciter (E1) / C bigger LDO", blk: "owner (+hardware E1)"}
+  - {id: ECR-0009, dup: [OUT-12, PWR-I5, DBG-12, 00-whole risk 6], t: "no output while docked vs docked self-test", opts: "a capped self-test exemption <= -12 dBFS (rec) / b sweep on battery, read back", blk: owner}
+  - {id: ECR-0014/15/16, t: "simplification packages A/B/C still 'proposed'; superseded in practice by ECR-0018 (O25/O26)", opts: "close as superseded (rec) / keep open for the cherry-picks not in MZ-2", blk: owner}
+  - {id: ECR-0018, t: "Phase-2 MZ-2 approved, implementation in progress, owner review in 1-2 weeks", blk: "owner (A-PHASE2-REVIEW)"}
+  - {id: OUT-6, dup: [PROC-6], t: "always-on hardware/ADC fault cut-off", opts: "A always-on ADC1 analog watchdog (+0.15-0.34 mA) / B self-test-only (today) / C COMP->BKIN if routable (PROC-6R)", blk: "owner (after PROC-6R)"}
+  - {id: RB-20, t: "R21 mid-board vs MZD-4 edge", opts: "accept (rec) / 0603 shunt at edge + wider Kelvin pour (router)", blk: owner}
+  - {id: RPB-4, dup: [CHK-SWITCH, UI lateral], t: "switch lateral stack 0.20 worst vs 0.15 (interfaces WARN, 0.05 over)", opts: "accept with selective fit / tighten board-lid tolerance (gauge pin also locates SW1) / larger bore", blk: owner}
+  - {id: RPB-15, t: "SWD needs a peel after the lid bond", opts: "accept, DFU recovery (rec per DBG-16 gate) / TPs back on B (router)", blk: owner}
+  - {id: UI-5, t: "gesture model holes", opts: "A spec + timings / B short=mode, double=vol, hold=Off (rec) / C three holds", blk: owner}
+  - {id: UI-8, dup: [PAD-13, ARM-8, 00-whole risk 3], t: "PB7 unprotected; pad-board LED_K 0.45 mm from OUT_B", opts: "A reorder pad-board pads / B R14 split / C both (rec)", blk: owner}
+  - {id: PAD-1, dup: [PHYS-9], t: "contact face 50 mm2 vs O16(4) 100-150", opts: "A Sugru over whole cup face (rec) / B grow cup / C pre-made", blk: owner}
+  - {id: PAD-3, t: "pad sealing", opts: "A dry test build, RTV final (rec) / B gasket / C pot", blk: owner}
+  - {id: PAD-9, t: "pad board panel vs separate order", blk: "owner (JLC quote)"}
+  - {id: SAI-4, t: "acoustic coupons vs O9", opts: "a JLC coupon panel / b rev-1 board + printed lids (rec) / c both", blk: owner}
+  - {id: PROC-11, t: "SMPS inductor DFE201610E vs spec D5 LQM21PN", blk: "owner (spec or schematic)"}
+  - {id: PROC-12, dup: [DBG-4], t: "O18 spare pins without pads (PA3 could sense VSYS)", blk: owner}
+  - {id: PROC-2, dup: [ECR-0008], t: "MCU stock 8 at JLC; reserve vs U585 drop-in", blk: "owner (O21)"}
+  - {id: PROC-3, t: "C7 CIN > 2 mm from pin 21", blk: "owner review O25"}
+  - {id: DK-04, t: "sealed-pod update path", opts: "A write-protected boot stub + ROM DFU (rec) / B dual bank / C SWD-only", blk: owner}
+  - {id: DK-10, dup: [A-USBC-SPACE], t: "USB-C fallback space not in shell_r2", opts: "clip-on adapter outside the pod (rec) / re-add keep-out", blk: owner}
+  - {id: DBG-1, t: "first-flash path", opts: "B DFU-first (rec) / C DFU + probe (FWSIM rec) / A probe", blk: owner}
+  - {id: DBG-3, dup: [RB-8], t: "panel / snap-off frame for 30 x 12", opts: "A header tab / B no-wire jig on tooling holes (rec) / C none", blk: "owner (O9)"}
+  - {id: PWR-I3, t: "charger watchdog policy B (triage default) awaits the safety packet", blk: "owner (A-SAFETY-REVIEW)"}
+  - {id: Q-A-SAFETY-REVIEW, t: "ECR-0013/0009 safety read vs SLUSE99C", blk: owner}
+  - {id: Q-B-FOSS-INSTALL-DEFAULT, t: "FOSS install rule reading", blk: owner}
+
+hardware:   # parts / bench / built board (O21: nothing ordered before freeze)
+  - {id: ECR-0006, t: "weighted dummy pair wear + joint flex test"}
+  - {id: ECR-0007, dup: [OUT-2, PAD-2], t: "exciter E1 coil R/L, E2 listening"}
+  - {id: ECR-0010, t: "bring-up plan + firmware tested before order", note: "firmware half = fw-agent"}
+  - {id: OUT-4, t: "JLCDFM verdict on Q1/Q2 0.15 mm gaps; 0.10 mm stencil", note: "needs the owner's JLC account"}
+  - {id: OUT-5, t: "C14 X5R sing risk (S2/E7 listening)"}
+  - {id: OUT-7, t: "dead time on the real Nexperia part", note: "or a browser-fetched model"}
+  - {id: OUT-8, dup: [SAI-8, MP-01], t: "PWM shaper noise into mic band: bench coupling"}
+  - {id: PWR-I4, t: "RT1 reads hot near U3: log TS vs thermocouple"}
+  - {id: PWR-I7, dup: [DK-06, DBG-6, PROC-8], t: "USB at +3V0 2.955 V: bench enumeration + DFU"}
+  - {id: PWR-I10, t: "cell lead exit, self-discharge, D4 drop, real charge time, E4 currents", dup: [PHYS-10]}
+  - {id: PWR-I12, dup: [00-whole risk 13], t: "board + cell temperature through a full charge (ECR-0009 item 3)"}
+  - {id: PWR-I15, t: "Off-current bench measurement", note: "firmware sequence = fw-agent"}
+  - {id: DK-02, t: "dock contact order + magnet keying (sample)"}
+  - {id: DK-03, t: "dock target envelope (caliper a sample)"}
+  - {id: DK-11, t: "dock magnets near L1: E11 whine on the right pod"}
+  - {id: SAI-5, t: "mic clock duty (scope R2.2)"}
+  - {id: SAI-6, t: "RSFLT at 800 kHz swept tone"}
+  - {id: SAI-7, t: "MIC_VDD self-noise capture"}
+  - {id: SAI-11, t: "PB4 back-feed in reset/DFU: meter"}
+  - {id: SAI-13, t: "63 kHz EQ notch constant from a bench sweep"}
+  - {id: DBG-8, t: "ROM DFU pauses charging: check with a cell"}
+  - {id: RB-4, dup: [OUT-9 J-pad, 00-whole risk 1], t: "meter adjacent J pads in bring-up step 1"}
+  - {id: RPB-17, t: "600k-press + drop coupon (MZD-7)", note: "analysis half = UI-2"}
+  - {id: UI-7, t: "LED VF at 0.1-1 mA"}
+  - {id: ARM-1R, t: "heel exit dry fit with the real cell"}
+  - {id: ARM-2, t: "pad force dip on jaw opening; option pick after E12", opts: "A ~5 mm set (rec if k_t <= 5 N/mm) / B 0.85 wire / C deeper + saddle"}
+  - {id: ARM-3, t: "wire diameter: buy 0.8/0.85, pick on bench"}
+  - {id: ARM-4, t: "unloading plateau coupon"}
+  - {id: ARM-5, t: "short flare 100-cycle test (or STRUT_START 3->4 CAD option)"}
+  - {id: ARM-9, dup: [ARM-10, PAD-7], t: "E9 temple + Ear (open) clearance at true scale"}
+  - {id: PAD-4, t: "tight fits: dry fit + shims"}
+  - {id: PAD-8, t: "LED polarity in JLC placement preview (order time)"}
+  - {id: PAD-11, t: "LED faint glow when off: fix if seen"}
+  - {id: Q-A-PHYSICAL-FIRSTWINS, t: "E1/E2/dummy wear"}
+
+router:   # needs placement/re-route (forbidden to parallel agents)
+  - {id: DBG-2, t: "TP row +3V0 beside GND (TP4|TP5 0.8 mm): reorder at the next placement edit"}
+
+fw_agent:   # owned by the firmware agent (fw/, docs/sim/firmware-emulation.yaml)
+  - {id: PROC-4, dup: [UI-6], t: "idle plan Run vs Stop 2 + ADF + LPDMA (also LED PWM in Stop 2)"}
+  - {id: PROC-5, t: "CPU budget re-cost for U575 / 800 kHz PWM"}
+  - {id: PROC-7, t: "boot stub + self-test design note (self-test-firmware.md missing)"}
+  - {id: PWR-I2, t: "charger register plan (TS_HOT, ICHG)"}
+  - {id: PWR-I13, dup: [DK-09 ILIM half], t: "ILIM 100 mA until enumeration"}
+  - {id: Q-B-FW-LIMITER, t: "true-peak limiter (e2e ceiling FAIL)"}
+  - {id: Q-B-FW-DSP-60S, t: "gate rule, transient mode"}
+
+item_dep:   # waits on another item
+  - {id: RPB-9, t: "r2 render dump + STEP export", blk: "item:ECR-0018 owner review edits"}
+  - {id: RPB-13, t: "seam corner butt joints: sealant bead or corner key", blk: "item:RPB-5 (sealing note)"}
+  - {id: UI-4, t: "button skin material", blk: "item:RPB-5"}
+  - {id: RPB-3, t: "body-side mic path", blk: "item:SAI-3, SAI-13"}
+
+info_only:   # check WARNs that are tracked elsewhere, not work items
+  - {id: CHK-PINS, t: "interfaces [pins] 3 known hazards (GB_N PB15, MIC_DATA PB4, TS PA2), ECR-0013 implemented"}
+  - {id: CHK-SELFTEST, t: "interfaces [selftest] 5 skipped rules (design no longer has what they break)"}
+
