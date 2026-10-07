@@ -1,0 +1,9 @@
+[Unit]
+Description=Check every 5 min that the ultrasonic Claude session is alive
+
+[Timer]
+OnBootSec=3min
+OnUnitActiveSec=5min
+
+[Install]
+WantedBy=timers.target

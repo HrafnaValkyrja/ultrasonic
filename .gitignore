@@ -51,3 +51,4 @@ hw/pod/draft_r1/*.png
 
 # board renders: regenerate with tools/render_board.py (30 s)
 docs/diagrams/renders/
+.claude-wake-prompt

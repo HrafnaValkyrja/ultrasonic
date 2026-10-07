@@ -1,0 +1,6 @@
+[Unit]
+Description=Ultrasonic Claude session keepalive (owner continuity rule 2026-10-07)
+
+[Service]
+Type=oneshot
+ExecStart=/home/hrafnavalkyrja/Desktop/ultrasonic/tools/keepalive.sh

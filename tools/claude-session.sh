@@ -15,12 +15,20 @@ set -euo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 
 SOCK=ultrasonic
+DETACHED=""; [ "${1:-}" = "--detached" ] && DETACHED="-d"     # keepalive restarts it without a terminal
 if tmux -L "$SOCK" has-session -t ultrasonic 2>/dev/null; then
+  [ -n "$DETACHED" ] && exit 0
   exec tmux -L "$SOCK" attach -t ultrasonic
+fi
+# optional first prompt (tools/keepalive.sh passes a wake prompt so the resumed session rebuilds its heartbeat)
+CMD="claude --continue; exec bash"
+if [ -n "${CLAUDE_WAKE_PROMPT:-}" ]; then
+  printf '%s' "$CLAUDE_WAKE_PROMPT" > "$PWD/.claude-wake-prompt"
+  CMD='claude --continue "$(cat .claude-wake-prompt)"; rm -f .claude-wake-prompt; exec bash'
 fi
 
 MAX="${CLAUDE_MEM_MAX:-18G}"
 HIGH="${CLAUDE_MEM_HIGH:-14G}"
 exec systemd-run --user --scope --quiet \
   -p MemoryHigh="$HIGH" -p MemoryMax="$MAX" -p MemorySwapMax=2G \
-  tmux -L "$SOCK" new-session -s ultrasonic -c "$PWD" "claude --continue; exec bash"
+  tmux -L "$SOCK" new-session $DETACHED -s ultrasonic -c "$PWD" "$CMD"
