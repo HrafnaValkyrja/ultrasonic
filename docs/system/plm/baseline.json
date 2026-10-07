@@ -109,7 +109,7 @@
   "SUB-DOCK-USB": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only",
+   "note": "DK-01: BOM cable-side head corrected to the 5-pin C5126847 (JLC stock 0 2026-10-07T17:14Z)",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"
