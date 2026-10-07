@@ -6,7 +6,10 @@ board:
   default_path: auto   # pcbgeom.default_board: env NOISE_BOARD, else newest of pcbgeom.ROUTED_CANDIDATES (2026-10-02: draft_r1/pod_r1_routed = Rev F); read only
   bom: hw/pod/bom_jlc.csv                                          # ref -> value ("100n", "2u2", "0.1")
   ground_net: GND
-  plane_layer: In1.Cu
+  plane_layer: In1.Cu         # the ground plane (kept for extract.py); all planes are listed in `planes`
+  planes:                      # 2026-10-07: Phase 2 adds an In2 +3V0 plane; a plane without a filled zone is skipped (Rev F)
+    - {net: GND, layer: In1.Cu}
+    - {net: +3V0, layer: In2.Cu}
   plane_pitch_mm: 0.1          # mesh pitch; 0.2 gives the same R within ~15 % (smoke run reports both)
   nets: [GND, +3V0, MIC_VDD, BRIDGE_RTN, LDO_OUT, VDD11, VLXSMPS]   # nets put in the L1 network
 model:

@@ -174,8 +174,11 @@ def _key(layer, x, y):
 
 
 def add_nets(net: Network, geom: dict, nets: set[str], plane_red: dict | None = None, plane_net: str = "GND",
-             t_plate_um: float = 20.0, plane_r_max: float = 0.5, tag_prefix: str = ""):
-    """Add R/L elements for every track, via and pad-join of `nets`; plane network for plane_net.
+             t_plate_um: float = 20.0, plane_r_max: float = 0.5, tag_prefix: str = "", planes: list | None = None):
+    """Add R/L elements for every track, via and pad-join of `nets`; a Kron-reduced plane network per plane.
+
+    planes: [{net, layer, red}] (2026-10-07: Phase 2 has In1 GND and In2 +3V0). The old single-plane arguments
+    (plane_red, plane_net on In1.Cu) still work and mean planes=[{net: plane_net, layer: "In1.Cu", red: plane_red}].
 
     Returns info dict: pad_node {ref.num -> node}, floating_pads, counts, per-net totals.
     """
@@ -274,7 +277,10 @@ def add_nets(net: Network, geom: dict, nets: set[str], plane_red: dict | None = 
         tot[s["net"]]["R"] += R; tot[s["net"]]["L"] += Lh; tot[s["net"]]["segs"] += 1
         nseg += 1
 
+    if planes is None:
+        planes = [dict(net=plane_net, layer="In1.Cu", red=plane_red)] if plane_red is not None else []
     ports = {}
+    pl_ports = [dict() for _ in planes]
     nvia = 0
     for v in vias:
         vi = v["gi"]
@@ -290,26 +296,32 @@ def add_nets(net: Network, geom: dict, nets: set[str], plane_red: dict | None = 
                 net.add("R", a, f"vm{vi}_{ia}", R, **tag)
                 net.add("L", f"vm{vi}_{ia}", b, L, **tag)
             nvia += 1
-        if v["net"] == plane_net and COPPER.index(v["top"]) <= 1 <= COPPER.index(v["bot"]):
-            ports[f"PL{vi}"] = (v["x"], v["y"], nname(_key("In1.Cu", v["x"], v["y"])))
+        for k, pl in enumerate(planes):
+            li = COPPER.index(pl["layer"])
+            if v["net"] == pl["net"] and COPPER.index(v["top"]) <= li <= COPPER.index(v["bot"]):
+                pl_ports[k][f"PL{vi}"] = (v["x"], v["y"], nname(_key(pl["layer"], v["x"], v["y"])))
+    if planes:
+        ports = pl_ports[0]
 
     nplane = 0
-    if plane_red is not None and ports:
-        names = plane_red["names"]
-        G = plane_red["G"]
-        # plane_red was built with port names as given by the caller (see plane_ports()); map them to nodes
+    for pl, pp in zip(planes, pl_ports):
+        if pl["red"] is None or not pp:
+            continue
+        names = pl["red"]["names"]
+        G = pl["red"]["G"]
+        # red was built with port names as given by the caller (see plane_ports()); map them to nodes
         for i in range(len(names)):
             for j in range(i + 1, len(names)):
                 g = -G[i, j]
                 if g > 1.0 / plane_r_max:
-                    net.add("R", ports[names[i]][2], ports[names[j]][2], 1.0 / g,
-                            kind_="plane", net=plane_net, layer="In1.Cu", xy=(*ports[names[i]][:2], *ports[names[j]][:2]))
+                    net.add("R", pp[names[i]][2], pp[names[j]][2], 1.0 / g,
+                            kind_="plane", net=pl["net"], layer=pl["layer"], xy=(*pp[names[i]][:2], *pp[names[j]][:2]))
                     nplane += 1
     pad_node = {f'{p["ref"]}.{p["num"]}': alias.get(f'{p["ref"]}_{p["num"]}', f'{p["ref"]}_{p["num"]}') for p in pads}
     floating = [k for k, n in pad_node.items() if not any(e["n1"] == n or e["n2"] == n for e in net.elems)]
     return dict(pad_node=pad_node, floating_pads=floating, n_segments=nseg, n_vias=nvia, n_plane_links=nplane,
                 totals={k: dict(R_ohm=round(v["R"], 4), L_nH=round(v["L"] * 1e9, 3), segs=v["segs"]) for k, v in tot.items()},
-                plane_ports=ports, seg_edges=seg_edges, via_edges=via_edges)
+                plane_ports=ports, all_plane_ports=pl_ports, seg_edges=seg_edges, via_edges=via_edges)
 
 
 def plane_ports(geom: dict, plane_net: str = "GND", plane_layer: str = "In1.Cu"):

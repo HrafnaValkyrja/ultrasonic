@@ -178,18 +178,29 @@ def attach_components(net: lumped.Network, info: dict, geom: dict, params: dict,
 
 
 def build_l1(geom: dict, params: dict, bom: dict, pitch: float | None = None):
+    """L1 network. Planes from params board.planes (each {net, layer}); a plane with no filled zone on this board is
+    skipped and reported (Rev F has no In2 +3V0 plane), except the ground plane, which is required."""
     st = geom["stackup"]
-    rs = params["materials"]["rho_cu_ohm_m"] / (st["copper_um"][params["board"]["plane_layer"]] * 1e-6)
-    zs = [z for z in geom["zones"] if z["layer"] == params["board"]["plane_layer"] and z["net"] == params["board"]["ground_net"]]
-    if not zs or not any(p["outer"] for p in zs[0]["polys"]):
-        raise SystemExit(f"{geom['path']}: no filled {params['board']['ground_net']} zone on {params['board']['plane_layer']}: refill zones in KiCad (B) or set board.plane_layer/ground_net in params.yaml")
-    z = zs[0]
-    mesh = plane.Mesh(z, pitch=pitch or params["board"]["plane_pitch_mm"], rs=rs)
-    ports = lumped.plane_ports(geom, params["board"]["ground_net"], params["board"]["plane_layer"])
-    red = mesh.reduce(ports)
+    gnd = params["board"]["ground_net"]
+    specs = params["board"].get("planes") or [dict(net=gnd, layer=params["board"]["plane_layer"])]
+    planes, skipped_planes, meshes = [], [], {}
+    for spec in specs:
+        rs_k = params["materials"]["rho_cu_ohm_m"] / (st["copper_um"][spec["layer"]] * 1e-6)
+        zs = [z for z in geom["zones"] if z["layer"] == spec["layer"] and z["net"] == spec["net"]]
+        if not zs or not any(p["outer"] for p in zs[0]["polys"]):
+            if spec["net"] == gnd:
+                raise SystemExit(f"{geom['path']}: no filled {gnd} zone on {spec['layer']}: refill zones in KiCad (B) or set board.planes in params.yaml")
+            skipped_planes.append(f"{spec['net']}@{spec['layer']}")
+            continue
+        m = plane.Mesh(zs[0], pitch=pitch or params["board"]["plane_pitch_mm"], rs=rs_k)
+        pts = lumped.plane_ports(geom, spec["net"], spec["layer"])
+        r = m.reduce(pts)
+        planes.append(dict(net=spec["net"], layer=spec["layer"], red=r))
+        meshes[spec["net"]] = (m, r, pts, rs_k)
+    mesh, red, ports, rs = meshes[gnd]
     net = lumped.Network()
-    info = lumped.add_nets(net, geom, set(params["board"]["nets"]), plane_red=red,
-                           plane_net=params["board"]["ground_net"], t_plate_um=params["materials"]["t_plate_um"])
+    info = lumped.add_nets(net, geom, set(params["board"]["nets"]), planes=planes,
+                           t_plate_um=params["materials"]["t_plate_um"])
     try:
         info["components"] = attach_components(net, info, geom, params, bom)
     except KeyError as e:
@@ -197,6 +208,9 @@ def build_l1(geom: dict, params: dict, bom: dict, pitch: float | None = None):
     info["plane"] = dict(sheet_ohm_sq=rs, pitch_mm=mesh.pitch, cells=red["n_cells"], area_mm2=round(mesh.area_mm2, 2),
                          zone_area_mm2=round(mesh.zone_area_mm2, 2), ports=len(ports), orphan_ports=red["orphan_ports"],
                          cells_dropped=red["cells_dropped"])
+    info["planes"] = {n: dict(layer=next(p["layer"] for p in planes if p["net"] == n), sheet_ohm_sq=v[3], cells=v[1]["n_cells"],
+                              area_mm2=round(v[0].area_mm2, 2), ports=len(v[2]), orphan_ports=v[1]["orphan_ports"]) for n, v in meshes.items()}
+    info["planes_skipped"] = skipped_planes
     return net, info, mesh, red
 
 
@@ -645,6 +659,9 @@ def main(argv=None):
     res["valid"] = not any("no copper path" in w or "STALE" in w for w in res["warnings"])
     res["metrics"] = metrics(res, agg, {})
     res["board"] = dict(path=a.board, sha256=geom["sha256"], stackup=geom["stackup"]["src"])
+    res["planes"] = dict(used=info.get("planes", {}), skipped=info.get("planes_skipped", []))
+    if res["planes"]["skipped"]:
+        res["warnings"].append(f"planes without a filled zone on this board (modelled as traces only): {res['planes']['skipped']}")
     np.savez_compressed(out / "transimpedance.npz", freqs=freqs, aggressors=[x["id"] for x in aggs_ok], probes=[v["id"] for v in victims_ok],
                         Z=np.array([[Zt[i][j] for j in range(len(victims_ok))] for i in range(len(aggs_ok))]))
     if a.plot:
