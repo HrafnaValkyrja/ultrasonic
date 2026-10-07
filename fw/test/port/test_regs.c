@@ -7,6 +7,8 @@
 #include "regfake.h"
 
 const uint32_t *u575_burst_buf(uint32_t i);
+void u575_dma_tc_isr(void);
+#define LLR_BITS ((1u << 29) | (1u << 28) | (1u << 16))
 
 static uint32_t checks, fails;
 #define CHECK(c) do { checks++; if (!(c)) { fails++; fprintf(stderr, "FAIL %s:%d %s\n", __FILE__, __LINE__, #c); } } while (0)
@@ -130,7 +132,7 @@ int main(void)
     CHECK(reg_read(RCC_AHB2ENR1) & (1u << 10));
     CHECK(((reg_read(ADC1_BASE + ADC_SQR1) >> 6) & 31u) == 7u && (reg_read(ADC1_BASE + ADC_PCSEL) == (1u << 7)));
     CHECK(((reg_read(ADC1_BASE + ADC_SMPR1) >> 21) & 7u) == 7u);
-    CHECK(hal_adc_read_mv(HAL_ADC_VBAT_SENSE, &mv) == HAL_ENOTIMPL);   /* ADC4 next */
+    CHECK(hal_adc_read_mv(HAL_ADC_VBAT_SENSE, &mv) == HAL_OK && (reg_read(RCC_AHB3ENR) & (1u << 5)));   /* ADC4 powered up */
 
     /* ---- break, full chain (FWSIM-R65): ADC1 continuous I_SENSE -> MDF1 OLD window -> mdf_break0 -> TIM1 BKCMP7 */
     CHECK(hal_brk_arm(300u) == HAL_OK);
@@ -161,28 +163,139 @@ int main(void)
     CHECK(!(reg_read(MDF1_BASE + MDF_OLD0CR) & 1u) && !(reg_read(ADC1_BASE + ADC_CR) & (1u << 2)) && reg_read(ADC1_BASE + ADC_CFGR1) == 0u);
     CHECK(hal_adc_read_mv(HAL_ADC_TS, &mv) == HAL_OK);
 
-    /* ---- GPDMA -> TIM1 DMAR bursts (3 words per update: CCR1, CCR2, CCR3 = ARR - CCR1) */
+    /* ---- GPDMA -> TIM1 DMAR bursts: 2-node linked list (ping-pong), started once both buffers are primed; underruns counted */
     rf_reset();
     CHECK(hal_pwm_config(&cfg) == HAL_OK);
     uint16_t c128[128];
     for (uint32_t i = 0; i < 128u; i++)
         c128[i] = (uint16_t)(60u + i % 80u);
     CHECK(hal_pwm_submit(c128, 128u) == HAL_OK);
+    CHECK(!(reg_read(DMA_REG(DMA_CCR)) & 1u));                        /* not started with one buffer */
+    CHECK(hal_pwm_submit(c128, 128u) == HAL_OK);
     CHECK(reg_read(TIM1_BASE + TIM_DCR) == (13u | (2u << 8)));
     CHECK(reg_read(T(TIM_DIER)) & (1u << 8));
     CHECK(reg_read(RCC_AHB1ENR) & 1u);
     CHECK(reg_read(DMA_REG(DMA_CTR1)) == (2u | (1u << 3) | (2u << 4) | (2u << 16) | (2u << 20)));
     CHECK(reg_read(DMA_REG(DMA_CTR2)) == 46u && reg_read(DMA_REG(DMA_CBR1)) == 128u * 12u);
-    CHECK(reg_read(DMA_REG(DMA_CDAR)) == TIM1_BASE + TIM_DMAR && (reg_read(DMA_REG(DMA_CCR)) & 1u));
-    CHECK((uint32_t)rf_find(DMA_REG(DMA_CCR), 0u) == rf_nlog() - 1u);   /* EN last */
+    CHECK(reg_read(DMA_REG(DMA_CDAR)) == TIM1_BASE + TIM_DMAR);
+    CHECK((reg_read(DMA_REG(0xCCu)) & (LLR_BITS)) == LLR_BITS);       /* node link updates SAR, BR1 and LLR */
+    CHECK(reg_read(DMA_REG(DMA_CCR)) == (1u | (1u << 8)) && (uint32_t)rf_find(DMA_REG(DMA_CCR), 0u) == rf_nlog() - 1u);   /* EN + TCIE last */
     {
         const uint32_t *b = u575_burst_buf(0u);
         CHECK(b[0] == 60u && b[1] == 0u && b[2] == 140u && b[3 * 127] == 60u + 127u % 80u && b[3 * 127 + 2] == 200u - (60u + 127u % 80u));
     }
-    CHECK(hal_pwm_submit(c128, 128u) == HAL_BUSY);                   /* channel enabled and not idle */
-    rf_poke(DMA_REG(DMA_CSR), 1u);                                   /* IDLEF: block done */
+    CHECK(hal_pwm_submit(c128, 128u) == HAL_BUSY);                    /* both queued */
+    u575_dma_tc_isr();                                                /* hop 0 played */
     CHECK(hal_pwm_submit(c128, 128u) == HAL_OK);
+    u575_dma_tc_isr();
+    u575_dma_tc_isr();                                                /* hops 1, 2 played; hop 3 never submitted ... */
+    u575_dma_tc_isr();                                                /* ... underrun */
+    CHECK(hal_pwm_underruns() == 1u);
+    CHECK(u575_burst_buf(0u)[0] == 100u && u575_burst_buf(0u)[2] == 100u);   /* refilled with the centre (silence) */
     CHECK(hal_pwm_submit(c128, 513u) == HAL_EINVAL);
+    CHECK(hal_pwm_submit(c128, 64u) == HAL_EINVAL);                   /* length fixed while running */
+
+    /* ==== round 9 ==== */
+    /* ADC4 VBAT (12 bit, IN9) - also while the break owns ADC1 */
+    rf_reset();
+    rf_adc4_code(9u, 2526u);                                         /* 2526 / 4095 x 3000 = 1850 mV = VBAT 3.70 V / 2 */
+    CHECK(hal_brk_arm(300u) == HAL_OK);
+    CHECK(hal_adc_read_mv(HAL_ADC_VBAT_SENSE, &mv) == HAL_OK && mv == 1851u);
+    CHECK(reg_read(ADC4_BASE + ADC4_CHSELR) == (1u << 9));
+    hal_brk_disarm();
+    /* I2C bus clear: SDA held for 3 clocks -> released, STOP, HAL_OK; held forever -> HAL_BUSY after 9 */
+    rf_sda_stuck(3u);
+    CHECK(hal_i2c_recover() == HAL_OK);
+    CHECK(reg_read(I2C2_BASE + I2C_CR1) & 1u);                      /* controller re-initialised */
+    CHECK(((reg_read(GB + GPIO_MODER) >> 26) & 3u) == 2u);           /* SCL back on AF */
+    rf_sda_stuck(100u);
+    CHECK(hal_i2c_recover() == HAL_BUSY);
+
+    /* clock plans: P80 from reset (Range 4) -> Range 2 + booster + 2 WS before PLL1 runs; P52 lowers range after; P112 = Range 1 */
+    rf_reset();
+    CHECK(hal_clock_set_plan(HAL_CLK_P80) == HAL_OK);
+    CHECK(hal_clock_hclk_hz() == 80009000u);
+    CHECK(((reg_read(PWR_VOSR) >> 16) & 3u) == 2u && (reg_read(PWR_VOSR) & (1u << 18)));
+    CHECK((reg_read(FLASH_ACR) & 0xFu) == 2u);
+    CHECK(reg_read(RCC_PLL1CFGR) == (1u | (3u << 2) | (2u << 8) | (2u << 12) | (1u << 18)));
+    CHECK(reg_read(RCC_PLL1DIVR) == (19u | (3u << 24)));
+    CHECK((reg_read(RCC_CFGR1) & 3u) == 3u);
+    CHECK(reg_read(PWR_CR3) & 2u);                                   /* SMPS */
+    {
+        int32_t i_vos = rf_find(PWR_VOSR, 0u), i_lat = rf_find(FLASH_ACR, 0u), i_pll = -1, i_sw = -1;
+        for (uint32_t i = 0; i < rf_nlog(); i++) {
+            if (rf_log(i)->addr == RCC_CR && (rf_log(i)->val & (1u << 24)) && i_pll < 0) i_pll = (int32_t)i;
+            if (rf_log(i)->addr == RCC_CFGR1 && (rf_log(i)->val & 3u) == 3u && i_sw < 0) i_sw = (int32_t)i;
+        }
+        CHECK(i_vos >= 0 && i_lat > i_vos && i_pll > i_lat && i_sw > i_pll);
+    }
+    uint32_t mk = rf_nlog();
+    CHECK(hal_clock_set_plan(HAL_CLK_P52) == HAL_OK);
+    CHECK(((reg_read(PWR_VOSR) >> 16) & 3u) == 1u && !(reg_read(PWR_VOSR) & (1u << 18)));   /* Range 3, no booster */
+    CHECK(reg_read(RCC_PLL1DIVR) == (12u | (3u << 24)) && (reg_read(FLASH_ACR) & 0xFu) == 2u);
+    CHECK(rf_find(PWR_VOSR, mk) > rf_find(RCC_CFGR1, mk));           /* range lowered after the clock */
+    CHECK(hal_clock_set_plan(HAL_CLK_P112) == HAL_OK);
+    CHECK(((reg_read(PWR_VOSR) >> 16) & 3u) == 3u && (reg_read(FLASH_ACR) & 0xFu) == 3u && hal_clock_hclk_hz() == 112012000u);
+    CHECK(hal_clock_set_plan(HAL_CLK_P72) == HAL_OK);
+    CHECK(((reg_read(PWR_VOSR) >> 16) & 3u) == 2u && reg_read(RCC_PLL1DIVR) == (17u | (3u << 24)));
+    rf_poke(T(TIM_CR1), 1u);
+    CHECK(hal_clock_set_plan(HAL_CLK_P80) == HAL_BUSY);              /* TIM1 running */
+    rf_poke(T(TIM_CR1), 0u);
+    /* Stop 2 prep: PLL2/PLL3/HSI48/SHSI off and not ready */
+    rf_poke(RCC_CR, reg_read(RCC_CR) | (1u << 26) | (1u << 27) | (1u << 12) | (1u << 13));
+    CHECK(hal_clock_stop_prep() == HAL_OK);
+    CHECK((reg_read(RCC_CR) & ((1u << 26) | (1u << 27) | (1u << 12) | (1u << 13) | (1u << 28) | (1u << 14))) == 0u);
+    /* RTC wake-up 60 s on the LSE: unlock 0xCA 0x53, WUTE off, WUTR 59, ck_spre, WUTE + WUTIE, relock */
+    CHECK(hal_power_rtc_wakeup_s(60u) == HAL_OK);
+    CHECK(reg_read(PWR_DBPR) & 1u);
+    CHECK(((reg_read(RCC_BDCR) >> 8) & 3u) == 1u && (reg_read(RCC_BDCR) & (1u << 15)));
+    CHECK(reg_read(RTC_WUTR) == 59u && (reg_read(RTC_CR) & 7u) == 4u && (reg_read(RTC_CR) & (1u << 10)) && (reg_read(RTC_CR) & (1u << 14)));
+    {
+        int32_t k1 = rf_find(RTC_WPR, 0u);
+        CHECK(k1 >= 0 && rf_log((uint32_t)k1)->val == 0xCAu && rf_log((uint32_t)k1 + 1u)->addr == RTC_WPR && rf_log((uint32_t)k1 + 1u)->val == 0x53u);
+        CHECK(reg_read(RTC_WPR) == 0xFFu);
+    }
+    /* Stop 2: LPMS 010, SLEEPDEEP around WFI, wake sources decoded and their flags cleared */
+    rf_wake(4u);
+    CHECK(hal_power_stop2() == HAL_WAKE_RTC);
+    CHECK((reg_read(PWR_CR1) & 7u) == 2u && !(reg_read(SCB_SCR) & 4u) && !(reg_read(RTC_SR) & 4u));
+    CHECK(reg_read(PWR_WUCR1) & 1u && (reg_read(EXTI_IMR1) & ((1u << 1) | (1u << 15))) == ((1u << 1) | (1u << 15)));
+    CHECK(reg_read(EXTI_FTSR1) & (1u << 15) && reg_read(EXTI_RTSR1) & (1u << 1));
+    rf_wake(1u);
+    CHECK(hal_power_stop2() == HAL_WAKE_BUTTON && !(reg_read(PWR_WUSR) & 1u));
+    rf_wake(2u);
+    CHECK(hal_power_stop2() == HAL_WAKE_CHG_INT && !(reg_read(EXTI_FPR1) & (1u << 15)));
+    rf_wake(3u);
+    CHECK(hal_power_stop2() == HAL_WAKE_VBUS);
+    CHECK(hal_clock_hclk_hz() == 48005000u);                          /* Stop exit on MSIS: plan restored by the caller */
+
+    /* ADF1 D1 at P80: CCK = 80.009 / 2 / 10 = 4.0009 MHz (PROCDIV+1 2, CCKDIV+1 10), normal SPI, Sinc5 /5, RSFLT /4, HPF 1.9 kHz, DMA 98 */
+    rf_reset();
+    CHECK(hal_clock_set_plan(HAL_CLK_P80) == HAL_OK);
+    CHECK(hal_adf_start(4000450u) == HAL_OK);
+    CHECK(reg_read(ADF1_BASE + ADF_CKGCR) == ((1u << 24) | (9u << 16) | (1u << 5) | (1u << 1) | 1u));
+    CHECK(reg_read(ADF1_BASE + ADF_SITF0CR) == ((4u << 8) | (1u << 4) | 1u));
+    CHECK(reg_read(ADF1_BASE + ADF_DFLT0CICR) == ((5u << 4) | (4u << 8)) && reg_read(ADF1_BASE + ADF_DFLT0RSFR) == (3u << 8));
+    CHECK(reg_read(GPDMA1_BASE + 0x80u * DMA_ADF_CH + DMA_CTR2) == 98u);
+    CHECK((uint32_t)rf_find(ADF1_BASE + ADF_DFLT0CR, 0u) == rf_nlog() - 1u && reg_read(ADF1_BASE + ADF_DFLT0CR) == 3u);
+    CHECK(((reg_read(GB + GPIO_AFRL) >> 12) & 0xFu) == 3u);          /* PB3 AF3 ADF1_CCK0 */
+    CHECK(hal_clock_set_plan(HAL_CLK_P72) == HAL_BUSY);              /* ADF running */
+    hal_adf_stop();
+    CHECK(!(reg_read(ADF1_BASE + ADF_DFLT0CR) & 1u) && !(reg_read(ADF1_BASE + ADF_CKGCR) & 2u));
+
+    /* USB lifecycle (R28): nothing without VBUS; with VBUS: HSI48, USV, OTGEN, AF10 pins, transceiver on, connect; off reverses */
+    CHECK(hal_usb_enable(true) == HAL_EINVAL);
+    rf_poke(GA + GPIO_IDR, 1u << 1);                                 /* PA1 VBUS_SENSE high */
+    CHECK(hal_usb_vbus());
+    CHECK(hal_usb_enable(true) == HAL_OK);
+    CHECK((reg_read(RCC_CR) & (1u << 13)) && (reg_read(PWR_SVMCR) & (1u << 28)) && (reg_read(RCC_AHB2ENR1) & (1u << 14)));
+    CHECK(((reg_read(GA + GPIO_AFRH) >> 12) & 0xFu) == 10u && ((reg_read(GA + GPIO_AFRH) >> 16) & 0xFu) == 10u);
+    CHECK((reg_read(OTG_BASE + OTG_GCCFG) & (1u << 16)) && !(reg_read(OTG_BASE + OTG_DCTL) & 2u) && (reg_read(OTG_BASE + OTG_GUSBCFG) & (1u << 30)));
+    mk = rf_nlog();
+    CHECK(hal_usb_enable(false) == HAL_OK);
+    CHECK(rf_log(mk)->addr == OTG_BASE + OTG_DCTL && (rf_log(mk)->val & 2u));   /* soft disconnect first */
+    CHECK(((reg_read(GA + GPIO_MODER) >> 22) & 3u) == 3u && ((reg_read(GA + GPIO_MODER) >> 24) & 3u) == 3u);
+    CHECK(!(reg_read(RCC_AHB2ENR1) & (1u << 14)) && !(reg_read(PWR_SVMCR) & (1u << 28)));
     printf("{\"checks\": %u, \"fails\": %u}\n", checks, fails);
     return fails ? 1 : 0;
 }

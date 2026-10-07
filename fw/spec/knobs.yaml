@@ -59,7 +59,7 @@ knobs:
   - {id: env_attack_us, def: 1500, min: 100, max: 50000, unit: us, src: "sim/dsp/pipeline.py BConfig env_attack_ms 1.5"}
   - {id: env_release_us, def: 15000, min: 1000, max: 500000, unit: us, src: "sim/dsp/pipeline.py BConfig env_release_ms 15"}
   # ---- clocks, power, timing
-  - {id: clock_plan, def: 0, min: 0, max: 3, unit: enum, src: "A3 s2 (0 P80, 1 P160, 2 P64, 3 P48)"}
+  - {id: clock_plan, def: 0, min: 0, max: 7, unit: enum, src: "A3 s2 (0 P80, 1 P160, 2 P64, 3 P48); 4 P112, 5 P104, 6 P72, 7 P52 (per-variant plans, hal_clock.h)"}
   - {id: hop_ring_depth, def: 3, min: 3, max: 8, unit: hop, src: "FWSIM-R46 (input ring >= 3 hops)"}
   - {id: ccr_buffers, def: 2, min: 2, max: 4, unit: hop, src: "FWSIM-R46 (CCR double buffer >= 2 hops)"}
   - {id: iwdg_ms, def: 1000, min: 100, max: 30000, unit: ms, src: assumed}

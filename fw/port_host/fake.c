@@ -122,7 +122,7 @@ void fake_time_set_us(uint64_t t) { F.t_us = t; }
 void fake_time_advance_us(uint64_t dt) { F.t_us += dt; }
 
 /* ------------------------------------------------------------------------------------------- clock */
-static const uint32_t plan_hz[HAL_CLK_PLAN_COUNT] = {80009000u, 160018000u, 64007000u, 48005000u};   /* A3 s2 (PCM = HCLK/400) */
+static const uint32_t plan_hz[HAL_CLK_PLAN_COUNT] = {80009000u, 160018000u, 64007000u, 48005000u, 112012000u, 104011000u, 72008000u, 52006000u};   /* A3 s2 + variant plans (PCM = HCLK/400) */
 
 hal_status_t hal_clock_set_plan(hal_clock_plan_t plan)
 {

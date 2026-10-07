@@ -329,7 +329,7 @@ def stage_dsp(cfg):
     d.mkdir(parents=True, exist_ok=True)
     exe = d / "test_regs"
     rc, _, se, w = run([GCC, "-std=c11", "-O2", *WARN, "-DFW_REG_RECORD", *INC, f"-I{FW / 'port_u575'}", f"-I{FW / 'test/port'}",
-                        FW / "port_u575/hal_u575_periph.c", FW / "port_u575/hal_u575_io.c", *sorted((FW / "test/port").glob("*.c")), "-o", exe])
+                        FW / "port_u575/hal_u575_periph.c", FW / "port_u575/hal_u575_io.c", FW / "port_u575/hal_u575_sys.c", *sorted((FW / "test/port").glob("*.c")), "-o", exe])
     if rc == 0:
         rc, so, se, w2 = run([exe])
         w += w2
@@ -441,7 +441,7 @@ def main(argv=None):
     summary = {"id": "FWSIM", "cmd": cfg.cmd, "status": status, "rows": rows, "requirements": requirement_status(rows, tests),
                "tests": tests.get("host_gcc", []), "arm": {k: arm[k] for k in ("flash", "ram_static", "stack_region", "sections") if k in arm},
                "tools": versions(), "wall_s": round(wall, 1),
-               "scope": "tier S + H: foundation (group a) + DSP chain host behaviour (group b: R7 L0-host/L1, R8, R13, R14, R15); L0 ARM vs host on QEMU mps2-an505 (no STM32 peripheral model: tier E open); port_u575 HAL is stubs (HAL_ENOTIMPL)"}
+               "scope": "tier S + H: foundation (group a) + DSP chain host behaviour (group b: R7 L0-host/L1, R8, R13, R14, R15); L0 ARM vs host on QEMU mps2-an505 (no STM32 peripheral model: tier E open); port_u575 register layer checked against RM0456 Rev 7 in a recorded-register fake (port_u575.regs); USB device stack, ADF hop bookkeeping and CDC are still HAL_ENOTIMPL"}
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, default=str) + "\n")
     for r in rows:
         print(f"{r['status']:4} {r['id']:<34} {r['last']}  [{r['src']}]")

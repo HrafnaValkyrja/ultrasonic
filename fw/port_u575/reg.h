@@ -95,3 +95,77 @@ uint32_t reg_read(uint32_t addr);
 #define DMA_REG(off) (GPDMA1_BASE + 0x80u * DMA_CH + (off))
 #define FW_BURST_WORDS (512u * 3u)          /* 800 kHz case: 512 periods x 3 words (FWSIM-R61) */
 #endif
+
+/* ---- round 9: clocks, power, RTC, EXTI, ADC4, ADF1, OTG_FS (RM0456 Rev 7) */
+#ifndef FW_PORT_U575_REG9_H
+#define FW_PORT_U575_REG9_H
+#define RCC_ICSCR1   (RCC_BASE + 0x008u)    /* MSISRANGE 31:28 (0000 = 48 MHz range 0), MSIRGSEL 23 */
+#define RCC_CFGR1    (RCC_BASE + 0x01Cu)    /* SW 1:0, SWS 3:2 (11 = PLL1) */
+#define RCC_PLL1CFGR (RCC_BASE + 0x028u)    /* PLL1SRC 1:0 (01 MSIS), PLL1RGE 3:2 (11 = 8-16 MHz), PLL1M 11:8 (M-1), PLL1MBOOST 15:12, PLL1REN 18 */
+#define RCC_PLL1DIVR (RCC_BASE + 0x034u)    /* PLL1N 8:0 (N-1), PLL1R 30:24 (R-1) */
+#define RCC_AHB3ENR  (RCC_BASE + 0x094u)    /* bit 2 PWREN, bit 5 ADC4EN, bit 10 ADF1EN */
+#define RCC_APB3ENR  (RCC_BASE + 0x0A8u)    /* bit 21 RTCAPBEN */
+#define RCC_BDCR     (RCC_BASE + 0x0F0u)    /* LSEON 0, LSERDY 1, RTCSEL 9:8 (01 LSE, 10 LSI), RTCEN 15, LSION 26, LSIRDY 27 */
+#define CR_MSISON 0u
+#define CR_MSISRDY 2u
+#define CR_MSIPLLEN 3u
+#define CR_MSIPLLSEL 6u
+#define CR_HSI48ON 12u
+#define CR_HSI48RDY 13u
+#define CR_SHSION 14u
+#define CR_SHSIRDY 15u
+#define CR_PLL1ON 24u
+#define CR_PLL1RDY 25u
+#define CR_PLL2ON 26u
+#define CR_PLL2RDY 27u
+#define CR_PLL3ON 28u
+#define CR_PLL3RDY 29u
+
+#define PWR_BASE   0x46020800u              /* PWR 0x4602 0800 */
+#define PWR_CR1    (PWR_BASE + 0x00u)       /* LPMS 2:0 (010 = Stop 2) */
+#define PWR_CR3    (PWR_BASE + 0x08u)       /* bit 1 REGSEL (1 = SMPS) */
+#define PWR_VOSR   (PWR_BASE + 0x0Cu)       /* BOOSTEN 18, VOS 17:16 (00 R4, 01 R3, 10 R2, 11 R1), VOSRDY 15, BOOSTRDY 14; reset 0x8000 */
+#define PWR_SVMCR  (PWR_BASE + 0x10u)       /* bit 28 USV */
+#define PWR_WUCR1  (PWR_BASE + 0x14u)       /* bit 0 WUPEN1 */
+#define PWR_DBPR   (PWR_BASE + 0x28u)       /* bit 0 DBP */
+#define PWR_WUSR   (PWR_BASE + 0x44u)       /* bit 0 WUF1 */
+#define PWR_WUSCR  (PWR_BASE + 0x48u)       /* bit 0 CWUF1 */
+#define FLASH_ACR  0x40022000u              /* FLASH 0x4002 2000: LATENCY 3:0 (Table 54), PRFTEN 8 */
+#define SCB_SCR    0xE000ED10u              /* bit 2 SLEEPDEEP (Armv8-M) */
+
+#define RTC_BASE   0x46007800u              /* RTC 0x4600 7800 */
+#define RTC_ICSR   (RTC_BASE + 0x0Cu)       /* bit 2 WUTWF */
+#define RTC_WUTR   (RTC_BASE + 0x14u)       /* WUT 15:0 */
+#define RTC_CR     (RTC_BASE + 0x18u)       /* WUCKSEL 2:0 (100 = ck_spre 1 Hz), WUTE 10, WUTIE 14 */
+#define RTC_WPR    (RTC_BASE + 0x24u)       /* key 0xCA, 0x53 */
+#define RTC_SR     (RTC_BASE + 0x50u)       /* bit 2 WUTF */
+#define RTC_SCR    (RTC_BASE + 0x5Cu)       /* bit 2 CWUTF */
+
+#define EXTI_BASE  0x46022000u              /* EXTI 0x4602 2000 */
+#define EXTI_RTSR1 (EXTI_BASE + 0x000u)
+#define EXTI_FTSR1 (EXTI_BASE + 0x004u)
+#define EXTI_RPR1  (EXTI_BASE + 0x00Cu)
+#define EXTI_FPR1  (EXTI_BASE + 0x010u)
+#define EXTI_EXTICR1 (EXTI_BASE + 0x060u)   /* line 1 port select bits 15:8 [M: standard U5 layout] */
+#define EXTI_EXTICR4 (EXTI_BASE + 0x06Cu)   /* line 15 port select bits 31:24 [M] */
+#define EXTI_IMR1  (EXTI_BASE + 0x080u)
+
+#define ADC4_BASE  0x46021000u              /* ADC4 0x4602 1000: ISR 0x00, CR 0x08 (ADEN 0, ADSTART 2, ADVREGEN 28, ADCAL 31), CFGR1 0x0C (RES 3:2 00 = 12 bit) */
+#define ADC4_SMPR  0x14u
+#define ADC4_CHSELR 0x28u                   /* CHSELRMOD 0: one bit per channel */
+
+#define ADF1_BASE  0x46024000u              /* ADF1 0x4602 4000 */
+#define ADF_CKGCR  0x004u                   /* CKGDEN 0, CCK0EN 1, CCK0DIR 5, CCKDIV 19:16, PROCDIV 30:24 */
+#define ADF_SITF0CR 0x080u                  /* SITFEN 0, SCKSRC 2:1 (00 CCK0), SITFMOD 5:4 (01 normal SPI), STH 12:8 */
+#define ADF_BSMX0CR 0x084u                  /* BSSEL 4:0 (00000 bs0_r) */
+#define ADF_DFLT0CR 0x088u                  /* DFLTEN 0, DMAEN 1, ACQMOD 6:4 (000 async continuous), DFLTACTIVE 31 */
+#define ADF_DFLT0CICR 0x08Cu                /* CICMOD 6:4 (101 Sinc5), MCICD 16:8 (4 = /5), SCALE 25:20 */
+#define ADF_DFLT0RSFR 0x090u                /* RSFLTBYP 0, RSFLTD 4 (0 = /4), HPFBYP 7, HPFC 9:8 */
+#define ADF_DFLT0DR 0x0F0u                  /* DR 31:8 */
+#define DMA_ADF_CH 6u                       /* GPDMA1 channel for ADF1 FLT0 (REQSEL 98, Table 137) */
+
+#define OTG_BASE   0x42040000u              /* OTG_FS 0x4204 0000 */
+#define OTG_GUSBCFG 0x00Cu                  /* bit 30 FDMOD */
+#define OTG_GCCFG  0x038u                   /* bit 16 PWRDWN (1 = transceiver on), bit 21 VBDEN */
+#define OTG_DCTL   0x804u                   /* bit 1 SDIS */
+#endif
