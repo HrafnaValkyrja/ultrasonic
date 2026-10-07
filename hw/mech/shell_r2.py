@@ -80,9 +80,22 @@ def bpt(bx, by):
 
 
 MIC_HOLE_D = 0.6
-MIC = bpt(1.98, 6.0)                   # board hole = duct axis (nominal offset 0)
+def board_mic():
+    """U2 centre and its port hole (board mm) read from the routed Phase-2 board, so the duct follows the layout."""
+    import re
+    f = Path(__file__).resolve().parents[1] / "pod/draft_r2/out/routed.kicad_pcb"
+    s = f.read_text()
+    i = s.index('"Reference" "U2"')
+    blk = s[s.rfind("(footprint ", 0, i):i]
+    x, y, rot = (float(v) for v in re.search(r"\(at ([\d.\-]+) ([\d.\-]+) ([\d.\-]+)\)", blk).groups())
+    assert abs(rot - 90) < 1e-6, "port-hole offset below assumes U2 at rot 90"
+    return (x, y), (x - 0.77, y)      # Knowles LGA port hole at local (0, -0.77)
+
+
+U2_XY, MIC_XY = board_mic()            # 2026-10-07: (2.65, 6.0) / (1.88, 6.0) after route closure v6
+MIC = bpt(*MIC_XY)                     # board hole = duct axis (nominal offset 0)
 SW = bpt(18.5, 6.0)
-U2 = dict(c=bpt(2.75, 6.0), dx=2.65, dz=3.5, h=1.08)          # Knowles LGA 3.5 x 2.65, rot 90; tallest B part
+U2 = dict(c=bpt(*U2_XY), dx=2.65, dz=3.5, h=1.08)          # Knowles LGA 3.5 x 2.65, rot 90; tallest B part
 SW1 = dict(body=(3.0, 2.6), pads=(3.8, 2.6), h=0.65, travel=(0.05, 0.15, 0.25))  # KMT022: 3.0x2.6x0.65; travel 0.15+-0.1
 B_MAX = 1.08                           # tools/checks/part_heights.yaml: U2
 PAD_ZONE = (25.0, 30.0)                # rear wire pads, board x
@@ -283,7 +296,8 @@ def duct_offsets():
     pin_r = (tol["bore_ream"][1] - tol["pin_body"]) / 2 + (tol["hole"][1] - tol["pin_tip"]) / 2 + tol["pin_runout"]
     stop_dx = X_STOP_GAP + tol["outline_to_hole"] + tol["print_bore_pos"]
     stop_dz = (CAV["z1"] - CAV["z0"] - PCB_H) / 2 + tol["outline_to_hole"] + tol["print_bore_pos"]
-    nominal = math.hypot(MIC[0] - (PCB["x0"] + 1.98), MIC[1] - (PCB["z0"] + 6.0))
+    hole = bpt(*board_mic()[1])         # re-read: the duct must sit on the board's port hole as built
+    nominal = math.hypot(MIC[0] - hole[0], MIC[1] - hole[1])
     lim = DUCT_D / 2 - MIC_HOLE_D / 2
     # the pin must never be fought by the x-stop / skirt walls: wall gap > outline error
     walls_free = X_STOP_GAP > tol["outline_to_hole"] and (CAV["z1"] - CAV["z0"] - PCB_H) / 2 > tol["outline_to_hole"]

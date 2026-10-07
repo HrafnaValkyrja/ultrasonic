@@ -42,7 +42,7 @@ checks:  # hw/mech/out/r2/checks.json, run 2026-10-03 ~00:40 local
   F_gap: "PASS 0.30 vs VHB 0.25 -> 0.05 slack (VHB thickness tolerance assumed +-0.025 [A])"
   SW1_pocket: "PASS 4.3 x 3.1 >= 4.1 x 2.9 (pad span 3.8); ceiling clearance 0.25 nominal, 0.095 worst [A]"
   switch_stack: {fixed_puck: "FAIL worst case: gap -0.185..+0.275 (RSS -0.003..+0.193); -0.185 is past KMT0 min travel 0.05 -> switch held pressed", selective_fit: "PASS 0.005..0.135 (half step 0.025 + depth gauge 0.02 + puck caliper 0.02)", travel_src: "docs/system/sub-ui.md: 0.15 +-0.1 (C&K KMT0 p.B-9)"}
-  duct_offset_R_ACO_P5: {limit: 0.20, nominal: 0.00, walls_only: "FAIL 0.86 (0.25 stop gap + 0.45 free z + outline 0.2 [A] + print 0.05 [A], radial)", with_gauge_pin: "PASS 0.115 (bore 1.00-1.02 vs pin 0.98: 0.02; hole 0.55-0.65 [A] vs tip 0.50: 0.075; runout 0.02)", VHB_hole: "registered by the same pin: <= 0.03 off the bore (0.01 hole-pin + 0.02 pin-bore)"}
+  duct_offset_R_ACO_P5: {limit: 0.20, nominal: 0.00, axis: "read from the routed board (U2 hole at x 1.88 since 2026-10-07)", walls_only: "FAIL 0.86 (0.25 stop gap + 0.45 free z + outline 0.2 [A] + print 0.05 [A], radial)", with_gauge_pin: "PASS 0.115 (bore 1.00-1.02 vs pin 0.98: 0.02; hole 0.55-0.65 [A] vs tip 0.50: 0.075; runout 0.02)", VHB_hole: "registered by the same pin: <= 0.03 off the bore (0.01 hole-pin + 0.02 pin-bore)"}
   stowage: "PASS 277 mm3 (198 behind board + 79 behind cell) vs need 107-142; prelim estimate for L30 was 276"
   envelope: "6211 mm3 vs size model MZ-2 6259 (live run = 6259): body 5720.9 = model 5721 exactly; plate 330.5 vs model 378.2 (r1 plate polygon re-proportioned: 472 vs 540 mm2); spine 159.6. Delta -48, all plate."
   print_volumes: {tub: 1321.5, lid_with_spine: 863.0, puck: 3.1}
