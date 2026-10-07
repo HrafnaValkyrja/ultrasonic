@@ -101,7 +101,7 @@ def seam_rebate():
 
 def tub(heel_mod=None):
     t = outer_body() & tub_region()
-    t = t + blade.rail()
+    t = t + blade.rail(zc=(Z0 + Z1) / 2)      # centred on the r2 body (H 14.5), not the Rev F frame constant
     if heel_mod is not None:
         t = t + heel_mod.heel_add()
     t = t - cavity()

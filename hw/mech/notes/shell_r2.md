@@ -20,7 +20,7 @@ inputs:
 frame: {x: "29.5-67.5 (L 38.0)", y: "4.3 inner -> 14.0 body -> 14.7 plate (T 10.40)", z: "-9.7..4.8 (H 14.5), belly to -11.75 (2.05) for x < 55.0", note: "Z0, X0/X1, Y_IN kept from r1, so heel, rail, strut relief and NiTi clearances are geometrically unchanged"}
 y_stack: {wall: 0.8, cell_vhb_gap: 0.3, cell: "5.4-10.7", B_gap: "10.7-12.1 (1.4)", board: "12.1-12.9", F_gap: "12.9-13.2 (0.30: VHB 4914 0.25 + 0.05)", lid: "13.2-14.0", plate: "14.0-14.7"}
 z_stack: {cavity: "-8.9..4.0 (12.9)", cell: "-8.1..3.9 (0.8 under for dock tails, 0.1 over)", board: "-8.45..3.55 (0.45 free each long edge)", mic_and_SW1_axis_z: -2.45}
-x_stack: {board: "30.55-60.55 (front 0.25 from the lid's front skirt wall)", mic_axis_x: 32.53, SW1_x: 49.05, rear_pads_x: "55.55-60.55", stowage: "60.55-66.7 behind the board + 65.6-66.7 behind the cell"}
+x_stack: {board: "30.55-60.55 (front 0.25 from the lid's front skirt wall)", mic_axis_x: 32.43, SW1_x: 49.05, rear_pads_x: "55.55-60.55", stowage: "60.55-66.7 behind the board + 65.6-66.7 behind the cell"}
 
 decisions:
   D1_seam: "Seam at the board's B face (y 12.1); lid = shallow cap whose 1.1 mm skirt holds the board. Stepped round the belly: the whole belly (x < 55, z < -8.9) is tub, so the dock window (target centred y 9.15) lies in one part. r1's inner lid lip dropped: it would hit the board's long edges (board needs >= 12.0 of opening; r1's lip, inset 0.65 per side, leaves 11.6)."

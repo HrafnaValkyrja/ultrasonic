@@ -108,10 +108,12 @@ def heel():
     return chamfer((s & w).edges().filter_by(Axis.X), 0.3) if False else (s & w)
 
 
-def rail():
-    """Male dovetail on the pod's inner face (part of the pod print)."""
-    sec = [(Y_IN, ZC - RAIL_W0 / 2), (Y_IN, ZC + RAIL_W0 / 2), (Y_IN - RAIL_H, ZC + RAIL_W1 / 2),
-           (Y_IN - RAIL_H, ZC - RAIL_W1 / 2)]
+def rail(zc=None):
+    """Male dovetail on the pod's inner face (part of the pod print). zc: the body's centre height; default = the frame
+    constant pod.POD_ZC (Rev F). shell_r2 passes its own body centre (2026-10-07 audit: the default sat 0.45 mm off)."""
+    zc = ZC if zc is None else zc
+    sec = [(Y_IN, zc - RAIL_W0 / 2), (Y_IN, zc + RAIL_W0 / 2), (Y_IN - RAIL_H, zc + RAIL_W1 / 2),
+           (Y_IN - RAIL_H, zc - RAIL_W1 / 2)]
     return prism_yz(sec, *RAIL_X) + catch_bump()
 
 

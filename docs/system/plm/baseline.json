@@ -68,13 +68,13 @@
    }
   },
   "REG-POD-BODY": {
-   "by": "docs-phase2-rewrite",
+   "by": "ultrasonic-lead",
    "date": "2026-10-07",
-   "note": "2026-10-07: doc body rewritten to the Phase-2 design (hw/current.yaml, ECR-0018) from the routed board, dims_r2, budget.json out_r2, port.py phase2_r2, interfaces.py/bom_check runs of 2026-10-07; Rev F/G kept as a short reference section",
+   "note": "2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)",
    "stamp": {
-    "file:hw/mech/blade.py": "4f7507b58a9e9bcd",
+    "file:hw/mech/blade.py": "48f90fab3319fbad",
     "file:hw/mech/dims_r2.py": "2e56e5d5e9675ad1",
-    "file:hw/mech/shell_r2.py": "a3ccedbb85e74d28",
+    "file:hw/mech/shell_r2.py": "6ecadd65f1af5dbe",
     "file:hw/mech/styles.py": "23dcb6bfe495f82f"
    }
   },
@@ -252,14 +252,14 @@
    }
   },
   "R-BODY-ARM": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "ultrasonic-lead",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/mech/shell_r1.py (reference) to hw/mech/dims_r2.py (CAD-free constants, values identical to shell_r2 before the split) + shell_r2.py solids; checked with interfaces.py on the routed board: mic-port PASS 0.000 mm (gauge pin 0.115 <= 0.20), switch WARN stack 0.20 vs 0.15, outline PASS, heights PASS (B 1.4, F 0.30, SW1 pocket 0.90), clamp-bands WARN (VHB 31 % bonded, open), frame WARN ECR-0001; USB-C keep-out not in shell_r2",
+   "note": "2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)",
    "stamp": {
     "sym:hw/mech/frame.py::E": "e41a5d539abd8437",
     "sym:hw/mech/heel.py::heel_add": "f10d6b9f6e8fecbf",
     "sym:hw/mech/heel.py::heel_cut": "438d7b8d3da63352",
-    "sym:hw/mech/shell_r2.py::tub": "0cb0a9ae80b172cd"
+    "sym:hw/mech/shell_r2.py::tub": "7c44fecec9f2e5e2"
    }
   },
   "R-CLOCK-BOARD": {
@@ -322,13 +322,13 @@
    }
   },
   "R-DOCK-BODY": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "ultrasonic-lead",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/mech/shell_r1.py (reference) to hw/mech/dims_r2.py (CAD-free constants, values identical to shell_r2 before the split) + shell_r2.py solids; checked with interfaces.py on the routed board: mic-port PASS 0.000 mm (gauge pin 0.115 <= 0.20), switch WARN stack 0.20 vs 0.15, outline PASS, heights PASS (B 1.4, F 0.30, SW1 pocket 0.90), clamp-bands WARN (VHB 31 % bonded, open), frame WARN ECR-0001; USB-C keep-out not in shell_r2",
+   "note": "2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)",
    "stamp": {
     "sym:hw/mech/dims_r2.py::BAY": "d933f8dc8c3634dd",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9",
-    "sym:hw/mech/shell_r2.py::tub": "0cb0a9ae80b172cd"
+    "sym:hw/mech/shell_r2.py::tub": "7c44fecec9f2e5e2"
    }
   },
   "R-OUT-ARM": {

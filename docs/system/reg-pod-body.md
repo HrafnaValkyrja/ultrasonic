@@ -40,7 +40,7 @@ dock: {part: "Xinyangze YZT0675 (5-pin magnetic pogo target, 21.2 x 6.86 x 2.8, 
 usb_c_keepout: "not carried into shell_r2 (R-DOCK-BODY)"
 cell_bed: {cell: "Renata ICP501233PA-02 envelope x 30.6-65.6, y 5.4-10.7, z -8.1..3.9", tape: "VHB 4914 0.25 in the 0.3 gap to the inner wall"}
 strut_relief: "identical to r1 (same Z0, CAV y0/z0): fill 1.0 legs in the inner-bottom rear corner x 62-66.7; outside cut to y + z = -3.65"
-rail_adapter: "blade.rail() + adapter, centred on pod.py POD_ZC -2.0 (body centre now -2.45: issue 8)"
+rail_adapter: "blade.rail(zc=-2.45): rail centred on the r2 body (2026-10-07; was pod.py POD_ZC -2.0, issue 8 closed). The adapter (blade.adapter, still on POD_ZC) is redesigned with the two-frame adapter work (O26, deferred) and must take its rail z from shell_r2"
 spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unioned into the lid (159.6 mm3)"
 ```
 
@@ -129,7 +129,7 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
 5. **Sealing undesigned past the seam** (table above); `docs/research/sealing-and-service.md` (cited by O10) doesn't exist. Closes: sealing note + IPX4 spray test plan.
 6. **Heel wire-channel exit overlaps the cell's rear end** (x 65.25-66.25 vs 65.6; cell position unchanged in Phase 2). heel.py still checks against frame.py's old cell. Closes: [reg-arm](reg-arm.md) issue 1.
 7. **Dock wire route** belly → rear pads undesigned: 5 wires in the 0.8 under-cell slack beside the flat tails; OD 0.8 won't lie flat, needs OD ≤ 0.6 or the rear-gap route (notes/shell_r2.md open items). Closes: [sub-dock-usb](sub-dock-usb.md).
-8. **Stale frame sources:** frame.py/pod.py disagree with dims_r2.py on 8 of 10 shared facts (interfaces.py frame WARN 2026-10-07; ECR-0001). blade.py's rail/adapter centre on pod.POD_ZC −2.0, the r2 body centre is −2.45 (0.45 off; r1 was 0.1). `notes/shell_r2.md` x_stack still says mic_axis_x 32.53 (now 32.43). Closes: ECR-0001 extended to pod.py; refresh the note.
+8. **Stale frame sources:** frame.py/pod.py disagree with dims_r2.py on 8 of 10 shared facts (interfaces.py frame WARN 2026-10-07; ECR-0001). The r2 rail is now centred on the body (blade.rail(zc), 2026-10-07); the adapter still uses pod.POD_ZC −2.0 until its redesign (O26). (notes x_stack mic_axis_x refreshed to 32.43.) Closes: ECR-0001 extended to pod.py; refresh the note.
 9. **No 3D render dump of r2** (section.png/plan.png only); STEP not exported. Closes: render dump (memory rule) after the owner review edits.
 10. **Unknowns:** VHB 4914 thickness tolerance and normal tensile (TDS not read [A]); bond and peel cycles; pod mass and CoM (D18; ≥ ~9.5 g lower bound vs ~8 g). Closes: TDS read + bench + CAD mass run.
 11. (closed in Phase 2) Foam strips without a floor: no foam; the board hangs from the lid.

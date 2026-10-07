@@ -197,3 +197,6 @@
 - 2026-10-07 08:51 checkout REG-BOARD by claude: B-DOC-AUDIT-0007 doc update after the 20bd842 local re-route
 - 2026-10-07 08:51 checkin REG-BOARD by claude
 - 2026-10-07 08:51 review REG-BOARD by claude: reg-board.md updated for the B-DOC-AUDIT-0007 local re-route (20bd842): J3/J4, keep-out, LSE, VDDA caps, issues 16/17 closed, issue 20 (R21/MZD-4) added
+- 2026-10-07 10:53 review R-DOCK-BODY by ultrasonic-lead: 2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)
+- 2026-10-07 10:53 review R-BODY-ARM by ultrasonic-lead: 2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)
+- 2026-10-07 10:53 review REG-POD-BODY by ultrasonic-lead: 2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)
