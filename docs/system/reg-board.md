@@ -1,7 +1,7 @@
 # REG-BOARD: the pod board (PCB region)
 Rev F 2026-10-02: Phase 1 logical simplification placed + routed (52 parts, J4/J6 merged, D5 at J3, debug dots, charger +2.5 mm, ECR-0003/0004/0011 in the board, 0.8 mm set); Rev E facts deleted.
 Status: **routed draft for the owner's board review, not the layout.** `place_r1.py` + one fenced FreeRouting pass on Rev F (commit 4b2c058, 2026-10-02 20:07): 2 unconnected, 19 DRC errors (courtyards only). Real layout = together with the owner (O14), after her review (two-phase plan: Phase 1 logic -> owner review -> Phase 2 miniaturization, which re-sizes the outline per O20). Updated 2026-10-02.
-Phase 2 2026-10-03 (ECR-0018, owner O25/O26): NEW BOARD hw/pod/draft_r2/ (WIP, not yet the default build). Rev G draft_r1 below stays the checked default until the switch.
+Phase 2 2026-10-03 (ECR-0018, owner O25/O26): NEW BOARD hw/pod/draft_r2/. Since 2026-10-07 it is THE CURRENT DESIGN: `hw/current.yaml` names its board, netlist, BOM and shell and every tool and check defaults to it (`tools/current.py`). Rev G draft_r1 below = reference design (env `ULTRASONIC_DESIGN=revg`).
 
 ```yaml
 phase2_board:   # src: ECR-0018 implementation log; hw/pod/draft_r2/out/check.json; 2026-10-03
@@ -17,7 +17,9 @@ phase2_board:   # src: ECR-0018 implementation log; hw/pod/draft_r2/out/check.js
   acoustics: {scenario: phase2_r2, mean_20_96_db_p50: 4.51, peak: "63 kHz Q6.4 (EQ notch target)", r14_pass_fraction: 0.70}
   noise_model: {date: 2026-10-07, out: sim/noise/out_r2/budget.json, planes: "In1 GND + In2 +3V0", LN-M01_db: 26.5, LN-M01_worst_db: 14.0, LN-M02_db: 20.1, LN-M03_pct: 1.29 (PASS after hw/pod/kelvin_r21.py; was 3.31), LN-M04_mv: 0.127, LN-M05_uv: 8.7}
   shell: "hw/mech/shell_r2.py: hung from the lid on full-face VHB, x-stop, duct D1.0, SW1 pocket + puck kit, 6211 mm3"
-  open: ["switch defaults (checks, sch, bom, docs) to draft_r2 + shell_r2"]
+  defaults: "2026-10-07: hw/current.yaml (board draft_r2/out/routed, netlist pod_mz2.net, bom bom_jlc_mz2.csv, shell shell_r2 / dims_r2) -> sim/noise, sim/acoustics, tools/checks, plm watches, sch.py, board_map, render_board"
+  checks_2026-10-07: {interfaces: "PASS mic-port/outline/inside/heights/board-nets; WARN switch stack, clamp-bands (VHB 31 % bonded), pins, rails, frame", bom_check: "PASS refs/netlist/footprints/nets/jlc-bom/selftest 61; WARN cost-bom (bom.py prices Rev G parts, ECR-0018)"}
+  open: ["VHB bond: one test-pad cut-out (TP1-TP6 incl. TP3 (9.3, 2.9), TP6 (24.0, 10.9)) keeps 31 % of the VHB; cut per pad or regroup the TPs (no ECR yet)", "re-price docs/build/bom.py for the MZ-2 parts (Y1, RT1, D4, R21; cost-bom WARN)", "Phase-2 rewrite of the docs/system bodies (pointer lines added 2026-10-07)"]
 ```
 
 

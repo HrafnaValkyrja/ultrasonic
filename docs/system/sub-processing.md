@@ -1,4 +1,5 @@
 # SUB-PROCESSING: MCU, core SMPS, clocks, firmware
+**Current design (2026-10-07): Phase 2, `hw/current.yaml` (ECR-0018); every tool and check defaults to it.** U1 on B at board (10.05, 5.4); Y1 Epson FC-12M X1A0000610006 2.0 x 1.2 (C99009, CL 7 pF) with C11/C12 8p2 C0G 0201 (C161441); 100n decoupling 0201 (C76934); C8/C9 stay 0402 10 V (SMPS loop); netlist `hw/pod/pod_mz2.net`. The body below is the Rev F/G reference design (`ULTRASONIC_DESIGN=revg`) unless it says Phase 2; its Phase-2 rewrite is open.
 Rev F 2026-10-02: leg B on TIM1_CH3/CH3N PA10/PB15 (ECR-0003); R11, R19, C20 removed; PB5 strapped to GND; PA15 internal pull-up; TP7-TP10 debug/MDF dots; free pins now PC13 PH0 PH1 PA3 PA9 PB0.
 
 ```yaml

@@ -4,11 +4,15 @@
 # Lnn = docs/spec.md line as of 2026-10-02. Read this first, then the sim doc you need. Edit when a sim, interface or gap changes.
 meta:
   id: SIM-INDEX
-  date: 2026-10-02
+  date: 2026-10-07
   scope: "stage C must catch the HARDWARE-ONLY failure classes before the board order (spec O18 L644, O19, O20; vcrm O18-stageC-classes): pinouts, footprints, rail capacity, acoustics, mechanics, noise coupling, thermal, ESD, assembly yield"
-  layout_agnostic: "every sim reads whatever schematic / board / shell exists and re-runs when they change (rerun_hooks); none writes a design file; layout is ON HOLD until the simplification study reports"
+  layout_agnostic: "every sim reads the schematic / board / shell it is given and re-runs when they change (rerun_hooks); none writes a design file"
+  default_design: "2026-10-07: ONE pointer hw/current.yaml (loader tools/current.py) = Phase 2 (ECR-0018): board hw/pod/draft_r2/out/routed.kicad_pcb, netlist hw/pod/pod_mz2.net, bom hw/pod/bom_jlc_mz2.csv, shell hw/mech/shell_r2.py (constants hw/mech/dims_r2.py), acoustic scenario phase2_r2. env ULTRASONIC_DESIGN=revg = Rev G/F reference (draft_r1 board, pod.net, bom_jlc.csv, shell_r1.py). No sim keeps its own candidate list"
   integrator_pass: "2026-10-02 (skeptic findings verified and fixed in the sim docs and code; see findings_resolution)"
-  verified_runs_2026-10-02T23:30:   # integrator re-runs, all fenced 3 GB, nothing installed; src /usr/bin/time
+  verified_runs_2026-10-07:   # defaults switch to hw/current.yaml, fenced 3 GB; src /usr/bin/time
+    SIM-LN: {cmd: sim/noise/smoke.sh, wall_s: 5.0, rss_mb: 286, exit: 0, board: "hw/pod/draft_r2/out/routed.kicad_pcb sha da4e8b13 (Phase 2), 195/195 pads, 0 mismatches vs hw/pod/pod_mz2.net, bom hw/pod/bom_jlc_mz2.csv", metrics: "M01 26.5, M02 20.1, M03 1.29 %, M04 0.127, M05 8.72 == sim/noise/out_r2/budget.json", doc_check: "doc and run agree"}
+    SIM-ACO: {cmd: sim/acoustics/smoke.sh, wall_s: 37.0, rss_mb: 370, exit: 0, design: phase2, board: hw/pod/draft_r2/out/routed.kicad_pcb, default_scenario: phase2_r2, selfcheck: "all true"}
+  verified_runs_2026-10-02T23:30:   # integrator re-runs, all fenced 3 GB, nothing installed; src /usr/bin/time (Rev F, reference)
     SIM-LN: {cmd: sim/noise/smoke.sh, wall_s: 3.9, rss_mb: 311, exit: 0, board: "hw/pod/draft_r1/pod_r1_routed.kicad_pcb sha e159bccb (Rev F), 0 pad mismatches vs hw/pod/pod.net", doc_check: "doc and run agree"}
     SIM-ACO: {cmd: sim/acoustics/smoke.sh, wall_s: 24.5, rss_mb: 370, exit: 0, selfcheck: "all true"}
     SIM-E2E: {cmd: "chain.py --scenario all --no-plot", wall_s: 13.8, rss_mb: 642, exit: 0, result: "5 PASS / 28 WARN / 0 OPEN / 3 FAIL (FAILs = the configured ceiling is not held: F1)"}
@@ -53,31 +57,31 @@ sims:
     purpose: "the PCB as a noise path: L1 resistive/inductive network (tracks, vias, In1 mesh) + L2 field coupling (M, Cm) from 8 declared aggressors (bridge, SMPS, CPU hop, PDM clock, LED, USB) to 6 victims (mic VDD/GND/DATA/CLK, ADC ref, I_SENSE), scored through mic PSRR (3 scenarios) and the PDM/CIC5/RSFLT alias chain; per-feature ranking"
     files: [sim/noise/extract.py, budget.py, couple.py, lumped.py, plane.py, pcbgeom.py, alias.py, params.yaml, aggressors.yaml, smoke.sh]
     status: model-runs   # copper read from the board; selfchecks vs ngspice (2.5e-7) and closed forms (0.03 %, 2.7 %, 8 %); pass/fail decided by unmeasured PSRR / floor / SMPS tolerance
-    inputs: {design: "board .kicad_pcb (explicit | env NOISE_BOARD | newest routed hw/pod/draft_r1 board, read-only via pcbnew), hw/pod/pod.net (stale-board check), hw/pod/bom_jlc.csv (values)", params: "sim/noise/params.yaml, aggressors.yaml, shared-params psrr names"}
+    inputs: {design: "board .kicad_pcb (explicit | env NOISE_BOARD | hw/current.yaml board, read-only via pcbnew), hw/current.yaml netlist (stale-board check), hw/current.yaml bom (values; params board.bom auto)", params: "sim/noise/params.yaml, aggressors.yaml, shared-params psrr names"}
     outputs: {files: "sim/noise/out/ (git-ignored): budget.json, IF-MIC-VDD-NOISE.json, transimpedance.npz, geometry.json, mic_vdd_path.sub, gnd_return.sub, l1_full.cir, noise_budget.png, extract_report.txt", consumers: ["SIM-E2E (IF-MIC-VDD-NOISE)", "layout session / simplification study (IF-LAYOUT-FEATURES: budget.json rows[].features, LF-*)", "SIM-FW clock plan (IF-ALIAS-PLAN)", "docs/system/rail-budget.yaml + GAP-RAIL (IF-RAIL-IR)"]}
     run_class: now-light
-    cmd: "sim/noise/smoke.sh [board.kicad_pcb]   # fence3 inside; exit 1 = stale board vs pod.net, unrouted net or doc drift"
+    cmd: "sim/noise/smoke.sh [board.kicad_pcb]   # fence3 inside; exit 1 = stale board vs the design netlist, unrouted net or doc drift (metric FAILs do not set it)"
     est: {smoke: "3.9 s, 0.31 GB", sweep: "budget.py --sweep --no-l2: 9.8 s, 0.30 GB"}
     heavy: [{id: LN-H1, what: "own PEEC crop 100 kHz-30 MHz", est: "10-20 min, 1-3 GB", fence: fence4, blocked_on: "layout freeze + L3 gate + code (~300 lines)"}, {id: LN-H2, what: "Elmer magnetodynamics crop", est: "30-90 min per frequency, 3-4 GB", fence: fence4, blocked_on: "installs P10/P11 + L3 gate"}, {id: LN-H3, what: "openEMS full wave", blocked_on: "not recommended"}, {id: LN-H4, what: "ngspice transient of l1_full.cir with PWL aggressors", est: "5-20 min, < 1 GB", fence: fence3, blocked_on: "IF-AGGRESSOR-I export"}, {id: LN-H5, what: "Monte Carlo over unmeasured params, 500 x 3.5 s", est: "~30 min, 0.3 GB", fence: fence3, blocked_on: "ranges agreed"}]
-    depends_on: [SIM-SHARED, "board + pod.net + bom_jlc.csv", "IF-AGGRESSOR-I producers (later)"]
+    depends_on: [SIM-SHARED, "hw/current.yaml (board + netlist + bom)", "IF-AGGRESSOR-I producers (later)"]
     covers: {classes: [noise coupling, rail capacity (copper IR drop, IF-RAIL-IR), clock-plan aliasing], spec_R: [R9, R13 (clock plan only), R21, R22 (stale-board check)], XR: [7 (SMPS L1 position: partial, no magnets), 9]}
     cannot_cover: "mic PSRR(f) and ultrasonic floor (S2 sweep via a MIC_VDD probe pad, LN-R12; E3); SMPS free-running tolerance and real ripple (scope at bring-up); MLCC piezo / L1 magnetostriction audibility (E11); arm wires, shell, dock magnets (GAP-ARM, GAP-MAG); HF slots/necks (L3 gate)"
-    rerun_hook: "schematic change: regenerate pod.net (gen.py), then sim/noise/smoke.sh exits 1 until a board matching it exists (results INVALID, never silently stale); board change: sim/noise/smoke.sh <board> (or NOISE_BOARD=...), refresh layout-noise.yaml results for the new sha until --check-doc agrees; shell change: no effect"
+    rerun_hook: "schematic change: regenerate the design netlist (hw/current.yaml generate), then sim/noise/smoke.sh exits 1 until a board matching it exists (results INVALID, never silently stale); board change: sim/noise/smoke.sh <board> (or NOISE_BOARD=...), refresh layout-noise.yaml results for the new sha until --check-doc agrees; shell change: no effect"
   SIM-ACO:
     doc: docs/sim/acoustics.yaml
     purpose: "(A) lid window -> bore -> lid-board gap or sealed duct -> board hole -> mic port, 1-100 kHz ratio vs a flush port, option comparison, R14 rules over the processed band 20-85 kHz, alignment tolerance stack; (B) bridge volts -> coil current -> exciter -> pad -> skin force and sensation level, Monte Carlo over unmeasured exciter params, shaped-PWM-noise check per ERB"
     files: [sim/acoustics/geometry.py, narrow.py, gap.py, port.py, run_port.py, fem_axisym.py, selfcheck.py, bone.py, headline.py, smoke.sh]
     status: "model-runs (A: lumped + modal, checked against axisymmetric FEM <= 1.5 dB below 60 kHz and a modal sum 4e-4); scaffold-runs (B: unmeasured exciter, +-8 dB 5-95 %)"
-    inputs: {design: "hw/mech/shell_r1.py (AST, never executed: MIC, PCB, CAV, lid_base bore/window/lip/ribs); board (explicit | env ACO_BOARD | newest draft_r1 board by mtime, read-only: U2 NPTH position + drill, thickness, F-side parts, vias near the port)", data: "sim/data/sph0641_ultrasonic_response.json; shared-params exciter + thresholds"}
-    outputs: {files: "sim/acoustics/out/: port_response.json (as built), port_response_chimney_d1.0.json, port_response_gasket_id2.1.json, port_results.json, bone_tf.json, bone_results.json, selfcheck.json, port_path.png, port_response.png, port_sweeps.png, bone_force.png, bone_sensitivity.png", consumers: ["SIM-E2E (IF-ACOUSTIC-PORT, IF-BONE-TF)", "owner (port option, port_path.png)", "reg-pod-body / sub-audio-in (x-stop, duct)", "E1 priors (bone_results zin.e1_expectation)"]}
+    inputs: {design: "Phase 2: hw/mech/dims_r2.py (imported, CAD-free: DUCT_D, HEX_R/DEPTH, Y_LID_IN, Y_TOP, F_GAP, PCB_T, duct_offsets); revg: hw/mech/shell_r1.py (AST); board (explicit | env ACO_BOARD | hw/current.yaml board, read-only: U2 NPTH position + drill, thickness, F-side parts, vias near the port)", data: "sim/data/sph0641_ultrasonic_response.json; shared-params exciter + thresholds"}
+    outputs: {files: "sim/acoustics/out/: port_response.json (hw/current.yaml acoustic_scenario: phase2_r2), port_response_chimney_d1.0.json, port_response_gasket_id2.1.json, port_results.json, bone_tf.json, bone_results.json, selfcheck.json, port_path.png, port_response.png, port_sweeps.png, bone_force.png, bone_sensitivity.png", consumers: ["SIM-E2E (IF-ACOUSTIC-PORT, IF-BONE-TF)", "owner (port option, port_path.png)", "reg-pod-body / sub-audio-in (x-stop, duct)", "E1 priors (bone_results zin.e1_expectation)"]}
     run_class: now-light
     cmd: "sim/acoustics/smoke.sh [board.kicad_pcb]   # fence3 + timeout 60 inside"
     est: {smoke: "24.5 s, 0.37 GB"}
     heavy: [{id: ACO-H-A1, what: "2-D thin-gap FEM with part heights (open gap only)", est: "1-2 min, 0.5 GB", fence: fence3, blocked_on: "option A kept + layout settled"}, {id: ACO-H-A2, what: "3-D cavity with parts", est: "40-80 min, 1.5-3 GB", fence: fence4, blocked_on: "option A kept; pyamg optional (P9)"}, {id: ACO-H-A4, what: "3-D sealed duct with offset 0/0.2/0.5/1.0 mm", est: "~14 min, ~1.6 GB", fence: fence3, blocked_on: "option B/S1 chosen"}, {id: ACO-H-A3, what: "visco-thermal port FEM", est: hours, blocked_on: "coupons disagree + solver licence"}]
-    depends_on: [SIM-SHARED, "hw/mech/shell_r1.py", "board"]
+    depends_on: [SIM-SHARED, "hw/current.yaml (shell_dims + board)"]
     covers: {classes: [acoustics, mechanics (duct alignment stack; board slide from CAV vs PCB)], spec_R: [R1, R8, R14, R19, R21 (output-path PWM noise only), R23 (peak force vs static)], XR: [8, 17, 20]}
     cannot_cover: "mic front volume / port length and whether the datasheet 25 kHz peak is the mic or the fixture (E3 coupons, vendor data); mesh acoustic resistance (D2 part datasheet); real exciter Bl, mass, f0, L (E1); tragus threshold and comfort (E2); parts in the gap and 3-D offset (H-A1/H-A4); sealing against water (O12)"
-    rerun_hook: "shell change (shell_r1.py MIC/PCB/CAV/lid_base) or board change (U2 position/drill, thickness, F-side parts or vias within r 1.6 mm of the port): sim/acoustics/smoke.sh [board]; then the SIM-E2E coupled cmd with the re-delivered port json; schematic change: none unless U2 part/footprint changes"
+    rerun_hook: "shell change (dims_r2.py duct stack / MIC / PCB; revg: shell_r1.py MIC/PCB/CAV/lid_base) or board change (U2 position/drill, thickness, F-side parts or vias within r 1.6 mm of the port): sim/acoustics/smoke.sh [board]; then the SIM-E2E coupled cmd with the re-delivered port json; schematic change: none unless U2 part/footprint changes"
   SIM-FW:
     doc: docs/sim/firmware-emulation.yaml
     purpose: "requirements for firmware written and tested before the board: host tier (Unity, fakes, L1/L2 vs sim/dsp + SIM-E2E), emulator tier (Renode + own U575 models: ADF1, TIM1, RCC/PWR/FLASH, GPDMA ...), trace rules, pin audit, cycle budget, fault injection FI-01..FI-14, USB self-test set, rev-1 telemetry"
@@ -140,8 +144,8 @@ run_order_machine_time: {steps_5_to_9: "~1-1.5 h (estimate)"}
 # ------------------------------------------------------------------------------------------------ re-run when the design changes (layout-agnostic hooks; one line per sim, detail in sims.*.rerun_hook)
 rerun_hooks:
   SIM-SHARED: "new E1/E2/E3/E5/S2 evidence or an owner number -> edit shared-params.yaml -> run_order steps 1-4"
-  SIM-LN: "schematic change -> pod.net regenerated -> smoke exits 1 until the board matches; board change -> sim/noise/smoke.sh <board>, refresh results for the new sha; shell change -> none"
-  SIM-ACO: "shell change (shell_r1.py MIC/PCB/CAV/lid_base) or board change near U2 -> sim/acoustics/smoke.sh <board> -> SIM-E2E coupled cmd; schematic change -> none unless U2 changes"
+  SIM-LN: "schematic change -> design netlist regenerated -> smoke exits 1 until the board matches; board change -> sim/noise/smoke.sh <board>, refresh results for the new sha; shell change -> none"
+  SIM-ACO: "shell change (dims_r2.py; revg shell_r1.py) or board change near U2 -> sim/acoustics/smoke.sh <board> -> SIM-E2E coupled cmd; schematic change -> none unless U2 changes"
   SIM-E2E: "reads no layout; gen.py value change (bridge, LDO, mic, R21), any re-delivered IF file, shared-params or pipeline.py change -> chain.py --scenario all --no-plot (+ coupled cmd)"
   SIM-FW: "pin-contract.yaml or integration-map.md s4 change -> refresh design_binding/pin_state_expect/rom_stub (FWSIM-R5 lint once fw/ exists); board/shell change -> none"
   plm_relations_proposed: {R-LAYOUT-NOISE: "layout-noise.yaml watch", R-ACOUSTICS: "acoustics.yaml watch", R-E2E: "e2e-chain.yaml watch", R-FWSIM: "firmware-emulation.yaml watch", R-SIM-SHARED: "docs/sim/shared-params.yaml -> every sim doc", note: "the lead registers them in tools/plm.py (agents do not edit docs/system)"}

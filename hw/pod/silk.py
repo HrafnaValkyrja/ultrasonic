@@ -254,8 +254,8 @@ def project_rules(board_path: Path):
 
 
 def main():
-    # Rev F silk generator: it WRITES the board, so its default stays the Rev F file. Never point it at the current design's
-    # read-only routed board (hw/current.yaml `board`); pass an explicit copy for Phase 2 (2026-10-07).
+    # It WRITES the board, so the default stays the Rev F file and is NOT taken from hw/current.yaml (2026-10-07): for Phase 2
+    # pass the board path explicitly, on purpose (the routed board is read-only for every other tool).
     path = Path(sys.argv[1] if len(sys.argv) > 1 else Path(__file__).parent / "draft_r1/pod_r1_routed.kicad_pcb")
     board = pcbnew.LoadBoard(str(path))
     strip(board, path)

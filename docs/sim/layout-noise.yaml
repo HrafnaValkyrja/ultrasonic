@@ -4,7 +4,7 @@
 # Thresholds below are READ BY sim/noise/budget.py --check-doc (drift = stale doc). Numbers in `results` belong to board sha in results.board_sha256; a different sha = stale.
 meta:
   id: SIM-LN
-  date: 2026-10-02
+  date: 2026-10-07
   scope: "ladder step C (O18 L644): bound, before the board order, how much of the pod's own noise the copper itself puts into the mic, the ADC and the bridge, in the bands that decide T6 L43 / R9 L602 / R21 L614 / D11 L210"
   layout_agnostic: true   # reads any 4-layer .kicad_pcb with a filled In1 GND zone (In2 +3V0 plane modelled when filled) + the design BOM (values) + the design netlist (stale-board check)
   default: "hw/current.yaml via tools/current.py (2026-10-07): board hw/pod/draft_r2/out/routed.kicad_pcb, netlist hw/pod/pod_mz2.net, bom hw/pod/bom_jlc_mz2.csv (Phase 2, ECR-0018); ULTRASONIC_DESIGN=revg -> Rev F board + hw/pod/pod.net + hw/pod/bom_jlc.csv"

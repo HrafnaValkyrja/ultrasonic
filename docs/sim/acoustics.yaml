@@ -3,7 +3,7 @@
 # Lnn = line in docs/spec.md as of 2026-10-02 20:30 (header v0.14, content v0.15 + O21/O22). Numbers in results_* belong to meta.last_run; re-run after anything in watch.
 meta:
   id: SIM-ACO
-  date: 2026-10-02
+  date: 2026-10-07
   scope: "ladder step C (O18 L644): before the board order predict (A) how lid window / lid bore / lid-board gap / board hole / mic port shape the 20-96 kHz capture (R14 L608, s8 L509-L511, E3 L700) and (B) force + perceived level at the pre-tragal skin per volt, and which unknowns dominate (R1 L594, R19 L612, R21 L614, T2 L39, T6 L43; E1 L698, E2 L699)"
   default: "hw/current.yaml via tools/current.py (2026-10-07): Phase 2 = duct stack from hw/mech/dims_r2.py (CAD-free constants of shell_r2.py, imported) + U2 NPTH on hw/pod/draft_r2/out/routed.kicad_pcb; default scenario phase2_r2 -> port_response.json; in Phase 2 the as_built* names are what-ifs on the r2 stack (0.30 F gap left OPEN). ULTRASONIC_DESIGN=revg = Rev F path (shell_r1.py AST + draft_r1 board, default scenario as_built)"
   layout_agnostic: "board = --board | env ACO_BOARD | hw/current.yaml board (no candidate list, no mtime guess), read-only via pcbnew; fall-backs flagged in port_results.json warnings"

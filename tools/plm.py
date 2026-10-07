@@ -29,7 +29,10 @@ Watches:
   sym:PATH::NAME            a top-level Python assignment / def / class (NAME as written, e.g. PCB, P.W, tub)
   sym:PATH::NAME[KEY]       one entry of a top-level dict literal (e.g. PLACE[U3])
   grep:PATH::REGEX          the lines matching REGEX
-  net:NAME | ref:REF | block:NAME   from the SKiDL schematic (hw/pod/gen.py via hw/pod/system_map.py)
+  yaml:PATH::KEY            one top-level key of a YAML file (e.g. yaml:hw/pod/draft_r2/placement.yaml::U2), 2026-10-07
+  net:NAME | ref:REF | block:NAME   from the SKiDL schematic (hw/pod/gen.py via hw/pod/system_map.py), built for the
+                            current design's package set (hw/current.yaml `packages`, tools/current.py apply_env)
+impact <target> also matches a directory: every watch under it (impact hw/pod/draft_r2).
 Baselines live in docs/system/plm/baseline.json (commit it). The SKiDL build costs a few seconds.
 """
 from __future__ import annotations
@@ -69,6 +72,9 @@ _circuit = None
 def circuit():
     global _circuit
     if _circuit is None:
+        sys.path.insert(0, str(REPO / "tools"))
+        from current import apply_env                       # noqa: E402  (hw/current.yaml: POD_PACKAGES of the current design)
+        apply_env()
         sys.path.insert(0, str(REPO / "hw/pod"))
         import system_map                                   # noqa: E402
         circ = system_map.build()
@@ -128,6 +134,12 @@ def watch_text(w):
             if not lines:
                 raise Broken("no matching lines")
             return "\n".join(lines)
+        if kind == "yaml":
+            path, _, key = arg.partition("::")
+            data = yaml.safe_load((REPO / path).read_text())
+            if not isinstance(data, dict) or key not in data:
+                raise Broken(f"key {key} not in {path}")
+            return json.dumps(data[key], sort_keys=True)
         if kind in ("net", "ref", "block"):
             nets, parts, blocks = circuit()
             if kind == "net":
@@ -247,7 +259,9 @@ def _matches(watch, target):
         return True
     kind, _, arg = watch.partition(":")
     path = arg.partition("::")[0]
-    if kind in ("file", "sym", "grep") and target in (path, f"file:{path}"):
+    if kind in ("file", "sym", "grep", "yaml", "glob") and target in (path, f"file:{path}"):
+        return True
+    if kind in ("file", "sym", "grep", "yaml", "glob") and path.startswith(target.rstrip("/") + "/"):   # a directory target
         return True
     if kind == "glob" and fnmatch.fnmatch(target, arg):
         return True

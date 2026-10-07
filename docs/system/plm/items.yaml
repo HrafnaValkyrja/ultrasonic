@@ -1,6 +1,9 @@
 # Design items and the relations between them (tools/plm.py). Hand-kept: when a new interface appears,
 # add a relation here in the same commit. Watches: see tools/plm.py docstring.
 # Items = the big-picture docs (docs/system/*), each owning the source content it summarises.
+# 2026-10-07: watches follow the CURRENT design (hw/current.yaml = Phase 2, ECR-0018): placement hw/pod/draft_r2/placement.yaml
+# (yaml: watches), routed board hw/pod/draft_r2/out/routed.kicad_pcb, shell constants hw/mech/dims_r2.py + solids hw/mech/shell_r2.py,
+# BOM hw/pod/bom_jlc_mz2.csv; net:/ref:/block: come from the SKiDL build with the MZ-2 package set. Rev G/F files are reference only.
 
 items:
   SPEC:
@@ -17,14 +20,13 @@ items:
     kind: integration
     title: Integration map (generated)
     doc: docs/system/integration-map.md
-    owns: [file:hw/pod/gen.py, file:hw/pod/system_map.py]
+    owns: [file:hw/pod/gen.py, file:hw/pod/system_map.py, file:hw/current.yaml]
   PHYSICAL:
     kind: physical
     title: Physical integration, stack-up, assembly
     doc: docs/system/physical.md
-    owns: [file:hw/mech/frame.py, "sym:hw/mech/shell_r1.py::X0", "sym:hw/mech/shell_r1.py::Y_IN", "sym:hw/mech/shell_r1.py::Z1",
-           "sym:hw/mech/shell_r1.py::CAV", "sym:hw/mech/shell_r1.py::CELL", "sym:hw/mech/shell_r1.py::PCB",
-           "sym:hw/mech/shell_r1.py::PARTS", file:docs/build/tolerances.md]
+    owns: [file:hw/mech/frame.py, "sym:hw/mech/dims_r2.py::X0", "sym:hw/mech/dims_r2.py::Y_IN", "sym:hw/mech/dims_r2.py::Z1", "sym:hw/mech/dims_r2.py::CAV", "sym:hw/mech/dims_r2.py::CELL", "sym:hw/mech/dims_r2.py::PCB",
+           "sym:hw/mech/dims_r2.py::B_GAP", "sym:hw/mech/dims_r2.py::VHB_T", file:docs/build/tolerances.md]
   SUB-POWER:
     kind: subsystem
     title: Cell, charger, power path, LDO, sensing
@@ -34,7 +36,7 @@ items:
     kind: subsystem
     title: Ultrasonic mic, port, PDM capture
     doc: docs/system/sub-audio-in.md
-    owns: [block:MIC, "sym:hw/mech/shell_r1.py::MIC"]
+    owns: [block:MIC, "sym:hw/mech/dims_r2.py::MIC", "sym:hw/mech/dims_r2.py::DUCT_D"]
   SUB-PROCESSING:
     kind: subsystem
     title: MCU, core SMPS, clocks, firmware
@@ -49,12 +51,12 @@ items:
     kind: subsystem
     title: Magnetic dock, USB, ESD, DFU
     doc: docs/system/sub-dock-usb.md
-    owns: [block:DOCK_USB, "sym:hw/mech/shell_r1.py::DOCK", "sym:hw/mech/shell_r1.py::USBC_KEEPOUT"]
+    owns: [block:DOCK_USB, "sym:hw/mech/dims_r2.py::DOCK"]
   SUB-UI:
     kind: subsystem
     title: Button and power LED
     doc: docs/system/sub-ui.md
-    owns: [block:UI, "sym:hw/mech/shell_r1.py::SWITCH", "sym:hw/mech/shell_r1.py::plunger", file:hw/padboard/gen.py]
+    owns: [block:UI, "sym:hw/mech/dims_r2.py::SW", "sym:hw/mech/dims_r2.py::POCKET", "sym:hw/mech/shell_r2.py::puck", file:hw/padboard/gen.py]
   SUB-DEBUG-TEST:
     kind: subsystem
     title: SWD, test pads, test hooks, self-test
@@ -64,12 +66,12 @@ items:
     kind: region
     title: Housing, retention, dock bay, sealing
     doc: docs/system/reg-pod-body.md
-    owns: [file:hw/mech/shell_r1.py, file:hw/mech/blade.py, file:hw/mech/styles.py]
+    owns: [file:hw/mech/shell_r2.py, file:hw/mech/dims_r2.py, file:hw/mech/blade.py, file:hw/mech/styles.py]
   REG-BOARD:
     kind: region
     title: The PCB (outline, faces, floorplan, routing)
     doc: docs/system/reg-board.md
-    owns: [file:hw/pod/place_r1.py, "sym:hw/pod/place.py::rules", "glob:hw/lib/pod.pretty/*.kicad_mod"]
+    owns: [file:hw/pod/draft_r2/placement.yaml, file:hw/pod/draft_r2/out/routed.kicad_pcb, "sym:hw/pod/place.py::rules", "glob:hw/lib/pod.pretty/*.kicad_mod"]
   REG-ARM:
     kind: region
     title: NiTi arm, heel, strut, wire path
@@ -84,7 +86,7 @@ items:
     kind: cost
     title: BOM and order cost
     doc: docs/build/bom.md
-    owns: [file:docs/build/bom.py, file:hw/pod/bom_jlc.csv]
+    owns: [file:docs/build/bom.py, file:hw/pod/bom_jlc_mz2.csv]
 
 relations:
   # ---------------------------------------------------------------- electrical interfaces (from the schematic)
@@ -147,68 +149,68 @@ relations:
   - id: R-SMPS-BOARD
     a: SUB-PROCESSING
     b: REG-BOARD
-    what: "MCU SMPS loop on U1's face, tight: VLXSMPS -> L1 (2.2 uH, DCR < 200 mohm, ISAT > 0.5 A) -> VDD11 C8/C9 (2x2.2 uF >= 10 V); C7 10 uF at VDDSMPS (DS13737 Rev 10 p.153; MZG-05/06); >= 10 mm from the mic (MZG-04)"
-    watch: ["sym:hw/pod/place_r1.py::PLACE[L1]", "sym:hw/pod/place_r1.py::PLACE[C7]", "sym:hw/pod/place_r1.py::PLACE[C8]", "sym:hw/pod/place_r1.py::PLACE[C9]", net:VLXSMPS, net:VDD11, ref:L1]
+    what: "MCU SMPS loop on U1's face, tight: VLXSMPS -> L1 (2.2 uH, DCR < 200 mohm, ISAT > 0.5 A) -> VDD11 C8/C9 (2x2.2 uF >= 10 V); C7 10 uF at VDDSMPS (DS13737 Rev 10 p.153; MZG-05/06); >= 10 mm from the mic (MZG-04). Phase 2: all on B, L1 at board (15.65, 7.0), mic at (2.65, 6.0)"
+    watch: ["yaml:hw/pod/draft_r2/placement.yaml::L1", "yaml:hw/pod/draft_r2/placement.yaml::C7", "yaml:hw/pod/draft_r2/placement.yaml::C8", "yaml:hw/pod/draft_r2/placement.yaml::C9", net:VLXSMPS, net:VDD11, ref:L1]
   - id: R-CLOCK-BOARD
     a: SUB-PROCESSING
     b: REG-BOARD
     what: "LSE crystal Y1 + C11/C12 beside PC14/PC15 on U1's face, short symmetric traces, no vias, guarded (A3 clock doc)"
-    watch: ["sym:hw/pod/place_r1.py::PLACE[Y1]", "sym:hw/pod/place_r1.py::PLACE[C11]", "sym:hw/pod/place_r1.py::PLACE[C12]", net:LSE_IN, net:LSE_OUT, ref:Y1]
+    watch: ["yaml:hw/pod/draft_r2/placement.yaml::Y1", "yaml:hw/pod/draft_r2/placement.yaml::C11", "yaml:hw/pod/draft_r2/placement.yaml::C12", net:LSE_IN, net:LSE_OUT, ref:Y1]
   - id: R-UI-BOARD
     a: SUB-UI
     b: REG-BOARD
     what: "SW1 on F on the board centre line under the lid plunger (O16-5/7); board stiffness under the press; one-face Phase-2 layout keeps SW1 alone on F"
-    watch: ["sym:hw/pod/place_r1.py::PLACE[SW1]", ref:SW1, net:BTN]
+    watch: ["yaml:hw/pod/draft_r2/placement.yaml::SW1", ref:SW1, net:BTN]
   - id: R-AUDIO-BOARD
     a: SUB-AUDIO-IN
     b: REG-BOARD
-    what: "mic U2 on B at board (4.67, 6.5), its 0.6 mm port NPTH at (3.9, 6.5) through the board (ECR-0011)"
-    watch: ["sym:hw/pod/place_r1.py::PLACE[U2]", ref:U2]
+    what: "mic U2 on B at board (2.65, 6.0) rot 90, its 0.6 mm port NPTH at (1.88, 6.0) through the board (ECR-0011; Phase 2 routed board)"
+    watch: ["yaml:hw/pod/draft_r2/placement.yaml::U2", ref:U2]
   - id: R-AUDIO-BODY
     a: SUB-AUDIO-IN
     b: REG-POD-BODY
-    what: "lid mic port + mesh aligned with the board's mic port NPTH (board 3.9 = pod 34.5 = lid bore axis; interfaces.py mic-port offset 0.000 mm since Rev F, ECR-0011); sealed duct ID 1.0 recommended (docs/sim/acoustics.yaml option B, A-PORT-SEAL)"
-    watch: ["sym:hw/mech/shell_r1.py::MIC", "sym:hw/mech/shell_r1.py::PCB", "sym:hw/pod/place_r1.py::PLACE[U2]", "sym:hw/mech/shell_r1.py::lid_base", "grep:hw/pod/gen.py::Knowles_LGA-5", "file:hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod"]
+    what: "Phase 2 sealed duct (O24 option B): reamed D1.0 lid bore + D1.0 VHB hole across the 0.30 F gap onto the board's D0.6 port NPTH (board 1.88 = pod 32.43; dims_r2 MIC is read from the routed board, gauge pin locates at bonding: worst 0.115 <= 0.20 mm); interfaces.py mic-port offset 0.000 mm; acoustics phase2_r2 (docs/sim/acoustics.yaml)"
+    watch: ["sym:hw/mech/dims_r2.py::MIC", "sym:hw/mech/dims_r2.py::PCB", "sym:hw/mech/dims_r2.py::DUCT_D", "sym:hw/mech/dims_r2.py::board_mic", "sym:hw/mech/dims_r2.py::duct_offsets", "yaml:hw/pod/draft_r2/placement.yaml::U2", "sym:hw/mech/shell_r2.py::lid_base", "grep:hw/pod/gen.py::Knowles_LGA-5", "file:hw/lib/lcsc/lcsc.pretty/Knowles_LGA-5_3.5x2.65mm_Port0.6.kicad_mod"]
   - id: R-UI-BODY
     a: SUB-UI
     b: REG-POD-BODY
-    what: switch on F under the lid plunger (pod x 52.6 = board x 22.0); KMT0 travel 0.15 mm tolerance stack
-    watch: ["sym:hw/mech/shell_r1.py::SWITCH", "sym:hw/mech/shell_r1.py::plunger", "sym:hw/pod/place_r1.py::PLACE[SW1]", ref:SW1]
+    what: "switch SW1 on F in a 4.3 x 3.1 lid pocket under a printed puck + silicone skin (pod x 49.05 = board x 18.5); puck length selective fit (5 lengths, 0.05 apart); KMT0 travel 0.15 mm stack"
+    watch: ["sym:hw/mech/dims_r2.py::SW", "sym:hw/mech/dims_r2.py::POCKET", "sym:hw/mech/dims_r2.py::PUCK_L", "sym:hw/mech/dims_r2.py::switch_stack", "sym:hw/mech/shell_r2.py::puck", "yaml:hw/pod/draft_r2/placement.yaml::SW1", ref:SW1]
   - id: R-DOCK-BODY
     a: SUB-DOCK-USB
     b: REG-POD-BODY
-    what: magnetic target in the belly bay + window, wired to J3/J4/J10/J11/J12; USB-C fallback keep-out
-    watch: ["sym:hw/mech/shell_r1.py::DOCK", "sym:hw/mech/shell_r1.py::USBC_KEEPOUT", "sym:hw/mech/shell_r1.py::BAY", "sym:hw/mech/shell_r1.py::tub"]
+    what: "magnetic target in the belly bay + window (the whole belly is tub in Phase 2), wired to J3/J4/J10/J11/J12; the Rev F USB-C fallback keep-out is not carried into shell_r2"
+    watch: ["sym:hw/mech/dims_r2.py::DOCK", "sym:hw/mech/dims_r2.py::BAY", "sym:hw/mech/shell_r2.py::tub"]
   - id: R-DOCK-BOARD
     a: SUB-DOCK-USB
     b: REG-BOARD
-    what: "dock wire pads J3/J4 (shared GND with cell -, between J3 and J5)/J10/J11/J12 in two rear columns on F; D5 ESD at J3 (F), D4/U6/R12/R13/R18 on B at the rear. Open: 0.60 mm pad gaps J4-J5 (cell short), J5-J12 0.89 (layout session)"
-    watch: ["sym:hw/pod/place_r1.py::PLACE[J3]", "sym:hw/pod/place_r1.py::PLACE[J4]", "sym:hw/pod/place_r1.py::PLACE[J5]", "sym:hw/pod/place_r1.py::PLACE[J10]", "sym:hw/pod/place_r1.py::PLACE[J11]", "sym:hw/pod/place_r1.py::PLACE[J12]", "sym:hw/pod/place_r1.py::PLACE[D5]", "sym:hw/pod/place_r1.py::PLACE[U6]", "sym:hw/pod/place_r1.py::PLACE[D4]"]
+    what: "Phase 2: dock wire pads J3/J4 (shared GND with cell -)/J10/J11/J12 in the two rear columns on B (board x 25-29, PAD_ZONE); D5/D6 ESD at J3/J12, U6 and D4 on B at the rear"
+    watch: ["yaml:hw/pod/draft_r2/placement.yaml::J3", "yaml:hw/pod/draft_r2/placement.yaml::J4", "yaml:hw/pod/draft_r2/placement.yaml::J5", "yaml:hw/pod/draft_r2/placement.yaml::J10", "yaml:hw/pod/draft_r2/placement.yaml::J11", "yaml:hw/pod/draft_r2/placement.yaml::J12", "yaml:hw/pod/draft_r2/placement.yaml::D5", "yaml:hw/pod/draft_r2/placement.yaml::D6", "yaml:hw/pod/draft_r2/placement.yaml::U6", "yaml:hw/pod/draft_r2/placement.yaml::D4"]
   - id: R-PWR-BOARD
     a: SUB-POWER
     b: REG-BOARD
     what: charger cluster around U3 (0.4 mm-pitch balls; C15/C16/C21 placement), LDO cluster
-    watch: ["sym:hw/pod/place_r1.py::PLACE[U3]", "sym:hw/pod/place_r1.py::PLACE[C15]", "sym:hw/pod/place_r1.py::PLACE[C16]", "sym:hw/pod/place_r1.py::PLACE[C21]", "sym:hw/pod/place_r1.py::PLACE[U4]", ref:U3]
+    watch: ["yaml:hw/pod/draft_r2/placement.yaml::U3", "yaml:hw/pod/draft_r2/placement.yaml::C15", "yaml:hw/pod/draft_r2/placement.yaml::C16", "yaml:hw/pod/draft_r2/placement.yaml::C21", "yaml:hw/pod/draft_r2/placement.yaml::U4", ref:U3]
   - id: R-PWR-BODY
     a: SUB-POWER
     b: REG-POD-BODY
-    what: cell envelope (35 x 12 x 5.3) in the cavity, foam strips under the board
-    watch: ["sym:hw/mech/shell_r1.py::CELL", "sym:hw/mech/shell_r1.py::placeholders"]
+    what: "cell envelope (35 x 12 x 5.3) on 0.25 VHB in the tub; 1.4 mm B gap to the hanging board (Phase 2: no foam strips)"
+    watch: ["sym:hw/mech/dims_r2.py::CELL", "sym:hw/mech/dims_r2.py::B_GAP", "sym:hw/mech/shell_r2.py::placeholders"]
   - id: R-OUT-BOARD
     a: SUB-OUTPUT
     b: REG-BOARD
-    what: "bridge legs Q1/Q2 (B face, Nexperia Fig. 32 SOT1216 footprint since Rev F, ECR-0004) and shunt R21 1206 (B, 21.6, 7.6); I_SENSE Kelvin route to R21 (LN-M03 5.2 % vs <= 2 %, layout item)"
-    watch: ["sym:hw/pod/place_r1.py::PLACE[Q1]", "sym:hw/pod/place_r1.py::PLACE[Q2]", "sym:hw/pod/place_r1.py::PLACE[R21]", ref:Q1, ref:R21]
+    what: "bridge legs Q1/Q2 (B, Nexperia Fig. 32 SOT1216 footprint, ECR-0004) and shunt R21 0402 ERJ2BSFR10X (B, 19.45, 6.45); I_SENSE Kelvin route to R21: LN-M03 1.29 % <= 2 % after the two-via fix (hw/pod/kelvin_r21.py, f6291e6)"
+    watch: ["yaml:hw/pod/draft_r2/placement.yaml::Q1", "yaml:hw/pod/draft_r2/placement.yaml::Q2", "yaml:hw/pod/draft_r2/placement.yaml::R21", ref:Q1, ref:R21, file:hw/pod/draft_r2/out/routed.kicad_pcb]
   - id: R-DEBUG-BOARD
     a: SUB-DEBUG-TEST
     b: REG-BOARD
-    what: "TP1-TP6 pogo row (0.7 mm, 1.27 mm pitch) on F top edge y 1.3, outside the 0.6 mm clamp band; TP7 0.5 mm printf dot on F (13.2, 1.5); TP8-TP10 0.5 mm MDF-fallback dots on B by the mic; R1 PH3 pad on F = DFU tack point; SWCLK->TP2 unrouted (layout session)"
-    watch: ["grep:hw/pod/place_r1.py::TP\\{|TP\\d", "glob:hw/lib/pod.pretty/TestPoint*.kicad_mod", "glob:hw/lib/pod.pretty/TestDot*.kicad_mod", "sym:hw/pod/place_r1.py::PLACE[R1]"]
+    what: "Phase 2: TP1-TP6 bare pads on F (TP1/2/4/5 row y 11.3, TP3 (9.3, 2.9), TP6 (24.0, 10.9)) in one VHB cut-out (interfaces.py clamp-bands: 31 % VHB bonded, WARN); TP7-TP10 dots on B by the mic; R1 PH3 pad = DFU tack point"
+    watch: ["yaml:hw/pod/draft_r2/placement.yaml::TP1", "yaml:hw/pod/draft_r2/placement.yaml::TP2", "yaml:hw/pod/draft_r2/placement.yaml::TP3", "yaml:hw/pod/draft_r2/placement.yaml::TP4", "yaml:hw/pod/draft_r2/placement.yaml::TP5", "yaml:hw/pod/draft_r2/placement.yaml::TP6", "yaml:hw/pod/draft_r2/placement.yaml::TP7", "yaml:hw/pod/draft_r2/placement.yaml::TP8", "yaml:hw/pod/draft_r2/placement.yaml::TP9", "yaml:hw/pod/draft_r2/placement.yaml::TP10", "yaml:hw/pod/draft_r2/placement.yaml::R1", "glob:hw/lib/pod.pretty/TestPoint*.kicad_mod", "glob:hw/lib/pod.pretty/TestDot*.kicad_mod"]
   - id: R-PROC-BOARD
     a: SUB-PROCESSING
     b: REG-BOARD
-    what: MCU on F centre, SMPS loop (L1, C7, C8/C9), crystal at the front; GND fan-out to In1
-    watch: ["sym:hw/pod/place_r1.py::PLACE[U1]", "sym:hw/pod/place_r1.py::PLACE[L1]", "sym:hw/pod/place_r1.py::PLACE[C7]", "sym:hw/pod/place_r1.py::PLACE[Y1]", "sym:hw/pod/place_r1.py::gnd_fanout"]
+    what: "Phase 2: MCU U1 on B at board (10.05, 5.4), SMPS loop (L1, C7, C8/C9), crystal Y1 at the front (4.73, 1.7); GND to In1, +3V0 plane on In2"
+    watch: ["yaml:hw/pod/draft_r2/placement.yaml::U1", "yaml:hw/pod/draft_r2/placement.yaml::L1", "yaml:hw/pod/draft_r2/placement.yaml::C7", "yaml:hw/pod/draft_r2/placement.yaml::Y1"]
   # ---------------------------------------------------------------- off-board wiring
   - id: R-OUT-ARM
     a: SUB-OUTPUT
@@ -234,18 +236,18 @@ relations:
   - id: R-BOARD-BODY
     a: REG-BOARD
     b: REG-POD-BODY
-    what: board outline/position (34 x 13 at pod x 30.6-64.6), height bands, clamp ribs on 0.6 mm edge bands, foam
-    watch: ["sym:hw/mech/shell_r1.py::PCB", "sym:hw/mech/shell_r1.py::PARTS", "sym:hw/mech/shell_r1.py::lid_base", "sym:hw/pod/place_r1.py::P.W"]
+    what: "Phase 2: board 30 x 12 x 0.8 at pod x 30.55-60.55 hangs from the lid on full-face VHB (no clamp ribs, no foam); height bands B 1.4 / F 0.30 (SW1 pocket 0.90); F test pads in a VHB cut-out; coarse x-stop 0.25 (interfaces.py outline, clamp-bands, heights)"
+    watch: ["sym:hw/mech/dims_r2.py::PCB", "sym:hw/mech/dims_r2.py::B_GAP", "sym:hw/mech/dims_r2.py::VHB_T", "sym:hw/mech/dims_r2.py::X_STOP_GAP", "sym:hw/mech/dims_r2.py::POCKET", "sym:hw/mech/shell_r2.py::lid_base", "sym:hw/mech/shell_r2.py::vhb", "yaml:hw/pod/draft_r2/placement.yaml::TP1", "yaml:hw/pod/draft_r2/placement.yaml::TP2", "yaml:hw/pod/draft_r2/placement.yaml::TP3", "yaml:hw/pod/draft_r2/placement.yaml::TP4", "yaml:hw/pod/draft_r2/placement.yaml::TP5", "yaml:hw/pod/draft_r2/placement.yaml::TP6"]
   - id: R-BOARD-ARM
     a: REG-BOARD
     b: REG-ARM
-    what: arm wires rise in the 2.1 mm gap behind the board's rear edge (1.1 mm behind the cell, where the heel exit opens) to the rear wire pads J1/J2/J7/J8
-    watch: ["sym:hw/mech/shell_r1.py::PCB", "sym:hw/mech/shell_r1.py::CELL", "sym:hw/mech/heel.py::CH_EXIT", "sym:hw/pod/place_r1.py::PLACE[J1]", "sym:hw/pod/place_r1.py::PLACE[J2]", "sym:hw/pod/place_r1.py::PLACE[J7]", "sym:hw/pod/place_r1.py::PLACE[J8]"]
+    what: "Phase 2: arm wires reach the rear wire pads J1/J2/J7/J8 (B, board x 27-29) through the stowage gap behind the board (pod x 60.55-66.7, above the cell; MZG-10) from the heel exit"
+    watch: ["sym:hw/mech/dims_r2.py::PCB", "sym:hw/mech/dims_r2.py::CELL", "sym:hw/mech/dims_r2.py::PAD_ZONE", "sym:hw/mech/heel.py::CH_EXIT", "yaml:hw/pod/draft_r2/placement.yaml::J1", "yaml:hw/pod/draft_r2/placement.yaml::J2", "yaml:hw/pod/draft_r2/placement.yaml::J7", "yaml:hw/pod/draft_r2/placement.yaml::J8"]
   - id: R-BODY-ARM
     a: REG-POD-BODY
     b: REG-ARM
     what: heel built into the tub; strut clearance to the tub (strut relief); NiTi socket mouth E
-    watch: ["sym:hw/mech/shell_r1.py::tub", "sym:hw/mech/frame.py::E", "sym:hw/mech/heel.py::heel_add", "sym:hw/mech/heel.py::heel_cut"]
+    watch: ["sym:hw/mech/shell_r2.py::tub", "sym:hw/mech/frame.py::E", "sym:hw/mech/heel.py::heel_add", "sym:hw/mech/heel.py::heel_cut"]
   - id: R-ARM-PAD
     a: REG-ARM
     b: REG-PAD
@@ -254,8 +256,8 @@ relations:
   - id: R-PHYS-FRAME
     a: PHYSICAL
     b: REG-POD-BODY
-    what: shared frame constants (frame.py) vs the rev-1 shell's own constants (shell_r1.py overrides several)
-    watch: ["sym:hw/mech/frame.py::PCB", "sym:hw/mech/frame.py::CELL", "sym:hw/mech/frame.py::BUTTON", "sym:hw/mech/frame.py::MIC_PORT", "sym:hw/mech/shell_r1.py::PCB", "sym:hw/mech/shell_r1.py::CELL"]
+    what: "shared frame constants (frame.py) vs the Phase-2 shell's own constants (dims_r2.py overrides several; interfaces.py frame: 8 of 10 differ, ECR-0001)"
+    watch: ["sym:hw/mech/frame.py::PCB", "sym:hw/mech/frame.py::CELL", "sym:hw/mech/frame.py::BUTTON", "sym:hw/mech/frame.py::MIC_PORT", "sym:hw/mech/dims_r2.py::PCB", "sym:hw/mech/dims_r2.py::CELL"]
   # ---------------------------------------------------------------- requirements and cost
   - id: R-SPEC-POWER
     a: SPEC
@@ -276,4 +278,4 @@ relations:
     a: COST
     b: REG-BOARD
     what: "BOM lines (JLC Standard PCBA feeder fee ~$1.53 each, Basic or Extended), placements, hidden-joint packages (X-ray) and assembly sides drive the JLC order cost; Extended types only add parts price"
-    watch: [file:hw/pod/bom_jlc.csv, "sym:hw/pod/place_r1.py::PLACE"]
+    watch: [file:hw/pod/bom_jlc_mz2.csv, file:hw/pod/draft_r2/placement.yaml]

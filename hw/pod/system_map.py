@@ -44,7 +44,7 @@ BLOCK_OF = {ref: blk for blk, refs in BLOCKS.items() for ref in refs.split()}
 # function -> (blocks, chain of nets/pins, mechanical counterpart, firmware counterpart)
 FUNCTIONS = [
     ("F1 Hear 20-85 kHz", "MIC, MCU", "MIC_VDD from PA5 (GPIO-switched supply, off in Off mode); MIC_CLK PB3 -> R2 33R -> U2; MIC_DATA U2 -> PB4 (ADF1)",
-     "mic U2 on B at board (4.67, 6.5), its 0.6 mm port at (3.9, 6.5) through the board, lid port D1.0 + hydrophobic mesh on the pod centre line", "ADF1 4 MHz PDM, algorithm A/B"),
+     "mic U2 on B at board (2.65, 6.0), its 0.6 mm port at (1.88, 6.0) through the board (pod x 32.43); sealed duct ID 1.0 (reamed lid bore + D1.0 hole in the 0.25 VHB across the 0.30 F gap), hex-window mesh seat, on the pod centre line", "ADF1 4 MHz PDM, algorithm A/B"),
     ("F2 Process", "MCU, CORE_SMPS, CLOCK", "+3V0 -> VDD/VDDA/VDDSMPS; VLXSMPS -> L1 -> VDD11 (C8/C9); LSE Y1 on PC14/PC15",
      "-", "MSI/PLL clocks, LSE (see A3-clock doc), Stop 2 / Off modes (D12)"),
     ("F3 Drive the exciter", "BRIDGE, ARM_PADS", "TIM1 CH1/CH1N PA8/PA7 -> Q1 gates (GA_P/GA_N); CH3/CH3N PA10/PB15 -> Q2 (GB_P/GB_N; Rev F, ECR-0003); P sources on +3V0, N sources on BRIDGE_RTN; OUT_A/OUT_B -> J1/J2",
@@ -52,7 +52,7 @@ FUNCTIONS = [
     ("F4 Self-test exciter |Z|", "SELFTEST, BRIDGE", "BRIDGE_RTN -> R21 0.1R -> GND; BRIDGE_RTN -> R22 1k -> I_SENSE (C22 10n) -> PA6 ADC1_IN11",
      "-", "tone sweep + synchronous detection over USB self-test (O15)"),
     ("F5 Charge the cell", "DOCK_USB, CHARGER, CELL_PADS", "dock J3 DOCK_VBUS -> D4 -> VBUS -> U3 IN; U3 BAT -> VBAT -> J5 (cell +) / J4 shared GND (cell -) -> cell (PCM inside); config over I2C",
-     "magnetic 5-pin target in the belly bay, wired to J3/J4/J10/J11/J12; cell under the board (B side) on foam", "I2C charge current/JEITA setup, charge state"),
+     "magnetic 5-pin target in the belly bay, wired to J3/J4/J10/J11/J12; cell on 0.25 VHB in the tub, 1.4 mm under the board's B face", "I2C charge current/JEITA setup, charge state"),
     ("F6 Temperature-safe charge", "CHARGER", "TS: RT1 (on board) OR J9 cell NTC, never both -> U3 TS/MR; TS also -> PA2",
      "optional NTC taped on the cell, wire to J9", "firmware 20 C rule reads PA2"),
     ("F7 System power rail", "CHARGER, LDO", "U3 SYS -> VSYS -> U4 IN/EN -> LDO_OUT (C18) -> R20 0R -> +3V0",
@@ -62,12 +62,12 @@ FUNCTIONS = [
     ("F10 USB data / DFU", "DOCK_USB, MCU", "J10 D+ / J11 D- -> U6 ESD -> PA12/PA11 (USB FS); CC: J12 -> R18 5k1 Rd (CC not sensed since Rev F; ILIM by enumeration)",
      "dock contacts D+/D-/CC", "ROM DFU via boot stub, CDC self-test, firmware update"),
     ("F11 Wake / button", "UI, MCU", "SW1 (3V0 <-> BTN) -> PA0 WKUP1, R10 2k2 pull-down (switch needs >= 1 mA)",
-     "SW1 on F at board (22.0, 6.5) under the lid plunger (D3.2 bore, silicone skin), KMT0 travel 0.15 mm", "wake from Off/Stop, on/off, modes"),
+     "SW1 on F at board (18.5, 6.0) in a 4.3 x 3.1 lid pocket under a printed puck (selective-fit length) + silicone skin, KMT0 travel 0.15 mm", "wake from Off/Stop, on/off, modes"),
     ("F12 Power LED (solid)", "UI, ARM_PADS", "VSYS -> R14 2k2 -> LED_A -> J7 -> wire -> LED in the pad housing -> wire -> J8 -> LED_K -> PB7 (open-drain, FT)",
      "2 more litz wires up the arm (4 total), LED on the tiny pad board (O8)", "duty set from VBAT for steady brightness"),
     ("F13 Charger link", "CHARGER, MCU", "I2C_SCL PB13, I2C_SDA PB14 (R15/R16 10k to 3V0); CHG_INT -> PA15 (internal pull-up; PB5 strapped to GND, ECR-0013 S1)", "-", "I2C2, charger IRQ"),
     ("F14 Debug / flash / test", "DEBUG, MCU", "TP1 SWDIO PA13, TP2 SWCLK PA14, TP3 NRST, TP4 3V0, TP5 GND, TP6 VSYS; BOOT0 (PH3) R1 10k low (R1 pad = DFU tack point); TP7 PB6 USART1_TX printf; TP8/TP9/TP10 MDF mic fallback dots; PA10 pulled up by the ROM loader itself (bootloader USART1_RX)",
-     "0.7 mm pads in a 1.27 mm row on F, top edge; snap-off test frame (O9)", "SWD, ROM bootloader"),
+     "TP1-TP6 bare 0.7 mm pads on F (TP1/2/4/5 at y 11.3, TP3 (9.3, 2.9), TP6 (24.0, 10.9)) in a VHB cut-out: reachable before the lid is bonded; snap-off test frame (O9)", "SWD, ROM bootloader"),
     ("F15 ESD at exposed contacts", "DOCK_USB", "D5 TPD1E10B06 at J3 DOCK_VBUS (bidirectional, 5.5 V working; D4 reverse block); D6 (same part) at J12 CC (Rev G); U6 on D+/D-", "dock contacts are the only exposed metal", "-"),
 ]
 
@@ -91,15 +91,15 @@ OFFBOARD = [
     ("TP1-TP6", "SWDIO, SWCLK, NRST, +3V0, GND, VSYS", "probe / pogo only"),
 ]
 
-MECH = [
-    "Board 34 x 13 x 0.8 mm, 4 layers (In1 solid GND), parts on BOTH faces today; pod x 30.6-64.6 in hw/mech/shell_r1.py.",
-    "F faces the lid (outside); B faces the cell. Part height bands: B 10.9-12.1, F 12.9-14.1 (y, pod coords) = ~1.2 mm each side.",
-    "Mic MUST be on B at board (3.9, 6.5): bottom-port, ports through the board and the lid (D1.0 + mesh). Same spot on both pods (one board for both, O16-5).",
-    "Switch MUST be on F at board (22.0, 6.5) under the lid plunger (D3.2 bore + silicone skin): changing the button changes the lid.",
-    "0.6 mm top and bottom edge bands free of parts on BOTH faces: the lid's clamp ribs and the foam strips press there (board retention, no screws).",
-    "Wire pads J* on F at the rear edge; the arm wires come up a 2.1 mm gap behind the board from the heel channel (exit x 65.75).",
-    "Dock target sits in the belly bay (pod x 31.5-52.7), wired to J3/J4/J10/J11/J12; USB-C fallback keep-out reserved.",
-    "Cell 35 x 12 x 5.3 mm under B on foam; nothing tall on B over the cell beyond the 1.2 mm band.",
+MECH = [   # Phase 2 (hw/current.yaml, ECR-0018), checked by tools/checks/interfaces.py against hw/mech/dims_r2.py, 2026-10-07
+    "Board 30 x 12 x 0.8 mm (R1.0 corners), 4 layers (In1 GND plane, In2 +3V0 plane); every part on B except SW1 and bare TP1-TP6 on F; pod x 30.55-60.55 (hw/mech/dims_r2.py).",
+    "F faces the lid (outside); B faces the cell. Height bands: B 1.4 (gap to the cell), F 0.30 (VHB gap to the lid), SW1 0.90 in its lid pocket.",
+    "Mic MUST be on B with its D0.6 port hole on the board centre line y 6.0 (board 1.88 = pod 32.43): sealed duct ID 1.0 (reamed lid bore + VHB hole) onto it; same spot on both pods (O16-5).",
+    "Switch MUST be on F at board (18.5, 6.0), inside the 4.3 x 3.1 lid pocket under the puck + skin: changing the button changes the lid.",
+    "The board hangs from the lid on full-face VHB (3M 4914, 0.25 mm): nothing presses its long edges; coarse x-stop 0.25 mm at the front skirt; a stepped gauge pin through the bore registers it at bonding. F parts only in VHB cut-outs.",
+    "Wire pads J* on B at the rear (board x 25-30); the arm wires reach them through the stowage gap behind the board (pod x 60.55-66.7) from the heel exit.",
+    "Dock target sits in the belly bay (pod x 31.5-52.7), wired to J3/J4/J10/J11/J12; the whole belly is tub.",
+    "Cell 35 x 12 x 5.3 mm on 0.25 VHB in the tub, 1.4 mm under the board's B face (tallest B part U2 1.08 mm).",
     "Arm: 4 litz wires (2 exciter + 2 LED) in shrink tube through heel channel D1.0 and strut bore D1.2: the wire count sets those bores.",
 ]
 
@@ -143,6 +143,9 @@ def build():
 
 
 def main():
+    sys.path.insert(0, str(REPO / "tools"))
+    from current import apply_env      # the map shows the CURRENT design's package set (hw/current.yaml)
+    d = apply_env()
     circ = build()
     nets = defaultdict(list)
     for p in circ.parts:
@@ -153,7 +156,7 @@ def main():
     refs = sorted({p.ref for p in circ.parts}, key=lambda r: (r.rstrip("0123456789"), int(r[len(r.rstrip("0123456789")):] or 0)))
     unassigned = [r for r in refs if r not in BLOCK_OF]
     L = ["# Integration map: the pod as one system (generated)", "",
-         "Generated by `hw/pod/system_map.py` from the SKiDL schematic (`hw/pod/gen.py`) plus hand-kept facts. "
+         f"Generated by `hw/pod/system_map.py` from the SKiDL schematic (`hw/pod/gen.py`, package set {d.packages}: design {d.id} in `hw/current.yaml`) plus hand-kept facts. "
          "Do not edit by hand; regenerate. Part of the living big-picture set (`docs/system/README.md`). "
          "The block diagram is `docs/diagrams/schematic-rev1.png`.", "",
          "**Use:** before proposing any change, walk it through every section. The required cross-check is at the end.", "",
