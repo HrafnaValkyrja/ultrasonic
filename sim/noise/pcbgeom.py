@@ -169,19 +169,36 @@ def read_netlist(path: str) -> dict[tuple[str, str], str]:
     return out
 
 
-# Board candidates, newest mtime wins (same rule as sim/acoustics/geometry.find_board, minus the unrouted placed board).
-# Override with an explicit path or env NOISE_BOARD. A stale board (pad->net map != hw/pod/pod.net) makes results INVALID.
-ROUTED_CANDIDATES = ("hw/pod/draft_r1/pod_r1_routed.kicad_pcb", "hw/pod/draft_r1/fanout/pod_r1_routed.kicad_pcb")
+# Default inputs come from the ONE design pointer hw/current.yaml (tools/current.py; 2026-10-07). No candidate lists, no
+# newest-mtime guessing: the routed board, netlist and BOM of the current design (env ULTRASONIC_DESIGN=revg: Rev G/F).
+# Override with an explicit path or env NOISE_BOARD. A stale board (pad->net map != the design netlist) makes results INVALID.
+def design(repo: Path):
+    import sys  # noqa: PLC0415
+    tools = str(Path(repo) / "tools")
+    if tools not in sys.path:
+        sys.path.insert(0, tools)
+    from current import current  # noqa: PLC0415
+    return current()
 
 
 def default_board(repo: Path) -> str:
     import os  # noqa: PLC0415
     if os.environ.get("NOISE_BOARD"):
         return os.environ["NOISE_BOARD"]
-    cands = [repo / c for c in ROUTED_CANDIDATES if (repo / c).exists()]
-    if not cands:
-        raise SystemExit(f"no routed board among {ROUTED_CANDIDATES}; pass a .kicad_pcb path")
-    return str(max(cands, key=os.path.getmtime))
+    d = design(repo)
+    if not d.board.exists():
+        raise SystemExit(f"hw/current.yaml board {d.rel['board']} ({d.id}) does not exist; pass a .kicad_pcb path")
+    return str(d.board)
+
+
+def default_netlist(repo: Path) -> str:
+    return str(design(repo).netlist)
+
+
+def bom_path(repo: Path, params: dict) -> str:
+    """params board.bom: 'auto' = the current design's BOM (hw/current.yaml), else a repo-relative path."""
+    b = params["board"].get("bom", "auto")
+    return str(design(repo).bom if b in (None, "auto") else Path(repo) / b)
 
 
 def netlist_diff(geom: dict, netlist_path: str) -> dict:

@@ -3,8 +3,8 @@
 #   guess, NOT measured. Assumptions are the things the bring-up measurements (docs/sim/layout-noise.yaml, LN-V*) retire.
 # Dated 2026-10-02. Units: SI unless the key says otherwise.
 board:
-  default_path: auto   # pcbgeom.default_board: env NOISE_BOARD, else newest of pcbgeom.ROUTED_CANDIDATES (2026-10-02: draft_r1/pod_r1_routed = Rev F); read only
-  bom: hw/pod/bom_jlc.csv                                          # ref -> value ("100n", "2u2", "0.1")
+  default_path: auto   # pcbgeom.default_board: env NOISE_BOARD, else hw/current.yaml `board` (2026-10-07: Phase 2 draft_r2/out/routed); read only
+  bom: auto            # auto = hw/current.yaml `bom` (Phase 2: hw/pod/bom_jlc_mz2.csv); or a repo-relative path. ref -> value ("100n", "2u2", "0.1")
   ground_net: GND
   plane_layer: In1.Cu         # the ground plane (kept for extract.py); all planes are listed in `planes`
   planes:                      # 2026-10-07: Phase 2 adds an In2 +3V0 plane; a plane without a filled zone is skipped (Rev F)
@@ -19,7 +19,7 @@ materials:
   rho_cu_ohm_m: 1.72e-8        # annealed Cu 20 C; status: textbook, model error +-10 %
   t_plate_um: 20.0             # via barrel plating; status: assumption (JLC minimum quoted 20 um, unverified)
 components:                    # BOM comment -> model. status: assumption (typical MLCC, not a manufacturer fit)
-  esl_nh: {"0402": 0.35, "0603": 0.45, "1206": 0.75}     # chip body only; mounting loop L comes from the extracted geometry
+  esl_nh: {"0201": 0.35, "0402": 0.35, "0603": 0.45, "1206": 0.75}     # chip body only; mounting loop L comes from the extracted geometry. 0201 (MZ-2): ASSUMPTION = the 0402 value until a 0201 figure is sourced (2026-10-07)
   esr_ohm: {"100n": 0.03, "10n": 0.08, "15p": 0.5, "1u": 0.02, "2u2": 0.015, "4u7": 0.012, "10u": 0.01, "22u": 0.008}
   dc_bias_keep: {"22u": 0.35, "10u": 0.55, "4u7": 0.6, "2u2": 0.65, "1u": 0.85, "100n": 0.9, "10n": 0.9, "15p": 1.0}
   # ^ fraction of nominal C left at the rail's DC bias (X5R/X7R). status: assumption; spec provenance note says no

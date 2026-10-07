@@ -6,11 +6,13 @@ meta:
   id: SIM-LN
   date: 2026-10-02
   scope: "ladder step C (O18 L644): bound, before the board order, how much of the pod's own noise the copper itself puts into the mic, the ADC and the bridge, in the bands that decide T6 L43 / R9 L602 / R21 L614 / D11 L210"
-  layout_agnostic: true   # reads any 4-layer .kicad_pcb with a filled In1 GND zone + hw/pod/bom_jlc.csv (values) + hw/pod/pod.net (stale-board check); the layout hold (simplification study) does not block it
-  board_rule: "explicit path | env NOISE_BOARD | newest mtime of sim/noise/pcbgeom.ROUTED_CANDIDATES (draft_r1/pod_r1_routed, draft_r1/fanout/pod_r1_routed); pad->net map != hw/pod/pod.net => valid=false, smoke exit 1 (budget.exit_code), --check-doc lists INVALID first"
+  layout_agnostic: true   # reads any 4-layer .kicad_pcb with a filled In1 GND zone (In2 +3V0 plane modelled when filled) + the design BOM (values) + the design netlist (stale-board check)
+  default: "hw/current.yaml via tools/current.py (2026-10-07): board hw/pod/draft_r2/out/routed.kicad_pcb, netlist hw/pod/pod_mz2.net, bom hw/pod/bom_jlc_mz2.csv (Phase 2, ECR-0018); ULTRASONIC_DESIGN=revg -> Rev F board + hw/pod/pod.net + hw/pod/bom_jlc.csv"
+  board_rule: "explicit path | env NOISE_BOARD | hw/current.yaml board (pcbgeom.default_board; no candidate list, no mtime guess); netlist --netlist | hw/current.yaml netlist; params board.bom auto = hw/current.yaml bom; pad->net map != netlist => valid=false, smoke exit 1 (budget.exit_code), --check-doc lists INVALID first. Exit is NOT set by metric FAILs (only invalid run or doc drift)"
   code: [sim/noise/extract.py, sim/noise/budget.py, sim/noise/couple.py, sim/noise/lumped.py, sim/noise/plane.py, sim/noise/pcbgeom.py, sim/noise/alias.py, sim/noise/params.yaml, sim/noise/aggressors.yaml, sim/noise/smoke.sh]
   outputs: "sim/noise/out/ (git-ignored by sim/noise/out/.gitignore): geometry.json, extract_report.txt, mic_vdd_path.sub, gnd_return.sub, l1_full.cir, budget.json, transimpedance.npz (freqs, aggressors, probes, Z[agg,probe,f] complex), noise_budget.png (dark), IF-MIC-VDD-NOISE.json"
-  last_run: {date: 2026-10-02T21:20, cmd: "sim/noise/smoke.sh", board: "hw/pod/draft_r1/pod_r1_routed.kicad_pcb (Rev F routed, mtime 20:23)", board_sha256_16: e159bccb65b756d9, netlist: "hw/pod/pod.net 20:01, 193/193 pads, 0 mismatches", wall_s: 3.9, peak_rss_mb: 310, fence: "systemd-run --user --scope -p MemoryMax=3G -p MemorySwapMax=0", sweep: {cmd: "budget.py --sweep --no-l2", wall_s: 9.8, peak_rss_mb: 302}, superseded: "results for sha 8712672846e0729d (Rev E fanout board, 30 pad mismatches vs the Rev F pod.net) withdrawn 2026-10-02"}
+  last_run: {date: 2026-10-07, cmd: "sim/noise/smoke.sh (no argument = hw/current.yaml)", board: "hw/pod/draft_r2/out/routed.kicad_pcb (Phase 2, after the R21 Kelvin fix f6291e6)", board_sha256_16: da4e8b132b895741, netlist: "hw/pod/pod_mz2.net, 195/195 pads, 0 mismatches", bom: hw/pod/bom_jlc_mz2.csv, wall_s: 5.0, peak_rss_mb: 286, exit: 0, metrics_equal_to: "sim/noise/out_r2/budget.json (M01 26.5, M02 20.1, M03 1.29, M04 0.1266, M05 8.72, rail paths identical)"}
+  last_run_revf: {date: 2026-10-02T21:20, cmd: "sim/noise/smoke.sh", board: "hw/pod/draft_r1/pod_r1_routed.kicad_pcb (Rev F routed, mtime 20:23)", board_sha256_16: e159bccb65b756d9, netlist: "hw/pod/pod.net 20:01, 193/193 pads, 0 mismatches", wall_s: 3.9, peak_rss_mb: 310, fence: "systemd-run --user --scope -p MemoryMax=3G -p MemorySwapMax=0", sweep: {cmd: "budget.py --sweep --no-l2", wall_s: 9.8, peak_rss_mb: 302}, superseded: "results for sha 8712672846e0729d (Rev E fanout board, 30 pad mismatches vs the Rev F pod.net) withdrawn 2026-10-02"}
   selfchecks_2026-10-02: {ngspice45_vs_internal_MNA_max_rel_err: 2.5e-07, L2_vs_closed_form: {grover_free_M: 0.0003, image_line_M: 0.027, image_wire_Cm: 0.080}, alias_pwm_and_mic_clock_fold_to_dc: pass, csv_period_import_vs_analytic_pulse_train_rel_err: 0.000, netlist_vs_board: "193/193 pads, 0 mismatches vs hw/pod/pod.net (Rev F, 2026-10-02 21:20)", stale_board_detected: "fanout board (Rev E): 30 mismatches -> valid=false, exit 1 (2026-10-02)", plane_raster_area_mm2: {raster: 381.6, zone: 381.66}}
   honesty: "The copper is the part of this model we can read from the board; the numbers that decide pass/fail (mic PSRR above 1 kHz, mic ultrasonic noise floor, MCU die and LDO small-signal impedance, SMPS clock tolerance) are unmeasured assumptions (section uncertainties). A pass here means 'the layout is not the limiting term under these assumptions', not 'quiet'."
 abbr:
@@ -168,7 +170,23 @@ tools:
   - {name: "own code (this scaffold)", licence: "repo", installed: true, role: "L1/L2 and the PEEC option", why: "a small custom extractor is allowed by the brief and is the only layout-agnostic option that needs no install"}
 
 # ------------------------------------------------------------------------------------------------ results on the draft board
-results:   # board hw/pod/draft_r1/pod_r1_routed.kicad_pcb (Rev F routed draft, NOT the layout: O14 on hold); src: sim/noise/out/*.json 2026-10-02 21:20
+results:   # READ BY budget.py --check-doc. Board hw/pod/draft_r2/out/routed.kicad_pcb (Phase 2 = hw/current.yaml); src: sim/noise/out/budget.json 2026-10-07 (== sim/noise/out_r2/budget.json)
+  board_sha256: da4e8b132b895741
+  board: {size_mm: [30.05, 12.05], segments: 610, vias: 136, pads: 195, nets: 42, track_widths_mm: [0.1, 0.15, 0.25], planes: {GND: {layer: In1.Cu, area_mm2: 296.95, ports: 49}, "+3V0": {layer: In2.Cu, area_mm2: 281.45, ports: 24}}}
+  nets_mm: {MIC_VDD: {F: 12.05, B: 5.52, total: 17.57, vias: 2}, MIC_DATA: {B: 4.58}, VDD11: {F: 10.31, B: 6.45, total: 16.76, vias: 2}, BRIDGE_RTN: {B: 11.80}, VLXSMPS: {B: 2.23}}
+  network_L1: {nodes: 825, elements: 1401, floating_pads: none}
+  plane_dc_mohm: {mic_gnd_to_mcu_vss: 4.053, shunt_gnd_to_mcu_vssa: 3.139, mcu_vss_to_cell_neg: 4.073, shunt_gnd_to_cell_neg: 2.147, mic_bypass_gnd_to_mcu_vss: 3.522}
+  rail_paths_dc_mohm: {"U4.1->Q1.4": 40.42, "U4.1->Q2.4": 39.51, "U4.1->U1.25": 42.82, "U4.1->U1.21": 45.02, "U1.15->U2.5": 82.47, "Q1.1->R21.1": 25.18, "U2.3->U1.24": 18.2, "C13.2->U2.3": 17.86, "C13.2->U1.24": 7.78, "R21.2->U1.8": 5.91, "U1.24->J4.1": 11.4, "C14.2->R21.2": 6.0}
+  metrics:
+    LN-M01: {value_db_pessimistic: 26.5, value_db_nominal: 46.5, value_db_worst: 14.0, ok: true, signoff: true, at: "A05_CPU_HOP conduction 21875 Hz", at_worst: "A01_SMPS_IN conduction 28.04 MHz -> 38955 Hz"}
+    LN-M02: {value_db: 20.1, ok: true, review: true, at: "F03_PDM_CLOCK -> FV3_MIC_CLK magnetic", note: "inside the +-10 dB L2 model error: REVIEW at the next re-route"}
+    LN-M03: {value_pct: 1.29, ok: true, at: "z 1.285 mohm at 5 kHz after the R21 two-via Kelvin fix (hw/pod/kelvin_r21.py, f6291e6); top features: GND vias (18.55, 6.45) 12.2 %, (18.94, 6.01) 11.2 %, B.Cu stubs 12.1 % + 11.7 %; layout share 96.6 %"}
+    LN-M04: {value_mv_pk: 0.1266, ok: true, at: "A05_CPU_HOP 1562 Hz"}
+    LN-M05: {value_uv_rms: 8.72, ok: true, at: "A05_CPU_HOP 1562 Hz x 10 %"}
+    LN-M06: {value_mv_rms: 0.1074, of_which_20k_100k_mv: 0.0199, ok: informational}
+  conclusion: "Phase 2 routed board, stated assumptions: all scored metrics pass (LN-M02 REVIEW inside model error). Rail copper 4-5x lower than Rev F (In2 +3V0 plane)."
+
+results_revf_reference:   # NOT read by --check-doc. Board hw/pod/draft_r1/pod_r1_routed.kicad_pcb (Rev F routed draft, reference design); src: sim/noise/out/*.json 2026-10-02 21:20
   board_sha256: e159bccb65b756d9
   board: {size_mm: [34.05, 13.05], segments: 687, vias: 118, pads: 193, nets: 42, track_widths_mm: [0.1, 0.15], note: "every signal and rail track is 0.1 mm (0.15 on some GND stubs)", plane: {zone_mm2: 381.66, polygons: 1, sheet_mohm_sq: 1.132, gnd_vias: 45, mesh_cells: 38162}}
   nets_mm: {MIC_VDD: {F: 2.23, In2: 5.89, B: 2.34, total: 10.46, vias: 2}, MIC_DATA: {F: 0.73, In2: 9.74, B: 6.56, total: 17.03, vias: 4}, N$2: {F: 0.72, In2: 15.50, B: 2.71, total: 18.93, vias: 4}, MIC_CLK: {B: 3.45}, VLXSMPS: {F: 2.45, In2: 1.25, B: 2.96, total: 6.66}, VDD11: {F: 13.87, In2: 21.44, total: 35.31}, OUT_A: {F: 6.24, In2: 12.08, B: 4.44, total: 22.75, vias: 2}, OUT_B: {F: 3.82, In2: 8.96, B: 3.89, total: 16.67, vias: 2}, BRIDGE_RTN: {F: 2.17, B: 12.77, total: 14.94}}
@@ -257,5 +275,6 @@ owner_inputs:
   - {id: OI-7, ask: "Does the owner have a function generator or sound-card output for a supply-injection sweep at bring-up?", why: "no bench rig (O18)"}
 
 change_log:
+  - "2026-10-07: defaults from hw/current.yaml (tools/current.py): board, netlist and BOM of the Phase-2 design; candidate list ROUTED_CANDIDATES removed; params board.bom auto; 0201 ESL row added (= 0402 value, assumption) and the size parse fixed (C_0201_0603Metric was read as 0603). results now Phase 2 (sha da4e8b13, == out_r2), Rev F results kept as results_revf_reference."
   - "2026-10-02 21:20 (integrator): board picked by rule (newest routed draft_r1 board, env NOISE_BOARD) instead of the stale Rev E fanout default; stale netlist => INVALID + exit 1; third PSRR scenario 'worst' (e2e rolloff) reported in LN-M01; LN-M06 demoted to informational (rms limit retired); Kelvin feature breakdown in budget.json; results, LF-1/2/4/7 re-run on Rev F (sha e159bccb), LF-11 added; T6 line L43."
   - "2026-10-02: created. Scaffold sim/noise/ (L1 extraction + SPICE, L2 field coupling, alias map, IF-MIC-VDD-NOISE export); first run on the draft_r1 fanout board; tool survey; heavy runs planned, none executed."

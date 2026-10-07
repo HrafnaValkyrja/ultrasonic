@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import re
 import sys
 import time
 from pathlib import Path
@@ -131,7 +132,8 @@ def attach_components(net: lumped.Network, info: dict, geom: dict, params: dict,
     done, skipped = [], []
     for ref, (comment, fp) in sorted(bom.items()):
         a, b = pn.get(f"{ref}.1"), pn.get(f"{ref}.2")
-        size = next((s for s in ("0402", "0603", "1206") if s in fp), "0402")
+        m_sz = re.search(r"_(\d{4})_\d{4}Metric", fp)                 # imperial code; "C_0201_0603Metric" is an 0201, not an 0603
+        size = m_sz[1] if m_sz and m_sz[1] in c["esl_nh"] else "0402"
         tag = dict(kind_="comp", ref=ref)
         val = lumped.parse_si(comment)
         if ref == "L1" and a and b:
@@ -625,10 +627,10 @@ def check_doc(res: dict, doc_path: Path = DOC) -> list[str]:
 
 def main(argv=None):
     ap = argparse.ArgumentParser()
-    ap.add_argument("board", nargs="?", default=None, help="default: newest routed board (pcbgeom.default_board; env NOISE_BOARD)")
+    ap.add_argument("board", nargs="?", default=None, help="default: env NOISE_BOARD, else hw/current.yaml board (pcbgeom.default_board)")
     ap.add_argument("--out", default=str(HERE / "out"))
     ap.add_argument("--params", default=str(HERE / "params.yaml"))
-    ap.add_argument("--netlist", default=str(REPO / "hw/pod/pod.net"), help="schematic netlist for the stale-board check ('' to skip)")
+    ap.add_argument("--netlist", default=None, help="default: hw/current.yaml netlist; schematic netlist for the stale-board check ('' to skip)")
     ap.add_argument("--aggressors", default=str(HERE / "aggressors.yaml"))
     ap.add_argument("--no-l2", action="store_true")
     ap.add_argument("--plot", action="store_true", help="write noise_budget.png (dark)")
@@ -636,12 +638,13 @@ def main(argv=None):
     ap.add_argument("--sweep", action="store_true", help="re-run L1 under perturbed assumptions (LDO Zout, PA5 R, die C, MLCC derating, ESR)")
     a = ap.parse_args(argv)
     a.board = a.board or pcbgeom.default_board(REPO)
+    a.netlist = pcbgeom.default_netlist(REPO) if a.netlist is None else a.netlist
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     params, agg = load_yaml(a.params), load_yaml(a.aggressors)
     geom = pcbgeom.load(a.board)
     nd = pcbgeom.netlist_diff(geom, a.netlist) if a.netlist and Path(a.netlist).exists() else None
-    bom = lumped.read_bom(str(REPO / params["board"]["bom"]))
+    bom = lumped.read_bom(pcbgeom.bom_path(REPO, params))
     t0 = time.time()
     net, info, mesh, red = build_l1(geom, params, bom)
     print(f"L1 network: {len(net.nodes)} nodes, {len(net.elems)} elements, plane {info['plane']['cells']} cells ({time.time() - t0:.1f} s)")

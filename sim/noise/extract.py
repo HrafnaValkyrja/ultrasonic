@@ -5,7 +5,7 @@ network, and write SPICE (a MIC_VDD path subckt, a GND return subckt, and a flat
     systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 \
         python3 sim/noise/extract.py [board.kicad_pcb] [--out DIR] [--budget] [--selfcheck]
 
-Reads only (never writes the board). Smoke run on hw/pod/draft_r1/fanout/pod_r1_routed.kicad_pcb: ~3 s, ~0.3 GB.
+Reads only (never writes the board). Default board/netlist/BOM: hw/current.yaml (tools/current.py). Smoke run on the Phase-2 routed board: ~4 s, ~0.3 GB.
 Outputs in --out (default sim/noise/out/, git-ignored):
   geometry.json      per-net segments/layers/lengths/widths/vias/pads, GND plane summary, board hash, stackup source
   mic_vdd_path.sub   .subckt MIC_VDD_PATH <pad nodes>: R + L per MIC_VDD segment and via barrel (ports PA5 pin, C13, mic VDD)
@@ -77,20 +77,21 @@ def selfcheck(net: lumped.Network, out: Path, pair: tuple[str, str], probe: tupl
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("board", nargs="?", default=None, help="default: newest routed board (pcbgeom.default_board; env NOISE_BOARD)")
+    ap.add_argument("board", nargs="?", default=None, help="default: env NOISE_BOARD, else hw/current.yaml board (pcbgeom.default_board)")
     ap.add_argument("--out", default=str(HERE / "out"))
     ap.add_argument("--params", default=str(HERE / "params.yaml"))
-    ap.add_argument("--netlist", default=str(REPO / "hw/pod/pod.net"), help="schematic netlist to compare the board's pad->net map against ('' to skip)")
+    ap.add_argument("--netlist", default=None, help="default: hw/current.yaml netlist; schematic netlist to compare the board's pad->net map against ('' to skip)")
     ap.add_argument("--budget", action="store_true", help="also run the L1 noise budget (budget.py)")
     ap.add_argument("--selfcheck", action="store_true", help="cross-check the SPICE deck in ngspice against the internal solver")
     a = ap.parse_args(argv)
     a.board = a.board or pcbgeom.default_board(REPO)
+    a.netlist = pcbgeom.default_netlist(REPO) if a.netlist is None else a.netlist
     t0 = time.time()
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
     params = budget.load_yaml(a.params)
     geom = pcbgeom.load(a.board)
-    bom = lumped.read_bom(str(REPO / params["board"]["bom"]))
+    bom = lumped.read_bom(pcbgeom.bom_path(REPO, params))
     rep = []
     P = rep.append
     P(f"board {a.board}  sha256[:16] {geom['sha256']}  size {geom['board_mm'][2]:.2f} x {geom['board_mm'][3]:.2f} mm")

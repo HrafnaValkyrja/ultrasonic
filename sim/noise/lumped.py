@@ -59,7 +59,7 @@ def parse_si(s: str) -> float | None:
 
 
 def read_bom(path: str) -> dict[str, tuple[str, str]]:
-    """hw/pod/bom_jlc.csv -> {ref: (comment, footprint)}"""
+    """JLC BOM csv (the current design's, hw/current.yaml `bom`) -> {ref: (comment, footprint)}"""
     import csv
     out = {}
     with open(path, newline="") as f:
