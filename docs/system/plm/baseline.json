@@ -22,7 +22,7 @@
   "PHYSICAL": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change",
+   "note": "RPB-12: seam rebate 0.2x0.3 -> 0.2x0.4 (shell_r2.REBATE_D/H; tolerances.md recess min 0.4; wall 0.6 = RESIN min_wall); shell_r2 rebuilt: tub 1 valid solid, 1318.9 -> 1317.4 mm3, all other checks unchanged; belly step still unmarked",
    "stamp": {
     "file:docs/build/tolerances.md": "13099f559e727c93",
     "file:hw/mech/frame.py": "c7981bfec8a45660",
@@ -70,11 +70,11 @@
   "REG-POD-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change",
+   "note": "RPB-12: seam rebate 0.2x0.3 -> 0.2x0.4 (shell_r2.REBATE_D/H; tolerances.md recess min 0.4; wall 0.6 = RESIN min_wall); shell_r2 rebuilt: tub 1 valid solid, 1318.9 -> 1317.4 mm3, all other checks unchanged; belly step still unmarked",
    "stamp": {
     "file:hw/mech/blade.py": "20e890c775848522",
     "file:hw/mech/dims_r2.py": "e5863607c701dddf",
-    "file:hw/mech/shell_r2.py": "6ecadd65f1af5dbe",
+    "file:hw/mech/shell_r2.py": "b99f349c130b4ba8",
     "file:hw/mech/styles.py": "23dcb6bfe495f82f"
    }
   },

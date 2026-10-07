@@ -83,7 +83,7 @@ Total T 10.4 (Rev F 11.8; O27 thin first). The heel sits under the temple and ad
 | Lid groove ↔ tub tongue | 0.05 | – | dims_r2 GROOVE_CL |
 | Belly-step key ↔ hanging board lower edge | 0.10 as the lid comes down | OK | notes/shell_r2.md D2 |
 | Strut ↔ housing | 1.18-1.34 in all 4 arm states (target 1.4) | accepted (relief unchanged from r1) | tolerances L36 |
-| Seam cut line | 0.2 × 0.3 tub-only rebate; belly step none | may fuse (< 0.4 resin min) | shell_r2.seam_rebate |
+| Seam cut line | 0.2 × 0.4 tub-only rebate (wall 0.6 behind it); belly step none | OK (= 0.4 resin recess min); step open | shell_r2.seam_rebate (2026-10-07) |
 
 ## Sealing paths (target IPX4 min, IPX5 preferred: O12(b))
 | Path | Phase-2 design | Test build | Final build | State |
@@ -178,7 +178,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 10. **Cell lead exit and PCM position** in the Renata pouch unknown, so the J5/J4 lead route is unknown.
 11. **Diagrams stale:** `system-overview-physical.png` (Rev F stack, ribs, foam, open gap); `arm-wiring.png`; `hardware-map.png`. No Phase-2 physical overview yet.
 12. (closed in Phase 2) Foam strips: none.
-13. **Seam:** 0.2 × 0.3 tub-only rebate (may fuse), belly step unmarked, butt joints at corners (reg-pod-body issues 12, 13).
+13. **Seam:** rebate now 0.2 × 0.4 (2026-10-07); belly step unmarked, butt joints at corners (reg-pod-body issues 12, 13).
 14. **Service** costs one seam cut per cell or arm swap; a board swap or SWD also destroys the board bond (Service table).
 15. **Wire stowage fill** is volume-checked (277 vs 107-142 mm³) but not routed: 12 loops, wires enter the 1.4 B gap to reach pads at board x 25-29 (up to 4.9 mm in front of the board's rear edge, J3 at board x 25.1). Close: a wire-route sketch with gauges (sub-dock-usb, sub-power).
 16. (closed in Phase 2) USB-C fallback: keep-out not carried into shell_r2 (R-DOCK-BODY).

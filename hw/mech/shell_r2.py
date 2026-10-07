@@ -91,11 +91,14 @@ def tub_region():
         box(X0 - 1, X_BELLY, Y_IN - 2, Y_OUT + 2, Z_BELLY - 1, CAV["z0"])
 
 
+REBATE_D, REBATE_H = 0.2, 0.4   # depth leaves 0.6 wall (frame.RESIN min_wall); height 0.4 = tolerances.md "recesses < 0.4 may fuse"
+
+
 def seam_rebate():
-    """Tub-only 0.2 x 0.3 rebate round the outside on the y = Y_SPLIT runs (cut line for reopening).
-    The belly step (z = CAV z0, x < X_BELLY) is left unmarked (open item)."""
-    band = box(X0 - 1, X1 + 1, Y_SPLIT - 0.3, Y_SPLIT + 0.01, Z_BELLY - 1, Z1 + 1)
-    band = band - box(X0 + 0.2, X1 - 0.2, Y_SPLIT - 0.4, Y_SPLIT + 0.1, Z0 + 0.2, Z1 - 0.2)
+    """Tub-only REBATE_D x REBATE_H rebate round the outside on the y = Y_SPLIT runs (cut line for reopening).
+    Was 0.2 x 0.3 until 2026-10-07 (reg-pod-body issue 12). The belly step (z = CAV z0, x < X_BELLY) is left unmarked (open item)."""
+    band = box(X0 - 1, X1 + 1, Y_SPLIT - REBATE_H, Y_SPLIT + 0.01, Z_BELLY - 1, Z1 + 1)
+    band = band - box(X0 + REBATE_D, X1 - REBATE_D, Y_SPLIT - REBATE_H - 0.1, Y_SPLIT + 0.1, Z0 + REBATE_D, Z1 - REBATE_D)
     return band - box(X0 - 2, X_BELLY, Y_SPLIT - 1, Y_SPLIT + 1, Z_BELLY - 2, CAV["z0"])
 
 

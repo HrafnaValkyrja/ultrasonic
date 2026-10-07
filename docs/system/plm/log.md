@@ -266,3 +266,9 @@
 - 2026-10-07 12:39 review SUB-DEBUG-TEST by backlog-agent: OUT-1/DBG-5: option D (2f lock-in on R21 supply current + 100k offset) verified in sim/checks/selftest_lockin.py: -12 dBFS |Z|<=1.9 %, phase<=0.7 deg; -22 dBFS <=3 %/3.4 deg at 0.25 s; -32 unusable; offset R still to add (router item OUT-1B)
 - 2026-10-07 12:39 checkin SUB-OUTPUT by backlog-agent
 - 2026-10-07 12:39 checkin SUB-DEBUG-TEST by backlog-agent
+- 2026-10-07 12:40 checkout REG-POD-BODY by backlog-agent: RPB-12: seam rebate 0.2 x 0.3 -> 0.2 x 0.4 (resin recess minimum)
+- 2026-10-07 12:40 checkout PHYSICAL by backlog-agent: RPB-12 seam rebate
+- 2026-10-07 12:41 review REG-POD-BODY by backlog-agent: RPB-12: seam rebate 0.2x0.3 -> 0.2x0.4 (shell_r2.REBATE_D/H; tolerances.md recess min 0.4; wall 0.6 = RESIN min_wall); shell_r2 rebuilt: tub 1 valid solid, 1318.9 -> 1317.4 mm3, all other checks unchanged; belly step still unmarked
+- 2026-10-07 12:41 review PHYSICAL by backlog-agent: RPB-12: seam rebate 0.2x0.3 -> 0.2x0.4 (shell_r2.REBATE_D/H; tolerances.md recess min 0.4; wall 0.6 = RESIN min_wall); shell_r2 rebuilt: tub 1 valid solid, 1318.9 -> 1317.4 mm3, all other checks unchanged; belly step still unmarked
+- 2026-10-07 12:41 checkin REG-POD-BODY by backlog-agent
+- 2026-10-07 12:41 checkin PHYSICAL by backlog-agent
