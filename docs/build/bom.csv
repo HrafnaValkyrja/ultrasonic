@@ -24,7 +24,7 @@ Cell,"Renata ICP501233PA-02, 175 mAh, PCM",BT1,Renata distributor quote,1,TBD,TB
 Cell,Adafruit #1570 105 mAh (bench stand-in),BT1 alt,Adafruit / Digi-Key,0,5.9500,0.00,option,set qty 1 for early bench tests
 Transducer,RC-BC02 bone-conduction exciter,XDCR,marketplace,1,TBD,TBD,rev C,listing URLs were never saved; price unknown; buy 3+ from two listings
 Connector,"Xinyangze YZT0675 5-pin magnetic TARGET (pod side, magnets built in)",J-dock,LCSC C5126848,1,2.4000,2.40,O16,21.2 x 6.86 x 2.8 mm; 51 in stock 2026-10-01; fits the bigger rev-1 bottom face
-Connector,Xinyangze YZP0048 magnetic POGO head (cable side),dock,LCSC C5126845,0.5,2.7500,1.38,O16,one per cable; 45 in stock; 4-pin target alt C6276862 $1.76
+Connector,Xinyangze YZP0048-20048-05025-01 5-pin magnetic POGO head (cable side; mates the 5-pin YZT0675 target),dock,LCSC C5126847,0.5,1.3900,0.69,O16,one per cable; JLC stock 0 (JLC API 2026-10-07T17:14Z): buy from LCSC/Xinyangze at order time; was wrongly C5126845 = the 4-pin -04025-03 head (DK-01)
 Connector,Adafruit 5358 + 5412 magnetic pair (bench alt),J-dock alt,adafruit.com,0,11.4500,0.00,option,"$6.50 + $4.95, 21 x 7 face; for early tests"
 Connector,"sealed USB-C receptacle (fallback, space reserved)",J-usbc,Same Sky UJ32-C-H-G-MSMT IP68,0,TBD,TBD,option,6.75 x 8.55 x 2.76; price not retrieved
 Arm,NiTi superelastic wire 0.75 mm,arm,Kellogg's W-NITI-0.75-SE,0.1,13.4900,1.35,O7b,$13.49 per 5 ft (~76 arms)

@@ -409,3 +409,4 @@
 - 2026-10-07 13:14 checkout SUB-DOCK-USB by backlog-agent: DK-01 BOM 5-pin head
 - 2026-10-07 13:15 review SUB-DOCK-USB by backlog-agent: DK-01: BOM cable-side head corrected to the 5-pin C5126847 (JLC stock 0 2026-10-07T17:14Z)
 - 2026-10-07 13:15 checkin SUB-DOCK-USB by backlog-agent
+- 2026-10-07 13:15 review COST by backlog-agent: DK-01: bom.py dock head line -> 5-pin C5126847; bom.md/bom.csv regenerated (per pod 23.18 -> 22.50)
