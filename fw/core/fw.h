@@ -1,0 +1,72 @@
+/* fw/core/fw.h: core entry points and the frozen IF-FW-DSP ABI (FWSIM-R3, R9, R10).
+ * Execution model (FWSIM-R3): ISRs only move data and set flags; every entry point below is a pure function of
+ * (fw_state_t, args, injected time): it calls no HAL function, reads no register, keeps no static state.
+ * ABI (FWSIM-R9, docs/sim/e2e-chain.yaml IF-FW-DSP): in = int32[128] ADF1 DR words (24-bit left-aligned, 200.02 kS/s,
+ * one hop = 0.640 ms); out = uint16 TIM1 CCR1 values, 128 per hop at ARR 200 (256 at ARR 100, 512 at ARR 50);
+ * V_diff/Vdd = 2*CCR/ARR - 1; leg B (CH3) = ARR - CCR1 is written by the port, the ABI carries one value.
+ * Firmware output hop k aligns with reference hop k-1 (frame completion, e2e F9). Changing anything here bumps FW_ABI_VERSION
+ * and must pass sim/e2e selftest fw_abi.*. */
+#ifndef FW_CORE_FW_H
+#define FW_CORE_FW_H
+#include <stddef.h>
+#include <stdint.h>
+#include "knobs.h"
+
+#define FW_ABI_VERSION 1u
+#define FW_HOP_N 128u                         /* input samples per hop */
+#define FW_CCR_MAX_PER_HOP (FW_HOP_N * 4u)    /* ARR 50 (800 kHz): FWSIM-R61 sizes buffers for it */
+#define FW_N_BANDS 28u
+#define FW_DSP_OUT_N 8u                       /* 12.5 kS/s output samples per hop */
+#define FW_HOP_US_X1000 639930u               /* 128 / 200.02 kS/s in ns (shared-params hop_ms 0.63993) */
+
+typedef struct {                              /* FWSIM-R10 taps, one set per hop */
+    float dsp_out[FW_DSP_OUT_N];              /* DSP output @12.5 kS/s, full scale 1.0 */
+    float band_energy[FW_N_BANDS];
+    float floor[FW_N_BANDS];
+    float pre_q_true_peak;                    /* true peak of the pre-quantiser x16-interpolated stream */
+    float shaper_norm[3];                     /* |e1|, |e2|, |e3| noise-shaper state */
+    uint32_t squelch_state;                   /* 1 = squelched */
+    uint32_t cycles_hop;                      /* filled by the caller (DWT), never by core */
+    uint32_t n_ccr;                           /* CCR words written */
+    uint32_t clamp_hits;                      /* FWSIM-R64 clamp engagements this hop (0 in normal listening) */
+} fw_taps_t;
+
+typedef enum {
+    FW_EV_NONE = 0,
+    FW_EV_BUTTON_SHORT,
+    FW_EV_BUTTON_LONG,
+    FW_EV_VBUS_ON,
+    FW_EV_VBUS_OFF,
+    FW_EV_CHG_INT,
+    FW_EV_MIC_FAULT,
+    FW_EV_KNOBS_DEFAULTED,                    /* knob store empty or bad (FWSIM-R6) */
+    FW_EV_KNOBS_CLAMPED,                      /* stored knobs outside today's ranges were clamped */
+    FW_EV_COUNT
+} fw_event_id_t;
+
+typedef struct {
+    uint64_t now_us;          /* last injected time */
+    uint64_t boot_us;
+    uint64_t hop_count;
+    fw_knobs_t knobs;
+    uint32_t abi;             /* FW_ABI_VERSION */
+    uint32_t arr;             /* from knobs.pwm_khz */
+    uint32_t amp_max_ppm;     /* FWSIM-R64 bound in use */
+    uint32_t squelched;       /* 1 until power_on_hold_ms elapsed (e2e F4) */
+    uint32_t vbus;            /* docked: output disabled unless exemption (ECR-0009) */
+    uint32_t clamp_hits;
+    uint32_t cdc_bytes;
+    uint32_t last_event;
+    int32_t last_arg;
+    uint32_t event_count[FW_EV_COUNT];
+} fw_state_t;
+
+void fw_init(fw_state_t *st, const fw_knobs_t *knobs, uint64_t now_us);
+/* One hop. Writes n = 128 * 200 / ARR CCR words if ccr_cap >= n and returns n; else writes nothing and returns 0.
+ * taps may be NULL. Foundation stub: passes silence (CCR = ARR/2 through the clamp); the DSP lands behind this signature. */
+size_t fw_hop(fw_state_t *st, const int32_t in[FW_HOP_N], uint16_t *ccr, size_t ccr_cap, fw_taps_t *taps);
+void fw_poll(fw_state_t *st, uint64_t now_us);
+void fw_event(fw_state_t *st, fw_event_id_t id, int32_t arg, uint64_t now_us);
+size_t fw_cdc_rx(fw_state_t *st, const uint8_t *buf, size_t len, uint8_t *reply, size_t reply_cap);   /* FWSIM-R57 codec: later */
+uint32_t fw_state_hash(const fw_state_t *st);
+#endif

@@ -1,0 +1,53 @@
+# fw/variants.yaml: build variants of the pod firmware (FWSIM-R5, FWSIM-R64). Audience: Claude instances + fw/tools/gen.py.
+# Read by fw/tools/gen.py -> fw/gen/variant_config.h (every cell and exemption as constants; one is selected per build with
+# -DFW_CELL=<id> -DFW_SELFTEST_EXEMPTION=<a|b>). fw/tools/fwsim.py builds and tests every combination in `matrix`.
+# Rule: a value here is a FACT with src + date; firmware never retypes it. Change here -> rerun `python3 fw/tools/fwsim.py all`.
+schema: 1
+updated: 2026-10-07
+
+# ---- bridge drive: inputs of the FWSIM-R64 current clamp  |V_diff/Vdd| <= i_peak_max * (r_exciter + r_path) / vdd
+bridge:
+  vdd_v: {val: 3.045, src: "sub-power.md U4 TPS7A2030 +3V0 2.955-3.045 V (Key numbers, read 2026-10-07)", why: "highest Vdd = highest current per unit amplitude (conservative)"}
+  r_exciter_ohm: {val: 8.0, src: "docs/sim/shared-params.yaml exciter.r_e_ohm.lo / corners.peak_current_and_ripple (2026-10-02)", why: "lowest R = highest current"}
+  r_path_ohm: {val: 1.3, src: "FWSIM-R64 text (r_pair 1.22 + r_shunt 0.1, shared-params exciter.r_loop_ohm; the 0.2 ohm wire is left out: conservative)"}
+  u4_rating_ma: {val: 300, src: "ECR-0005; hw/pod/gen.py U4 TPS7A2030 (300 mA)"}
+  u4_derate: {val: 0.9, src: "FWSIM-R64 (0.9 x U4)"}
+  cell_derate: {val: 0.8, src: "FWSIM-R64 (0.8 x cell pulse rating)"}
+
+# ---- cells: i_peak_max_ma = min(cell_derate * pulse_ma, u4_derate * u4_rating_ma); ichg_code_max = the BQ25180 ICHG code at <= 1C
+cells:
+  PH2_175:
+    gloss: "Renata ICP501233PA-02 175 mAh Li-polymer pack with PCM (the Phase-2 cell)"
+    capacity_mah: 175
+    pulse_ma: 350
+    ichg_code_max: 44          # 170 mA (code n > 31: 40 + (n - 31) x 10 mA, SLUSE99C s8.5.1.5; sub-power.md ichg_step)
+    vbatreg_code_max: 0x46     # 4.20 V cell CV limit (Renata cv_V 4.2; sub-power.md VBATREG default 0x46)
+    src: "docs/research/drastic/V2-cells.yaml ICP501233PA-02 discharge_mA.pulse_nonCont 350 (read 2026-10-07)"
+  K1_130:
+    gloss: "Renata ICP401230UPR 130 mAh Li-polymer pack with PCM (the drastic-study K1 thin cell)"
+    capacity_mah: 130
+    pulse_ma: 260
+    ichg_code_max: 40          # 130 mA = 1C
+    vbatreg_code_max: 0x46
+    src: "docs/research/drastic/V2-cells.yaml ICP401230UPR discharge_mA.pulse_nonCont 260 (read 2026-10-07); synthesis.md s5 K1"
+default_cell: PH2_175          # hw/current.yaml phase2 (ECR-0018) carries the 175 mAh cell
+
+# ---- selftest exemption (ECR-0009): a = docked output allowed through an armed CDC command at <= -12 dBFS; b = no exemption code at all
+selftest_exemption: {options: [a, b], default: b, src: "ECR-0009 item 1; FWSIM-R19", why: "b is the safe default until the owner picks (FWSIM owner_inputs)"}
+
+# ---- variants listed by architecture.build_matrix.variants that do not change code yet (kept so the list is one place)
+not_yet_in_code:
+  BRIDGE_LEG_B: {val: CH3, src: "ECR-0003 Rev F (fixed)"}
+  HAS_LSE: {options: [1, 0], src: "PER-05"}
+  HAS_CC_SENSE: {val: 0, src: "Rev F, PER-01"}
+  I2C_PULLUPS: {options: [EXT, INT], src: "PER-04"}
+  LED_SITE: {options: [PAD, LID, NONE], src: "PER-07/08"}
+  GESTURES: {options: [A, B, C], src: "sub-ui issue 5"}
+  IDLE_PLAN: {options: [1, 2], src: "sub-processing issue 4"}
+  USB_STACK: {options: [tinyusb, own], src: "FWSIM build_matrix"}
+
+matrix:   # every row builds and passes the host tests (fwsim stage `variants`)
+  - {cell: PH2_175, exemption: a}
+  - {cell: PH2_175, exemption: b}
+  - {cell: K1_130, exemption: a}
+  - {cell: K1_130, exemption: b}

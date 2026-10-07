@@ -1,0 +1,74 @@
+# fw/spec/knobs.yaml: THE single source of fw_knobs_t (FWSIM-R6). fw/tools/gen.py writes fw/gen/knobs_def.h (X-macro) from it.
+# Audience: Claude instances. Every knob is an int32 in a stated integer unit (cdB = 0.01 dB) so ranges and hard clamps are
+# integer constant expressions the compiler can _Static_assert. def/min/max may name a hard clamp (HC_*) or a variant constant (FW_VAR_*).
+# `hard` = the hard-clamp bound the knob may never pass: {max: HC_X} or {min: HC_X}; enforced at compile time (static assert on the
+# range) AND at run time (knob_set rejects, knobs_sanitize clamps). Hard clamps live under `hard_clamps` (literal) or come from
+# fw/variants.yaml (FW_VAR_*, per cell / exemption).
+# Coverage: the knobs_required ids of docs/sim/firmware-emulation.yaml that the foundation needs; the rest are added with their
+# feature (FWSIM-R6 status lists them). Adding, removing or retyping a knob bumps `version` (stored records then load as defaults + event).
+schema: 1
+version: 1
+updated: 2026-10-07
+assumed: "assumed (no source yet; FWSIM knobs_required lists the id only)"
+
+hard_clamps:
+  HC_CEILING_CDB_MAX: {val: -1200, src: "FWSIM design_binding.ceiling_dbfs -12 (assumed, no spec number); shared-params#ceiling; spec D17 L293"}
+  HC_SELFTEST_CAP_CDB_MAX: {val: -1200, src: "FWSIM knobs_required.hard_clamps selftest_cap_dbfs <= -12; ECR-0009"}
+  HC_DEADTIME_TICKS_MIN: {val: 1, src: "spec D6 L170 (1 tick = 12.5 ns at P80)"}
+  HC_ARR_MIN: {val: 50, src: "spec D6 MP-01 L157-L163 (800 kHz = ARR 50)"}
+  HC_TS_HOT_CODE_MAX: {val: 3, src: "sub-power.md charger plan TS_HOT 0b11 = 45 C; FWSIM hard_clamps"}
+  HC_ICHG_CODE_MAX: {val: FW_VAR_ICHG_CODE_MAX, src: "fw/variants.yaml cells.*.ichg_code_max (<= 1C of the fitted cell)"}
+  HC_VBATREG_CODE_MAX: {val: FW_VAR_VBATREG_CODE_MAX, src: "fw/variants.yaml cells.*.vbatreg_code_max (4.20 V)"}
+  HC_I_PEAK_MA_MAX: {val: FW_VAR_I_PEAK_MA_MAX, src: "FWSIM-R64; fw/variants.yaml (min(0.8 x cell pulse, 0.9 x U4 300 mA))"}
+  HC_DOCKED_OUTPUT_MAX: {val: FW_VAR_DOCKED_OUTPUT_MAX, src: "ECR-0009: 1 only in selftest exemption variant a"}
+
+knobs:
+  # ---- output path
+  - {id: pwm_khz, def: 200, min: 200, max: 800, enum: [200, 400, 800], unit: kHz, src: "spec D6 MP-01 L157-L165"}
+  - {id: dead_time_rise_ticks, def: 1, min: 1, max: 8, hard: {min: HC_DEADTIME_TICKS_MIN}, unit: tick, src: "spec D6 L170; TIM1_DTR2"}
+  - {id: dead_time_fall_ticks, def: 1, min: 1, max: 8, hard: {min: HC_DEADTIME_TICKS_MIN}, unit: tick, src: "spec D6 L170; TIM1_DTR2 DTGF"}
+  - {id: dither_on, def: 1, min: 0, max: 1, unit: bool, src: "spec D6 L178"}
+  - {id: ceiling_cdb, def: -1200, min: -4000, max: -1200, hard: {max: HC_CEILING_CDB_MAX}, unit: cdBFS, src: "spec D17; e2e F1; shared-params#ceiling (true peak of the pre-quantiser x16 stream)"}
+  - {id: out_i_peak_ma, def: FW_VAR_I_PEAK_MA_MAX, min: 0, max: FW_VAR_I_PEAK_MA_MAX, hard: {max: HC_I_PEAK_MA_MAX}, unit: mA, src: "FWSIM-R64 output current clamp (may only be lowered)"}
+  - {id: squelch_cdb, def: -6800, min: -9000, max: -4000, unit: cdBFS, src: "e2e-chain.yaml design_binding squelch -68 dBFS (assumed knob, F3)"}
+  - {id: squelch_hold_ms, def: 50, min: 0, max: 1000, unit: ms, src: assumed}
+  - {id: power_on_hold_ms, def: 300, min: 300, max: 3000, unit: ms, src: "e2e F4 (0.3 s floor-tracker settle)"}
+  - {id: gate_hold_hops, def: 2, min: 1, max: 32, unit: hop, src: "e2e F12/F14 (value assumed)"}
+  - {id: volume_step_cdb, def: 400, min: 100, max: 600, unit: cdB, src: "spec D3 L123-L124 (~4 dB)"}
+  - {id: volume_steps, def: 8, min: 1, max: 16, unit: step, src: assumed}
+  # ---- input path
+  - {id: mic_clk_khz, def: 4000, min: 3072, max: 4800, unit: kHz, src: "spec D13 L226 (3.072-4.8 MHz); A3 s1.1 (4.0004 MHz)"}
+  - {id: adf_front, def: 1, min: 1, max: 2, unit: enum, src: "A3 s1.2 (1 = D1 CIC5/5 + RSFLT/4, 2 = D2 /10 + CPU half-band)"}
+  - {id: mic_dead_ms, def: 100, min: 10, max: 1000, unit: ms, src: "FWSIM-R24 (<= 100 ms)"}
+  # ---- dsp
+  - {id: algo, def: 2, min: 1, max: 2, unit: enum, src: "spec D12 L222 (1 = A, 2 = B)"}
+  - {id: band_lo_hz, def: 20000, min: 15000, max: 40000, unit: Hz, src: "spec D10 (owner hearing test sets it)"}
+  - {id: band_hi_hz, def: 85000, min: 60000, max: 95000, unit: Hz, src: "sim/dsp/pipeline.py BConfig"}
+  - {id: out_lo_hz, def: 1500, min: 500, max: 3000, unit: Hz, src: "spec D9"}
+  - {id: out_hi_hz, def: 4000, min: 2000, max: 6000, unit: Hz, src: "spec D9"}
+  - {id: n_bands, def: 28, min: 28, max: 28, unit: band, src: "sim/dsp/pipeline.py BConfig (taps fixed at 28: FWSIM-R10)"}
+  - {id: gate_cdb, def: 600, min: 0, max: 2000, unit: cdB, src: "sim/dsp/pipeline.py BConfig gate_db 6"}
+  - {id: floor_up_ms, def: 3000, min: 100, max: 30000, unit: ms, src: "sim/dsp/pipeline.py BConfig floor_up_s 3.0"}
+  - {id: floor_down_ms, def: 300, min: 10, max: 10000, unit: ms, src: "sim/dsp/pipeline.py BConfig floor_down_s 0.3"}
+  - {id: env_attack_us, def: 1500, min: 100, max: 50000, unit: us, src: "sim/dsp/pipeline.py BConfig env_attack_ms 1.5"}
+  - {id: env_release_us, def: 15000, min: 1000, max: 500000, unit: us, src: "sim/dsp/pipeline.py BConfig env_release_ms 15"}
+  # ---- clocks, power, timing
+  - {id: clock_plan, def: 0, min: 0, max: 3, unit: enum, src: "A3 s2 (0 P80, 1 P160, 2 P64, 3 P48)"}
+  - {id: hop_ring_depth, def: 3, min: 3, max: 8, unit: hop, src: "FWSIM-R46 (input ring >= 3 hops)"}
+  - {id: ccr_buffers, def: 2, min: 2, max: 4, unit: hop, src: "FWSIM-R46 (CCR double buffer >= 2 hops)"}
+  - {id: iwdg_ms, def: 1000, min: 100, max: 30000, unit: ms, src: assumed}
+  - {id: telemetry_period_ms, def: 1000, min: 100, max: 60000, unit: ms, src: assumed}
+  # ---- charger (BQ25180, SLUSE99C)
+  - {id: ichg_code_warm, def: FW_VAR_ICHG_CODE_MAX, min: 5, max: FW_VAR_ICHG_CODE_MAX, hard: {max: HC_ICHG_CODE_MAX}, unit: code, src: "sub-power.md ICHG code 44 = 170 mA at 20-45 C (175 mAh cell; K1 code 40 = 130 mA)"}
+  - {id: ichg_code_cool, def: 32, min: 5, max: FW_VAR_ICHG_CODE_MAX, hard: {max: HC_ICHG_CODE_MAX}, unit: code, src: "sub-power.md ICHG code 32 = 50 mA below 20 C"}
+  - {id: vbatreg_code, def: 0x46, min: 0x3C, max: FW_VAR_VBATREG_CODE_MAX, hard: {max: HC_VBATREG_CODE_MAX}, unit: code, src: "sub-power.md VBATREG 0x46 = 4.20 V; tws-power-size.md s3 (0x3C-0x41 = 4.10-4.15 V)"}
+  - {id: ts_hot_code, def: 3, min: 0, max: 3, hard: {max: HC_TS_HOT_CODE_MAX}, unit: code, src: "sub-power.md TS_HOT 0b11 (45 C)"}
+  - {id: ilim_pre_enum_ma, def: 100, min: 50, max: 500, unit: mA, src: "sub-power.md ILIM 100 mA until enumeration (ECR-0013 F1)"}
+  - {id: vindpm_mv, def: 4200, min: 4200, max: 4700, unit: mV, src: "sub-power.md VINDPM 4.2 V"}
+  - {id: charger_log_period_s, def: 1, min: 1, max: 60, unit: s, src: "FWSIM-R62"}
+  # ---- ui
+  - {id: stuck_button_s, def: 5, min: 1, max: 60, unit: s, src: "sub-ui.md issue 7 (FWSIM-R29 default 5 s)"}
+  # ---- self-test and dock interlock
+  - {id: selftest_cap_cdb, def: -1200, min: -6000, max: -1200, hard: {max: HC_SELFTEST_CAP_CDB_MAX}, unit: cdBFS, src: "FWSIM knobs_required.selftest -12 dBFS; ECR-0009"}
+  - {id: selftest_max_s, def: 60, min: 1, max: 600, unit: s, src: "FWSIM-R19 (default 60 s)"}
+  - {id: docked_output, def: 0, min: 0, max: FW_VAR_DOCKED_OUTPUT_MAX, hard: {max: HC_DOCKED_OUTPUT_MAX}, unit: bool, src: "ECR-0009 item 1 (0 unless exemption variant a)"}
