@@ -1,0 +1,12 @@
+# fw/vendor/tinyusb: vendored source, not installed (FOSS rule: MIT, LICENSE kept beside the code)
+name: TinyUSB
+version: 0.18.0
+licence: MIT (fw/vendor/tinyusb/LICENSE, Copyright (c) 2018 hathach)
+src: https://github.com/hathach/tinyusb/archive/refs/tags/0.18.0.tar.gz
+tarball_sha256: e7fa1bd723213749a0362c79eaccc99e84c8adea8f0a63588c4e4812608b7aa9
+fetched: 2026-10-07
+subset: "src/ files needed for a device-only CDC-ACM on the STM32U575 OTG_FS (Synopsys DWC2 core): tusb.c/h, tusb_option.h, common/,
+  device/, class/cdc/cdc.h + cdc_device.c/h, osal/osal.h + osal_none.h, portable/synopsys/dwc2/{dcd_dwc2.c, dwc2_common.c/h, dwc2_stm32.h,
+  dwc2_type.h}. Files are byte-identical to the tarball (check: tar -xzf and diff -r against src/)."
+local_glue: "fw/port_u575/usb/ (tusb_config.h, the stm32u5xx.h shim TinyUSB's dwc2_stm32.h includes, descriptors, callbacks, HAL CDC calls)"
+build: "fwsim arm_build compiles these with -w (vendor code is not held to the fw warning set) and -isystem includes"

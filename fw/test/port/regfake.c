@@ -65,7 +65,7 @@ void reg_write(uint32_t a, uint32_t v)
         return;
     if (a == TIM1_BASE + TIM_SR)
         *s &= v;                                       /* rc_w0 */
-    else if (a == ADC1_BASE + ADC_ISR || a == ADC4_BASE || a == EXTI_FPR1 || a == EXTI_RPR1)
+    else if (a == ADC1_BASE + ADC_ISR || a == ADC4_BASE || a == EXTI_FPR1 || a == EXTI_RPR1 || a == ADF1_BASE + ADF_DFLT0ISR)
         *s &= ~v;                                      /* rc_w1 */
     else if (a == PWR_WUSCR || a == RTC_SCR) {
         *s = v;
@@ -172,6 +172,14 @@ uint8_t *rf_i2c_regs(void) { return i2c_regs; }
 void rf_sda_stuck(uint32_t clocks) { sda_stuck_clocks = clocks; scl_rises = 0u; }
 void rf_adc4_code(uint32_t ch, uint16_t code) { if (ch < 24u) adc4_code[ch] = code; }
 void rf_wake(uint32_t which) { wake_flag = which; }
+/* TinyUSB stands in: what its dcd_dwc2 init / disconnect write first (core start = connect, stop = soft disconnect) */
+void u575_usb_core_start(void)
+{
+    reg_write(OTG_BASE + OTG_GUSBCFG, reg_read(OTG_BASE + OTG_GUSBCFG) | (1u << 30));
+    reg_write(OTG_BASE + OTG_GCCFG, reg_read(OTG_BASE + OTG_GCCFG) | (1u << 16));
+    reg_write(OTG_BASE + OTG_DCTL, reg_read(OTG_BASE + OTG_DCTL) & ~(1u << 1));
+}
+void u575_usb_core_stop(void) { reg_write(OTG_BASE + OTG_DCTL, reg_read(OTG_BASE + OTG_DCTL) | (1u << 1)); }
 void u575_wfi(void)                                    /* "hardware": the wake source the test scripted raises its flag */
 {
     if (wake_flag == 1u) rf_poke(PWR_WUSR, 1u);

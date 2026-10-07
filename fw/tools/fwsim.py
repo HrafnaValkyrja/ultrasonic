@@ -42,7 +42,11 @@ REL = lambda p: str(Path(p).relative_to(REPO))  # noqa: E731
 CORE = sorted((FW / "core").glob("*.c"))
 HOST_PORT = sorted((FW / "port_host").glob("*.c"))
 TESTS = sorted((FW / "test").glob("*.c"))
-ARM_PORT = sorted((FW / "port_u575").glob("*.c"))
+ARM_PORT = sorted((FW / "port_u575").glob("*.c")) + sorted((FW / "port_u575/usb").glob("*.c"))
+TUSB = FW / "vendor/tinyusb/src"
+VENDOR = [TUSB / p for p in ("tusb.c", "common/tusb_fifo.c", "device/usbd.c", "device/usbd_control.c", "class/cdc/cdc_device.c",
+                              "portable/synopsys/dwc2/dcd_dwc2.c", "portable/synopsys/dwc2/dwc2_common.c")]
+INC_USB = [f"-I{FW / 'port_u575'}", f"-I{FW / 'port_u575/usb'}", f"-isystem{TUSB}"]
 LD = FW / "port_u575/u575.ld"
 INC = [f"-I{FW / d}" for d in ("hal", "core", "gen")]
 INC_HOST = INC + [f"-I{FW / 'port_host'}", f"-I{FW / 'test'}"]
@@ -136,9 +140,10 @@ def arm_build(name, defines=(), stack=False):
     (d / "obj").mkdir(parents=True)
     objs, errs, wall = [], [], 0.0
     extra = ["-fstack-usage", "-fcallgraph-info=su"] if stack else []
-    for src in CORE + ARM_PORT:
+    for src in CORE + ARM_PORT + VENDOR:
         o = d / "obj" / f"{src.parent.name}_{src.stem}.o"
-        rc, _, se, w = run([ARMCC, *ARM_FLAGS, *WARN, *defines, *INC, *extra, "-c", src, "-o", o])
+        warn = ["-w"] if src in VENDOR else WARN               # vendored TinyUSB is not held to the fw warning set
+        rc, _, se, w = run([ARMCC, *ARM_FLAGS, *warn, *defines, *INC, *INC_USB, *extra, "-c", src, "-o", o])
         wall += w
         objs.append(o)
         if rc != 0:
@@ -328,8 +333,8 @@ def stage_dsp(cfg):
     d = OUT / "port_regs"
     d.mkdir(parents=True, exist_ok=True)
     exe = d / "test_regs"
-    rc, _, se, w = run([GCC, "-std=c11", "-O2", *WARN, "-DFW_REG_RECORD", *INC, f"-I{FW / 'port_u575'}", f"-I{FW / 'test/port'}",
-                        FW / "port_u575/hal_u575_periph.c", FW / "port_u575/hal_u575_io.c", FW / "port_u575/hal_u575_sys.c", *sorted((FW / "test/port").glob("*.c")), "-o", exe])
+    rc, _, se, w = run([GCC, "-std=c11", "-O2", *WARN, "-DFW_REG_RECORD", *INC, f"-I{FW / 'port_u575'}", f"-I{FW / 'port_u575/usb'}", f"-I{FW / 'test/port'}",
+                        FW / "port_u575/hal_u575_periph.c", FW / "port_u575/hal_u575_io.c", FW / "port_u575/hal_u575_sys.c", FW / "port_u575/usb/usb_desc.c", *sorted((FW / "test/port").glob("*.c")), "-o", exe])
     if rc == 0:
         rc, so, se, w2 = run([exe])
         w += w2
@@ -441,7 +446,7 @@ def main(argv=None):
     summary = {"id": "FWSIM", "cmd": cfg.cmd, "status": status, "rows": rows, "requirements": requirement_status(rows, tests),
                "tests": tests.get("host_gcc", []), "arm": {k: arm[k] for k in ("flash", "ram_static", "stack_region", "sections") if k in arm},
                "tools": versions(), "wall_s": round(wall, 1),
-               "scope": "tier S + H: foundation (group a) + DSP chain host behaviour (group b: R7 L0-host/L1, R8, R13, R14, R15); L0 ARM vs host on QEMU mps2-an505 (no STM32 peripheral model: tier E open); port_u575 register layer checked against RM0456 Rev 7 in a recorded-register fake (port_u575.regs); USB device stack, ADF hop bookkeeping and CDC are still HAL_ENOTIMPL"}
+               "scope": "tier S + H: foundation (group a) + DSP chain host behaviour (group b: R7 L0-host/L1, R8, R13, R14, R15); L0 ARM vs host on QEMU mps2-an505 (no STM32 peripheral model: tier E open); port_u575 register layer checked against RM0456 Rev 7 in a recorded-register fake (port_u575.regs); USB CDC-ACM on vendored TinyUSB 0.18.0 (fw/vendor/tinyusb, MIT) builds for ARM, its descriptors are host-checked, the stack itself runs only on hardware (tier E)"}
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, default=str) + "\n")
     for r in rows:
         print(f"{r['status']:4} {r['id']:<34} {r['last']}  [{r['src']}]")

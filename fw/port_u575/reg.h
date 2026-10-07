@@ -162,6 +162,7 @@ uint32_t reg_read(uint32_t addr);
 #define ADF_DFLT0CICR 0x08Cu                /* CICMOD 6:4 (101 Sinc5), MCICD 16:8 (4 = /5), SCALE 25:20 */
 #define ADF_DFLT0RSFR 0x090u                /* RSFLTBYP 0, RSFLTD 4 (0 = /4), HPFBYP 7, HPFC 9:8 */
 #define ADF_DFLT0DR 0x0F0u                  /* DR 31:8 */
+#define ADF_DFLT0ISR 0x0B0u                 /* rc_w1: DOVRF 1, SATF 9, CKABF 10, RFOVRF 11 */
 #define DMA_ADF_CH 6u                       /* GPDMA1 channel for ADF1 FLT0 (REQSEL 98, Table 137) */
 
 #define OTG_BASE   0x42040000u              /* OTG_FS 0x4204 0000 */

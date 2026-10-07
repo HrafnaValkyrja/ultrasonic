@@ -185,8 +185,59 @@ hal_wake_t hal_power_stop2(void)
 }
 
 /* ---------------------------------------------------------------------------------------------- ADF1 microphone (D1) */
-static int32_t adf_buf[3][128];              /* hop ring filled by GPDMA (REQSEL 98 adf1_flt0) */
-static uint32_t adf_head, adf_tail, adf_running;
+/* Hop ring: 3 hops of 128 words, filled back to back by a 3-node GPDMA linked list (each node reloads DAR + BR1, links to the next hop;
+ * the last links to the first). The transfer-complete ISR counts filled hops. The consumer takes the oldest complete hop and releases it.
+ * When the DMA is about to overwrite a hop the consumer has not taken, that hop is dropped (oldest first), counted, and the hal_adf_flags
+ * report a DOVRF-style overflow (FWSIM-R46: input ring >= 3 hops). */
+#define ADF_HOPS 3u
+#define ADF_HOP_N 128u
+typedef struct { uint32_t dar, br1, llr; } adf_lli_t;
+static int32_t adf_buf[ADF_HOPS][ADF_HOP_N];
+static adf_lli_t adf_lli[ADF_HOPS];
+static volatile uint32_t adf_filled, adf_taken, adf_held, adf_drops, adf_sw_flags;
+static uint32_t adf_running;
+
+void u575_adf_dma_tc_isr(void)
+{
+    REG_W(GPDMA1_BASE + 0x80u * DMA_ADF_CH + DMA_CFCR, 1u << 8);
+    adf_filled++;
+    if (adf_filled - adf_taken > ADF_HOPS - 1u) {                /* the DMA now writes the oldest unconsumed hop */
+        adf_drops++;
+        adf_sw_flags |= HAL_ADF_FLAG_DOVRF;
+        adf_taken = adf_filled - (ADF_HOPS - 1u);
+        adf_held = 0u;                                           /* a hop held across this point is invalid: release is a no-op */
+    }
+}
+
+const int32_t *hal_adf_hop_take(void)
+{
+    if (!adf_running || adf_held || adf_filled == adf_taken)
+        return NULL;
+    adf_held = 1u;
+    return adf_buf[adf_taken % ADF_HOPS];
+}
+
+void hal_adf_hop_release(void)
+{
+    if (adf_held) {
+        adf_held = 0u;
+        adf_taken++;
+    }
+}
+
+uint32_t hal_adf_flags(void)
+{
+    uint32_t isr = REG_R(ADF1_BASE + ADF_DFLT0ISR), f = adf_sw_flags;
+    adf_sw_flags = 0u;
+    if (isr & (1u << 9)) f |= HAL_ADF_FLAG_SATF;
+    if (isr & (1u << 10)) f |= HAL_ADF_FLAG_CKABF;
+    if (isr & (1u << 1)) f |= HAL_ADF_FLAG_DOVRF;
+    if (isr & (1u << 11)) f |= HAL_ADF_FLAG_RFOVRF;
+    REG_W(ADF1_BASE + ADF_DFLT0ISR, isr & ((1u << 1) | (1u << 9) | (1u << 10) | (1u << 11)));   /* rc_w1 */
+    return f;
+}
+
+uint32_t u575_adf_drops(void) { return adf_drops; }
 
 hal_status_t hal_adf_start(uint32_t cck_hz)
 {
@@ -204,17 +255,25 @@ hal_status_t hal_adf_start(uint32_t cck_hz)
     REG_W(ADF1_BASE + ADF_BSMX0CR, 0u);                          /* bs0_r (rising edge) */
     REG_W(ADF1_BASE + ADF_DFLT0CICR, (5u << 4) | (4u << 8));     /* Sinc5, /5 (MCICD 4); SCALE 0 until the bench sets it (knob adf_scale) */
     REG_W(ADF1_BASE + ADF_DFLT0RSFR, (3u << 8));                 /* RSFLT on, /4; HPF on, HPFC 3 (1.9 kHz) */
-    /* GPDMA: peripheral -> memory, word, circular over the hop ring (linked-list reload of the block: [T]) */
+    /* GPDMA: peripheral -> memory, word, one block per hop, endless 3-node linked list (LLR: UB1 | UDA | ULL) */
     uint32_t ch = GPDMA1_BASE + 0x80u * DMA_ADF_CH;
+    for (uint32_t k = 0; k < ADF_HOPS; k++) {
+        adf_lli[k].dar = (uint32_t)(uintptr_t)adf_buf[k];
+        adf_lli[k].br1 = ADF_HOP_N * 4u;
+        adf_lli[k].llr = ((uint32_t)(uintptr_t)&adf_lli[(k + 1u) % ADF_HOPS] & 0xFFFCu) | (1u << 29) | (1u << 27) | (1u << 16);
+    }
     REG_SET(RCC_AHB1ENR, 1u);
+    REG_W(ch + DMA_CFCR, (1u << 8) | (1u << 9));
+    REG_W(ch + 0x50u, (uint32_t)(uintptr_t)adf_lli & 0xFFFF0000u);   /* CLBAR */
     REG_W(ch + DMA_CTR1, 2u | (2u << 16) | (1u << 19));          /* word -> word, destination increment */
     REG_W(ch + DMA_CTR2, 98u);                                   /* REQSEL adf1_flt0_dma */
-    REG_W(ch + DMA_CBR1, sizeof adf_buf);
+    REG_W(ch + DMA_CBR1, ADF_HOP_N * 4u);
     REG_W(ch + DMA_CSAR, ADF1_BASE + ADF_DFLT0DR);
-    REG_W(ch + DMA_CDAR, (uint32_t)(uintptr_t)adf_buf);
-    REG_W(ch + DMA_CCR, 1u);
+    REG_W(ch + DMA_CDAR, adf_lli[0].dar);
+    REG_W(ch + 0xCCu, adf_lli[0].llr);                           /* CLLR: then hop 1 */
+    REG_W(ch + DMA_CCR, 1u | (1u << 8));                         /* EN, TCIE */
+    adf_filled = adf_taken = adf_held = adf_drops = adf_sw_flags = 0u;
     REG_W(ADF1_BASE + ADF_DFLT0CR, (1u << 1) | 1u);              /* DMAEN, DFLTEN (async continuous) last */
-    adf_head = adf_tail = 0u;
     adf_running = 1u;
     return HAL_OK;
 }
@@ -229,6 +288,8 @@ void hal_adf_stop(void)
 }
 
 /* ---------------------------------------------------------------------------------------------- USB OTG_FS lifecycle (FWSIM-R28) */
+void u575_usb_core_start(void);                                  /* usb/hal_u575_usb.c (TinyUSB); the register test supplies its own */
+void u575_usb_core_stop(void);
 bool hal_usb_vbus(void)
 {
     return hal_gpio_read(BOARD_PIN_VBUS_SENSE);                  /* PA1 divider (VBUS/2 ~ 2.5 V >= VIH) as a digital input */
@@ -248,12 +309,10 @@ hal_status_t hal_usb_enable(bool on)
         REG_SET(RCC_AHB2ENR1, 1u << 14);                         /* OTGEN */
         (void)hal_gpio_mode(BOARD_PIN_USB_DM, HAL_GPIO_AF);
         (void)hal_gpio_mode(BOARD_PIN_USB_DP, HAL_GPIO_AF);
-        REG_SET(OTG_BASE + OTG_GUSBCFG, 1u << 30);               /* FDMOD */
-        REG_SET(OTG_BASE + OTG_GCCFG, 1u << 16);                 /* PWRDWN = 1: transceiver on */
-        REG_CLR(OTG_BASE + OTG_DCTL, 1u << 1);                   /* SDIS = 0: connect (D+ pull-up); the device stack runs from here */
+        u575_usb_core_start();                                   /* TinyUSB: core reset, FDMOD, PWRDWN = 1, SDIS = 0 (usb/hal_u575_usb.c) */
     } else {
-        REG_SET(OTG_BASE + OTG_DCTL, 1u << 1);                   /* soft disconnect first */
-        REG_CLR(OTG_BASE + OTG_GCCFG, 1u << 16);
+        u575_usb_core_stop();                                    /* soft disconnect (SDIS = 1) first, stack down */
+        REG_CLR(OTG_BASE + OTG_GCCFG, 1u << 16);                 /* transceiver off */
         REG_CLR(RCC_AHB2ENR1, 1u << 14);
         (void)hal_gpio_mode(BOARD_PIN_USB_DM, HAL_GPIO_ANALOG);  /* PA11/PA12 analog, no pull (R28) */
         (void)hal_gpio_mode(BOARD_PIN_USB_DP, HAL_GPIO_ANALOG);

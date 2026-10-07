@@ -5,9 +5,12 @@
 #include "hal.h"
 #include "reg.h"
 #include "regfake.h"
+#include "usb_desc.h"
 
 const uint32_t *u575_burst_buf(uint32_t i);
 void u575_dma_tc_isr(void);
+void u575_adf_dma_tc_isr(void);
+uint32_t u575_adf_drops(void);
 #define LLR_BITS ((1u << 29) | (1u << 28) | (1u << 16))
 
 static uint32_t checks, fails;
@@ -280,6 +283,35 @@ int main(void)
     CHECK((uint32_t)rf_find(ADF1_BASE + ADF_DFLT0CR, 0u) == rf_nlog() - 1u && reg_read(ADF1_BASE + ADF_DFLT0CR) == 3u);
     CHECK(((reg_read(GB + GPIO_AFRL) >> 12) & 0xFu) == 3u);          /* PB3 AF3 ADF1_CCK0 */
     CHECK(hal_clock_set_plan(HAL_CLK_P72) == HAL_BUSY);              /* ADF running */
+    /* hop ring: 3-node linked list, TCIE; take/release in order; overflow drops the oldest and flags it */
+    CHECK(reg_read(GPDMA1_BASE + 0x80u * DMA_ADF_CH + DMA_CCR) == (1u | (1u << 8)));
+    CHECK(reg_read(GPDMA1_BASE + 0x80u * DMA_ADF_CH + DMA_CBR1) == 512u);
+    CHECK((reg_read(GPDMA1_BASE + 0x80u * DMA_ADF_CH + 0xCCu) & ((1u << 29) | (1u << 27) | (1u << 16))) == ((1u << 29) | (1u << 27) | (1u << 16)));
+    CHECK(hal_adf_hop_take() == NULL);
+    u575_adf_dma_tc_isr();
+    {
+        const int32_t *h0 = hal_adf_hop_take();
+        CHECK(h0 != NULL && (uint32_t)(uintptr_t)h0 == reg_read(GPDMA1_BASE + 0x80u * DMA_ADF_CH + DMA_CDAR));   /* hop 0 = first DAR */
+        CHECK(hal_adf_hop_take() == NULL);                            /* one held at a time */
+        hal_adf_hop_release();
+        u575_adf_dma_tc_isr();
+        const int32_t *h1 = hal_adf_hop_take();
+        CHECK(h1 == h0 + 128);
+        hal_adf_hop_release();
+        CHECK(hal_adf_hop_take() == NULL && u575_adf_drops() == 0u);
+        for (int i = 0; i < 4; i++)
+            u575_adf_dma_tc_isr();                                    /* consumer stalled 4 hops: 2 dropped */
+        CHECK(u575_adf_drops() == 2u);
+        const int32_t *h4 = hal_adf_hop_take();
+        CHECK(h4 == h0 + 128 * ((4 % 3)));                            /* oldest surviving = hop 4 */
+        hal_adf_hop_release();
+        CHECK(hal_adf_hop_take() != NULL);
+        hal_adf_hop_release();
+        CHECK(hal_adf_hop_take() == NULL);
+    }
+    rf_poke(ADF1_BASE + ADF_DFLT0ISR, (1u << 9) | (1u << 10) | 1u);
+    CHECK(hal_adf_flags() == (HAL_ADF_FLAG_SATF | HAL_ADF_FLAG_CKABF | HAL_ADF_FLAG_DOVRF));   /* DOVRF from the software drop */
+    CHECK(reg_read(ADF1_BASE + ADF_DFLT0ISR) == 1u && hal_adf_flags() == 0u);   /* rc_w1 cleared, FTHF untouched */
     hal_adf_stop();
     CHECK(!(reg_read(ADF1_BASE + ADF_DFLT0CR) & 1u) && !(reg_read(ADF1_BASE + ADF_CKGCR) & 2u));
 
@@ -296,6 +328,43 @@ int main(void)
     CHECK(rf_log(mk)->addr == OTG_BASE + OTG_DCTL && (rf_log(mk)->val & 2u));   /* soft disconnect first */
     CHECK(((reg_read(GA + GPIO_MODER) >> 22) & 3u) == 3u && ((reg_read(GA + GPIO_MODER) >> 24) & 3u) == 3u);
     CHECK(!(reg_read(RCC_AHB2ENR1) & (1u << 14)) && !(reg_read(PWR_SVMCR) & (1u << 28)));
+
+    /* ==== round 10: USB descriptors (FWSIM-R28), walked as a host would (USB 2.0 ch. 9.5/9.6, CDC PSTN 1.2) */
+    {
+        const uint8_t *d = usb_desc_device;
+        CHECK(d[0] == 18u && d[1] == 1u && d[2] == 0x00u && d[3] == 0x02u);
+        CHECK(d[4] == 0xEFu && d[5] == 0x02u && d[6] == 0x01u && d[7] == 64u);              /* IAD composite, EP0 64 (FS) */
+        CHECK((d[8] | d[9] << 8) == USB_VID && (d[10] | d[11] << 8) == USB_PID && d[17] == 1u);
+        const uint8_t *c = usb_desc_config;
+        uint32_t total = (uint32_t)(c[2] | c[3] << 8), at = 0u, nif = 0u, neps = 0u, dbad = 0u, seen_iad = 0u, seen_union = 0u;
+        uint8_t eps[8];
+        CHECK(total == sizeof usb_desc_config && c[1] == 2u && c[4] == 2u && (c[7] & 0x80u) && c[8] * 2u == USB_MAX_POWER_MA);
+        while (at < total) {
+            uint8_t len = c[at], ty = c[at + 1u];
+            if (len < 2u || at + len > total) { dbad++; break; }
+            if (ty == 0x04u) { nif++; dbad += c[at + 2u] != nif - 1u; }                     /* interfaces numbered 0, 1 */
+            if (ty == 0x0Bu) { seen_iad = 1u; dbad += c[at + 2u] != 0u || c[at + 3u] != 2u || c[at + 4u] != 0x02u; }
+            if (ty == 0x24u && c[at + 2u] == 0x06u) { seen_union = 1u; dbad += c[at + 3u] != 0u || c[at + 4u] != 1u; }
+            if (ty == 0x05u) {
+                uint8_t ep = c[at + 2u], attr = c[at + 3u];
+                uint16_t mps = (uint16_t)(c[at + 4u] | c[at + 5u] << 8);
+                for (uint32_t k = 0; k < neps; k++) dbad += eps[k] == ep;                       /* addresses unique */
+                if (neps < 8u) eps[neps++] = ep;
+                dbad += (attr == 0x02u && mps != 64u) || (attr == 0x03u && (mps > 64u || c[at + 6u] == 0u)) || (ep & 0x0Fu) == 0u;
+            }
+            at += len;
+        }
+        CHECK(dbad == 0u && at == total && nif == c[4] && seen_iad && seen_union && neps == 3u);
+        uint16_t w[40];
+        static const uint32_t uid[3] = {0x0012ABCDu, 0x3156470Fu, 0xDEADBEEFu};
+        CHECK(usb_desc_string(0u, uid, w, 40u) == 2u && w[0] == 0x0304u && w[1] == 0x0409u);
+        size_t n = usb_desc_string(1u, uid, w, 40u);
+        CHECK(n == 18u && w[0] == (0x0300u | 36u) && w[1] == 'S' && w[17] == 'd');
+        n = usb_desc_string(3u, uid, w, 40u);
+        CHECK(n == 25u && w[0] == (0x0300u | 50u) && w[1] == '0' && w[3] == '1' && w[24] == 'F' && w[17] == 'D');
+        CHECK(usb_desc_string(4u, uid, w, 40u) == 0u);
+        CHECK(usb_desc_string(1u, uid, w, 5u) == 5u && (w[0] & 0xFFu) == 10u);             /* truncated to the buffer, still well-formed */
+    }
     printf("{\"checks\": %u, \"fails\": %u}\n", checks, fails);
     return fails ? 1 : 0;
 }

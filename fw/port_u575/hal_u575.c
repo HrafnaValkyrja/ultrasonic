@@ -25,15 +25,10 @@ void hal_power_system_reset(void)
 void hal_power_ucpd_dbdis(void) {}
 
 
-const int32_t *hal_adf_hop_take(void) { return NULL; }   /* [next] DMA half/complete bookkeeping of the hop ring (hal_u575_sys.c) */
-void hal_adf_hop_release(void) {}
-uint32_t hal_adf_flags(void) { return 0u; }
 
 
 
 
-size_t hal_usb_cdc_write(const uint8_t *buf, size_t len) { (void)buf; (void)len; return 0u; }
-size_t hal_usb_cdc_read(uint8_t *buf, size_t cap) { (void)buf; (void)cap; return 0u; }
 void hal_usb_dfu_request(void) {}
 
 hal_status_t hal_flash_erase_page(uint32_t page) { (void)page; return HAL_ENOTIMPL; }

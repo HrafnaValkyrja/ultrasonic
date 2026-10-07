@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "app.h"
+#include "cdc_frame.h"
 #include "fake.h"
 #include "fw.h"
 #include "tf.h"
@@ -451,4 +452,112 @@ void test_break_always_on(void)
     TF_CHECK(!app.bridge_on);
     TF_CHECK(app.start_errors > 0u);
     TF_CHECK_EQ(fake_calls(FAKE_FN_hal_pwm_start), 0);
+}
+
+/* FWSIM-R28: CDC stream reassembly. The same byte stream cut into packets of every size 1..23 yields the same frames; garbage between
+ * frames and impossible lengths are skipped (counted); a frame stalled longer than FW_CDC_GAP_US is discarded */
+void test_cdc_frame_stream(void)
+{
+    static const uint8_t s[] = {0x00u, 0x13u, 0xA5u, 0x02u, 0x00u,                   /* garbage, ST_STOP */
+                                0xA5u, 0x01u, 0x04u, 0x38u, 0xFFu, 0x60u, 0x09u,     /* ST_ARM */
+                                0xA5u, 0x07u, 0xFFu,                                 /* impossible length 255: dropped */
+                                0xA5u, 0x09u, 0x40u, 0xA5u, 0x03u, 0x02u, 0xFFu, 0x7Fu,   /* length 64: resync, then RAW */
+                                0xA5u, 0x04u, 0x00u};                                /* DFU_REQ */
+    for (size_t chunk = 1u; chunk <= sizeof s; chunk++) {
+        fw_cdc_frame_t f;
+        fw_cdc_frame_init(&f);
+        uint8_t types[8];
+        size_t lens[8], nf = 0u;
+        for (size_t at = 0u; at < sizeof s; at += chunk) {
+            size_t len = sizeof s - at < chunk ? sizeof s - at : chunk, used = 0u;
+            while (used < len) {
+                size_t fl = 0u;
+                used += fw_cdc_frame_push(&f, &s[at + used], len - used, 1000u, &fl);
+                if (fl && nf < 8u) {
+                    types[nf] = f.buf[1];
+                    lens[nf++] = fl;
+                }
+            }
+        }
+        TF_CHECK_EQ(nf, 4u);
+        if (nf == 4u) {
+            TF_CHECK(types[0] == 0x02u && lens[0] == 3u && types[1] == 0x01u && lens[1] == 7u);
+            TF_CHECK(types[2] == 0x03u && lens[2] == 5u && types[3] == 0x04u && lens[3] == 3u);
+        }
+        TF_CHECK_EQ(f.frames, 4u);
+    }
+    /* stall mid-frame: the half frame is dropped, the next complete frame decodes */
+    fw_cdc_frame_t f;
+    fw_cdc_frame_init(&f);
+    size_t fl = 0u;
+    static const uint8_t half[4] = {0xA5u, 0x01u, 0x04u, 0x38u}, stop[3] = {0xA5u, 0x02u, 0x00u};
+    (void)fw_cdc_frame_push(&f, half, sizeof half, 0u, &fl);
+    TF_CHECK_EQ(fl, 0u);
+    (void)fw_cdc_frame_push(&f, stop, sizeof stop, FW_CDC_GAP_US + 1u, &fl);
+    TF_CHECK_EQ(fl, 3u);
+    TF_CHECK_EQ(f.timeouts, 1u);
+    TF_CHECK_EQ(f.buf[1], 0x02u);
+}
+
+/* FWSIM-R28 + R64 through the USB path: OTG_FS powered only while PA1 shows VBUS; commands arrive as CDC bytes in arbitrary packets and
+ * are answered; random byte streams in random packet sizes, with VBUS toggling, never drive the bridge past the FWSIM-R64 clamp */
+void test_usb_cdc_lifecycle_clamp(void)
+{
+    static fw_app_t app;
+    app_boot_docked(&app, 2);
+    app_run(&app, 10u);
+    TF_CHECK_EQ(fake_calls(FAKE_FN_hal_usb_enable), 0u);             /* no VBUS: never enabled */
+    TF_CHECK(!app.usb_on);
+    fake_vbus(true);
+    app_run(&app, 60u);
+    TF_CHECK(app.usb_on);
+    uint8_t arm[7] = {0xA5u, 0x01u, 4u, 0x58u, 0x02u, 0x60u, 0x09u};
+    fake_usb_rx(arm, 3u);                                            /* split across two packets */
+    app_run(&app, 1u);
+    fake_usb_rx(&arm[3], 4u);
+    app_run(&app, 1u);
+    uint8_t tx[8];
+    size_t ntx = fake_usb_tx(tx, sizeof tx);
+    TF_CHECK_EQ(ntx, 1u);
+#if FW_VAR_DOCKED_OUTPUT_MAX
+    TF_CHECK_EQ(tx[0], 0x06u);
+#else
+    TF_CHECK_EQ(tx[0], 0x15u);
+#endif
+    fake_vbus(false);
+    app_run(&app, 2u);
+    TF_CHECK(!app.usb_on);
+    /* fuzz */
+    uint32_t seed = 2026u, bad = 0u;
+    app_boot_docked(&app, 2);
+    fake_vbus(true);
+    app_run(&app, 60u);
+    for (uint32_t i = 0; i < 3000u; i++) {
+        uint8_t b[24];
+        size_t n = 1u + rng32(&seed) % sizeof b;
+        for (size_t j = 0; j < n; j++)
+            b[j] = (uint8_t)rng32(&seed);
+        if (i % 3u == 0u) {                                          /* a well-formed frame with random payload */
+            static const uint8_t ty[4] = {1u, 2u, 3u, 4u}, ln[4] = {4u, 0u, 2u, 0u};
+            uint32_t k = rng32(&seed) % 4u;
+            b[0] = 0xA5u;
+            b[1] = k == 3u ? 2u : ty[k];                              /* no DFU reset in the fuzz */
+            b[2] = ln[k == 3u ? 1u : k];
+            n = 3u + b[2];
+        }
+        fake_usb_rx(b, n);
+        if (i % 500u == 250u)
+            fake_vbus(false);
+        if (i % 500u == 260u)
+            fake_vbus(true);
+        app_run(&app, 1u);
+        size_t m;
+        const uint16_t *c = fake_pwm_last(&m);
+        for (size_t j = 0; c != NULL && j < m; j++)
+            bad += fabs(2.0 * c[j] / (double)app.st.arr - 1.0) > (double)app.st.amp_max_ppm * 1e-6 + 1e-9;
+        uint8_t sink[64];
+        (void)fake_usb_tx(sink, sizeof sink);
+    }
+    TF_CHECK_EQ(bad, 0u);
+    TF_CHECK(app.cdc_replies >= 950u);                               /* ~1000 well-formed frames answered (garbage may swallow a few) */
 }

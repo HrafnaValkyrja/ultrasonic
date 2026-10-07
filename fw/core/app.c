@@ -147,6 +147,30 @@ static void service_charger(fw_app_t *app, uint32_t force)
     app->chg_ok = fw_chg_service(&app->chg, &app->st.knobs, &p, hal_time_us(), force);
 }
 
+/* FWSIM-R28: USB core and pins only while PA1 shows VBUS; CDC bytes reassembled into frames, each answered (ACK/NACK). Every drive
+ * a frame can cause goes through fw_ccr_from_amp (FWSIM-R64) in fw_hop / fw_selftest_hop. */
+static void service_usb(fw_app_t *app, uint32_t pa1)
+{
+    if (pa1 != app->usb_on) {
+        if (hal_usb_enable(pa1 != 0u) == HAL_OK || !pa1)
+            app->usb_on = pa1;
+        fw_cdc_frame_init(&app->cdc);
+    }
+    if (!app->usb_on)
+        return;
+    uint8_t rx[64];
+    size_t n = hal_usb_cdc_read(rx, sizeof rx), used = 0u;
+    while (used < n) {
+        size_t flen = 0u;
+        used += fw_cdc_frame_push(&app->cdc, &rx[used], n - used, hal_time_us(), &flen);
+        if (flen) {
+            uint8_t rep[4];
+            size_t r = fw_cdc_rx(&app->st, app->cdc.buf, flen, rep, sizeof rep);
+            app->cdc_replies += (uint32_t)hal_usb_cdc_write(rep, r);
+        }
+    }
+}
+
 void fw_app_step(fw_app_t *app)
 {
     const int32_t *hop;
@@ -176,6 +200,7 @@ void fw_app_step(fw_app_t *app)
         app->chg_int_seen = app->st.event_count[FW_EV_CHG_INT];
         force_chg = 1u;
     }
+    service_usb(app, pa1);
     fw_poll(&app->st, hal_time_us());
     apply_outputs(app);
     apply_mic_led(app);

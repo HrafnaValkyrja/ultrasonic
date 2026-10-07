@@ -534,6 +534,9 @@ void fake_vbus(bool present)
 }
 void fake_usb_rx(const uint8_t *buf, size_t len)
 {
+    memmove(F.usb_rx, &F.usb_rx[F.usb_rx_i], F.usb_rx_n - F.usb_rx_i);   /* drop what the firmware already read */
+    F.usb_rx_n -= F.usb_rx_i;
+    F.usb_rx_i = 0u;
     size_t room = sizeof F.usb_rx - F.usb_rx_n, n = len < room ? len : room;
     memcpy(&F.usb_rx[F.usb_rx_n], buf, n);
     F.usb_rx_n += n;
@@ -542,6 +545,8 @@ size_t fake_usb_tx(uint8_t *buf, size_t cap)
 {
     size_t n = cap < F.usb_tx_n ? cap : F.usb_tx_n;
     memcpy(buf, F.usb_tx, n);
+    memmove(F.usb_tx, &F.usb_tx[n], F.usb_tx_n - n);   /* the host read them */
+    F.usb_tx_n -= n;
     return n;
 }
 

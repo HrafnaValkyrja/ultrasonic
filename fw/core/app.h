@@ -2,6 +2,7 @@
  * (tests) and on the target. Owns all HAL calls in core; entry points stay pure (FWSIM-R3). */
 #ifndef FW_CORE_APP_H
 #define FW_CORE_APP_H
+#include "cdc_frame.h"
 #include "charger.h"
 #include "fw.h"
 #include "knob_store.h"
@@ -18,6 +19,8 @@ typedef struct {
     uint32_t chg_ok, chg_temp_class, chg_int_seen, pa1_seen;
     uint32_t mic_on, led_duty_ppm, stops, last_wake;
     fw_chg_t chg;
+    uint32_t usb_on, cdc_replies;          /* OTG_FS powered (FWSIM-R28: only while PA1 shows VBUS) */
+    fw_cdc_frame_t cdc;
 } fw_app_t;
 
 void fw_app_boot(fw_app_t *app);   /* knobs from flash (defaults + event if bad), fw_init, UCPD release, TIM1 config */

@@ -82,7 +82,7 @@ def lint_hal(errs):
         errs.append(f"hal: {n} is not in FAKE_HAL_FUNCS (fw/port_host/fake.h): no fake, no coverage test")
     for n in sorted(set(listed) - set(surface)):
         errs.append(f"hal: FAKE_HAL_FUNCS lists {n}, which no fw/hal header declares")
-    for port, files in (("port_host", [FW / "port_host/fake.c"]), ("port_u575", sorted((FW / "port_u575").glob("*.c")))):
+    for port, files in (("port_host", [FW / "port_host/fake.c"]), ("port_u575", sorted((FW / "port_u575").rglob("*.c")))):
         have = defined(files)
         for n in sorted(set(surface) - have):
             errs.append(f"hal: {n} has no definition in fw/{port}")
