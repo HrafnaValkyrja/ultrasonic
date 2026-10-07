@@ -41,7 +41,7 @@ Keeps every region (pod body, board, cell, arm, pad) in one coordinate frame, so
 | Mic port NPTH D0.6 = duct axis | 32.43 | 12.1-14.7 | −2.45 | dims_r2 MIC (read from routed board U2 (2.65, 6.0) r90, hole at local −0.77) |
 | Lid duct bore D1.0 (reamed) + hex window R1.9 × 0.8 | 32.43 | 13.2-13.9 / 13.9-14.7 | −2.45 | shell_r2.lid_base |
 | SW1 / pocket / puck / skin | 49.05 | 12.9-13.55 / to 13.8 / 13.65-14.38 / 14.45-14.7 | −2.45 | dims_r2 SW, POCKET, PUCK_L, SKIN_FLOOR |
-| TP1-TP6 (F, in VHB cut-outs) | TP5 32.15, TP4 33.65, TP2 35.15, TP1 36.65 (z 2.85); TP3 39.85 (z −5.55); TP6 54.55 (z 2.45) | 12.9 | see x | placement.yaml via dims_r2 F_PADS + bpt [derived] |
+| TP1-TP6 (F, in VHB cut-outs) | TP5 32.15, TP2 33.65, TP4 35.15, TP1 36.65 (z 2.85; TP2/TP4 swapped 2026-10-07, DBG-2); TP3 39.85 (z −5.55); TP6 54.55 (z 2.45) | 12.9 | see x | placement.yaml via dims_r2 F_PADS + bpt [derived] |
 | Rear wire pads (B), board x 25.1-28.9 | 55.65-59.45 | 12.1 | J1 1.45, J2 2.5, J7 −0.75, J8 0.3 (CAD pod) | routed board probe 2026-10-07 + bpt [derived] |
 | Stowage zone | 60.55-66.7 (+ 65.6-66.7 behind the cell) | 10.7-13.2 (+ 5.1-10.7 behind the cell) | −8.9-4.0 | shell_r2.stowage_zone |
 | Dock target | 31.5-52.7 | 5.72-12.58 | −11.75-(−8.95) | dims_r2 DOCK |

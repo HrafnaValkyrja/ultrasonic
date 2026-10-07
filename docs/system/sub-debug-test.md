@@ -194,6 +194,7 @@ option_bytes: "set nSWBOOT0=0, nBOOT0=1 only once a write-protected boot stub wo
   owner: "FWSIM decision 9 (firmware-emulation.yaml L428) recommends C: owner picks"
 - id: DBG-2
   t: "TP row puts +3V0 beside GND: TP4 | TP5 at 0.8 mm; a smear or a jig off by one pitch shorts the rail (TP6 VSYS now separate)"
+  status: "done 2026-10-07 (round 8): TP2 SWCLK at (3.1, 11.3), TP4 +3V0 at (4.6, 11.3); row GND | SWCLK | +3V0 | SWDIO: +3V0 no longer beside GND"
   close: "reorder (e.g. SWDIO, GND, SWCLK, +3V0) at the next placement edit; dims_r2 reads F_PADS live, so the VHB cut-outs follow"
 - id: DBG-3
   t: "snap-off test frame (O9) not designed for 30 x 12"
