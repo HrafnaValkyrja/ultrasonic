@@ -410,3 +410,10 @@
 - 2026-10-07 13:15 review SUB-DOCK-USB by backlog-agent: DK-01: BOM cable-side head corrected to the 5-pin C5126847 (JLC stock 0 2026-10-07T17:14Z)
 - 2026-10-07 13:15 checkin SUB-DOCK-USB by backlog-agent
 - 2026-10-07 13:15 review COST by backlog-agent: DK-01: bom.py dock head line -> 5-pin C5126847; bom.md/bom.csv regenerated (per pod 23.18 -> 22.50)
+- 2026-10-07 13:18 checkout SUB-DOCK-USB by backlog-agent: dock route clearance >= 0.3 (y-first route)
+- 2026-10-07 13:19 checkout PHYSICAL by backlog-agent: dock route v2 + hold/check step
+- 2026-10-07 13:19 review SUB-DOCK-USB by backlog-agent: dock route v2 (y-first, climb above the cell behind the board): worst 0.58 to the arm bundle (was 0.11); hold + check step 11
+- 2026-10-07 13:19 review PHYSICAL by backlog-agent: dock route v2 (y-first, climb above the cell behind the board): worst 0.58 to the arm bundle (was 0.11); hold + check step 11
+- 2026-10-07 13:19 review R-DOCK-BODY by backlog-agent: dock route v2 (y-first, climb above the cell behind the board): worst 0.58 to the arm bundle (was 0.11); hold + check step 11
+- 2026-10-07 13:19 checkin SUB-DOCK-USB by backlog-agent
+- 2026-10-07 13:19 checkin PHYSICAL by backlog-agent

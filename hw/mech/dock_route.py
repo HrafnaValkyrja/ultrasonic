@@ -37,6 +37,8 @@ CH_EXIT = np.array([66.20, 5.15, -5.50])
 X_DOCK_GAP = 65.85                    # dock ribbon in the rear gap, cell side (cell rear face 65.6)
 X_ARM_GAP = 66.40                     # arm bundle against the rear wall (heel.py)
 TAIL = np.array([52.9, 9.15, -8.5])   # [A] tails end, 5-pin row centre
+Y_HI = 12.55                          # ribbon level in the stowage behind the board (cell top 10.7, lid inner 13.2)
+X_UP = 64.6                           # first wire's climb line (x), behind the board's rear edge 60.55
 
 
 def pz(by, pod):
@@ -58,12 +60,17 @@ def plen(pts):
 def dock_wire(ref, k, pod):
     net, bx, by, od = DOCK_PADS[ref]
     z = pz(by, pod)
-    y_rib = TAIL[1] - 0.4 + 0.2 * k                     # ribbon position across y (flat, 0.2 pitch)
+    y_rib = TAIL[1] - 0.52 + 0.26 * k                   # ribbon position across y (flat, 0.26 pitch >= the 0.249 OD)
     pad = np.array([PCB["x0"] + bx, PCB["y0"] - od / 2, z])
+    # v2 (2026-10-07, clearance >= 0.3): climb in y while LOW (z -8.5, ~3 mm under the arm exit height), then climb in z
+    # above the cell top in the stowage behind the board (y Y_HI, between the cell top 10.7 and the lid 13.2), where the
+    # arm bundle never is (it runs at y <= 11.6); come down to EDGE_Y only at the pad's own z.
+    x_up = X_UP - 0.3 * k                                                                    # ribbon spread in x while climbing in z
     pts = [np.array([TAIL[0], y_rib, TAIL[2]]), np.array([X_DOCK_GAP, y_rib, TAIL[2]]),     # under the cell
-           np.array([X_DOCK_GAP, 6.0 + 0.2 * k, TAIL[2] + 0.3]),                            # into the gap, low y
-           np.array([X_DOCK_GAP, 6.0 + 0.2 * k, z]),                                        # climb to the pad's z
-           np.array([X_DOCK_GAP, EDGE_Y, z]), np.array([PCB["x1"], EDGE_Y, z]),            # up in y, forward
+           np.array([X_DOCK_GAP, Y_HI, TAIL[2]]),                                           # up the rear gap in y, low
+           np.array([x_up, Y_HI, TAIL[2]]),                                                 # forward over the cell's rear-top edge
+           np.array([x_up, Y_HI, z]),                                                       # climb to the pad's z, above the cell
+           np.array([PCB["x1"] + 0.3, EDGE_Y, z]), np.array([PCB["x1"], EDGE_Y, z]),        # down to the edge level at the pad's z
            np.array([pad[0] + 0.5, pad[1], z]), pad]
     return dict(net=net, od=od, pts=pts)
 
@@ -104,7 +111,7 @@ def box_clear(P, b):
 
 
 def main():
-    res = {"date": "2026-10-07", "assumptions": {"tail_end": TAIL.tolist(), "ribbon_pitch": 0.2, "x_dock_gap": X_DOCK_GAP,
+    res = {"date": "2026-10-07", "assumptions": {"tail_end": TAIL.tolist(), "ribbon_pitch": 0.26, "route": "v2 y-first (climb in z above the cell, behind the board)", "x_dock_gap": X_DOCK_GAP,
                                                  "arm_route": "heel.wire_route(pod), both pods"}}
     curves = {}
     for pod in ("right", "left"):

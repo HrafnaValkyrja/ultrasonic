@@ -22,7 +22,7 @@
   "PHYSICAL": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only",
+   "note": "dock route v2 (y-first, climb above the cell behind the board): worst 0.58 to the arm bundle (was 0.11); hold + check step 11",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
@@ -109,7 +109,7 @@
   "SUB-DOCK-USB": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "DK-01: BOM cable-side head corrected to the 5-pin C5126847 (JLC stock 0 2026-10-07T17:14Z)",
+   "note": "dock route v2 (y-first, climb above the cell behind the board): worst 0.58 to the arm bundle (was 0.11); hold + check step 11",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9"
@@ -324,7 +324,7 @@
   "R-DOCK-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "RPB-5: sealing note docs/research/sealing-and-service.md + membrane_loss.py (ePTFE vents fail R14); docs only",
+   "note": "dock route v2 (y-first, climb above the cell behind the board): worst 0.58 to the arm bundle (was 0.11); hold + check step 11",
    "stamp": {
     "sym:hw/mech/dims_r2.py::BAY": "d933f8dc8c3634dd",
     "sym:hw/mech/dims_r2.py::DOCK": "5f6cb6d0f2504ed9",
