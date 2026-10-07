@@ -338,6 +338,18 @@ def stage_dsp(cfg):
                         src="FWSIM-R10, FWSIM-R47", wall=w))
     else:
         rows.append(row("dsp.cycles_hop_static", "FAIL", f"exit {rc}", "runs", src="FWSIM-R47", detail=tail(se + so)))
+    # E2 cross-check: per-hop instruction counts on QEMU (-icount) vs the static model's instruction count
+    j = OUT / "dsp_icount.json"
+    rc, so, se, w = run([sys.executable, REPO / "sim/fw/qemu_icount.py", "--json", j], timeout=900)
+    if rc == 0 and j.exists():
+        q = json.loads(j.read_text())
+        rows.append(row("dsp.insns_hop_qemu", "PASS", {v: {"qemu": x["qemu_insns_hop"], "static": x["static_insns_hop"], "ratio": x["ratio_qemu_static"]} for v, x in q.items()},
+                        "reported (static model must not undercount: ratio <= 1.05)", op="", basis="sim/fw/qemu_icount.py: QEMU mps2-an505 -icount shift=0, SysTick around fw_hop, sweep vector hops 600+",
+                        src="FWSIM-R47", wall=w))
+        if any(x["ratio_qemu_static"] > 1.05 for x in q.values()):
+            rows[-1]["status"] = "FAIL"
+    else:
+        rows.append(row("dsp.insns_hop_qemu", "FAIL", f"exit {rc}", "runs", src="FWSIM-R47", detail=tail(se + so)))
     return rows
 
 

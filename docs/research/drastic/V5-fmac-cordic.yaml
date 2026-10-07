@@ -1,0 +1,59 @@
+# V5: can the STM32U575 FMAC / CORDIC take the output stage (x16 interpolator, 3rd-order shaper) off the CPU? AI-facing.
+# Done 2026-10-07 by Claude (Opus 5.5, firmware agent). Sources read 2026-10-07: RM0456 Rev 7 (March 2026) s25 CORDIC, s26 FMAC, local text
+# ~/Desktop/ultrasonic-scratch/st_new/rm7.txt L102912-L105640. Numbers: sim/fw/fmac_model.py (bit-accurate host model, below), fw/tools/cycles.py,
+# sim/fw/qemu_icount.py. Confidence: H = read from the RM / exact from the model; M = derived; L = assumption.
+meta:
+  task: "coordinator 2026-10-07: evaluate FMAC (x16 polyphase interpolator FIR, 3rd-order shaper IIR, DMA-fed) and CORDIC; cycles saved, precision via a bit-accurate FMAC model vs D17 THD+N and the true-peak limiter placement, DMA/timing plan"
+  glossary:
+    FMAC: "filter math accelerator: 16x16 multiplier, 26-bit accumulator, 256 x 16-bit local memory, FIR (<= 127 taps) and IIR direct form 1, DMA read/write channels (RM0456 s26.2)"
+    CORDIC: "24-bit rotation engine, 4 iterations per clock; sin, cos, atan2, modulus, sinh, cosh, atanh, ln, sqrt in q1.31/q1.15 (RM0456 s25.2, s25.3.5)"
+    q1.15: "16-bit signed fraction, -1 .. 1-2^-15"
+    kappa: "worst-case gain of one interpolator phase for |input| <= 1: max_p sum_t |h[16t+p]| (1.741 for TPP 10)"
+
+rm_facts:   # RM0456 Rev 7, read 2026-10-07
+  - {fact: "inputs, coefficients, outputs q1.15; accumulator 26 bits q4.22, range -8 .. +7.99999976, WRAPS on overflow (SAT flag only); output gain 2^R, R 0..7; CLIPEN saturates the q1.15 output, else the unused accumulator bits are truncated", src: "s26.3.7 p974", conf: H}
+  - {fact: "FIR: P = N+1 taps in [2:127]; local memory 256 words, FIR needs 2N+1 (N <= 127). IIR: direct form 1 only, N <= 64 feed-forward, M <= 63 feedback, linear (no element inside the loop)", src: "s26.3.6, s26.3.8, s26.3.9 p970-976", conf: H}
+  - {fact: "one FMAC unit; cascaded or multiple filters share it by switching X2_BASE and re-loading each stage's X1/Y history per round (design tips)", src: "s26.3.12 p981", conf: H}
+  - {fact: "throughput not stated in RM0456; 3 clock cycles of delay after the last X1 space is filled / last Y read", src: "s26 (notes near L106270)", conf: H, assumed: "1 MAC per FMAC clock (AN5305 figure, not re-read) [L]"}
+  - {fact: "CORDIC: 4 iterations per clock; sin/cos to q1.31 precision in ~6 cycles; result readable as soon as ready (bus stall, no polling)", src: "s25.3.5 Table 209", conf: H}
+  - {unclear: "how a 30-bit product enters the q4.22 accumulator and how bits are dropped at the output are not described: modelled as floor (A1, A2), the worst plausible choice", conf: L, closes: "bench read-back of known vectors on a U575 (E4/V8)"}
+
+model: {file: sim/fw/fmac_model.py, what: "per-tap q1.15 x q1.15 product, >> 8 (floor) into a 26-bit wrapping accumulator, 2^R gain, >> 7 (floor), CLIPEN; polyphase x16 as 16 FMAC FIR runs (one per phase) with the firmware's own TPP 10 prototype (fw/tools/dsp_tables.py)", check: "accumulator worst partial sum 1.74 < 8: no wrap"}
+
+interpolator_on_fmac:
+  fit:
+    single_fir_zero_stuffed: {verdict: "NO", why: "x16 prototype is 16 x TPP = 160 taps for TPP 10 (70.3 dB images, e2e F5 needs >= 67); FMAC FIR max 127 taps -> TPP <= 7, ~55 dB: fails F5", conf: H}
+    two_stage_x4_x4: {verdict: "possible, not chosen", why: "both stages share the one FMAC: per hop 2 re-configurations with history reload (s26.3.12) and the FMAC computes the stuffed zeros (no polyphase skip): ~1.7k + 2k MAC per hop and more CPU/DMA control than option C", conf: M}
+    polyphase_16_runs: {verdict: "fits", memory: "X2 = 16 phases x 10 coefficients = 160 words (all resident; switch X2_BASE per phase), X1 = 9 history + 8 new = 17 (+d), Y = 8: ~190 of 256 words", conf: H}
+  precision:   # sim/fw/fmac_model.py, 2.4 kHz / 1.5 kHz tones, error = FMAC model minus the firmware's float interpolator, band 0.2-16 kHz
+    raw_stream_as_today: {placement: "true-peak limiter after the interpolator (today): the FMAC sees the pre-limiter stream, up to ~+14 dBFS (L2 D17 13.5 dBFS) -> input scale 0.108, LSB 2.8e-4 FS",
+                          err_inband_dbfs: -79, err_re_tone_db: {m40: -39.1, m12: -67.0, m60: -17.5}, D17_chain_thdn_m40_db: "-49.3 -> -38.7 (limit -45): FAILS", conf: M}
+    prelimited: {placement: "sample-domain gain limiter on the 12.5 kS/s stream BEFORE the FMAC (same instant attack / 60 ms release, threshold = ceiling) so |input| <= ceiling; input scale 0.999/(ceiling x kappa) = 2.28, LSB 1.3e-5 FS. The true-peak limiter stays after the FMAC on the CPU (16 interpolated samples per input sample) so FWSIM-R15 holds unchanged",
+                 err_inband_dbfs: -105.6, err_re_tone_db: {m40: -65.5, m12: -93.1, m60: -46.4}, D17_chain_thdn_m40_db: "-49.3 -> -49.2: passes", conf: M,
+                 cost: "a sample-peak limiter at the ceiling also acts when the TRUE peak is still below it only through earlier gain reduction near 4 kHz, where sample peaks under-read the true peak by up to 1/cos(pi 4000/12500) = 5.4 dB: it never acts where the true-peak limiter would not, but it engages more smoothly/earlier on high tones [M]"}
+    guard_6db: {placement: "RECOMMENDED: a scaling guard at ceiling + 6 dB (sample domain, same gain law) before the FMAC, today's true-peak limiter unchanged after it: the guard only touches samples whose true peak is >= 2 x ceiling, where the true-peak limiter cuts >= 6 dB anyway; input scale 0.999/(2 ceiling kappa) = 1.14",
+                err_inband_dbfs: -99.9, err_re_tone_db: {m40: -59.9, m12: -88.3, m60: -39.6}, D17_chain_thdn_m40_db: "-49.3 -> -48.9 (limit -45): passes", conf: M}
+  cycles:   # static model (fw/tools/cycles.py, hi), output stage = 19.5k cycles/hop in every variant
+    removed_from_cpu: "interpolator MACs 5.0k + phase loop 0.9k + history shift 0.8k = ~6.7k cycles/hop"
+    added_on_cpu: "guard 8 samples ~0.1k; float -> q1.15 of 8 inputs ~0.05k; q1.15 -> float of 128 outputs (LDRSH + VMOV + VCVT) ~0.5k; 16 x (X2_BASE write, PARAM START/stop, DMA re-arm) ~0.6k if the CPU drives the phase switch = ~1.3k"
+    net: "~5.4k cycles/hop = ~8.4 MHz (+V4 overhead ~9 MHz) on every variant: B 82.7-105.9 -> ~74-97 MHz, slim 55.8-71.1 -> ~47-62, A 43.5-54.5 -> ~35-45 (static; QEMU instruction counts say the static model runs 13-15 % high, see FWSIM-R47)"
+    fmac_busy: "16 runs x (8 outputs x 10 MAC + ~4 cycles start/drain) ~1.3-1.5k FMAC clocks per hop [L: 1 MAC/clock] = ~4 % of a 0.64 ms hop at 55 MHz: runs in parallel with the FFT"
+  dma_timing_plan:
+    - "GPDMA ch A (memory -> FMAC_WDATA, halfword): per phase 17 q1.15 samples (9 history + 8 new) from a RAM ring; FMAC X1 FULL_WM/flow control paces it"
+    - "GPDMA ch B (FMAC_RDATA -> memory): 8 outputs per phase into an interleaved 128-sample buffer (2D addressing on GPDMA ch 12-15: destination stride 16 halfwords) so the CPU reads natural order"
+    - "phase switch (X2_BASE, START) by the CPU: 16 short register sequences per hop (~40 cycles each); a GPDMA linked list writing FMAC_X2BUFCFG/PARAM is possible but not worth it at 0.6k cycles"
+    - "order per hop: algorithm (FFT etc.) -> 8 samples -> +6 dB guard + float->q1.15 -> kick FMAC (16 phases, ~1.5k FMAC clocks) while the CPU finishes band bookkeeping -> CPU waits on ch B transfer-complete -> true-peak check + shaper (CPU) -> CCR (TIM1 DMA as today). Latency +<= 30 us"
+  verdict: "YES with a +6 dB scaling guard before the FMAC (true-peak limiter unchanged after it on the CPU); NO with the raw stream as today (D17 THD+N -38.7 dB fails). Saves ~9 MHz on every variant; does not by itself reach the V4 budgets"
+
+shaper_on_fmac:
+  verdict: "NO"
+  why: "the 3rd-order error-feedback shaper feeds back e = q - v, where q is the QUANTISED value of the current sample (201 levels + TPDF dither): the FMAC IIR is a linear direct-form-1 recursion y = B.x + A.y' with no quantiser inside the loop, so it cannot produce e sample by sample; running it one sample per FMAC start (128-512 starts per hop) costs more CPU than the 7 k cycles it would save. Precision is moot (e fits q1.15 easily)"
+  conf: H
+
+cordic:
+  synthesis_sin: {use: "oscillator bank sin(phase): the uint32 phase IS the CORDIC q1.31 angle (theta/pi) - write phase, read sin, VCVT #31", cost: "~8-10 cycles per sample (6-cycle CORDIC, store/load overlap) vs ~11-13 for the table + interpolation", saves: "~0.7k cycles/hop (B), ~0.4k (slim)", precision: "q1.31 ~2^-19 after 24 iterations, better than the table's 4.7e-6", verdict: "small win, later (changes L1 at the 1e-6 level; dsp_out_err stays < -60 dB [M])"}
+  other: "sqrt (VSQRT 14 cycles in b_update, 28/hop) and ln (already replaced by the per-band series) gain nothing"
+
+integration_map_crosscheck:
+  touches: [docs/sim/firmware-emulation.yaml FWSIM-R47, R14 F1 (limiter placement), R15 (true-peak bound kept by the CPU check), docs/system/sub-processing.md (DMA channel use, FMAC/CORDIC currently unused peripherals)]
+  design_change: "none yet (research). Adopting it is a firmware change (two-stage limiter, GPDMA 2 channels, FMAC clock enable); no hardware or pin change"

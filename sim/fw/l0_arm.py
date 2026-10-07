@@ -31,17 +31,17 @@ QEMU = ["qemu-system-arm", "-M", "mps2-an505", "-nographic", "-monitor", "none",
         "-semihosting-config", "enable=on,target=native"]
 
 
-def build():
+def build(defines=()):
     core = [p for p in fwsim.CORE if p.stem not in ("app", "knob_store")]          # no HAL users in the L0 image
     srcs = core + sorted((FW / "port_qemu").glob("*.c"))
     h = hashlib.sha256()
     for p in srcs + sorted(p for d in ("core", "gen", "hal") for p in (FW / d).glob("*.h")) + [FW / "port_qemu/an505.ld"]:
         h.update(p.read_bytes())
-    h.update(" ".join(fwsim.ARM_FLAGS).encode())
+    h.update(" ".join(fwsim.ARM_FLAGS + list(defines)).encode())
     elf = OUT / f"l0_an505_{h.hexdigest()[:12]}.elf"
     if not elf.exists():
         OUT.mkdir(parents=True, exist_ok=True)
-        cmd = ["arm-none-eabi-gcc", *fwsim.ARM_FLAGS, *fwsim.WARN, "-Wno-conversion", *fwsim.INC, *map(str, srcs),
+        cmd = ["arm-none-eabi-gcc", *fwsim.ARM_FLAGS, *defines, *fwsim.WARN, "-Wno-conversion", *fwsim.INC, *map(str, srcs),
                "-T", str(FW / "port_qemu/an505.ld"), "-nostartfiles", "--specs=nano.specs", "-Wl,--gc-sections", "-o", str(elf)]
         p = subprocess.run(cmd, capture_output=True, text=True)
         if p.returncode:

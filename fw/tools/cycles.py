@@ -137,7 +137,7 @@ def adjusted(cnt):
 def total(cost_rows, cnt):
     ranges = cnt["__ranges__"]
     cnt = adjusted({k: v for k, v in cnt.items() if k != "__ranges__"})
-    lo = hi = 0.0
+    lo = hi = ins = 0.0
     per_fn = {}
     prev = {}
     for fn, f, ln, clo, chi in cost_rows:
@@ -152,9 +152,11 @@ def total(cost_rows, cnt):
         prev[fn] = c
         lo += clo * c
         hi += chi * c
+        ins += c
         a = per_fn.setdefault(fn, [0.0, 0.0])
         a[0] += clo * c
         a[1] += chi * c
+    total.last_insns = ins
     return lo, hi, per_fn
 
 
@@ -174,13 +176,15 @@ def estimate(vector="sweep", transient=0):
             c1 = line_counts(tmp, words, False, kn, h1)
             c2 = line_counts(tmp, words, False, kn, h2)
             lo1, hi1, f1 = total(cr, c1)
+            i1 = total.last_insns
             lo2, hi2, f2 = total(cr, c2)
+            i2 = total.last_insns
             dh = h1 - h2
             lo, hi = (lo1 - lo2) / dh, (hi1 - hi2) / dh
             fns = {k: [round((f1[k][0] - f2.get(k, [0, 0])[0]) / dh), round((f1[k][1] - f2.get(k, [0, 0])[1]) / dh)] for k in f1}
             fns = {k: x for k, x in sorted(fns.items(), key=lambda kv: -kv[1][1]) if x[1] > 0}
             used = [k for k in fns]
-            res[v] = {"cycles_hop": [round(lo), round(hi)], "MHz_dsp": [round(lo * HOPS_PER_S / 1e6, 1), round(hi * HOPS_PER_S / 1e6, 1)],
+            res[v] = {"cycles_hop": [round(lo), round(hi)], "insns_hop_static": round((i1 - i2) / dh), "MHz_dsp": [round(lo * HOPS_PER_S / 1e6, 1), round(hi * HOPS_PER_S / 1e6, 1)],
                       "MHz_with_V4_overhead": [round(lo * HOPS_PER_S / 1e6 * 1.03 + 0.5, 1), round(hi * HOPS_PER_S / 1e6 * 1.08 + 0.5, 1)],
                       "per_function": fns, "code_bytes_used": sum(size.get(k, 0) for k in used),
                       "vector": vector, "hops_measured": dh, "v4": V4[v]}

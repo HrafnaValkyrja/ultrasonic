@@ -1,7 +1,7 @@
 /* fw/port_qemu/l0_main.c: ARM L0 driver (FWSIM-R7) on QEMU mps2-an505 (Cortex-M33 + FPv5-SP + DSP, as the U575). Runs the SAME
  * fw/core objects as the product build (fwsim ARM_FLAGS) over a golden vector and writes every CCR word and tap through semihosting;
  * sim/fw/l0_arm.py compares the bytes with the host build. Not product firmware: no HAL, no peripherals.
- * l0_in.bin : u32 magic 'FWL0', n_hops, d2, t0_us_lo, t0_us_hi, n_knobs, then n_knobs x (u32 id, i32 value), then the words.
+ * l0_in.bin : u32 magic 'FWL0', n_hops, d2 (bit 0; bits 8..: hops not counted in L0_COUNT builds), t0_us_lo, t0_us_hi, n_knobs, then n_knobs x (u32 id, i32 value), then the words.
  * l0_out.bin: per hop: u16 ccr[n] (n = 128*200/ARR), f32 dsp[8], band[28], floor[28], peak, norm[3], u32 sq, clamp. */
 #include <stdint.h>
 #include <string.h>
@@ -37,6 +37,15 @@ static void s_exit(uint32_t code)
     for (;;) {}
 }
 
+#if defined(L0_COUNT)
+/* instruction counting (FWSIM-R47 E2): QEMU -icount shift=0 advances virtual time 1 ns per guest instruction; SysTick (processor clock)
+ * counts that virtual time, so ticks around fw_hop x (instructions per tick, calibrated with a 2-instruction loop) = instructions. */
+#define SYST_CSR (*(volatile uint32_t *)0xE000E010u)
+#define SYST_RVR (*(volatile uint32_t *)0xE000E014u)
+#define SYST_CVR (*(volatile uint32_t *)0xE000E018u)
+static uint32_t ticks_between(uint32_t a, uint32_t b) { return (a - b) & 0xFFFFFFu; }   /* down-counter */
+#endif
+
 static fw_state_t st;
 static int32_t words[2u * FW_HOP_N];
 static uint8_t obuf[64u * 1024u];
@@ -58,14 +67,34 @@ int main(void)
     }
     fw_init(&st, &k, 0u);
     uint64_t t0 = (uint64_t)hdr[3] | ((uint64_t)hdr[4] << 32);
-    uint32_t per_in = hdr[2] ? 2u * FW_HOP_N : FW_HOP_N, fill = 0;
+#if defined(L0_COUNT)
+    SYST_RVR = 0xFFFFFFu;
+    SYST_CVR = 0u;
+    SYST_CSR = 5u;                                                 /* enable, processor clock, no interrupt */
+    uint32_t c0 = SYST_CVR;
+    __asm__ volatile("mov r0, #0x10000\n1: subs r0, r0, #1\n bne 1b" ::: "r0", "cc");   /* 65536 x 2 instructions */
+    uint32_t calib = ticks_between(c0, SYST_CVR);
+    uint64_t ticks = 0u;
+    uint32_t counted = 0u, skip = hdr[2] >> 8;                     /* hops before `skip` (power-on hold) are not counted */
+#endif
+    uint32_t per_in = (hdr[2] & 1u) ? 2u * FW_HOP_N : FW_HOP_N, fill = 0;
     for (uint32_t h = 0; h < hdr[1]; h++) {
         if (s_read(hi, words, per_in * 4u) != 0)
             s_exit(5u);
         fw_poll(&st, t0 + (uint64_t)st.hop_count * 640u);
         uint16_t ccr[FW_CCR_MAX_PER_HOP];
         fw_taps_t t;
-        size_t n = hdr[2] ? fw_hop_d2(&st, words, ccr, FW_CCR_MAX_PER_HOP, &t) : fw_hop(&st, words, ccr, FW_CCR_MAX_PER_HOP, &t);
+#if defined(L0_COUNT)
+        uint32_t a = SYST_CVR;
+#endif
+        size_t n = (hdr[2] & 1u) ? fw_hop_d2(&st, words, ccr, FW_CCR_MAX_PER_HOP, &t) : fw_hop(&st, words, ccr, FW_CCR_MAX_PER_HOP, &t);
+#if defined(L0_COUNT)
+        uint32_t bb = SYST_CVR;
+        if (h >= skip) {
+            ticks += ticks_between(a, bb);
+            counted++;
+        }
+#endif
         uint32_t rec = (uint32_t)n * 2u + (8u + 28u + 28u + 1u + 3u) * 4u + 8u;
         if (fill + rec > sizeof obuf) {
             s_write(ho, obuf, fill);
@@ -83,6 +112,11 @@ int main(void)
         fill += rec;
     }
     s_write(ho, obuf, fill);
+#if defined(L0_COUNT)
+    uint32_t rec[4] = {(uint32_t)ticks, (uint32_t)(ticks >> 32), counted, calib};
+    int32_t hc = s_open("l0_count.bin", 5u);
+    s_write(hc, rec, sizeof rec);
+#endif
     s_exit(0u);
     return 0;
 }
