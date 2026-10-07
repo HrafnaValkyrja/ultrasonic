@@ -22,7 +22,7 @@
   "PHYSICAL": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected",
+   "note": "UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
@@ -99,7 +99,7 @@
   "SUB-DEBUG-TEST": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "OUT-1/DBG-5: option D (2f lock-in on R21 supply current + 100k offset) verified in sim/checks/selftest_lockin.py: -12 dBFS |Z|<=1.9 %, phase<=0.7 deg; -22 dBFS <=3 %/3.4 deg at 0.25 s; -32 unusable; offset R still to add (router item OUT-1B)",
+   "note": "UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only",
    "stamp": {
     "block:DEBUG": "eb54d1edb852e4fd",
     "block:SELFTEST": "b91fae734845754d",
@@ -149,7 +149,7 @@
   "SUB-UI": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change",
+   "note": "UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only",
    "stamp": {
     "block:UI": "2e30cc3f141e491d",
     "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
@@ -587,7 +587,7 @@
   "R-UI-BODY": {
    "by": "backlog-agent",
    "date": "2026-10-07",
-   "note": "VHB-TOL: dims_r2.switch_stack VHB tol 0.025 [A] -> 0.0375 (3M VHB 4914 TDS 2024-09, +-15 %); fixed worst -0.185/+0.275 -> -0.198/+0.287, RSS -0.003/+0.193 -> -0.007/+0.197, pocket ceiling worst 0.095 -> 0.082, F-gap slack worst 0.0125; selective fit unchanged 0.005-0.135; no geometry change",
+   "note": "UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only",
    "stamp": {
     "ref:SW1": "6a5226a0b24dd9c5",
     "sym:hw/mech/dims_r2.py::POCKET": "75123b323bc1f0df",

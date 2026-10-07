@@ -329,3 +329,13 @@
 - 2026-10-07 12:58 review R-ARM-PAD by backlog-agent: PAD-5: frame.FASTENERS M1.2_pan pilot 0.95 -> 1.0 (hardware.md 74 % engagement); only pad.py uses it; pad re-run: cavity-pilot wall 0.775 -> 0.75, nothing else; physical/reg-arm unaffected
 - 2026-10-07 12:58 checkin PHYSICAL by backlog-agent
 - 2026-10-07 12:58 checkin REG-PAD by backlog-agent
+- 2026-10-07 12:59 checkout PHYSICAL by backlog-agent: DBG-16 lid-bond gate + UI-1 puck fit procedure in the assembly order
+- 2026-10-07 12:59 checkout SUB-UI by backlog-agent: close UI-1 / DBG-16 pointers
+- 2026-10-07 12:59 checkout SUB-DEBUG-TEST by backlog-agent: close UI-1 / DBG-16 pointers
+- 2026-10-07 12:59 review PHYSICAL by backlog-agent: UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only
+- 2026-10-07 12:59 review SUB-UI by backlog-agent: UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only
+- 2026-10-07 12:59 review SUB-DEBUG-TEST by backlog-agent: UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only
+- 2026-10-07 12:59 review R-UI-BODY by backlog-agent: UI-1 puck fit procedure + DBG-16 lid-bond gate written into physical.md assembly steps 8-9; docs only
+- 2026-10-07 12:59 checkin PHYSICAL by backlog-agent
+- 2026-10-07 12:59 checkin SUB-UI by backlog-agent
+- 2026-10-07 12:59 checkin SUB-DEBUG-TEST by backlog-agent

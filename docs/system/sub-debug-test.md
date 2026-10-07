@@ -224,6 +224,7 @@ option_bytes: "set nSWBOOT0=0, nBOOT0=1 only once a write-protected boot stub wo
 - id: DBG-16
   t: "SWD is gone after the board->lid bond: a bricked app on a bonded pod means peeling/sawing the board off the VHB (physical.md reopening table: lid reprint). DFU-via-stub must be proven on the bare board (step 6) before step 8"
   close: "bring-up gate in physical.md: no lid bond before step 6 passes; boot stub write-protected (option_bytes)"
+  status: "gate written into physical.md assembly step 8 (2026-10-07); remains: boot stub + option-byte WRP (fw agent), step 6 on board 1"
 - id: DBG-17
   t: "B-face access while the board hangs from the lid relies on the arm/dock/cell wires' slack (lid lifts the board on its wires); slack length not designed"
   close: "wire-route design (physical.md, reg-board stowage zone)"
