@@ -1,13 +1,16 @@
-"""Read the mic-port geometry from the sources of truth, without executing them.
+"""Read the mic-port geometry from the sources of truth, without executing CAD.
 
- * lid / shell:  hw/mech/shell_r1.py  (AST: module constants + lid_base() bore / hex-window / lip / rib calls)
+Which design: hw/current.yaml via tools/current.py (2026-10-07). Phase 2 (default): duct stack from hw/mech/dims_r2.py
+(the CAD-free constants shell_r2.py builds from; imported, never AST-parsed) and U2's hole on the Phase-2 routed board.
+Reference (env ULTRASONIC_DESIGN=revg): the Rev F path below, unchanged.
+ * lid / shell:  hw/mech/shell_r1.py  (revg; AST: module constants + lid_base() bore / hex-window / lip / rib calls)
  * board hole:   the NPTH pad of footprint U2 in a .kicad_pcb (pcbnew, read-only) -> position, drill, board thickness;
                  F-side footprints inside the lid-board gap (obstacles, reported only)
  * mic port:     datasheet constants (D0.325 +-0.05) and assumptions marked ASSUMED
 
 Layout-agnostic: nothing here is hard-wired except fall-backs; every field records where it came from
-(Geom.src) and a fall-back is flagged in Geom.warnings.  Re-run after ANY change to shell_r1.py or the board.
-Board choice: --board / env ACO_BOARD, else the NEWEST (mtime) of DEFAULT_BOARDS.
+(Geom.src) and a fall-back is flagged in Geom.warnings.  Re-run after ANY change to the shell (dims_r2.py) or the board.
+Board choice: --board / env ACO_BOARD, else hw/current.yaml `board` (no candidate list, no mtime guess).
 All lengths in this module's output are metres.
 """
 from __future__ import annotations
@@ -21,9 +24,16 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[2]
 MM = 1e-3
 
-SHELL = REPO / "hw/mech/shell_r1.py"
-DEFAULT_BOARDS = ["hw/pod/draft_r1/pod_r1_routed.kicad_pcb", "hw/pod/draft_r1/pod_r1_placed.kicad_pcb",
-                  "hw/pod/draft_r1/fanout/pod_r1_routed.kicad_pcb"]
+SHELL = REPO / "hw/mech/shell_r1.py"          # the revg (reference) shell; Phase 2 reads current().shell_dims
+
+
+def design(name=None):
+    """hw/current.yaml through tools/current.py (env ULTRASONIC_DESIGN=revg selects the reference)."""
+    import sys  # noqa: PLC0415
+    if str(REPO / "tools") not in sys.path:
+        sys.path.insert(0, str(REPO / "tools"))
+    from current import current  # noqa: PLC0415
+    return current(name)
 
 
 @dataclass(frozen=True)
@@ -207,17 +217,81 @@ def probe_board(board_path, port_xy_hint=None, gap_box=None):
                 f_side_bbox_area_mm2=round(fparts, 1), f_side_nearest=near[:4])
 
 
-def find_board(explicit=None):
+def find_board(explicit=None, d=None):
     if explicit:
         return explicit if Path(explicit).exists() else None
     if os.environ.get("ACO_BOARD"):
         return os.environ["ACO_BOARD"]
-    cands = [REPO / c for c in DEFAULT_BOARDS if (REPO / c).exists()]
-    return str(max(cands, key=os.path.getmtime)) if cands else None
+    b = (d or design()).board
+    return str(b) if b.exists() else None
 
 
-def load(board=None, quiet=True) -> Geom:
-    src, warn, info = {}, [], {}
+def import_dims(path):
+    """Import a CAD-free dims module (hw/mech/dims_r2.py) by path; it puts hw/mech on sys.path itself (frame.py)."""
+    import importlib.util  # noqa: PLC0415
+    spec = importlib.util.spec_from_file_location(Path(path).stem, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def load_r2(d, board=None) -> Geom:
+    """Phase 2 (ECR-0018): reamed D1.0 lid bore + hex window (mesh seat) -> D1.0 hole in the 0.25 VHB across the 0.30 F gap
+    (sealed) -> board hole D0.6 through 0.8. Numbers from d.shell_dims (dims_r2.py); offset from U2's NPTH on the board."""
+    src, warn, info = {}, [], {"design": d.id}
+    D = import_dims(d.shell_dims)
+    rel = lambda p: str(Path(p).resolve().relative_to(REPO))  # noqa: E731
+    area = 6 / 2 * D.HEX_R ** 2 * math.sin(2 * math.pi / 6)
+    floor_y = D.Y_TOP - D.HEX_DEPTH
+    g = Geom().with_(a_recess=math.sqrt(area / math.pi) * MM, hex_circum_r=D.HEX_R * MM, d_recess=D.HEX_DEPTH * MM,
+                     a_bore=D.DUCT_D / 2 * MM, l_bore=(floor_y - D.Y_LID_IN) * MM, h_gap=D.F_GAP * MM, t_board=D.PCB_T * MM,
+                     a_hole=D.MIC_HOLE_D / 2 * MM,
+                     # no open channel in Phase 2 (VHB fills the F gap); the rectangle is the VHB outline, used only by open-gap what-ifs
+                     cav_lx=(D.PCB_L - 0.4) * MM, cav_lz=(D.PCB_H - 0.4) * MM,
+                     bore_cx=(D.MIC[0] - D.PCB["x0"] - 0.2) * MM, bore_cz=(D.MIC[1] - D.PCB["z0"] - 0.2) * MM)
+    src["lid"] = (f"{d.rel['shell_dims']} (shell {d.rel['shell']}): bore D{D.DUCT_D} reamed, lid inner face y {D.Y_LID_IN:.2f} -> window floor "
+                  f"y {floor_y:.2f} (bore {floor_y - D.Y_LID_IN:.2f}), hex R {D.HEX_R} x {D.HEX_DEPTH} deep, sealed VHB duct {D.F_GAP} (F gap), "
+                  f"PCB y {D.PCB['y0']:.2f}-{D.PCB['y1']:.2f}, MIC ({D.MIC[0]:.2f}, {D.MIC[1]:.2f})")
+    src["gap_channel"] = "Phase 2: none (VHB full-face bond, D1.0 duct hole); open-gap scenarios use the VHB outline as a what-if"
+    do = D.duct_offsets()
+    info["duct_locating"] = dict(method="stepped gauge pin through the reamed bore into the board hole during bonding (shell_r2 duct_offsets)",
+                                 worst_mm=do["worst_with_gauge_pin"], limit_mm=do["limit_R_ACO_P5"], walls_only_worst_mm=do["worst_walls_only"],
+                                 src=f"{d.rel['shell_dims']}:duct_offsets [A] tolerances")
+    bpath = find_board(board, d)
+    try:
+        if bpath is None:
+            raise FileNotFoundError(f"no board at {d.rel['board']}")
+        pr = probe_board(bpath)
+        px, py = pr["port_xy"]
+        dx = D.PCB["x0"] + px - D.MIC[0]
+        # one board, two pods (O16-5): board +y = pod +z in one pod (dims_r2.bpt), -z in the mirrored one; take the worse
+        dz = max([D.PCB["z0"] + py - D.MIC[1], D.PCB["z1"] - py - D.MIC[1]], key=abs)
+        off = math.hypot(dx, dz)
+        g = g.with_(offset=off * MM, off_ang=(math.atan2(dz, dx) if off > 1e-6 else math.pi), a_hole=pr["drill"] / 2 * MM)
+        import time as _t
+        src["board"] = (f"{rel(bpath)} (mtime {_t.strftime('%Y-%m-%d %H:%M', _t.localtime(os.path.getmtime(bpath)))}): U2 NPTH D{pr['drill']} at board "
+                        f"{pr['port_xy']} (pcbnew), U2 origin {pr['body_xy']}, rot {pr['rot']}, {pr['layer']}; port-to-duct offset dx {dx:+.2f} dz {dz:+.2f} mm "
+                        f"(dims_r2 MIC is read from {d.rel['board']}, so the routed board gives 0 by construction; another board shows its real offset)")
+        info.update(gasket_seat_items_within_r1p6_mm=pr["gasket_seat_r1p6"], board_thickness_setting_mm=pr["thickness_setting"],
+                    f_side_bbox_area_mm2=pr["f_side_bbox_area_mm2"], board_area_mm2=round(pr["board_wh"][0] * pr["board_wh"][1], 1),
+                    f_side_nearest_to_port=pr["f_side_nearest"], board_file=rel(bpath))
+        if abs(pr["thickness_setting"] - D.PCB_T) > 0.05:
+            warn.append(f"board file general thickness {pr['thickness_setting']} mm != shell PCB {D.PCB_T:.2f} mm: the fab order must say the shell value")
+        if off > do["limit_R_ACO_P5"] + 1e-9:
+            warn.append(f"board port is {off:.2f} mm from the duct axis (limit {do['limit_R_ACO_P5']:.2f} = r_duct - r_hole; ECR-0011 class)")
+    except Exception as e:                                # noqa: BLE001
+        warn.append(f"board not probed ({e!r}): port offset = 0 (duct follows the hole by construction), D{D.MIC_HOLE_D} hole")
+        src["board"] = f"FALLBACK offset 0, D{D.MIC_HOLE_D} hole"
+    src["mic"] = "datasheet Rev B-1 p.9: AP D0.325 +-0.05; port length, standoff ASSUMED"
+    return replace(g, src=src, warnings=tuple(warn), info=info)
+
+
+def load(board=None, quiet=True, design_name=None) -> Geom:
+    """Geometry of the selected design (hw/current.yaml; env ULTRASONIC_DESIGN=revg for the Rev F reference)."""
+    d = design(design_name)
+    if not d.is_reference:
+        return load_r2(d, board)
+    src, warn, info = {}, [], {"design": d.id}
     g = Geom()
     pcb = dict(x0=30.6, x1=64.6, y0=12.1, y1=12.9, z0=-8.6, z1=4.4)
     mic_x, mic_z = 34.5, -2.1
@@ -257,7 +331,7 @@ def load(board=None, quiet=True) -> Geom:
     except Exception as e:                                # noqa: BLE001
         warn.append(f"shell_r1.py not parsed ({e!r}): lid dimensions are the last-known constants (2026-10-02)")
         src["lid"] = "FALLBACK constants (shell_r1.py 2026-10-02)"
-    bpath = find_board(board)
+    bpath = find_board(board, d)
     try:
         if bpath is None:
             raise FileNotFoundError("no .kicad_pcb")

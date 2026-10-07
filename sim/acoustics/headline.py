@@ -7,8 +7,10 @@ sc = json.loads((OUT / "selfcheck.json").read_text())
 p = json.loads((OUT / "port_results.json").read_text())
 b = json.loads((OUT / "bone_results.json").read_text())
 print("selfcheck", sc["verdict"], "wall", sc["wall_s"], "s")
-print("board", p["geometry_info"].get("board_file"), "| port offset", p["geometry"]["offset"], "mm | warnings", p["warnings"])
-for n in ("as_built", "as_built_channel", "chimney_d1.0", "gasket_id2.1", "size_s1", "size_s2"):
+dflt = p.get("default_scenario", "as_built")
+print("design", p.get("design"), "| default scenario", dflt, "(port_response.json) | board", p["geometry_info"].get("board_file"),
+      "| port offset", p["geometry"]["offset"], "mm | warnings", p["warnings"])
+for n in dict.fromkeys((dflt, "as_built", "as_built_channel", "chimney_d1.0", "gasket_id2.1", "size_s1", "size_s2")):
     s = p["scenarios"][n]
     f = s["feat"]
     mc = p["mc_summary"].get(n, {}).get("mean_20_96_db")

@@ -2,7 +2,9 @@
 
     python3 sim/acoustics/run_port.py [--board path.kicad_pcb] [--mc 60] [--no-plot]
 Writes sim/acoustics/out/: port_response.json (+ port_response_<design>.json), port_results.json, port_*.png (dark).
-Fenced smoke: ~20 s, < 0.6 GB.  Layout-agnostic: geometry from hw/mech/shell_r1.py (AST) and the newest board's U2 NPTH (pcbnew).
+Fenced smoke: ~20 s, < 0.6 GB.  Design from hw/current.yaml (tools/current.py): Phase 2 = hw/mech/dims_r2.py duct stack + the routed
+board's U2 NPTH (pcbnew); ULTRASONIC_DESIGN=revg = shell_r1.py (AST) + the Rev F board. port_response.json = the design's scenario
+(current().acoustic_scenario: phase2_r2; revg: as_built).
 """
 from __future__ import annotations
 
@@ -47,7 +49,13 @@ def in_pod_db(f, H):
 
 
 MC_DESIGNS = ("as_built", "as_built_channel", "chimney_d1.0", "gasket_id2.1", "phase2_r2")
-IF_FILES = {"as_built": "port_response.json", "chimney_d1.0": "port_response_chimney_d1.0.json", "gasket_id2.1": "port_response_gasket_id2.1.json"}
+DEFAULT_SCENARIO = None     # set in main(): hw/current.yaml acoustic_scenario (the design whose response the e2e chain consumes)
+IF_EXTRA = {"chimney_d1.0": "port_response_chimney_d1.0.json", "gasket_id2.1": "port_response_gasket_id2.1.json"}
+
+
+def if_files(default):
+    """port_response.json = the current design's scenario; the comparison designs keep their own files."""
+    return {default: "port_response.json", **{k: v for k, v in IF_EXTRA.items() if k != default}}
 
 
 def peaks(f, H, prominence=3.0, lo=5e3, hi=100e3):
@@ -196,7 +204,14 @@ def spec_checks(name, gg, oo, H, f, g_info, mc=None):
                     note="datasheet held flat at its 80 kHz value (+12.7 dB re 1 kHz) above 80 kHz: assumption"))
     # sealed duct: lateral tolerance stack vs the geometric rule offset <= r_duct - r_hole (the lumped duct cannot see offset)
     sl = g_info.get("board_slide_mm")
-    if oo.gap != "open" and sl:
+    loc = g_info.get("duct_locating")
+    if oo.gap != "open" and loc:                         # Phase 2: the gauge pin registers board and VHB to the reamed bore
+        allow = max(oo.a_chim - gg.a_hole, 0.0) / MM
+        worst = gg.offset / MM + loc["worst_mm"]
+        chk("S8-duct-alignment-stack", "sealed duct: nominal offset + gauge-pin locating residual <= r_duct - r_hole",
+            worst <= allow + 1e-9, f"worst {worst:.3f} mm (nominal {gg.offset / MM:.3f} + pin {loc['worst_mm']:.3f}, {loc['src']}) vs allowed {allow:.2f} mm; "
+            f"walls only (no pin) {loc['walls_only_worst_mm']:.3f} mm", SPEC["s8_rules"] + "; hw/mech/shell_r2.py duct_offsets", "derived")
+    elif oo.gap != "open" and sl:
         allow = max(oo.a_chim - gg.a_hole, 0.0) / MM
         dx_n = gg.offset / MM * math.cos(gg.off_ang)
         dz_n = gg.offset / MM * math.sin(gg.off_ang)
@@ -213,6 +228,9 @@ def main(argv):
     plot = "--no-plot" not in argv
     t0 = time.time()
     g = load_geom(board)
+    global DEFAULT_SCENARIO
+    DEFAULT_SCENARIO = __import__("geometry").design().acoustic_scenario or "as_built"
+    IF_FILES = if_files(DEFAULT_SCENARIO)
     f = F_GRID
     refs = ["ideal", "pcb:0.8:0.5", "pcb:1.6:0.8"]
     mics = {r: calibrate_mic(g, r) for r in refs}
@@ -354,10 +372,12 @@ def main(argv):
     for stale in ("port_response_chimney_id2.1.json", "port_response_chimney_aligned_id1.0.json"):
         (OUT / stale).unlink(missing_ok=True)
     res["files"] = [str((OUT / v).relative_to(REPO)) for v in IF_FILES.values()]
+    res["default_scenario"] = DEFAULT_SCENARIO
+    res["design"] = g.info.get("design")
 
     # ---- spec s8 / R14 checks
     res["spec_checks"] = {}
-    for name in ("as_built", "as_built_channel", "chimney_d1.0", "chimney_d1.0_hole1.0", "gasket_id2.1", "size_s1", "size_s2", "chimney_d1.0+mesh_mouth"):
+    for name in dict.fromkeys((DEFAULT_SCENARIO, "as_built", "as_built_channel", "chimney_d1.0", "chimney_d1.0_hole1.0", "gasket_id2.1", "size_s1", "size_s2", "chimney_d1.0+mesh_mouth")):
         gg, oo = sc[name]
         res["spec_checks"][name] = spec_checks(name, gg, oo, scen[name]["H"], f, g.info, res["mc_summary"].get(name))
 
@@ -370,7 +390,7 @@ def main(argv):
         plots(g, f, sc, scen, mc, sweeps)
     a = scen["as_built"]
     b = scen["chimney_d1.0"]
-    print(json.dumps(dict(wall_s=res["wall_s"], board=g.info.get("board_file"), offset_mm=round(g.offset / MM, 3), warnings=list(g.warnings),
+    print(json.dumps(dict(wall_s=res["wall_s"], design=g.info.get("design"), default_scenario=DEFAULT_SCENARIO, board=g.info.get("board_file"), offset_mm=round(g.offset / MM, 3), warnings=list(g.warnings),
                           as_built=a["feat"], as_built_channel_notch=scen["as_built_channel"]["feat"]["min_20_96_db"], chimney_d1_peaks=b["peaks"],
                           mc_as_built=res["mc_summary"]["as_built"]["mean_20_96_db"], mc_chimney=res["mc_summary"]["chimney_d1.0"]["mean_20_96_db"]), default=float))
     return res

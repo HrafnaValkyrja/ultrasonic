@@ -224,8 +224,11 @@ def size_variant(g: Geom, lid_mm: float, plate_mm: float, chim_mm: float, window
 
 
 def scenarios(g: Geom):
-    """Named designs.  g = the geometry read from shell_r1.py + the newest board (as built today)."""
+    """Named designs.  g = the CURRENT design's geometry (geometry.load: hw/current.yaml). Phase 2 (default): g is the r2 duct
+    stack, so `phase2_r2` = g as read (U2 hole offset from the board) and the as_built* / chimney / gasket names are what-ifs
+    on the r2 stack (as_built = the 0.30 F gap left OPEN, i.e. the VHB duct not sealed). revg: g = Rev F (shell_r1.py)."""
     a0 = g.with_(offset=0.0)
+    r2 = g.info.get("design") not in (None, "revg")       # g already is the Phase-2 stack: keep its measured offset
     sealed = lambda a, **kw: Opt(gap="chimney", a_chim=a, **kw)  # noqa: E731
     return {
         "as_built": (g, Opt()),                                                   # open 1.5 mm gap, walls absorbing (smooth limit)
@@ -237,8 +240,8 @@ def scenarios(g: Geom):
         "size_s2": (size_variant(g, 1.0, 0.0, 1.15, False), sealed(0.5e-3, recess=False)),   # S2: plate removed, 1.0 lid
         # Phase 2 (hw/mech/shell_r2.py, 2026-10-07): lid 0.8 + plate 0.7, hex window 0.8 deep, reamed D1.0 bore, then the
         # D1.0 hole in the 0.25 VHB across the 0.30 F gap (sealed), board hole D0.6; duct axis on the hole (gauge pin)
-        "phase2_r2": (size_variant(g, 0.8, 0.7, 0.30, True), sealed(0.5e-3)),
-        "phase2_r2+mesh_floor": (size_variant(g, 0.8, 0.7, 0.30, True), sealed(0.5e-3, mesh="floor")),
+        "phase2_r2": (g if r2 else size_variant(g, 0.8, 0.7, 0.30, True), sealed(0.5e-3)),
+        "phase2_r2+mesh_floor": (g if r2 else size_variant(g, 0.8, 0.7, 0.30, True), sealed(0.5e-3, mesh="floor")),
         "as_built+mesh_mouth": (g, Opt(mesh="mouth")),
         "chimney_d1.0+mesh_mouth": (a0, sealed(0.5e-3, mesh="mouth")),
         "chimney_d1.0+mesh_floor": (a0, sealed(0.5e-3, mesh="floor")),

@@ -2,10 +2,11 @@
 # Fenced smoke run of the acoustics scaffold: geometry read, self-checks (analytic limits, finite-channel modal sum, axisymmetric
 # FEM), mic-port designs + sweeps + Monte Carlo, bone-conduction network + sensitivity + T6 noise, then a headline print.
 # Read-only on the board and the shell.  Expect ~35 s and < 0.5 GB.
-#   sim/acoustics/smoke.sh [board.kicad_pcb]        (default: newest of hw/pod/draft_r1/{pod_r1_routed,pod_r1_placed,fanout/pod_r1_routed})
+#   sim/acoustics/smoke.sh [board.kicad_pcb]        (default: env ACO_BOARD, else hw/current.yaml board; ULTRASONIC_DESIGN=revg = Rev F)
 set -euo pipefail
 cd "$(dirname "$0")/../.."
 source tools/env.sh >/dev/null
+python3 tools/current.py | head -1   # which design this run uses
 BOARD_ARG=()
 [ $# -ge 1 ] && BOARD_ARG=(--board "$1")
 exec systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 \
