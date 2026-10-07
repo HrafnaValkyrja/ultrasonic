@@ -1,8 +1,7 @@
 """Silkscreen pass for the pod board: post-route, idempotent, never touches copper.
 
-KNOWN ISSUE (2026-10-03): re-running on an already-silked board can segfault inside pcbnew's SWIG bindings after the
-board drawings are removed; place_r1.py / place_r2.py only call it on freshly routed boards, where it works. Debug before
-relying on manual re-runs. Pin-1 dot list: sidecar <board>.silkdots (fresh boards compute it).
+FIXED 2026-10-07: re-runs used to segfault because BOARD.Remove() leaves SWIG wrappers that free items the board still
+references; BOARD.Delete() is the safe call (re-runs on both boards now exit 0 and are byte-identical). Pin-1 dot list: sidecar <board>.silkdots (fresh boards compute it).
 
     source tools/env.sh && python3 hw/pod/silk.py [board.kicad_pcb]
 
@@ -174,7 +173,7 @@ def strip(board, path):
     ours = [d for d in list(board.GetDrawings()) if d.GetLayer() in (pcbnew.F_SilkS, pcbnew.B_SilkS)]
     dots = dot_parts(board, path, bool(ours))
     for d in ours:
-        board.Remove(d)
+        board.Delete(d)
     for fp in board.GetFootprints():
         fab = pcbnew.B_Fab if fp.IsFlipped() else pcbnew.F_Fab
         silk = pcbnew.B_SilkS if fp.IsFlipped() else pcbnew.F_SilkS

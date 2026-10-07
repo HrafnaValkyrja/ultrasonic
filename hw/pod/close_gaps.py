@@ -111,6 +111,105 @@ def find_items(board, desc_pos):
     return out
 
 
+def net_islands(board, net):
+    """Copper items of one net grouped into connected islands (shapes touching on a shared layer; vias join all)."""
+    items = [t for t in board.GetTracks() if t.GetNetCode() == net]
+    items += [pd for f in board.GetFootprints() for pd in f.Pads() if pd.GetNetCode() == net]
+    parent = list(range(len(items)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+    for i, j in itertools.combinations(range(len(items)), 2):
+        for l in OUTER + (pcbnew.In1_Cu, pcbnew.In2_Cu):
+            if items[i].IsOnLayer(l) and items[j].IsOnLayer(l) and \
+               items[i].GetEffectiveShape(l).Collide(items[j].GetEffectiveShape(l), 0):
+                parent[find(i)] = find(j)
+                break
+    groups = {}
+    for i, it in enumerate(items):
+        groups.setdefault(find(i), []).append(it)
+    return list(groups.values())
+
+
+def l_paths(a, b):
+    yield [a, b]
+    yield [a, (b[0], a[1]), b]
+    yield [a, (a[0], b[1]), b]
+
+
+def via_spots(board, net, anc, radii=(0.0, 0.45, 0.6, 0.8, 1.0, 1.2, 1.5), n_ang=16):
+    """Legal (via + stub) spots near an anchor, as ((x, y), needs_via, stub_layer)."""
+    out = []
+    for r in radii:
+        for k in range(n_ang if r else 1):
+            a = 2 * math.pi * k / n_ang
+            pt = (anc[0] + r * math.cos(a), anc[1] + r * math.sin(a))
+            if r == 0 and pcbnew.F_Cu in anc[2]:
+                out.append((pt, False, None))
+                continue
+            circ = pcbnew.SHAPE_CIRCLE(pcbnew.VECTOR2I(mm(pt[0]), mm(pt[1])), mm(VIA_D / 2))
+            if not all(clear(board, net, l, circ) for l in OUTER):
+                continue
+            lay = next(iter(anc[2]))
+            if r:
+                seg = pcbnew.SHAPE_SEGMENT(pcbnew.VECTOR2I(mm(anc[0]), mm(anc[1])), pcbnew.VECTOR2I(mm(pt[0]), mm(pt[1])), mm(TRACK_W))
+                if not clear(board, net, lay, seg):
+                    continue
+            out.append((pt, True, lay if r else None))
+    return out
+
+
+def try_f_bridge(board, net, isl_a, isl_b, max_len):
+    """Hop over on F (the nearly empty lid face): legal via spots near the nearest anchors of each island, then a straight
+    or L path on F between a spot pair. Spots are screened first so the path search stays small."""
+    ca = [p for it in isl_a for p in anchors(it)]
+    cb = [p for it in isl_b for p in anchors(it)]
+    pairs = sorted(((math.hypot(x[0] - y[0], x[1] - y[1]), x, y) for x in ca for y in cb), key=lambda t: t[0])
+    seen = set()
+    for d, x, y in pairs[:12]:
+        if d > max_len or (x[:2], y[:2]) in seen:
+            continue
+        seen.add((x[:2], y[:2]))
+        sa, sb = via_spots(board, net, x), via_spots(board, net, y)
+        cands = sorted(((math.hypot(u[0][0] - w[0][0], u[0][1] - w[0][1]), u, w) for u in sa for w in sb), key=lambda t: t[0])
+        for _, u, w in cands[:200]:
+            for path in l_paths(u[0], w[0]):
+                segs, ok = [], True
+                for q, r in zip(path, path[1:]):
+                    if math.hypot(q[0] - r[0], q[1] - r[1]) < 1e-3:
+                        continue
+                    sg = try_segment(board, net, pcbnew.F_Cu, q, r)
+                    if sg is None:
+                        ok = False
+                        break
+                    segs += sg
+                if not ok:
+                    for t in segs:
+                        board.Remove(t)
+                    continue
+                added = list(segs)
+                for spot, anc in ((u, x), (w, y)):
+                    if spot[1]:
+                        v = try_via(board, net, spot[0])
+                        if not v:
+                            ok = False
+                            break
+                        added += v
+                        if spot[2] is not None:
+                            st = try_segment(board, net, spot[2], anc[:2], spot[0])
+                            if st is None:
+                                ok = False
+                                break
+                            added += st
+                if ok:
+                    return added
+                for t in added:
+                    board.Remove(t)
+    return None
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("board")
@@ -137,12 +236,13 @@ def main():
             for kind, l in plan:
                 if best is None or d < best[0]:
                     best = (d, kind, l, pa, pb)
-        if best is None:
-            print("  skip (no anchors within max-len):", [i["description"] for i in u["items"]])
-            continue
-        d, kind, layer, pa, pb = best
         added = None
-        if kind == "seg":
+        kind, d = "f-bridge", 0.0
+        if best is not None:
+            d, kind, layer, pa, pb = best
+        if best is None:
+            pass
+        elif kind == "seg":
             added = try_segment(board, net, layer, pa[:2], pb[:2])
         else:   # different faces: a via at one end, then a segment on the other end's face
             for at, other in ((pa, pb), (pb, pa)):
@@ -154,6 +254,13 @@ def main():
                         added = v + s
                         break
                     board.Remove(v[0])
+        if not added:                                    # fall back: hop over on the F face between the two islands
+            isl = net_islands(board, net)
+            ia = next((g for g in isl if any(items[0] is it or (it.m_Uuid.AsString() == items[0].m_Uuid.AsString()) for it in g)), None)
+            ib = next((g for g in isl if any(it.m_Uuid.AsString() == items[1].m_Uuid.AsString() for it in g)), None)
+            if ia is not None and ib is not None and ia is not ib:
+                added = try_f_bridge(board, net, ia, ib, a.max_len * 3)
+                kind = "f-bridge"
         if not added:
             print(f"  no clear path ({d:.2f} mm):", [i["description"] for i in u["items"]])
             continue
