@@ -18,8 +18,8 @@ phase2_board:   # src: ECR-0018 implementation log; hw/pod/draft_r2/out/check.js
   noise_model: {date: 2026-10-07, out: sim/noise/out_r2/budget.json, planes: "In1 GND + In2 +3V0", LN-M01_db: 26.5, LN-M01_worst_db: 14.0, LN-M02_db: 20.1, LN-M03_pct: 1.29 (PASS after hw/pod/kelvin_r21.py; was 3.31), LN-M04_mv: 0.127, LN-M05_uv: 8.7}
   shell: "hw/mech/shell_r2.py: hung from the lid on full-face VHB, x-stop, duct D1.0, SW1 pocket + puck kit, 6211 mm3"
   defaults: "2026-10-07: hw/current.yaml (board draft_r2/out/routed, netlist pod_mz2.net, bom bom_jlc_mz2.csv, shell shell_r2 / dims_r2) -> sim/noise, sim/acoustics, tools/checks, plm watches, sch.py, board_map, render_board"
-  checks_2026-10-07: {interfaces: "PASS mic-port/outline/inside/heights/board-nets; WARN switch stack, clamp-bands (VHB 31 % bonded), pins, rails, frame", bom_check: "PASS refs/netlist/footprints/nets/jlc-bom/selftest 61; WARN cost-bom (bom.py prices Rev G parts, ECR-0018)"}
-  open: ["VHB bond: one test-pad cut-out (TP1-TP6 incl. TP3 (9.3, 2.9), TP6 (24.0, 10.9)) keeps 31 % of the VHB; cut per pad or regroup the TPs (no ECR yet)", "re-price docs/build/bom.py for the MZ-2 parts (Y1, RT1, D4, R21; cost-bom WARN)", "Phase-2 rewrite of the docs/system bodies (pointer lines added 2026-10-07)"]
+  checks_2026-10-07: {interfaces: "PASS mic-port/outline/inside/heights/board-nets; PASS clamp-bands (per-pad VHB cut-outs, 91 % bonded); WARN switch stack, pins, rails, frame", bom_check: "PASS refs/netlist/footprints/nets/jlc-bom/selftest 61; WARN cost-bom (bom.py prices Rev G parts, ECR-0018)"}
+  open: ["re-price docs/build/bom.py for the MZ-2 parts (Y1, RT1, D4, R21; cost-bom WARN)", "Phase-2 rewrite of the docs/system bodies (pointer lines added 2026-10-07)"]
 ```
 
 

@@ -204,7 +204,7 @@ relations:
   - id: R-DEBUG-BOARD
     a: SUB-DEBUG-TEST
     b: REG-BOARD
-    what: "Phase 2: TP1-TP6 bare pads on F (TP1/2/4/5 row y 11.3, TP3 (9.3, 2.9), TP6 (24.0, 10.9)) in one VHB cut-out (interfaces.py clamp-bands: 31 % VHB bonded, WARN); TP7-TP10 dots on B by the mic; R1 PH3 pad = DFU tack point"
+    what: "Phase 2: TP1-TP6 bare pads on F (TP1/2/4/5 row y 11.3, TP3 (9.3, 2.9), TP6 (24.0, 10.9)) in per-pad 1.8 mm VHB cut-outs (interfaces.py clamp-bands: 91 % VHB bonded, PASS; 2026-10-07); TP7-TP10 dots on B by the mic; R1 PH3 pad = DFU tack point"
     watch: ["yaml:hw/pod/draft_r2/placement.yaml::TP1", "yaml:hw/pod/draft_r2/placement.yaml::TP2", "yaml:hw/pod/draft_r2/placement.yaml::TP3", "yaml:hw/pod/draft_r2/placement.yaml::TP4", "yaml:hw/pod/draft_r2/placement.yaml::TP5", "yaml:hw/pod/draft_r2/placement.yaml::TP6", "yaml:hw/pod/draft_r2/placement.yaml::TP7", "yaml:hw/pod/draft_r2/placement.yaml::TP8", "yaml:hw/pod/draft_r2/placement.yaml::TP9", "yaml:hw/pod/draft_r2/placement.yaml::TP10", "yaml:hw/pod/draft_r2/placement.yaml::R1", "glob:hw/lib/pod.pretty/TestPoint*.kicad_mod", "glob:hw/lib/pod.pretty/TestDot*.kicad_mod"]
   - id: R-PROC-BOARD
     a: SUB-PROCESSING
@@ -236,7 +236,7 @@ relations:
   - id: R-BOARD-BODY
     a: REG-BOARD
     b: REG-POD-BODY
-    what: "Phase 2: board 30 x 12 x 0.8 at pod x 30.55-60.55 hangs from the lid on full-face VHB (no clamp ribs, no foam); height bands B 1.4 / F 0.30 (SW1 pocket 0.90); F test pads in a VHB cut-out; coarse x-stop 0.25 (interfaces.py outline, clamp-bands, heights)"
+    what: "Phase 2: board 30 x 12 x 0.8 at pod x 30.55-60.55 hangs from the lid on full-face VHB (no clamp ribs, no foam); height bands B 1.4 / F 0.30 (SW1 pocket 0.90); F test pads in per-pad VHB cut-outs (91 % bonded); coarse x-stop 0.25 (interfaces.py outline, clamp-bands, heights)"
     watch: ["sym:hw/mech/dims_r2.py::PCB", "sym:hw/mech/dims_r2.py::B_GAP", "sym:hw/mech/dims_r2.py::VHB_T", "sym:hw/mech/dims_r2.py::X_STOP_GAP", "sym:hw/mech/dims_r2.py::POCKET", "sym:hw/mech/shell_r2.py::lid_base", "sym:hw/mech/shell_r2.py::vhb", "yaml:hw/pod/draft_r2/placement.yaml::TP1", "yaml:hw/pod/draft_r2/placement.yaml::TP2", "yaml:hw/pod/draft_r2/placement.yaml::TP3", "yaml:hw/pod/draft_r2/placement.yaml::TP4", "yaml:hw/pod/draft_r2/placement.yaml::TP5", "yaml:hw/pod/draft_r2/placement.yaml::TP6"]
   - id: R-BOARD-ARM
     a: REG-BOARD

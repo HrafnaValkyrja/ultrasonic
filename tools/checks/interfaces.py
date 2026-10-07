@@ -805,14 +805,15 @@ def check_inside(sh, brd, table):
 # ------------------------------------------------------------------------------------------- [clamp-bands]
 def vhb_cutouts(sh):
     """Phase 2 VHB cut-outs in board mm (x0, y0, x1, y1, what), as dims_r2/shell_r2 vhb() cuts them: SW1 pocket, one box round
-    every bare F pad, and the duct hole (as its bounding square, for area only)."""
+    each bare F pad (one square per pad, 2026-10-07), and the duct hole (as its bounding square, for area only)."""
     pcb, v, pk = sh["PCB"], sh["vhb"], sh["pocket"]
     bx, by = pk["centre"][0] - pcb["x0"], pk["centre"][1] - pcb["z0"]
     cuts = [(bx - pk["dx"] / 2, by - pk["dz"] / 2, bx + pk["dx"] / 2, by + pk["dz"] / 2, f"{pk['ref']} pocket")]
     if v["f_pads"]:
         r = v["tp_cut_r"]
-        xs, ys = [xy[0] for xy in v["f_pads"].values()], [xy[1] for xy in v["f_pads"].values()]
-        cuts.append((min(xs) - r, min(ys) - r, max(xs) + r, max(ys) + r, "test-pad cut-out (" + ",".join(sorted(v["f_pads"], key=nat)) + ")"))
+        for ref in sorted(v["f_pads"], key=nat):
+            x, y = v["f_pads"][ref]
+            cuts.append((x - r, y - r, x + r, y + r, f"{ref} cut-out"))
     mx, mz = sh["MIC"][0] - pcb["x0"], sh["MIC"][1] - pcb["z0"]
     cuts.append((mx - v["duct_d"] / 2, mz - v["duct_d"] / 2, mx + v["duct_d"] / 2, mz + v["duct_d"] / 2, "duct hole"))
     return cuts
@@ -863,8 +864,8 @@ def check_vhb(sh, brd, table):
         return Result("clamp-bands", FAIL, f"{len(bad)} F-face part(s) under the full-face VHB, outside every cut-out: {refs_str([b[0] for b in bad])}", d)
     head = f"Phase 2 (no clamp ribs; board on full-face VHB): all {nf} F-face parts sit in VHB cut-outs; {100 * frac:.0f} % of the VHB stays bonded"
     if frac < VHB_MIN_BOND:
-        return Result("clamp-bands", WARN, head + f" (< {100 * VHB_MIN_BOND:.0f} % ASSUMED threshold: the one test-pad cut-out spans "
-                      f"{cuts[1][2] - cuts[1][0]:.1f} x {cuts[1][3] - cuts[1][1]:.1f} mm; cut per pad or regroup the TPs; no ECR yet)", d, ["clamp-bands:vhb-bond"])
+        return Result("clamp-bands", WARN, head + f" (< {100 * VHB_MIN_BOND:.0f} % ASSUMED threshold: "
+                      f"{len(cuts)} cut-outs; shrink or regroup them)", d, ["clamp-bands:vhb-bond"])
     return Result("clamp-bands", PASS, head, d)
 
 
@@ -1721,8 +1722,8 @@ def selftest_cases(ctx):
     def vhb_bond():
         if not sh.get("vhb"):
             raise LookupError("revg: no VHB")
-        big = {**sh, "vhb": {**sh["vhb"], "f_pads": {"TPa": (0.3, 0.3), "TPb": (sh["PCB"]["x1"] - sh["PCB"]["x0"] - 0.3, sh["PCB"]["z1"] - sh["PCB"]["z0"] - 0.3)}}}
-        return Case("clamp-bands: test pads in opposite corners: one cut-out box removes the whole VHB", lambda: check_clamp(big, brd, table), WARN, "stays bonded")
+        big = {**sh, "vhb": {**sh["vhb"], "tp_cut_r": 6.0}}     # per-pad cut-outs blown up to 12 x 12 mm (board is 12 tall): most of the tape gone
+        return Case("clamp-bands: test-pad cut-outs grown to 12 mm squares: too little VHB left", lambda: check_clamp(big, brd, table), WARN, "stays bonded")
 
     def clamp_body():
         if sh.get("vhb"):

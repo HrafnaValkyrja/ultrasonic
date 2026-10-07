@@ -160,11 +160,11 @@ def vhb():
     v = box(PCB["x0"] + 0.2, PCB["x1"] - 0.2, Y_LID_IN - VHB_T, Y_LID_IN, PCB["z0"] + 0.2, PCB["z1"] - 0.2)
     v = v - ycyl(MIC[0], MIC[1], DUCT_D, Y_LID_IN - 1, Y_LID_IN + 1)
     v = v - box(SW[0] - POCKET["dx"] / 2, SW[0] + POCKET["dx"] / 2, Y_LID_IN - 1, Y_LID_IN + 1, SW[1] - POCKET["dz"] / 2, SW[1] + POCKET["dz"] / 2)
-    if F_PADS:                 # one strip round the F test-pad row: no adhesive on the pads
+    if F_PADS:                 # one square per bare F test pad (2026-10-07: a single box round all pads left 31 % bonded)
         r = TP_PAD_D / 2 + TP_CUT_MARGIN
-        xs = [bpt(*xy)[0] for xy in F_PADS.values()]
-        zs = [bpt(*xy)[1] for xy in F_PADS.values()]
-        v = v - box(min(xs) - r, max(xs) + r, Y_LID_IN - 1, Y_LID_IN + 1, min(zs) - r, max(zs) + r)
+        for xy in F_PADS.values():
+            x, z = bpt(*xy)
+            v = v - box(x - r, x + r, Y_LID_IN - 1, Y_LID_IN + 1, z - r, z + r)
     return v
 
 
@@ -411,9 +411,9 @@ def plan_png(c):
     ax.plot([], [], "s", ms=4, color=S[6], label="F: SW1 + bare TP1-TP6")
     if F_PADS:
         r = TP_PAD_D / 2 + TP_CUT_MARGIN
-        xs = [bpt(*xy)[0] for xy in F_PADS.values()]
-        zs = [bpt(*xy)[1] for xy in F_PADS.values()]
-        rect(min(xs) - r, max(xs) + r, min(zs) - r, max(zs) + r, fc="none", ec=S[6], lw=0.8, ls="--", label="VHB cut-out over F test pads")
+        for k, xy in enumerate(F_PADS.values()):
+            x, z = bpt(*xy)
+            rect(x - r, x + r, z - r, z + r, fc="none", ec=S[6], lw=0.8, ls="--", label="VHB cut-outs over F test pads" if k == 0 else None)
     ax.legend(loc="upper left", bbox_to_anchor=(1.01, 1.0), fontsize=7, frameon=False, labelcolor=plotstyle.TEXT)
     fig.tight_layout()
     fig.savefig(OUT / "plan.png", dpi=160)

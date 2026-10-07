@@ -68,13 +68,13 @@
    }
   },
   "REG-POD-BODY": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "ultrasonic-lead",
    "date": "2026-10-07",
-   "note": "2026-10-07: owns moved to the Phase-2 sources (dims_r2.py / shell_r2.py, MZ-2 package set); each doc got a dated 'Current design: Phase 2' line with the item's Phase-2 facts (from dims_r2.py, placement.yaml, gen.py MZ2, interfaces.py/bom_check/noise/acoustics runs of 2026-10-07). The doc BODIES still describe the Rev F/G reference and say so: Phase-2 body rewrite is an open item (reg-board.md phase2_board.open)",
+   "note": "2026-10-07: VHB cut-outs per test pad (shell_r2 vhb(), interfaces vhb_cutouts): bond 31 -> 91 %; both sides' text updated",
    "stamp": {
     "file:hw/mech/blade.py": "4f7507b58a9e9bcd",
     "file:hw/mech/dims_r2.py": "2e56e5d5e9675ad1",
-    "file:hw/mech/shell_r2.py": "14f58d3d08ac5836",
+    "file:hw/mech/shell_r2.py": "a3ccedbb85e74d28",
     "file:hw/mech/styles.py": "23dcb6bfe495f82f"
    }
   },
@@ -232,9 +232,9 @@
    }
   },
   "R-BOARD-BODY": {
-   "by": "claude (defaults switch, session 01Wg997D)",
+   "by": "ultrasonic-lead",
    "date": "2026-10-07",
-   "note": "2026-10-07: watches moved from hw/mech/shell_r1.py (reference) to hw/mech/dims_r2.py (CAD-free constants, values identical to shell_r2 before the split) + shell_r2.py solids; checked with interfaces.py on the routed board: mic-port PASS 0.000 mm (gauge pin 0.115 <= 0.20), switch WARN stack 0.20 vs 0.15, outline PASS, heights PASS (B 1.4, F 0.30, SW1 pocket 0.90), clamp-bands WARN (VHB 31 % bonded, open), frame WARN ECR-0001; USB-C keep-out not in shell_r2",
+   "note": "2026-10-07: VHB cut-outs per test pad (shell_r2 vhb(), interfaces vhb_cutouts): bond 31 -> 91 %; both sides' text updated",
    "stamp": {
     "sym:hw/mech/dims_r2.py::B_GAP": "9e0415c00f9dc49a",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
@@ -242,7 +242,7 @@
     "sym:hw/mech/dims_r2.py::VHB_T": "64d2b9d2ed88b422",
     "sym:hw/mech/dims_r2.py::X_STOP_GAP": "bf5c979b74f48fe8",
     "sym:hw/mech/shell_r2.py::lid_base": "856ca309404e120b",
-    "sym:hw/mech/shell_r2.py::vhb": "9d70919d0b2e0c71",
+    "sym:hw/mech/shell_r2.py::vhb": "aea744df4a11fad9",
     "yaml:hw/pod/draft_r2/placement.yaml::TP1": "8a363c7933bedfb6",
     "yaml:hw/pod/draft_r2/placement.yaml::TP2": "03b8740b06f6ac41",
     "yaml:hw/pod/draft_r2/placement.yaml::TP3": "74f8322693f68d65",
