@@ -44,26 +44,6 @@ fw_ccr_bounds_t fw_ccr_bounds(uint16_t arr, uint32_t amp_ppm)
     return b;
 }
 
-uint16_t fw_ccr_from_amp(float a, const fw_ccr_bounds_t *b, uint32_t *clamp_hits)
-{
-    float v = (a + 1.0f) * 0.5f * (float)b->arr;
-    if (!(v == v))                       /* NaN */
-        v = 0.5f * (float)b->arr;
-    if (v < (float)b->lo) {
-        v = (float)b->lo;
-        (*clamp_hits)++;
-    } else if (v > (float)b->hi) {
-        v = (float)b->hi;
-        (*clamp_hits)++;
-    }
-    uint16_t c = (uint16_t)(v + 0.5f);
-    if (c > b->hi)
-        c = b->hi;
-    if (c < b->lo)
-        c = b->lo;
-    return c;
-}
-
 float fw_db_to_amp(int32_t cdb)
 {
     if (cdb >= 0)

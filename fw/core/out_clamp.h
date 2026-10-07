@@ -17,7 +17,26 @@ typedef struct {
 uint32_t fw_amp_ppm_for_ma(int32_t i_ma);                          /* i * R_load / Vdd in ppm (fw/variants.yaml bridge) */
 uint32_t fw_out_amp_max_ppm(const fw_knobs_t *k);                  /* min(compile-time clamp, knob) */
 fw_ccr_bounds_t fw_ccr_bounds(uint16_t arr, uint32_t amp_ppm);     /* amp_ppm is capped at FW_VAR_AMP_MAX_PPM here too */
-uint16_t fw_ccr_from_amp(float a, const fw_ccr_bounds_t *b, uint32_t *clamp_hits);   /* a = V_diff/Vdd; NaN -> centre */
+/* a = V_diff/Vdd; NaN -> centre. Inline (called once per PWM period, 128-512 x per hop); still the only CCR writer in core. */
+static inline uint16_t fw_ccr_from_amp(float a, const fw_ccr_bounds_t *b, uint32_t *clamp_hits)
+{
+    float v = (a + 1.0f) * 0.5f * (float)b->arr;
+    if (!(v == v))                       /* NaN */
+        v = 0.5f * (float)b->arr;
+    if (v < (float)b->lo) {
+        v = (float)b->lo;
+        (*clamp_hits)++;
+    } else if (v > (float)b->hi) {
+        v = (float)b->hi;
+        (*clamp_hits)++;
+    }
+    uint16_t c = (uint16_t)(v + 0.5f);
+    if (c > b->hi)
+        c = b->hi;
+    if (c < b->lo)
+        c = b->lo;
+    return c;
+}
 float fw_db_to_amp(int32_t cdb);                                   /* table lookup, 0.1 dB steps, -80..0 dB; > 0 dB -> 1 */
 uint16_t fw_arr_for_khz(int32_t pwm_khz);                          /* 200 -> 200, 400 -> 100, 800 -> 50 (else 200) */
 #endif

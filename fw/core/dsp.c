@@ -28,6 +28,7 @@ static const float hb[FW_DSP_HB_N] = FW_DSP_HB_INIT;
 static const float a_hp[FW_DSP_A_HP_N] = FW_DSP_A_HP_INIT;
 static const float a_c[FW_DSP_A_C_N] = FW_DSP_A_C_INIT;
 static const float ntf_2cos[FW_DSP_NTF_2COS_N] = FW_DSP_NTF_2COS_INIT;
+static const float a_noise_sm[FW_DSP_A_NOISE_SM_N] = FW_DSP_A_NOISE_SM_INIT;
 
 _Static_assert(FW_DSP_INTERP_N == 16u * FW_INTERP_TPP, "interpolator table shape");
 _Static_assert(FW_DSP_A_C_N * 2u - 1u == FW_DSP_A_NC, "algorithm A FIR is symmetric, 288 folded taps");
@@ -109,6 +110,7 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr)
     /* algorithm A */
     d->a_lo_inc = (uint32_t)((((uint64_t)(uint32_t)k->a_lo_hz << 32) + 100000u) / 200000u);   /* round(f 2^32 / 200 kHz), exact */
     d->a_gate_lin = fw_db20_to_lin((float)k->gate_cdb * 0.01f);
+    d->a_noise_thr = a_noise_sm[0] * fw_db20_to_lin((float)k->noise_margin_cdb * 0.01f);   /* gate floor: mic self-noise + margin */
     d->a_up_s = fw_om_exp(1000.0f / ((float)k->floor_up_ms * FS_OUT_HZ));
     d->a_dn_s = fw_om_exp(1000.0f / ((float)k->floor_down_ms * FS_OUT_HZ));
     /* output stage */
@@ -348,7 +350,10 @@ NOINL static void a_post(fw_dsp_t *d, float *y8)
             d->a_floor_init = 1u;
             fl = sm > fl ? fl + d->a_up_s * (sm - fl) : fl + d->a_dn_s * (sm - fl);
             d->a_floor = fl;
-            g = sm > 0.0f ? (sm - fl * d->a_gate_lin) / sm : 0.0f;
+            float thr = fl * d->a_gate_lin;
+            if (thr < d->a_noise_thr)
+                thr = d->a_noise_thr;
+            g = sm > 0.0f ? (sm - thr) / sm : 0.0f;
             if (g < 0.0f)
                 g = 0.0f;
             if (g > 1.0f)

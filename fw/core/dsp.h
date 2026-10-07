@@ -37,7 +37,7 @@ typedef struct {
     uint32_t inc_prev[FW_DSP_NB_MAX], inc_new[FW_DSP_NB_MAX], phase[FW_DSP_NB_MAX];
     /* ---- algorithm A */
     float a_hist[FW_DSP_A_HIST];
-    float a_z1, a_z2, a_sm, a_floor, a_gate_lin, a_up_s, a_dn_s;
+    float a_z1, a_z2, a_sm, a_floor, a_gate_lin, a_noise_thr, a_up_s, a_dn_s;
     uint32_t a_lo_ph, a_lo_inc, a_floor_init;
     /* ---- D2 half-band */
     float hb_hist[FW_DSP_HB_HIST];

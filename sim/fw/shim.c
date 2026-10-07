@@ -1,6 +1,6 @@
 /* sim/fw/shim.c: ctypes surface of the host firmware build (sim/fw/fwlib.py). Not firmware: a batch driver around the pure entry
  * points (fw_init, fw_poll, fw_hop, fw_hop_d2) so Python can run whole scenes in one call. Time is injected: hop k at k * 640 us
- * (sim rate 200 kS/s; hardware 200.02 kS/s). */
+ * + t0_us (sim rate 200 kS/s; hardware 200.02 kS/s). t0_us >= 300000 = powered on long before the scene (hold over). */
 #include <string.h>
 
 #include "fw.h"
@@ -35,12 +35,12 @@ uint32_t shim_ccr_per_hop(const fw_state_t *st) { return FW_HOP_N * 200u / st->a
 /* n_hops hops of words (128 per hop for D1, 256 for D2). Outputs (each may be NULL): ccr[n_hops * ccr_per_hop],
  * dsp[n_hops * 8], band[n_hops * 28], floor_[n_hops * 28], peak[n_hops], sq[n_hops], norm[n_hops * 3], sq_periods[n_hops] */
 int32_t shim_run(fw_state_t *st, const int32_t *words, uint32_t n_hops, int32_t d2, uint16_t *ccr, float *dsp, float *band,
-                 float *floor_, float *peak, uint32_t *sq, float *norm, uint32_t *clamp)
+                 float *floor_, float *peak, uint32_t *sq, float *norm, uint32_t *clamp, uint64_t t0_us)
 {
     fw_taps_t t;
     uint16_t buf[FW_CCR_MAX_PER_HOP];
     for (uint32_t h = 0; h < n_hops; h++) {
-        fw_poll(st, (uint64_t)st->hop_count * 640u);
+        fw_poll(st, t0_us + (uint64_t)st->hop_count * 640u);   /* t0_us: time since power-on at the first hop */
         size_t n = d2 ? fw_hop_d2(st, &words[(size_t)h * 256u], buf, FW_CCR_MAX_PER_HOP, &t)
                       : fw_hop(st, &words[(size_t)h * 128u], buf, FW_CCR_MAX_PER_HOP, &t);
         if (n == 0u)

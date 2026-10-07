@@ -67,7 +67,7 @@ def lib(cc="gcc", opt="-O2", defines=()):
     L.shim_hash.restype = C.c_uint32
     L.shim_ccr_per_hop.argtypes = [C.c_void_p]
     L.shim_ccr_per_hop.restype = C.c_uint32
-    L.shim_run.argtypes = [C.c_void_p, I32P, C.c_uint32, C.c_int32, U16P, F32P, F32P, F32P, F32P, U32P, F32P, U32P]
+    L.shim_run.argtypes = [C.c_void_p, I32P, C.c_uint32, C.c_int32, U16P, F32P, F32P, F32P, F32P, U32P, F32P, U32P, C.c_uint64]
     L.shim_run.restype = C.c_int32
     L.shim_out.argtypes = [C.c_void_p, F32P, C.c_uint32, U16P, F32P, U32P]
     L.shim_out.restype = C.c_int32
@@ -98,7 +98,8 @@ class Firmware:
                 raise ValueError("noise calibration length does not match the band count")
         self.per = self.L.shim_ccr_per_hop(self.buf)
 
-    def run(self, words, d2=False):
+    def run(self, words, d2=False, t0_us=0):
+        """t0_us: time since power-on at the first hop (0 = the scene starts at power-on: 300 ms hold, e2e F4)."""
         w = np.ascontiguousarray(words, np.int32)
         hop_in = 256 if d2 else 128
         n = len(w) // hop_in
@@ -106,7 +107,7 @@ class Firmware:
         r = dict(ccr=np.zeros(n * self.per, np.uint16), dsp=np.zeros(n * 8, np.float32), band=np.zeros(n * 28, np.float32),
                  floor=np.zeros(n * 28, np.float32), peak=np.zeros(n, np.float32), sq=np.zeros(n, np.uint32),
                  norm=np.zeros(n * 3, np.float32), clamp=np.zeros(n, np.uint32))
-        if self.L.shim_run(self.buf, w, n, int(d2), r["ccr"], r["dsp"], r["band"], r["floor"], r["peak"], r["sq"], r["norm"], r["clamp"]):
+        if self.L.shim_run(self.buf, w, n, int(d2), r["ccr"], r["dsp"], r["band"], r["floor"], r["peak"], r["sq"], r["norm"], r["clamp"], int(t0_us)):
             raise RuntimeError("fw_hop returned 0")
         r["band"] = r["band"].reshape(n, 28)
         r["floor"] = r["floor"].reshape(n, 28)

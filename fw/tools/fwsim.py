@@ -16,6 +16,8 @@ Stages (each a row in fw/out/summary.json, schema {id, op, thr, last, status, ba
   arm        arm-none-eabi-gcc Cortex-M33 ELF from the SAME core sources; size                           FWSIM-R1
   no_malloc  no allocator symbol in the ARM ELF or in core/port objects; no libm transcendental in core  FWSIM-R11, R4 (part)
   stack      worst-case stack from -fstack-usage + -fcallgraph-info <= 50 % of the linker stack region   FWSIM-R11
+  dsp        golden vectors sha-pinned (R8), L1 vs sim/dsp per variant (R7, R13), L0 gcc/clang/-O0 bit-exact (R7),
+             ceiling property 1.36e6 hops (R15), static cycles_hop per variant (R10, R47)                FWSIM-R7, R8, R13, R15
 Exit 0 only if every row is PASS.  Subcommands: all | host | arm | lint | gen  (host/arm/lint/gen run a subset).
 """
 import argparse
@@ -271,6 +273,63 @@ def stage_variants(cfg):
     return rows
 
 
+# ------------------------------------------------------------------------------------------- dsp (group b)
+def stage_dsp(cfg):
+    rows = []
+    j = OUT / "dsp_vectors.json"
+    rc, so, se, w = run([sys.executable, REPO / "sim/fw/gen_vectors.py", "--json", j], timeout=900)
+    res = json.loads(j.read_text()) if j.exists() and rc in (0, 1) else {"rows": []}
+    by = {}
+    for r in res["rows"]:
+        if r["id"].startswith("L1."):
+            by.setdefault("L1", []).append(r)
+        else:
+            rows.append(row(f"dsp.{r['id']}", r["status"], r["value"], r["thr"], op=r["op"], basis=r.get("basis", ""),
+                            src="FWSIM-R8" if r["id"].startswith("R8") else "FWSIM-R7", detail=r.get("detail")))
+    l1 = by.get("L1", [])
+    bad = [f"{r['id']} {r['value']} {r['op']} {r['thr']}" for r in l1 if r["status"] != "PASS"]
+    worst = {}
+    for r in l1:
+        m = r["id"].split(".")[-1]
+        if m in ("dsp_out_err_db", "band_db_err_max", "squelch_agree"):
+            worst[m] = r["value"] if m not in worst else (min(worst[m], r["value"]) if m == "squelch_agree" else max(worst[m], r["value"]))
+    rows.append(row("dsp.L1", "PASS" if l1 and not bad else "FAIL", f"{len(l1) - len(bad)}/{len(l1)} within fw/test/l1_thresholds.yaml; worst {worst}",
+                    "all", basis="sim/fw/gen_vectors.py: firmware host build vs sim/dsp/pipeline.py on 6 golden vectors x {B, slim, A}",
+                    src="FWSIM-R7, FWSIM-R13", detail="\n".join(bad) or None, wall=w))
+    if rc not in (0, 1) and not res["rows"]:
+        rows.append(row("dsp.vectors", "FAIL", f"exit {rc}", "exit 0", src="FWSIM-R8", detail=tail(se + so, 15)))
+    # FWSIM-R15 ceiling property
+    d = OUT / "prop"
+    d.mkdir(parents=True, exist_ok=True)
+    exe = d / "prop_ceiling"
+    rc, _, se, w1 = run([GCC, *HOST_FLAGS, "-D_DEFAULT_SOURCE", *INC_HOST, *CORE, FW / "port_host/fake.c", FW / "test/prop/prop_ceiling.c", "-lm", "-o", exe])
+    if rc != 0:
+        rows.append(row("dsp.ceiling_property", "FAIL", "build error", 0, src="FWSIM-R15", detail=tail(se)))
+    else:
+        rc, so, se, w2 = run([exe], timeout=900)
+        try:
+            p = json.loads(so.strip().splitlines()[-1])
+        except Exception:                            # noqa: BLE001
+            p = {}
+        ok = rc == 0 and p.get("viol_a") == 0 and p.get("viol_b") == 0 and p.get("viol_c") == 0
+        rows.append(row("dsp.ceiling_property", "PASS" if ok else "FAIL",
+                        f"{p.get('total_hops')} hops: true peak max {p.get('true_peak_max')} (ceiling {p.get('ceiling')}), CCR |amp| max {p.get('ccr_amp_max_arr200')} "
+                        f"(bound {p.get('bound_b_arr200')}), R64 clamp hits {p.get('viol_c')}", "0 violations of (a), (b), (c)",
+                        basis="fw/test/prop/prop_ceiling.c: adversarial words (FS tones, FS noise, steps, chirps, bursts) x every volume step x B/slim/A x ARR 200/100/50",
+                        src="FWSIM-R15", detail=p.get("rows") if ok else (tail(se + so) or p), wall=w1 + w2))
+    # static cycles per variant
+    j = OUT / "dsp_cycles.json"
+    rc, so, se, w = run([sys.executable, FW / "tools/cycles.py", "--json", j], timeout=600)
+    if rc == 0:
+        c = json.loads(j.read_text())
+        rows.append(row("dsp.cycles_hop_static", "PASS", {v: {"cyc": x["cycles_hop"], "MHz": x["MHz_with_V4_overhead"], "V4_MHz": x["v4"]["MHz"]} for v, x in c.items()},
+                        "estimate (reported, not gated)", op="", basis="fw/tools/cycles.py: fw/bench/cyccount CPI x gcov line counts on the sweep vector (active path), 0 WS",
+                        src="FWSIM-R10, FWSIM-R47", wall=w))
+    else:
+        rows.append(row("dsp.cycles_hop_static", "FAIL", f"exit {rc}", "runs", src="FWSIM-R47", detail=tail(se + so)))
+    return rows
+
+
 # ------------------------------------------------------------------------------------------- gen + lint (python)
 def stage_py(rid, script, args, req, basis):
     rc, so, se, w = run([sys.executable, FW / "tools" / script, *args], timeout=300)
@@ -305,7 +364,7 @@ def requirement_status(rows, tests):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("cmd", nargs="?", default="all", choices=["all", "host", "arm", "lint", "gen"])
+    ap.add_argument("cmd", nargs="?", default="all", choices=["all", "host", "arm", "lint", "gen", "dsp"])
     ap.add_argument("-j", "--jobs", type=int, default=4, help="parallel compiler processes (default 4; the box is shared)")
     cfg = ap.parse_args(argv)
     OUT.mkdir(exist_ok=True)
@@ -325,12 +384,14 @@ def main(argv=None):
     if cfg.cmd == "all":
         rows.append(stage_symbols(arm))
         rows += stage_variants(cfg)
+    if cfg.cmd in ("all", "dsp"):
+        rows += stage_dsp(cfg)
     wall = time.monotonic() - t0
     status = "PASS" if all(r["status"] == "PASS" for r in rows) else "FAIL"
     summary = {"id": "FWSIM", "cmd": cfg.cmd, "status": status, "rows": rows, "requirements": requirement_status(rows, tests),
                "tests": tests.get("host_gcc", []), "arm": {k: arm[k] for k in ("flash", "ram_static", "stack_region", "sections") if k in arm},
                "tools": versions(), "wall_s": round(wall, 1),
-               "scope": "tier S + H foundation (FWSIM group a): no emulator, no DSP yet; port_u575 HAL is stubs (HAL_ENOTIMPL)"}
+               "scope": "tier S + H: foundation (group a) + DSP chain host behaviour (group b: R7 L0-host/L1, R8, R13, R14, R15); no emulator (L0 ARM, tier E open); port_u575 HAL is stubs (HAL_ENOTIMPL)"}
     (OUT / "summary.json").write_text(json.dumps(summary, indent=2, default=str) + "\n")
     for r in rows:
         print(f"{r['status']:4} {r['id']:<34} {r['last']}  [{r['src']}]")

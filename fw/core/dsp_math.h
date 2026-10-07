@@ -9,5 +9,13 @@ float fw_log2f(float x);          /* x > 0 and normal; else returns -126 */
 float fw_exp2f(float x);          /* clamps x to [-126, 127] */
 float fw_db20_to_lin(float db);   /* 10^(db/20) */
 float fw_om_exp(float x);         /* 1 - exp(-x), x >= 0, accurate for small x (one-pole coefficients) */
-float fw_sin_turns(uint32_t ph);  /* sin(2 pi ph / 2^32) from the 1024-entry table + linear interpolation */
+extern const float fw_sin_tab[1025];
+/* sin(2 pi ph / 2^32) from the 1024-entry table + linear interpolation (inline: called 8 x bands per hop) */
+static inline float fw_sin_turns(uint32_t ph)
+{
+    uint32_t i = ph >> 22;
+    float f = (float)(ph & 0x3FFFFFu) * 0x1p-22f;
+    float a = fw_sin_tab[i];
+    return a + f * (fw_sin_tab[i + 1u] - a);
+}
 #endif

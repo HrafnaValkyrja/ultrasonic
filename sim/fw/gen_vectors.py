@@ -307,6 +307,7 @@ def freeze(l1):
     doc = {"meta": {"what": "FWSIM-R7 L1 thresholds (firmware host build vs sim/dsp float64 reference on the golden vectors)",
                     "frozen": str(datetime.date.today()), "by": "sim/fw/gen_vectors.py --freeze (measured worst + margin; proposed starting values kept where they hold)",
                     "proposed": "band energy <= 0.1 dB steady state; 12.5 kS/s output error <= -60 dB re signal rms; squelch decisions equal on >= 99.9 % of hops",
+                    "squelch_agree_why": "the reference squelch (stages.PwmShaper) uses centred 5 ms / 20 ms windows (non-causal); the firmware's causal rule is compared at a 10 ms lag and still differs around transitions, so 0.999 cannot hold",
                     "rule": "changing a value needs a stated reason in docs/sim/firmware-emulation.yaml change_log"},
            "thresholds": th}
     THRESH.write_text(yaml.safe_dump(doc, sort_keys=False, width=200))

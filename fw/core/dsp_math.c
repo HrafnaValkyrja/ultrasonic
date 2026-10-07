@@ -4,7 +4,8 @@
 
 #include "dsp_tables.h"
 
-static const float sin_tab[FW_DSP_SIN_N] = FW_DSP_SIN_INIT;
+const float fw_sin_tab[FW_DSP_SIN_N] = FW_DSP_SIN_INIT;
+_Static_assert(FW_DSP_SIN_N == 1025u, "sine table size (dsp_math.h)");
 
 #define LN2_F 0x1.62e430p-1f      /* ln 2 */
 #define LOG2E_F 0x1.715476p+0f    /* 1 / ln 2 */
@@ -59,12 +60,4 @@ float fw_om_exp(float x)
     if (x < 0.5f)   /* Taylor to x^8: rel err < 1e-8 at 0.5 */
         return x * (1.0f - x * (0.5f - x * (0x1.555556p-3f - x * (0x1.555556p-5f - x * (0x1.111112p-7f - x * (0x1.6c16c2p-10f - x * (0x1.a01a02p-13f - x * 0x1.a01a02p-16f)))))));
     return 1.0f - fw_exp2f(-x * LOG2E_F);
-}
-
-float fw_sin_turns(uint32_t ph)
-{
-    uint32_t i = ph >> 22;                                    /* 1024 entries */
-    float f = (float)(ph & 0x3FFFFFu) * 0x1p-22f;
-    float a = sin_tab[i];
-    return a + f * (sin_tab[i + 1u] - a);
 }

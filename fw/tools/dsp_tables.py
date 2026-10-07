@@ -72,6 +72,21 @@ def noise_bands():
     return out
 
 
+def a_noise_sm():
+    """mean of algorithm A's gate envelope (|y| pi/2, one-pole 0.02) on the mic self-noise alone (same calibration input as
+    noise_bands): the A gate never opens below noise_margin x this (mirrors B's noise_band rule; e2e F12/F14)"""
+    sys.path.insert(0, str(REPO / "sim/dsp"))
+    import pipeline as pl                                               # noqa: E402
+    x = pl.decimate_to_fs(pl.microphone(np.zeros(int(0.5 * pl.FS_IN)), seed=99, noise_scale=1.0))
+    t = np.arange(len(x)) / FS
+    b = signal.firwin(255, 2750.0 + 1500.0, fs=FS)
+    base = signal.fftconvolve(x * np.cos(2 * np.pi * 38e3 * t) * 2, b, mode="same")
+    base = signal.sosfilt(signal.butter(2, 1250.0, "hp", fs=FS, output="sos"), base)
+    y = signal.resample_poly(base, 1, 16)
+    sm = signal.lfilter([0.02], [1, -0.98], np.abs(y) * np.pi / 2)
+    return float(np.mean(sm[len(sm) // 4:]))
+
+
 def generate(hdr):
     sys.path.insert(0, str(REPO / "sim/dsp"))
     import pipeline as pl                                               # noqa: E402
@@ -122,6 +137,8 @@ def generate(hdr):
     o += arr("FW_DSP_A_HP", [hp[0], hp[1], hp[2], hp[4], hp[5]])
     o.append("/* algorithm A decimating FIR c = firwin(321, 1/16, kaiser 5) (x) firwin(255, 4250 Hz), taps 0..287 (c symmetric, centre 287) */")
     o += arr("FW_DSP_A_C", c[:288])
+    o.append("/* algorithm A: mean gate envelope of the mic self-noise (nominal mic, LO 38 kHz), pre-gain FS units */")
+    o += arr("FW_DSP_A_NOISE_SM", [a_noise_sm()])
     o.append("/* shaper NTF zero pair at 13 kHz: 2 cos(2 pi 13000 / f_pwm) for 200, 400, 800 kHz */")
     o += arr("FW_DSP_NTF_2COS", [2 * math.cos(2 * math.pi * 13e3 / f) for f in (200e3, 400e3, 800e3)])
     o.append("\n#endif\n")
