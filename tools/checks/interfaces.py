@@ -10,7 +10,7 @@ Layout-agnostic and read-only. Default inputs = the current design in hw/current
 hw/pod/draft_r2/out/routed.kicad_pcb, hw/pod/pod_mz2.net, the SKiDL circuit built with POD_PACKAGES=mz2 (hw/pod/system_map.py
 build(): gen.build() + gen.apply_packages()), and the shell facts from hw/mech/dims_r2.py (CAD-free constants of shell_r2.py,
 imported). env ULTRASONIC_DESIGN=revg checks the Rev G/F reference: hw/pod/draft_r1/pod_r1_routed.kicad_pcb, hw/pod/pod.net and
-hw/mech/shell_r1.py (parsed with ast, never imported: importing it pulls in the CAD kernel). Always read: frame.py, pod.py (ast), ST's open
+hw/mech/shell_r1.py (parsed with ast, never imported: importing it pulls in the CAD kernel). Always read: frame.py, pod.py (imported, CAD-free), ST's open
 pin data (tools/data/stm32_open_pin_data) and three tables kept next to the thing they describe. It never edits any of them and
 moves nothing on the board. One line per check, "PASS|WARN|FAIL <id> <message>"; exit 1 if any FAIL (2 if the tool environment
 is missing: run `source tools/env.sh`). -v adds detail lines under each non-PASS result, -vv under every result, --json prints
@@ -42,7 +42,7 @@ Checks
   rails        declared rail loads vs ratings (docs/system/rail-budget.yaml), resistive loads computed from the schematic's
                values; D11 (one switching regulator, the MCU's) enforced on the whole circuit; open overloads WARN, cite
                their ECR and stay under the waiver's ceiling
-  frame        the mechanical constant files (frame.py, pod.py) vs the live shell (dims_r2.py | shell_r1.py) on the shared facts (ECR-0001)
+  frame        the mechanical constant files (frame.py, pod.py; imported, CAD-free) vs the live shell (dims_r2.py | shell_r1.py) on the shared facts (ECR-0001)
   selftest     each rule above must fire on a deliberately broken copy (and stay quiet on a harmless one: a board dragged to
                another KiCad origin, rails listed in another order, a loosely formatted ECR status)
 
@@ -1439,7 +1439,7 @@ def check_rails(budget, sch):
 
 
 # ------------------------------------------------------------------------------------------- [frame]
-FRAME_FACTS = (       # (what, shell_r1.py expression, same fact in frame.py, same fact in pod.py)
+FRAME_FACTS = (       # (what, shell fact, same fact in frame.pod_facts(), same fact in pod.py)
     ("pod centre z", lambda s: s["ZC"], lambda f: f["ZC"], lambda p: p["POD_ZC"]),   # pod.py feeds blade.py: the rail and adapter
     ("pod bottom z", lambda s: s["Z0"], lambda f: f["Z0"], None),
     ("pod front x", lambda s: s["X0"], lambda f: f["X0"], None),
@@ -1453,9 +1453,23 @@ FRAME_FACTS = (       # (what, shell_r1.py expression, same fact in frame.py, sa
 )
 
 
-def check_frame(sh):
-    """frame.py and pod.py are what heel.py, pad.py and blade.py build against; shell_r1.py overrides several values locally."""
-    shell, frame, pod = sh["env"], module_constants(CFG.mech / "frame.py")[0], module_constants(CFG.mech / "pod.py")[0]
+def frame_pod_facts(design=None):
+    """What heel.py, pad.py and blade.py actually build against: frame.pod_facts() and pod.py's body constants, imported
+    (both CAD-free since ECR-0001, 2026-10-07; frame.py's pod names resolve from the selected design's shell dims)."""
+    if str(CFG.mech) not in sys.path:
+        sys.path.insert(0, str(CFG.mech))
+    import frame as fr
+    import pod as pd
+    return fr.pod_facts(design), dict(POD_ZC=pd.POD_ZC, POD_H=pd.POD_H, POD_L=pd.POD_L, POD_W=pd.POD_W)
+
+
+def check_frame(sh, frame=None, pod=None):
+    """frame.py and pod.py are what heel.py, pad.py and blade.py build against; they must agree with the live shell.
+    frame/pod: injected facts (selftest); default = the imported modules for the shell's design."""
+    if frame is None or pod is None:
+        f0, p0 = frame_pod_facts(sh.get("design"))
+        frame, pod = frame if frame is not None else f0, pod if pod is not None else p0
+    shell = sh["env"]
     rows = []
     rnd = lambda v: tuple(round(x, 3) for x in v) if isinstance(v, tuple) else round(v, 3)
     for what, fs, ff, fp in FRAME_FACTS:
@@ -1472,8 +1486,9 @@ def check_frame(sh):
         return Result("frame", PASS, f"frame.py and pod.py agree with {sh.get('name', 'the shell')} on all {len(FRAME_FACTS)} shared facts")
     level, tag = known("ECR-0001")
     return Result("frame", level, f"frame.py / pod.py disagree with {sh.get('name', 'the shell')} on {len(rows)} of {len(FRAME_FACTS)} shared facts "
-                  f"(pod centre z, board size, mic and button position, ...): known open issue {tag}; heel.py's clearance checks read frame.PCB and CELL, "
-                  "and blade.py's rail and adapter read pod.POD_ZC (ECR-0001 names frame.py only)", rows, [f"frame:{tag}"] if level == WARN else [])
+                  f"({tag}): since ECR-0001 both derive from the current design's shell dims, so a difference means someone re-hard-coded a pod "
+                  "constant in frame.py/pod.py; heel.py's clearance checks read frame.PCB and CELL, blade.py's rail and adapter read pod.POD_ZC",
+                  rows, [f"frame:{tag}"] if level == WARN else [])
 
 
 # ------------------------------------------------------------------------------------------- [selftest]
@@ -1989,9 +2004,11 @@ def selftest_cases(ctx):
 
     def frame_expired():
         def run():
+            f0, p0 = frame_pod_facts(sh.get("design"))
+            stale = dict(f0, ZC=f0["ZC"] + 0.45)              # a pod constant re-hard-coded in frame.py (the pre-ECR-0001 state)
             with ecr_states(ECR_0001="closed"):
-                return check_frame(sh)
-        return Case("frame: ECR-0001 closed while frame.py still disagrees", run, FAIL, "ECR-0001")
+                return check_frame(sh, frame=stale, pod=p0)
+        return Case("frame: frame.py's pod centre re-hard-coded 0.45 mm off the shell, ECR-0001 closed", run, FAIL, "ECR-0001")
 
     for build in (mic_origin, mic_stack, mic_lid, mic_face, mic_ap, mic_locating, mic_located, switch_locating, switch_off, switch_stack, outline_wide, outline_tall, outline_thick, outline_drag, round_trip_mic,
                   dup_ref, inside_far, inside_rear, clamp_body, clamp_tiny, clamp_wire_pad, vhb_flip, vhb_pocket, vhb_bond, heights, heights_pocket, heights_empty, nets_swap, nets_missing,

@@ -36,6 +36,7 @@ X0, X1 = 29.5, 67.5
 Y_IN, Y_SPLIT, Y_OUT = 4.3, 14.4, 15.4
 Z1, Z0, Z_BELLY, X_BELLY = 5.5, -9.7, -13.2, 55.0
 W = 0.8
+RAIL_ZC = -2.0          # rail + adapter centre as built in rev 1 (= pod.POD_ZC before ECR-0001; r1 body centre is -2.1)
 CAV = dict(x0=X0 + W, x1=X1 - W, y0=Y_IN + W, z0=Z0 + W, z1=Z1 - W)            # main cavity
 BAY = dict(x0=X0 + W, x1=X_BELLY - W, z0=Z_BELLY + W, z1=CAV["z0"])            # connector bay
 ZC = (CAV["z0"] + CAV["z1"]) / 2                                               # board centre line
@@ -71,7 +72,7 @@ def seam_groove():
 
 def tub(heel_mod=None):
     t = outer_body() & box(X0 - 1, X1 + 1, Y_IN - 1, Y_SPLIT, Z_BELLY - 1, Z1 + 1)
-    t = t + blade.rail()
+    t = t + blade.rail(zc=RAIL_ZC)
     if heel_mod is not None:
         t = t + heel_mod.heel_add()
     t = t - cavity()
@@ -204,7 +205,7 @@ def main():
     for k, (f, m, off) in steps.items():
         common[k] = (import_step(pad / f), m, off)
     common["niti"] = (import_step(HERE / "out/parts/heel/niti_root_worn.step"), "niti", (0, 0, 0))
-    common["adapter"] = (blade.adapter(), "adapter", (0, -4, 0))
+    common["adapter"] = (blade.adapter(zc=RAIL_ZC), "adapter", (0, -4, 0))
     common["temple"] = (Pos(40, F.TEMPLE_T / 2, 0) * chamfer(Box(130, F.TEMPLE_T, F.TEMPLE_H).edges(), 0.6), "temple", (0, -4, 0))
     for cname, fn in CONCEPTS.items():
         d = OUT / cname

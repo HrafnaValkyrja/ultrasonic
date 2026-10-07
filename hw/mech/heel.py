@@ -536,8 +536,8 @@ def checks():
     ch = channel_cut(path)
     boxes = {k: Pos((v["x0"] + v["x1"]) / 2, (v["y0"] + v["y1"]) / 2, (v["z0"] + v["z1"]) / 2) *
              Box(v["x1"] - v["x0"], v["y1"] - v["y0"], v["z1"] - v["z0"]) for k, v in
-             (("cell", F.CELL), ("pcm", F.PCM), ("pcb", F.PCB))}
-    exit_ok = F.PCM["x1"] < CH_EXIT[0] - CH_D / 2 and CH_EXIT[0] + CH_D / 2 < F.CAV["x1"] and CH_EXIT[2] > F.CAV["z0"]
+             (("cell", F.CELL), ("pcb", F.PCB))}     # the current design's cell and board (frame.pod_facts(); no PCM since rev 1)
+    exit_ok = F.CELL["x1"] < CH_EXIT[0] - CH_D / 2 and CH_EXIT[0] + CH_D / 2 < F.CAV["x1"] and CH_EXIT[2] > F.CAV["z0"]
     res["channel"] = {"d": CH_D, "total_bend_deg": round(bend_deg, 1), "bend_radius": CH_BEND,
                       "entry_world": W(CH_B0, CH_N0, H_LAND).round(3).tolist(), "exit_world": CH_EXIT.tolist(),
                       "length_mm": round(sum(float(np.linalg.norm(p1 - p0)) for p0, p1 in zip(path[:-1], path[1:])), 2),
@@ -548,7 +548,7 @@ def checks():
                       "exit_in_rear_gap": bool(exit_ok),
                       "gap_to": {k: _gap(ch, v) for k, v in boxes.items()},
                       "bundle_fill": round(4 * 0.3 ** 2 / CH_D ** 2, 3)}
-    res["channel"]["pass_clear_of_cell_pcm_pcb"] = all(g >= 0.2 for g in res["channel"]["gap_to"].values())
+    res["channel"]["pass_clear_of_cell_pcb"] = all(g >= 0.2 for g in res["channel"]["gap_to"].values())
 
     # 5. shroud / boss / land vs the strut top, all states: generic boxes (two centrings, two
     #    orientations), pad.py's section as a box, and pad.py's actual lofted strut when it imports.

@@ -21,20 +21,28 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from build123d import Box, Cylinder, Pos, Rot, export_step, export_stl, fillet, Axis
 
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(REPO / "tools"))
+sys.path.insert(0, str(HERE))
+import frame as F  # noqa: E402  (CAD-free; build123d is imported inside the build functions, so tools can read this module)
 OUT = HERE / "out"
 OUT.mkdir(exist_ok=True)
 
 # ---------------------------------------------------------------- parameters (mm)
-TEMPLE_T, TEMPLE_H = 2.5, 5.0     # temple-arm section; typical acetate, MEASURE on her frame (E9)
+TEMPLE_T, TEMPLE_H = F.TEMPLE_T, F.TEMPLE_H   # temple-arm section 2.5 x 5.0; typical acetate, MEASURE on her frame (E9)
 VISION_X = 29.5                   # pod may not start forward of this (spec §8 v0.9: pupil + 18 mm)
-POD_L, POD_W, POD_H = 38.0, 10.0, 15.0  # rev 2: was 35 x 9 x 14; grown for the max cell + PCM + clearances
+# pod body = the CURRENT design (frame.pod_facts(), ECR-0001 2026-10-07); blade.py builds its rail, adapter, shell() on these.
+# Phase 2: 38.0 x 9.7 x 14.5, centre z -2.45 (was the rev-2 sketch's 38 x 10 x 15 at -2.0, still used by build() below).
+POD_L, POD_W, POD_H = F.X1 - F.X0, F.Y_OUT - F.Y_IN, F.Z1 - F.Z0
+POD_ZC = (F.Z0 + F.Z1) / 2        # body centre (Phase 2 = the board/cavity centre line)
+assert abs(F.X0 - VISION_X) < 1e-9, "the pod front moved off the vision limit: re-check blade.py X0"
+
+# ---- rev-2 sketch (2026-09-30, pre-rev-1): build() below is kept as the historical arm-variant study and keeps its own
+# envelope and contents. NOT the current pod (cell, board and body come from frame.pod_facts()).
+REV2_POD = (38.0, 10.0, 15.0, -2.0)   # L, W, H, centre z (was 35 x 9 x 14; grown for the max cell + PCM + clearances)
 CLR = 0.3                         # assembly clearance to walls (MJF +-0.2 mm)
-POD_ZC = -2.0                     # pod centre sits a little below the temple arm (hides under the brow line)
 WALL = 0.8                        # PA12 MJF minimum sensible wall
 CELL = (31.0, 4.3, 12.5)          # LP401230 MAX envelope (EEMB spec ZJQM-RD-SPC-H2294, 2022-10-19)
 PCM = (3.0, 4.3, 12.5)            # protection board on the cell's end [Low]: typical, MEASURE (B4)
@@ -43,7 +51,7 @@ PCB_PARTS = 1.2                   # tallest part each side (MCU 0.55, crystal 0.
 SWEEP_DEG = 30.0                  # owner's swept-back arm, 25-35 deg (§8), variant A
 # the pad location is anatomy, so it is fixed from rev 1 (35 x 14 pod, anchor 4 mm from its rear)
 PIVOT = (VISION_X + 35.0 - 4.0, 0.5, -2.0 - 14.0 / 2 + 1.5)
-WIRE_D, SLEEVE_D = 0.75, 1.8      # NiTi wire (owner 2026-09-30: keep 20 mm / 30 deg; 0.75 caps force ~1.6 N)
+SLEEVE_D = 1.8                    # sleeve over the NiTi wire (wire: frame.NITI_D)
                                   # sleeve also carries the two transducer wires (docs/diagrams/arm-wiring.svg)
 ARM_L = {"A": None, "B": 30.0}    # free length; None = straight from PIVOT at SWEEP_DEG (~20 mm)
 PAD_DROP = 25.0                   # temple arm to pad centre (ear-open-fit.md, owner's photos)
@@ -57,11 +65,14 @@ MASS_FIXED = {"cell": 2.2, "pcb_assembly": 0.9, "transducer": 1.2, "wire+sleeve"
 
 
 def rounded_box(l, w, h, r):
+    from build123d import Box, fillet
     b = Box(l, w, h)
     return fillet(b.edges(), r) if r > 0 else b
 
 
 def build(variant="A"):
+    from build123d import Box, Cylinder, Pos, Rot
+    POD_L, POD_W, POD_H, POD_ZC = REV2_POD
     parts = {}
     pod_c = (VISION_X + POD_L / 2, TEMPLE_T + POD_W / 2, POD_ZC)
     outer = Pos(*pod_c) * rounded_box(POD_L, POD_W, POD_H, 1.6)
@@ -158,6 +169,7 @@ def render(parts, temple, geom):
     views = [("Side view from outside (face is to the right)", (0, 90)),
              ("3/4 view from behind, outside", (22, 130)),
              ("From behind (head is to the left)", (0, 0))]
+    POD_W = REV2_POD[1]
     fig = plt.figure(figsize=(13, 5))
     for i, (title, (el, az)) in enumerate(views):
         ax = fig.add_subplot(1, 3, i + 1, projection="3d", proj_type="ortho" if i != 1 else "persp")
@@ -208,6 +220,7 @@ def sketch_sheet(builds):
            "arm": ("#b8b4a4", 1.0), "anchor_boss": ("#8a8676", 1.0), "pad_housing": ("#d9d6cc", 0.45),
            "transducer": (plotstyle.SERIES[1], 1.0), "silicone_pad": (plotstyle.SERIES[0], 0.5)}
     light = np.array([0.3, 0.7, 0.65]); light /= np.linalg.norm(light)
+    POD_L, POD_W, POD_H, POD_ZC = REV2_POD
     fig = plt.figure(figsize=(14, 10))
     for r, (variant, (parts, temple, geom)) in enumerate(builds.items()):
         for c, (title, el, az, persp) in enumerate((("side, from outside", 0, -90, False),
@@ -252,6 +265,7 @@ MIN_GAP = 0.2        # mm: MJF tolerance ~+-0.2 (JLC), so anything under this is
 
 
 def main():
+    from build123d import export_step, export_stl
     out, builds = {}, {}
     for variant in ("A", "B"):
         parts, temple, geom = build(variant)

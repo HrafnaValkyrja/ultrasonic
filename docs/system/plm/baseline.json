@@ -169,9 +169,9 @@
  },
  "relations": {
   "R-ARM-PAD": {
-   "by": "claude",
-   "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "by": "claude-ecr0001",
+   "date": "2026-10-07",
+   "note": "ECR-0001: arm/pad constants untouched (frame.summary identical: E, A_E, span, T_worn, pad_centre); pad.py solids identical before/after",
    "stamp": {
     "file:hw/mech/pad.py": "00d8456a0d641613",
     "sym:hw/mech/frame.py::PAD_CONTACT": "a9817b30cc013f18",
@@ -252,9 +252,9 @@
    }
   },
   "R-BODY-ARM": {
-   "by": "ultrasonic-lead",
+   "by": "claude-ecr0001",
    "date": "2026-10-07",
-   "note": "2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)",
+   "note": "ECR-0001: heel_add/heel_cut/hardware solids identical before/after (vol, bbox, centroid); E unchanged; shell_r2.tub identical. heel checks now see the r2 cell: exit_in_rear_gap False, channel-cell 0.085 mm (known reg-arm issue 1 / reg-pod-body issue 6); plain-shell strut clearance 0.314->0.173 (blade.shell at r2 envelope, no relief)",
    "stamp": {
     "sym:hw/mech/frame.py::E": "e41a5d539abd8437",
     "sym:hw/mech/heel.py::heel_add": "f10d6b9f6e8fecbf",
@@ -376,16 +376,15 @@
    }
   },
   "R-PHYS-FRAME": {
-   "by": "docs-phase2-rewrite",
+   "by": "claude-ecr0001",
    "date": "2026-10-07",
-   "note": "2026-10-07: relation text updated to Phase 2 (U4->bridge 40 mohm via In2 plane; CC wording; blade.py 0.45 offset); both sides' docs agree",
+   "note": "ECR-0001: frame.py pod names now from dims_r2 via pod_facts(); interfaces frame PASS 10/10 (phase2 and revg); pod.POD_ZC -2.45 so blade rail/adapter default = body centre; shell_r1 pins -2.0; CAD diff: shell_r2/shell_r1 identical",
    "stamp": {
     "sym:hw/mech/dims_r2.py::CELL": "77243a4be17c6775",
     "sym:hw/mech/dims_r2.py::PCB": "0b983e5b5147defd",
-    "sym:hw/mech/frame.py::BUTTON": "d646708aa7d8d618",
-    "sym:hw/mech/frame.py::CELL": "31c4767bc3cff96e",
-    "sym:hw/mech/frame.py::MIC_PORT": "9f9b9e155f7478d0",
-    "sym:hw/mech/frame.py::PCB": "f3163c7e25f6a505"
+    "sym:hw/mech/frame.py::POD_NAMES": "3389037a1ca45bed",
+    "sym:hw/mech/frame.py::pod_facts": "f6b16a293e6b5a79",
+    "sym:hw/mech/pod.py::POD_ZC": "943c91ca1f4d8928"
    }
   },
   "R-PROC-BOARD": {
@@ -600,12 +599,12 @@
    }
   },
   "R-UI-PAD": {
-   "by": "claude",
-   "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "by": "claude-ecr0001",
+   "date": "2026-10-07",
+   "note": "ECR-0001: padboard/mech.py pod-side checks now read the frozen pre-rev-1 pod (shell.py PRE_R1); all checks/geometry outputs identical before/after; pad board and LED untouched",
    "stamp": {
     "file:hw/padboard/gen.py": "602c2ac9a9a1a590",
-    "file:hw/padboard/mech.py": "7f658b878ab3e395",
+    "file:hw/padboard/mech.py": "63ebe69b0207a26c",
     "net:LED_A": "a7463c1e8bb60b81",
     "net:LED_K": "0443cd1bf2f94b91"
    }

@@ -87,8 +87,11 @@ def check_prism_yz():
     return (round(b.min.X, 3), round(b.max.X, 3), round(b.min.Y, 3), round(b.max.Y, 3), round(b.min.Z, 3), round(b.max.Z, 3))
 
 
-def fin():
-    """Tapered dorsal fin: raked side profile intersected with a sloped-wall cross-section."""
+def fin(z1=None, y_out=None):
+    """Tapered dorsal fin: raked side profile intersected with a sloped-wall cross-section. z1/y_out: body top and
+    outer face (default: the current pod, pod.py; hw/mech/shell.py passes its pre-rev-1 body)."""
+    Z1 = globals()["Z1"] if z1 is None else z1
+    Y_OUT = globals()["Y_OUT"] if y_out is None else y_out
     side = [(46.0, Z1 - 0.6), (50.0, Z1 + 0.25), (55.0, Z1 + 0.8), (60.0, Z1 + 1.5), (64.2, Z1 + 2.4),
             (66.6, Z1 + 2.3), (67.5, Z1 + 0.6), (67.5, Z1 - 0.6)]
     s = prism_xz(side, Y_IN + 3.0, Y_OUT + 1.2)
@@ -109,19 +112,20 @@ def heel():
 
 
 def rail(zc=None):
-    """Male dovetail on the pod's inner face (part of the pod print). zc: the body's centre height; default = the frame
-    constant pod.POD_ZC (Rev F). shell_r2 passes its own body centre (2026-10-07 audit: the default sat 0.45 mm off)."""
+    """Male dovetail on the pod's inner face (part of the pod print). zc: the body's centre height; default = pod.POD_ZC,
+    the CURRENT design's body centre (Phase 2: -2.45; was the Rev F/rev-2 constant -2.0 until ECR-0001, 2026-10-07)."""
     zc = ZC if zc is None else zc
     sec = [(Y_IN, zc - RAIL_W0 / 2), (Y_IN, zc + RAIL_W0 / 2), (Y_IN - RAIL_H, zc + RAIL_W1 / 2),
            (Y_IN - RAIL_H, zc - RAIL_W1 / 2)]
     return prism_yz(sec, *RAIL_X) + catch_bump()
 
 
-def adapter():
-    """Separate print: plate + temple clip lips, female dovetail (closed at the rear = end stop),
+def adapter(zc=None):
+    """zc: the rail centre it mates (default pod.POD_ZC, the current design's body centre, as rail()). Separate print: plate + temple clip lips, female dovetail (closed at the rear = end stop),
     and a snap tab hanging below the plate. Slide on from the front; the tooth rides over the pod's
     ramp and drops in behind it. Release: push the tab's foot toward the head with a fingernail
     (0.45 mm) and slide forward. Tab 5 mm x 0.6 mm: ~1.6% bending strain at release (PA12/PETG ok)."""
+    ZC_ = ZC if zc is None else zc
     T, Hh = pod.TEMPLE_T, pod.TEMPLE_H
     zt, zb = Hh / 2 + 1.4, -Hh / 2 - 1.4
     x0, x1 = RAIL_X[0] - 3.0, RAIL_X[1] + 1.0
@@ -132,8 +136,8 @@ def adapter():
         lip = Pos((x0 + x1) / 2, T / 2 + 0.2, z) * Box(x1 - x0 - 4, T + 0.4, 0.8)
         hook = Pos((x0 + x1) / 2, -0.4, zs * (Hh / 2 - 0.25)) * Box(x1 - x0 - 4, 0.8, 1.3)
         body = body + lip + hook
-    sec = [(Y_IN + 0.01, ZC - RAIL_W0 / 2 - FIT), (Y_IN + 0.01, ZC + RAIL_W0 / 2 + FIT),
-           (Y_IN - RAIL_H - FIT, ZC + RAIL_W1 / 2 + FIT), (Y_IN - RAIL_H - FIT, ZC - RAIL_W1 / 2 - FIT)]
+    sec = [(Y_IN + 0.01, ZC_ - RAIL_W0 / 2 - FIT), (Y_IN + 0.01, ZC_ + RAIL_W0 / 2 + FIT),
+           (Y_IN - RAIL_H - FIT, ZC_ + RAIL_W1 / 2 + FIT), (Y_IN - RAIL_H - FIT, ZC_ - RAIL_W1 / 2 - FIT)]
     body = body - prism_yz(sec, x0 - 0.01, RAIL_X[1] + FIT)
     tx = BUMP_X[1] + 0.1
     tab = prism_xy([(tx, Y_IN - 1.05), (tx + 2.6, Y_IN - 1.05), (tx + 2.6, Y_IN - 0.45), (tx, Y_IN - 0.45)],
@@ -148,8 +152,11 @@ def shell():
     return chamfer(b.edges(), 1.0)
 
 
-def armour_and_trace():
-    y = Y_OUT
+def armour_and_trace(y_out=None, z1=None, mic=None):
+    """Armour plate + trace groove + hex mic window (defaults: the current pod; hw/mech/shell.py passes its pre-rev-1 body)."""
+    Z1 = globals()["Z1"] if z1 is None else z1
+    MIC = globals()["MIC"] if mic is None else mic
+    y = Y_OUT if y_out is None else y_out
     pts = [(31.8, 4.3), (46.0, 4.3), (47.8, Z1 - 0.1), (66.2, Z1 - 0.1), (66.2, -7.2), (61, -8.6), (37, -8.6), (31.8, -3.6)]
     arm = plate(pts, y, 0.8, 0.35)
     upper = plate([(34.5, 3.6), (44.0, 3.6), (41.8, 1.3), (34.5, 1.3)], y + 0.8, 0.45, 0.2)

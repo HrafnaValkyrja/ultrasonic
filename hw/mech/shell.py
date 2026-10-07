@@ -4,7 +4,7 @@ LID (0.9 mm outer wall + Blade armour, circuit-trace groove, dorsal fin, button 
     source tools/env.sh && systemd-run --user --scope --quiet -p MemoryMax=2G -p MemorySwapMax=0 \
         python3 hw/mech/shell.py          # -> hw/mech/out/parts/shell/ (STEP, STL, checks.json, PNG)
 
-Builds two variants against hw/mech/frame.py (the shared interface; never edited here):
+Builds two variants against the pre-rev-1 pod (PRE_R1 below; was frame.py's until ECR-0001) + frame.py's adapter/fasteners:
 
   "proposed" (RECOMMENDED, exported at the top of out/parts/shell/)
       The tub is an empty box apart from features outside the cell's drop-in corridor: front cap,
@@ -39,8 +39,52 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
 sys.path.insert(0, str(HERE))
 sys.path.insert(0, str(REPO / "tools"))
-import frame as F  # noqa: E402
-from blade import adapter, armour_and_trace, fin, prism_xy, prism_xz, rail  # noqa: E402
+import frame as _frame  # noqa: E402
+from types import SimpleNamespace  # noqa: E402
+
+# Pre-rev-1 pod (2026-09-30): the numbers this shell was designed on. frame.py held them until ECR-0001 (2026-10-07) moved
+# frame.py's pod names to the current design; frozen here unchanged so this historical shell (and hw/padboard/mech.py's
+# pre-rev-1 checks) still build what they built. NOT the current pod: see frame.pod_facts() / hw/current.yaml.
+_X0, _X1, _Z0, _Z1, _WALL, _Y_OUT, _Y_SPLIT = 29.5, 67.5, -9.5, 5.5, 0.8, 14.3, 13.4
+PRE_R1 = dict(
+    X0=_X0, X1=_X1, Z0=_Z0, Z1=_Z1, ZC=-2.0, Y_OUT=_Y_OUT, WALL=_WALL, Y_SPLIT=_Y_SPLIT, EDGE_CHAMFER=1.0,
+    CAV=dict(x0=_X0 + _WALL, x1=_X1 - _WALL, y0=_frame.Y_IN + _WALL, y1=_Y_SPLIT, z0=_Z0 + _WALL, z1=_Z1 - _WALL),
+    TAPE=0.3,
+    CELL=dict(x0=30.6, x1=61.6, y0=5.4, y1=9.7, z0=-8.25, z1=4.25),       # LP401230 MAX envelope
+    PCM=dict(x0=61.8, x1=64.8, y0=5.4, y1=9.7, z0=-8.25, z1=4.25),        # cell protection board [Low]
+    PCB=dict(x0=30.6, x1=50.6, y0=11.1, y1=11.9, z0=-7.75, z1=3.75),      # 20 x 11.5 x 0.8, 4-layer
+    PARTS_IN=dict(y0=9.9, y1=11.1), PARTS_OUT=dict(y0=11.9, y1=13.1),
+    PCB_CLAMP_BAND=0.6, PCB_END_KEEPOUT=0.5,
+    WIRE_PADS=["OUT_A", "OUT_B", "LED+", "LED-", "BAT+", "BAT-", "VBUS", "GND_CHG"],
+    WIRE_PAD=dict(x0=49.2, x1=50.4, z_top=3.0, pitch=1.3, h=1.0),
+    MIC_PORT=dict(x=34.5, z=-1.0, d_pcb=0.6, d_lid=1.0),
+    MIC_SEAL=dict(chimney_od=2.6, chimney_id=1.0, washer_od=3.0, washer_t=0.8, keepout_r=1.6),
+    BUTTON=dict(x=42.5, z=1.9, body=(3.0, 2.0), height=0.6, travel=0.25, force_n=1.6),   # KXT321LHS on the outer face
+    LID_SCREWS=[(60.8, 2.7), (60.8, -6.4)], LID_HOOK=dict(z0=-5.0, z1=1.0),
+)
+
+
+# blade.py's rail/adapter/fin/armour default to the CURRENT pod since ECR-0001: pin them to the pre-rev-1 body this shell was built on
+def rail():
+    return _blade.rail(zc=PRE_R1["ZC"])
+
+
+def adapter():
+    return _blade.adapter(zc=PRE_R1["ZC"])
+
+
+def fin():
+    return _blade.fin(z1=PRE_R1["Z1"], y_out=PRE_R1["Y_OUT"])
+
+
+def armour_and_trace():
+    return _blade.armour_and_trace(y_out=PRE_R1["Y_OUT"], z1=PRE_R1["Z1"], mic=(29.5 + 5.0, PRE_R1["ZC"] + 1.0))
+
+
+# F: frame.py's own constants (adapter, fasteners, resin, arm) + the frozen pre-rev-1 pod
+F = SimpleNamespace(**{k: getattr(_frame, k) for k in dir(_frame) if k.isupper() and k not in PRE_R1 and k != "POD_NAMES"}, **PRE_R1)
+import blade as _blade  # noqa: E402
+from blade import prism_xy, prism_xz  # noqa: E402
 from styles import plate  # noqa: E402
 
 OUT = HERE / "out" / "parts" / "shell"

@@ -2,7 +2,7 @@
 Rev MZ-2 2026-10-07: body rewritten to the Phase-2 shell (`hw/current.yaml`, ECR-0018): seam at the board's B face, board hung from the lid on per-pad-cut VHB, sealed D1.0 duct + gauge pin, SW1 pocket + selective-fit puck, no ribs/foam; Rev F/G shell moved to the reference section.
 Status: Phase-2 shell CAD `hw/mech/shell_r2.py` (constants `hw/mech/dims_r2.py`), last rebuilt for commit c348661 (2026-10-07 07:30): `hw/mech/out/r2/checks.json` every clash 0 mm³, tub/lid/puck each 1 valid solid. Not printed, not owner-reviewed (O25: review in 1-2 weeks). Updated 2026-10-07.
 · Source of truth: `hw/mech/dims_r2.py` (every number), `hw/mech/shell_r2.py` (solids, checks), `hw/mech/notes/shell_r2.md` (decisions D1-D8, retention options, assembly), `hw/mech/blade.py` (rail, adapter), `hw/mech/heel.py` (heel unioned into the tub, [reg-arm](reg-arm.md)), `docs/build/tolerances.md` (Rev-1 fits; no Phase-2 rows yet, issue 18)
-· Owner decisions: O5, O10, O12(b), O16(3)(5)(6)(7), O17, O19, O24 (sealed duct D1.0 + locating), O25/O26 (Phase 2, Claude lays out), O27 (thin > short > long) · Open ECRs: ECR-0001 (`frame.py`/`pod.py` constants), ECR-0006 (weighted dummy pair, wear + joint flex), ECR-0018 (Phase 2, approved, implementation in progress)
+· Owner decisions: O5, O10, O12(b), O16(3)(5)(6)(7), O17, O19, O24 (sealed duct D1.0 + locating), O25/O26 (Phase 2, Claude lays out), O27 (thin > short > long) · ECR-0001 (`frame.py`/`pod.py` constants) implemented 2026-10-07, awaiting owner review · Open ECRs: ECR-0006 (weighted dummy pair, wear + joint flex), ECR-0018 (Phase 2, approved, implementation in progress)
 
 ## Purpose
 - Holds and protects the board, the cell and the dock target, **without screws** (O16-6).
@@ -40,7 +40,7 @@ dock: {part: "Xinyangze YZT0675 (5-pin magnetic pogo target, 21.2 x 6.86 x 2.8, 
 usb_c_keepout: "not carried into shell_r2 (R-DOCK-BODY)"
 cell_bed: {cell: "Renata ICP501233PA-02 envelope x 30.6-65.6, y 5.4-10.7, z -8.1..3.9", tape: "VHB 4914 0.25 in the 0.3 gap to the inner wall"}
 strut_relief: "identical to r1 (same Z0, CAV y0/z0): fill 1.0 legs in the inner-bottom rear corner x 62-66.7; outside cut to y + z = -3.65"
-rail_adapter: "blade.rail(zc=-2.45): rail centred on the r2 body (2026-10-07; was pod.py POD_ZC -2.0, issue 8 closed). The adapter (blade.adapter, still on POD_ZC) is redesigned with the two-frame adapter work (O26, deferred) and must take its rail z from shell_r2"
+rail_adapter: "blade.rail(zc=-2.45) in shell_r2; since ECR-0001 (2026-10-07) blade.rail()/blade.adapter() default to pod.POD_ZC = the current body centre (-2.45), so the modelled adapter slot now mates the r2 rail (it sat 0.45 mm high before). The adapter itself is still redesigned with the two-frame adapter work (O26, deferred); shell_r1 pins its as-built -2.0 (RAIL_ZC)"
 spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unioned into the lid (159.6 mm3)"
 ```
 
@@ -71,8 +71,8 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
   invariant: "exit x 65.25-66.25 overlaps the cell's rear end 65.6 (issue 6)"
   rel: R-BODY-ARM
 - to: physical
-  crosses: "frame axes; frame.py/pod.py vs dims_r2.py; assembly order"
-  invariant: "interfaces.py frame WARN: 8 of 10 shared facts differ (ECR-0001)"
+  crosses: "frame axes; frame.py/pod.py pod names derived from dims_r2.py (frame.pod_facts(), ECR-0001); assembly order"
+  invariant: "interfaces.py frame PASS: 10 of 10 shared facts agree (2026-10-07)"
   rel: R-PHYS-FRAME
 - to: sub-debug-test
   crosses: "TP1-TP6 bare pads on F under the VHB cut-outs, facing the lid 0.30 away"
@@ -127,9 +127,9 @@ spine_top: "shell_r1.concept_spine moved -1.4 y / -0.7 z onto the r2 top, unione
 3. **Mic acoustic path (body side):** duct sealed and aligned; mesh product and the EQ notch (~63 kHz) open; Monte Carlo R14 all-pass 0.70 (ECR-0018 log 2026-10-07). Closes: sub-audio-in issues.
 4. **Switch stack:** fixed puck pre-presses at worst case, so the kit is selective fit (PASS); lateral stack WARN in interfaces.py (0.20 worst vs 0.15 limit, 2026-10-07). KMT022 height tolerance unknown (C&K gives 0.65 nominal only). Closes: tighten lid/board position tolerance or accept, owner review; sub-ui.
 5. **Sealing undesigned past the seam** (table above); `docs/research/sealing-and-service.md` (cited by O10) doesn't exist. Closes: sealing note + IPX4 spray test plan.
-6. **Heel wire-channel exit overlaps the cell's rear end** (x 65.25-66.25 vs 65.6; cell position unchanged in Phase 2). heel.py still checks against frame.py's old cell. Closes: [reg-arm](reg-arm.md) issue 1.
+6. **Heel wire-channel exit overlaps the cell's rear end** (x 65.25-66.25 vs 65.6; cell position unchanged in Phase 2). heel.py now checks the real cell (ECR-0001, 2026-10-07): exit_in_rear_gap False, channel ↔ cell 0.085 mm (< 0.2). Closes: [reg-arm](reg-arm.md) issue 1.
 7. **Dock wire route** belly → rear pads undesigned: 5 wires in the 0.8 under-cell slack beside the flat tails; OD 0.8 won't lie flat, needs OD ≤ 0.6 or the rear-gap route (notes/shell_r2.md open items). Closes: [sub-dock-usb](sub-dock-usb.md).
-8. **Stale frame sources:** frame.py/pod.py disagree with dims_r2.py on 8 of 10 shared facts (interfaces.py frame WARN 2026-10-07; ECR-0001). The r2 rail is now centred on the body (blade.rail(zc), 2026-10-07); the adapter still uses pod.POD_ZC −2.0 until its redesign (O26). (notes x_stack mic_axis_x refreshed to 32.43.) Closes: ECR-0001 extended to pod.py; refresh the note.
+8. (closed 2026-10-07, ECR-0001) **Stale frame sources.** frame.py's pod names and pod.py POD_L/W/H/ZC now come from the current design's dims (frame.pod_facts(); revg via ULTRASONIC_DESIGN); interfaces.py frame PASS 10/10 (revg too). blade.rail()/adapter() default to the body centre −2.45; shell_r1 pins −2.0. Pre-rev-1 values frozen in shell.py PRE_R1. Before/after CAD diff: shell_r2, shell_r1, heel_add/heel_cut, pad, dummies' bodies unchanged; modelled adapter slot −0.45 mm, dummies' default rail −0.45 mm (now = shell_r2's), Blade/styles concept bodies follow the r2 envelope (ECR-0001 log).
 9. **No 3D render dump of r2** (section.png/plan.png only); STEP not exported. Closes: render dump (memory rule) after the owner review edits.
 10. **Unknowns:** VHB 4914 thickness tolerance and normal tensile (TDS not read [A]); bond and peel cycles; pod mass and CoM (D18; ≥ ~9.5 g lower bound vs ~8 g). Closes: TDS read + bench + CAD mass run.
 11. (closed in Phase 2) Foam strips without a floor: no foam; the board hangs from the lid.

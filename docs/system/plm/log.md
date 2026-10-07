@@ -200,3 +200,15 @@
 - 2026-10-07 10:53 review R-DOCK-BODY by ultrasonic-lead: 2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)
 - 2026-10-07 10:53 review R-BODY-ARM by ultrasonic-lead: 2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)
 - 2026-10-07 10:53 review REG-POD-BODY by ultrasonic-lead: 2026-10-07: blade.rail(zc) centres the r2 rail on the body (-2.45; audit item 7). Rail on the inner face x 36-62 only: dock bay, heel and strut relief unchanged (shell_r2 rebuild: 3 valid solids, no clash)
+- 2026-10-07 11:54 checkout PHYSICAL by claude-ecr0001: ECR-0001: frame.py/pod.py pod constants from the current design dims
+- 2026-10-07 11:54 checkout REG-ARM by claude-ecr0001: ECR-0001: frame.py/pod.py pod constants from the current design dims
+- 2026-10-07 11:54 checkout REG-POD-BODY by claude-ecr0001: ECR-0001: frame.py/pod.py pod constants from the current design dims
+- 2026-10-07 11:54 checkout REG-PAD by claude-ecr0001: ECR-0001: frame.py/pod.py pod constants from the current design dims
+- 2026-10-07 12:03 review R-PHYS-FRAME by claude-ecr0001: ECR-0001: frame.py pod names now from dims_r2 via pod_facts(); interfaces frame PASS 10/10 (phase2 and revg); pod.POD_ZC -2.45 so blade rail/adapter default = body centre; shell_r1 pins -2.0; CAD diff: shell_r2/shell_r1 identical
+- 2026-10-07 12:03 review R-BODY-ARM by claude-ecr0001: ECR-0001: heel_add/heel_cut/hardware solids identical before/after (vol, bbox, centroid); E unchanged; shell_r2.tub identical. heel checks now see the r2 cell: exit_in_rear_gap False, channel-cell 0.085 mm (known reg-arm issue 1 / reg-pod-body issue 6); plain-shell strut clearance 0.314->0.173 (blade.shell at r2 envelope, no relief)
+- 2026-10-07 12:03 review R-ARM-PAD by claude-ecr0001: ECR-0001: arm/pad constants untouched (frame.summary identical: E, A_E, span, T_worn, pad_centre); pad.py solids identical before/after
+- 2026-10-07 12:03 review R-UI-PAD by claude-ecr0001: ECR-0001: padboard/mech.py pod-side checks now read the frozen pre-rev-1 pod (shell.py PRE_R1); all checks/geometry outputs identical before/after; pad board and LED untouched
+- 2026-10-07 12:04 checkin PHYSICAL by claude-ecr0001
+- 2026-10-07 12:04 checkin REG-ARM by claude-ecr0001
+- 2026-10-07 12:04 checkin REG-POD-BODY by claude-ecr0001
+- 2026-10-07 12:04 checkin REG-PAD by claude-ecr0001

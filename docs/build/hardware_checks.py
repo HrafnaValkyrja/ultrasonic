@@ -144,7 +144,8 @@ chk("resin_candidate_full_TDS", True, "Siraya Blu: 50 MPa, 32 %, Izod 45 J/m, HD
     "siraya.tech, " + D)
 chk("vhb_4914_fits_tape_gap", 0.25 <= frame.TAPE, {"tape": 0.25, "gap": frame.TAPE, "spare": round(frame.TAPE - 0.25, 2)},
     "3M VHB 4914 (Tekra snippet), " + D)
-chk("poron_0.79_for_0.8_washer", True, {"thinnest_PORON_4701-30_mm": 0.79, "washer_t": frame.MIC_SEAL["washer_t"]},
+# pre-rev-1 mic chimney washer (was frame.MIC_SEAL washer_t 0.8; Phase 2 seals the duct with VHB instead, O24; ECR-0001)
+chk("poron_0.79_for_0.8_washer", True, {"thinnest_PORON_4701-30_mm": 0.79, "washer_t": 0.8},
     "rogerscorp.com PORON 4701-30 (snippet), " + D)
 
 # ------------------------------------------------------------------ 5. Dock

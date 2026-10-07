@@ -256,8 +256,8 @@ relations:
   - id: R-PHYS-FRAME
     a: PHYSICAL
     b: REG-POD-BODY
-    what: "shared frame constants (frame.py) vs the Phase-2 shell's own constants (dims_r2.py overrides several; interfaces.py frame: 8 of 10 differ, ECR-0001; blade.py rail/adapter centre pod.POD_ZC -2.0 vs r2 body centre -2.45)"
-    watch: ["sym:hw/mech/frame.py::PCB", "sym:hw/mech/frame.py::CELL", "sym:hw/mech/frame.py::BUTTON", "sym:hw/mech/frame.py::MIC_PORT", "sym:hw/mech/dims_r2.py::PCB", "sym:hw/mech/dims_r2.py::CELL"]
+    what: "frame.py pod names (X0..Z1, CAV, CELL, PCB, MIC_PORT, BUTTON) and pod.py POD_L/W/H/ZC derive from the current design's shell dims (frame.pod_facts(), ECR-0001 implemented 2026-10-07); interfaces.py frame PASS 10/10. blade.rail/adapter default to pod.POD_ZC (-2.45 in Phase 2); shell_r1 pins its as-built -2.0 (RAIL_ZC); shell.py keeps the pre-rev-1 pod frozen (PRE_R1)"
+    watch: ["sym:hw/mech/frame.py::pod_facts", "sym:hw/mech/frame.py::POD_NAMES", "sym:hw/mech/pod.py::POD_ZC", "sym:hw/mech/dims_r2.py::PCB", "sym:hw/mech/dims_r2.py::CELL"]
   # ---------------------------------------------------------------- requirements and cost
   - id: R-SPEC-POWER
     a: SPEC

@@ -1,7 +1,8 @@
 """Shared interface for the buildable pod: coordinates, stack-up, fasteners, tolerances, handoffs.
 
-Every part module (shell.py, heel.py, pad.py) builds against THIS file so they can be designed in
-parallel and still fit. Change a number here, not in a part module. (2026-09-30, owner decisions:
+Every part module (heel.py, pad.py, blade.py via pod.py, the shells) builds against THIS file so they can be designed in
+parallel and still fit. Arm, pad, anatomy, fasteners and the glasses interface are owned here; the pod body (X0..Z1, CAV,
+CELL, PCB, MIC_PORT, BUTTON) is read from the current design's shell dims (pod_facts(), ECR-0001, 2026-10-07). (2026-09-30, owner decisions:
 rev 1 is the prototype; resin printing; straight pre-set superelastic NiTi, direction set by
 angled sockets, no heat-setting; Blade exterior; removable frame adapter; LED ring on the pad.)
 
@@ -12,46 +13,92 @@ from __future__ import annotations
 
 import json
 import math
+import sys
 from pathlib import Path
 
 import numpy as np
 
 HERE = Path(__file__).resolve().parent
 
-# ----------------------------------------------------------------------------- pod envelope
-# (same numbers as blade.py; the pod sits on a 1.8 mm removable frame adapter)
+# ----------------------------------------------------------------------------- glasses interface (all designs)
 TEMPLE_T, TEMPLE_H = 2.5, 5.0
 ADAPT_T = 1.8
-X0, X1 = 29.5, 67.5                  # pod front (vision limit) .. rear
-Z0, Z1, ZC = -9.5, 5.5, -2.0          # pod bottom, top, centre
 Y_IN = TEMPLE_T + ADAPT_T             # 4.3 pod inner face (touches the adapter)
-Y_OUT = Y_IN + 10.0                   # 14.3 pod outer face (armour plate adds 0.8 on top)
-WALL = 0.8
-Y_SPLIT = 13.4                        # tub | lid seam: the lid is the outer face, 0.9 thick
-EDGE_CHAMFER = 1.0
 
-# cavity inside the tub
-CAV = dict(x0=X0 + WALL, x1=X1 - WALL, y0=Y_IN + WALL, y1=Y_SPLIT, z0=Z0 + WALL, z1=Z1 - WALL)
-# = x 30.3..66.7, y 5.1..13.4, z -8.7..4.7
+# ----------------------------------------------------------------------------- the pod body: from the CURRENT design (ECR-0001)
+# These names are not stored here. They resolve on first use (module __getattr__) from the selected design's shell dims
+# (hw/current.yaml `shell_dims` via tools/current.py): Phase 2 -> hw/mech/dims_r2.py (imported; numpy only);
+# ULTRASONIC_DESIGN=revg -> hw/mech/shell_r1.py (ast-read, never imported). Until 2026-10-07 this block held the pre-rev-1
+# pod (PCB 20 x 11.5, LP401230 + PCM, KXT321 button, lid screws, mic chimney); those values now live only in hw/mech/shell.py
+# (the pre-rev-1 shell, PRE_R1), the one script that still builds that pod.
+POD_NAMES = ("X0", "X1", "Z0", "Z1", "ZC", "Y_OUT", "Y_SPLIT", "WALL", "TAPE", "CAV", "CELL", "PCB", "MIC_PORT", "BUTTON")
+_POD_CACHE: dict = {}
 
-# ----------------------------------------------------------------------------- stack-up (inner -> outer)
-TAPE = 0.3                            # double-sided foam tape, cell to inner wall
-CELL = dict(x0=30.6, x1=61.6, y0=5.4, y1=9.7, z0=-8.25, z1=4.25)      # LP401230 MAX envelope
-PCM = dict(x0=61.8, x1=64.8, y0=5.4, y1=9.7, z0=-8.25, z1=4.25)       # cell protection board [Low]
-PCB = dict(x0=30.6, x1=50.6, y0=11.1, y1=11.9, z0=-7.75, z1=3.75)     # 20 x 11.5 x 0.8, 4-layer
-PARTS_IN = dict(y0=9.9, y1=11.1)      # tallest parts on the PCB's inner face (1.2)
-PARTS_OUT = dict(y0=11.9, y1=13.1)    # tallest parts on the outer face (1.2); lid inner face 13.4
-PCB_CLAMP_BAND = 0.6                  # no parts within 0.6 mm of the PCB's top/bottom edges (ribs clamp there)
-PCB_END_KEEPOUT = 0.5                 # no parts within 0.5 mm of the front/rear edges
-# wire pads: one row on the PCB's OUTER face along its REAR edge (x 49.2..50.4), top to bottom
-WIRE_PADS = ["OUT_A", "OUT_B", "LED+", "LED-", "BAT+", "BAT-", "VBUS", "GND_CHG"]
-WIRE_PAD = dict(x0=49.2, x1=50.4, z_top=3.0, pitch=1.3, h=1.0)      # pad k at z_top - k*pitch
-# rear free space: behind the PCB in the PCB layer (x 50.6..66.7, y 9.9..13.4): lid bosses, wire loop
-MIC_PORT = dict(x=34.5, z=-1.0, d_pcb=0.6, d_lid=1.0)                 # mic on PCB inner face, ports outward
-MIC_SEAL = dict(chimney_od=2.6, chimney_id=1.0, washer_od=3.0, washer_t=0.8, keepout_r=1.6)
-BUTTON = dict(x=42.5, z=1.9, body=(3.0, 2.0), height=0.6, travel=0.25, force_n=1.6)   # KXT321LHS on outer face
-LID_SCREWS = [(60.8, 2.7), (60.8, -6.4)]    # (x, z) on the outer face; into captured brass nuts
-LID_HOOK = dict(z0=-5.0, z1=1.0)             # front edge tongue under a notch in the front wall
+
+def _ast_constants(path):
+    """Module-level plain-number/dict constants of a CAD script, evaluated in order without running it (no CAD kernel)."""
+    import ast
+    env, safe = {}, {"__builtins__": {}, "dict": dict}
+    for node in ast.parse(Path(path).read_text()).body:
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        try:
+            val = eval(compile(ast.Expression(node.value), str(path), "eval"), safe, env)
+        except Exception:      # noqa: BLE001  (Path(...), function calls: not constants)
+            continue
+        t = node.targets[0]
+        if isinstance(t, ast.Name):
+            env[t.id] = val
+        elif isinstance(t, ast.Tuple) and all(isinstance(e, ast.Name) for e in t.elts):
+            env.update({e.id: v for e, v in zip(t.elts, val)})
+    return env
+
+
+def pod_facts(design=None):
+    """The pod body of the selected design (argument > env ULTRASONIC_DESIGN > hw/current.yaml) in this file's frame, mm.
+    Keys: POD_NAMES. CAV/CELL/PCB are x0..x1, y0..y1, z0..z1 boxes; ZC is the board (= cavity) centre line;
+    MIC_PORT is the lid port axis (x, z) with the board hole d_pcb and lid bore d_lid; BUTTON is the switch axis (x, z)."""
+    import copy
+    if str(HERE.parents[1] / "tools") not in sys.path:
+        sys.path.insert(0, str(HERE.parents[1] / "tools"))
+    from current import current
+    d = current(design)
+    if d.id not in _POD_CACHE:
+        path = d.shell_dims
+        if path.name == "shell_r1.py":                       # revg: Rev-1 shell, constants only
+            e = _ast_constants(path)
+            cav = dict(e["CAV"], y1=e["Y_SPLIT"])            # r1 lid is the outer 1.0 mm above the split
+            f = dict(X0=e["X0"], X1=e["X1"], Z0=e["Z0"], Z1=e["Z1"], ZC=e["ZC"], Y_OUT=e["Y_OUT"], Y_SPLIT=e["Y_SPLIT"],
+                     WALL=e["W"], CAV=cav, CELL=dict(e["CELL"]), PCB=dict(e["PCB"]),
+                     MIC_PORT=dict(x=e["MIC"][0], z=e["MIC"][1]), BUTTON=dict(x=e["SWITCH"][0], z=e["SWITCH"][1], ref="SW1"))
+        else:                                                # Phase 2+: a CAD-free dims module
+            import importlib.util
+            D = sys.modules.get(path.stem)
+            if D is None or Path(getattr(D, "__file__", "")).resolve() != path.resolve():
+                spec = importlib.util.spec_from_file_location(path.stem, path)
+                D = importlib.util.module_from_spec(spec)
+                sys.modules[path.stem] = D
+                try:
+                    spec.loader.exec_module(D)
+                except Exception:
+                    sys.modules.pop(path.stem, None)
+                    raise
+            f = dict(X0=D.X0, X1=D.X1, Z0=D.Z0, Z1=D.Z1, ZC=(D.PCB["z0"] + D.PCB["z1"]) / 2, Y_OUT=D.Y_OUT, Y_SPLIT=D.Y_SPLIT,
+                     WALL=D.W, CAV=dict(D.CAV), CELL=dict(D.CELL), PCB=dict(D.PCB),
+                     MIC_PORT=dict(x=D.MIC[0], z=D.MIC[1], d_pcb=D.MIC_HOLE_D, d_lid=D.DUCT_D),
+                     BUTTON=dict(x=D.SW[0], z=D.SW[1], ref="SW1", body=D.SW1["body"], height=D.SW1["h"], travel=D.SW1["travel"]))
+        f["TAPE"] = round(f["CELL"]["y0"] - Y_IN - f["WALL"], 6)     # cell-to-inner-wall gap (VHB): 0.3 in r1 and r2
+        f["design"] = d.id
+        _POD_CACHE[d.id] = f
+    return copy.deepcopy(_POD_CACHE[d.id])
+
+
+def __getattr__(name):
+    """frame.X0, frame.PCB, ... (POD_NAMES): the current design's value, see pod_facts()."""
+    if name in POD_NAMES:
+        return pod_facts()[name]
+    raise AttributeError(f"module 'frame' has no attribute {name!r}")
+
 
 # ----------------------------------------------------------------------------- fasteners & materials
 # Resin printing (owner). No heat-set inserts in resin: captured nuts or self-tapping screws.

@@ -22,6 +22,8 @@ REPO = HERE.parents[1]
 sys.path.insert(0, str(REPO / "hw/mech"))
 sys.path.insert(0, str(REPO / "tools"))
 import frame as F  # noqa: E402
+import shell as _SH  # noqa: E402  (pre-rev-1 shell; its frozen PRE_R1 pod is what these checks were written against)
+F0 = _SH.F       # pre-rev-1 pod (PCB 20 x 11.5, KXT321, lid screws, mic chimney): frozen in shell.py since ECR-0001
 
 OUT = REPO / "hw/mech/out/parts/electronics"
 OUT.mkdir(parents=True, exist_ok=True)
@@ -30,7 +32,7 @@ OUT.mkdir(parents=True, exist_ok=True)
 LED_H, SOLDER = 0.45, 0.03          # Everlight DSE-0008890 Rev 3 p6: 1.0 x 0.5 x 0.45 mm
 JOINT_H = 0.45                      # 0.25-0.3 mm OD wire + fillet on a pad, worst case
 PB = F.PAD_BOARD
-PCB = F.PCB
+PCB = F0.PCB
 Z_MID = (PCB["z0"] + PCB["z1"]) / 2                   # -2.0, the board's horizontal centre line
 JLC_EDGE_MIN = 0.2                                    # copper to routed edge (JLC capabilities, 2026-09-30)
 
@@ -131,9 +133,9 @@ def checks():
             add("NiTi pad-socket bottom clears pad-board parts (outward y gap)", gap_y > 0.3,
                 round(float(gap_y), 3), f"socket end at e1 {e1:.2f}, e3 {e3:.2f}, y {y:.2f} (rigid with the pad in every state)")
     # ---- pod PCB
-    top_band, bot_band = PCB["z1"] - F.PCB_CLAMP_BAND, PCB["z0"] + F.PCB_CLAMP_BAND
-    h = F.WIRE_PAD["h"]
-    for interp, zc0 in (("z_top = pad CENTRE", F.WIRE_PAD["z_top"]), ("z_top = pad TOP edge", F.WIRE_PAD["z_top"] - h / 2)):
+    top_band, bot_band = PCB["z1"] - F0.PCB_CLAMP_BAND, PCB["z0"] + F0.PCB_CLAMP_BAND
+    h = F0.WIRE_PAD["h"]
+    for interp, zc0 in (("z_top = pad CENTRE", F0.WIRE_PAD["z_top"]), ("z_top = pad TOP edge", F0.WIRE_PAD["z_top"] - h / 2)):
         zs = wire_pad_rows(zc0)
         intr = max(zs[0] + h / 2 - top_band, bot_band - (zs[-1] - h / 2), 0)
         add(f"frame wire pads vs clamp bands ({interp})", intr <= 0, round(float(intr), 3),
@@ -141,12 +143,12 @@ def checks():
     zs = wire_pad_rows(Z_MID + 3.5 * 1.3)
     add("8 pads x 1.0 at 1.3 pitch fit between the bands only when centred on z=-2.0",
         zs[0] + h / 2 <= top_band and zs[-1] - h / 2 >= bot_band, f"centred: {zs[-1]-h/2:.2f}..{zs[0]+h/2:.2f} (0.10 mm each side)")
-    edge = PCB["x1"] - F.WIRE_PAD["x1"]
+    edge = PCB["x1"] - F0.WIRE_PAD["x1"]
     add("frame wire pad copper to rear edge >= JLC 0.2 + 0.1 margin", edge >= JLC_EDGE_MIN + 0.1, round(edge, 3),
         "0.2 is JLC's absolute minimum; mouse bites or sanding there would cut into it")
-    gap = F.WIRE_PAD["pitch"] - h
+    gap = F0.WIRE_PAD["pitch"] - h
     add("frame wire pad gap for hand soldering (want >= 0.4)", gap >= 0.4, round(gap, 3), "1.0 mm round test pads, 0.3 mm apart")
-    b = F.BUTTON
+    b = F0.BUTTON
     bz0, bz1 = b["z"] - b["body"][1] / 2, b["z"] + b["body"][1] / 2
     bx0, bx1 = b["x"] - b["body"][0] / 2, b["x"] + b["body"][0] / 2
     mz1, mx0, mx1 = MCU["z"] + MCU["s"] / 2, MCU["x"] - MCU["s"] / 2, MCU["x"] + MCU["s"] / 2
@@ -155,20 +157,20 @@ def checks():
         "MCU must move >= 0.8 mm down (or to the inner face) under the frame's button; see note section 2")
     add("button on the board's centre line (needed for one board in both pods without moving it)", abs(b["z"] - Z_MID) < 0.05,
         b["z"], "it sits 3.9 mm above; the left pod (board turned over) would need it at z = -5.9")
-    add("mic port on the board's centre line (same reason)", abs(F.MIC_PORT["z"] - Z_MID) < 0.05, F.MIC_PORT["z"],
+    add("mic port on the board's centre line (same reason)", abs(F0.MIC_PORT["z"] - Z_MID) < 0.05, F0.MIC_PORT["z"],
         "1.0 mm above; the left pod would need its port at z = -3.0")
-    ks = F.MIC_SEAL["keepout_r"]
-    add("mic seal keep-out inside the board, clear of the clamp bands", F.MIC_PORT["z"] + ks <= top_band and
-        F.MIC_PORT["x"] - ks >= PCB["x0"] + F.PCB_END_KEEPOUT, f'x {F.MIC_PORT["x"]-ks:.2f}..{F.MIC_PORT["x"]+ks:.2f}, z {F.MIC_PORT["z"]-ks:.2f}..{F.MIC_PORT["z"]+ks:.2f}')
+    ks = F0.MIC_SEAL["keepout_r"]
+    add("mic seal keep-out inside the board, clear of the clamp bands", F0.MIC_PORT["z"] + ks <= top_band and
+        F0.MIC_PORT["x"] - ks >= PCB["x0"] + F0.PCB_END_KEEPOUT, f'x {F0.MIC_PORT["x"]-ks:.2f}..{F0.MIC_PORT["x"]+ks:.2f}, z {F0.MIC_PORT["z"]-ks:.2f}..{F0.MIC_PORT["z"]+ks:.2f}')
     nut = F.FASTENERS["M1.4_nut"]["pocket_af"] / 2
-    d = min(x for x, z in F.LID_SCREWS) - nut - PCB["x1"]
+    d = min(x for x, z in F0.LID_SCREWS) - nut - PCB["x1"]
     add("lid-screw nut pockets clear of the PCB rear edge", d > 3, round(d, 2), "screws are the charge contacts: VBUS top, GND bottom")
     place_mic = (2.2, 8.74)                      # hw/pod/place.py U2 (KiCad x, y)
     xw_right = PCB["x1"] - place_mic[0]
     add("place.py draft drawn for the right pod (mic at the front)", xw_right < 40, round(xw_right, 2),
         "draft puts the mic at KiCad x=2.2; viewed from outside the RIGHT pod KiCad x runs front->rear "
         "right-to-left, so this is the LEFT pod's board (or the right pod's board upside down)")
-    adj = adjacency(F.WIRE_PADS, HAZ_NO_SPLIT)
+    adj = adjacency(F0.WIRE_PADS, HAZ_NO_SPLIT)
     add("frame pad order: no high-hazard neighbours (R14 as drawn)", not any(x[2] == "H" for x in adj),
         [f"{a}|{b}:{h}" for a, b, h in adj])
     adj2 = adjacency(PROPOSED_ORDER, HAZ)
@@ -253,13 +255,13 @@ def shell_interface_checks():
     swd_top = 2.5 + 0.4
     c.append({"name": "SWD probe pads clear of the lid's top rib", "pass": rib_top0 - swd_top > 0.1,
               "value": round(rib_top0 - swd_top, 3), "note": ""})
-    fz = [(SH.TOP_BAND[0], F.CELL["z1"]), (F.CELL["z0"], SH.BOT_BAND[1])]
+    fz = [(SH.TOP_BAND[0], F0.CELL["z1"]), (F0.CELL["z0"], SH.BOT_BAND[1])]
     on_board = [(max(a, PCB["z0"]), min(b, PCB["z1"])) for a, b in fz]
     ok = abs(on_board[0][0] - SH.TOP_BAND[0]) < 1e-6 and abs(on_board[1][1] - SH.BOT_BAND[1]) < 1e-6
     c.append({"name": "cell foam strips press the board only inside its inner-face clamp bands", "pass": ok,
               "value": [[round(a, 2), round(b, 2)] for a, b in on_board],
               "note": "x 32.0..49.5; inner-face parts must stay out of both bands (they did already)"})
-    stub = PCB["x0"] - F.CAV["x0"]
+    stub = PCB["x0"] - F0.CAV["x0"]
     c.append({"name": "front edge: tub front stops only in the bands; room for an unsanded SWD-tab stub", "pass": stub > 0.1,
               "value": round(stub, 3), "note": "stops at x <= 30.55 in the bands; sand the stub flush anyway"})
     bx0 = v["boss_x"][0]
@@ -312,15 +314,15 @@ def cad():
 
     p = PCB
     sol = [box(p["x0"], p["x1"], p["y0"], p["y1"], p["z0"], p["z1"], "pod_pcb_0.8")]
-    for zz, nm in ((p["z1"] - F.PCB_CLAMP_BAND, "top"), (p["z0"], "bottom")):
-        sol.append(box(p["x0"], p["x1"], F.PARTS_IN["y0"], F.PARTS_OUT["y1"], zz, zz + F.PCB_CLAMP_BAND, f"keepout_clamp_band_{nm}"))
-    for xx, nm in ((p["x0"], "front"), (p["x1"] - F.PCB_END_KEEPOUT, "rear")):
-        sol.append(box(xx, xx + F.PCB_END_KEEPOUT, F.PARTS_IN["y0"], F.PARTS_OUT["y1"], p["z0"], p["z1"], f"keepout_end_{nm}"))
-    m = F.MIC_PORT
-    ch = Pos(m["x"], (p["y1"] + F.CAV["y1"]) / 2, m["z"]) * Location((0, 0, 0), (90, 0, 0)) * Cylinder(F.MIC_SEAL["keepout_r"], F.CAV["y1"] - p["y1"])
+    for zz, nm in ((p["z1"] - F0.PCB_CLAMP_BAND, "top"), (p["z0"], "bottom")):
+        sol.append(box(p["x0"], p["x1"], F0.PARTS_IN["y0"], F0.PARTS_OUT["y1"], zz, zz + F0.PCB_CLAMP_BAND, f"keepout_clamp_band_{nm}"))
+    for xx, nm in ((p["x0"], "front"), (p["x1"] - F0.PCB_END_KEEPOUT, "rear")):
+        sol.append(box(xx, xx + F0.PCB_END_KEEPOUT, F0.PARTS_IN["y0"], F0.PARTS_OUT["y1"], p["z0"], p["z1"], f"keepout_end_{nm}"))
+    m = F0.MIC_PORT
+    ch = Pos(m["x"], (p["y1"] + F0.CAV["y1"]) / 2, m["z"]) * Location((0, 0, 0), (90, 0, 0)) * Cylinder(F0.MIC_SEAL["keepout_r"], F0.CAV["y1"] - p["y1"])
     ch.label = "keepout_mic_seal_outer_face"
     sol.append(ch)
-    b = F.BUTTON
+    b = F0.BUTTON
     sol.append(box(b["x"] - b["body"][0] / 2, b["x"] + b["body"][0] / 2, p["y1"], p["y1"] + b["height"],
                    b["z"] - b["body"][1] / 2, b["z"] + b["body"][1] / 2, "SW1_button_body_frame_position"))
     zs = wire_pad_rows(Z_MID + 3.5 * 1.3)
@@ -352,30 +354,30 @@ def pictures():
     fig, axs = plt.subplots(2, 1, figsize=(10.5, 10.5), gridspec_kw={"height_ratios": [1.25, 1]})
     ax = axs[0]
     rect(ax, p["x0"], p["z0"], p["x1"] - p["x0"], p["z1"] - p["z0"], TX, lw=1.6)
-    for zz in (p["z1"] - F.PCB_CLAMP_BAND, p["z0"]):
-        rect(ax, p["x0"], zz, p["x1"] - p["x0"], F.PCB_CLAMP_BAND, T2, fill=True, alpha=0.35, hatch="////")
-    for xx in (p["x0"], p["x1"] - F.PCB_END_KEEPOUT):
-        rect(ax, xx, p["z0"], F.PCB_END_KEEPOUT, p["z1"] - p["z0"], T2, fill=True, alpha=0.25)
+    for zz in (p["z1"] - F0.PCB_CLAMP_BAND, p["z0"]):
+        rect(ax, p["x0"], zz, p["x1"] - p["x0"], F0.PCB_CLAMP_BAND, T2, fill=True, alpha=0.35, hatch="////")
+    for xx in (p["x0"], p["x1"] - F0.PCB_END_KEEPOUT):
+        rect(ax, xx, p["z0"], F0.PCB_END_KEEPOUT, p["z1"] - p["z0"], T2, fill=True, alpha=0.25)
     rect(ax, MCU["x"] - 3.5, MCU["z"] - 3.5, 7, 7, S[6], ls="--")
     ax.text(MCU["x"], MCU["z"] - 0.6, "MCU 7x7\n(draft, centred)", color=S[6], ha="center", va="center", fontsize=8)
-    b = F.BUTTON
+    b = F0.BUTTON
     rect(ax, b["x"] - 1.5, b["z"] - 1.0, 3.0, 2.0, S[7], fill=True, alpha=0.35)
-    ax.text(b["x"], F.CAV["z1"] + 0.25, "button (frame) overlaps MCU 0.6", color=S[7], ha="center", va="bottom", fontsize=8)
+    ax.text(b["x"], F0.CAV["z1"] + 0.25, "button (frame) overlaps MCU 0.6", color=S[7], ha="center", va="bottom", fontsize=8)
     rect(ax, 44.0, Z_MID - 1.5, 2.0, 3.0, S[7], ls=":")
     ax.text(45.0, Z_MID, "button\n(L3)", color=S[7], ha="center", va="center", fontsize=7)
-    m = F.MIC_PORT
-    ax.add_patch(Circle((m["x"], m["z"]), F.MIC_SEAL["keepout_r"], fc=S[2], alpha=0.3, ec=S[2]))
+    m = F0.MIC_PORT
+    ax.add_patch(Circle((m["x"], m["z"]), F0.MIC_SEAL["keepout_r"], fc=S[2], alpha=0.3, ec=S[2]))
     ax.add_patch(Circle((m["x"], m["z"]), m["d_pcb"] / 2, fc=plotstyle.SURFACE, ec=S[2]))
-    ax.add_patch(Circle((m["x"], Z_MID), F.MIC_SEAL["keepout_r"], fc="none", ec=S[2], ls=":"))
+    ax.add_patch(Circle((m["x"], Z_MID), F0.MIC_SEAL["keepout_r"], fc="none", ec=S[2], ls=":"))
     ax.text(m["x"], -3.9, "mic port 0.6,\nseal keep-out r1.6\n(dotted: L3 position)", color=S[2], ha="center", va="top", fontsize=7.5)
     for k in range(5):
         zc = 2.5 - 1.27 * k
         rect(ax, p["x0"] + 0.5, zc - 0.4, 1.4, 0.8, S[3], fill=True, alpha=0.8)
     ax.text(p["x0"] + 1.2, 2.5 - 1.27 * 4 - 0.8, "SWD\nprobe\n1.27", color=S[3], ha="center", va="top", fontsize=7)
     # frame's wire pads (circles) and proposed P2
-    zs_frame = wire_pad_rows(F.WIRE_PAD["z_top"])
+    zs_frame = wire_pad_rows(F0.WIRE_PAD["z_top"])
     for k, zc in enumerate(zs_frame):
-        ax.add_patch(Circle(((F.WIRE_PAD["x0"] + F.WIRE_PAD["x1"]) / 2, zc), 0.5, fc="none", ec=S[1], lw=0.9))
+        ax.add_patch(Circle(((F0.WIRE_PAD["x0"] + F0.WIRE_PAD["x1"]) / 2, zc), 0.5, fc="none", ec=S[1], lw=0.9))
     zs = wire_pad_rows(Z_MID + 3.5 * 1.3)
     for k, zc in enumerate(zs):
         x1 = p["x1"] - 0.3 if k % 2 == 0 else p["x1"] - 2.1
@@ -387,7 +389,7 @@ def pictures():
     # ---- shell agent's "proposed" variant (hw/mech/shell.py): the LID locates the board
     import shell as SH
     v = SH.VARIANTS["proposed"]
-    cz0, cz1 = F.CAV["z0"], F.CAV["z1"]
+    cz0, cz1 = F0.CAV["z0"], F0.CAV["z1"]
     rt0, rb1 = SH.TOP_BAND[0] + 0.05, SH.BOT_BAND[1] - 0.05
     for xa, xb in ((SH.RIB_X[0], 35.8), (46.6, SH.RIB_X[1])):          # top rib gap = button flexure
         rect(ax, xa, rt0, xb - xa, p["z1"] - rt0, S[1], fill=True, alpha=0.6, lw=0.6)
@@ -397,7 +399,7 @@ def pictures():
     for za, zb in ((rt0, cz1 - 0.15), (cz0 + 0.15, rb1)):
         rect(ax, SH.REAR_STOP_X[0], za, SH.REAR_STOP_X[1] - SH.REAR_STOP_X[0], zb - za, S[1], fill=True, alpha=0.95, lw=0.6)
     for za, zb in (SH.TOP_BAND, SH.BOT_BAND):
-        rect(ax, F.CAV["x0"], za, SH.FRONT_STOP_X1 - F.CAV["x0"], zb - za, S[4], fill=True, alpha=0.95, lw=0.6)
+        rect(ax, F0.CAV["x0"], za, SH.FRONT_STOP_X1 - F0.CAV["x0"], zb - za, S[4], fill=True, alpha=0.95, lw=0.6)
     pcm = v["pcm"]
     rect(ax, pcm["x0"], pcm["z0"], pcm["x1"] - pcm["x0"], pcm["z1"] - pcm["z0"], T2, ls="--", lw=0.9)
     ax.text((pcm["x0"] + pcm["x1"]) / 2, -6.2, "cell PCM\nfolded flat\n(placeholder)", color=T2, ha="center", va="center", fontsize=6.5)
@@ -406,9 +408,9 @@ def pictures():
         rect(ax, bx[0], z - 2.0, bx[1] - bx[0], 4.0, S[5], ls="-", lw=0.7)
         ax.add_patch(Circle((x, z), 1.4, fc=S[5], alpha=0.45, ec=S[5]))
         ax.text(x, z, nm, color=TX, ha="center", va="center", fontsize=6.5)
-    for (x, z) in F.LID_SCREWS:
+    for (x, z) in F0.LID_SCREWS:
         ax.add_patch(Circle((x, z), 1.4, fc="none", ec=S[5], ls=":", lw=0.9))
-    ax.text(F.LID_SCREWS[0][0], F.LID_SCREWS[0][1] + 1.9, "frame.py\nscrew (old)", color=S[5], ha="center", va="bottom", fontsize=6)
+    ax.text(F0.LID_SCREWS[0][0], F0.LID_SCREWS[0][1] + 1.9, "frame.py\nscrew (old)", color=S[5], ha="center", va="bottom", fontsize=6)
     for k, (x, z) in enumerate(v["screws"]):
         ax.annotate("", xy=(p["x1"] + 0.1, zs[k]), xytext=(bx[0] - 0.1, z if k == 0 else z + 1.0),
                     arrowprops=dict(arrowstyle="->", color=S[5], lw=0.9, connectionstyle="arc3,rad=0.15"))

@@ -1,6 +1,6 @@
 # Pad: transducer cup, contact face, pad board and LED
 Rev MZ-2 2026-10-07: pad region unchanged by Phase 2 (ECR-0018 touches the pod board and shell only); reg-board row points at the Phase-2 BOM and the B-face pod-board pads.
-Status: CAD rev 1, not built. `pad.py` build 2026-10-01 00:54: checks.json `all_pass` false, 2 known items (open issue 6). Pad board draft `hw/padboard/layout.py` 2026-09-30 23:37, DRC 0 violations / 0 unconnected. Exciter not measured (E1). Updated 2026-10-01.
+Status: CAD rev 1, not built. `pad.py` build 2026-10-01 00:54: checks.json `all_pass` false, 2 known items (open issue 6). Pad board draft `hw/padboard/layout.py` 2026-09-30 23:37, DRC 0 violations / 0 unconnected. Exciter not measured (E1). `hw/padboard/mech.py` pod-side checks read the pre-rev-1 pod frozen in `shell.py` PRE_R1 since ECR-0001 (2026-10-07; outputs unchanged). Updated 2026-10-07.
 · Source of truth: `hw/mech/pad.py`, `hw/mech/frame.py` (`PAD_*`, `TRANSDUCER`, `pad_pose`), `hw/padboard/gen.py` (pad-board schematic), `hw/padboard/layout.py` (pad positions), `hw/padboard/mech.py`, `docs/build/tolerances.md` (transducer pod)
 · Owner decisions: O8 (LED, solid), O10 (test/final build), O11 (Sugru contact, swappable inserts), O12(b) (IPX4–5), O16(4) (larger near-flat pad), O16(6) (cup screw OK), O19 (serviceable by the owner) · Open ECRs: ECR-0006 (weighted printed dummy pair, 2 h wear test; R20), ECR-0007 (buy exciters now, E1/E2; R19)
 

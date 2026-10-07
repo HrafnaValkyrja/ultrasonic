@@ -1,6 +1,6 @@
 # Physical integration: frame, stack-up, sealing, assembly
 Rev MZ-2 2026-10-07: body rewritten to the Phase-2 build (`hw/current.yaml`, ECR-0018): one-face 30 × 12 board hung from the lid on per-pad-cut VHB, seam at the board's B face, sealed D1.0 duct + gauge pin, SW1 pocket + puck, B-face rear wire pads + stowage zone; Rev F/G stack moved to the reference section.
-Status: Phase-2 shell `hw/mech/shell_r2.py` / `dims_r2.py` (checks.json all clashes 0, rebuilt for c348661 2026-10-07) + routed board `hw/pod/draft_r2/out/routed.kicad_pcb` (DRC 0, 0 unconnected, 2026-10-07). Not printed, not built; owner review pending (O25). Updated 2026-10-07. · Source of truth: `hw/mech/dims_r2.py` (Phase-2 numbers), `hw/mech/notes/shell_r2.md` (decisions, assembly sequence), `hw/mech/frame.py` (axes, arm, pad, fasteners), `hw/mech/pod.py` + `hw/mech/blade.py` (rail, catch, adapter), `hw/mech/heel.py`, `hw/mech/pad.py`, `hw/pod/draft_r2/placement.yaml` + routed board, `docs/build/tolerances.md` (Rev-1 fits) · Owner decisions: O9, O10, O11, O12(b), O16(5)(6), O17, O19, O24, O25/O26, O27 · Open ECRs: ECR-0001 (frame constants), ECR-0006 (weighted dummy pair; R20, R24), ECR-0018 (Phase 2)
+Status: Phase-2 shell `hw/mech/shell_r2.py` / `dims_r2.py` (checks.json all clashes 0, rebuilt for c348661 2026-10-07) + routed board `hw/pod/draft_r2/out/routed.kicad_pcb` (DRC 0, 0 unconnected, 2026-10-07). Not printed, not built; owner review pending (O25). Updated 2026-10-07. · Source of truth: `hw/mech/dims_r2.py` (Phase-2 numbers), `hw/mech/notes/shell_r2.md` (decisions, assembly sequence), `hw/mech/frame.py` (axes, arm, pad, fasteners), `hw/mech/pod.py` + `hw/mech/blade.py` (rail, catch, adapter), `hw/mech/heel.py`, `hw/mech/pad.py`, `hw/pod/draft_r2/placement.yaml` + routed board, `docs/build/tolerances.md` (Rev-1 fits) · Owner decisions: O9, O10, O11, O12(b), O16(5)(6), O17, O19, O24, O25/O26, O27 · ECR-0001 (frame constants) implemented 2026-10-07, awaiting owner review · Open ECRs: ECR-0006 (weighted dummy pair; R20, R24), ECR-0018 (Phase 2)
 
 ## Purpose
 Keeps every region (pod body, board, cell, arm, pad) in one coordinate frame, so a change in one can be checked against the others: what sits where, what touches what, how water gets in, and in what order it all goes together. It carries no F-row of its own; it is the mechanical counterpart of every F-row in [integration-map.md](integration-map.md) §1 and the keep-outs in §7.
@@ -27,7 +27,7 @@ Keeps every region (pod body, board, cell, arm, pad) in one coordinate frame, so
 
 **Note on the mirror.** Same board, F toward the lid, mic end forward in both pods; seen from outside, one pod shows KiCad's top view, the other that view rotated 180°. Anything off the centre line (TP pads, U3, L1, the J-pad order) lands at a different height in each pod. The mic and SW1 are on the line, so the shell needs no per-pod change; the rear pads stay in the stowage zone either way (`notes/shell_r2.md` open items).
 
-**Which numbers are live.** For Phase 2 trust `dims_r2.py` (CAD-free; read by `shell_r2.py`, `tools/checks/interfaces.py`, `sim/acoustics/geometry.py`). `frame.py` still holds round-1 values (PCB 20 × 11.5 at y 11.1-11.9, LP401230 cell, KXT321 button, mic chimney): interfaces.py [frame] WARN, 8 of 10 shared facts differ (2026-10-07; ECR-0001). `heel.py` and `pad.py` build against `frame.py` (axes, arm, pad: valid; cell/cavity: stale). `blade.py` centres the rail and adapter on `pod.py` POD_ZC −2.0; the Phase-2 body centre is −2.45, so they sit **0.45 mm** off it [derived] (r1: 0.1). Phase 2 kept X0/X1/Z0/Y_IN from r1, so heel, rail, strut relief and NiTi clearances are geometrically unchanged (`notes/shell_r2.md` frame).
+**Which numbers are live.** For Phase 2 trust `dims_r2.py` (CAD-free; read by `shell_r2.py`, `tools/checks/interfaces.py`, `sim/acoustics/geometry.py`). Since ECR-0001 (2026-10-07) `frame.py`'s pod names (X0, X1, Z0, Z1, ZC, Y_OUT, Y_SPLIT, WALL, TAPE, CAV, CELL, PCB, MIC_PORT, BUTTON) are not stored there: `frame.pod_facts()` reads them from the selected design's shell dims (`hw/current.yaml` `shell_dims`; env `ULTRASONIC_DESIGN=revg` gives shell_r1's). `pod.py` POD_L/W/H/ZC follow them (Phase 2: 38.0 × 9.7 × 14.5, centre −2.45), so `blade.rail()`/`blade.adapter()` now default to the body centre; `shell_r1.py` pins its as-built −2.0 (RAIL_ZC). interfaces.py [frame] PASS 10/10. The pre-rev-1 pod (PCB 20 × 11.5, LP401230 + PCM, KXT321, lid screws, mic chimney) lives only in `shell.py` PRE_R1 (historical). `heel.py` and `pad.py` keep axes, arm and pad from `frame.py` (unchanged: heel and pad solids have identical volume, bounding box and centroid before and after); heel's checks now see the real cell and board.
 
 ### Key positions (pod mm, Phase 2; CAD pod for z)
 | Feature | x | y | z | Source (2026-10-07) |
@@ -141,7 +141,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 | 6 | [sub-power](sub-power.md) (cell) ↔ [reg-board](reg-board.md) | battery | leads to J5 (28.9, 1.1) / J4 (27.0, 1.9); optional NTC to J9 (28.9, 3.3) | F5-F8 |
 | 7 | [reg-pod-body](reg-pod-body.md) ↔ [reg-board](reg-board.md) | retention | full-face VHB on F (91 % bonded), x-stop 0.25, long edges free 0.45 | – |
 | 8 | [reg-pod-body](reg-pod-body.md) (tub ↔ lid) | seal + access | seam y 12.1, tongue/groove, belly all tub, rebate tub-only | – |
-| 9 | [reg-pod-body](reg-pod-body.md) ↔ glasses | mounting | `blade.py` dovetail + snap tab, centred on pod.py −2.0 (body −2.45) | §1.2.1 |
+| 9 | [reg-pod-body](reg-pod-body.md) ↔ glasses | mounting | `blade.py` dovetail + snap tab, centred on pod.POD_ZC = body centre −2.45 (ECR-0001) | §1.2.1 |
 | 10 | [reg-pad](reg-pad.md) ↔ skin | vibration + preload | contact face at (70.6, −3.0, −25.0), pressing −y | D1 |
 | 11 | [reg-board](reg-board.md) ↔ [reg-pod-body](reg-pod-body.md) ([sub-debug-test](sub-debug-test.md)) | test access | TP1-TP6 on F under VHB cut-outs: bench only, before step 8 | F14 |
 
@@ -167,9 +167,9 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 
 ## Open issues (IDs stable; gaps = closed)
 1. (closed in Phase 2) Mic port unsealed: sealed D1.0 duct (O24); 1b board port vs lid bore: nominal 0.000, gauge pin worst 0.115 (dims_r2.duct_offsets, 2026-10-07). R-ACO-P6 keep-out holds since 2026-10-07 (reg-pod-body issue 19 closed).
-2. **Heel wire exit vs the cell.** Exit x 65.25-66.25 vs cell end 65.6 (unchanged in Phase 2); heel.py's exit check still uses frame.py's old cell. Close: re-run against dims_r2 CELL or move the exit; dry-fit the pouch.
+2. **Heel wire exit vs the cell.** Exit x 65.25-66.25 vs cell end 65.6 (unchanged in Phase 2); heel.py now checks the real cell (ECR-0001): exit_in_rear_gap **False**, channel ↔ cell 0.085 mm (< 0.2 rule). Close: move the exit or accept with a dry-fit of the pouch.
 3. **Dock wire route not designed.** 5 wires from the belly to the B pads at board x 25-29: 0.8 under the cell beside the flat tails (0.85 tail-to-cell) or the rear gap; OD ≤ 0.6 needed under the cell (notes/shell_r2.md).
-4. **`frame.py` / `pod.py` stale** (8 of 10 facts, ECR-0001; rail/adapter 0.45 off the body centre).
+4. (closed 2026-10-07, ECR-0001) `frame.py` / `pod.py` derive the pod from the current dims; rail and adapter default to the body centre.
 5. **Which pod the CAD is**, and board orientation per pod, are stated two ways (pcb-mech-interface §1 "right"; dims_r2/notes "right = mirror"). Close: one statement in dims_r2 + a KiCad 3D render placed in the CAD for both pods.
 6. **Sealing unverified.** No IP test plan; mesh, skin, tape and adhesive products not chosen.
 7. (closed in Phase 2) Plunger reach: selective-fit puck kit (switch_stack PASS); residual lateral WARN in sub-ui / reg-pod-body issue 4.
@@ -182,7 +182,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 14. **Service** costs one seam cut per cell or arm swap; a board swap or SWD also destroys the board bond (Service table).
 15. **Wire stowage fill** is volume-checked (277 vs 107-142 mm³) but not routed: 12 loops, wires enter the 1.4 B gap to reach pads at board x 25-29 (up to 4.9 mm in front of the board's rear edge, J3 at board x 25.1). Close: a wire-route sketch with gauges (sub-dock-usb, sub-power).
 16. (closed in Phase 2) USB-C fallback: keep-out not carried into shell_r2 (R-DOCK-BODY).
-17. **Three frame sources** (`frame.py`, `dims_r2.py`, `pod.py`/`blade.py`): see issue 4.
+17. (closed 2026-10-07, ECR-0001) One pod source: `dims_r2.py` (via `frame.pod_facts()`); `frame.py` owns axes, adapter, arm and pad only.
 18. **Phase-2 tolerances unverified [A]** (JLC outline ±0.2 / NPTH ±0.05, VHB thickness, resin ±0.05, KMT022 height); `docs/build/tolerances.md` is Rev-1 only.
 
 ## Before you change this, check
@@ -192,7 +192,7 @@ Cycle count the seam survives: unknown (reg-pod-body issues 10, 12, 14).
 - Anything off the centre line lands at a different height in each pod.
 - Changing the arm wire count changes the heel channel Ø1.0, strut bore Ø1.2, counterbores and J pads ([reg-arm](reg-arm.md), [reg-pad](reg-pad.md)).
 - Changing lid/plate thickness changes the duct length (acoustics scenario `phase2_r2`) and the puck kit.
-- Editing `frame.py` changes what `heel.py` and `pad.py` build; editing `dims_r2.py` changes shell, interfaces.py and sim/acoustics together.
+- Editing `frame.py` changes what `heel.py` and `pad.py` build; editing `dims_r2.py` changes shell, interfaces.py, sim/acoustics and (via `frame.pod_facts()` / `pod.py`) heel's checks and blade's rail/adapter default together.
 - Then walk [integration-map.md §10](integration-map.md#10-required-cross-check-for-every-proposed-change) and `python3 tools/plm.py impact PHYSICAL`.
 
 ## Reference design (Rev F/G)
