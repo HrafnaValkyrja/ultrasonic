@@ -40,10 +40,10 @@ def main():
         "project": "Stereo Ultrasound",
         "updated": datetime.now().astimezone().isoformat(timespec="seconds"),
         "phase": "Phase 2: miniaturization (internals); owner review of the layout due ~mid-October",
-        "headline": "One-face 30 x 12 mm board routed (1 connection left) + Phase-2 shell; size research done, battery decision waits on the runtime rule (D18)",
+        "headline": "One-face 30 x 12 mm board fully routed (DRC clean) + Phase-2 shell; size research done, battery decision waits on the runtime rule (D18)",
         "progress": [
             {"item": "Phase 1 logical simplification (Rev F/G)", "state": "done", "pct": 100},
-            {"item": "Phase 2 board layout (draft_r2)", "state": "routing: 1 open connection", "pct": 90},
+            {"item": "Phase 2 board layout (draft_r2)", "state": "fully routed, DRC clean; owner review pending", "pct": 95},
             {"item": "Phase 2 shell (shell_r2)", "state": "first model; duct re-check after mic move", "pct": 60},
             {"item": "Stage-C sims on the Phase-2 board", "state": "noise model needs the +3V0 plane", "pct": 40},
             {"item": "Drastic size options K1/K2'", "state": "researched; owner call D18", "pct": 30},
