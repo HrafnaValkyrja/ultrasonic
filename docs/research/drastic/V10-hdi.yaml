@@ -1,0 +1,56 @@
+# V10 HDI / via-in-pad options for K4 board P (6L, STM32U575 QFN48 0.5mm + Hirose BM28 0.35mm)
+# read: 2026-10-07. Facts marked [src]; gaps marked UNVERIFIED. Prices NOT published by JLC in capability docs; quote needed.
+id: V10
+date: 2026-10-07
+glosses: {POFV: plated-over filled via (via-in-pad), HDI: high density interconnect, BM28: Hirose 0.35mm-pitch board-to-board connector, QFN48: quad flat no-lead 48 pins, ENIG: electroless nickel immersion gold}
+sources:
+  S1: {url: https://jlcpcb.com/capabilities/Multilayer-PCB-Capabilities, read: 2026-10-07}
+  S2: {url: https://jlcpcb.com/capabilities/pcb-capabilities, read: 2026-10-07}
+  S3: {url: https://jlcpcb.com/help/article/hdi-pcb-capabilities-faq, read: 2026-10-07}
+  S4: {url: https://raw.githubusercontent.com/freerouting/freerouting/master/src/main/java/app/freerouting/io/specctra/parser/Structure.java, read: 2026-10-07}
+  S5: {url: https://www.futureelectronics.com/p/5091805 (BM28 listing only; no land pattern), read: 2026-10-07}
+jlc:
+  std_6L:  # S1,S2
+    trace_space_1oz: 0.09/0.09 mm (3.5 mil)
+    via_min: hole 0.15 / pad 0.25 mm; preferred hole >=0.2
+    via_min_thin: hole 0.10 / pad 0.20 mm ONLY board <=1.0 mm AND ENIG/OSP
+    via_hole_to_hole: 0.2 mm
+    annular_ring_PTH_1oz: recommended 0.20, absolute min 0.15
+    bga_pad_min: 0.2 mm, ENIG required, pad-to-trace >=0.1 mm
+    thickness: 0.4/0.6/0.8/1.0/1.2/1.6/2.0 mm
+    NOTE: project via 0.35/0.15 and clearance 0.11 is well above JLC min; 0.25 pad / 0.15 hole / 0.09 space is legal today
+  via_in_pad_POFV:  # S2 + search snippet (2nd-hand: "free of charge for 6-layer boards" - UNVERIFIED on JLC order page; check at quote)
+    options: [soldermask-filled (not usable under pad; via<=0.5 and >=0.35 mm from other mask openings), "Epoxy Filled & Capped", "Copper paste Filled & Capped"]
+    via_dia_range: 0.15-0.55 mm
+    fee: not in capability docs; 6L reportedly free (UNVERIFIED); 2L/4L reportedly paid. Select at quote -> read price line.
+    use: put 0.15/0.25 via inside QFN/BM28 pads, ENIG finish
+  hdi_blind_buried:  # S2,S3
+    offered: yes, 1-step / 2-step / 3-step (1st order = 1 lamination + 1 laser drill)
+    laser_hole: 0.075-0.15 mm (default 0.1); annular ring >=0.075; pad >= hole+0.15 (so 0.10 hole -> 0.25 pad)
+    blind_aspect: depth:dia <=1:1 (filled+planarised by plating)
+    buried_mech: 0.15-0.55 mm (extreme 0.10), resin plugged+capped
+    hole_edge_spacing_diff_net: >=0.24 mm
+    line_space: 3/3 mil min (recommend 3.5/3.5, extreme 2.7)
+    max_thickness: 2.4 mm; min panel V-cut 30x60
+    layer_pairs: UNVERIFIED (page lists 8L example only; 1+N+1 typical L1-L2 blind). Layer count min for HDI not stated.
+    price: UNVERIFIED. Search snippets (non-primary, low trust): HDI +$20-50 per 5 pcs, buried +$50-100. Real quote for 2 designs x 5 pcs 15x12mm 6L = owner/quote step (calculator needs login/Gerbers).
+    lead_time: UNVERIFIED (HDI usually longer than std)
+bm28_escape:
+  land_pattern: Hirose recommended pattern NOT retrieved (distributor pages carry none; drawing is in Hirose BM28 catalog PDF CL0684-xxxx). Need fetch from hirose.com. Do not invent pad dims; project footprints already C424570/C424571.
+  geometry: 0.35 mm pitch, 2 rows (30 pos = 15/row). Pad width ~0.2 (UNVERIFIED) -> 0.15 gap; trace 0.09 fits only 1 trace between pads, no via between pads (via pad 0.25 > gap).
+  routes: (a) outer row escapes outward on top layer, inner row needs via-in-pad -> POFV or microvia in pad; (b) 0.1 laser via in pad (HDI) is the only fanout that fits pad width; (c) mechanical 0.15 via in 0.2-wide pad does not fit even POFV -> pad-adjacent dog-bone impossible at 0.35 pitch.
+  guidance: UNVERIFIED vs Hirose; verify before committing.
+freerouting:
+  dsn_keyword: "(control (via_at_smd on))"  # S4: parser reads Keyword.VIA_AT_SMD in control scope; writer emits "on" if any via info attachSmdAllowed()
+  kicad_export: KiCad 10 ExportSpecctraDSN emits NO control block and no via_at_smd (checked hw/pod/draft_r1/pod_r1.dsn: structure has only layers, boundary, plane, via, rule). So default = vias NOT allowed on SMD pads.
+  how_to_enable:
+    - post-process the DSN text before FreeRouting: add "(control (via_at_smd on))" inside (structure ...) (Specctra spec location is structure scope; S4 shows parser handles it in control scope inside structure) -> UNVERIFIED empirically; test on tiny board, no parallel runs
+    - also check CLI/GUI setting "Attach SMD" (jar properties key attach_smd) - per-via-type flag; unclear whether the DSN flag sets it. Test.
+  limits: flag only permits vias on SMD pad area; FreeRouting does not know about filled-via fab cost and will drop vias in any pad it likes (incl. non-fanout) -> use 6L free POFV or constrain.
+  fallback_robust: pre-place fixed fanout vias in script (one via in each QFN pad that needs it, same net, as pcbnew VIAs), then export; FreeRouting treats them as fixed same-net copper. No DSN change needed. Also prefer pre-fanout in all BM28 inner-row pads.
+  caveat: "KiCad DRC: via in pad ok if same net; mark via 'tented' none, set pad-to-via same-net allowed. fab note: Epoxy Filled & Capped in JLC order"
+recommendation:  # owner decides
+  A: "Stay std 6L, 0.15/0.25 vias, 0.09 trace, + POFV epoxy-capped (reportedly free on 6L) with script pre-placed fanout vias in QFN/BM28 pads. Lowest cost/risk. Verify POFV fee at quote."   # recommended
+  B: "A + JLC HDI 1+N+1 laser microvias 0.1 for BM28 inner row. Extra cost+lead time; use only if A fails."
+  C: "Relax: move to BM28 0.5 mm-pitch class / bigger land (mechanical) - out of scope here."
+todo: [fetch Hirose BM28 land pattern PDF, get live JLC quote for POFV+HDI (needs Gerbers/login), empirical test of via_at_smd on]
