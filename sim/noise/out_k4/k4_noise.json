@@ -1,0 +1,535 @@
+{
+ "args": {
+  "gap": 1.3,
+  "floor": 0.1,
+  "out": "/home/hrafnavalkyrja/Desktop/ultrasonic/sim/noise/out_k4"
+ },
+ "cases": {
+  "traces_only": {
+   "F01_BRIDGE_OUT|FV1_MIC_VDD": {
+    "f_dominant_hz": 2000000,
+    "dB_signed": 10.5,
+    "dB_abs": 16.2,
+    "per_f": {
+     "200000": {
+      "M_today": -0.2799,
+      "M_k4": -0.5997,
+      "dB_signed": 6.6,
+      "abs_today": 1.794,
+      "abs_k4": 11.3214,
+      "dB_abs": 16.0
+     },
+     "600000": {
+      "M_today": -0.2422,
+      "M_k4": -0.5495,
+      "dB_signed": 7.1,
+      "abs_today": 1.5523,
+      "abs_k4": 9.793,
+      "dB_abs": 16.0
+     },
+     "2000000": {
+      "M_today": -0.1233,
+      "M_k4": -0.4117,
+      "dB_signed": 10.5,
+      "abs_today": 0.7907,
+      "abs_k4": 5.1201,
+      "dB_abs": 16.2
+     }
+    }
+   },
+   "F01_BRIDGE_OUT|FV2_MIC_DATA": {
+    "f_dominant_hz": 2000000,
+    "dB_signed": 18.3,
+    "dB_abs": 22.9,
+    "per_f": {
+     "200000": {
+      "M_today": 0.0504,
+      "M_k4": -0.3734,
+      "dB_signed": 17.4,
+      "abs_today": 0.3603,
+      "abs_k4": 5.5504,
+      "dB_abs": 23.8
+     },
+     "600000": {
+      "M_today": 0.0436,
+      "M_k4": -0.3321,
+      "dB_signed": 17.6,
+      "abs_today": 0.3118,
+      "abs_k4": 4.6935,
+      "dB_abs": 23.6
+     },
+     "2000000": {
+      "M_today": 0.0222,
+      "M_k4": -0.1822,
+      "dB_signed": 18.3,
+      "abs_today": 0.159,
+      "abs_k4": 2.2278,
+      "dB_abs": 22.9
+     }
+    },
+    "margin_today": [
+     105.1
+    ],
+    "margin_k4_signed": [
+     86.8
+    ],
+    "margin_k4_absbound": [
+     82.2
+    ]
+   },
+   "F01_BRIDGE_OUT|FV3_MIC_CLK": {
+    "f_dominant_hz": 2000000,
+    "dB_signed": 12.4,
+    "dB_abs": 20.7,
+    "per_f": {
+     "200000": {
+      "M_today": -0.059,
+      "M_k4": 0.2263,
+      "dB_signed": 11.7,
+      "abs_today": 0.6718,
+      "abs_k4": 7.179,
+      "dB_abs": 20.6
+     },
+     "600000": {
+      "M_today": -0.0511,
+      "M_k4": 0.2015,
+      "dB_signed": 11.9,
+      "abs_today": 0.5814,
+      "abs_k4": 6.2003,
+      "dB_abs": 20.6
+     },
+     "2000000": {
+      "M_today": -0.026,
+      "M_k4": 0.1087,
+      "dB_signed": 12.4,
+      "abs_today": 0.2964,
+      "abs_k4": 3.202,
+      "dB_abs": 20.7
+     }
+    },
+    "margin_today": [
+     103.4
+    ],
+    "margin_k4_signed": [
+     91.0
+    ],
+    "margin_k4_absbound": [
+     82.7
+    ]
+   },
+   "F02_SMPS_LX|FV1_MIC_VDD": {
+    "f_dominant_hz": 3000000,
+    "dB_signed": 4.2,
+    "dB_abs": 9.2,
+    "per_f": {
+     "3000000": {
+      "M_today": -0.0969,
+      "M_k4": 0.158,
+      "dB_signed": 4.2,
+      "abs_today": 0.1798,
+      "abs_k4": 0.5172,
+      "dB_abs": 9.2
+     },
+     "6000000": {
+      "M_today": -0.047,
+      "M_k4": 0.1251,
+      "dB_signed": 8.5,
+      "abs_today": 0.0964,
+      "abs_k4": 0.3137,
+      "dB_abs": 10.2
+     },
+     "9000000": {
+      "M_today": -0.0293,
+      "M_k4": 0.1134,
+      "dB_signed": 11.8,
+      "abs_today": 0.067,
+      "abs_k4": 0.2418,
+      "dB_abs": 11.2
+     },
+     "27000000": {
+      "M_today": -0.0054,
+      "M_k4": 0.1204,
+      "dB_signed": 27.0,
+      "abs_today": 0.0269,
+      "abs_k4": 0.187,
+      "dB_abs": 16.8
+     }
+    },
+    "margin_today": [
+     68.6,
+     48.6,
+     18.6
+    ],
+    "margin_k4_signed": [
+     64.4,
+     44.4,
+     14.4
+    ],
+    "margin_k4_absbound": [
+     59.4,
+     39.4,
+     9.4
+    ]
+   },
+   "F02_SMPS_LX|FV2_MIC_DATA": {
+    "f_dominant_hz": 3000000,
+    "dB_signed": 20.3,
+    "dB_abs": 16.2,
+    "per_f": {
+     "3000000": {
+      "M_today": 0.0137,
+      "M_k4": -0.1414,
+      "dB_signed": 20.3,
+      "abs_today": 0.0252,
+      "abs_k4": 0.1619,
+      "dB_abs": 16.2
+     },
+     "6000000": {
+      "M_today": 0.0073,
+      "M_k4": -0.0732,
+      "dB_signed": 20.0,
+      "abs_today": 0.0134,
+      "abs_k4": 0.084,
+      "dB_abs": 15.9
+     },
+     "9000000": {
+      "M_today": 0.0051,
+      "M_k4": -0.0491,
+      "dB_signed": 19.7,
+      "abs_today": 0.0092,
+      "abs_k4": 0.0564,
+      "dB_abs": 15.7
+     },
+     "27000000": {
+      "M_today": 0.002,
+      "M_k4": -0.0395,
+      "dB_signed": 25.9,
+      "abs_today": 0.0036,
+      "abs_k4": 0.0451,
+      "dB_abs": 22.1
+     }
+    },
+    "margin_today": [
+     77.0
+    ],
+    "margin_k4_signed": [
+     56.7
+    ],
+    "margin_k4_absbound": [
+     60.8
+    ]
+   },
+   "F02_SMPS_LX|FV3_MIC_CLK": {
+    "f_dominant_hz": 3000000,
+    "dB_signed": 20.3,
+    "dB_abs": 18.6,
+    "per_f": {
+     "3000000": {
+      "M_today": -0.0138,
+      "M_k4": 0.1422,
+      "dB_signed": 20.3,
+      "abs_today": 0.0387,
+      "abs_k4": 0.3298,
+      "dB_abs": 18.6
+     },
+     "6000000": {
+      "M_today": -0.0073,
+      "M_k4": 0.0853,
+      "dB_signed": 21.4,
+      "abs_today": 0.0204,
+      "abs_k4": 0.184,
+      "dB_abs": 19.1
+     },
+     "9000000": {
+      "M_today": -0.005,
+      "M_k4": 0.0651,
+      "dB_signed": 22.3,
+      "abs_today": 0.0139,
+      "abs_k4": 0.1325,
+      "dB_abs": 19.6
+     },
+     "27000000": {
+      "M_today": -0.0019,
+      "M_k4": 0.0578,
+      "dB_signed": 29.7,
+      "abs_today": 0.0051,
+      "abs_k4": 0.083,
+      "dB_abs": 24.2
+     }
+    },
+    "margin_today": [
+     76.7
+    ],
+    "margin_k4_signed": [
+     56.4
+    ],
+    "margin_k4_absbound": [
+     58.1
+    ]
+   }
+  },
+  "with_L1_body": {
+   "F01_BRIDGE_OUT|FV1_MIC_VDD": {
+    "f_dominant_hz": 2000000,
+    "dB_signed": 10.5,
+    "dB_abs": 16.2,
+    "per_f": {
+     "200000": {
+      "M_today": -0.2799,
+      "M_k4": -0.5997,
+      "dB_signed": 6.6,
+      "abs_today": 1.794,
+      "abs_k4": 11.3214,
+      "dB_abs": 16.0
+     },
+     "600000": {
+      "M_today": -0.2422,
+      "M_k4": -0.5495,
+      "dB_signed": 7.1,
+      "abs_today": 1.5523,
+      "abs_k4": 9.793,
+      "dB_abs": 16.0
+     },
+     "2000000": {
+      "M_today": -0.1233,
+      "M_k4": -0.4117,
+      "dB_signed": 10.5,
+      "abs_today": 0.7907,
+      "abs_k4": 5.1201,
+      "dB_abs": 16.2
+     }
+    }
+   },
+   "F01_BRIDGE_OUT|FV2_MIC_DATA": {
+    "f_dominant_hz": 2000000,
+    "dB_signed": 18.3,
+    "dB_abs": 22.9,
+    "per_f": {
+     "200000": {
+      "M_today": 0.0504,
+      "M_k4": -0.3734,
+      "dB_signed": 17.4,
+      "abs_today": 0.3603,
+      "abs_k4": 5.5504,
+      "dB_abs": 23.8
+     },
+     "600000": {
+      "M_today": 0.0436,
+      "M_k4": -0.3321,
+      "dB_signed": 17.6,
+      "abs_today": 0.3118,
+      "abs_k4": 4.6935,
+      "dB_abs": 23.6
+     },
+     "2000000": {
+      "M_today": 0.0222,
+      "M_k4": -0.1822,
+      "dB_signed": 18.3,
+      "abs_today": 0.159,
+      "abs_k4": 2.2278,
+      "dB_abs": 22.9
+     }
+    },
+    "margin_today": [
+     105.1
+    ],
+    "margin_k4_signed": [
+     86.8
+    ],
+    "margin_k4_absbound": [
+     82.2
+    ]
+   },
+   "F01_BRIDGE_OUT|FV3_MIC_CLK": {
+    "f_dominant_hz": 2000000,
+    "dB_signed": 12.4,
+    "dB_abs": 20.7,
+    "per_f": {
+     "200000": {
+      "M_today": -0.059,
+      "M_k4": 0.2263,
+      "dB_signed": 11.7,
+      "abs_today": 0.6718,
+      "abs_k4": 7.179,
+      "dB_abs": 20.6
+     },
+     "600000": {
+      "M_today": -0.0511,
+      "M_k4": 0.2015,
+      "dB_signed": 11.9,
+      "abs_today": 0.5814,
+      "abs_k4": 6.2003,
+      "dB_abs": 20.6
+     },
+     "2000000": {
+      "M_today": -0.026,
+      "M_k4": 0.1087,
+      "dB_signed": 12.4,
+      "abs_today": 0.2964,
+      "abs_k4": 3.202,
+      "dB_abs": 20.7
+     }
+    },
+    "margin_today": [
+     103.4
+    ],
+    "margin_k4_signed": [
+     91.0
+    ],
+    "margin_k4_absbound": [
+     82.7
+    ]
+   },
+   "F02_SMPS_LX|FV1_MIC_VDD": {
+    "f_dominant_hz": 3000000,
+    "dB_signed": 11.7,
+    "dB_abs": 14.0,
+    "per_f": {
+     "3000000": {
+      "M_today": -0.0947,
+      "M_k4": 0.3656,
+      "dB_signed": 11.7,
+      "abs_today": 0.1978,
+      "abs_k4": 0.9932,
+      "dB_abs": 14.0
+     },
+     "6000000": {
+      "M_today": -0.0462,
+      "M_k4": 0.2725,
+      "dB_signed": 15.4,
+      "abs_today": 0.1063,
+      "abs_k4": 0.6045,
+      "dB_abs": 15.1
+     },
+     "9000000": {
+      "M_today": -0.029,
+      "M_k4": 0.2396,
+      "dB_signed": 18.3,
+      "abs_today": 0.074,
+      "abs_k4": 0.4671,
+      "dB_abs": 16.0
+     },
+     "27000000": {
+      "M_today": -0.0057,
+      "M_k4": 0.2281,
+      "dB_signed": 32.0,
+      "abs_today": 0.0301,
+      "abs_k4": 0.3596,
+      "dB_abs": 21.5
+     }
+    },
+    "margin_today": [
+     68.6,
+     48.6,
+     18.6
+    ],
+    "margin_k4_signed": [
+     56.9,
+     36.9,
+     6.9
+    ],
+    "margin_k4_absbound": [
+     54.6,
+     34.6,
+     4.6
+    ]
+   },
+   "F02_SMPS_LX|FV2_MIC_DATA": {
+    "f_dominant_hz": 3000000,
+    "dB_signed": 18.0,
+    "dB_abs": 17.8,
+    "per_f": {
+     "3000000": {
+      "M_today": 0.0197,
+      "M_k4": -0.157,
+      "dB_signed": 18.0,
+      "abs_today": 0.0349,
+      "abs_k4": 0.2708,
+      "dB_abs": 17.8
+     },
+     "6000000": {
+      "M_today": 0.0105,
+      "M_k4": -0.081,
+      "dB_signed": 17.7,
+      "abs_today": 0.0186,
+      "abs_k4": 0.1407,
+      "dB_abs": 17.6
+     },
+     "9000000": {
+      "M_today": 0.0073,
+      "M_k4": -0.0541,
+      "dB_signed": 17.4,
+      "abs_today": 0.0128,
+      "abs_k4": 0.0947,
+      "dB_abs": 17.4
+     },
+     "27000000": {
+      "M_today": 0.0028,
+      "M_k4": -0.0484,
+      "dB_signed": 24.6,
+      "abs_today": 0.005,
+      "abs_k4": 0.0773,
+      "dB_abs": 23.8
+     }
+    },
+    "margin_today": [
+     77.0
+    ],
+    "margin_k4_signed": [
+     59.0
+    ],
+    "margin_k4_absbound": [
+     59.2
+    ]
+   },
+   "F02_SMPS_LX|FV3_MIC_CLK": {
+    "f_dominant_hz": 3000000,
+    "dB_signed": -4.5,
+    "dB_abs": 20.2,
+    "per_f": {
+     "3000000": {
+      "M_today": -0.0255,
+      "M_k4": 0.0153,
+      "dB_signed": -4.5,
+      "abs_today": 0.0605,
+      "abs_k4": 0.6175,
+      "dB_abs": 20.2
+     },
+     "6000000": {
+      "M_today": -0.0135,
+      "M_k4": 0.0068,
+      "dB_signed": -6.0,
+      "abs_today": 0.032,
+      "abs_k4": 0.351,
+      "dB_abs": 20.8
+     },
+     "9000000": {
+      "M_today": -0.0092,
+      "M_k4": 0.0038,
+      "dB_signed": -7.7,
+      "abs_today": 0.0219,
+      "abs_k4": 0.2568,
+      "dB_abs": 21.4
+     },
+     "27000000": {
+      "M_today": -0.0034,
+      "M_k4": 0.0284,
+      "dB_signed": 18.3,
+      "abs_today": 0.0082,
+      "abs_k4": 0.1616,
+      "dB_abs": 25.9
+     }
+    },
+    "margin_today": [
+     76.7
+    ],
+    "margin_k4_signed": [
+     81.2
+    ],
+    "margin_k4_absbound": [
+     56.5
+    ]
+   }
+  }
+ }
+}

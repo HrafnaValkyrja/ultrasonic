@@ -102,7 +102,9 @@ evidence_pins:
   "sim/dsp/nature_demo.py": "48ca02df64"
   "sim/dsp/pipeline.py": "9aa630fa71"
   "sim/dsp/run_phase1.py": "fe7912bd11"
+  "sim/noise/k4_noise.py": "44fb2a97c7"
   "tools/checks/bom_check.py": "3a2a49045a"
+  "tools/checks/k4_checks.py": "e25afd026a"
 # vcrm:pins:end
 
 stage_c_baseline: [S1.1-goal, S1.2-C1, S1.2-C2, S1.2-C3, S1.2-C4, S1.3-T1, S1.3-T2, S1.3-T4, S1.3-T5, S1.3-T6, D1-force,
@@ -1076,7 +1078,7 @@ requirements:
     owner_items: [REG-BOARD, REG-POD-BODY, SUB-POWER, SUB-PROCESSING]
     artefacts: [docs/research/drastic/V9-k4-board.yaml, hw/mech/shell_k4.py, hw/pod/k4/gen.py, ERC]
     planned: ["placement of M and P and a length measurement on the real outlines", "BM28 datasheet read (rating, mated height) and footprint fetch", "bring-up conduction test over the B2B (LN-V*) and an acoustic tap test of L1/C buzz"]
-    evidence: [docs/research/drastic/V9-k4-board.yaml, docs/system/plm/ecr/ECR-0020.md]
+    evidence: [docs/research/drastic/V9-k4-board.yaml, docs/system/plm/ecr/ECR-0020.md, sim/noise/k4_noise.py, tools/checks/k4_checks.py]
     ecrs: [ECR-0020, ECR-0019]
     next: "Owner review of ECR-0020; then lay out M and P"
     gap: >-
