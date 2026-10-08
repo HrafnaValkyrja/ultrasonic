@@ -615,3 +615,4 @@
 - 2026-10-07 17:44 review REG-POD-BODY by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT
 - 2026-10-07 20:49 checkout REG-POD-BODY by claude: RPB-12 close
 - 2026-10-07 20:49 checkin REG-POD-BODY by claude
+- 2026-10-07 20:50 review REG-POD-BODY by claude: RPB-12: belly-step witness groove 0.1x0.4; reopen.md; shell checks unchanged

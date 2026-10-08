@@ -68,13 +68,13 @@
    }
   },
   "REG-POD-BODY": {
-   "by": "claude-backlog",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT",
+   "note": "RPB-12: belly-step witness groove 0.1x0.4; reopen.md; shell checks unchanged",
    "stamp": {
     "file:hw/mech/blade.py": "ad6b4d86e46c5d84",
     "file:hw/mech/dims_r2.py": "d5e3fa6b93c2df7d",
-    "file:hw/mech/shell_r2.py": "1c3627a79b7b8cbd",
+    "file:hw/mech/shell_r2.py": "98ab986aa83fc405",
     "file:hw/mech/styles.py": "23dcb6bfe495f82f"
    }
   },
