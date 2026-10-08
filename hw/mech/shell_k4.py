@@ -139,7 +139,10 @@ def placeholders():
     bat = box(STACK_X1 - 0.5, CELL_X0 + 0.5, CELL_Y0 + 0.6, CELL_Y0 + 0.95, ZC + 3, ZC + 3.35) + box(STACK_X1 - 0.5, CELL_X0 + 0.5, CELL_Y0 + 0.6, CELL_Y0 + 0.95, ZC + 4, ZC + 4.35)
     zw = CAV["z0"] + 0.3
     arm = box(STACK_X1 - 0.5, STACK_X1 + 0.3, STACK_Y0 + 0.4, STACK_Y0 + 0.75, zw, STACK_Z0 + 1.5) + box(STACK_X1 - 0.5, 62.4, CAV["y0"] + 0.10, CAV["y0"] + 0.45, zw, zw + 0.35) + box(62.0, 62.4, CAV["y0"] + 0.10, CAV["y0"] + 1.9, zw, zw + 0.35) + box(62.0, 64.0, CAV["y0"] + 1.55, CAV["y0"] + 1.9, zw, zw + 0.35)
-    tab = box(TAB_X[0], TAB_X[1], DOCK_YC - 0.4, DOCK_YC + 0.4, TAB_Z_BOTTOM, STACK_Z0 + 0.3)           # M board tab carrying the pads (placeholder)
+    if DOCK == "front" or TAB_X[1] <= STACK_X1:
+        tab = box(TAB_X[0], TAB_X[1], DOCK_YC - 0.4, DOCK_YC + 0.4, TAB_Z_BOTTOM, STACK_Z0 + 0.3)           # M board tab carrying the pads (placeholder)
+    else:                                                                                                  # strip continues under the cell, in the wire channel
+        tab = box(TAB_X[0], STACK_X1, DOCK_YC - 0.4, DOCK_YC + 0.4, TAB_Z_BOTTOM, STACK_Z0 + 0.3) + box(STACK_X1 - 0.01, TAB_X[1], DOCK_YC - 0.4, DOCK_YC + 0.4, TAB_Z_BOTTOM, TAB_STRIP_TOP)
     mags = [Pos(x, DOCK_YC, Z0 + MAG_SKIN + MAG_T / 2) * Cylinder(MAG_D / 2, MAG_T) for x in (MAG_X_FRONT, MAG_X_REAR)]
     mag = mags[0] + mags[1]
     return dict(m_tab=tab, dock_mags=mag, cell=cell, ctape=ctape, pcb_top=top, stack_body=body, vhb=vhb, u2_mic=u2, sw1=sw1, skin=skin, bat_wires=bat, arm_wires=arm)
@@ -191,7 +194,7 @@ def main():
               pocket_edge_front=round(MAG_X_FRONT - POCKET_D / 2, 2), belly_round_start=round(X0 + 1.0, 2), pocket_edge_to_pod_end=round(MAG_X_FRONT - POCKET_D / 2 - X0, 2),
               tab_x=[round(v, 2) for v in TAB_X], tab_to_cell=round(CELL_X0 - TAB_X[1], 2), tab_to_front_boss=round(PAD_X[0] - WIN_W / 2 - 0.3 - (MAG_X_FRONT + BOSS_D / 2), 2),
               tab_to_rear_boss=round((MAG_X_REAR - BOSS_D / 2) - TAB_X[1], 2), tab_past_stack=round(TAB_X[1] - STACK_X1, 2), skin=MAG_SKIN, boss_to_cell=round(CELL_Z0 - BOSS_TOP, 3), boss_to_Mtab=round(STACK_Z0 - BOSS_TOP, 3),
-              pad_recess=round(TAB_Z_BOTTOM - Z0, 2), cell_shift=DOCK_SHIFT)
+              pad_recess=round(TAB_Z_BOTTOM - Z0, 2), cell_shift=DOCK_SHIFT, mode=DOCK, tab_strip_to_cell_z=round(CELL_Z0 - TAB_STRIP_TOP, 2), tab_under_cell_x=round(max(0.0, TAB_X[1] - CELL_X0), 2))
     c["dock"] = dk
     ev = outer_body().volume
     c["envelope"] = dict(T=round(Y_OUT - Y_IN, 2), L=round(L, 2), H=round(H, 2), env_mm3=round(ev, 1), x=[round(X0, 2), X1], z=[Z0, round(Z1, 2)])

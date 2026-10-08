@@ -33,7 +33,10 @@ CAV = dict(y0=Y_IN + WALL, y1=Y_LID_IN, z0=Z0 + WALL, z1=Z1 - WALL, x1=X1 - WALL
 CELL_SPEC = dict(part="Renata ICP401230UPR", mAh=130, g=3.5, T=4.5, W=12.7, L=31.0)
 TAPE = 0.10                            # thin transfer tape under the cell (cell swap = peel); was VHB 0.25, cut to buy lid clearance (2026-10-08, k4-dock.yaml)
 LID_CLEAR_MIN = 0.2                    # cell swell allowance
-DOCK_SHIFT = 1.5                       # option A (k4-dock.yaml option_A_design): pod grows 1.5 at the FRONT (stack moves forward, wire gap 0.8 -> 2.3) so the M pad tab can end 0.55 before the cell; the cell cannot move back (strut relief fill clips it past x 62.0)
+DOCK = (os.environ.get("K4_DOCK") or "under").strip()   # under (default): M pad tab runs UNDER the cell in the 0.8 wire channel, pod +0 mm | front: tab ends before the cell, pod +1.5 mm at the front
+if DOCK not in ("under", "front"):
+    raise ValueError("K4_DOCK: under | front")
+DOCK_SHIFT = 1.5 if DOCK == "front" else 0.0                       # option A (k4-dock.yaml option_A_design): pod grows 1.5 at the FRONT (stack moves forward, wire gap 0.8 -> 2.3) so the M pad tab can end 0.55 before the cell; the cell cannot move back (strut relief fill clips it past x 62.0)
 CELL_X1 = 62.0 if RELIEF == "len" else CAV["x1"] - 1.1   # 65.8: heel exit (frame-fixed 65.8-66.6) stays free
 CELL_X0 = CELL_X1 - CELL_SPEC["L"]
 CELL_Y0 = CAV["y0"] + TAPE
@@ -96,6 +99,7 @@ DOCK_CX = MAG_X_FRONT + HEAD_MAG_PITCH / 2
 PAD_X = [DOCK_CX + (i - 1.5) * DOCK_PITCH for i in range(4)]    # 23.45 .. 30.95 -> see option_A_design for the net order
 WIN_W, WIN_H = 1.3, 1.2                # belly window x, y (pad half-hole 0.9 + 0.2/side)
 TAB_Z_BOTTOM = -9.0                    # M tab edge, 0.1 above the cavity floor (-9.1); pad recess in the window 0.7 from the outer belly
+TAB_STRIP_TOP = CELL_Z0 - 0.1            # tab part beyond the stack rear is a 0.6 high strip (z -9.0..-8.4) in the channel under the cell (cell bottom z -8.3)
 TAB_X = (PAD_X[0] - WIN_W / 2 - 0.3, PAD_X[-1] + WIN_W / 2 + 0.3)
 DOCK_FIT = dict(head_W=6.86, pod_T=T, head_overhang_each_side=round((6.86 - T) / 2, 2),
                 note="head 21.2 x 6.86 sits on the 4.4 flat belly (fillet 1.0) and overhangs T 6.4 by 0.23/side when centred; it is centred on DOCK_YC, not on T")
