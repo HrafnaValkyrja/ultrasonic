@@ -25,7 +25,7 @@ def sh(*cmd):
     return subprocess.run(cmd, capture_output=True, text=True, cwd=REPO).stdout.strip()
 
 
-FIRST = ["A-K4-H-VS-L", "A-K4-LAYOUT", "A-PHASE2-REVIEW", "A-USBC-SPACE", "A-TODAY-DOCKED-WORN", "A-IDLE-TRADE", "A-SAFETY-REVIEW"]   # packets first
+FIRST = ["A-K4-DOCK", "A-K4-H-VS-L", "A-K4-LAYOUT", "A-PHASE2-REVIEW", "A-USBC-SPACE", "A-TODAY-DOCKED-WORN", "A-IDLE-TRADE", "A-SAFETY-REVIEW"]   # packets first
 
 
 def main():
