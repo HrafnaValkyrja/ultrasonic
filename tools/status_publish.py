@@ -25,6 +25,9 @@ def sh(*cmd):
     return subprocess.run(cmd, capture_output=True, text=True, cwd=REPO).stdout.strip()
 
 
+FIRST = ["A-PHASE2-REVIEW", "A-USBC-SPACE", "A-TODAY-DOCKED-WORN", "A-IDLE-TRADE", "A-SAFETY-REVIEW"]   # packets first
+
+
 def main():
     q = yaml.safe_load((REPO / "docs/brief/queue.yaml").read_text())
     items = q.get("items", q) if isinstance(q, dict) else q
@@ -40,16 +43,16 @@ def main():
         "project": "Stereo Ultrasound",
         "updated": datetime.now().astimezone().isoformat(timespec="seconds"),
         "phase": "Phase 2: miniaturization (internals); owner review of the layout due ~mid-October",
-        "headline": "One-face 30 x 12 mm board fully routed (DRC clean) + Phase-2 shell; size research done, battery decision waits on the runtime rule (D18)",
+        "headline": "Phase-2 board routed (DRC clean), shell + firmware sim done; waiting on owner packets 1-2 (cell/plate/board-as-base, USB-C/gestures/pad face)",
         "progress": [
             {"item": "Phase 1 logical simplification (Rev F/G)", "state": "done", "pct": 100},
             {"item": "Phase 2 board layout (draft_r2)", "state": "fully routed, DRC clean; owner review pending", "pct": 95},
-            {"item": "Phase 2 shell (shell_r2)", "state": "first model; duct re-check after mic move", "pct": 60},
-            {"item": "Stage-C sims on the Phase-2 board", "state": "noise model needs the +3V0 plane", "pct": 40},
-            {"item": "Drastic size options K1/K2'", "state": "researched; owner call D18", "pct": 30},
-            {"item": "Firmware", "state": "not started (DSP findings logged)", "pct": 0},
+            {"item": "Phase 2 shell (shell_r2)", "state": "checks pass; duct fix, VHB cut-outs, reopening line done", "pct": 85},
+            {"item": "Stage-C sims on the Phase-2 board", "state": "noise (multi-plane) + acoustics MC60 pass", "pct": 90},
+            {"item": "Drastic size options K1/K2'", "state": "K1 / K1-thin built; owner call in packet 1", "pct": 60},
+            {"item": "Firmware (emulated)", "state": "35/35 sim checks; bench-only items left", "pct": 70},
         ],
-        "needs_owner": needs[:6],
+        "needs_owner": sorted(needs, key=lambda n: (n["id"] not in FIRST, FIRST.index(n["id"]) if n["id"] in FIRST else 0))[:6],
         "health": {"session": "alive", "watchdog": "alive" if sh("pgrep", "-f", r"^bash tools/memwatch\.sh") else "down",
                    "last_heartbeat": datetime.now().astimezone().isoformat(timespec="seconds"), "oom_2h": int(oom),
                    "tracker": plm[-1] if plm else ""},
