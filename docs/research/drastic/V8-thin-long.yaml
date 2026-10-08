@@ -41,3 +41,29 @@ findings:
   - "Cell capacity at 3.3-4.0 mm nominal thickness tops out at 85 mAh (catalogue) -> would need ~98 mAh (slim B) / 124 mAh (spec B); no such thin cell in V2 or the 2026-10-03 catalogue. A thin+long 100+ mAh cell would be a new search (e.g. 3.0 x 12 x 40 class [T])."
   - "Unmodelled: B2 hardware saves, exciter mean cap, firmware peak cap (K2/K3 peaks 315 mA vs pulse 100/136 mA), K2 needs external protector (no PCM)."
 integration_map_crosscheck: "read-only research; no design change, no ECR. F7/F8 (power, charger) affected only if a cell is adopted: see synthesis.md integration_map_crosscheck. tools/plm.py impact not run."
+K4_130mAh_end_to_end:   # added 2026-10-07 by Claude (Opus 5.5 subagent). AI-facing. [E] = arithmetic on repo figures, no CAD run.
+  what: "ICP401230UPR 130/125 mAh (4.0 nominal, env 4.5 x 12.7 x 31.0, PCM, 260 mA pulse = 0.83x the 315 mA peak, V2) END-TO-END with the V5 two-face board (SYN-4/K3 layout), no stacking, no armour plate (O29), walls 0.6, lid 1.0 (O29). Runtime as slim_B/spec_B above: slim B 10.6/10.2/8.2 h worst (passes EOL); spec B 8.4/8.1/6.4 (fails EOL)."
+  model:
+    T: "cell T max 4.5 + 1.9 = 6.4 (the K3 delta: 5.6 from 3.7 = floor/wall 0.6 + lid 1.0 + 0.3 gap; board section is thinner than the cell, so the cell sets T). Using nominal 4.0 + swell gap 0.1 (SK-3 note) would give ~5.9-6.0."
+    H: "14.8 (K1 value for the same 12.7 cell; board H 12 fixed by O27)"
+    L: "31.0 cell + board + 3.1 walls/gaps (pod_length_mm rule above); board 16 = V5 target_16mm WLCSP/QFN32 (6L), 17 = V5 shortest legal QFN48 (6L), 20 = QFN48 target_20mm (6L; 4L load x1.85 'unlikely')"
+    volume: "box = L*T*H; 'env' = box x 1.07 (K1 4544/4227 = 1.075, K3 3563/3346 = 1.065 from synthesis.md; shape/fillet/belly factor). Stowage (+100-140) not included."
+    off_temple: "T + 1.8 (K1 10.3 = 8.5 + 1.8; K3 7.4 = 5.6 + 1.8)"
+    mass: "cell 130/29 = 4.5 g (power-cell.md ~29 mAh/g [E]) + non-cell 5.8 g (K3 7.5 g - 50/29 g cell = 5.8 g) = ~10.3 g; +/- 0.5 g. Board length changes it < 0.1 g (longer board = more FR4, shorter shell)."
+  table:   # T mm | H mm | L mm | box mm3 | env mm3 (x1.07) | off temple mm | mass g | CoM mm behind pod front
+    board_16: {T: 6.4, H: 14.8, L: 50.1, box: 4745, env: 5078, off_temple: 8.2, mass: 10.3, com: 22.2, V5_basis: "WLCSP-90 or QFN32, 6 layers, conf M"}
+    board_17: {T: 6.4, H: 14.8, L: 51.1, box: 4840, env: 5179, off_temple: 8.2, mass: 10.3, com: 22.9, V5_basis: "today's QFN48 U575CIU6Q, 6 layers (V5 option 1, Claude's lean)"}
+    board_20: {T: 6.4, H: 14.8, L: 54.1, box: 5124, env: 5483, off_temple: 8.2, mass: 10.3, com: 25.0, V5_basis: "QFN48, 6 layers (4 layers x1.85 unlikely); no HDI/via-in-pad needed to be sure"}
+  compare:   # concept: T / H / L / env / off temple / cell / worst h (slim_B typ)
+    K1_stacked_thin: {T: 8.5, H: 14.8, L: 33.6, env: 4544, off_temple: 10.3, mass: 10.0, worst_h: "11.4 (B1)"}
+    K1_stacked_built: {T: 9.6, note: "built value per owner packet 1; env/off temple not recomputed here (~11.4 off temple by +1.8 rule)"}
+    K3_e2e_50mAh: {T: 5.6, H: 14.9, L: 40.1, env: 3563, off_temple: 7.4, mass: 7.5, worst_h: "fails D18 (4.1 typ slim B)"}
+    K4_e2e_130mAh_b17: {T: 6.4, H: 14.8, L: 51.1, env: 5179, off_temple: 8.2, mass: 10.3, worst_h: "10.6 / 10.2 / 8.2 EOL (slim B)"}
+  deltas_vs_K1_thin: "T -2.1 (-25 %) thin built: -3.2; off temple -2.1 (built -3.2); H 0; L +16.5..+20.5 (+49..+61 %); volume +12..+21 % (K1 4544 -> 5078-5483) i.e. thin-first buys thickness with length AND volume; mass +0.3 g. Versus K3: T +0.8, off temple +0.8, L +10..+14, volume +43..+54 %, but the only end-to-end variant that meets D18 reading B."
+  ear_fit:
+    fits: "YES. Hinge-to-ear 100 mm; pad 70.6 mm behind hinge; transducer arm attaches 10-15 mm in front of the ear = ~85-90 mm (tragus-arm.md, ear-open-fit.md s. arm). Pod from the hinge ends at 50.1 / 51.1 / 54.1 mm: 31-36 mm of clear arm before the arm attach, nothing behind the ear (spec D18 / O4, section 1.2.4 reading holds)."
+    caveats:
+      - "L 50-54 breaks the repo's 'soft cap 38-40 mm' (SK-5) and the Phase-2 pod 38.0: a longer rigid pod on the temple; check curved temples (arm flex/bend radius over 54 mm), the temple's own hinge-end shape, and any glasses with a short straight run [T, V7 dummies on both frames O26]."
+      - "Balance: CoM only 22-25 mm behind the pod front, i.e. cell (4.5 g) sits at ~33 mm; load split nose ~7.7-8.0 g / ear ~2.3-2.6 g per side if the pod starts at the hinge (K1 ~8.3 / 1.7 by the same method). Spec D18 target is 3.7 / 4.1 (CoM 52 mm). Mic/board must stay at the hinge (F1), so the lever is lighter board/shell, not position; run sim/checks/balance.py with the 10.3 g / CoM 22-25 mm case [T]"]
+  src: ["V5-density.yaml (board lengths, 6L need)", "V2-cells.yaml (ICP401230UPR env/pulse)", "synthesis.md SYN-4, K1/K3 rows, SK-3, SK-5", "spec.md D18/O4/O27/O28/O29, section 8", "tragus-arm.md and ear-open-fit.md (hinge-to-ear 100 mm, pad 70.6 mm)", "power-cell.md (29 mAh/g)"]
+  integration_map_crosscheck: "read-only research, no design change/ECR; tools/plm.py impact not run. If adopted: F7/F8 (cell params), mechanical shell (new end-to-end shell, dock belly), F1 mic duct on board segment, pin map unchanged for QFN48 (b17/b20)."
