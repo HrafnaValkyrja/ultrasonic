@@ -1,7 +1,6 @@
 """Per-call audibility with temporal integration, real limiter (port of fw/core/lahead.c) and a slow-AGC option.
     systemd-run --user --scope -p MemoryMax=3G python3 sim/acoustics/audibility_reconciled.py -> docs/proof/electrical/audibility_reconciled.png + .json
-Detection level per call = max over the call of the 200 ms sliding band rms (Plomp&Bouman 1959: threshold of tone bursts falls ~10 dB/decade of
-duration up to ~200-300 ms; ISO 532-1 / Moore-Glasberg time-varying loudness use ~100-200 ms integration), NOT long-term LAeq and NOT the peak.
+Detection level per call = max over the call of the 200 ms sliding band rms (Plomp&Bouman 1959 JASA 31:749 (abstract fetched 2026-10-08): exponential build-up, time constant ~375 ms @250 Hz to ~150 ms @8 kHz, i.e. ~200 ms at 1.6-4 kHz; ISO 532-1 / Moore-Glasberg time-varying loudness use ~100-200 ms integration), NOT long-term LAeq and NOT the peak.
 Chain/ambients as sim/acoustics/programme_audibility.py (same constants, same masked threshold max(q, amb-4))."""
 import json, sys, pathlib, numpy as np
 from scipy import signal
@@ -60,7 +59,9 @@ amb = {k: to3(np.array(v, float)) for k, v in amb_oct.items()}
 def scaled(shape, dba):
     ff = np.geomspace(100, 10000, 60); full = np.interp(np.log(ff), np.log(oc), shape) - 10 * np.log10(3)
     return to3(np.array(shape, float)) + dba - 10 * np.log10(np.sum(10 ** ((full + Aw(ff)) / 10)))
-amb["Cafe 65 dBA [unsourced]"] = scaled([57, 59, 61, 60, 56, 51, 46, 41], 65)
+# Cafe: babble ~ speech spectrum. Shape = ANSI S3.5 normal-effort speech octave levels (63-8k) as tabulated in Odeon Application Note Restaurants (odeon.dk, fetched 2026-10-08);
+# level 67 dBA = lowest occupied-venue mean in RWTH Aachen restaurant logging study (publications.rwth-aachen.de/record/772183, fetched 2026-10-08; range 67-77.8 dBA). Proxy, not a measured cafe 1/3-oct spectrum.
+amb["Cafe 67 dBA [speech-shape proxy]"] = scaled([45.0, 55.0, 65.3, 69.0, 63.0, 55.8, 49.8, 44.5], 67)
 amb["Car 68 dBA [unsourced]"] = scaled([72, 67, 62, 57, 52, 48, 44, 42], 68)
 
 # events in the unprocessed programme: 100 ms frames within 20 dB of loudest, runs merged across gaps < 0.3 s
