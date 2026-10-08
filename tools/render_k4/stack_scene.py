@@ -54,7 +54,7 @@ for m in bpy.data.materials:                                     # soften mirror
         b = m.node_tree.nodes.get("Principled BSDF")
         if b and b.inputs["Metallic"].default_value < 0.5: b.inputs["Roughness"].default_value = max(b.inputs["Roughness"].default_value, 0.35)
 # --- material overrides by mesh name (KiCad GLB drops STEP colours on my simple models; mask must be black)
-OV = {"soldermask": ((0.010, 0.010, 0.012), 0, 0.42), "silkscreen": ((0.55, 0.55, 0.55), 0, 0.6), "PCB": ((0.045, 0.036, 0.022), 0, 0.5),
+OV = {"soldermask": ((0.0025, 0.0025, 0.0028), 0, 0.30), "silkscreen": ((0.55, 0.55, 0.55), 0, 0.6), "PCB": ((0.003, 0.003, 0.0035), 0, 0.32),
       "can": ((0.72, 0.73, 0.75), 1, 0.28), "substrate": ((0.05, 0.12, 0.07), 0, 0.5), "mark": ((0.1, 0.1, 0.1), 0, 0.5),
       "frame": ((0.7, 0.71, 0.73), 1, 0.3), "cap": ((0.04, 0.04, 0.045), 0, 0.4), "btn": ((0.16, 0.16, 0.18), 0, 0.35),
       "term": ((0.85, 0.65, 0.22), 1, 0.3), "lcp": ((0.04, 0.04, 0.045), 0, 0.4), "au": ((0.85, 0.65, 0.22), 1, 0.3),
@@ -65,14 +65,26 @@ for o in bpy.data.objects:
     if key is None and o.dimensions.x > 14.9 and o.dimensions.z > 0.5: key = "PCB"
     if key:
         c, mt, rg = OV[key]; o.data.materials.clear(); m_ = mat("ov_" + key, c, mt, rg); o.data.materials.append(m_)
-        if key in ("soldermask", "PCB"): m_.node_tree.nodes["Principled BSDF"].inputs["Specular IOR Level"].default_value = 0.25
+        if key in ("soldermask", "PCB"): m_.node_tree.nodes["Principled BSDF"].inputs["Specular IOR Level"].default_value = 0.35
+# --- GLB names are "=>[0:1:1:NN]" so the name map above misses the board layers: recolour by source material colour.
+# big (board-sized) meshes: grey 0.5 = silkscreen, gold = ENIG, anything else (0.035 mask, green core/edge) = black satin mask.
+BLK = mat("mask_black", (0.0025, 0.0025, 0.0028), 0, 0.30); BLK.node_tree.nodes["Principled BSDF"].inputs["Specular IOR Level"].default_value = 0.35
+for o in bpy.data.objects:
+    if o.type != "MESH" or o.dimensions.x <= 14.0: continue
+    for i, sl in enumerate(o.data.materials):
+        if sl is None or sl.name in ("ov_PCB", "ov_soldermask", "mask_black") or not sl.use_nodes: continue
+        b = sl.node_tree.nodes.get("Principled BSDF")
+        if b is None: continue
+        r, g, bl = b.inputs["Base Color"].default_value[:3]
+        silk = abs(r - g) < 0.02 and abs(g - bl) < 0.02 and r > 0.3; gold = r > 0.5 and bl < 0.2 or b.inputs["Metallic"].default_value > 0.5
+        if not (silk or gold): o.data.materials[i] = BLK
 # --- world + floor + lights
 w = bpy.data.worlds.new("w"); sc.world = w; w.use_nodes = True
-bg = w.node_tree.nodes["Background"]; bg.inputs[0].default_value = (0.012, 0.014, 0.02, 1); bg.inputs[1].default_value = 1.0
+bg = w.node_tree.nodes["Background"]; bg.inputs[0].default_value = (0.004, 0.004, 0.005, 1); bg.inputs[1].default_value = 1.0
 fl = bpy.data.objects.new("floor", bpy.data.meshes.new("floor")); sc.collection.objects.link(fl)
 import bmesh
 bm = bmesh.new(); bmesh.ops.create_grid(bm, x_segments=1, y_segments=1, size=400); bm.to_mesh(fl.data); bm.free()
-fl.data.materials.append(mat("floor", (0.02, 0.022, 0.03), 0.0, 0.3)); fl.location = (0, 0, FLOOR - 0.001)
+fl.data.materials.append(mat("floor", (0.006, 0.006, 0.007), 0.0, 0.3)); fl.location = (0, 0, FLOOR - 0.001)
 def area(name, loc, size, energy, col=(1, 1, 1)):
     d = bpy.data.lights.new(name, "AREA"); d.size = size; d.energy = energy; d.color = col
     o = bpy.data.objects.new(name, d); sc.collection.objects.link(o); o.location = loc
@@ -138,7 +150,7 @@ for v in VIEWS:
                 tx.data.body = str(i // 10); tx.data.size = 3.2; tx.data.materials.append(km); extras.append(tx)
         aim(mathutils.Vector((-3, -14, 1.0)), 18, 42, 40, frac=0.9); render("stack_scale_coin_ruler", 1200)
     elif v == "side":
-        d = bpy.data.lights.new("front", "AREA"); d.size = 80; d.energy = 1.5e5
+        d = bpy.data.lights.new("front", "AREA"); d.size = 80; d.energy = 2.5e4
         fo = bpy.data.objects.new("front", d); sc.collection.objects.link(fo); fo.location = (cx, -140, 6); extras.append(fo)
         fo.rotation_euler = (math.radians(90), 0, 0)
         aim(cen((lo[2] + hi[2]) / 2), 24, 9, 9.5, frac=0.9); render("stack_side_low", 800)
