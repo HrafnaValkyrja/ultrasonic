@@ -1,0 +1,24 @@
+# K4 release gate. Written 2026-10-08. Nothing ordered (O21); the owner places and pays.
+gate: BLOCKED          # artifacts are generated and self-consistent; the design is not frozen
+source_revision:
+  git_head_at_export: a6201ab   # K4 lid ledge 0.70 (ECR-0022)
+  boards: {routed_P: 17a588cb54be45b1376f04c00029062d9c0ae65a, routed_M: 66269155bdd2ead8a366426c43a43578fd33bc67}  # sha1, hw/pod/k4/
+  bom_source: git show a6201ab:hw/pod/k4/bom_jlc_{P,M}.csv  # copied to src/; working-tree BOMs are AHEAD of the boards (see blockers)
+checks_passed:
+  - "kicad-cli DRC (error severity, persisted JLC fine rules): P 0 / M 0 violations, 0 unconnected. Warnings only: silk (74 overlap, 64 over copper, 7 edge) - cosmetic, JLC trims silk over pads."
+  - "BOM refs == board assembled refs (excl. TP/J wire pads), both boards; CPL rows = BOM designators (P 29, M 26)"
+  - "stock >= qty x5 for every line (JLC API 2026-10-08T08:40Z); lowest margin MCU C5271013: 19 vs 5 needed"
+blockers:
+  - id: B1-HEIGHTS
+    what: "B2B gap side fails in sim/checks/k4_heights.py (C16 -0.10, C17/C9 -0.05 mm, U3/D4 marginal). Design gate, not a release defect."
+  - id: B2-REROUTE-PENDING
+    what: "Another agent is changing the design right now: commit b18670c changed the BM28 plug footprint courtyard; uncommitted BOM edits swap C9 (P) and C16/C17 (M) to 0201 (C318539, C318540, 'dated lookup') and regenerate nets. routed_P/M.kicad_pcb are still the a6201ab files. Any re-route invalidates every artifact here. Re-export (build_release.py + commands in README) after their commit."
+  - id: B3-BM28-LAND-PATTERN
+    what: "BM28 pad dims were not taken from the Hirose drawing at the time of the original footprints (V10-hdi.yaml: 'Do not invent pad dims'). b18670c read the catalog but only moved the courtyard. Confirm pads vs Hirose CL0684 before freeze."
+  - id: B4-STACKUP-0.8-6L
+    what: "JLC publishes no 0.8 mm 6L build (K4-STACK6). Dielectric split is chosen by JLC at order; do not order impedance control. Confirm on live quote."
+user_review_needed:
+  - "JLC DFM + placement preview, bottom-side rotations (CPL uses KiCad's raw rotation; see README table). Never verified against JLC's rotation DB."
+  - "Live quote: 6L 0.8 mm ENIG, 0.15/0.25 vias, POFV, panel. Cost below is an estimate, PCB line unquoted."
+  - "Independent Gerber viewer pass not done (only kicad-cli export + drill histogram)."
+promote_to_PASS_when: [B1..B4 closed, boards frozen with new hash, build_release.py re-run on that hash, owner reviews JLC preview]
