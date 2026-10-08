@@ -9,6 +9,8 @@
 #
 # The limits leave ~12 GB for the owner's desktop, games and other agents. Override per launch:
 #   CLAUDE_MEM_MAX=22G tools/claude-session.sh
+# The session runs with no DISPLAY/WAYLAND_DISPLAY, so nothing in it can open a window on the owner's screen (RULES.md
+# "Never steal her screen", 2026-10-08); KiCad/Blender run CLI-only, Remote Control needs no display.
 # A dedicated tmux socket (-L ultrasonic) matters: a session created on an already-running default
 # tmux server would be spawned by that server, outside the fence.
 set -euo pipefail
@@ -32,6 +34,6 @@ fi
 
 MAX="${CLAUDE_MEM_MAX:-8G}"     # owner-set session fence 8G (2026-10-07), permanent since 2026-10-08
 HIGH="${CLAUDE_MEM_HIGH:-7G}"
-exec systemd-run --user --scope --quiet \
+exec env -u DISPLAY -u WAYLAND_DISPLAY systemd-run --user --scope --quiet \
   -p MemoryHigh="$HIGH" -p MemoryMax="$MAX" -p MemorySwapMax=2G \
   tmux -L "$SOCK" new-session $DETACHED -s ultrasonic -c "$PWD" "$CMD"
