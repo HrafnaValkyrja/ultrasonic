@@ -1,0 +1,217 @@
+{
+ "src": "sim/checks/sw1_press_fem.py",
+ "date": "2026-10-08",
+ "model": "Kirchhoff plate (Morley) on Winkler VHB over the bonded area; lid rigid",
+ "inputs": {
+  "board": [
+   15.5,
+   12.0,
+   0.8
+  ],
+  "E_pcb_MPa": 20000.0,
+  "nu": 0.15,
+  "vhb_t": 0.25,
+  "inset": 0.2,
+  "pocket": [
+   4.3,
+   3.1
+  ],
+  "sw1_body": [
+   3.0,
+   2.6
+  ],
+  "sw_xy": [
+   5.325,
+   6.025
+  ],
+  "mic": [
+   1.775,
+   5.275
+  ],
+  "tp_cut_half": 0.9,
+  "mesh": [
+   125,
+   97
+  ],
+  "bond_x1": 15.5,
+  "k4": true
+ },
+ "limits": {
+  "b_part_margin_to_cell_mm": 0.65,
+  "kmt022_travel_mm": [
+   0.05,
+   0.15,
+   0.25
+  ]
+ },
+ "results": [
+  {
+   "E_vhb_MPa": 0.15,
+   "F_N": 2.0,
+   "w_sw1_mm": 0.1288,
+   "w_max_mm": 0.1634,
+   "w_min_mm": 0.0511,
+   "vhb_tension_peak_kPa": 97.2,
+   "vhb_compression_peak_kPa": -0.0,
+   "board_strain_peak_ue": 171.0,
+   "board_strain_peak_off_sw1_ue": 160.0,
+   "reaction_N": 2.019,
+   "bm28_end_w_um": [
+    122.81,
+    74.75
+   ],
+   "bm28_plug_tilt_urad": 6865.1,
+   "bm28_end_to_end_lift_um": 48.06,
+   "p_floor_gap_mm": 0.65,
+   "p_bottomed_bm28_share_N": 1.961,
+   "p_bottomed_w_sw1_um": 3.12
+  },
+  {
+   "E_vhb_MPa": 0.15,
+   "F_N": 10.0,
+   "w_sw1_mm": 0.6438,
+   "w_max_mm": 0.8168,
+   "w_min_mm": 0.2555,
+   "vhb_tension_peak_kPa": 486.0,
+   "vhb_compression_peak_kPa": -0.0,
+   "board_strain_peak_ue": 853.0,
+   "board_strain_peak_off_sw1_ue": 801.0,
+   "reaction_N": 10.096,
+   "bm28_end_w_um": [
+    614.05,
+    373.77
+   ],
+   "bm28_plug_tilt_urad": 34325.6,
+   "bm28_end_to_end_lift_um": 240.28,
+   "p_floor_gap_mm": 0.65,
+   "p_bottomed_bm28_share_N": 9.805,
+   "p_bottomed_w_sw1_um": 15.6
+  },
+  {
+   "E_vhb_MPa": 0.5,
+   "F_N": 2.0,
+   "w_sw1_mm": 0.0412,
+   "w_max_mm": 0.0467,
+   "w_min_mm": 0.0141,
+   "vhb_tension_peak_kPa": 93.0,
+   "vhb_compression_peak_kPa": -0.0,
+   "board_strain_peak_ue": 168.0,
+   "board_strain_peak_off_sw1_ue": 157.0,
+   "reaction_N": 2.019,
+   "bm28_end_w_um": [
+    39.81,
+    22.79
+   ],
+   "bm28_plug_tilt_urad": 2432.0,
+   "bm28_end_to_end_lift_um": 17.02,
+   "p_floor_gap_mm": 0.65,
+   "p_bottomed_bm28_share_N": 1.86,
+   "p_bottomed_w_sw1_um": 2.72
+  },
+  {
+   "E_vhb_MPa": 0.5,
+   "F_N": 10.0,
+   "w_sw1_mm": 0.206,
+   "w_max_mm": 0.2335,
+   "w_min_mm": 0.0707,
+   "vhb_tension_peak_kPa": 465.1,
+   "vhb_compression_peak_kPa": -0.0,
+   "board_strain_peak_ue": 838.0,
+   "board_strain_peak_off_sw1_ue": 786.0,
+   "reaction_N": 10.096,
+   "bm28_end_w_um": [
+    199.06,
+    113.94
+   ],
+   "bm28_plug_tilt_urad": 12159.8,
+   "bm28_end_to_end_lift_um": 85.12,
+   "p_floor_gap_mm": 0.65,
+   "p_bottomed_bm28_share_N": 9.3,
+   "p_bottomed_w_sw1_um": 13.62
+  },
+  {
+   "E_vhb_MPa": 2.0,
+   "F_N": 2.0,
+   "w_sw1_mm": 0.0128,
+   "w_max_mm": 0.013,
+   "w_min_mm": 0.0023,
+   "vhb_tension_peak_kPa": 101.6,
+   "vhb_compression_peak_kPa": -0.0,
+   "board_strain_peak_ue": 157.0,
+   "board_strain_peak_off_sw1_ue": 146.0,
+   "reaction_N": 2.019,
+   "bm28_end_w_um": [
+    12.82,
+    6.1
+   ],
+   "bm28_plug_tilt_urad": 959.7,
+   "bm28_end_to_end_lift_um": 6.72,
+   "p_floor_gap_mm": 0.65,
+   "p_bottomed_bm28_share_N": 1.656,
+   "p_bottomed_w_sw1_um": 1.94
+  },
+  {
+   "E_vhb_MPa": 2.0,
+   "F_N": 10.0,
+   "w_sw1_mm": 0.064,
+   "w_max_mm": 0.0651,
+   "w_min_mm": 0.0116,
+   "vhb_tension_peak_kPa": 508.2,
+   "vhb_compression_peak_kPa": -0.0,
+   "board_strain_peak_ue": 783.0,
+   "board_strain_peak_off_sw1_ue": 730.0,
+   "reaction_N": 10.096,
+   "bm28_end_w_um": [
+    64.1,
+    30.51
+   ],
+   "bm28_plug_tilt_urad": 4798.5,
+   "bm28_end_to_end_lift_um": 33.59,
+   "p_floor_gap_mm": 0.65,
+   "p_bottomed_bm28_share_N": 8.278,
+   "p_bottomed_w_sw1_um": 9.72
+  },
+  {
+   "E_vhb_MPa": 10.0,
+   "F_N": 2.0,
+   "w_sw1_mm": 0.0045,
+   "w_max_mm": 0.0047,
+   "w_min_mm": -0.0005,
+   "vhb_tension_peak_kPa": 174.8,
+   "vhb_compression_peak_kPa": 14.6,
+   "board_strain_peak_ue": 130.0,
+   "board_strain_peak_off_sw1_ue": 121.0,
+   "reaction_N": 2.019,
+   "bm28_end_w_um": [
+    4.71,
+    1.6
+   ],
+   "bm28_plug_tilt_urad": 443.1,
+   "bm28_end_to_end_lift_um": 3.1,
+   "p_floor_gap_mm": 0.65,
+   "p_bottomed_bm28_share_N": 1.417,
+   "p_bottomed_w_sw1_um": 1.2
+  },
+  {
+   "E_vhb_MPa": 10.0,
+   "F_N": 10.0,
+   "w_sw1_mm": 0.0223,
+   "w_max_mm": 0.0236,
+   "w_min_mm": -0.0025,
+   "vhb_tension_peak_kPa": 874.0,
+   "vhb_compression_peak_kPa": 72.8,
+   "board_strain_peak_ue": 651.0,
+   "board_strain_peak_off_sw1_ue": 604.0,
+   "reaction_N": 10.096,
+   "bm28_end_w_um": [
+    23.53,
+    8.02
+   ],
+   "bm28_plug_tilt_urad": 2215.5,
+   "bm28_end_to_end_lift_um": 15.51,
+   "p_floor_gap_mm": 0.65,
+   "p_bottomed_bm28_share_N": 7.087,
+   "p_bottomed_w_sw1_um": 6.02
+  }
+ ]
+}
