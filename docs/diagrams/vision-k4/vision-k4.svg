@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" font-family="sans-serif" font-size="13">
+<rect width="1000" height="400" fill="#141518"/>
+<text x="30" y="32" fill="#e6e6e6" font-size="18">Peripheral-vision no-go vs pod extent (side view, x rearward from hinge, mm)</text>
+<rect x="90.0" y="70" width="236.0" height="290" fill="#5a1e1e" opacity="0.35"/>
+<text x="98.0" y="90" fill="#ff8a8a">vision no-go zone (x &lt; 29.5)</text>
+<rect x="90.0" y="120" width="580.0" height="8" fill="#6b7280"/>
+<text x="98.0" y="116" fill="#9aa0a6">temple arm: hinge x=0 -> continues rearward to the ear keep-out (off-chart)</text>
+<line x1="326.0" y1="70" x2="326.0" y2="365" stroke="#f5b942" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="332.0" y="385" fill="#f5b942">vision line x = 29.5 (estimate; pen test decides)</text>
+<line x1="90.0" y1="70" x2="90.0" y2="365" stroke="#bbb"/><text x="72.0" y="385" fill="#bbb">hinge 0</text>
+<line x1="630.0" y1="70" x2="630.0" y2="365" stroke="#6aa9ff" stroke-dasharray="3 3"/><text x="600.0" y="385" fill="#6aa9ff">fixed rear 67.5</text>
+<rect x="231.2" y="150" width="94.80000000000001" height="34" fill="#e5484d"/>
+<rect x="326.0" y="150" width="304.0" height="34" fill="#3b82c4"/>
+<text x="235.2" y="172" fill="#fff">11.85 mm in no-go</text>
+<text x="30" y="172" fill="#e6e6e6">K4</text>
+<text x="638.0" y="172" fill="#e6e6e6">17.65 - 67.5 (L 49.85)</text>
+<rect x="359.6" y="210" width="270.4" height="34" fill="#3b82c4"/>
+<text x="30" y="232" fill="#e6e6e6">K1-thin</text>
+<text x="638.0" y="232" fill="#e6e6e6">33.70 - 67.5 (L 33.80)</text>
+<rect x="326.0" y="270" width="304.0" height="34" fill="#3b82c4"/>
+<text x="30" y="292" fill="#e6e6e6">phase2</text>
+<text x="638.0" y="292" fill="#e6e6e6">29.50 - 67.5 (L 38.00)</text>
+<text x="30" y="345" fill="#e6e6e6">Max pod 29.5..67.5 = 38.0 mm. K4 (49.85) must lose 11.85 mm of front length (24%).</text>
+</svg>
