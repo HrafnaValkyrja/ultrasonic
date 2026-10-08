@@ -6,7 +6,7 @@ Metrics (spec): thickness T, height H, length L, worn mass, vision clearance, ru
 
 | ID | Track | Idea | Metric moved (est.) | Evidence / calc | Cost + risk | Rank | Status | Judge note |
 |---|---|---|---|---|---|---|---|---|
-| I-001 | D | Alert tones at 2-3 kHz + look-ahead limiter (fw knobs) | loudness margin +6-10 dB (est.) | docs/proof/electrical/loudness.md | free; changes sound character | - | in progress (guess, DIRECTION 2026-10-08) | - |
+| I-001 | D | Alert tones at 2-3 kHz + look-ahead limiter at the R64 clamp (fw knobs alert_hz, lim_lookahead) | alert margin +4.5 dB (quiet +6.1->+10.6, office -8.9->-4.4, street -28.9->-24.4; p05) | loudness.md before/after, fbfb38b | free; limiter raises max output past the -12 dBFS D17 ceiling: needs owner re-sign of D17 + golden re-bless | 1 | built, limiter OFF pending owner (D17) | - |
 | I-002 | D | Pad stiffness / exciter resonance at 2-3 kHz | loudness +4-10 dB | loudness.md levers; needs E1/E2 | bench time, pad parts | - | bench day | - |
 
 ## Judge log (newest first)
