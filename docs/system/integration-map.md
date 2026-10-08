@@ -199,22 +199,22 @@ Nets inside one block only: CC, DOCK_VBUS, LDO_OUT, MIC_CLK, N$1
 
 ## 11. K4 two-board split (ECR-0020, proposed; NOT the current design until adopted)
 
-Netlists: hw/pod/k4/gen.py -> pod_k4_M.net (22 placed parts), pod_k4_P.net (32); ERC 0 errors both (2026-10-08). Board M (lower, mic on its outer face): U1 + its caps, Y1/C11/C12, U2/R2/C13, R1, R15/R16, C19, SWD/NRST/3V0/GND pads TP1-TP5, dots TP7-TP10, J20 BM28 receptacle. Board P (upper): charger U3 block, LDO U4 block, dock/ESD, VBAT/VBUS sense dividers, L1, bridge Q1/Q2 + shunt + C14, SW1 + R10, R14, wire pads, TP6, J21 BM28 plug. J12/R18/D6 and net CC are gone (ECR-0019).
+Netlists (rev 3, area re-balance 2026-10-08): hw/pod/k4/gen.py -> pod_k4_M.net (23 placed parts), pod_k4_P.net (31); ERC 0 errors both. Board M (lower, mic on its outer face): U2/C13, charger U3 block, LDO U4 block (+R20), dock D4/D5/U6 + own gold pads J3/J4/J10/J11 + 2 magnets, SW1/R10, VBUS/VBAT dividers, RT1/J9, R14/J7/J8, J5, TP6, J20 BM28 receptacle. Board P (upper, over the mic): U1 + caps, Y1, L1/C7/C8/C9, R1/R2, R15/R16, bridge Q1/Q2 + shunt + C14, J1/J2, TP1-TP5/TP7-TP10, J21 BM28 plug. J12/R18/D6 and net CC are gone (ECR-0019).
 
 | BM28 pin | Net | BM28 pin | Net | BM28 pin | Net |
 |---|---|---|---|---|---|
-| 1 | GND | 11 | GND | 21 | GND |
-| 2 | +3V0 | 12 | I_SENSE | 22 | TS |
-| 3 | VLXSMPS | 13 | USB_DP | 23 | VBAT_SENSE |
-| 4 | GND | 14 | GND | 24 | VBUS_SENSE |
-| 5 | GND | 15 | USB_DM | 25 | GND |
-| 6 | VDD11 | 16 | GND | 26 | LED_K |
-| 7 | GA_P | 17 | GND | 27 | BTN |
-| 8 | GA_N | 18 | I2C_SCL | 28 | +3V0 |
-| 9 | GB_P | 19 | I2C_SDA | 29 | GND |
-| 10 | GB_N | 20 | CHG_INT | 30 | GND |
+| 1 | GND | 11 | USB_DP | 21 | GND |
+| 2 | GND | 12 | GND | 22 | TS |
+| 3 | MIC_CLK | 13 | USB_DM | 23 | I2C_SCL |
+| 4 | GND | 14 | GND | 24 | GND |
+| 5 | GND | 15 | GND | 25 | I2C_SDA |
+| 6 | MIC_VDD | 16 | GND | 26 | VBUS_SENSE |
+| 7 | MIC_DATA | 17 | +3V0 | 27 | CHG_INT |
+| 8 | GND | 18 | +3V0 | 28 | VBAT_SENSE |
+| 9 | GND | 19 | +3V0 | 29 | BTN |
+| 10 | GND | 20 | GND | 30 | LED_K |
 
-30 contacts = 19 signal/power + 11 GND (odd pins row A, even row B [T]). Parts: P plug C424570 BM28B0.6-30DP/2-0.35V(51), M receptacle C424571 BM28B0.6-30DS/2-0.35V(51), JLC 2026-10-08. Rating 0.3 A per signal contact [T, secondary source]. VLXSMPS and VDD11 carry the SMPS inductor current on one contact each (unproven margin). Mated height 0.6 mm [T].
+30 contacts = 16 signal/power + 14 GND (odd pins row A, even row B [T]). Parts: P plug C424570 BM28B0.6-30DP/2-0.35V(51), M receptacle C424571 BM28B0.6-30DS/2-0.35V(51), JLC 2026-10-08. Rating 0.3 A per signal contact [T, secondary source]; +3V0 (LDO on M to P) uses 3 contacts, the 315 mA bridge peaks are served by C14/C4/C7 on P. No VLXSMPS, VDD11 or bridge node crosses. Mated height 0.6 mm [T].
 
 ## 10. Required cross-check for every proposed change
 

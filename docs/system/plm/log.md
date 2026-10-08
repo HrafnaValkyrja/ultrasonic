@@ -627,3 +627,4 @@
 - 2026-10-07 21:07 review WHOLE by claude: O28-O32 (2026-10-08) recorded; whole.md owner_decisions updated, ECR-0019
 - 2026-10-07 22:05 ECR-0020 raised by claude: K4 two-board split: M (MCU+mic) and P (power, bridge, dock, button) joined by Hirose BM28 30-pin (O33, B+)
 - 2026-10-07 22:06 review INTEGRATION by claude: ECR-0020: K4 split section 11 added to integration-map and system_map.py (proposed, not current design)
+- 2026-10-08 ECR-0020 rev 3 by claude: area re-balance, M = mic+charger+LDO+dock+button (23 parts), P = MCU+SMPS+bridge (31); BM28 30 contacts (16 signal, 14 GND); est. L P ~11.5, M ~9 mm

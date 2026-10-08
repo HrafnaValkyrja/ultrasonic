@@ -189,9 +189,9 @@ All wire-pad edge gaps >= 0.90 mm (MZD-10 asks >= 0.8 between pads whose bridge 
 - Rev G route (2026-10-02): 1 unconnected, DRC 19 courtyard + 1 clearance; layout noise (sha e159bccb) LN-M01 23.1 dB, LN-M02 12.2 dB, LN-M03 5.2 % FAIL, LN-M04 0.199 mV, LN-M05 14.3 µV. Details: git history of this file before 2026-10-07.
 
 ## K4 two-board split (ECR-0020, proposed 2026-10-08; NOT the current design)
-Source: hw/pod/k4/gen.py -> pod_k4_M.net / pod_k4_P.net, BOMs bom_jlc_M.csv (22 parts) / bom_jlc_P.csv (32 parts); SKiDL ERC 0 errors both. Study: docs/research/drastic/V9-k4-board.yaml (B+), noise sim sim/noise/vertical_bplus.py.
-- M (lower, 4L, ~11 x 12): U1 MCU and caps, Y1 crystal, U2 mic on the outer face (port through the shell), R15/R16, C19, SWD/NRST pads, dots TP7-TP10, J20 BM28 receptacle.
-- P (upper, 4L): charger, LDO, dock/ESD, sense dividers, L1, bridge Q1/Q2 + shunt, SW1 on its top face, wire pads, TP6, J21 BM28 plug.
-- B2B: BM28 30 contacts (19 signal/power, 11 GND; map in integration-map.md section 11 and pin-contract.yaml k4_split). L1 and the bridge on P is the B+ noise premise; the cost is VLXSMPS + VDD11 crossing the connector on one contact each.
+Source: hw/pod/k4/gen.py -> pod_k4_M.net / pod_k4_P.net, BOMs bom_jlc_M.csv (23 parts) / bom_jlc_P.csv (31 parts); SKiDL ERC 0 errors both. Study: docs/research/drastic/V9-k4-board.yaml (B+), noise sim sim/noise/vertical_bplus.py.
+- M (lower, 4L, est. L ~9 x 12): U2 mic (outer/belly face, port through the shell), charger U3, LDO U4 (+R20), dock D4/D5/U6 with 4 own gold pads J3/J4/J10/J11 + 2 magnets on the belly (k4-dock.yaml A), SW1/R10, VBUS/VBAT dividers, RT1/J9, R14/J7/J8, cell pad J5, TP6, J20 BM28 receptacle. 23 parts.
+- P (upper, 4L, est. L ~11.5 x 12, over the mic): U1 MCU + caps, Y1, L1/C7/C8/C9 (same board), bridge Q1/Q2 + shunt + C14, I2C pull-ups, J1/J2, SWD/test pads TP1-TP5/TP7-TP10, J21 BM28 plug. 31 parts.
+- B2B: BM28 30 contacts (16 signal/power incl. +3V0 on 3, 14 GND; map integration-map.md section 11, pin-contract.yaml k4_split). No switching node crosses; USB D+/D- are an adjacent pair with GND either side; the PDM trio is GND-guarded. 20 contacts do not fit.
 - Placement rules to carry: continuous GND under L1 and over the mic on both boards, BM28 slot offset from the L1 shadow, >= 4 GND pins near L1 (V9 B+ conditions); MP-01 10 mm port-to-L1 rule is relaxed only on those conditions. Not placed or routed; board outline, heights and TP accessibility are placement work.
 - ECR-0019 is folded in: no J12/R18/D6 or CC net in the K4 netlists.

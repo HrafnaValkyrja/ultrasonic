@@ -354,19 +354,67 @@ def build():
 
 
 
-# ============================================================ K4 two-board split (ECR-0020 rev 2, spec O33, V9 option B+)
+# ============================================================ K4 two-board split (ECR-0020 rev 3, spec O33, V9 option B+)
 # Rule (review of d2a70d9): no switching node crosses the B2B. VLXSMPS, L1, C8/C9 (VDD11), C7 (VDDSMPS) stay on U1's board.
-# P = upper board: everything electrical (MCU U1 + its SMPS, charger, LDO, bridge, dock, button), the B+ aggressors.
-# M = lower board: only the mic U2 + its 100 nF C13 (mic on M's outer face, port through M). The PDM clock, data and the
-# GPIO-switched mic supply are the only signals that cross. Hirose BM28 0.35 mm stack, 10 contacts: P carries the plug (DP),
-# M the receptacle (DS), pin n to pin n [T].
-BOARD_OF = {"U2": "M", "C13": "M"}
+# Rev 3 (2026-10-08, area re-balance): rev 2 put 51 parts on P and only the mic on M (P as long as one board). Now
+#   P (upper, over the mic): U1 + crystal + L1/C8/C9/C7 (same board) + bridge Q1/Q2 + shunt + C14 + SWD/test pads + J1/J2 + I2C pull-ups.
+#   M (lower, carries the mic): mic U2 + C13, BQ25180 charger U3, LDO U4, dock (D4/D5/U6, own gold pads J3/J4/J10/J11 + 2 magnets, k4-dock.yaml A),
+#   button SW1 + R10, VBUS/VBAT sense dividers, NTC RT1/J9, LED feed R14/J7/J8, cell wire pads J5, TP6 VSYS.
+# Crossing nets: +3V0 (LDO on M feeds P; C14/C4/C7 local on P), the 3 mic nets, I2C x2, CHG_INT, TS, VBUS_SENSE, VBAT_SENSE, USB D+/D-, BTN, LED_K.
+# BM28 30 contacts: P carries the plug (DP), M the receptacle (DS), pin n to pin n [T].
+BOARD_OF = {r: "M" for r in (
+    "U2", "C13",                                   # mic
+    "U3", "C15", "C16", "C21", "U4", "C17", "C18", "R20", "TP6",       # charger, LDO (LDO_OUT -> R20 -> +3V0), VSYS pad
+    "D4", "D5", "U6", "J3", "J4", "J10", "J11",    # dock: reverse block, ESD, 4 gold pads (VBUS, GND, D+, D-)
+    "R12", "R13", "R8", "R9", "C19",               # VBUS / VBAT sense dividers (analogue nodes cross as VBUS_SENSE / VBAT_SENSE)
+    "RT1", "J9", "J5",                             # NTC, NTC pad, cell BAT+ wire pad (cell - lands on dock GND pad J4, ASM-09)
+    "SW1", "R10",                                  # button (+3V0 from the LDO on M; BTN crosses)
+    "R14", "J7", "J8")}                            # LED feed (VSYS), LED wire pads; LED_K crosses to PB7
 # Everything not listed is P.
 BM28_PINS = {    # pin -> net. Odd pins row A, even pins row B; pins (2k-1, 2k) face each other [T].
-    1: "GND", 2: "MIC_VDD", 3: "MIC_CLK", 4: "GND", 5: "GND",
-    6: "GND", 7: "MIC_DATA", 8: "GND", 9: "GND", 10: "GND"}
-# MIC_CLK (3): GND at 1 and 5 (same row) and 4 (facing). MIC_DATA (7): GND at 5, 9 and 8. MIC_VDD (2): GND at 4 and 1.
-# 3 signals + 7 GND. MIC_VDD is a ~1 mA GPIO supply (PA5), CLK/DATA 3-4 MHz 3 V PDM: no current or switching-node risk on the contacts.
+    1: "GND", 2: "GND", 3: "MIC_CLK", 4: "GND", 5: "GND", 6: "MIC_VDD", 7: "MIC_DATA", 8: "GND", 9: "GND", 10: "GND",
+    11: "USB_DP", 12: "GND", 13: "USB_DM", 14: "GND", 15: "GND", 16: "GND", 17: "+3V0", 18: "+3V0", 19: "+3V0", 20: "GND",
+    21: "GND", 22: "TS", 23: "I2C_SCL", 24: "GND", 25: "I2C_SDA", 26: "VBUS_SENSE", 27: "CHG_INT", 28: "VBAT_SENSE",
+    29: "BTN", 30: "LED_K"}
+# Shielding: MIC_CLK(3) GND at 1,5,4; MIC_DATA(7) GND at 5,9,8; MIC_VDD(6) GND at 4,5,8; USB_DP/DM (11,13) pair with GND at 9 and 15 (row)
+# and 12, 14 (facing); +3V0 on 17,18,19 (3 contacts, <= 0.3 A each [T]: bridge peaks 315 mA sit on local C14 22 uF; mean < 0.1 A).
+# 16 signal/power + 14 GND. 20 contacts do not fit (16 + >= 6 GND shielding the PDM trio and the D+/D- pair).
+
+
+# Placed-area estimate (V9 method): courtyard areas from hw/pod/draft_r2/out/routed.kicad_pcb (same mz2 package set), mm2.
+CY = {"C_0201_0603Metric": 0.959, "R_0201_0603Metric": 0.959, "C_0402_1005Metric": 1.647, "R_0402_1005Metric": 1.72,
+      "C_0603_1608Metric": 4.277, "D_SOD-882": 1.892, "X1SON-2_L1.0-W0.6-P0.65-BI-1": 0.584, "L0806": 3.164,
+      "Nexperia_SOT1216_DFN1010B-6": 1.932, "SW-SMD_4P-L3.0-W2.6-P1.85-LS3.4": 7.744, "TestPoint_Pad_D0.7mm": 1.109,
+      "TestDot_D0.5mm": 0.488, "TestPoint_Pad_D1.0mm": 3.105, "QFN-48-1EP_7x7mm_P0.5mm_EP5.6x5.6mm": 65.6,
+      "Knowles_LGA-5_3.5x2.65mm_Port0.65": 12.569, "DSBGA-8_L1.6-W0.9-R2-C4-P0.40-BL": 1.317,
+      "X2SON-4_L1.0-W1.0-P0.65-TL-EP": 0.98, "SOT-553-5_L1.6-W1.2-P0.50-LS1.6-TL-1": 1.914,
+      "Crystal_SMD_2012-2Pin_2.0x1.2mm": 6.548, "WirePad_1.0x2.0mm": 3.71, "BM28B0.6-10DP_2-0.35V": 0,
+      "BM28B0.6-30": 7.0 * 2.6}   # BM28 30-pin: ~7.0 x 2.6 mm courtyard [E; ECR-0020 'about 7 mm along the row']
+DOCK_STRIP = 37.0   # M outer face: 4 gold pads on 2.0 pitch (8 x 2.4) + 2 magnet seats (2 x 3 x 3) [E, k4-dock.yaml option A; magnet size [T]]
+ROUTING = 1.3
+H = 12.0
+
+
+def area(board):
+    """courtyard sum, two-face L at H=12 (x1.3 routing) and the QFN-face bound for P."""
+    tot, items = 0.0, []
+    for p in builtins.default_circuit.parts:
+        if "DNP_BOM" in p.fields and p.ref.startswith("TP") is False and p.ref not in ("J1", "J2", "J3", "J4", "J5", "J7", "J8", "J9", "J10", "J11"):
+            continue
+        fp = str(p.footprint).split(":")[-1]
+        if p.ref in ("J3", "J4", "J10", "J11"):
+            continue                                   # counted once in DOCK_STRIP
+        a = CY.get(fp)
+        if a is None and fp.startswith("BM28"):
+            a = CY["BM28B0.6-30"]
+        assert a is not None, (p.ref, fp)
+        tot += a
+        items.append((p.ref, a))
+    if board == "M":
+        tot += DOCK_STRIP
+    placed = tot
+    L2 = placed * ROUTING / (2 * H)
+    return placed, L2
 
 
 def board_of(ref):
@@ -375,8 +423,8 @@ def board_of(ref):
 
 def b2b_part(ref, lcsc, mpn):
     pins = [Pin(num=n, name=f"{n}_{net}", func=Pin.types.PASSIVE) for n, net in sorted(BM28_PINS.items())]
-    j = Part(tool=SKIDL, name="BM28_10", ref_prefix="J", ref=ref, tag=ref, pins=pins,
-             footprint="lcsc:BM28B0.6-10DP_2-0.35V", value=mpn)    # footprint to be fetched at placement [T]
+    j = Part(tool=SKIDL, name="BM28_30", ref_prefix="J", ref=ref, tag=ref, pins=pins,
+             footprint="lcsc:BM28B0.6-30DP_2-0.35V", value=mpn)    # footprint to be fetched at placement [T]
     j.fields["LCSC"] = lcsc
     return j
 
@@ -395,8 +443,8 @@ def split(board):
     cross = crossing_nets()
     pinnets = set(BM28_PINS.values())
     assert set(cross) == pinnets, ("B2B net list mismatch", sorted(set(cross) ^ pinnets))
-    j = b2b_part("J20" if board == "M" else "J21", "C424563" if board == "M" else "C424562",
-                 "BM28B0.6-10DS/2-0.35V(51)" if board == "M" else "BM28B0.6-10DP/2-0.35V(51)")
+    j = b2b_part("J20" if board == "M" else "J21", "C424571" if board == "M" else "C424570",
+                 "BM28B0.6-30DS/2-0.35V(51)" if board == "M" else "BM28B0.6-30DP/2-0.35V(51)")
     for num, nname in BM28_PINS.items():
         j[num] += cross[nname]
     for p in list(builtins.default_circuit.parts):
@@ -428,4 +476,6 @@ if __name__ == "__main__":
         skidl.ERC()
         generate_netlist(file_=str(HERE / f"pod_k4_{b}.net"))
         lines, n = bom(b)
+        pa, L2 = area(b)
+        print(f"BOARD {b}: courtyards {pa:.1f} mm2, x{ROUTING} two faces at H{H:g} -> L {L2:.1f} mm")
         print(f"BOARD {b}: BOM {lines} lines, {n} placed parts, B2B pins {len(BM28_PINS)}")
