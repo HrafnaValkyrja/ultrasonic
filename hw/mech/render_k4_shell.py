@@ -13,8 +13,12 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 OUT = HERE / "out"
 DOCS = HERE.parent.parent / "docs" / "diagrams"
-PODS = {"S": OUT / "k4s"}
-LABEL = ("K4 end-to-end shell", "T 6.4   L 49.2   H 14.8 mm   walls 0.6, lid 1.0", "130 mAh cell + 11 mm board-stack block (placeholder), mic at the hinge end")
+import os
+POD = os.environ.get("K4_POD", "k4s")                 # k4s = placeholder stack, k4r = real routed boards (k4_real_boards.py)
+PREFIX = os.environ.get("K4_PREFIX", "k4-shell")
+PODS = {"S": OUT / POD}
+LABEL = (("K4 end-to-end shell", "T 6.4   L 49.2   H 14.8 mm   walls 0.6, lid 1.0", "130 mAh cell + 11 mm board-stack block (placeholder), mic at the hinge end") if POD == "k4s" else
+         ("K4 pod with the real routed P + M boards", "T 6.4   L 53.7   H 14.8 mm   boards 15.55 x 12.05, 6L", "130 mAh cell + M (top, mic + button) and P (lower, MCU) from routed_M/P STEP"))
 VIEWS = ("iso", "top", "section")
 CUT_Z = -2.3
 C = (43.0, 8.0, -2.3)
@@ -28,7 +32,7 @@ def compose():
     except OSError:
         f1 = f2 = ImageFont.load_default()
     for v in VIEWS:
-        im = Image.open(OUT / "k4cmp" / f"S_{v}.png").convert("RGBA")
+        im = Image.open(OUT / "k4cmp" / f"S_{POD}_{v}.png").convert("RGBA")
         w, h = im.size
         top = 190
         cv = Image.new("RGB", (w, h + top), (14, 15, 18))
@@ -39,7 +43,7 @@ def compose():
             d.text((30, 20 + 55 * k), txt, fill=col, font=fnt)
         cv = cv.resize((cv.width * 4 // 5, cv.height * 4 // 5), Image.LANCZOS)
         DOCS.mkdir(parents=True, exist_ok=True)
-        p = DOCS / f"k4-shell-{v}.png"
+        p = DOCS / f"{PREFIX}-{v}.png"
         cv.save(p, optimize=True)
         print(p, p.stat().st_size // 1024, "KB")
 
@@ -130,7 +134,7 @@ def render_all():
             s.render.film_transparent = True
             s.render.resolution_x, s.render.resolution_y = 1400, 1000
             s.view_settings.view_transform = "AgX"
-            s.render.filepath = str(OUT / "k4cmp" / f"{pod}_{view}.png")
+            s.render.filepath = str(OUT / "k4cmp" / f"{pod}_{POD}_{view}.png")
             bpy.ops.render.render(write_still=True)
 
 
