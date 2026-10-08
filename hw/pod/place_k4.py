@@ -34,7 +34,7 @@ R1, P = R2.R1, R2.P
 mm, MM = pcbnew.FromMM, pcbnew.ToMM
 K4 = HERE / "k4"
 H = 12.0
-GAP = 0.6                                            # BM28 mated height [T: from P/N, datasheet not read]
+GAP = 0.6                                            # BM28 mated height [V: Hirose BM28 catalog Aug 2019, stacking height 0.6; tol +-0.05 still T]
 # part heights (mm) [T: typical, none read from datasheets except where noted]; default by footprint family
 HEIGHT = {"C_0201": 0.33, "R_0201": 0.26, "C_0402": 0.5, "R_0402": 0.35, "C_0603": 0.9, "Nexperia_SOT1216": 0.37,
           "D_SOD-882": 0.5, "X1SON": 0.4, "X2SON": 0.4, "DSBGA": 0.5, "SOT-553": 0.55, "TestPoint": 0.0, "TestDot": 0.0,
