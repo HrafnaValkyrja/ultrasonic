@@ -143,7 +143,7 @@ U4: "input 1.6-6.0 V (VSYS <= 4.9 V by design); output 3.0 V ± 1.5 %; rated 300
 ## Key numbers
 ```yaml
 cell: {cap: "175 nom (170 min) mAh", size: "<= 5.3 x 12 x 35 mm", mass: "~4.2 g", R: "< 480 mΩ at 30 % SOC", src: "Renata V03 08/2019, fetched 2026-10-01"}
-charge_current: {val: "170 mA (20-45 °C), 50 mA below 20 °C (firmware rule)", src: "gen.py U3 comment, adjusted to U3 10 mA steps; ICHG codes 44/32 confirmed audit row g (2026-10-02)"}
+charge_current: {val: "PH2 175 mAh: 170 mA; K4 130 mAh (ICP401230UPR): 130 mA = 1C max, fw/variants.yaml K1_130 ichg_code_max 40 (owner question A-SAFETY-REVIEW: cap ~65 mA = 0.5C?) (20-45 °C), 50 mA below 20 °C (firmware rule)", src: "gen.py U3 comment, adjusted to U3 10 mA steps; ICHG codes 44/32 confirmed audit row g (2026-10-02)"}
 U3_defaults: {val: "ICHG 10 mA, VBATREG 4.20 V, BUVLO 3.0 V, ILIM 500 mA, SYS 4.5 V, safety timer 6 h, VINDPM disabled, WATCHDOG_SEL 00 (160 s register revert, armed after the first I2C transaction)", src: "SLUSE99C Rev C Jan 2023 §8.5.1 p.32-38; audit-datasheet-claims.md rows 3, 4, g (2026-10-02)"}
 U3_TS: {val: "0 / 10 / 45 / 60 °C (cold / cool = ½ ICHG / warm = -100 mV / hot); bias 38 µA with adapter, 60 µA pulsed 4 ms / 196 ms on battery only; VTSMR 90 mV", src: "SLUSE99C §7.5, §8.5.1.12 (2026-10-01; audit row g)"}
 U3_fet_iq: {val: "battery FET 55 mΩ typ (90 max); battery-only Iq 3 / 3.5 µA (watchdog and push-button disabled), 4 / 5 µA (push-button on); ship 3.2 µA; shutdown 15 nA; Iq with watchdog enabled not tabulated", src: "SLUSE99C §7.5 p.6 IQ_BAT; audit row e"}
