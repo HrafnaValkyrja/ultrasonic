@@ -140,6 +140,8 @@ LCSC = {
     "C4u7_25V": "C2858031", "ESD_VBUS": "C48260",
     # Rev G (O24), JLC parts API 2026-09-30 (sourcing-lock row C_VDD11): ST wants >= 10 V on VDD11
     "C2u2_10V": "C107369",
+    # ECR-0022 B2B-gap thin MLCCs (Samsung 0201, T 0.30 +-0.09 = 0.39 max; Samsung spec sheets C318539/C318540, read + JLC API 2026-10-08, Extended)
+    "C2u2_10V_0201": "C318539", "C1u_16V_0201": "C318540",
 }
 
 
@@ -199,7 +201,8 @@ def build():
     l1.fields["LCSC"] = "C337891"
     l1[1] += vlx; l1[2] += vdd11
     for ref in ("C8", "C9"):                                           # 2 x 2.2 uF on VDD11: ESR < 20 mOhm @ 3 MHz, rated >= 10 V
-        c = C(ref, "2u2 10V", "C2u2_10V"); c[1] += vdd11; c[2] += gnd   # (DS13737 Rev 10 p.153; Rev G, O24: was 6.3 V C12530)
+        c = C(ref, "2u2 10V", "C2u2_10V") if ref == "C8" else C(ref, "2u2 10V", "C2u2_10V_0201", C0201)   # C9 on P's inner face: 0201 0.39 max (ECR-0022 gap)
+        c[1] += vdd11; c[2] += gnd   # (DS13737 Rev 10 p.153; Rev G, O24: was 6.3 V C12530)
     nrst = Net("NRST"); nrst += u1["NRST"]
     c = C("C10", "100n", "C100n"); c[1] += nrst; c[2] += gnd
     r = R("R1", "10k", "R10k"); r[1] += u1["PH3"]; r[2] += gnd         # BOOT0 low: boot from flash (10k as AN5373)
@@ -292,7 +295,7 @@ def build():
     rt.fields["LCSC"] = "C77131"
     rt[1] += ts; rt[2] += gnd                                            # board NTC: DNP-able if the cell carries one
     c = C("C15", "4u7 25V", "C4u7_25V"); c[1] += vbus; c[2] += gnd     # USB attach limit <= 10 uF; 25 V per TI 9.2.2.1
-    c = C("C16", "4u7", "C4u7"); c[1] += vbat; c[2] += gnd
+    c = C("C16", "2u2 10V", "C2u2_10V_0201", C0201); c[1] += vbat; c[2] += gnd
     c = C("C21", "10u", "C10u_0402"); c[1] += vsys; c[2] += gnd  # TI: >= 10 uF on SYS; 0402 10 V (ECR-0022, lid ledge option B: 0603 0.9 -> 0402 0.70 max)
     # VBUS sense: firmware knows it is docked (DFU entry, charge mode). 2.5 V at PA1 from 5 V.
     vbs = Net("VBUS_SENSE")
@@ -313,7 +316,7 @@ def build():
     u4 = Part("lcsc", "TPS7A2030PDQNR", ref="U4", tag="U4"); u4.fields["LCSC"] = "C5220164"
     v3_ldo = Net("LDO_OUT")
     u4["IN"] += vsys; u4["EN"] += vsys; u4["OUT"] += v3_ldo; gnd += u4["GND"], u4["EP"]   # SYS <= 4.9 V < LDO 6 V max
-    c = C("C17", "1u", "C1u"); c[1] += vsys; c[2] += gnd
+    c = C("C17", "1u 16V", "C1u_16V_0201", C0201); c[1] += vsys; c[2] += gnd
     c = C("C18", "1u", "C1u"); c[1] += v3_ldo; c[2] += gnd           # stays at the LDO for stability
     r = R("R20", "0", "R0"); r[1] += v3_ldo; r[2] += v3                # lift: measure or inject the 3V0 rail
     vs = Net("VBAT_SENSE")                                              # 1M/1M: 2 uA, 2.1 V max at PA4

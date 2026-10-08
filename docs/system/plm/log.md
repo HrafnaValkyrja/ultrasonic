@@ -670,3 +670,4 @@
 - 2026-10-08 04:34 review PHYSICAL by K4 ledge agent: ECR-0022 ledge + C21 0402
 - 2026-10-08 04:34 checkin PHYSICAL by K4 ledge agent
 - 2026-10-08 04:34 ECR-0022 raised by K4 ledge agent: K4 lid ledge (VHB on its tip) + C21 10 uF 0603 -> 0402, pod T unchanged
+- 2026-10-08 04:38 checkout REG-BOARD by K4 gap agent: ECR-0022 thin MLCCs C16/C17/C9

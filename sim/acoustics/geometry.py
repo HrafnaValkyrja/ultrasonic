@@ -240,6 +240,8 @@ def load_r2(d, board=None) -> Geom:
     (sealed) -> board hole D0.6 through 0.8. Numbers from d.shell_dims (dims_r2.py); offset from U2's NPTH on the board."""
     src, warn, info = {}, [], {"design": d.id}
     D = import_dims(d.shell_dims)
+    if not hasattr(D, "Y_TOP"):
+        return load_k4(d, D, board)
     rel = lambda p: str(Path(p).resolve().relative_to(REPO))  # noqa: E731
     area = 6 / 2 * D.HEX_R ** 2 * math.sin(2 * math.pi / 6)
     floor_y = D.Y_TOP - D.HEX_DEPTH
@@ -282,6 +284,41 @@ def load_r2(d, board=None) -> Geom:
     except Exception as e:                                # noqa: BLE001
         warn.append(f"board not probed ({e!r}): port offset = 0 (duct follows the hole by construction), D{D.MIC_HOLE_D} hole")
         src["board"] = f"FALLBACK offset 0, D{D.MIC_HOLE_D} hole"
+    src["mic"] = "datasheet Rev B-1 p.9: AP D0.325 +-0.05; port length, standoff ASSUMED"
+    return replace(g, src=src, warnings=tuple(warn), info=info)
+
+
+def load_k4(d, D, board=None) -> Geom:
+    """K4 (ECR-0021/0022, 2026-10-08): flat 1.0 lid with a hex window HEX_DEPTH deep, reamed D1.0 bore to the lid inner face, then a SEALED duct
+    through the lid-underside ledge tube (LID_STANDOFF) + VHB ring (VHB_T) = F_GAP, board hole MIC_HOLE_D through PCB_T (M board, 6L).
+    Offset from U2's NPTH on routed_M vs the duct axis (dims_k4.MIC = board (1.75, 6.0)); locating tolerance = printed tube vs bore, ASSUMED 0.1 mm."""
+    src, warn, info = {}, [], {"design": d.id}
+    rel = lambda p: str(Path(p).resolve().relative_to(REPO))  # noqa: E731
+    area = 6 / 2 * D.HEX_R ** 2 * math.sin(2 * math.pi / 6)
+    floor_y = D.Y_OUT - D.HEX_DEPTH
+    g = Geom().with_(a_recess=math.sqrt(area / math.pi) * MM, hex_circum_r=D.HEX_R * MM, d_recess=D.HEX_DEPTH * MM,
+                     a_bore=D.DUCT_D / 2 * MM, l_bore=(floor_y - D.Y_LID_IN) * MM, h_gap=D.F_GAP * MM, t_board=D.PCB_T * MM,
+                     a_hole=D.MIC_HOLE_D / 2 * MM, cav_lx=(D.STACK_L - 0.4) * MM, cav_lz=(D.STACK_H - 0.4) * MM, bore_cx=1.55e-3, bore_cz=5.8e-3)
+    src["lid"] = (f"{d.rel['shell_dims']}: bore D{D.DUCT_D} from lid inner face y {D.Y_LID_IN:.2f} to window floor y {floor_y:.2f} (bore {floor_y - D.Y_LID_IN:.2f}), "
+                  f"hex R {D.HEX_R} x {D.HEX_DEPTH}, sealed duct {D.F_GAP:.2f} = ledge tube {D.LID_STANDOFF} + VHB {D.VHB_T}, board {D.PCB_T}, hole D{D.MIC_HOLE_D}")
+    src["gap_channel"] = "K4: none (sealed ledge tube + VHB ring); open-gap scenarios are what-ifs"
+    allow = D.DUCT_D / 2 - D.MIC_HOLE_D / 2
+    info["duct_locating"] = dict(method="printed tube round the bore, VHB ring registered by the tube", worst_mm=0.1, limit_R_ACO_P5=allow,
+                                 walls_only_worst_mm=0.1, src="[A] 0.1 mm print/place tolerance, not derived from a K4 gauge-pin stack")
+    bpath = find_board(board, d)
+    try:
+        pr = probe_board(bpath)
+        px, py = pr["port_xy"]
+        dx = px - 1.75
+        dz = max(py - 6.0, (12.0 - py) - 6.0, key=abs)
+        off = math.hypot(dx, dz)
+        g = g.with_(offset=off * MM, off_ang=(math.atan2(dz, dx) if off > 1e-6 else math.pi), a_hole=pr["drill"] / 2 * MM)
+        src["board"] = f"{rel(bpath)}: U2 NPTH D{pr['drill']} at board {pr['port_xy']}; offset dx {dx:+.2f} dz {dz:+.2f} mm vs duct axis (1.75, 6.0)"
+        info.update(board_thickness_setting_mm=pr["thickness_setting"], board_file=rel(bpath))
+        if off > allow + 1e-9:
+            warn.append(f"board port is {off:.2f} mm from the duct axis (limit {allow:.2f})")
+    except Exception as e:                                # noqa: BLE001
+        warn.append(f"board not probed ({e!r}): offset 0")
     src["mic"] = "datasheet Rev B-1 p.9: AP D0.325 +-0.05; port length, standoff ASSUMED"
     return replace(g, src=src, warnings=tuple(warn), info=info)
 

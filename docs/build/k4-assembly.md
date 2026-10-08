@@ -71,11 +71,15 @@ Why now: P sits below M and has no solder window over M. After mating you cannot
 
 ## 5. Mate P to M
 
-1. **Do:** align the BM28 (30 pins, 0.35 pitch) square, plug on receptacle, press with a flat tool at the connector only. You should feel a soft stop; mated gap about 0.6 mm.
-2. **Check:** loupe along the gap: even all round. Then meter J5-J4 again (cell connected, board now live): 3.5 to 4.2 V, no warm part by touch after 30 s.
-3. **Check:** TP4 (+3V0) to TP5 (GND) on M: 0 V or about 3.0 V, never a short (above 1 kohm unpowered).
-4. **Gate G1/G2:** no 5 V on the dock pads until the cell side is quiet.
-5. **If it fails:** unplug, re-seat; a part getting warm = unplug the cell lead at J5 and look for a short.
+**BM28 warning (Hirose catalogue, per coordinator b18670c):** no polarity key, so it can mate 180 degrees reversed. Rated for only **10 mating cycles**. **Mate it once**, after testing each board alone where you can (M alone: step 3 checks; P alone: loupe + shorts only, it has no supply pad of its own).
+
+1. **Do (marks):** before anything else, put a pin-1 dot (paint pen or marker) on M next to J20 pin 1 and on P next to J21 pin 1, on the board edge where you can see it from the side. Pin n mates pin n. Which end is pin 1 comes from the KiCad footprint, so confirm it on the board silkscreen or in KiCad first **[T]**.
+2. **Do (photo check before pressing):** lay P over M with the dots on the same side, 2 mm apart, not touching. Take a photo from above and one from the side. Both dots must be on the same end. Wrong = turn P around. Only then press.
+3. **Do:** press with a flat tool at the connector only. Soft stop; mated gap about 0.6 mm. Do not unplug and re-mate for casual probing.
+4. **Check:** loupe along the gap: even all round. Then meter J5-J4 again (cell connected, board now live): 3.5 to 4.2 V, no warm part by touch after 30 s.
+5. **Check:** TP4 (+3V0) to TP5 (GND) on M: 0 V or about 3.0 V, never a short (above 1 kohm unpowered).
+6. **Gate G1/G2:** no 5 V on the dock pads until the cell side is quiet.
+7. **If it fails:** unplug, re-seat (counts as a cycle); a part getting warm = unplug the cell lead at J5 and look for a short.
 
 ## 6. Bench power-up and bring-up (stack on the mat, no lid)
 
@@ -130,7 +134,7 @@ Same cut-and-rebond pattern as `docs/build/reopen.md`. K4 differences:
 1. Score the rebate (0.1 deep x 0.4 high, with a 0.1 inward ridge so the wall stays 0.6): 2 to 3 light passes, 0.3 mm total depth at most.
 2. Open from the rear straight run with a spudger. The stack hangs on the lid and lifts with it on the wires (slack: 5 mm loops).
 3. **Cell swap:** desolder J5/J4, peel the 0.10 tape (floss), new cell on new tape. **Arm swap:** desolder J7 J8 (M) and J1 J2 (P), release the heel set screw.
-4. **P off M:** needs the lid off the tub first, then pull P from the BM28 (it is not glued). Re-solder J2 before re-mating.
+4. **P off M:** costs one of the 10 BM28 cycles; needs the lid off the tub first, then pull P from the BM28 (it is not glued). Re-solder J2 before re-mating.
 5. **Always replace:** seam adhesive, cell tape; **sometimes:** lid (stack VHB is destroyed on a board swap, 60 to 80 C and floss).
 
 ## 12. Left pod (mirror)

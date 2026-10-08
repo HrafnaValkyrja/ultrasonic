@@ -43,7 +43,7 @@ K4 = os.environ.get("SW1_BOARD", "").strip().lower() == "k4"
 if K4:
     import dims_k4 as K          # numpy-free; the K4 shell numbers
     TAG = "_k4" + ("_vhb14" if os.environ.get("SW1_VHB_X") == "14" else "")
-    BW, BH, T = 14.0, 12.0, K.PCB_T
+    BW, BH, T = float(K.STACK_L), 12.0, K.PCB_T   # follows the router (was 14.0)
     VHB_T = K.VHB_T
     SW_XY = (5.325, 6.025)       # routed_M.kicad_pcb, board origin = outline corner
     POCKET = (K.POCKET["dx"], K.POCKET["dz"])
@@ -55,6 +55,12 @@ if K4:
     BM28 = dict(c=(9.825, 6.025), L=7.0, W=2.6)                  # J20 courtyard [E]
     B_MARGIN = round(K.STACK_Y0 - K.CAV["y0"], 3)                # P to the cavity floor: 0.2 free
     TRAVEL = (0.05, 0.15, 0.25)
+    LEDGE = os.environ.get("SW1_LEDGE", "1") != "0"   # ECR-0022: VHB only on the notched ledge tip (default); SW1_LEDGE=0 = old full-face bond
+    if LEDGE:
+        TAG = "_k4_ledge" + ("_vhb14" if os.environ.get("SW1_VHB_X") == "14" else "")
+        import shell_k4 as SK         # build123d; rects are M lid-face courtyards in board coords (x from front edge, z from the low edge)
+        _rects, (LB, HB) = SK._m_lid_face_rects()
+        LRECTS = [r for r in _rects if r[0] not in ("U2", "SW1")]
 else:
     TAG = "" if D.DESIGN.id == "phase2" else f"_{D.OUT_DIR.name}"   # variants write their own outputs (e.g. _k1t_dome)
     BW, BH, T = 30.0, 12.0, D.PCB_T if hasattr(D, "PCB_T") else 0.8
@@ -77,6 +83,18 @@ FORCES = (2.0, 10.0)                          # N
 def bonded(x, y):
     """1 where the VHB is bonded (board coords, mm), else 0."""
     m = (x > INSET) & (x < BOND_X1 - INSET) & (y > INSET) & (y < BH - INSET)
+    if K4 and LEDGE:
+        W, I = K.LEDGE_W, K.LEDGE_INSET
+        m = (x > I) & (x < LB - I) & (y > I) & (y < HB - I) & ~((x > I + W) & (x < LB - I - W) & (y > I + W) & (y < HB - I - W))
+        for _r, rx0, rz0, rx1, rz1 in LRECTS:      # same notch rule as shell_k4.ledge_ring (courtyards already carry the 0.1 clear)
+            m &= ~((x > rx0) & (x < rx1) & (y > rz0) & (y < rz1))
+        if os.environ.get("SW1_POCKET_RING"):      # candidate fix: extra 0.5 wide ledge ring round the SW1 pocket (0.2 clear), notched for courtyards
+            hx, hz = POCKET[0] / 2 + 0.2, POCKET[1] / 2 + 0.2
+            ring = (np.abs(x - SW_XY[0]) < hx + W) & (np.abs(y - SW_XY[1]) < hz + W) & ~((np.abs(x - SW_XY[0]) < hx) & (np.abs(y - SW_XY[1]) < hz))
+            for _r, rx0, rz0, rx1, rz1 in LRECTS:
+                ring &= ~((x > rx0) & (x < rx1) & (y > rz0) & (y < rz1))
+            m |= ring
+        m |= (x - MIC_XY[0]) ** 2 + (y - MIC_XY[1]) ** 2 < (K.DUCT_TUBE_D / 2) ** 2     # duct tube ring (bore cut below)
     m &= ~((np.abs(x - SW_XY[0]) < POCKET[0] / 2) & (np.abs(y - SW_XY[1]) < POCKET[1] / 2))
     m &= ~((x - MIC_XY[0]) ** 2 + (y - MIC_XY[1]) ** 2 < DUCT_R ** 2)
     for px, py in F_PADS.values():
