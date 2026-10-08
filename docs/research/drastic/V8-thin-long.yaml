@@ -1,0 +1,43 @@
+# V8: thin cells (<= 4.0 mm) vs D18 reading B (>= 8 h on the WORST day, ~12 h normal). AI-facing. 2026-10-07 (rulings O28-O30 of 2026-10-08).
+# Sources: sim/checks/runtime_fw.py (run 2026-10-07; clock plans spec B P112 112.012 MHz R1, slim B P72 72.008 MHz R2; DS13737 Rev 10 July 2024
+#   Tables 39/46; fw/out/dsp_icount.json), V2-cells.yaml (Renata datasheets read 2026-10-07), power-cell.md s3 catalogue (fetched 2026-10-03),
+#   synthesis.md K1-K3 (concepts.py [E]), rail-budget bridge peak.
+meta:
+  model: "runtime_fw.py = power-cell.md B1 (FIRMWARE levers only) with real MCU clock; NO B2 hardware (mic 1.8 V LDO, bridge on VSYS) and NO B3 Range-4 DSP. synthesis.md K2/K3 numbers (9.9 h / 7.3 h) assume B2+B3 and are NOT reproduced here."
+  worst_def: "always awake, every block high, LED high; worst h = mAh x 0.75 / worst_mA (script 'worst'). typ = typ mAh; min = Renata min mAh; EOL = min x 0.8 (80 % after 500 cycles, F02 rule). Script itself only tabulates 130/175 mAh cells; the thin cells were fed through its mcu/awake/hours functions unchanged (ad-hoc call, same constants)."
+  normal_def: "design = 50 % awake nominal, 0.85 x 0.8 usable (script 'design'); expected = 18 % awake, 0.85 usable"
+  currents_mA: {spec_B: {awake_lo_nom_hi: [6.67, 8.32, 11.49], worst_incl_LED: 11.64}, slim_B: {awake_lo_nom_hi: [4.71, 6.13, 9.01], worst_incl_LED: 9.16}}
+  need_for_8h_worst_mAh: {slim_B: "97.7 (typ or min basis); 122 if EOL (x0.8) applied to min", spec_B: "124 (typ/min); 155 with EOL"}
+  peak: "bridge full-scale ~315 mA (power-cell.md cell_risks / rail-budget); D17-ceiling normal peaks ~85 mA. Renata pulse = 2C 'non continuous', duration unstated (V2)."
+cells_runtime_h:   # worst: typ / min / EOL ; normal: design(EOL) / expected
+  ICP331319PM_K3:  # 50 typ / 45 min mAh
+    slim_B: {worst: [4.1, 3.7, 2.9], normal: [8.6, 17.0], meets_8h_worst: false}
+    spec_B: {worst: [3.2, 2.9, 2.3], normal: [6.7, 14.7], meets_8h_worst: false}
+  ICP281029HPG_K2: # 68 / 65
+    slim_B: {worst: [5.6, 5.3, 4.3], normal: [11.7, 23.2], meets_8h_worst: false}
+    spec_B: {worst: [4.4, 4.2, 3.4], normal: [9.2, 20.0], meets_8h_worst: false}
+  ICP390831PR:     # 85 / 80
+    slim_B: {worst: [7.0, 6.6, 5.2], normal: [14.6, 28.9], meets_8h_worst: false}
+    spec_B: {worst: [5.5, 5.2, 4.1], normal: [11.5, 25.0], meets_8h_worst: false}
+  ICP401230UPR:    # 130 / 125 (reference, nominal T exactly 4.0, max 4.5)
+    slim_B: {worst: [10.6, 10.2, 8.2], normal: [22.4, 44.3], meets_8h_worst: "yes, incl. EOL (8.2)"}
+    spec_B: {worst: [8.4, 8.1, 6.4], normal: [17.5, 38.3], meets_8h_worst: "typ/min only; fails EOL (6.4)"}
+cells_geometry:    # T/W/L envelope max after 500 cycles (V2); nominal T in brackets
+  ICP331319PM: {nominal_T: 3.3, env: "3.7 x 12.8 x 21.0", mAh: [50, 45], pcm: yes, pulse_mA: 100, pulse_vs_315mA_peak: "0.32x (cap needed to 100 mA = -10 dB)", R_mOhm: 730}
+  ICP281029HPG: {nominal_T: 2.8, env: "3.3 x 10.2 x 30.5", mAh: [68, 65], pcm: "NO (bare, 4.35 V CV)", pulse_mA: 136, pulse_vs_315mA_peak: "0.43x", R_mOhm: 570}
+  ICP390831PR: {nominal_T: 3.9, env: "4.3 x 8.7 x 33.0", mAh: [85, 80], pcm: yes, pulse_mA: 170, pulse_vs_315mA_peak: "0.54x", R_mOhm: 530, note: "envelope T 4.3 > 4.0"}
+  ICP401230UPR: {nominal_T: 4.0, env: "4.5 x 12.7 x 31.0", mAh: [130, 125], pcm: yes, pulse_mA: 260, pulse_vs_315mA_peak: "0.83x", R_mOhm: 340, note: "envelope T 4.5 > 4.0; only listed because nominal = 4.0"}
+pod_length_mm:
+  rule: "walls/gaps ~3.1 (synthesis K2: 30.5 -> 33.1 stacked over a 30 mm board; K3: 21 + 16 + 3.1 = 40.1). Stacked: max(cell L, 30) + 3.1. End-to-end: cell L + board 16..20 + 3.1 (16 = two-face WLCSP board [T], 20 = QFN48). Pod T: stacked = cell T + 4.0 (MZ-2 stack, plate on); end-to-end = cell T + 1.9 (K3 5.6 from 3.7)."
+  ICP331319PM: {stacked: {L: 33.1, T: 7.7}, end_to_end: {L: "40.1 (16 mm bd) .. 44.1 (20 mm)", T: 5.6}}
+  ICP281029HPG: {stacked: {L: 33.6, T: 7.3}, end_to_end: {L: "49.6 .. 53.6", T: 5.2}}
+  ICP390831PR: {stacked: {L: 36.1, T: 8.3}, end_to_end: {L: "52.1 .. 56.1", T: 6.2}}
+  ICP401230UPR: {stacked: {L: 34.1, T: 8.5}, end_to_end: {L: "50.1 .. 54.1", T: 6.4}}
+  note: "K2 synthesis quotes L 33.1 (its own rounding); here 30.5 + 3.1 = 33.6 with a 30 mm board."
+findings:
+  - "With today's firmware plans NO cell with envelope T <= 4.0 mm reaches 8 h worst at either variant. Best thin cell ICP281029HPG: slim B 5.6 h typ (4.3 EOL), spec B 4.4 h."
+  - "The only cell near the line is ICP401230UPR (nominal 4.0, max 4.5): slim B 10.6 / 10.2 / 8.2 h (passes even EOL); spec B 8.4 / 8.1 / 6.4 (fails EOL)."
+  - "K2 and K3 need B2 hardware + B3 Range-4 DSP (synthesis: K2 9.9 h, K3 7.3 h worst) to approach 8 h; SK-3 (synthesis) already refutes K3 at min capacity (6.6 h, EOL 6.0). Slim B at P72 without B3 is ~2x worse than those figures assume."
+  - "Cell capacity at 3.3-4.0 mm nominal thickness tops out at 85 mAh (catalogue) -> would need ~98 mAh (slim B) / 124 mAh (spec B); no such thin cell in V2 or the 2026-10-03 catalogue. A thin+long 100+ mAh cell would be a new search (e.g. 3.0 x 12 x 40 class [T])."
+  - "Unmodelled: B2 hardware saves, exciter mean cap, firmware peak cap (K2/K3 peaks 315 mA vs pulse 100/136 mA), K2 needs external protector (no PCM)."
+integration_map_crosscheck: "read-only research; no design change, no ECR. F7/F8 (power, charger) affected only if a cell is adopted: see synthesis.md integration_map_crosscheck. tools/plm.py impact not run."
