@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 480" width="980" height="480" font-family="DejaVu Sans, sans-serif">
+<rect width="980" height="480" fill="#fbfaf7"/>
+<text x="24" y="36" font-size="22" fill="#1f2328" font-weight="bold" text-anchor="start">Lid features: mic duct and button puck (section through the lid)</text>
+<text x="24" y="58" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">Numbers from dims_k4.py. The mic hole in M is 0.65; the lid bore is 1.0.</text>
+<rect x="80" y="100" width="760" height="81.0" rx="2" fill="#ddd4b4" stroke="#1f2328" stroke-width="1.5"/>
+<text x="85" y="92" font-size="12" fill="#57606a" font-weight="normal" text-anchor="start">lid (1.0 flat)</text>
+<rect x="80" y="190" width="760" height="28" rx="2" fill="#fff4ea" stroke="#b8520a" stroke-width="1.5"/>
+<text x="850" y="208" font-size="11.5" fill="#b8520a" font-weight="normal" text-anchor="start">ledge 0.70 + VHB 0.25</text>
+<rect x="80" y="218" width="760" height="28" rx="2" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1.5"/>
+<text x="850" y="236" font-size="11.5" fill="#1a7a55" font-weight="normal" text-anchor="start">board M</text>
+<rect x="192" y="100" width="16" height="90" rx="1" fill="#fbfaf7" stroke="#e34948" stroke-width="2"/>
+<text x="200" y="270" font-size="12" fill="#e34948" font-weight="bold" text-anchor="middle">mic duct</text>
+<text x="200" y="288" font-size="11" fill="#57606a" font-weight="middle" text-anchor="start">D1.0 bore + VHB ring + D0.65 hole</text>
+<rect x="184" y="246" width="32" height="22" rx="2" fill="#ece5cd" stroke="#1f2328" stroke-width="1.5"/>
+<text x="200" y="262" font-size="11" fill="#1f2328" font-weight="normal" text-anchor="middle">U2</text>
+<rect x="490" y="104" width="40" height="86" rx="1" fill="#fbfaf7" stroke="#2a78d6" stroke-width="2"/>
+<text x="510" y="270" font-size="12" fill="#2a78d6" font-weight="bold" text-anchor="middle">puck (kit 1.03-1.23)</text>
+<text x="510" y="288" font-size="11" fill="#57606a" font-weight="middle" text-anchor="start">chosen length ~1.13, under a 0.1 silicone skin</text>
+<rect x="496" y="246" width="28" height="18" rx="2" fill="#ece5cd" stroke="#1f2328" stroke-width="1.5"/>
+<text x="510" y="260" font-size="11" fill="#1f2328" font-weight="normal" text-anchor="middle">SW1</text>
+<text x="80" y="340" font-size="13.5" fill="#1f2328" font-weight="normal" text-anchor="start">Mic: slide a pin gauge through the lid bore, VHB hole and M's hole while the VHB is pressed. Pull the pin last.</text>
+<text x="80" y="366" font-size="13.5" fill="#1f2328" font-weight="normal" text-anchor="start">Button: measure depth with the skin off, pick the puck, test 10 presses unbonded, then bond the skin.</text>
+<text x="80" y="392" font-size="13.5" fill="#e34948" font-weight="normal" text-anchor="start">Mesh in the hex seat (R1.9 x 0.3 deep): hydrophobic open mesh, product not chosen yet.</text>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600" font-family="DejaVu Sans, sans-serif">
+<rect width="1000" height="600" fill="#fbfaf7"/>
+<text x="24" y="36" font-size="22" fill="#1f2328" font-weight="bold" text-anchor="start">Where every wire lands (plan view, board file coordinates)</text>
+<text x="24" y="58" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">Cell, LED and exciter joints. mm from the board's front (mic) edge. Pads read from placement_M.yaml / placement_P.yaml.</text>
+<rect x="40" y="120" width="434.0" height="336.0" rx="3" fill="#ffffff" stroke="#1a7a55" stroke-width="2"/>
+<text x="44" y="112" font-size="14" fill="#1a7a55" font-weight="bold" text-anchor="start">Board M, LID face (looking at the pads)</text>
+<circle cx="335.40000000000003" cy="425.2" r="8" fill="#e34948" stroke="#1f2328" stroke-width="1.2"/>
+<text x="305.40000000000003" y="413.2" font-size="11" fill="#1f2328" font-weight="bold" text-anchor="middle">J5 BAT+</text>
+<circle cx="335.40000000000003" cy="358.0" r="8" fill="#a4a9b0" stroke="#1f2328" stroke-width="1.2"/>
+<text x="305.40000000000003" y="346.0" font-size="11" fill="#1f2328" font-weight="bold" text-anchor="middle">J4 GND</text>
+<circle cx="395.03999999999996" cy="315.44" r="8" fill="#2a78d6" stroke="#1f2328" stroke-width="1.2"/>
+<text x="365.03999999999996" y="303.44" font-size="11" fill="#1f2328" font-weight="bold" text-anchor="middle">J8 LED-</text>
+<circle cx="145.83999999999997" cy="363.03999999999996" r="8" fill="#b8520a" stroke="#1f2328" stroke-width="1.2"/>
+<text x="115.83999999999997" y="351.03999999999996" font-size="11" fill="#1f2328" font-weight="bold" text-anchor="middle">J7 LED+</text>
+<circle cx="81.44" cy="153.04" r="8" fill="#fbfaf7" stroke="#1f2328" stroke-width="1.2"/>
+<text x="51.44" y="141.04" font-size="11" fill="#1f2328" font-weight="bold" text-anchor="middle">J9 NTC</text>
+<rect x="146.39999999999998" y="251.6" width="84.0" height="72.8" rx="2" fill="#f3f1ea" stroke="#57606a" stroke-width="1"/>
+<text x="188.4" y="292.0" font-size="10.5" fill="#57606a" font-weight="normal" text-anchor="middle">SW1</text>
+<rect x="75.0" y="253.0" width="28.0" height="28.0" rx="2" fill="#f3f1ea" stroke="#57606a" stroke-width="1"/>
+<text x="89.0" y="271.0" font-size="10.5" fill="#57606a" font-weight="normal" text-anchor="middle">U2 port</text>
+<rect x="540" y="120" width="434.0" height="336.0" rx="3" fill="#ffffff" stroke="#2a78d6" stroke-width="2"/>
+<text x="544" y="112" font-size="14" fill="#2a78d6" font-weight="bold" text-anchor="start">Board P, as drawn in its file</text>
+<circle cx="603.84" cy="220.24" r="8" fill="#b8520a" stroke="#1f2328" stroke-width="1.2"/>
+<text x="573.84" y="208.24" font-size="11" fill="#1f2328" font-weight="bold" text-anchor="middle">J1 OUT_A</text>
+<circle cx="587.04" cy="220.24" r="8" fill="#e34948" stroke="#1f2328" stroke-width="1.2"/>
+<text x="647.04" y="246.24" font-size="11" fill="#1f2328" font-weight="bold" text-anchor="middle">J2 OUT_B inner face</text>
+<rect x="716.4000000000001" y="156.39999999999998" width="196.0" height="196.0" rx="2" fill="#f3f1ea" stroke="#57606a" stroke-width="1"/>
+<text x="814.4000000000001" y="258.4" font-size="10.5" fill="#57606a" font-weight="normal" text-anchor="middle">U1 chip</text>
+<rect x="638.84" y="174.04" width="56.0" height="44.800000000000004" rx="2" fill="#f3f1ea" stroke="#57606a" stroke-width="1"/>
+<text x="666.84" y="200.44" font-size="10.5" fill="#57606a" font-weight="normal" text-anchor="middle">L1</text>
+<text x="40" y="500" font-size="13" fill="#1f2328" font-weight="normal" text-anchor="start">Colour key:  red = battery plus   grey = ground   orange = exciter OUT_A / LED plus   blue = LED minus / second exciter wire.</text>
+<text x="40" y="524" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">J9 NTC stays EMPTY: the thermistor RT1 is on M (the charger reads one or the other, never both).</text>
+<text x="40" y="548" font-size="13" fill="#e34948" font-weight="normal" text-anchor="start">J2 sits on P's INNER face, which ends up inside the 0.6 mm gap. Solder it before P is mated, and see 'Open items' in the guide.</text>
+</svg>

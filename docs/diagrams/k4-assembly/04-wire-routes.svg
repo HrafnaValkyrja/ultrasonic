@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 560" width="1000" height="560" font-family="DejaVu Sans, sans-serif">
+<rect width="1000" height="560" fill="#fbfaf7"/>
+<text x="24" y="36" font-size="22" fill="#1f2328" font-weight="bold" text-anchor="start">Wire routes in the pod (plan, looking at the lid side)</text>
+<text x="24" y="58" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">Model lengths from dims_k4.wire_lengths(); cut each wire 5 mm long and trim at the dry fit.</text>
+<rect x="60" y="120" width="697.4499999999999" height="192.4" rx="14" fill="#ffffff" stroke="#57606a" stroke-width="2"/>
+<rect x="71.05" y="138.2" width="201.5" height="156.0" rx="2" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<text x="76.05" y="154.2" font-size="12" fill="#1a7a55" font-weight="bold" text-anchor="start">stack M+P</text>
+<rect x="282.95" y="140.8" width="403.0" height="165.1" rx="4" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+<text x="382.95" y="211.0" font-size="13" fill="#2a78d6" font-weight="bold" text-anchor="start">cell 130 mAh (in tub)</text>
+<rect x="688.5500000000001" y="138.2" width="63.700000000000074" height="156.0" rx="2" fill="#fff4ea" stroke="#b8520a" stroke-width="1.5"/>
+<text x="689.9499999999999" y="269.5" font-size="11" fill="#b8520a" font-weight="normal" text-anchor="start">dead zone</text>
+<line x1="272.55" y1="216.2" x2="282.95" y2="216.2" stroke="#e34948" stroke-width="3"/>
+<text x="276.55" y="210.2" font-size="11" fill="#e34948" font-weight="normal" text-anchor="start">BAT+ / GND 8 mm</text>
+<line x1="272.55" y1="226.2" x2="698.9499999999999" y2="226.2" stroke="#b8520a" stroke-width="2.5" stroke-dasharray="6 3"/>
+<text x="432.55" y="250.2" font-size="11.5" fill="#b8520a" font-weight="normal" text-anchor="start">4 arm litz wires run UNDER the cell, ~50-60 mm</text>
+<line x1="698.9499999999999" y1="226.2" x2="740.5500000000001" y2="195.39999999999998" stroke="#b8520a" stroke-width="2.5" stroke-dasharray="6 3"/>
+<circle cx="740.5500000000001" cy="195.39999999999998" r="7" fill="#ffffff" stroke="#b8520a" stroke-width="1.5"/>
+<text x="730.5500000000001" y="181.39999999999998" font-size="11.5" fill="#b8520a" font-weight="normal" text-anchor="end">heel exit</text>
+<text x="60" y="400" font-size="13.5" fill="#1f2328" font-weight="normal" text-anchor="start">1. Cell leads go forward-to-back: M lid-face pads J5/J4 -> past the stack rear edge -> up to the cell's front lead (8 mm).</text>
+<text x="60" y="426" font-size="13.5" fill="#1f2328" font-weight="normal" text-anchor="start">2. Arm wires: pads J1 J2 J7 J8 -> stack rear -> drop into the 0.9 mm lane under the cell -> dead zone -> heel exit.</text>
+<text x="60" y="452" font-size="13.5" fill="#e34948" font-weight="normal" text-anchor="start">3. The route under the cell is a drawing, not a proven path (K4 arm route is a placeholder in the repo). Dry-fit with dummies first.</text>
+<text x="60" y="478" font-size="13.5" fill="#57606a" font-weight="normal" text-anchor="start">Wire OD 0.21 each, bundle 0.51, minimum bend radius 0.5 mm.</text>
+</svg>

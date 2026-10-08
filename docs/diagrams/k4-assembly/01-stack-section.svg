@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 520" width="1320" height="520" font-family="DejaVu Sans, sans-serif">
+<rect width="1320" height="520" fill="#fbfaf7"/>
+<text x="24" y="36" font-size="22" fill="#1f2328" font-weight="bold" text-anchor="start">K4 stack, side section (y up toward the lid)</text>
+<text x="24" y="58" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">From dims_k4.py. Layer thickness x 70 for readability; mm in the labels.</text>
+<rect x="130" y="90" width="430" height="70.0" rx="2" fill="#ddd4b4" stroke="#1f2328" stroke-width="1.5"/>
+<text x="574" y="110.0" font-size="12.5" fill="#1f2328" font-weight="normal" text-anchor="start">Lid, flat</text>
+<rect x="130" y="160.0" width="430" height="66.5" rx="2" fill="#fff4ea" stroke="#b8520a" stroke-width="1.5"/>
+<text x="574" y="180.0" font-size="12.5" fill="#1f2328" font-weight="normal" text-anchor="start">Ledge 0.70 + VHB 0.25 on the ledge tip</text>
+<rect x="130" y="226.5" width="430" height="56.0" rx="2" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1.5"/>
+<text x="574" y="246.5" font-size="12.5" fill="#1f2328" font-weight="normal" text-anchor="start">Board M 0.8: lid face has SW1 + wire pads J5 J4 J7 J8</text>
+<rect x="130" y="282.5" width="430" height="42.0" rx="2" fill="#e8f0fb" stroke="#2a78d6" stroke-width="1.5"/>
+<text x="574" y="302.5" font-size="12.5" fill="#1f2328" font-weight="normal" text-anchor="start">BM28 gap 0.6: M parts hang in here (mic U2, U3, U4)</text>
+<rect x="130" y="324.5" width="430" height="56.0" rx="2" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1.5"/>
+<text x="574" y="344.5" font-size="12.5" fill="#1f2328" font-weight="normal" text-anchor="start">Board P 0.8: inner Q1 Q2; outer U1 chip, L1 coil</text>
+<rect x="130" y="380.5" width="430" height="45.5" rx="2" fill="#ffffff" stroke="#57606a" stroke-width="1.5"/>
+<text x="574" y="400.5" font-size="12.5" fill="#1f2328" font-weight="normal" text-anchor="start">Floor clearance 0.65 (0.16 worst case), then tub floor</text>
+<text x="130" y="466.0" font-size="13" fill="#1f2328" font-weight="normal" text-anchor="start">Pods are glued stack-to-lid. The lid carries the stack (hangs from it); the tub holds the cell.</text>
+<text x="130" y="488.0" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">Seam (tub | lid) is at the flat lid underside, y 9.7. Tongue 0.35 high in the tub, groove in the lid.</text>
+<circle cx="70" cy="120" r="13" fill="#b8520a" stroke="#b8520a" stroke-width="1.5"/>
+<text x="70" y="125" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">A</text>
+<text x="88" y="150" font-size="12" fill="#57606a" font-weight="normal" text-anchor="middle">lid side</text>
+<circle cx="70" cy="406.0" r="13" fill="#b8520a" stroke="#b8520a" stroke-width="1.5"/>
+<text x="70" y="411.0" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">B</text>
+<text x="88" y="434.0" font-size="12" fill="#57606a" font-weight="normal" text-anchor="middle">belly side</text>
+<text x="130" y="526.0" font-size="13" fill="#1f2328" font-weight="normal" text-anchor="start">Stack 15.5 x 12.0 mm, total thickness 3.2 mm.  Cell 4.5 thick, front end at pod x 31.0.</text>
+</svg>

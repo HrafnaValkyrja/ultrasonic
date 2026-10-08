@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" font-family="DejaVu Sans, sans-serif">
+<rect width="1000" height="520" fill="#fbfaf7"/>
+<text x="24" y="36" font-size="22" fill="#1f2328" font-weight="bold" text-anchor="start">Left pod is the mirror of the right pod</text>
+<text x="24" y="58" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">Same two boards, same parts. The shell is mirrored; off-centre things flip.</text>
+<rect x="40" y="110" width="420" height="200" rx="20" fill="#ffffff" stroke="#1a7a55" stroke-width="2.5"/>
+<text x="50" y="100" font-size="15" fill="#1a7a55" font-weight="bold" text-anchor="start">RIGHT pod (CAD as drawn)</text>
+<line x1="50" y1="210" x2="450" y2="210" stroke="#57606a" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="455" y="214" font-size="10.5" fill="#57606a" font-weight="normal" text-anchor="end">centre line</text>
+<rect x="80" y="150" width="130" height="120" rx="3" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<circle cx="190" cy="170" r="6" fill="#e34948" stroke="#1f2328" stroke-width="1"/>
+<text x="176" y="174" font-size="11" fill="#1f2328" font-weight="normal" text-anchor="end">J5</text>
+<circle cx="190" cy="190" r="6" fill="#b8520a" stroke="#1f2328" stroke-width="1"/>
+<text x="176" y="194" font-size="11" fill="#1f2328" font-weight="normal" text-anchor="end">J7</text>
+<circle cx="190" cy="235" r="6" fill="#2a78d6" stroke="#1f2328" stroke-width="1"/>
+<text x="176" y="239" font-size="11" fill="#1f2328" font-weight="normal" text-anchor="end">J8</text>
+<circle cx="110" cy="210" r="6" fill="#fbfaf7" stroke="#e34948" stroke-width="2"/>
+<text x="110" y="235" font-size="11" fill="#e34948" font-weight="normal" text-anchor="middle">mic</text>
+<circle cx="150" cy="210" r="6" fill="#fbfaf7" stroke="#2a78d6" stroke-width="2"/>
+<text x="150" y="235" font-size="11" fill="#2a78d6" font-weight="normal" text-anchor="middle">SW1</text>
+<rect x="520" y="110" width="420" height="200" rx="20" fill="#ffffff" stroke="#2a78d6" stroke-width="2.5"/>
+<text x="530" y="100" font-size="15" fill="#2a78d6" font-weight="bold" text-anchor="start">LEFT pod (mirror shell)</text>
+<line x1="530" y1="210" x2="930" y2="210" stroke="#57606a" stroke-width="1.5" stroke-dasharray="6 4"/>
+<text x="935" y="214" font-size="10.5" fill="#57606a" font-weight="normal" text-anchor="end">centre line</text>
+<rect x="560" y="150" width="130" height="120" rx="3" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<circle cx="670" cy="250" r="6" fill="#e34948" stroke="#1f2328" stroke-width="1"/>
+<text x="656" y="254" font-size="11" fill="#1f2328" font-weight="normal" text-anchor="end">J5</text>
+<circle cx="670" cy="230" r="6" fill="#b8520a" stroke="#1f2328" stroke-width="1"/>
+<text x="656" y="234" font-size="11" fill="#1f2328" font-weight="normal" text-anchor="end">J7</text>
+<circle cx="670" cy="185" r="6" fill="#2a78d6" stroke="#1f2328" stroke-width="1"/>
+<text x="656" y="189" font-size="11" fill="#1f2328" font-weight="normal" text-anchor="end">J8</text>
+<circle cx="590" cy="210" r="6" fill="#fbfaf7" stroke="#e34948" stroke-width="2"/>
+<text x="590" y="235" font-size="11" fill="#e34948" font-weight="normal" text-anchor="middle">mic</text>
+<circle cx="630" cy="210" r="6" fill="#fbfaf7" stroke="#2a78d6" stroke-width="2"/>
+<text x="630" y="235" font-size="11" fill="#2a78d6" font-weight="normal" text-anchor="middle">SW1</text>
+<text x="40" y="350" font-size="14" fill="#1f2328" font-weight="bold" text-anchor="start">On the centre line (no change): mic, SW1, BM28.</text>
+<text x="40" y="376" font-size="14" fill="#1f2328" font-weight="normal" text-anchor="start">Flips up/down: J5 J4 J7 J8 J1 J2 order, arm wire order at the heel, the dock pad order is along x so it stays.</text>
+<text x="40" y="402" font-size="14" fill="#e34948" font-weight="normal" text-anchor="start">Print the mirrored tub and lid. Re-do the wire dry fit: the repo's left-pod wire route is NOT checked for K4.</text>
+<text x="40" y="428" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">Same dock head: the head's 2 magnets key the same way; just fit the magnets as the right pod (check with the compass).</text>
+</svg>

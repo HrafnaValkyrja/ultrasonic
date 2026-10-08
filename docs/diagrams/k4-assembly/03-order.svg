@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" width="1000" height="520" font-family="DejaVu Sans, sans-serif">
+<rect width="1000" height="520" fill="#fbfaf7"/>
+<text x="24" y="36" font-size="22" fill="#1f2328" font-weight="bold" text-anchor="start">K4 order of operations (hand build)</text>
+<text x="24" y="58" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">Each box = one section of the guide. Red gate = do not go on until its test passes.</text>
+<rect x="40" y="100" width="170" height="100" rx="6" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2.5"/>
+<circle cx="60" cy="120" r="13" fill="#1a7a55" stroke="#1a7a55" stroke-width="1.5"/>
+<text x="60" y="125" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">1</text>
+<text x="125" y="162" font-size="13.5" fill="#1f2328" font-weight="bold" text-anchor="middle">Print + check parts</text>
+<line x1="212" y1="150" x2="228" y2="150" stroke="#1f2328" stroke-width="2.5"/>
+<polygon points="228.0,150.0 217.9,154.3 217.9,145.7" fill="#1f2328"/>
+<rect x="230" y="100" width="170" height="100" rx="6" fill="#fff4ea" stroke="#b8520a" stroke-width="2.5"/>
+<circle cx="250" cy="120" r="13" fill="#b8520a" stroke="#b8520a" stroke-width="1.5"/>
+<text x="250" y="125" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">2</text>
+<text x="315" y="162" font-size="13.5" fill="#1f2328" font-weight="bold" text-anchor="middle">Solder joints to M</text>
+<line x1="402" y1="150" x2="418" y2="150" stroke="#1f2328" stroke-width="2.5"/>
+<polygon points="418.0,150.0 407.9,154.3 407.9,145.7" fill="#1f2328"/>
+<rect x="420" y="100" width="170" height="100" rx="6" fill="#fff4ea" stroke="#b8520a" stroke-width="2.5"/>
+<circle cx="440" cy="120" r="13" fill="#b8520a" stroke="#b8520a" stroke-width="1.5"/>
+<text x="440" y="125" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">3</text>
+<text x="505" y="162" font-size="13.5" fill="#1f2328" font-weight="bold" text-anchor="middle">Solder joints to P</text>
+<line x1="592" y1="150" x2="608" y2="150" stroke="#1f2328" stroke-width="2.5"/>
+<polygon points="608.0,150.0 597.9,154.3 597.9,145.7" fill="#1f2328"/>
+<rect x="610" y="100" width="170" height="100" rx="6" fill="#fff4ea" stroke="#b8520a" stroke-width="2.5"/>
+<circle cx="630" cy="120" r="13" fill="#b8520a" stroke="#b8520a" stroke-width="1.5"/>
+<text x="630" y="125" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">4</text>
+<text x="695" y="162" font-size="13.5" fill="#1f2328" font-weight="bold" text-anchor="middle">Mate P to M</text>
+<line x1="782" y1="150" x2="798" y2="150" stroke="#1f2328" stroke-width="2.5"/>
+<polygon points="798.0,150.0 787.9,154.3 787.9,145.7" fill="#1f2328"/>
+<rect x="800" y="100" width="170" height="100" rx="6" fill="#fff4ea" stroke="#e34948" stroke-width="2.5"/>
+<circle cx="820" cy="120" r="13" fill="#e34948" stroke="#e34948" stroke-width="1.5"/>
+<text x="820" y="125" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">5</text>
+<text x="885" y="162" font-size="13.5" fill="#1f2328" font-weight="bold" text-anchor="middle">Bench power-up</text>
+<rect x="40" y="270" width="170" height="100" rx="6" fill="#fff4ea" stroke="#e34948" stroke-width="2.5"/>
+<circle cx="60" cy="290" r="13" fill="#e34948" stroke="#e34948" stroke-width="1.5"/>
+<text x="60" y="295" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">6</text>
+<text x="125" y="332" font-size="13.5" fill="#1f2328" font-weight="bold" text-anchor="middle">Dock + button test</text>
+<line x1="212" y1="320" x2="228" y2="320" stroke="#1f2328" stroke-width="2.5"/>
+<polygon points="228.0,320.0 217.9,324.3 217.9,315.7" fill="#1f2328"/>
+<rect x="230" y="270" width="170" height="100" rx="6" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.5"/>
+<circle cx="250" cy="290" r="13" fill="#2a78d6" stroke="#2a78d6" stroke-width="1.5"/>
+<text x="250" y="295" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">7</text>
+<text x="315" y="332" font-size="13.5" fill="#1f2328" font-weight="bold" text-anchor="middle">Cell in tub</text>
+<line x1="402" y1="320" x2="418" y2="320" stroke="#1f2328" stroke-width="2.5"/>
+<polygon points="418.0,320.0 407.9,324.3 407.9,315.7" fill="#1f2328"/>
+<rect x="420" y="270" width="170" height="100" rx="6" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.5"/>
+<circle cx="440" cy="290" r="13" fill="#2a78d6" stroke="#2a78d6" stroke-width="1.5"/>
+<text x="440" y="295" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">8</text>
+<text x="505" y="332" font-size="13.5" fill="#1f2328" font-weight="bold" text-anchor="middle">Stack on lid</text>
+<line x1="592" y1="320" x2="608" y2="320" stroke="#1f2328" stroke-width="2.5"/>
+<polygon points="608.0,320.0 597.9,324.3 597.9,315.7" fill="#1f2328"/>
+<rect x="610" y="270" width="170" height="100" rx="6" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2.5"/>
+<circle cx="630" cy="290" r="13" fill="#2a78d6" stroke="#2a78d6" stroke-width="1.5"/>
+<text x="630" y="295" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">9</text>
+<text x="695" y="332" font-size="13.5" fill="#1f2328" font-weight="bold" text-anchor="middle">Close + seal</text>
+<line x1="782" y1="320" x2="798" y2="320" stroke="#1f2328" stroke-width="2.5"/>
+<polygon points="798.0,320.0 787.9,324.3 787.9,315.7" fill="#1f2328"/>
+<rect x="800" y="270" width="170" height="100" rx="6" fill="#fff4ea" stroke="#e34948" stroke-width="2.5"/>
+<circle cx="820" cy="290" r="13" fill="#e34948" stroke="#e34948" stroke-width="1.5"/>
+<text x="820" y="295" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">10</text>
+<text x="885" y="332" font-size="13.5" fill="#1f2328" font-weight="bold" text-anchor="middle">First charge</text>
+<text x="40" y="460" font-size="14" fill="#1f2328" font-weight="bold" text-anchor="start">Why M and P get their wires BEFORE they are mated:</text>
+<text x="40" y="482" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">P has no solder window over M, and P's J2 lands inside the 0.6 mm gap. After mating you cannot reach those pads.</text>
+</svg>
