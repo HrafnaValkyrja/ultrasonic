@@ -1,4 +1,4 @@
-# K4 release package (P + M boards) - 2026-10-08 - gate BLOCKED (see gate.yaml); rebuilt on 9137d96 (board hashes in gate.yaml)
+# K4 release package (P + M boards) - 2026-10-08 - gate BLOCKED (see gate.yaml); rebuilt on 311b11d (board hashes in gate.yaml)
 
 Files (per board X in P, M): `k4_X_gerber_drill.zip` (Protel-ext Gerbers F/In1-4/B Cu, masks, paste, silk, Edge.Cuts; Excellon PTH+NPTH; drill maps; job file),
 `bom_X.csv` (JLC columns Comment/Designator/Footprint/LCSC Part #), `cpl_X.csv` (Designator, Mid X, Mid Y, Layer, Rotation; absolute KiCad coordinates, y up, mm),
