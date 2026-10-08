@@ -1,4 +1,27 @@
 # Audibility requirement for AUDIO PLAYBACK in day-to-day life (2026-10-08, rewritten after owner correction)
+
+## 0. REAL programme simulation (owner: simulate against what it will actually play) -- supersedes the crest-6 numbers in sections 2-4
+Script `docs/proof/electrical/audibility_playback.py` (3G fence), data `docs/proof/electrical/audibility_playback.json`, plot `docs/proof/electrical/audibility_playback.png`.
+![per-band](audibility_playback.png)
+- **Programme:** `sim/out/nature/2_translated_only.wav` (48 kS/s, 20 s): Port Meadow AudioMoth 192 kS/s night recording, Zenodo 22079773, CC-BY-4.0, four bat passes; algorithm B transient mode, `sim/dsp/nature_demo.py` (calls scaled to 75 dB SPL at the mic: assumed). Measured: file peak **-9.5 dBFS** (not -12; the ceiling would trim 2.5 dB), crest **22.6 dB overall, 14.0 dB inside the loudest 10% of 50 ms frames**. The calls are narrow-band, so they land as a tone near **2.56 kHz**; every other 1/3-octave band is 25-30 dB lower (below threshold). The earlier "crest 6 dB programme" was optimistic by 8-16 dB for this material.
+- **Chain:** sample = duty fraction of Vdd; 0.6353 = 208 mA clamp (`fw/variants.yaml`, FWSIM-R64), so i = 0.327 A per unit. Force per amp: `sim/acoustics/out/bone_tf.json` `mag_db_n_per_a` (nominal; Bl 1.0 assumed; built by `sim/acoustics/bone.py`). eq SPL = force - front-of-tragus threshold (`thr_front_measured_db_re_1uN`, Surendran 2023) + ISO 226 air threshold [recall]. Per 1/3-octave, call-active frames.
+- **D17 variants (my mapping; confirm):** C = now, fixed -12 dBFS ceiling; A = look-ahead limiter at clamp minus shaper excursion (0.520, `lim_lookahead=1`); B = hard ceiling at the clamp (0.635). Playback gain is raised so the loudest peak meets each ceiling (the limiter then barely acts; fixed-gain D3 would need a user volume setting).
+- **Ambient spectra** (shapes [recall], +-5 dB per band, normalised to the stated dBA): residential/subdivision = EN 1793-3 traffic spectrum; office = NC-like fall ~3 dB/oct above 500 Hz (ASHRAE); shop/cafe = long-term speech spectrum falling ~9 dB/oct above 1 kHz (Byrne 1994); car = 6 dB/oct fall. Ambient at 2.5 kHz band: residential 55 dBA 41 dB, office 50 dBA 36, subdivision with passing cars 60 dBA 46, shop 65 dBA 46, car 68 dBA 49. Need = ambient band + 8 dB (section 1 headroom).
+
+| Case (2.5 kHz band, call-active) | eq SPL | peak I | LAeq-eq | margin over ambient band: residential 55 / office 50 / subdiv+cars 60 / shop 65 / car 68 |
+|---|---|---|---|---|
+| C now (-12 dBFS) | 39.8 | 82 mA | 41.4 | -0.8 / +3.6 / -5.8 / -6.5 / -9.4 |
+| C + TEAX14C02-8 | 47.4 | 82 | 49.0 | +6.8 / +11.2 / +1.8 / +1.1 / -1.8 |
+| A limiter at clamp-shaper | 46.2 | 170 | 47.7 | +5.5 / +9.9 / +0.5 / -0.2 / -3.1 |
+| **A + TEAX** | **53.8** | 170 | 55.3 | **+13.1 / +17.5 / +8.1 / +7.4 / +4.5** |
+| B ceiling = clamp | 47.9 | 208 | 49.4 | +7.2 / +11.7 / +2.2 / +1.5 / -1.3 |
+| B + TEAX | 55.5 | 208 | 57.0 | +14.8 / +19.3 / +9.8 / +9.1 / +6.3 |
+Need is +8 (+4 minimum). Read: **today (C) the real calls are audible but not comfortable in an office and not over a 55 dBA street; A alone gets residential/office to the +4..+10 band, not a 60 dBA subdivision with cars. A + TEAX14C02-8 meets +8 for a 60 dBA subdivision (+8.1), office and residential with 5-9 dB spare, shops 65 dBA at +7.4 (about target), car 68 at +4.5 (minimum).** B adds only 1.7 dB over A for a worse THD risk at the clamp; keep A. Pad stiffness 3e5 (+4 dB, E1) on top of A + TEAX takes shops to +11.4 and car to +8.5.
+TEAX14C02-8 (Tectonic, Bl 2.4 T m, 14 dia x 9.85 mm, 7.50 EUR; `docs/brainstorm/R-exciter2.md`): +7.6 dB is applied flat (vendor claim, band flatness unverified); cost is pad size/thickness at the tragus; bench E1 for flatness, force/amp and comfort. D17 effect: C -> A is +6.4 dB (mostly gain headroom); A -> B only +1.7 dB.
+**Thermal/battery with the real programme:** peak 170 mA (A) but the rms is 22.6 dB under peak, about 13 mA rms -> mean |i| roughly 10 mA, far below the 60 mA I assumed in section 4: U4 rise ~1-2 K, runtime cost small (rail budget 2.5 mA average is exceeded only during long calls; log it on the bench, PWR-I12). Cell pulse rule: peak 170 mA < 260 mA.
+Caveats: eq SPL is +-10 dB; call level 75 dB SPL at the mic is an assumption (distant bats are quieter; the device gain is fixed, D3); a 1/3-octave ambient band is about 2 dB wider than the ear's critical band at 2.5 kHz, so margins are slightly conservative; masking by the ambient spectrum is only band-level, not a full masking model; THD+N at the 170 mA peak is extrapolated (-52 dB at 85 mA, section 2).
+
+---
 Owner: "it's an audio device not an alert system." The device plays the shifted/compressed ultrasonic scene as listening audio (spec §1.1; DSP chain ends `volume -> safety ceiling` at 12.5 kS/s, spec L66). The 2-3 kHz alert-tone move (`alert_hz`) is system-sound only and is NOT counted here. Sources: [repo] = read today; [recall] = from memory, not re-fetched (no web check run), verify before external citation.
 
 ## 1. Requirement
