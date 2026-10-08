@@ -26,7 +26,7 @@ Status: PASS = met with margin from a source; FAIL = exceeded; OPEN = no K4 evid
 | 13 | Clock: LSE 32.768 kHz Y1 (7 pF) with C11/C12 8.2 pF | CL = 8.2 x 8.2 / 16.4 + stray (~3 pF) = ~7 pF; matches Y1. No HSE (internal oscillator) | PASS (analytic), bench confirm | bom_jlc_P.csv; docs/research/A3-clock-and-peripherals.md | 2026-10-08 |
 | 14 | DRC (kicad-cli pcb drc, JLC 6L rules) | P: 0 violations, 0 unconnected; M: 0 / 0 | PASS | `kicad-cli pcb drc` run today on routed_P / routed_M | 2026-10-08 |
 | 15 | ERC (SKiDL, gen.py) | 0 errors, 15 warnings (unconnected-by-design nets LDO_OUT/VBUS/VBAT, VLXSMPS pin type) | PASS | hw/pod/k4/gen.erc | 2026-10-08 |
-| 16 | tools/checks/interfaces.py | runs on the **r2** board, not K4 (rails, pins, heights); K4 has no equivalent rail checker | OPEN | tools/checks/interfaces.py | 2026-10-08 |
+| 16 | tools/checks/interfaces.py on K4 | since 56cf4fd it runs on K4 (ULTRASONIC_DESIGN=k4): mic-port, switch, outline, inside, clamp-bands (ledge), heights (37 parts), board-nets PASS; pins WARN (known ECR-0013 hazards); rails WARN uses unclamped peaks and the old 175 mAh cell pulse rating (350 mA), not K4's 130 mAh (260 mA): checker gap, fw clamp covers it (row 2); frame FAIL = vision line (parked for the pen test) | PASS with 1 checker gap | ULTRASONIC_DESIGN=k4 python3 tools/checks/interfaces.py, run by lead 2026-10-08 | 2026-10-08 |
 
 ## Part ratings vs worst case
 
