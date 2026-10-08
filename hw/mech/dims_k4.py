@@ -47,8 +47,36 @@ CELL_Z0 = CELL_Z1 - CELL_SPEC["W"]
 CH_UNDER = CELL_Z0 - CAV["z0"]         # wire channel under the cell
 
 # ---------------------------------------------------------------- board stack (placeholder block for B+ two-board stack, V9-k4-board.yaml B_plus)
-STACK_L, STACK_H, STACK_T = float(os.environ.get("K4_STACK_L") or 11.0), 12.0, 4.3   # K4_STACK_L=14.05: the committed routed M board is 14.05 x 12.05 (K4-SHELLCHK finding)
-PCB_T, F_GAP, VHB_T = 0.8, 0.30, 0.25
+def routed_board_length() -> tuple[float, str]:
+    """Stack length = max over the routed boards' Edge.Cuts x-extent (hw/pod/k4/routed_P|M.kicad_pcb), else placement_P|M.yaml `L`, else 11.0. K4_STACK_L overrides."""
+    import re
+    from pathlib import Path
+    d = Path(__file__).resolve().parents[1] / "pod" / "k4"
+    num = r"(-?[\d.]+)"
+    best, src = None, ""
+    for b in "PM":
+        f, L = d / f"routed_{b}.kicad_pcb", None
+        if f.exists():
+            xs = []
+            for m in re.finditer(r"\((?:gr_line|gr_arc|gr_rect)\s+\(start " + num + r" " + num + r"\)\s+(?:\(mid " + num + r" " + num + r"\)\s+)?\(end " + num + r" " + num + r"\)(?:(?!\(layer ).)*\(layer \"Edge\.Cuts\"\)", f.read_text(), re.S):
+                g = m.groups()
+                xs += [float(g[0]), float(g[4])]
+            if xs:
+                L = max(xs) - min(xs)
+        if L is None:
+            y = d / f"placement_{b}.yaml"
+            m = y.exists() and re.search(r"^L:\s*([\d.]+)", y.read_text(), re.M)
+            L = float(m.group(1)) if m else None
+        if L is not None and (best is None or L > best):
+            best, src = L, f"routed_{b}"
+    return (round(best, 3), src) if best else (11.0, "default")
+
+
+_RB = routed_board_length()
+STACK_L, STACK_H, STACK_T = float(os.environ.get("K4_STACK_L") or _RB[0]), 12.0, 4.3   # follows the router (Edge.Cuts of routed_P/M); STACK_L_SRC says where from
+STACK_L_SRC = "K4_STACK_L env" if os.environ.get("K4_STACK_L") else _RB[1]
+PCB_T, VHB_T = 0.8, 0.25
+F_GAP = VHB_T                          # was 0.30 (0.05 slack above the VHB); K4-SHELLCHK: slack removed so the worst-case floor clearance (VHB +-15 %, 2 boards +-0.1) is >= 0
 Y_F = Y_LID_IN - F_GAP                 # 9.4 F face of the top board, bonded to the lid on VHB
 Y_B = Y_F - PCB_T                      # 8.6 B face (mic U2 hangs below it)
 STACK_Y1, STACK_Y0 = Y_F, Y_F - STACK_T   # 9.4 .. 5.1 (floor 4.9: 0.2 free)
@@ -75,7 +103,7 @@ MIC_HOLE_D = 0.65
 DUCT_D = 1.0
 HEX_R, HEX_DEPTH = 1.9, 0.3
 POCKET = dict(dx=4.3, dz=3.1, top=Y_LID_IN + 0.6)
-BORE_D, PUCK_D, NUB_D, NUB_H = 2.6, 2.3, 1.0, 0.10
+BORE_D, PUCK_D, NUB_D, NUB_H = 2.8, 2.3, 1.0, 0.10
 SKIN_D, SKIN_T = 4.6, 0.1
 SKIN_FLOOR = Y_OUT - SKIN_T
 SW1 = dict(body=(3.0, 2.6), pads=(3.8, 2.6), h=0.65, travel=(0.05, 0.15, 0.25))   # KMT022 travel 0.15 +-0.1 (as dims_r2)
@@ -84,7 +112,7 @@ PUCK_L = SKIN_FLOOR - PRE_GAP - (Y_F + SW1["h"])
 PUCK_STEP = 0.05
 PUCK_KIT = tuple(round(PUCK_L + k * PUCK_STEP, 2) for k in (-2, -1, 0, 1, 2))
 TONGUE_W, TONGUE_H, GROOVE_CL, CORNER_KEEP = 0.35, 0.35, 0.05, 1.4   # tongue height 0.35 (r2: 0.5) so the 1.0 lid keeps 0.60 over the groove
-REBATE_D, REBATE_H = 0.1, 0.4          # r2: 0.2; a 0.6 wall keeps 0.5
+REBATE_D, REBATE_H = 0.1, 0.4          # r2: 0.2; K4: 0.1 + a 0.1 inward ridge (shell_k4.seam_ridge) keeps the 0.6 residual wall
 
 # ---------------------------------------------------------------- dock, option A (docs/research/k4-dock.yaml option_A_design; head = Xinyangze YZP0048-20048-04025-03, C5126845)
 # 4 castellated gold half-hole pads on the M tab edge (pitch 2.5 = head pogo pitch) seen through 4 belly windows + 2 N52 discs 2.5 x 1.0 in bossed belly pockets.
@@ -105,6 +133,46 @@ TAB_STRIP_TOP = CELL_Z0 - 0.1            # tab part beyond the stack rear is a 0
 TAB_X = (PAD_X[0] - WIN_W / 2 - 0.3, PAD_X[-1] + WIN_W / 2 + 0.3)
 DOCK_FIT = dict(head_W=6.86, pod_T=T, head_overhang_each_side=round((6.86 - T) / 2, 2),
                 note="head 21.2 x 6.86 sits on the 4.4 flat belly (fillet 1.0) and overhangs T 6.4 by 0.23/side when centred; it is centred on DOCK_YC, not on T")
+
+
+# ---------------------------------------------------------------- wires (K4-HEELWIRE 2026-10-08): cell + arm, in the K4 frame
+# Pads (routed boards, board x from the front edge, y from the board edge; z = ZC + (y - 6.0)): M B face J5 BAT+ (10.55, 10.9), J4 GND/cell- (10.55, 8.5), J9 NTC (1.48, 1.18),
+# J7 LED+ (3.78, 8.68), J8 LED- (12.68, 6.98); P J1 OUT_A (2.28, 3.58), J2 OUT_B (1.38, 1.48). ASSUMPTION [T]: wire-pad access past the P board (P covers x<=14.0): the router must keep a
+# solder window or the wires leave sideways over the board z edge; modelled as a straight run rearward at the pad's y plane.
+WIRE_OD, BUNDLE_OD, WIRE_R_MIN = 0.21, 0.51, 0.5
+WIRE_PADS = {"BAT+": ("M", 10.55, 10.9), "GND": ("M", 10.55, 8.5), "NTC": ("M", 1.48, 1.18), "LED+": ("M", 3.78, 8.68), "LED-": ("M", 12.68, 6.98),
+             "OUT_A": ("P", 2.28, 3.58), "OUT_B": ("P", 1.38, 1.48)}
+HEEL_EXIT = (66.20, 5.15, -5.50)       # heel.CH_EXIT: conductor channel mouth in the tub's inner wall (frame-fixed)
+ARM_NETS = ("OUT_A", "OUT_B", "LED+", "LED-")
+LANE_Z = CAV["z0"] + 0.3               # under-cell / under-stack lane (cell bottom CELL_Z0, floor CAV z0): z -8.8
+LANE_Y0 = 8.4                          # lane y 8.4..9.0: above the dock bosses (y 5.4..8.2, z <= -8.45) and the strut-relief fill; the lane is below the cell (z < -8.3)
+
+
+def wire_routes():
+    """{net: [(x, y, z), ...]} centrelines. Cell leads: pad -> rear -> stack/cell gap -> cell front-end lead. Arm: pad -> stack rear -> down to the lane under the stack/cell
+    -> rearward under the cell -> dead zone (rise, then in to the heel channel mouth). Rectilinear + one diagonal; bends are filleted by the caller (R >= WIRE_R_MIN)."""
+    out, xr = {}, STACK_X1 + 0.4
+    y_lead = CELL_Y0 + 0.8
+    for n in ("BAT+", "GND"):
+        _, bx, by = WIRE_PADS[n]
+        x, z = STACK_X0 + bx, ZC + (by - 6.0)
+        out[n] = [(x, Y_B - 0.1, z), (xr, Y_B - 0.1, z), (xr, y_lead + (0.3 if n == "GND" else 0.0), z), (CELL_X0 + 0.3, y_lead + (0.3 if n == "GND" else 0.0), z)]
+    _, bx, by = WIRE_PADS["NTC"]
+    out["NTC"] = [(STACK_X0 + bx, Y_B - 0.1, ZC + (by - 6.0)), (xr, Y_B - 0.1, ZC + (by - 6.0)), (xr, CELL_Y0 + 0.2, ZC + (by - 6.0)), (CELL_X0 + 0.3, CELL_Y0 + 0.2, ZC + (by - 6.0))]
+    for i, n in enumerate(ARM_NETS):
+        b, bx, by = WIRE_PADS[n]
+        yp = Y_B - 0.1 if b == "M" else Y_B - PCB_T - 1.08 + 0.1      # P pads sit on the lower board
+        x, z = STACK_X0 + bx, ZC + (by - 6.0)
+        xd = xr + 0.15 * i                                           # staggered drop columns so the 4 wires do not cross
+        yl = LANE_Y0 + 0.2 * i
+        out[n] = [(x, yp, z), (xd, yp, z), (xd, yl, z), (xd, yl, LANE_Z + 0.2 * i), (CELL_X1 + 0.4, yl, LANE_Z + 0.2 * i),
+                  (CELL_X1 + 1.4, yl, -7.4), (HEEL_EXIT[0] - 0.8, HEEL_EXIT[1] + 0.2 * i * 0, HEEL_EXIT[2] - 0.3 + 0.2 * i), HEEL_EXIT]
+    return out
+
+
+def wire_lengths():
+    import math
+    return {n: round(sum(math.dist(a, b) for a, b in zip(p[:-1], p[1:])), 1) for n, p in wire_routes().items()}
 
 
 def switch_stack():

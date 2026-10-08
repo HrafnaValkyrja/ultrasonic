@@ -65,9 +65,23 @@ def tongue(g=0.0):
     return s
 
 
+def _over_cell_top():
+    """top (z1) edge strip over the cell: the cell hangs 0.1 under the cavity top, so no inward ridge there; the rebate is left out there instead."""
+    return box(CELL_X0 - 0.3, CELL_X1 + 0.3, Y_SPLIT - REBATE_H - 0.2, Y_SPLIT + 0.2, CAV["z1"] - 0.25, Z1 + 1)
+
+
 def seam_rebate():
     band = box(X0 - 1, X1 + 1, Y_SPLIT - REBATE_H, Y_SPLIT + 0.01, Z0 - 1, Z1 + 1)
-    return band - box(X0 + REBATE_D, X1 - REBATE_D, Y_SPLIT - REBATE_H - 0.1, Y_SPLIT + 0.1, Z0 + REBATE_D, Z1 - REBATE_D)
+    band = band - box(X0 + REBATE_D, X1 - REBATE_D, Y_SPLIT - REBATE_H - 0.1, Y_SPLIT + 0.1, Z0 + REBATE_D, Z1 - REBATE_D)
+    return band - _over_cell_top()
+
+
+def seam_ridge():
+    """K4-SHELLCHK: the rebate (0.1 x 0.4) on a 0.6 wall left 0.5 < 0.6 min wall. Inward ridge of the same size on the cavity wall opposite the rebate:
+    wall 0.6 + 0.1 = 0.7 -> residual 0.6, outside size unchanged (0 L/H/T cost). Omitted where the cell hangs under the cavity top."""
+    band = box(CAV["x0"] - 0.01, CAV["x1"] + 0.01, Y_SPLIT - REBATE_H, Y_SPLIT, CAV["z0"] - 0.01, CAV["z1"] + 0.01)
+    band = band - box(CAV["x0"] + REBATE_D, CAV["x1"] - REBATE_D, Y_SPLIT - REBATE_H - 0.1, Y_SPLIT + 0.1, CAV["z0"] + REBATE_D, CAV["z1"] - REBATE_D)
+    return band - _over_cell_top()
 
 
 def tub_add():
@@ -98,6 +112,7 @@ def tub():
     t = outer_body() & box(X0 - 1, X1 + 1, Y_IN - 2, Y_SPLIT, Z0 - 1, Z1 + 1)
     t = t + tub_add()
     t = t - cavity()
+    t = t + (seam_ridge() & outer_body())
     cz, y0 = CAV["z0"], CAV["y0"]
     t = t + blade.prism_yz([(y0, cz), (y0 + 1.4, cz), (y0, cz + 1.4)], 62.0, CAV["x1"])    # relief fill: legs 1.4 keep >= 0.6 normal wall (r2: 1.0 at y0 5.1)
     t = t - blade.prism_yz([(3.9, -12.5), (3.9, -3.65 - 3.9), (-3.65 + 12.5, -12.5)], 62.0, 68.5)
@@ -136,9 +151,18 @@ def placeholders():
     sw1 = box(SW[0] - SW1["body"][0] / 2, SW[0] + SW1["body"][0] / 2, Y_F, Y_F + SW1["h"], SW[1] - SW1["body"][1] / 2, SW[1] + SW1["body"][1] / 2)
     skin = ycyl(SW[0], SW[1], SKIN_D - 0.1, SKIN_FLOOR, Y_OUT)
     # wire paths (rendered as 0.35 square runs): cell leads front end -> stack rear pads; arm bundle stack rear -> heel channel mouth under the cell
-    bat = box(STACK_X1 - 0.5, CELL_X0 + 0.5, CELL_Y0 + 0.6, CELL_Y0 + 0.95, ZC + 3, ZC + 3.35) + box(STACK_X1 - 0.5, CELL_X0 + 0.5, CELL_Y0 + 0.6, CELL_Y0 + 0.95, ZC + 4, ZC + 4.35)
-    zw = CAV["z0"] + 0.3
-    arm = box(STACK_X1 - 0.5, STACK_X1 + 0.3, STACK_Y0 + 0.4, STACK_Y0 + 0.75, zw, STACK_Z0 + 1.5) + box(STACK_X1 - 0.5, 62.4, CAV["y0"] + 0.10, CAV["y0"] + 0.45, zw, zw + 0.35) + box(62.0, 62.4, CAV["y0"] + 0.10, CAV["y0"] + 1.9, zw, zw + 0.35) + box(62.0, 64.0, CAV["y0"] + 1.55, CAV["y0"] + 1.9, zw, zw + 0.35)
+    wr = K.wire_routes()
+
+    def run(nets, r):
+        acc = None
+        for n in nets:
+            for p0, p1 in zip(wr[n][:-1], wr[n][1:]):
+                if p0 != p1:
+                    c = heel._cyl(p0, p1, r)
+                    acc = c if acc is None else acc + c
+        return acc
+    bat = run(("BAT+", "GND", "NTC"), WIRE_OD / 2)
+    arm = run(ARM_NETS, WIRE_OD / 2)
     if DOCK == "front" or TAB_X[1] <= STACK_X1:
         tab = box(TAB_X[0], TAB_X[1], DOCK_YC - 0.4, DOCK_YC + 0.4, TAB_Z_BOTTOM, STACK_Z0 + 0.3)           # M board tab carrying the pads (placeholder)
     else:                                                                                                  # strip continues under the cell, in the wire channel
@@ -179,7 +203,8 @@ def main():
             walls[f"cavity+{w}_outside_body_mm3"] = round((g - outer_all).volume, 3)
         except Exception as e:      # noqa: BLE001
             walls[f"cavity+{w}"] = f"offset failed: {e}"
-    walls.update(nominal=WALL, lid=LID_T, floor=WALL, rebate_residual=round(WALL - REBATE_D, 2), lid_over_groove=round(LID_T - (TONGUE_H + GROOVE_CL), 2),
+    c['wires'] = dict(length_mm=K.wire_lengths(), lane_z=round(LANE_Z, 2), lane_y=LANE_Y0, stack_L=STACK_L, stack_L_src=STACK_L_SRC)
+    walls.update(nominal=WALL, lid=LID_T, floor=WALL, rebate_residual=round(WALL + REBATE_D - REBATE_D, 2), lid_over_groove=round(LID_T - (TONGUE_H + GROOVE_CL), 2),
                  puck_guide=round(SKIN_FLOOR - POCKET["top"], 2), min_resin=0.6, src="frame.RESIN min_wall 0.6")
     c["walls"] = walls
     bb = ph["cell"].bounding_box()

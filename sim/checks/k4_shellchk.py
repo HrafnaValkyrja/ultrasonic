@@ -16,7 +16,9 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "hw/mech"))
 import dims_k4 as K  # noqa: E402
 
-BOARD = dict(outline=(14.05, 12.05), port=(1.75, 6.0), sw1=(5.3, 6.0), j20=(9.825, 6.025), src="routed_M.kicad_pcb read 2026-10-08 (pcbnew, origin = outline corner + 0.025)")
+BOARD = dict(outline=(K.STACK_L, 12.0),   # read from the routed Edge.Cuts via dims_k4
+              port=(1.75, 6.0), sw1=(5.3, 6.0), j20=(9.825, 6.025), src="routed_M.kicad_pcb read 2026-10-08 (pcbnew, origin = outline corner + 0.025)")
+RIDGE = K.REBATE_D     # shell_k4.seam_ridge: inward ridge opposite the rebate (not over the cell top edge)
 STACK_MM = 0.2          # board 0.1 + lid 0.1 (tools/checks/interfaces.py STACK_MM, tolerances.md)
 
 
@@ -24,9 +26,9 @@ def main():
     out = {}
     # 1. seam rebate
     resin_min_feature, resin_min_wall = 0.3, 0.6                               # frame.RESIN
-    out["rebate"] = dict(height=K.REBATE_H, depth=K.REBATE_D, height_ok=K.REBATE_H >= 0.4 - 1e-9, residual_wall=round(K.WALL - K.REBATE_D, 2),
-                         residual_ok=K.WALL - K.REBATE_D >= resin_min_wall - 1e-9, depth_vs_min_feature_ok=K.REBATE_D >= resin_min_feature - 1e-9,
-                         note="r2: 0.2 deep x 0.4 high on a 0.8 wall (residual 0.6). K4: 0.1 x 0.4 on a 0.6 wall (residual 0.5 < 0.6 min wall; depth 0.1 < 0.3 min feature)")
+    out["rebate"] = dict(height=K.REBATE_H, depth=K.REBATE_D, height_ok=K.REBATE_H >= 0.4 - 1e-9, residual_wall=round(K.WALL + RIDGE - K.REBATE_D, 2),
+                         residual_ok=K.WALL + RIDGE - K.REBATE_D >= resin_min_wall - 1e-9, depth_vs_min_feature_ok=K.REBATE_D >= resin_min_feature - 1e-9,
+                         note="r2: 0.2 deep x 0.4 high on a 0.8 wall (residual 0.6). K4: 0.1 x 0.4 on a 0.6 wall + 0.1 inward ridge opposite (shell_k4.seam_ridge) = residual 0.6; depth 0.1 < 0.3 min feature stays (witness line only); rebate omitted on the top edge over the cell")
     # 2. strut clearance vs the K4 tub
     f = ROOT / "hw/mech/out/parts/heel_k4tub/checks.json"
     if f.exists():
@@ -42,7 +44,7 @@ def main():
     nom_sw = math.hypot(sx - BOARD["sw1"][0], sz - (BOARD["sw1"][1] - BOARD["outline"][1] / 2))
     nom_mic = math.hypot(mx - BOARD["port"][0], mz - (BOARD["port"][1] - BOARD["outline"][1] / 2))
     lim_mic = K.DUCT_D / 2 - K.MIC_HOLE_D / 2
-    out["lateral"] = dict(switch_nominal=round(nom_sw, 3), switch_limit=tol_sw, switch_worst=round(nom_sw + STACK_MM, 3), switch_status="WARN (as r2 RPB-4: stack 0.20 vs 0.15, selective fit)" if nom_sw <= tol_sw else "FAIL",
+    out["lateral"] = dict(switch_nominal=round(nom_sw, 3), switch_limit=tol_sw, switch_worst=round(nom_sw + STACK_MM, 3), switch_status=("PASS" if nom_sw + STACK_MM <= tol_sw else "WARN (selective fit)") if nom_sw <= tol_sw else "FAIL",
                           mic_nominal=round(nom_mic, 3), mic_limit=lim_mic, mic_ok=nom_mic <= lim_mic,
                           pin_to_sw1_mm=round(abs(BOARD["sw1"][0] - BOARD["port"][0]), 2), note="with the pre-2026-10-08 dims (SW 8.0, MIC 1.9) the switch was 2.7 mm off the plunger: dims_k4 now follows the routed board")
     # 5. board in pod: M outline vs cavity, stack thickness
