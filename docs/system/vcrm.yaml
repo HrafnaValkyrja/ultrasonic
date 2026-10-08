@@ -1130,7 +1130,7 @@ requirements:
     evidence: [hw/pod/gen.py, docs/build/tolerances.md, 779872e, sim/checks/sw1_press_fem.py]
     ecrs: [ECR-0012, ECR-0023]
     related: [O12-sealing, O16-oneboard]
-    next: "Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale; K4: fit the ECR-0023 floor post (gap 0.015 +-0.015) and press-test with it"
+    next: "Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale; K4: fit the ECR-0023 floor post (gap 0.015 +-0.015) and press-test with it. 2026-10-08: foam-pad replacement fails (sw1_pad_fem.py, ECR-0023 addendum), owner decision pending"
     gap: >-
       C: SW1 is the C&K KMT022NGJLHS (IP68, 1.6 N, 0.15 +-0.1 mm travel; LCSC C221707) in the schematic and JLC BOM. The
       placed board's footprint copy may still carry the pre-cleanup C221708 (the 3.4 N KMT031): bom_check:identity reads it
