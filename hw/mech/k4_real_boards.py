@@ -2,8 +2,8 @@
 of shell_k4.py, replacing its placeholder pcb_top/stack_body/u2_mic/sw1 -> hw/mech/out/k4r (STL + parts.json).
     systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 python3 hw/mech/k4_real_boards.py
 Mapping (board STEP: x right, y up = -KiCad y, z = F side up, slab z 0..0.8):
-  M (top board, F face DOWN, B face toward the lid, J20/U2 hang below): X=STACK_X0+xs, Y=Y_F-zs, Z=ZC+ys+6   (mirror-free)
-  P (lower board, F up toward M, U1 on B hangs below):                   X=STACK_X0+xs, Y=Y_B-1.88+zs, Z=ZC-ys-6
+  M (board next to the lid: its B face carries SW1 + the mic port and faces the lid features, F face down, J20/U2 hang below): X=STACK_X0+xs, Y=Y_F-zs, Z=ZC+ys+6
+  P (far board, F up toward M, U1 on its outer B face): X=STACK_X0+xs, Y=Y_B-1.4+zs, Z=ZC-ys-6  (long-axis flip). BM28 mated gap 0.6 (was 1.88-0.8=1.08, a bug) -> P F face at Y_B-0.6.
 """
 import json, shutil, sys
 from pathlib import Path
@@ -31,7 +31,7 @@ def place(b, m, tx, ty, tz):
     from build123d import Shape
     return Shape.cast(t.Shape())
 Mm = place("M", (1,0,0, 0,0,-1, 0,1,0), K.STACK_X0, K.Y_F, K.ZC + 6)
-Pm = place("P", (1,0,0, 0,0,1, 0,-1,0), K.STACK_X0, K.Y_B - 1.88, K.ZC - 6)
+Pm = place("P", (1,0,0, 0,0,1, 0,-1,0), K.STACK_X0, K.Y_B - 1.4, K.ZC - 6)
 for n, s in (("board_M", Mm), ("board_P", Pm)):
     export_stl(s, str(DST / f"{n}.stl"), tolerance=0.01, angular_tolerance=0.1)
     info[n] = {"mat": "pcb", "explode": [0, 0, 0]}

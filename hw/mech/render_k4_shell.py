@@ -18,7 +18,7 @@ POD = os.environ.get("K4_POD", "k4s")                 # k4s = placeholder stack,
 PREFIX = os.environ.get("K4_PREFIX", "k4-shell")
 PODS = {"S": OUT / POD}
 LABEL = (("K4 end-to-end shell", "T 6.4   L 49.2   H 14.8 mm   walls 0.6, lid 1.0", "130 mAh cell + 11 mm board-stack block (placeholder), mic at the hinge end") if POD == "k4s" else
-         ("K4 pod with the real routed P + M boards", "T 6.4   L 53.7   H 14.8 mm   boards 15.55 x 12.05, 6L", "130 mAh cell + M (top, mic + button) and P (lower, MCU) from routed_M/P STEP"))
+         ("K4 pod with the real routed P + M boards", "T 6.4   L 53.7   H 14.8 mm   boards 15.55 x 12.05, 6L", "130 mAh cell + real M (lid side: mic, button) and P (MCU)"))
 VIEWS = ("iso", "top", "section")
 CUT_Z = -2.3
 C = (43.0, 8.0, -2.3)
