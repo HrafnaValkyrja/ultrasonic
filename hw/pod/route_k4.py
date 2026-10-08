@@ -33,6 +33,9 @@ def _import_fine(out, ses):
     if R2.prune_dangling_vias(b):
         pcbnew.ZONE_FILLER(b).Fill(b.Zones())
     b.GetDesignSettings().m_NetSettings.GetDefaultNetclass().SetClearance(mm(0.09))
+    for t in b.GetTracks():                         # short stubs come back 0.067 wide from the SES: bring them to the JLC 3.5 mil minimum
+        if t.GetClass() != "PCB_VIA" and t.GetWidth() < mm(0.0889):
+            t.SetWidth(mm(0.09))
     return b
 
 
@@ -67,6 +70,10 @@ def main():
         pcbnew.ZONE_FILLER(b0).Fill(b0.Zones())
         pcbnew.SaveBoard(str(out / "placed.kicad_pcb"), b0)
         R2.ROUTE_CLEARANCE = FINE["route_clr"]
+        import place_k4 as K
+        b0 = pcbnew.LoadBoard(str(out / "placed.kicad_pcb"))
+        K.fine_rules(b0)                            # DRC reflects JLC 6L: annular 0.05, hole clearance 0.14
+        pcbnew.SaveBoard(str(out / "placed.kicad_pcb"), b0)
     b = pcbnew.LoadBoard(str(out / "placed.kicad_pcb"))
     b.GetDesignSettings().m_NetSettings.GetDefaultNetclass().SetClearance(mm(R2.ROUTE_CLEARANCE))
     dsn, ses = out / "board.dsn", out / "board.ses"

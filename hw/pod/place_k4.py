@@ -139,6 +139,8 @@ def pack(board, comps, nets, L):
         blocked["F"].append(n); blocked["B"].append(n)
         blocked["F"] += PINNER
         fixed.update({"U1": (cx, U1_CY, U1_ROT, "B"), "J21": (cx, H / 2, 180, "F")})
+        if VIP["on"]:     # no inner-face part over U1's exposed pad: a +3V0 / signal via there would short to the EP (GND)
+            blocked["F"].append((cx - 4.1, U1_CY - 4.1, cx + 4.1, U1_CY + 4.1))   # EP + via-in-pad ring (pad end 3.88 + via + clearance)
     else:
         fixed.update({"U2": (MIC_CX, MIC_CY, MIC_ROT, "F"), "U3": (4.6, 2.3, 90, "F"), "J20": (cx, H / 2, 0, "F"), "SW1": (SW1_X, H / 2, 0, "B"),
                       "J3": (10.55, 1.6, 0, "B"), "J10": (10.55, 3.8, 0, "B"), "J11": (10.55, 6.0, 0, "B"),
@@ -354,6 +356,66 @@ def preroute_k4(b, fps):
     return bad
 
 
+FINE = {"on": False}                                  # --fine: JLC 6L standard minimums (V10-hdi.yaml, 2026-10-07)
+VIP = {"on": False}                                   # --vip: pre-placed via-in-pad (POFV) on U1 signal/power pads, J21 GND/+3V0 pads
+
+
+def fine_rules(b):
+    """JLC 6-layer standard capability (V10-hdi.yaml, S1/S2 read 2026-10-07): via pad 0.25 / hole 0.15 -> annular 0.05
+    (JLC absolute min 0.15 is for PTH holes, not vias; vias 0.25/0.15 listed as via_min), track/space 0.09, hole-to-hole 0.2.
+    Hole-to-copper (different net) = annular 0.05 + space 0.09 = 0.14: the 0.2 of the 4L rule cannot hold at 0.09 space."""
+    b.SetCopperLayerCount(6)
+    ds = b.GetDesignSettings()
+    ds.m_TrackMinWidth = mm(0.088); ds.m_MinClearance = mm(0.088)     # JLC 3.5 mil = 0.0889
+    ds.m_ViasMinSize = mm(0.25); ds.m_MinThroughDrill = mm(0.15); ds.m_ViasMinAnnularWidth = mm(0.05)
+    ds.m_HoleClearance = mm(0.14); ds.m_HoleToHoleMin = mm(0.2); ds.m_CopperEdgeClearance = mm(0.2)
+    nc = ds.m_NetSettings.GetDefaultNetclass()
+    nc.SetViaDiameter(mm(0.25)); nc.SetViaDrill(mm(0.15)); nc.SetTrackWidth(mm(0.09))
+
+
+def vip_vias(b, fps):
+    """Via-in-pad on every U1 perimeter pad whose net leaves the B face (GND, +3V0, or a pad on the other face), at the pad's
+    outer end (away from the EP), plus a via at the outer end of each J21 GND/+3V0 pad. Locked, same net as the pad."""
+    out = []
+    skipped = vip_vias.skipped = []
+    def add(x, y, net):
+        v = pcbnew.PCB_VIA(b); v.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y))); v.SetWidth(mm(0.25)); v.SetDrill(mm(0.15))
+        v.SetNet(b.FindNet(net)); v.SetLocked(True); b.Add(v); out.append((x, y))
+    face = {}
+    for ref, f in fps.items():
+        for pd in f.Pads():
+            if pd.GetNetname():
+                face.setdefault(pd.GetNetname(), set()).add(f.IsFlipped())
+    u1 = fps["U1"]; ux, uy = MM(u1.GetPosition().x), MM(u1.GetPosition().y)
+    for pd in u1.Pads():
+        n = pd.GetNetname(); sz = pd.GetSize()
+        if not n or min(MM(sz.x), MM(sz.y)) > 3 or n == "GND" and False:
+            continue
+        multi = sum(1 for p3 in u1.Pads() if p3.GetNetname() == n) > 1
+        if n != "GND" and n != "+3V0" and face[n] == {True} and not multi:
+            continue
+        x, y = MM(pd.GetPosition().x), MM(pd.GetPosition().y)
+        dx, dy = x - ux, y - uy
+        if abs(dx) > abs(dy):
+            x += math.copysign(0.2, dx)
+        else:
+            y += math.copysign(0.2, dy)
+        if any(p2.GetNetname() != n and p2.GetAttribute() != pcbnew.PAD_ATTRIB_NPTH and R1._d_rect(x, y, R1._rect(p2)) < 0.125 + 0.16
+               for ref2, f2 in fps.items() if ref2 != "U1" for p2 in f2.Pads()):
+            skipped.append((n, round(x, 2), round(y, 2)))      # an other-net pad of a part on F sits on the via spot
+            continue
+        add(x, y, n)
+    j = fps["J21"]; jy = MM(j.GetPosition().y)
+    rows = [MM(pd.GetPosition().y) for pd in j.Pads() if pd.GetNumber().isdigit()]
+    cy = (min(rows) + max(rows)) / 2
+    for pd in j.Pads():
+        n = pd.GetNetname()
+        if n == "GND" and pd.GetNumber().isdigit():
+            x, y = MM(pd.GetPosition().x), MM(pd.GetPosition().y)
+            add(x, y + math.copysign(0.31 + 0.08, y - cy), n)       # pad half-length 0.305 + via radius 0.125 - 0.05 overlap
+    return out
+
+
 def build(board, placement, L):
     comps, nets = P.parse_netlist(K4 / f"pod_k4_{board}.net")
     missing = set(placement) ^ set(comps)
@@ -363,6 +425,9 @@ def build(board, placement, L):
         mod.W, mod.H, mod.CORNER = L, H, 1.0
     b = pcbnew.BOARD()
     P.rules(b)
+    if FINE["on"]:
+        R2.VIA_D = R1.VIA_D = 0.25
+        fine_rules(b)
     nc = b.GetDesignSettings().m_NetSettings.GetDefaultNetclass()
     nc.SetViaDiameter(mm(R2.VIA_D)); R1.VIA_D = R2.VIA_D
     outline_k4(b, board, L)
@@ -393,9 +458,27 @@ def build(board, placement, L):
         px, py = -100.0, -100.0
         pre_bad = preroute_k4(b, fps)
     R2.PAD_RECTS[:] = [R1._rect(pd) for f in fps.values() for pd in f.Pads() if pd.GetAttribute() != pcbnew.PAD_ATTRIB_NPTH]
-    R1.AVOID = lambda x, y, seg_from=None: R2._avoid(x, y, seg_from, px, py)
+    mine = vip_vias(b, fps) if (VIP["on"] and board == "P") else []
+    nvia0 = len([t for t in b.GetTracks() if t.GetClass() == "PCB_VIA"])
+    R1.AVOID = lambda x, y, seg_from=None: R2._avoid(x, y, seg_from, px, py) or any(math.hypot(x - a, y - c) < 0.5 for a, c in mine)
     added, skipped = R1.gnd_fanout(b, fps, 0.0) if "U1" in fps else R2.net_fanout(b, fps, "GND", 0.0)
     a3, s3 = R2.net_fanout(b, fps, R2.PWR_NET, 0.0)
+    if VIP["on"] and board == "P":                      # drop fan-out vias that touch another net's pad or a locked via-in-pad
+        keep = [t for t in b.GetTracks() if t.GetClass() == "PCB_VIA" and not t.IsLocked()]
+        for v in keep:
+            vx, vy = MM(v.GetPosition().x), MM(v.GetPosition().y)
+            bad = any(pd.GetNetname() != v.GetNetname() and R1._d_rect(vx, vy, R1._rect(pd)) < 0.125 + 0.16
+                      for f in fps.values() for pd in f.Pads() if pd.GetAttribute() != pcbnew.PAD_ATTRIB_NPTH)
+            bad = bad or any(math.hypot(vx - a, vy - c) < 0.4 for a, c in mine)
+            if board == "P":
+                n_ = notch_rect()
+                bad = bad or (n_[0] - 0.4 < vx < n_[2] + 0.4 and n_[1] - 0.4 < vy < n_[3] + 0.4)
+            if bad:
+                for t in list(b.GetTracks()):
+                    if t.GetClass() != "PCB_VIA" and not t.IsLocked() and any(
+                            math.hypot(MM(e.x) - vx, MM(e.y) - vy) < 0.01 for e in (t.GetStart(), t.GetEnd())):
+                        b.Remove(t)
+                b.Remove(v)
     R1.AVOID = None
     R1.gnd_plane(b)
     R2.pwr_plane(b, L, H)
@@ -574,7 +657,10 @@ def main():
     ap.add_argument("--L", type=float, default=12.6)
     ap.add_argument("--u1rot", type=int, default=90)
     ap.add_argument("--u1cy", type=float, default=4.8)
+    ap.add_argument("--fine", action="store_true", help="JLC 6L minimum rules (via 0.25/0.15, annular 0.05, hole clearance 0.14)")
+    ap.add_argument("--vip", action="store_true", help="pre-placed via-in-pad on U1 / J21 pads (P only)")
     a = ap.parse_args()
+    FINE["on"], VIP["on"] = a.fine, a.vip
     L = a.L
     global MIC_ROT, _MIC_R, MIC_CY, U1_ROT, U1_CY
     U1_ROT, U1_CY = a.u1rot, a.u1cy
