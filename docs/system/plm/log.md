@@ -616,3 +616,12 @@
 - 2026-10-07 20:49 checkout REG-POD-BODY by claude: RPB-12 close
 - 2026-10-07 20:49 checkin REG-POD-BODY by claude
 - 2026-10-07 20:50 review REG-POD-BODY by claude: RPB-12: belly-step witness groove 0.1x0.4; reopen.md; shell checks unchanged
+- 2026-10-07 21:06 ECR-0019 raised by claude: Drop the pod USB-C fallback: Rd to the dock head, remove J12/R18/D6 (O31)
+- 2026-10-07 21:07 review R-SPEC-POWER by claude: O31 (USB-C fallback dropped) checked against SUB-POWER/REG-POD-BODY: dock power path and body keep-out unaffected; ECR-0019
+- 2026-10-07 21:07 review R-SPEC-BODY by claude: O31 (USB-C fallback dropped) checked against SUB-POWER/REG-POD-BODY: dock power path and body keep-out unaffected; ECR-0019
+- 2026-10-07 21:07 checkout SPEC by claude: O28-O32 recorded
+- 2026-10-07 21:07 checkin SPEC by claude
+- 2026-10-07 21:07 checkout WHOLE by claude: O28-O32 recorded
+- 2026-10-07 21:07 checkin WHOLE by claude
+- 2026-10-07 21:07 review SPEC by claude: O28-O32 (2026-10-08) recorded; whole.md owner_decisions updated, ECR-0019
+- 2026-10-07 21:07 review WHOLE by claude: O28-O32 (2026-10-08) recorded; whole.md owner_decisions updated, ECR-0019

@@ -153,6 +153,14 @@ The matrix never overrides the spec. If a row shows the design cannot meet a req
 | `O15` | Superseded by O20 (rev 1 is final-size). Its question about debugging over USB is carried by O18-diagnosability (F4 self-test). |
 | `O21` | A process rule (no orders until the design is finalized, owner 2026-10-02). Nothing to verify; it blocks E1/E2 and the dummy-wear test (ECR-0006/0007/0008 deferred) until the design freeze. |
 | `O22` | A process rule (the freeze is an evidence gate). It is enforced, not verified: a freeze-gate mode of tools/checks/vcrm.py (planned) evaluates criteria 1-4 from this matrix, interfaces.py and the ECR states; criterion 5 is a recorded review. |
+| `O23` | A cosmetic fabrication choice (black solder mask, white legend). Nothing to verify in the design; it is an order-package parameter checked at the order review. |
+| `O24` | Owner acceptance of four recommendations; each lands as its own verified change: mic duct + x-stop (SIM-ACO, R14 row), C8/C9 10 V (bom_check identity + DS13737 rule), CC ESD (interfaces F15), heavy sims (docs/sim/index.yaml run_order). |
+| `O25` | A process decision (who lays out the board, review timing); nothing to verify in the design. |
+| `O26` | A scheduling decision (Phase 2 now, adapter later); the two-frame adapter requirement is captured for the adapter work, verified there. |
+| `O27` | A design priority (thin > short > long) that ranks size measures; verified through the pod envelope numbers each design reports (thickness first), not a standalone requirement row. |
+| `O29` | A look decision (no armour plate; lid 1.0 mm with the engraved trace, owner 2026-10-08). Carried by the shell dims and the K1 shell checks; no separate requirement. |
+| `O30` | A process decision (study the thinner K2/K3 concepts before settling the board, owner 2026-10-08). Nothing to verify; it gates the board freeze (O22). |
+| `O32` | A scoping answer (a pod is never docked or charged while worn, owner 2026-10-08). Enforced by the no-output-while-docked interlock (ECR-0009) and verified in the charge/interlock tests there. |
 
 <!-- vcrm:end -->
 

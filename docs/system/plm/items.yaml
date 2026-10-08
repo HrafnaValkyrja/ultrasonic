@@ -128,7 +128,7 @@ relations:
   - id: R-PROC-DOCK
     a: SUB-PROCESSING
     b: SUB-DOCK-USB
-    what: "USB FS PA11/PA12, VBUS sense PA1 (CC not sensed since Rev F; Rd R18 + J12 stay, ILIM by enumeration)"
+    what: "USB FS PA11/PA12, VBUS sense PA1 (CC not sensed since Rev F; Rd R18 + J12 stay until ECR-0019 (O31) moves Rd to the head; ILIM by enumeration)"
     watch: [net:USB_DP, net:USB_DM, net:VBUS_SENSE, net:CC, ref:R18]
   - id: R-PROC-UI
     a: SUB-PROCESSING
@@ -179,7 +179,7 @@ relations:
   - id: R-DOCK-BODY
     a: SUB-DOCK-USB
     b: REG-POD-BODY
-    what: "magnetic target in the belly bay + window (the whole belly is tub in Phase 2), wired to J3/J4/J10/J11/J12; the Rev F USB-C fallback keep-out is not carried into shell_r2"
+    what: "magnetic target in the belly bay + window (the whole belly is tub in Phase 2), wired to J3/J4/J10/J11/J12; the USB-C fallback is dropped (O31, ECR-0019)"
     watch: ["sym:hw/mech/dims_r2.py::DOCK", "sym:hw/mech/dims_r2.py::BAY", "sym:hw/mech/shell_r2.py::tub"]
   - id: R-DOCK-BOARD
     a: SUB-DOCK-USB

@@ -190,7 +190,7 @@ Wire slack for lifting the lid with the board on its wires (DBG-17, computed 202
 13. **Seam:** rebate now 0.2 × 0.4 (2026-10-07); belly step unmarked, butt joints at corners (reg-pod-body issues 12, 13).
 14. **Service** costs one seam cut per cell or arm swap; a board swap or SWD also destroys the board bond (Service table).
 15. **Wire stowage fill** is volume-checked (277 vs 107-142 mm³) but not routed: 12 loops, wires enter the 1.4 B gap to reach pads at board x 25-29 (up to 4.9 mm in front of the board's rear edge, J3 at board x 25.1). Close: a wire-route sketch with gauges (sub-dock-usb, sub-power). Dock wires routed in both pods 2026-10-07 (issue 3, `hw/mech/dock_route.py`); cell leads J5/J4 + NTC J9 wait on the cell lead exit (issue 10).
-16. (closed in Phase 2) USB-C fallback: keep-out not carried into shell_r2 (R-DOCK-BODY).
+16. (closed, O31 2026-10-08) USB-C fallback dropped: no keep-out; ECR-0019 (proposed) removes J12/R18/D6 and takes the dock wires 5 -> 4 when the board is re-planned.
 17. (closed 2026-10-07, ECR-0001) One pod source: `dims_r2.py` (via `frame.pod_facts()`); `frame.py` owns axes, adapter, arm and pad only.
 18. **Phase-2 tolerances sourced 2026-10-07** (`docs/build/tolerances.md` Phase-2 section: JLC outline ±0.2, hole +0.13/−0.08, position ±0.075, board ±0.1; VHB ±15 %). Still [A]: resin ±0.05, KMT022 height.
 

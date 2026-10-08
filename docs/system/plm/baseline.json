@@ -80,10 +80,10 @@
   },
   "SPEC": {
    "by": "claude",
-   "date": "2026-10-03",
-   "note": "spec O24-O27 added (owner decisions); 00-whole unaffected in substance",
+   "date": "2026-10-07",
+   "note": "O28-O32 (2026-10-08) recorded; whole.md owner_decisions updated, ECR-0019",
    "stamp": {
-    "file:docs/spec.md": "55e87ab5e70b128b"
+    "file:docs/spec.md": "14762701a89718d9"
    }
   },
   "SUB-AUDIO-IN": {
@@ -159,11 +159,11 @@
    }
   },
   "WHOLE": {
-   "by": "backlog-agent",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "RB-TOL: JLC capability tolerances sourced (outline +-0.2, hole +0.13/-0.08, position +-0.075, board +-0.1) into dims_r2.duct_offsets + tolerances.md Phase-2 section; gauge-pin duct worst 0.115 -> 0.155 PASS; D0.6 hole can be 0.52 < spec 0.6 -> owner SAI-15D",
+   "note": "O28-O32 (2026-10-08) recorded; whole.md owner_decisions updated, ECR-0019",
    "stamp": {
-    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "8109175ed2b59501"
+    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "1e2fd3d76d1e058f"
    }
   }
  },
@@ -540,19 +540,19 @@
   },
   "R-SPEC-BODY": {
    "by": "claude",
-   "date": "2026-10-02",
-   "note": "BL-0 configuration SNAPSHOT (not a correctness claim): schematic Rev E, rough draft 34x13 (mic port fix), rev-1 Spine shell, spec v0.15+O21/O22. Consistency basis: 2026-10-01 doc-set inspection (electrical + physical inspectors, editor pass), 2026-10-02 datasheet audit, interfaces/bom_check/vcrm checks (exit 0). Known disagreements are open ECRs 0001-0013, not hidden. From here on review relations individually.",
+   "date": "2026-10-07",
+   "note": "O31 (USB-C fallback dropped) checked against SUB-POWER/REG-POD-BODY: dock power path and body keep-out unaffected; ECR-0019",
    "stamp": {
-    "grep:docs/spec.md::\\bO1[0267]\\b": "a536ed44898d05e4"
+    "grep:docs/spec.md::\\bO1[0267]\\b": "444043fe2637ce08"
    }
   },
   "R-SPEC-POWER": {
    "by": "claude",
-   "date": "2026-10-02",
-   "note": "Rev G (ECR-0017, O24): C8/C9 10 V + D6 CC ESD; docs updated same commit",
+   "date": "2026-10-07",
+   "note": "O31 (USB-C fallback dropped) checked against SUB-POWER/REG-POD-BODY: dock power path and body keep-out unaffected; ECR-0019",
    "stamp": {
     "grep:docs/spec.md::D11": "2e97b7d968dc4623",
-    "grep:docs/spec.md::\\bO1[26]\\b": "1c43865ce9e22be6"
+    "grep:docs/spec.md::\\bO1[26]\\b": "d7ad19f821e6fcdd"
    }
   },
   "R-SPEC-UI": {

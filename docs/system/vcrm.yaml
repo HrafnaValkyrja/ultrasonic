@@ -122,6 +122,9 @@ not_verifiable:
   O25: "A process decision (who lays out the board, review timing); nothing to verify in the design."
   O26: "A scheduling decision (Phase 2 now, adapter later); the two-frame adapter requirement is captured for the adapter work, verified there."
   O27: "A design priority (thin > short > long) that ranks size measures; verified through the pod envelope numbers each design reports (thickness first), not a standalone requirement row."
+  O29: "A look decision (no armour plate; lid 1.0 mm with the engraved trace, owner 2026-10-08). Carried by the shell dims and the K1 shell checks; no separate requirement."
+  O30: "A process decision (study the thinner K2/K3 concepts before settling the board, owner 2026-10-08). Nothing to verify; it gates the board freeze (O22)."
+  O32: "A scoping answer (a pod is never docked or charged while worn, owner 2026-10-08). Enforced by the no-output-while-docked interlock (ECR-0009) and verified in the charge/interlock tests there."
   O15: "Superseded by O20 (rev 1 is final-size). Its question about debugging over USB is carried by O18-diagnosability (F4 self-test)."
 
 ecrs_no_row: {}
@@ -816,6 +819,7 @@ requirements:
     planned: ["whole-pod mass and centre of mass from the rev-1 CAD with one density plus parts, dock target, adapter and wires"]
     evidence: [sim/checks/balance.py, hw/mech/shell_r1.py]
     ecrs: [ECR-0001, ECR-0006]
+    covers: [O28]
     related: [S1.2-C4, S1.3-T5, O20-finalsize]
     known_fail: "Rev-1 mass is already at least ~10.2 g per pod before parts, dock target, adapter and wires (00-whole key numbers, derived 2026-10-01), above the ~8 g target in spec §8; ~15 g is where glasses start to hurt."
     known_fail_ref: "none; the mass and size work is the simplification study (docs/research/simplify/size.md) and spec O20"
@@ -1029,7 +1033,7 @@ requirements:
     source: "docs/spec.md O16(3)"
     spec_block: O16
     spec_hash: "a603512778"
-    text: "No custom connector board: a pre-built magnetic connector (own magnets are acceptable), and space reserved for a sealed USB-C receptacle as the fallback."
+    text: "No custom connector board: a pre-built magnetic connector (own magnets are acceptable). The sealed USB-C receptacle reservation is dropped (O31, 2026-10-08); the fallback is a clip-on USB-C adapter outside the pod. Condition: the magnetic dock (USB FS + ROM DFU + charging) is proven at bring-up."
     method: [Inspection, Test]
     stage: [C, D]
     c_role: surrogate
@@ -1040,15 +1044,14 @@ requirements:
     artefacts: [docs/system/sub-dock-usb.md, hw/pod/gen.py, hw/mech/shell_r1.py, ERC, "interfaces:pins"]
     planned: ["cut and check the USB-C keep-out in the shell (shell_r1.py defines it and never uses it)", "a cable-side head that is in stock and matches the target (5 contacts)", "mate, tug and release the cable on a built pod"]
     evidence: [docs/system/sub-dock-usb.md, hw/mech/shell_r1.py]
+    covers: [O31]
     related: [O12-dock]
     next: "Fix the cable-side part number and stock; cut the USB-C keep-out in the shell model and check its overlap with the target"
     gap: >-
       C: the dock uses a bought connector pair and no custom connector board: the pod-side target (Xinyangze YZT0675, five
       contacts, two NdFeB magnets, C5126848) is glued flush into the belly floor and hand-wired to pads J3/J4/J10/J11/J12
       (sub-dock-usb.md). Open: the cable-side head (YZP0048, C5126847) showed no stock at JLC on 2026-10-02 and docs/build/bom.md
-      lists a different 4-pin head (sub-dock-usb issue 1); the sealed USB-C fallback (Same Sky UJ32-C-H-G-MSMT) is only a box,
-      USBC_KEEPOUT, that shell_r1.py defines and never cuts or checks, and it overlaps the target's rear 4.8 mm, so it is
-      either/or (issue 10). D: whether the magnets hold under wear, sweat and the cable's pull is untested.
+      lists a different 4-pin head (sub-dock-usb issue 1); the sealed USB-C fallback (Same Sky UJ32-C-H-G-MSMT) is dropped by O31 (2026-10-08; ECR-0019 moves Rd to the head). D: whether the magnets hold under wear, sweat and the cable's pull is untested.
 
   - id: O16-nohousingscrews
     kind: owner

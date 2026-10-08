@@ -7,7 +7,7 @@ abbrev: {MZ-2: "Phase-2 package set 'Balanced' (ECR-0018)", F: "board face towar
 item: WHOLE
 design_pointer: hw/current.yaml (id phase2; reference = revg)
 src_of_truth: [docs/spec.md, "hw/pod/gen.py (POD_PACKAGES=mz2, MZ2 table L93)", hw/pod/draft_r2/out/routed.kicad_pcb, hw/mech/dims_r2.py, hw/mech/shell_r2.py, hw/mech/frame.py, hw/mech/heel.py, hw/mech/pad.py]
-owner_decisions: "O1-O27 (spec §12); Phase 2 = O25 (Claude lays out, owner reviews), O26 (miniaturise internals first), O27 (thin > short > long)"
+owner_decisions: "O1-O32 (spec §12; O28-O32 2026-10-08: D18 reading B, lid plate, thin-concept study, O31 USB-C fallback dropped (ECR-0019), O32 never docked while worn); Phase 2 = O25 (Claude lays out, owner reviews), O26 (miniaturise internals first), O27 (thin > short > long)"
 open_ecrs: {ECR-0018: "approved (owner delegated), implementation in progress", others: "ECR-0001, 0005-0010, 0014-0016 proposed (plm.py status 2026-10-07)"}
 checks_2026-10-07: {interfaces.py: "PASS mic-port, outline, inside, clamp-bands (VHB face, 91 % bonded), heights, board-nets; WARN switch (worst stack 0.05 over), pins (3 known hazards), rails (+3V0 326 mA vs U4 300 mA, ECR-0005), frame (8 of 10, ECR-0001)", bom_check.py: "PASS refs/netlist/footprints/fp-library/nets/assembly-tier/jlc-bom/cost-bom/selftest 61; WARN values, identity, stock-lock (8 rows missing), lock-drift (12)"}
 ```
