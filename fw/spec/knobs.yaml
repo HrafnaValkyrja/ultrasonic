@@ -7,8 +7,8 @@
 # Coverage: the knobs_required ids of docs/sim/firmware-emulation.yaml that the foundation needs; the rest are added with their
 # feature (FWSIM-R6 status lists them). Adding, removing or retyping a knob bumps `version` (stored records then load as defaults + event).
 schema: 1
-version: 4
-updated: 2026-10-07   # v4: idle detector, ticks, LED; v3: ui/fsm/charger/break knobs, ts_hot_code fixed to 45 C; v2: DSP knobs (b_variant, transient_only, volume_cdb, noise_margin_cdb, a_lo_hz, limiter_release_ms); squelch_hold_ms default 20
+version: 5
+updated: 2026-10-08   # v5: alert tone + look-ahead limiter (loudness proof); v4: idle detector, ticks, LED; v3: ui/fsm/charger/break knobs, ts_hot_code fixed to 45 C; v2: DSP knobs (b_variant, transient_only, volume_cdb, noise_margin_cdb, a_lo_hz, limiter_release_ms); squelch_hold_ms default 20
 assumed: "assumed (no source yet; FWSIM knobs_required lists the id only)"
 
 hard_clamps:
@@ -91,3 +91,9 @@ knobs:
   - {id: brk_margin_ma, def: 30, min: 0, max: 100, unit: mA, src: "FWSIM-R65 break threshold = i_peak_max (FWSIM-R64) + margin"}
   - {id: brk_cooldown_ms, def: 2000, min: 100, max: 60000, unit: ms, src: "FWSIM-R65 latched break cleared only after a cool-down (assumed value)"}
   - {id: docked_output, def: 0, min: 0, max: FW_VAR_DOCKED_OUTPUT_MAX, hard: {max: HC_DOCKED_OUTPUT_MAX}, unit: bool, src: "ECR-0009 item 1 (0 unless exemption variant a)"}
+  # ---- loudness (docs/proof/electrical/loudness.md, 2026-10-08): alert tone in the 2-3 kHz sensation-level peak + look-ahead limiter at the R64 clamp
+  - {id: lim_lookahead, def: 0, min: 0, max: 1, unit: bool, src: "loudness.md fix 1b: 1 = look-ahead soft-knee limiter with ceiling = FWSIM-R64 clamp minus shaper excursion (spec D17 fixed ceiling); 0 = legacy -12 dBFS true-peak limiter only. Default 0 until the pinned golden vectors and D17 are re-signed (owner)"}
+  - {id: lim_knee_pct, def: 70, min: 50, max: 95, unit: pct, src: "soft-knee start as a percent of the ceiling (assumed, loudness fix)"}
+  - {id: alert_hz, def: 2500, min: 500, max: 4000, unit: Hz, src: "loudness.md fix 1a: sensation level peaks at 2-3 kHz (Surendran 2023 front-of-tragus threshold min 29.5 dB at 2.5 kHz); legacy 1000 Hz"}
+  - {id: alert_cdb, def: 0, min: -4000, max: 0, unit: cdBFS, src: "alert tone peak before the limiter (0 = full scale; the limiter/clamp sets the real ceiling)"}
+  - {id: alert_ms, def: 300, min: 50, max: 2000, unit: ms, src: "alert length including the 10 ms raised-cosine ramps (assumed)"}

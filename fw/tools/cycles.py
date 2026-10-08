@@ -28,7 +28,7 @@ sys.path[:0] = [str(FW / "bench"), str(FW / "tools")]
 import cyccount as cc  # noqa: E402
 import fwsim  # noqa: E402
 
-SRCS = ["dsp.c", "dsp_math.c", "fw.c", "out_clamp.c"]
+SRCS = ["dsp.c", "dsp_math.c", "fw.c", "out_clamp.c", "lahead.c"]
 HOPS_PER_S = 200_020 / 128
 V4 = {"B": {"cfg": "B_28bands (V4: 28 bands, hop 128, TPP 8, CMSIS FFT)", "MHz": [59.1, 68.8]},
       "slim": {"cfg": "B_slim1 (V4: 16 bands, hop 256, TPP 8, CMSIS FFT)", "MHz": [37.7, 43.7]},

@@ -111,6 +111,7 @@ static size_t hop_pcm(fw_state_t *st, const float pcm[FW_HOP_N], uint16_t *ccr, 
     } else {
         fw_dsp_algo(&st->dsp, apcm, y8, taps ? taps->band_energy : NULL, taps ? taps->floor : NULL);
     }
+    (void)fw_alert_hop(&st->alert, y8);                        /* alert replaces the algorithm output while it plays */
     tick_add(st, y8);
     fw_ccr_bounds_t b = fw_ccr_bounds((uint16_t)st->arr, st->amp_max_ppm);
 #if FW_VAR_DOCKED_OUTPUT_MAX
@@ -204,6 +205,11 @@ size_t fw_selftest_hop(fw_state_t *st, float y8[FW_DSP_OUT_N], const fw_ccr_boun
     return m;
 }
 #endif
+
+void fw_alert_trigger(fw_state_t *st)
+{
+    fw_alert_start(&st->alert, (uint32_t)st->knobs.alert_hz, st->knobs.alert_cdb, (uint32_t)st->knobs.alert_ms);
+}
 
 void fw_event(fw_state_t *st, fw_event_id_t id, int32_t arg, uint64_t now_us)
 {

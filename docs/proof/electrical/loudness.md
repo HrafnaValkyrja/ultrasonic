@@ -40,3 +40,21 @@ Bat calls and alerts are a 1.5-4 kHz band, in practice a few hundred ms chirps a
 4. **Different exciter with more Bl (N/A)** is the only route to street-level alerts (+20 dB); the Aeropex-like Bl would give about +7 dB for free, if the RC-BC02 is as strong as its datasheet class (unverified).
 
 Open: Bl, f0, true threshold at the D1 site (E1, E2); program rms of bat-call playback; ambient band-spectrum assumption (-11 dB).
+
+## Firmware fix: before / after (2026-10-08)
+Script `loudness_fw.py`, plot `loudness_fw.png`. Same chain as above (front site, p05 exciter, ambient band = dBA - 11, target +12.5 dB, mean over the alert band).
+
+![before/after](loudness_fw.png)
+
+**Finding:** the shipped output stage's true-peak ceiling is -12 dBFS (0.251 of Vdd, knob `ceiling_cdb`, hard max -1200), which is **8.1 dB below** the 0.635 clamp that the tables above assume. So the real "before" is worse than the table.
+
+| Alert margin (dB, p05 / nominal) | Quiet 35 dBA | Office 50 dBA | Street 70 dBA |
+|---|---|---|---|
+| Before: -12 dBFS ceiling, band 1.5-4 kHz | +6.1 / +15.1 | -8.9 / +0.1 | -28.9 / -19.9 |
+| Tone to 2-3 kHz only (still -12 dBFS) | +4.3 / +13.3 | -10.7 / -1.7 | -30.7 / -21.7 |
+| **After: 2-3 kHz + look-ahead limiter at the clamp** | **+10.6 / +19.6** | **-4.4 / +4.6** | **-24.4 / -15.4** |
+| Reference (table above, ideal full scale at clamp) | +12.4 / +21.4 | -2.6 / +6.4 | -22.6 / -13.6 |
+
+Net gain +4.5 dB (after - before; the band mean already sat near 2-3 kHz, so the tone move alone is -1.8 dB against the 1.5-4 kHz mean, which includes the 1.5 kHz point); the limiter supplies +6.3 dB. The limiter ceiling is the R64 clamp (0.6353) minus the noise-shaper excursion bound (0.1150) = 0.5203, 1.7 dB under the ideal, so the clamp never bites. Office goes from failing to marginal (p05) / passing (nominal); street still fails (needs +20 dB: exciter Bl, not firmware).
+
+**Knobs** (`fw/spec/knobs.yaml`, v5): `lim_lookahead` (0 = legacy, **default 0** until the pinned golden vectors and the D17 -12 dBFS ceiling are re-signed by the owner), `lim_knee_pct` (70), `alert_hz` (2500; legacy 1000), `alert_cdb` (0), `alert_ms` (300). Code: `fw/core/lahead.c` (soft-knee limiter: 4-sample look-ahead min + moving average, one-pole release, 3-sample delay, |out| <= ceiling by construction; raised-cosine alert ramps 10 ms), `fw_alert_trigger()`. Tests: `fw/test/test_loud.c` (tone frequency, no clicks, bound/step, ceiling and clamp through `fw_dsp_out`); full `fwsim all` PASS (35 rows).

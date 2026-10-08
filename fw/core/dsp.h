@@ -11,7 +11,9 @@
 
 #include "dsp_tables.h"
 #include "knobs.h"
+#include "lahead.h"
 #include "out_clamp.h"
+#include "lahead.h"
 
 #ifndef FW_INTERP_FMAC
 #define FW_INTERP_FMAC 1                         /* 1: +6 dB guard + FMAC x16 interpolator (hal_fmac); 0: CPU float interpolator */
@@ -53,6 +55,8 @@ typedef struct {
     uint32_t fmac_faults;
     float lim_g, e1, e2, e3, sq_env;
     uint32_t dither, sq_quiet;
+    uint32_t la_on;                               /* knob lim_lookahead: look-ahead soft-knee limiter ahead of the interpolator */
+    fw_lahead_t la;
 } fw_dsp_t;
 
 void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr, uint32_t reps);   /* reps = PWM periods per PCM sample */

@@ -145,6 +145,12 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr, uint32_t reps)
     /* output stage */
     d->lim_c = fw_db20_to_lin((float)k->ceiling_cdb * 0.01f);
     d->lim_rel = fw_om_exp(1000.0f / (FS_OUT_HZ * (float)k->limiter_release_ms));
+    d->la_on = k->lim_lookahead ? 1u : 0u;
+    if (d->la_on) {   /* loudness fix: ceiling = R64 clamp minus the noise-shaper excursion bound (so the clamp never bites); D17 fixed ceiling */
+        float amp = (float)fw_out_amp_max_ppm(k) * 1e-6f - (float)FW_SHAPER_EXCURSION_PPM * 1e-6f;
+        d->lim_c = amp > d->lim_c ? amp : d->lim_c;
+        fw_lahead_init(&d->la, d->lim_c, (uint32_t)k->lim_knee_pct, d->lim_rel);
+    }
     d->lim_g = 1.0f;
     d->guard_g = 1.0f;
     {
@@ -570,8 +576,14 @@ NOINL static void out_interp_fmac(fw_dsp_t *d, const float y8[8], float *v)
 }
 #endif
 
-NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8[8], uint32_t force_squelch, const fw_ccr_bounds_t *b, uint16_t *ccr, fw_out_info_t *info)
+NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8_in[8], uint32_t force_squelch, const fw_ccr_bounds_t *b, uint16_t *ccr, fw_out_info_t *info)
 {
+    float yl[8];
+    const float *y8 = y8_in;
+    if (d->la_on) {
+        fw_lahead_hop(&d->la, y8_in, yl);
+        y8 = yl;
+    }
     size_t n = 0;
     float peak = 0.0f;
     uint32_t sq = 0u, sq_periods = 0u, hits = 0u, reps = d->reps, dith = d->dither;

@@ -80,6 +80,7 @@ typedef struct {
     int32_t vol_offset_cdb;   /* volume applied to the DSP gain */
     uint32_t usb_enumerated;
     uint32_t usb_suspended;   /* a connected host suspended the bus: <= 2.5 mA from VBUS (charger input off, FWSIM-R20) */
+    fw_alert_t alert;         /* alert tone generator (knobs alert_hz / alert_cdb / alert_ms) */
     fw_dsp_t dsp;             /* DSP chain state (FWSIM-R13): front end, algorithm, interpolator, limiter, shaper */
 } fw_state_t;
 
@@ -101,6 +102,7 @@ void fw_event(fw_state_t *st, fw_event_id_t id, int32_t arg, uint64_t now_us);
 size_t fw_cdc_rx(fw_state_t *st, const uint8_t *buf, size_t len, uint8_t *reply, size_t reply_cap);
 fw_outputs_t fw_outputs(const fw_state_t *st);
 void fw_brk_clear_done(fw_state_t *st);   /* the app cleared TIM1 BIF as fw_outputs().brk_clear asked */
+void fw_alert_trigger(fw_state_t *st);   /* play one alert tone through the normal output stage (limiter, shaper, R64 clamp) */
 #if FW_VAR_DOCKED_OUTPUT_MAX
 size_t fw_selftest_hop(fw_state_t *st, float y8[FW_DSP_OUT_N], const fw_ccr_bounds_t *b, uint16_t *ccr, uint32_t *hits);
 #endif
