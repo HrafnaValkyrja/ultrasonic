@@ -5,7 +5,7 @@
 
 Reused from shell_r2: seam tongue/groove, rebate, heel (arm mount: socket, keel, conductor channel), dovetail rail, strut relief,
 VHB-hung board (board F face on the lid, mic duct = lid bore + VHB hole + board hole), KMT022 pocket + puck + skin, K1_DUCT=rec numbers.
-Dropped: belly + dock window (YZT0675 6.86 > T 6.4, DOCK_FIT), belly-step witness groove (no step: the rebate is continuous).
+Dock option A (k4-dock.yaml option_A_design): 4 belly windows over the M pad tab + 2 bossed magnet pockets (dock_add/dock_cut). Dropped: the YZT0675 bay (6.86 > T 6.4), belly-step witness groove (no step: the rebate is continuous).
 
 Hand assembly (order; every fixing is glue/VHB, nothing screwed except the M1.4 set screw in the heel):
  1 tub on the bench, inner face down.  2 arm anchor + set screw in the heel socket (heel.py), arm wires out of the channel (x 64, z -8.6).
@@ -75,6 +75,25 @@ def tub_add():
     return blade.rail(zc=(Z0 + Z1) / 2) + heel.heel_add()
 
 
+def dock_add():
+    """inward bosses around the two magnet pockets (belly wall 0.6 is too thin for a 1.0 disc + 0.2 skin)."""
+    z0 = CAV["z0"] - 0.05
+    bs = [Pos(x, DOCK_YC, (z0 + BOSS_TOP) / 2) * Cylinder(BOSS_D / 2, BOSS_TOP - z0) for x in (MAG_X_FRONT, MAG_X_REAR)]
+    return bs[0] + bs[1]
+
+
+def dock_cut():
+    """2 magnet pockets (insert from the cavity side before the cell goes in, 0.2 skin outside) + 4 belly windows for the pads."""
+    zp = Z0 + MAG_SKIN
+    cut = None
+    for x in (MAG_X_FRONT, MAG_X_REAR):
+        c = Pos(x, DOCK_YC, (zp + BOSS_TOP + 0.01) / 2) * Cylinder(POCKET_D / 2, BOSS_TOP + 0.01 - zp)
+        cut = c if cut is None else cut + c
+    for x in PAD_X:
+        cut = cut + box(x - WIN_W / 2, x + WIN_W / 2, DOCK_YC - WIN_H / 2, DOCK_YC + WIN_H / 2, Z0 - 0.1, CAV["z0"] + 0.02)
+    return cut
+
+
 def tub():
     t = outer_body() & box(X0 - 1, X1 + 1, Y_IN - 2, Y_SPLIT, Z0 - 1, Z1 + 1)
     t = t + tub_add()
@@ -84,6 +103,8 @@ def tub():
     t = t - blade.prism_yz([(3.9, -12.5), (3.9, -3.65 - 3.9), (-3.65 + 12.5, -12.5)], 62.0, 68.5)
     t = t - heel.heel_cut()        # after the relief fill: the conductor channel / socket must stay open through it
     t = t + (tongue() & outer_body())
+    t = t + (dock_add() & outer_body())
+    t = t - dock_cut()
     return t - seam_rebate()
 
 
@@ -117,18 +138,28 @@ def placeholders():
     # wire paths (rendered as 0.35 square runs): cell leads front end -> stack rear pads; arm bundle stack rear -> heel channel mouth under the cell
     bat = box(STACK_X1 - 0.5, CELL_X0 + 0.5, CELL_Y0 + 0.6, CELL_Y0 + 0.95, ZC + 3, ZC + 3.35) + box(STACK_X1 - 0.5, CELL_X0 + 0.5, CELL_Y0 + 0.6, CELL_Y0 + 0.95, ZC + 4, ZC + 4.35)
     zw = CAV["z0"] + 0.3
-    arm = box(STACK_X1 - 0.5, STACK_X1 + 0.3, STACK_Y0 + 0.4, STACK_Y0 + 0.75, zw, STACK_Z0 + 1.5) + box(STACK_X1 - 0.5, 62.4, CAV["y0"] + 0.4, CAV["y0"] + 0.75, zw, zw + 0.35) + box(62.0, 62.4, CAV["y0"] + 0.4, CAV["y0"] + 1.9, zw, zw + 0.35) + box(62.0, 64.0, CAV["y0"] + 1.55, CAV["y0"] + 1.9, zw, zw + 0.35)
-    return dict(cell=cell, ctape=ctape, pcb_top=top, stack_body=body, vhb=vhb, u2_mic=u2, sw1=sw1, skin=skin, bat_wires=bat, arm_wires=arm)
+    arm = box(STACK_X1 - 0.5, STACK_X1 + 0.3, STACK_Y0 + 0.4, STACK_Y0 + 0.75, zw, STACK_Z0 + 1.5) + box(STACK_X1 - 0.5, 62.4, CAV["y0"] + 0.10, CAV["y0"] + 0.45, zw, zw + 0.35) + box(62.0, 62.4, CAV["y0"] + 0.10, CAV["y0"] + 1.9, zw, zw + 0.35) + box(62.0, 64.0, CAV["y0"] + 1.55, CAV["y0"] + 1.9, zw, zw + 0.35)
+    tab = box(TAB_X[0], TAB_X[1], DOCK_YC - 0.4, DOCK_YC + 0.4, TAB_Z_BOTTOM, STACK_Z0 + 0.3)           # M board tab carrying the pads (placeholder)
+    mags = [Pos(x, DOCK_YC, Z0 + MAG_SKIN + MAG_T / 2) * Cylinder(MAG_D / 2, MAG_T) for x in (MAG_X_FRONT, MAG_X_REAR)]
+    mag = mags[0] + mags[1]
+    return dict(m_tab=tab, dock_mags=mag, cell=cell, ctape=ctape, pcb_top=top, stack_body=body, vhb=vhb, u2_mic=u2, sw1=sw1, skin=skin, bat_wires=bat, arm_wires=arm)
 
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     t, l, pk, ph = tub(), lid(), puck(), placeholders()
     c = {}
-    for k in ("cell", "ctape", "pcb_top", "stack_body", "vhb", "u2_mic", "sw1", "bat_wires", "arm_wires"):
+    for k in ("cell", "ctape", "pcb_top", "stack_body", "vhb", "u2_mic", "sw1", "bat_wires", "arm_wires", "dock_mags"):
         for n, p in (("tub", t), ("lid", l)):
             c[f"clash/{n}/{k}"] = round((p & ph[k]).volume, 4)
     c["clash/tub/lid"] = round((t & l).volume, 4)
+    c["clash/cell/m_tab"] = round((ph["cell"] & ph["m_tab"]).volume, 4)
+    c["clash/m_tab/stack_body_overlap_is_intended"] = round((ph["m_tab"] & ph["stack_body"]).volume, 4)
+    c["clash/tub/m_tab"] = round((t & ph["m_tab"]).volume, 4)
+    c["clash/cell/dock_boss"] = round((ph["cell"] & dock_add()).volume, 4)
+    c["clash/stack_body/dock_boss"] = round((ph["stack_body"] & dock_add()).volume, 4)
+    c["clash/arm_wires/dock_boss"] = round((ph["arm_wires"] & dock_add()).volume, 4)
+    c["clash/ctape/dock_boss"] = round((ph["ctape"] & dock_add()).volume, 4)
     c["clash/cell/stack"] = round((ph["cell"] & ph["stack_body"]).volume, 4)
     c["clash/puck/lid"] = round((pk & l).volume, 4)
     c["clash/puck/sw1"] = round((pk & ph["sw1"]).volume, 4)
@@ -154,7 +185,14 @@ def main():
     c["stack"] = dict(x=[round(STACK_X0, 2), round(STACK_X1, 2)], T=STACK_T, floor_clear=round(STACK_Y0 - CAV["y0"], 2), front_gap=X_STOP_GAP,
                       side_gap_z=round((CAV["z1"] - CAV["z0"] - STACK_H) / 2, 2), mic=MIC, button=SW)
     c["button"] = dict(puck_L=round(PUCK_L, 3), puck_feasible=PUCK_L > NUB_H + 0.02, guide_bore=round(SKIN_FLOOR - POCKET["top"], 3), gap_nominal=PRE_GAP)
-    c["dock"] = DOCK_FIT
+    mt = {i: round(((t & box(x - WIN_W / 2 + 0.01, x + WIN_W / 2 - 0.01, DOCK_YC - WIN_H / 2 + 0.01, DOCK_YC + WIN_H / 2 - 0.01, Z0 - 1, 0)).volume), 4) for i, x in enumerate(PAD_X)}
+    dk = dict(DOCK_FIT)
+    dk.update(pad_x=[round(x, 2) for x in PAD_X], mag_x=[MAG_X_FRONT, round(MAG_X_REAR, 2)], head_mag_pitch_T=HEAD_MAG_PITCH, yc=DOCK_YC, window_open_resin_mm3=mt,
+              pocket_edge_front=round(MAG_X_FRONT - POCKET_D / 2, 2), belly_round_start=round(X0 + 1.0, 2), pocket_edge_to_pod_end=round(MAG_X_FRONT - POCKET_D / 2 - X0, 2),
+              tab_x=[round(v, 2) for v in TAB_X], tab_to_cell=round(CELL_X0 - TAB_X[1], 2), tab_to_front_boss=round(PAD_X[0] - WIN_W / 2 - 0.3 - (MAG_X_FRONT + BOSS_D / 2), 2),
+              tab_to_rear_boss=round((MAG_X_REAR - BOSS_D / 2) - TAB_X[1], 2), tab_past_stack=round(TAB_X[1] - STACK_X1, 2), skin=MAG_SKIN, boss_to_cell=round(CELL_Z0 - BOSS_TOP, 3), boss_to_Mtab=round(STACK_Z0 - BOSS_TOP, 3),
+              pad_recess=round(TAB_Z_BOTTOM - Z0, 2), cell_shift=DOCK_SHIFT)
+    c["dock"] = dk
     ev = outer_body().volume
     c["envelope"] = dict(T=round(Y_OUT - Y_IN, 2), L=round(L, 2), H=round(H, 2), env_mm3=round(ev, 1), x=[round(X0, 2), X1], z=[Z0, round(Z1, 2)])
     c["volumes"] = dict(tub=round(t.volume, 1), lid=round(l.volume, 1), puck=round(pk.volume, 3))
@@ -163,7 +201,7 @@ def main():
     print(json.dumps(c, indent=1))
     (OUT / "checks.json").write_text(json.dumps(c, indent=1))
     mats = dict(cell="cell", ctape="silicone", pcb_top="pcb", stack_body="chips", vhb="silicone", u2_mic="chips", sw1="metal", skin="silicone",
-                bat_wires="metal", arm_wires="metal")
+                bat_wires="metal", arm_wires="metal", m_tab="pcb", dock_mags="metal")
     parts = {"tub": (t, "body"), "lid": (l, "armour"), "puck": (pk, "metal"), **{k: (v, mats[k]) for k, v in ph.items()}}
     info = {}
     for k, (s, m) in parts.items():
@@ -188,7 +226,7 @@ def mass(t, l, pk, ph):
     }
     lo, hi = sum(a for a, _ in items.values()), sum(b for _, b in items.values())
     return dict(items_g={k: [round(a, 3), round(b, 3)] for k, (a, b) in items.items()}, pod_body_g=[round(lo, 2), round(hi, 2)],
-                excludes="adapter clip, arm, pad, exciter, NiTi (as pod_mass pod_body_only); dock target not placed (DOCK_FIT)", target_g=8.0)
+                excludes="adapter clip, arm, pad, exciter, NiTi (as pod_mass pod_body_only); dock = 2 N52 2.5x1 discs (0.04 g) + M tab, not in the roll-up", target_g=8.0)
 
 
 if __name__ == "__main__":
