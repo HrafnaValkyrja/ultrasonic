@@ -1,42 +1,46 @@
-# Audibility requirement: "audible in a subdivision and in day-to-day life" (2026-10-08)
-Owner ruling #3. All sources tagged [recall] = from memory, NOT re-fetched this session (no web check run); verify before citing outside the repo. Repo numbers [repo].
+# Audibility requirement for AUDIO PLAYBACK in day-to-day life (2026-10-08, rewritten after owner correction)
+Owner: "it's an audio device not an alert system." The device plays the shifted/compressed ultrasonic scene as listening audio (spec §1.1; DSP chain ends `volume -> safety ceiling` at 12.5 kS/s, spec L66). The 2-3 kHz alert-tone move (`alert_hz`) is system-sound only and is NOT counted here. Sources: [repo] = read today; [recall] = from memory, not re-fetched (no web check run), verify before external citation.
 
 ## 1. Requirement
-**Design ambient 60 dBA (daytime, A-weighted). Alert in-band level at the ear >= ambient band level + 12.5 dB. Delivered need = 58 dB eq. SPL central (band 54.5-61.5), pure-tone 2.5 kHz alert.** Stretch tier 65 dBA (cafe, car): need 63 (59.5-66.5). Busy arterial (70+ dBA) stays out of scope: not day-to-day for a subdivision walk; covered by the haptic option (I-010).
+**Design ambient 60 dBA (daytime). Programme (playback) rms at the ear >= ambient dBA - 5 = 55 dB eq. SPL, clean (THD+N <= -40 dB), central estimate, +-10 dB.** Stretch 65 dBA (cafe/shop): 60. Subdivision walk at 55 dBA: 50. Car (65-72) and arterial street are out of scope.
 
-| Place | Level (dBA) | Source |
-|---|---|---|
-| Residential outdoor, daytime, target | 55 Ldn/Leq (activity interference) | US EPA "Levels Document" 1974 (EPA 550/9-74-004) [recall] |
-| Same, WHO | 55 serious / 50 moderate annoyance, 16 h daytime outdoor | WHO Guidelines for Community Noise 1999 [recall] |
-| Subdivision with passing cars | 50-60 Leq, passing car 60-70 LAmax at ~10 m | typical measured; ISO 1996-1:2016 method [recall] |
-| Office | 45-55 (open plan to 60) | ASHRAE Handbook Applications ch.48 NC/RC tables; open-plan studies [recall] |
-| Cafe / shop | 60-70 | restaurant measurement studies (e.g. Rindel; Lombard-effect literature) [recall] |
-| Car interior, 90-110 km/h | 65-72 | cabin measurements, widely reported [recall] |
-=> 60 dBA covers subdivision + office + shop; 65 covers cafe/car. A pure-tone alert is far more detectable than the noise models here say (tone-in-noise masked threshold is band level -3..+3 dB, R-loudness-conflict item 5), so 12.5 over band is conservative.
-**Margin target 12.5 dB:** ISO 7731:2003 (danger signals for work places) wants the signal >= 13 dB above ambient A-level (>= 10 dB in octave bands) [recall]; the repo's 10-15 guidance is the same family [repo: loudness.md]. Band tilt: ambient band = dBA - 11 (proof, conservative) to -18 (traffic typical, B-loud); need = dBA + 1.5 (conservative) to dBA - 5.5. Central -13 gives 60 -> 58.
+Ambient places (dBA): residential outdoor day 50-55 (EPA Levels Document 1974, EPA 550/9-74-004; WHO Community Noise 1999: 55 serious / 50 moderate annoyance) [recall]; subdivision with passing cars 50-60 Leq, passing car 60-70 LAmax [recall, ISO 1996-1:2016 method]; office 45-55, open plan to 60 (ASHRAE Applications ch.48) [recall]; cafe/shop 60-70 (restaurant measurement studies, Lombard literature) [recall]; car 65-72 at highway speed [recall].
 
-## 2. Verdict re-run (loudness_fw.py chain + R-loudness-conflict corrected estimate)
-`loudness_fw.py` nominal, front site, band mean 2-3 kHz: legacy -12 dBFS 51.6 dB eq. SPL; after (tone 2.5 kHz + limiter at clamp) **56.1** (= conflict doc's 58 central minus the 1.7 dB shaper margin; band about 46-66).
-| Ambient | need (central, band) | fw-after margin (central, band) |
-|---|---|---|
-| 50 office | 52 (48-52.5) | +4 (-6 to +8) |
-| **60 design** | **58 (54.5-61.5)** | **-2 (-15 to +2)** |
-| 65 stretch | 63 (59.5-66.5) | -7 (-20 to -3) |
-| 70 street | 68 (64.5-71.5) | -12 (-25 to 0) |
-Firmware alone passes 50 dBA and fails 60. Bat chirps run 3-12 dB under pure-tone level [repo]; this requirement is the alert tone.
+**Listening headroom (replaces the 10-15 dB alert rule):** the programme must sit about +8 dB (range +4 to +10) over the ambient in the same 1.5-4 kHz band. Basis [recall]: preferred listening levels in noise sit about 6-10 dB over the background (Airo et al. 1996, Hodgetts et al. 2007 Ear & Hearing); real-life listening SNRs about +5 to +10 dB (Smeds et al. 2015 JAAA); sentence intelligibility is near ceiling by about +4 to +6 dB SNR (Plomp 1986; ANSI S3.5 SII). +4 = "follows it", +8 = target, +10 = enjoyable. Ambient in band = dBA - 13 (range -11 proof, -18 traffic typical). So need = dBA - 13 + 8 = **dBA - 5** (range dBA - 9 to dBA + 0).
 
-## 3. Cheapest combination (nominal chain; dB cumulative)
+## 2. Max CLEAN level at her ear (repo chain; central 2.5 kHz, nominal, front site)
+Force at the 208 mA clamp (0.635 of Vdd diff): 94.5 dB re 1 uN; corrected central eq. SPL **58** for a full-scale sine (R-loudness-conflict, band 48-68).
+| Ceiling | Peak (sine) eq. SPL | Programme rms (crest 6 dB; chirps are 3-12 dB under sine [repo]) | THD+N [repo C3-output-stage.md] |
+|---|---|---|---|
+| -12 dBFS (D17 now, 0.251) | 49.9 | **43.9** | -52 dB @12.5 ns dead time; -38 @25 ns (no compensation) |
+| limiter at clamp minus shaper excursion (0.520, D17 option A, `lim_lookahead=1`) | 56.3 | **50.3** | not modelled: model stops at -12 dBFS; signal current 2.1x larger, dead-time error grows with level (-61 @-40 dBFS to -52 @-12), my extrapolation -45 +-5 dB (assumed) |
+| clamp itself (0.635) | 58 | 52 | extrapolated -43 +-5 |
+"Clean" = THD+N <= -40 dB (assumed; the exciter's own distortion is likely larger, C3 note). It passes at 12.5 ns dead time, fails at 25 ns uncompensated at the ceiling (-38). Bench: THD at the clamp on the real bridge (E-series current probe + FFT), not modelled.
+
+## 3. Verdict vs ambient (programme rms, margin = delivered - need)
+| Ambient | Band | Need (+8; +4..+10) | Legacy -12 dBFS 43.9 | Limiter 50.3 |
+|---|---|---|---|---|
+| Quiet room 35 | 22 | 30 | +14 | +20 |
+| Office 50 | 37 | 45 (41-47) | -1 (+3..-3) | +5 (+9..+3) |
+| Subdivision 55 | 42 | 50 (46-52) | -6 (-2..-8) | **+0 (+4..-2)** |
+| **Design 60** | 47 | **55 (51-57)** | -11 | **-5 (-1..-7)** |
+| Cafe/shop 65 | 52 | 60 (56-62) | -16 | -10 (-6..-12) |
+Honest read: today's -12 dBFS ceiling gives quiet room and a quiet office only. The limiter makes office comfortable and a 55 dBA subdivision just adequate; 60 dBA and beyond need force-per-amp, not more current (current is pinned by the clamp and the THD ceiling).
+
+## 4. Cheapest combination (cumulative programme rms, central)
 ![waterfall](audibility_waterfall.png)
-| # | Step | dB | Cost | Size | Thermal (U4 LDO, cell at 208 mA clamp) | Bench |
+| # | Step | dB | Cost | Size | Thermal / battery | Bench |
 |---|---|---|---|---|---|---|
-| 0 | Baseline legacy -12 dBFS | 51.6 | 0 | 0 | n/a | none |
-| 1 | `lim_lookahead=1`, `alert_hz=2500` (fbfb38b; D17 option A, ceiling = clamp - shaper 0.5203) | +4.5 -> 56.1 | 0, firmware | 0 | 300 ms burst at clamp: U4 +0.3 to +3 K (tau assumed); continuous bound +33 K never reached; cell stays within the 260 mA pulse rule (clamp 208) | re-sign golden vectors + D17 ceiling (owner); U4 temp log (PWR-I12) |
-| 2 | Pad stiffness 3e5 N/m (loudness.md lever 3, model) | +4 -> 60.1 | ~0 (pad durometer/geometry) | 0 | none | E1 force vs drive on a 1 N preload fixture |
-| **= meets 60 dBA** | | **+2 central over need** | | | | **masked detection test on her (conflict doc)** |
-| 3 | Resonant pad/exciter tuned to 2-3 kHz (Q 1.5-8) | +4 more of 6-10 -> 64.1 | ~0 to small tooling | 0 | none (same current) | E1/E2 sweep; f0 of loaded pad |
-| 4 | D17: let limiter ceiling go to the clamp itself (drop 1.7 dB shaper margin) | +1.7 -> 65.8 | 0 | 0 | none (clamp unchanged) | prove shaper never exceeds clamp (fwsim) |
-=> **Meets 65 dBA at +2.8 central with steps 1+2+3+4; all free or near-free, zero size.**
-Rejected or deferred: raising the clamp to 270 mA (+2.3 dB) breaks the cell 260 mA rule; 12 ohm exciter gives no volume (loudness.md fix 2); BCE-1 swap (R-exciter): Bl unpublished, 0..+6 dB without basis, +1.4 mm thickness against O27 thin-first, buy one only for E1 Bl measurement; BCT-3 (+12.9 dB, 44x32 mm) does not fit; pad on tragus (conflict item 3): 0..+5 dB, comfort cost, D1 site change. Tragus 10 dB bonus and B-loud +15.5 dB are not supportable (conflict doc).
+| 0 | Legacy -12 dBFS | 43.9 | - | - | - | - |
+| 1 | `lim_lookahead=1` (fbfb38b; D17 option A) | +6.3 -> 50.2 | 0, fw | 0 | current doubles for +6 dB (see below) | owner re-signs golden vectors + D17; THD at the ceiling |
+| 2 | D17: ceiling = clamp (drop 1.7 dB shaper margin) | +1.7 -> 52.0 | 0 | 0 | +1.7 dB current | fwsim: shaper never exceeds clamp; THD |
+| 3 | Playback compression: crest 6 -> 4 dB (log-compression mode B is already the intended main mode, spec L222; limiter-aware makeup) | +2 -> 54.0 | 0, fw tuning | 0 | rms current up 2 dB | listening test: pumping/artifacts |
+| 4 | Pad stiffness 3e5 N/m (loudness.md lever 3) | +4 -> 58.0 | ~0 (durometer/geometry) | 0 | **lowers** current for equal level | E1 force vs drive, 1 N preload |
+| 5 | Broad resonant pad, Q <= 2 (narrow Q colours playback) | +2 -> 60.0 | small tooling | 0 | as 4 | E1/E2 sweep |
+| opt | Exciter with more Bl (Aeropex-class model says 0-7 dB, BCE-1 0-6 unproven +1.4 mm thick) | 0..+7 | buy 1 for E1 (O21: bench only) | O27 conflict | as 4 | measure Bl first |
+=> **Minimal: steps 1+2+3+4 = 58.0 vs 55 need at 60 dBA (+3, band -7..+13). Meets subdivision/office/shops at 60 dBA; 65 dBA cafes need step 5 (60.0) plus luck or Bl.** Rejected: clamp to 270 mA (+2.3 dB, breaks the 260 mA cell pulse rule, worse THD); 12 ohm (no volume); BCT-3 (44x32 mm, does not fit); B-loud's +15.5 and tragus 10 dB bonus (conflict doc).
 
-## 4. Honest uncertainty
-Band is +-10 dB (threshold SD 6-9, Bl 1 N/A assumed, model may be 0-7 dB low: Aeropex anchor [repo]). Steps 1+2 give 60 dBA only at central; a 12 dB-wider real distribution means roughly even odds. Step 3 is the margin that makes 60 dBA robust (+6 vs central need at 60, i.e. 66.5 vs 54.5-61.5 upper). The single deciding bench measurement: masked detection threshold on her at the D1 site under a 60-65 dBA recording, logging drive current and pad force (E1). If detection current < 0.15 A rms at 65 dBA the requirement is met with step 1 alone.
+**Thermal / battery at the clamp (docs/proof/thermal row 8):** rms playback current at 50.3 dB (6 dB under the 147 mA clamp sine) is about 74 rms, ~60 mA mean|i| from the 3.0 V LDO U4: ~72 mW at 1.2 V drop docked, +12 K at theta-JA 166 K/W (cap 125 C: fine). The problem is runtime: the rail budget carries 2.5 mA average for the exciter; sustained loud playback at 60 mA with ~9 mA base is ~2 h on a 130 mAh cell. Each +6 dB of force per amp (steps 4-5, Bl) halves that current, which is the second reason to prefer force-per-amp levers over more drive. Cell stays inside its 260 mA pulse rule (clamp 208).
+
+## 5. Open (bench)
+(a) THD+N at the clamp on the real bridge; (b) force vs current, pad stiffness, Bl (E1); (c) masked-listening test on her: scene playback under 55/60/65 dBA recordings, adaptive level to "comfortable", logging drive current; one afternoon settles the +8 target, the band tilt and eq. SPL uncertainty (+-10 dB) together; (d) program crest of real bat/house material; (e) U4 temp and battery current log (PWR-I12).
