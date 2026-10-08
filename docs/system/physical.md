@@ -217,3 +217,5 @@ Wire slack for lifting the lid with the board on its wires (DBG-17, computed 202
 - From the lid down: ledge 0.70 | VHB 0.25 | M 0.8 | gap 0.6 | P 0.8 | L1 1.0 | floor; STACK_T 3.2 (dims_k4); floor clear 0.65 nominal, 0.163 worst-case. Pod T/H/L unchanged.
 
 - K4 arm-wire lane moved (2026-10-08): z -8.8 single level, y 8.85-9.51, drop column x 30.86; clears the rear dock boss (x 27.9-30.8) and magnet. Floor-post chain: Y_F 8.75 puts U1 top 1.05 above the tub floor; compressible pad alternatives fail (ECR-0023 addendum).
+
+- K4 shell default K4_RELIEF=lift (O34, ECR-0024, 2026-10-08): T 6.4 x H 15.25 x L 49.85 at stack 15.5 (len 14.8 x 53.65); worn 9.43-10.58 g, nose 6.16-6.84 g / ear 3.27-3.73 g, COM 34.7-35.3 mm behind the hinge.

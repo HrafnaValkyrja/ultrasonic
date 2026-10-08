@@ -18,7 +18,7 @@ import os
 Y_IN, T, WALL, LID_T = 4.3, 6.4, 0.6, 1.0
 X1 = 67.5
 Z0 = -9.7
-RELIEF = (os.environ.get("K4_RELIEF") or "len").strip()
+RELIEF = (os.environ.get("K4_RELIEF") or "lift").strip()
 if RELIEF not in ("len", "lift"):
     raise ValueError("K4_RELIEF: len | lift")
 H = 14.8 + (0.45 if RELIEF == "lift" else 0.0)
@@ -171,7 +171,7 @@ LANE_Z = CAV["z0"] + 0.3               # under-cell / under-stack lane (cell bot
 LANE_Y0 = 8.85                         # lane y 8.85..9.51: above the dock bosses (y 5.4..8.2, z <= -8.45) and the strut-relief fill; the lane is below the cell (z < -8.3)
 
 
-DROP_X = 30.86                         # drop column: between the rear magnet boss edge (x 30.80 at y 8.35, less at the lane's higher y) and the cell front face (31.0); K4-WIRE-LANE clash 0 (2026-10-08)
+DROP_X = round(CELL_X0 - 0.14, 2)                         # drop column: between the rear magnet boss edge (x 30.80 at y 8.35, less at the lane's higher y) and the cell front face (31.0); K4-WIRE-LANE clash 0 (2026-10-08)
 
 
 def wire_routes():
@@ -191,8 +191,9 @@ def wire_routes():
         x, z = STACK_X0 + bx, ZC + (by - 6.0)
         xd = DROP_X                                           # one drop column DROP_X, wires staggered in y
         yl = LANE_Y0 + 0.22 * i
-        out[n] = [(x, yp, z), (xd, yp, z), (xd, yl, z), (xd, yl, LANE_Z), (CELL_X1 + 0.4, yl, LANE_Z),
-                  (CELL_X1 + 1.4, yl, -7.4), (HEEL_EXIT[0] - 0.8, HEEL_EXIT[1] + 0.2 * i * 0, HEEL_EXIT[2] - 0.3 + 0.2 * i), HEEL_EXIT]
+        tail = ([(CELL_X1 + 1.4, yl, -7.4), (HEEL_EXIT[0] - 0.8, HEEL_EXIT[1] + 0.2 * i * 0, HEEL_EXIT[2] - 0.3 + 0.2 * i), HEEL_EXIT] if RELIEF == "len" else
+                [(CELL_X1 + 0.3, yl, -7.4), (HEEL_EXIT[0] - 0.1, HEEL_EXIT[1] + 0.2 * i * 0, HEEL_EXIT[2] - 0.3 + 0.2 * i), HEEL_EXIT])   # lift: 1.1 rear gap only, rise + turn inside it
+        out[n] = [(x, yp, z), (xd, yp, z), (xd, yl, z), (xd, yl, LANE_Z), (CELL_X1 + 0.3, yl, LANE_Z)] + tail
     return out
 
 

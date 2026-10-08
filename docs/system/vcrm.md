@@ -126,7 +126,7 @@ The matrix never overrides the spec. If a row shows the design cannot meet a req
 | `O13-budget` | Analysis, Inspection | partial (decides) | not-started |  |  | Compute the first-order total against $300 once the simplification study fixes the part list; price the TBD items |
 | `O16-cell` | Inspection, Analysis, Test | partial (surrogate) | not-started |  | 0001, 0008 | Dry-fit the real pouch; re-check the heel exit against it |
 | `O16-connector` | Inspection, Test | partial (surrogate) | not-started |  | 0019, 0021 | Fix the cable-side part number and stock; cut the USB-C keep-out in the shell model and check its overlap with the target |
-| `O33` | Analysis, Inspection | partial (surrogate) | not-started |  | 0020, 0019 | Owner review of ECR-0020; then lay out M and P |
+| `O33` | Analysis, Inspection | partial (surrogate) | not-started |  | 0020, 0019, 0024 | Owner review of ECR-0020; then lay out M and P |
 | `O16-nohousingscrews` | Inspection | done (decides) | not-started |  |  | Confirm on the built pod |
 | `O16-ip68switch` | Inspection, Test | partial (surrogate) | not-started |  | 0012, 0023 | Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale; K4: ECR-0023 add.2 gap-filling bonded post (post 0.5875 short + epoxy dab on Kapton peel); press-test with it. 2026-10-08: foam-pad replacement fails (sw1_pad_fem.py, ECR-0023 addendum), owner decision pending |
 | `O16-oneboard` | Inspection, Analysis | partial (decides) | not-started |  | 0011, 0001 | Script the left-pod board mapping and check the off-centre parts in both shells |

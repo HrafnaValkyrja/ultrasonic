@@ -20,9 +20,9 @@
    }
   },
   "PHYSICAL": {
-   "by": "K4 ledge agent",
+   "by": "claude",
    "date": "2026-10-08",
-   "note": "ECR-0022 ledge + C21 0402",
+   "note": "O34/ECR-0024 lift default: spec O34 and whole doc consistent",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
@@ -37,9 +37,9 @@
    }
   },
   "REG-ARM": {
-   "by": "K4-SHELLCHK agent",
+   "by": "claude",
    "date": "2026-10-08",
-   "note": "doc updated with K4 shell/strut checks 2026-10-08",
+   "note": "O34/ECR-0024 lift default: spec O34 and whole doc consistent",
    "stamp": {
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
     "file:hw/mech/heel.py": "37f8dda276f86d83",
@@ -68,9 +68,9 @@
    }
   },
   "REG-POD-BODY": {
-   "by": "K4 ledge agent",
+   "by": "claude",
    "date": "2026-10-08",
-   "note": "ECR-0022 ledge + C21 0402",
+   "note": "O34/ECR-0024 lift default: spec O34 and whole doc consistent",
    "stamp": {
     "file:hw/mech/blade.py": "ad6b4d86e46c5d84",
     "file:hw/mech/dims_r2.py": "99cbaaf4302a2566",
@@ -80,10 +80,10 @@
   },
   "SPEC": {
    "by": "claude",
-   "date": "2026-10-07",
-   "note": "O28-O33 recorded; 00-whole updated",
+   "date": "2026-10-08",
+   "note": "O34/ECR-0024 lift default: spec O34 and whole doc consistent",
    "stamp": {
-    "file:docs/spec.md": "ff22907041c4390c"
+    "file:docs/spec.md": "f84d1d5fbeb08569"
    }
   },
   "SUB-AUDIO-IN": {
@@ -160,10 +160,10 @@
   },
   "WHOLE": {
    "by": "claude",
-   "date": "2026-10-07",
-   "note": "O28-O33 recorded; 00-whole updated",
+   "date": "2026-10-08",
+   "note": "O34/ECR-0024 lift default: spec O34 and whole doc consistent",
    "stamp": {
-    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "6f512ddbcaab3d20"
+    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "952ff36768a6c50d"
    }
   }
  },

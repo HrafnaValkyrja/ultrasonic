@@ -11,7 +11,7 @@ from build123d import import_step, Location, Matrix, export_stl, Compound
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import dims_k4 as K
-SRC, DST = HERE / "out" / "k4s", HERE / "out" / "k4r"
+SRC, DST = ((HERE / "out" / "k4s", HERE / "out" / "k4r") if K.RELIEF == "len" else (HERE / "out" / "k4s_lift", HERE / "out" / "k4r_lift"))
 DST.mkdir(exist_ok=True)
 info = json.loads((SRC / "parts.json").read_text())
 for n in info:

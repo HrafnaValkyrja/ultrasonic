@@ -191,3 +191,5 @@ k4_conduct_2026_10_08:   # Claude (Opus 5.5 subagent). Closes backlog K4-CONDUCT
   verdict: "PASS. Contacts do not threaten the mic budget: >= 17 dB pessimistic margin even with the power tabs dead; no need for more +3V0/GND pins. Open for bench: measured contact R (4-wire across a mated pair, E-step) and tabs 31-34 actually soldered/connected; the tabs counted as power contacts follow V9 [T] (Hirose catalog says 2 power contacts 5 A)."
   integration_map_crosscheck: "touches SUB-POWER (+3V0 across BM28), SUB-AUDIO-IN (mic supply conduction), REG-BOARD (BM28 pin map). No design change; assumptions: contact L not modelled (0.4 mohm at 400 kHz, small vs R); LDO Zout not in loop for the divider. plm status 0 suspect / 0 stale."
 
+
+# O34 2026-10-08 (ECR-0024): pod L now 49.85 (lift default, cell to x 65.8); board length rule unchanged (STACK_L follows routed boards 15.5).

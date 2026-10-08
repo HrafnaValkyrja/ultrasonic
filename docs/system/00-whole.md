@@ -189,3 +189,4 @@ Follow [README](README.md) "The rule" and walk the change through [integration-m
 
 ## Reference design (Rev F/G)
 Kept in the repo, never deleted (`hw/current.yaml` reference): Rev G schematic / Rev F board `hw/pod/draft_r1/pod_r1_routed.kicad_pcb`, 34 × 13 × 0.8, parts on both faces (F 21 / B 31), In2 signals, 1 unconnected + 19 courtyard DRC; shell `hw/mech/shell_r1.py` ("Spine"): board on foam strips clamped by lid ribs, 1.5 mm unsealed mic gap, plunger Ø1.2; envelope 38.0 × 11.8 × 15.2 + belly 3.5, 7801 mm³; LN-M03 5.2 % FAIL, LN-M02 12.2 dB. Risks closed by Phase 2: 12 (floorless foam: no foam), 14 (USB-C fallback keep-out: not carried into shell_r2), 19 (simplification study: superseded by MZ-2). Full Rev F text: git history of this file before 2026-10-07.
+- K4 shell default K4_RELIEF=lift (O34, ECR-0024): pod 6.4 x 15.25 x 49.85 mm; len variant 14.8 x 53.65.

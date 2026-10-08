@@ -682,3 +682,9 @@
 - 2026-10-08 04:53 checkin REG-BOARD by k4-conduct-agent
 - 2026-10-08 04:53 checkin PHYSICAL by k4-conduct-agent
 - 2026-10-08 04:53 ECR-0023 raised by claude: K4 floor post on U1 top under the BM28 line: SW1 press path lid-M-BM28-P-U1-post-floor, shim-fitted gap (ECR-0022 follow-up)
+- 2026-10-08 08:40 ECR-0024 raised by claude: K4 shell default K4_RELIEF=lift (O34): pod 49.85 L x 15.25 H
+- 2026-10-08 08:41 review SPEC by claude: O34/ECR-0024 lift default: spec O34 and whole doc consistent
+- 2026-10-08 08:41 review WHOLE by claude: O34/ECR-0024 lift default: spec O34 and whole doc consistent
+- 2026-10-08 08:41 review REG-POD-BODY by claude: O34/ECR-0024 lift default: spec O34 and whole doc consistent
+- 2026-10-08 08:41 review PHYSICAL by claude: O34/ECR-0024 lift default: spec O34 and whole doc consistent
+- 2026-10-08 08:41 review REG-ARM by claude: O34/ECR-0024 lift default: spec O34 and whole doc consistent

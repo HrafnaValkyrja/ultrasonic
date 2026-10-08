@@ -1081,7 +1081,8 @@ requirements:
     artefacts: [docs/research/drastic/V9-k4-board.yaml, hw/mech/shell_k4.py, hw/pod/k4/gen.py, ERC]
     planned: ["placement of M and P and a length measurement on the real outlines", "BM28 datasheet read (rating, mated height) and footprint fetch", "bring-up conduction test over the B2B (LN-V*) and an acoustic tap test of L1/C buzz"]
     evidence: [docs/research/drastic/V9-k4-board.yaml, docs/system/plm/ecr/ECR-0020.md, sim/noise/k4_noise.py, tools/checks/k4_checks.py]
-    ecrs: [ECR-0020, ECR-0019]
+    ecrs: [ECR-0020, ECR-0019, ECR-0024]
+    covers: [O34, O34(a), O34(b), O34(c), O34(d)]    # O34 (2026-10-08): K4 shell lift default, pod 6.4 x 15.25 x 49.85; hw/mech/dims_k4.py, ECR-0024
     next: "Owner review of ECR-0020; then lay out M and P"
     gap: >-
       C: V9 studies the shortest board (B+ two stacked 4L boards, ~11 x 12 mm; length figures are estimates, no placement run) and

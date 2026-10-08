@@ -17,8 +17,10 @@ import os
 B_DIR = os.environ.get("K4_B", "k4")                  # k4 = concept, k4r = real routed boards (k4_real_boards.py)
 PREFIX = os.environ.get("K4_PREFIX", "k4-vs-k1t")
 PODS = {"A": OUT / "k1t", "B": OUT / B_DIR}
+sys.path.insert(0, str(HERE))
+import dims_k4 as K          # label numbers follow K4_RELIEF (default lift, O34)
 LABEL = {"A": ("A  K1-thin stacked", "T 8.5   L 33.6   H 14.1 mm", "130 mAh cell on top of the board"),
-         "B": ("B  K4 end-to-end", "T 6.4   L 53.7   H 14.8 mm", "same cell beside 15.5 mm boards, along the arm")}
+         "B": ("B  K4 end-to-end", f"T {K.T:.1f}   L {K.X1 - K.X0:.1f}   H {K.H:.2f} mm", "same cell beside 15.5 mm boards, along the arm")}
 VIEWS = ("iso", "top", "section")
 CUT_Z = -2.3
 C = (float(os.environ.get("K4_CX", 41.5)), 8.0, -2.3)   # common look-at point, mm

@@ -93,3 +93,5 @@ K5_stacked_thin_long_cell:   # added 2026-10-07 by Claude (Opus 5.5 subagent). A
   honest_read: "K5 stays a custom-cell project. Only a custom ~3.0x12x45, ~150 mAh cell passes slim B incl. EOL (9.3 h) and spec B except EOL (7.3 h); it buys T -1.2 vs K1 thin (7.3 vs 8.5) for L +14.5..19.5 - same trade as K4 (T 6.4, L 51) but K4 uses a real, datasheeted cell and is thinner than K5. Buyable stacked options: Besomi 301227 (poor spec, EOL fail) or current Renata 175 mAh (T 9.3)."
   next: "If owner wants K5: request quotes + samples from Grepow/PKCELL/EEMB for 3.0x12x45, >=145 mAh min, PCM, 2C pulse >=300 mA, T max <=3.3 (ask pulse duration); compare against K4 first."
   integration_map_crosscheck: "read-only research, no ECR; tools/plm.py impact not run. If adopted: F7/F8 (cell params, pulse vs 315 mA peak), mechanical shell, board length growth."
+
+# O34 2026-10-08 (ECR-0024): K4 shell default K4_RELIEF=lift -> T 6.4, H 15.25, L 49.85 (stack 15.5), mass 9.43-10.58 g worn, nose 6.16-6.84 g; K4_e2e entries above are the len variant (H 14.8, L +3.8).
