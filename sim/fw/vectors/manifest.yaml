@@ -1,7 +1,7 @@
 meta:
   what: 'FWSIM-R8 golden vectors: inputs (ADF1 words) + reference taps; regenerate with sim/fw/gen_vectors.py --bless'
-  generated: '2026-10-07'
-  sim_commit: 42fb891 2026-10-02
+  generated: '2026-10-08'
+  sim_commit: 9bb9f30 2026-10-07
   chain: 'sim/e2e AcousticPort -> Microphone -> SupplyInject -> AdfDecimator D1 stub (D2: 400 kS/s words) -> stages.pcm_to_adf_words'
   reference: 'sim/dsp/pipeline.py algo_b (B: 28 bands hop 128; slim: 16 bands hop 256; ceiling +100 dBFS = pre-limiter), pipeline.algo_a_base (pre-gate) x 10^1.5'
   alignment: 'firmware 12.5 kS/s sample n = reference n - 8 (B, slim) or n (A: reference and firmware causal, identical decimators); fw hop k = ref frame k-1 (B), fw hop 2h+1 = ref frame h (slim)'
@@ -18,12 +18,12 @@ vectors:
     n_words: 144000
     sha256:
       words: f36ed106eecc178eb5bba93d0b0bd8ef8aac0a551b15831334b8e76900241f43
-      B_y: 603cab4fec68524c0bc179277ed015b0b219e8b6afc4f72f61e9731ed962893f
-      B_band: ca79f422d1b8e24cbd57b3c4a5de0fde75c9e27e55cb4dd75e3d616533de18e2
-      B_floor: 48572719b550d6494508be52dc8534c7b6bfca3fbc6f99687a056dee8eaa2523
-      slim_y: fa0112cf4f57055afee20e09db1b29f152e2c1b4cc56f6af24b95ae69e62110f
-      slim_band: 70592a36af83f75b6801a4700d64c87566e75b72a7d6dcde91a6603aeb0493c0
-      slim_floor: f3c9c51d285315ea5ba0255bc95700062304a37b0c83d23ea5292965545db3fe
+      B_y: 5eb3e18efb61b13a91047eb3bece991c998072b1d4f853addaa2614bd1a545e7
+      B_band: f8906986083389f1111567e3a926688b45b675c86a4a773d7dda72b5eb8db48b
+      B_floor: 6b7359f23e920a82ae7ac9aea66e394e9cbc9db862ff3bbe4158aca60af4eced
+      slim_y: 2911e888471be738a3b95baccca968812edff9b7233530ed80ef80b256c8fc62
+      slim_band: 88e45dc5227aa65e0ca0dc419d23c1fca1a060a5d71cc9c03686767f1f6fca4b
+      slim_floor: 7cc949735395ff7478f19f3a63e794ef1104ac5e8b6ee717fd88d5f50d777b30
       A_y: a019ac1624e202b093e8e25130285df920c305ccc82fa28758ea0c87c4519153
   bats:
     scenario: bats
@@ -36,12 +36,12 @@ vectors:
     n_words: 160000
     sha256:
       words: 7389fdda9cc659330e00735cd63658ccaf6642f30c0cf7d05f482bb59739f5c5
-      B_y: 26981056a01445ea1830b025420b640c9bb2be779436d46bc19069be2f181c43
-      B_band: 982c0d995c867ca6d3d9fb68effa6662f00da37bf14bde60fb53c7dc0e61e6ac
-      B_floor: 9e26664f9d0b66d4cb65c83b66f0a6fe2b53a454806f89c5800303eea6a75f09
-      slim_y: e4d89f610c84b87f1044f2a8b2092cf98051bb04c34eb7597093c2f9786640fc
-      slim_band: 0a11a7f35a02d2dd51264913705490e3f6d84bda74216ad896f27d0de2ca1ad0
-      slim_floor: 24646b1adad21226b1c5eb6570ea68c39ff17a9bacbaa1a9d52f9be6bb09895b
+      B_y: 283631a88be82c77b25f32841b9da764e4d3e3a8dc341a4569b7061fb4171a9f
+      B_band: 719e071b0e2a6904518650ae2e57a21416830bd5d28716536543935c993d7578
+      B_floor: 9df6243168adb18e146b94a2aca52cd1339075a00193f5fcec4d007136fe9190
+      slim_y: 89ae0bc208b8db1bb47c97876af1eff2a2beb88862e7eebdf8e1e2d00a0f7c94
+      slim_band: 76076516f409a5a2979259ee734bc2553e01a07079807b11f4c4e67fc13251de
+      slim_floor: d789189286f7b9e4993f9eb45d493c307f6ba950e65775fd2382fa8e7c24dc44
   house:
     scenario: house
     seed: 1
@@ -53,12 +53,12 @@ vectors:
     n_words: 320000
     sha256:
       words: 9d59bdea62703c16189cbebb389b96bd0eb61387eea35828b5a697e1258543d4
-      B_y: 24ce872d67ab0f2c1b9750293aa856bd599e4082c45e60ef944860955de20991
-      B_band: b0254bcbe6822720a28836f12083cb6c3a477b967d9be4da293bee2aefa305fe
-      B_floor: 01801eda4f5877cc50fcc7a4bb90caad59c74e559cebba37f8aebdb18cc24b0b
-      slim_y: cebe439a14abf5fdbb29bbd497c5c69754df3b60e0f6e5660af1992a56636c89
-      slim_band: 75211a61166132fc56f6d7133f578c8478f8b8992f465287c928e8f83ca7f7d3
-      slim_floor: f83854f2a351b91d06667cbeccafe0edb5a2a913cf635213b5f458d4c0c00ca8
+      B_y: c5096abad7f5e1fc23ccc398d471703e6735316d6c46c76b5d54f04daf4a01ed
+      B_band: f331c094d901d4b5e20acc4c0e3398f97dc55463d66417caa4fc6866d0174eec
+      B_floor: 0718c3c500186346432070e39a66252aa3caa8933478e6d3233c56df4fc79d6a
+      slim_y: 96dcb12e8bf2a5f583708904d85dff3d3fe8fdb3b3b1e6d2d94f5cb5597f8173
+      slim_band: b8f2cc331550e9d439c8f53d4eca9455b40d90816c2fad9a8721661864565575
+      slim_floor: 505465da167f6b1c61c54c06d7ea7effe96fb932804089a6b9ee3c1c5144deda
   silence:
     scenario: silence
     seed: 4
@@ -70,12 +70,12 @@ vectors:
     n_words: 160000
     sha256:
       words: 50b9ddf8abea5c2fef38dfdbc34d4771f9d8c3b23b8f0689d071c17ab5d0ee88
-      B_y: 041056d92da69cd88815f7157581f9204ff9e365cb4b993f256cb060f99616ca
-      B_band: 0a7851ceff5a557131376f179ad5d5b688afb7e3906b6f4bfd3464913fc1cb91
-      B_floor: d15138d132c3569abf2d22bdfd9c3bda01aab40f626bf77d9ed578c4d5474b0c
-      slim_y: 2cd467cedd80d30390f434c749654a27e8773aee62d023ba3ae9fdc16200afc9
-      slim_band: 13e2bb5029237083c735537cda2bd1d1b55d9363f075637e0df218c9cb6388ee
-      slim_floor: 889a72eb4d1f278f8a7170bc121f97a0fa3252fd9a03c15f0673a7cae056ed40
+      B_y: 2c5fb21b4f69e739066280911e6b898a4cf91c095e94e4dcbb862cf8d71827f3
+      B_band: 091c77523c3b1530225f340684b0f95994352b4800fefaf5ba0efeb54791dce6
+      B_floor: 18e1caa8f8400f7d2d9dbbdb23243c07f871be52adeac29531342fd1c881b632
+      slim_y: c04d639c2b1708dcdae3351e5cbc47b95de1f2e3cd301250b9ff770da2cea035
+      slim_band: 0e6ed1bfad9d18edd26af06a08b352481156769b60508b3a0753ba47f215518e
+      slim_floor: 3ebfe91ad17119d070caedfaeeb71ef2dd7224fdb2a7ef3db14aca278a738f37
   loud:
     scenario: loud
     seed: 5
@@ -87,12 +87,12 @@ vectors:
     n_words: 119936
     sha256:
       words: 2447732a538f85aaffab334f3c33975bf2c1f7007b9c6b25201742ee47ac7f28
-      B_y: 33e916226124b82be85307a88a8473936c7ba69ebb822f9adc342cb300be9c54
-      B_band: b10d5c125cf2ad2bac9f2e9bf1dab84db8b6e74b57c1d15b7e40783ca2c88fe5
-      B_floor: 95c751963d7ef7cdff3a5eb6d92b53c638dd5a647f65faf57775a00192071442
-      slim_y: 5e0af1d150c656335a5ef142bd0a523605d47ca2ac8c0a286234d5636731ead4
-      slim_band: 30d15c2c287824bfaa7141c1a5edf623da62d95ced050f0e08dd859f1c72e2a5
-      slim_floor: 5188547e15b476eb3764e89acdc8eda74ac623a833ed25a797e359e6adeeeb75
+      B_y: 02589823e50015f70014d9f9f172cc8690c568e6f984ac11f9677de091829f66
+      B_band: 1ad43df57ca8b7b3454752f83a09ad98db5f19034f9c8afe593f01734e2b1019
+      B_floor: bad641021b9ad368e79680d90a092d671bd6f092363df40c7d2c41975cd022c4
+      slim_y: 5b0e3968f52b423ba37cca29d972011384167937c68f308ca8f8f5f50c331151
+      slim_band: 81bb08dfbea7ff5c291334e728cec6e31fd0b57cc7a0e51d31f44fb35b6ec509
+      slim_floor: ba314f495285e0875c7be03367b83ab593238dcd90c70b9bbc5f621fdf7dcc99
   bats_d2:
     scenario: bats
     seed: 3
@@ -103,6 +103,6 @@ vectors:
     n_words: 320000
     sha256:
       words: 16228888aa455fed81dc95a61b286c0dc3cd63eb91063b9c277c8a42c88a7b8e
-      B_y: 00797de85c7795bce5be8ef96842cba356479f6444fc7aea5dd8bcf9faeb6810
-      B_band: e5f8d944a6967e7caf36f6fd989d6f4e037a041c63a999cbf4046197953ba799
-      B_floor: f5d887f831bb0eae5b337f94e774cf7fd12adb49b9c5cec3ac72b1adaeb0c802
+      B_y: 87a22a6d2bbb1a5b7175ffad7f32a88320feeb3d65d9111a927f9c427a0d05a7
+      B_band: a75e19f02090ab9ad116e252124d70ae99499b3005f080cdebbc915779bd959c
+      B_floor: a27130166fcedeae04565d8593a7d9b02570d53f9c41b6432d0bf64a931e35bb

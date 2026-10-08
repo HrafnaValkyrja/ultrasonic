@@ -35,6 +35,17 @@ def mic_response_db(f):
     return np.where(f < 10e3, np.interp(f, [0, 10e3], [0, _RDB[0]]), np.interp(f, _RF, _RDB))
 
 
+def eq_notch_power(f):
+    """SAI-13 mic-port resonance cut |H|^2 of the active design (fw/variants.yaml mic_notch; ULTRASONIC_DESIGN=k4 -> k4 else r2);
+    same formula as fw/tools/dsp_tables.notch_power, which folds it into FW_DSP_EQ2."""
+    import os, yaml
+    d = "k4" if os.environ.get("ULTRASONIC_DESIGN", "").strip().lower() == "k4" else "r2"
+    n = {k: float(v["val"]) for k, v in yaml.safe_load((REPO / "fw/variants.yaml").read_text())["mic_notch"][d].items() if isinstance(v, dict)}
+    a = 10 ** (-n["depth_db"] / 40)
+    s = 1j * np.asarray(f, float) / n["f0_hz"]
+    return np.abs((s * s + s * a / n["q"] + 1) / (s * s + s / (a * n["q"]) + 1)) ** 2
+
+
 def microphone(p_pa, seed=0, noise_scale=1.0):
     """Pressure (Pa, at FS_IN) -> digital full-scale units (1.0 = 0 dBFS sine peak ~ 0 dBFS rms*sqrt2)."""
     n = len(p_pa)
@@ -98,7 +109,7 @@ def algo_b(x, cfg: BConfig = BConfig()):
     edges = band_edges(cfg)
     band_of_bin = np.digitize(freqs, edges) - 1
     valid = (band_of_bin >= 0) & (band_of_bin < cfg.n_bands)
-    eqg = 10 ** (-mic_response_db(freqs) / 20) if cfg.eq else np.ones_like(freqs)
+    eqg = 10 ** (-mic_response_db(freqs) / 20) * np.sqrt(eq_notch_power(freqs)) if cfg.eq else np.ones_like(freqs)
     n_hops = (len(x) - cfg.nfft) // cfg.hop
     out_per_hop = cfg.hop * FS_OUT // FS            # 8 output samples per 0.64 ms hop
     hop_s = cfg.hop / FS

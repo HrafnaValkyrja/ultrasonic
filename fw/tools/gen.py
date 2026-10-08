@@ -231,7 +231,7 @@ def tables():
 def dsp_tables():
     sys.path.insert(0, str(FW / "tools"))
     import dsp_tables as dt                                          # noqa: E402
-    srcs = [FW / "tools/dsp_tables.py", REPO / "sim/dsp/pipeline.py", REPO / "sim/data/sph0641_ultrasonic_response.json"]
+    srcs = [FW / "tools/dsp_tables.py", REPO / "sim/dsp/pipeline.py", REPO / "sim/data/sph0641_ultrasonic_response.json", FW / "variants.yaml"]
     hdr = HDR.format(src="fw/tools/dsp_tables.py (filters + tables from sim/dsp/pipeline.py, sim/e2e/stages.py)", h=inputs_hash(srcs))
     return dt.generate(hdr), [str(Path(s).relative_to(REPO)) for s in srcs]
 

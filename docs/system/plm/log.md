@@ -688,3 +688,4 @@
 - 2026-10-08 08:41 review REG-POD-BODY by claude: O34/ECR-0024 lift default: spec O34 and whole doc consistent
 - 2026-10-08 08:41 review PHYSICAL by claude: O34/ECR-0024 lift default: spec O34 and whole doc consistent
 - 2026-10-08 08:41 review REG-ARM by claude: O34/ECR-0024 lift default: spec O34 and whole doc consistent
+- 2026-10-08 10:53 review SUB-PROCESSING by SAI-13 worker: pipeline.py gained eq_notch_power (mic-port notch); doc line 80 updated

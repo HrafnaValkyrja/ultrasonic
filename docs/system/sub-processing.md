@@ -77,7 +77,7 @@ free_NC: {2: PC13 (keep static, ES §2.2.1), 5: PH0, 6: PH1, 13: PA3 (ADC1_IN8; 
 - reference_models: `sim/dsp/pipeline.py` (float64 chain; models D2 fallback decimation 400 kS/s + 31-tap half-band, not ADF D1), `sim/dsp/run_phase1.py`, `sim/dsp/nature_demo.py` (3 WAVs in `sim/out/nature/`), `sim/checks/{idle_detector,ntf_compare,pwm_ultrasonic_leak,deadtime_switching,power}.py`, `sim/e2e/`. Algorithm A (2026-10-07, lead decision): causal two-stage decimator 16-tap /4 + 40-tap /4 then HP at 12.5 kS/s (`a_decimators()`, `algo_a_base()`), identical in fw/core (ARM L0 bit-exact on QEMU); A bat-call recall 0.39 (E2-ALGO).
 ```
 ADF1 -GPDMA-> SRAM ring 200 kS/s -IRQ per hop-> CPU
-  B: 256-pt real FFT -> 28-32 log bands 20-85 kHz -> mic EQ -> floor / transient gate -> envelopes -> oscillator bank 12.5 kS/s
+  B: 256-pt real FFT -> 28-32 log bands 20-85 kHz -> mic EQ (datasheet inverse x SAI-13 port-resonance notch: fw/variants.yaml mic_notch, r2 63 kHz, K4 44.4 kHz; 2026-10-08) -> floor / transient gate -> envelopes -> oscillator bank 12.5 kS/s
   A: x LO -> low-pass -> /16 -> 12.5 kS/s -> envelope squelch
   -> volume (D3) -> ceiling (D17) -> x16 interpolate -> 3rd-order shaper + TPDF dither -GPDMA burst-> TIM1 CCR1..CCR3, 200 kHz
 Control: EXTI PA0, I2C2 + EXTI PA15, ADC1/ADC4, TIM4 LED, USB FS (CDC self-test, ROM DFU), SWD, USART1_TX printf PB6

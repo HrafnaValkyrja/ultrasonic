@@ -51,3 +51,15 @@ matrix:   # every row builds and passes the host tests (fwsim stage `variants`)
   - {cell: PH2_175, exemption: b}
   - {cell: K1_130, exemption: a}
   - {cell: K1_130, exemption: b}
+
+# ---- mic-port resonance EQ notch (SAI-13): cut applied to the per-bin power scale FW_DSP_EQ2 (dsp_tables.py); chosen at gen time by ULTRASONIC_DESIGN (k4 -> k4, else r2)
+# peaking-EQ cut, analog prototype H(s)=(s^2+s*A/Q*w0+w0^2)/(s^2+s/(A*Q)*w0+w0^2), A=10^(-depth_db/40): |H(f0)| = -depth_db. Bench sweep refines f0/Q/depth (SAI-13 stays open).
+mic_notch:
+  r2:
+    f0_hz: {val: 63000, src: "ECR-0018 log 2026-10-07; sub-audio-in.md key numbers: peak 63.0 kHz Q6.4 (EQ target)"}
+    q: {val: 6.4, src: "same"}
+    depth_db: {val: 11.5, src: "sub-audio-in.md in-pod highest +11.5 dB re median at 63.6 kHz (port_results.json spec_checks.phase2_r2, 2026-10-07)"}
+  k4:
+    f0_hz: {val: 44400, src: "sim/acoustics/out/port_results.json scenarios.phase2_r2.abs_peaks_re_1k 44391 Hz, ULTRASONIC_DESIGN=k4 run_port.py (K4-ACO, 2026-10-08)"}
+    q: {val: 6.8, src: "same abs_peaks_re_1k q"}
+    depth_db: {val: 10.8, src: "sub-audio-in.md K4 duct entry: in-pod peak +10.8 dB re median at 44.4 kHz Q6.8 (2026-10-08)"}

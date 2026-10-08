@@ -136,14 +136,14 @@
    }
   },
   "SUB-PROCESSING": {
-   "by": "backlog-agent",
-   "date": "2026-10-07",
-   "note": "round 8 router batch (ECR-0018 log): R23 1M I_SENSE offset (OUT-1B), TP2/TP4 swap (DBG-2), mic NPTH D0.65 at (1.90, 6.0) Port0.65 footprint (SAI-15D), local re-route of BTN/I_SENSE/SWCLK; DK-17D (R24/PA9) not routable locally, backed out (reg-board 22). DRC 0/0/0 all severities, place_r2 check PASS, noise smoke PASS (M03 1.32 %), acoustics MC60 mean +5.93 dB / R14 all-pass 0.63, interfaces/bom_check no FAIL, shell_r2 valid",
+   "by": "SAI-13 worker",
+   "date": "2026-10-08",
+   "note": "pipeline.py gained eq_notch_power (mic-port notch); doc line 80 updated",
    "stamp": {
     "block:CLOCK": "2ac3a525f62269dc",
     "block:CORE_SMPS": "c2e952ea730a4765",
     "block:MCU": "60387f07208e3c06",
-    "glob:sim/dsp/*.py": "0044390e25166ce3"
+    "glob:sim/dsp/*.py": "49168481b634d837"
    }
   },
   "SUB-UI": {

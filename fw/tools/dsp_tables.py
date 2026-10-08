@@ -80,6 +80,23 @@ def a_noise_sm():
     return float(np.mean(sm[len(sm) // 4:]))
 
 
+def mic_notch():
+    """SAI-13 notch of the active design (ULTRASONIC_DESIGN=k4 -> k4, anything else -> r2) from fw/variants.yaml."""
+    import os
+    import yaml
+    d = "k4" if os.environ.get("ULTRASONIC_DESIGN", "").strip().lower() == "k4" else "r2"
+    v = yaml.safe_load((REPO / "fw/variants.yaml").read_text())["mic_notch"][d]
+    return {"design": d, **{k: float(v[k]["val"]) for k in ("f0_hz", "q", "depth_db")}}
+
+
+def notch_power(f, f0, q, depth_db):
+    """|H|^2 of the analog peaking-EQ cut (gain -depth_db at f0, bandwidth f0/q)."""
+    a = 10 ** (-depth_db / 40)
+    s = 1j * np.asarray(f, float) / f0
+    h = (s * s + s * a / q + 1) / (s * s + s / (a * q) + 1)
+    return np.abs(h) ** 2
+
+
 def generate(hdr):
     sys.path.insert(0, str(REPO / "sim/dsp"))
     import pipeline as pl                                               # noqa: E402
@@ -87,10 +104,14 @@ def generate(hdr):
     win = np.hanning(NFFT)
     freqs = np.fft.rfftfreq(NFFT, 1 / FS)
     eq2 = (2.0 / win.sum() * 10 ** (-pl.mic_response_db(freqs) / 20)) ** 2
+    nt = mic_notch()
+    eq2 = eq2 * notch_power(freqs, nt["f0_hz"], nt["q"], nt["depth_db"])
     o.append("/* algo_b analysis window: np.hanning(256) x 2^-31 (DR word = s24 << 8 -> FS) */")
     o += arr("FW_DSP_HANN", win * 2.0 ** -31)
     o.append("/* per-bin power scale (2/sum(win) x 10^(-mic_response_db(f)/20))^2, pipeline.algo_b eq=True, bins 0..128 */")
     o += arr("FW_DSP_EQ2", eq2)
+    o.append(f"/* mic-port resonance notch folded into FW_DSP_EQ2 (variants.yaml mic_notch.{nt['design']}) */")
+    o.append(f"#define FW_DSP_NOTCH_F0_HZ {nt['f0_hz']:.1f}f\n#define FW_DSP_NOTCH_Q {nt['q']:.2f}f\n#define FW_DSP_NOTCH_DEPTH_DB {nt['depth_db']:.2f}f")
     nbt = noise_bands()
     o.append("/* mic self-noise band energy (stages.DspStage calibration: nominal EIN, seed 99, 0.5 s); default until a unit calibration is loaded */")
     o += arr("FW_DSP_NOISE_SPEC", nbt["SPEC"])

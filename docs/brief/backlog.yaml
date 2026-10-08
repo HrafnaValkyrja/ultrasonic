@@ -133,7 +133,7 @@ hardware:   # parts / bench / built board (O21: nothing ordered before freeze)
   - {id: SAI-6, t: "RSFLT at 800 kHz swept tone", k4: "valid"}
   - {id: SAI-7, t: "MIC_VDD self-noise capture", k4: "MIC_VDD crosses BM28 pin 6"}
   - {id: SAI-11, t: "PB4 back-feed in reset/DFU: meter", k4: "valid"}
-  - {id: SAI-13, t: "63 kHz EQ notch constant from a bench sweep", k4: "valid"}
+  - {id: SAI-13, t: "mic-port EQ notch constant refined from a bench sweep (r2 63.0 kHz Q6.4 -11.5 dB; K4 44.4 kHz Q6.8 -10.8 dB)", k4: "firmware variant-selectable 2026-10-08 (fw/variants.yaml mic_notch, folded into FW_DSP_EQ2, ULTRASONIC_DESIGN=k4); bench sweep refinement still open"}
   - {id: DBG-8, t: "ROM DFU pauses charging: check with a cell", k4: "valid"}
   - {id: RB-4, dup: [OUT-9 J-pad, 00-whole risk 1], t: "meter adjacent J pads in bring-up step 1", st: "stale-closed 2026-10-08 (K4: r2 J-pad adjacency meter step; K4 pad set differs (TP1-TP5 on P, dock pads on M) -> K4-BRINGUP)"}
   - {id: RPB-17, t: "600k-press + drop coupon (MZD-7) + 1.6 N kitchen-scale press test (UI-2 bench half)", note: "analysis done (UI-2)", k4: "SW1 on M belly; coupon + press test re-point to shell_k4"}
@@ -177,7 +177,7 @@ item_dep:   # waits on another item
   - {id: RPB-9, t: "r2 render dump + STEP export", blk: "item:ECR-0018 owner review edits", st: "stale-closed 2026-10-08 (K4: r2 render dump; K4 dump after ECR-0020/0021 implemented (K4-DIAG))"}
   - {id: RPB-13, t: "seam corner butt joints: sealant bead or corner key", blk: "item:RPB-5 (sealing note) -> note done 2026-10-07: rec = RTV fillet bead in each corner (S2); confirm on the spray coupon (hardware)", k4: "corner joints reused in shell_k4"}
   - {id: UI-4, t: "button skin material", blk: "owner-confirm (feel)", st: "options written 2026-10-07 (sub-ui issue 4)", opts: "A (rec) Wacker ELASTOSIL Film 2030 silicone film 300 um (+-5 %, compression set 5 %, glues with silicone adhesive) in a recess deepened to 0.30 (puck kit -0.05) / B 0.25 TPU film (easy bond, stiffer, creeps) / C moulded Sugru (no purchase, poor thickness control)", commit: "ed4e7dd", k4: "valid"}
-  - {id: RPB-3, t: "body-side mic path", blk: "item:SAI-3, SAI-13", k4: "valid; SAI-3/SAI-13 unchanged"}
+  - {id: RPB-3, t: "body-side mic path", blk: "item:SAI-3, SAI-13", k4: "valid; SAI-3 unchanged; SAI-13 notch now 44.4 kHz (sim), sweep open"}
 
 info_only:   # check WARNs that are tracked elsewhere, not work items
   - {id: CHK-PINS, t: "interfaces [pins] 3 known hazards (GB_N PB15, MIC_DATA PB4, TS PA2), ECR-0013 implemented"}
