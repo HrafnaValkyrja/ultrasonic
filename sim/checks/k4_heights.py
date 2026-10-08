@@ -43,18 +43,18 @@ H = [
 # ECR-0022 / K4-HEIGHTS (2026-10-08): per-reference MAX heights read from datasheets / spec sheets (lcsc.com datasheet PDFs fetched 2026-10-08, pdftotext). Overrides the footprint table.
 # Samsung catalog (CL05A475MP5NRNC datasheet C23733) lists T per part: 4.7u/10V 0.65, 1u/25V 0.60, 10u/10V 0402 0.70 (spec sheet CL05A106MP5NUNC: 0.50 +-0.20); 2.2u/10V CL05A225KP5NSN not listed: 0.60 [T, KO5 sibling].
 REF_H = {
- "C16": (0.65, "Samsung CL05A475MP5NRNC 4.7u 10V 0402 T max 0.65 (Samsung MLCC catalog in LCSC C23733 datasheet, 2026-10-08)"),
- "C17": (0.60, "Samsung CL05A105KA5NQNC 1u 25V 0402 T 0.60 (same catalog)"), "C18": (0.60, "same as C17"),
+ "C16": (0.39, "Samsung CL03A225MP3CRNC 2.2u 10V X5R 0201 T 0.30 +-0.09 = 0.39 max (Samsung spec sheet LCSC C318539, 2026-10-08); ECR-0022 gap swap, was 4.7u 0402 0.65"),
+ "C17": (0.39, "Samsung CL03A105MO3NRNC 1u 16V X5R 0201 T 0.30 +-0.09 = 0.39 max (Samsung spec sheet LCSC C318540, 2026-10-08); ECR-0022 gap swap, was 1u 25V 0402 0.60"), "C18": (0.60, "same as C17"),
  "C21": (0.70, "Samsung CL05A106MP5NUNC 10u 10V 0402 T 0.50 +-0.20 = 0.70 max (Samsung spec sheet C315248, 2026-10-08)"),
  "C15": (0.55, "Murata GRM155R61E475ME15D 4.7u 25V 0402: T code 5 = 0.50 +0.05 [T: Murata catalog row not extractable]"),
- "C9": (0.60, "Samsung CL05A225KP5NSN 2.2u 10V 0402 code 5: 0.60 [T: sibling KO5 row 0.60]"), "C8": (0.60, "same as C9"),
+ "C9": (0.39, "Samsung CL03A225MP3CRNC 2.2u 10V X5R 0201 0.39 max (C318539, 2026-10-08); ECR-0022 gap swap"), "C8": (0.60, "Samsung CL05A225KP5NSN 2.2u 10V 0402 code 5: 0.60 [T: sibling KO5 row 0.60]; outer face, not in the gap"),
  "U1": (0.60, "ST DS13737 Table 154 UFQFPN48 A max 0.600 (LCSC C5271013 datasheet, read 2026-10-08)"),
  "Y1": (0.60, "Seiko Epson X1A0000610006 2.0x1.2 '0.6 Max.' (LCSC C99009 datasheet, 2026-10-08)"),
  "U4": (0.40, "TI TPS7A20 DQN X2SON package drawing '0.4 MAX' (LCSC C5220164 datasheet, 2026-10-08)"),
  "U6": (0.60, "TI TPD2E2U06 DRL 'SOT - 0.6 mm max height' (LCSC C1972959 datasheet, 2026-10-08)"),
  "D4": (0.50, "Nexperia PMEG3005EL SOD882 outline 0.50/0.46 (LCSC C282565 datasheet, 2026-10-08)"),
- "D5": (0.40, "TI TPD1E10B06 DPY X1SON [T: outline is an image in the PDF, 0.4 from TI package family]"),
- "U3": (0.50, "TI BQ25180 YBG DSBGA [T: outline is an image in the PDF; K0 pocket 0.65 is the tape, not the part]"),
+ "D5": (0.45, "TI TPD1E10B06 DPY0002A 'X1SON - 0.45 mm max height' (TI datasheet pp.19-29, fetched 2026-10-08)"),
+ "U3": (0.50, "TI BQ25180 YBG0008-C01 'DSBGA - 0.5 mm max height' (TI SLUSE99C Jan 2023 p.53, read 2026-10-08)"),
  "L1": (1.00, "Murata DFE201610E-2R2M: 2.0x1.6x1.0 max (name H1.0; V9 [V]); datasheet text has no T row"),
  "R21": (0.40, "Panasonic ERJ2BSFR10X 0402 0.33-ish; kept 0.40 (Uni-Royal 0402 R T 0.35 +-0.05 for siblings)"),
  "R30": (0.40, "Uni-Royal 0402WGF330JTCE T 0.35 +-0.05 = 0.40"), "R20": (0.40, "Uni-Royal 0402WGF0000TCE T 0.35 +-0.05 = 0.40"),
@@ -196,6 +196,34 @@ def main():
     R["swap_route"] = dict(margin_target=MARG, lid_face_max_part_h=round(lid_allow, 3), n_lid_parts_over=sum(1 for p in lidp if p["h"] > lid_allow),
                            gap_max_part_h=round(gap_allow, 3), gap_over=[g.get("m") or g.get("p") for g in chk if g["clear_worst"] < MARG],
                            verdict=("INFEASIBLE: no SMD part is <= %.3f mm, so a flat lid + 0.25 VHB takes zero components on M file B; the gap side needs <= %.2f mm (0201/0402-0.4 only)" % (lid_allow, gap_allow)) if lid_allow < 0.2 else "feasible")
+    # 7. ECR-0023 floor post under P on the U1 top: footprint vs the routed P floor-face parts, tolerance chain, fit window, never-negative rule
+    px0, px1 = K.POST_X - K.POST_W / 2, K.POST_X + K.POST_W / 2
+    pz0, pz1 = 6.0 - K.POST_W / 2, 6.0 + K.POST_W / 2                 # board y = centre line (SW1/BM28/mic 6.0)
+    pbox = (px0 + bP[0], H - pz1 + bP[1], px1 + bP[0], H - pz0 + bP[1])       # stack frame -> P file frame (P mirrored on y)
+    def inside(a, b, m=0.0):
+        return a[0] >= b[0] + m and a[1] >= b[1] + m and a[2] <= b[2] - m and a[3] <= b[3] - m
+    u1 = next(p for p in Pp if p["ref"] == "U1")
+    # U1 body 7 x 7 centred on its courtyard box (courtyard = body + 0.675 each side, ST DS13737 UFQFPN48 7x7); pin-1 dot / lead pads are at the body edge, keep the post 0.5 inside
+    cx, cy = (u1["box"][0] + u1["box"][2]) / 2, (u1["box"][1] + u1["box"][3]) / 2
+    ubody = (cx - 3.5, cy - 3.5, cx + 3.5, cy + 3.5)
+    others = [p["ref"] for p in Pp if p["face"] == "B" and p["ref"] != "U1" and overlap(pbox, p["box"])]
+    items = [TOL["vhb"], TOL["board"], TOL["bm28"], TOL["board"], TOL["cavity"], TOL["cavity"], K.U1_H_TOL]
+    lin_p, rss_p = tol_stack(items)
+    j21 = next(p for p in Pp if p["ref"] == "J21")
+    meas_err = 0.02
+    R["floor_post"] = dict(
+        post_board_x=[round(px0, 2), round(px1, 2)], post_board_y=[round(pz0, 2), round(pz1, 2)], p_file_box=[round(v, 2) for v in pbox], u1_body_p_file=[round(v, 2) for v in ubody],
+        inside_u1_body_with_0p5_edge_margin=inside(pbox, ubody, 0.5), other_p_floor_face_parts_hit=others, in_bm28_x_span=bool(j21["box"][0] <= pbox[0] and pbox[2] <= j21["box"][2]),
+        lever_post_to_bm28_centre_mm=round(abs((px0 + px1) / 2 - (j21["box"][0] + j21["box"][2]) / 2 + bP[0] * 0), 2), lever_sw1_to_post_mm=round(abs(5.3 - K.POST_X), 2),
+        chain_items=items, chain_lin=round(lin_p, 3), chain_rss=round(rss_p, 3), nominal_gap=K.POST_GAP,
+        as_printed_gap_range_lin=[round(K.POST_GAP - lin_p, 3), round(K.POST_GAP + lin_p, 3)], as_printed_gap_range_rss=[round(K.POST_GAP - rss_p, 3), round(K.POST_GAP + rss_p, 3)],
+        fixed_height_post_verdict="FAIL as a fixed-height part: as-printed gap spans %.2f..%.2f mm linear (%.2f..%.2f RSS), i.e. up to %.2f mm of PRELOAD on the BM28/ledge VHB; a 0.05 nominal rigid post cannot be both effective and never-negative" % (K.POST_GAP - lin_p, K.POST_GAP + lin_p, K.POST_GAP - rss_p, K.POST_GAP + rss_p, lin_p - K.POST_GAP),
+        fit=dict(method="measure with the stack bonded to the lid, before the lid goes on: depth of U1 top below the lid seam plane vs post top below the tub seam plane (caliper depth / micrometer); add PET or Kapton shim (0.025/0.05/0.1) or trim the post top to the fitted gap",
+                 target_gap=K.POST_GAP, measurement_error=meas_err, fitted_gap_range=[round(K.POST_GAP - meas_err, 3), round(K.POST_GAP + meas_err, 3)], never_negative=K.POST_GAP - meas_err >= 0,
+                 shim_or_trim_lin=[round(-lin_p, 3), round(lin_p, 3)], shim_or_trim_rss=[round(-rss_p, 3), round(rss_p, 3)]),
+        load_on_u1_top_MPa=dict(N2=round(2.0 / (K.POST_W ** 2), 3), N10=round(10.0 / (K.POST_W ** 2), 3)),
+        note="P floor face under the whole BM28 line (J21 x %.2f-%.2f) is U1; a post on a part-free spot (x < 4 or the y 9-11.5 row) would load the plug as a couple (2 N x ~3-7 mm) and tip P. Post height above the floor as printed %.2f." % (j21["box"][0], j21["box"][2], K.POST_TOP_Y - K.CAV["y0"]))
+    R["floor_post"]["pass"] = bool(R["floor_post"]["inside_u1_body_with_0p5_edge_margin"] and not others and R["floor_post"]["in_bm28_x_span"] and R["floor_post"]["fit"]["never_negative"])
     print(json.dumps(R, indent=1, default=str) if "--json" in sys.argv else json.dumps({k: R[k] for k in R if k != "faces"} | {"faces": R["faces"]}, indent=1, default=str))
     (ROOT / "sim/out").mkdir(exist_ok=True)
     (ROOT / "sim/out/k4_heights.json").write_text(json.dumps(R, indent=1, default=str))

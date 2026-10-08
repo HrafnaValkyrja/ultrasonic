@@ -47,9 +47,9 @@
    }
   },
   "REG-BOARD": {
-   "by": "K4 ledge agent",
+   "by": "K4 gap agent",
    "date": "2026-10-08",
-   "note": "ECR-0022 ledge + C21 0402",
+   "note": "ECR-0022 thin MLCCs",
    "stamp": {
     "file:hw/pod/draft_r2/out/routed.kicad_pcb": "db9136df8bc9b089",
     "file:hw/pod/draft_r2/placement.yaml": "35192f3dd7427e78",

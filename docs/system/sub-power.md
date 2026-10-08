@@ -34,7 +34,7 @@ tree:   # nets as in integration-map §3/§5 (Phase 2 nets == Rev G)
   DOCK_VBUS: {from: J3 (dock contact), parts: [D5 ESD to GND at the contact], to: D4.A}
   VBUS: {from: D4.K (PMEG3005EL, reverse-dock block), parts: [C15 4.7 µF 25 V, R12/R13 100k/100k -> VBUS_SENSE PA1], to: U3.A2 IN}
   VSYS: {from: U3.B2 SYS, parts: [C21 10 µF], value: "4.5 V docked (SYS_REG default); ≈ VBAT - I x 55 mΩ on battery", to: [U4 IN/EN, C17, R14 -> LED_A (J7), TP6]}
-  VBAT: {from: cell via J5 (cell +) / J4 (cell -, shared GND), parts: [C16 4.7 µF, R8/R9 1M/1M + C19 -> VBAT_SENSE PA4], to: U3.C2 BAT (battery FET 55 mΩ)}
+  VBAT: {from: cell via J5 (cell +) / J4 (cell -, shared GND), parts: [C16 2.2 µF 0201 (ECR-0022), R8/R9 1M/1M + C19 -> VBAT_SENSE PA4], to: U3.C2 BAT (battery FET 55 mΩ)}
   LDO_OUT: {from: U4 OUT (TPS7A2030 3.0 V), parts: [C18 1 µF], to: R20 0 Ω}
   +3V0: {from: R20, loads: [U1 VDD/VDDA/VDDSMPS/VBAT, Q1/Q2 S_P + C14 22 µF, R15/R16 I2C pull-ups, SW1, mic via PA5, TP4]}
   TS: {nodes: [U3.D1 TS/MR, PA2, RT1 (on board) OR J9 (cell NTC), never both]}
@@ -62,9 +62,9 @@ J4: {part: "1.0 x 2.0 mm wire pad pod:WirePad_1.0x2.0mm, GND = dock GND + cell -
 R20: {part: "0 Ω 0402 link LDO_OUT -> +3V0 (kept 0402 as a hand hook, gen.py MZ2 comment)", lcsc: C17168 · Basic, xy: "(23.0, 11.0)", note: "test hook (O9/O15); carries every +3V0 mA, bridge peaks included (PWR-I6)"}
 R8_R9_C19: {part: "1 MΩ / 1 MΩ divider 0201 + 100 nF 0201", lcsc: "C473482 (R8/R9), C76934 (C19)", xy: "R9 (15.4, 1.0), R8 (15.4, 1.85), C19 (15.4, 2.7)", note: "VBAT/2 -> PA4; always connected, 2.1 µA at 4.2 V"}
 R15_R16: {part: "10 kΩ 0201 pull-ups to +3V0 on I2C_SCL / I2C_SDA", lcsc: C473048, xy: "R15 (17.4, 1.0), R16 (17.4, 1.85)", src: "TI asks 10 kΩ on SCL/SDA (SLUSE99C Table 6-1)"}
-C16: {val: "4.7 µF 10 V X5R 0402 (VBAT)", lcsc: C23733 · Basic, xy: "(20.9, 2.3), VBAT pad 1.0 mm from ball C2"}
+C16: {val: "2.2 µF 10 V X5R 0201 (VBAT; ECR-0022 gap swap 2026-10-08, T 0.39 max; TI CBAT min 1 µF nom 1 µF; was 4.7 µF 0402 C23733)", lcsc: C318539 · Extended (JLC API 2026-10-08), xy: "(20.9, 2.3), VBAT pad 1.0 mm from ball C2"}
 C21: {val: "10 µF 10 V X5R 0603 (VSYS)", lcsc: C19702 · Basic, xy: "(20.2, 0.9)", note: "TI recommends 25 V on IN/SYS (SLUSE99C 9.2.2.1); derated value must stay > 1 µF (CSYS 1/10/100 µF min/nom/max, Table 9-2); still 10 V (PWR-I14)"}
-C17_C18: {val: "1 µF 25 V X5R 0402, LDO in / out", lcsc: C52923 · Basic, xy: "C17 (23.0, 9.6), C18 (23.0, 6.5) beside U4 OUT pin 1", note: "C18 must stay at U4 for stability"}
+C17_C18: {val: "C18 1 µF 25 V X5R 0402 LDO out; C17 (LDO in) 1 µF 16 V X5R 0201 since ECR-0022 2026-10-08, T 0.39 max, derate check vs TPS7A20 CIN open", lcsc: C52923 · Basic (C18), C318540 · Extended (C17, JLC API 2026-10-08), xy: "C17 (23.0, 9.6), C18 (23.0, 6.5) beside U4 OUT pin 1", note: "C18 must stay at U4 for stability"}
 C15: {val: "4.7 µF 25 V X5R 0402 Murata GRM155R61E475ME15D, VBUS at U3 IN (block DOCK_USB)", lcsc: "C2858031 · Extended · $0.0833 (bom.md, JLC API 2026-10-02T23:50Z)", xy: "(20.9, 3.4), VBUS pad 1.0 mm from ball A2", note: "<= 10 µF USB attach limit; 25 V per SLUSE99C 9.2.2.1 (ECR-0013 S3)"}
 D5: {part: "TI TPD1E10B06DPYR bidirectional ESD, 5.5 V working, X1SON-2, DOCK_VBUS to GND near J3 (block DOCK_USB)", lcsc: "C48260 · $0.0417 (bom.md)", xy: "(25.0, 3.5)", owner_doc: sub-dock-usb}
 D4: {part: "Nexperia PMEG3005EL 30 V 0.5 A Schottky, SOD-882 (DFN1006-2), DOCK_VBUS -> VBUS (block DOCK_USB)", lcsc: "C282565 · Extended · stock 43,342 · $0.115 (bom.md, 2026-10-07T11:31Z)", xy: "(22.9, 1.0)", owner_doc: sub-dock-usb,

@@ -379,15 +379,17 @@ BOARD_OF = {r: "M" for r in (
     "R14", "J7", "J8",                             # LED feed (VSYS), LED wire pads; LED_K crosses to PB7
     "TP4", "TP5", "TP10", "R15", "R16")}           # 2026-10-08 unload P->M (ECR-0020 rev 4): +3V0/GND/MIC_DATA pads, I2C pull-ups (+3V0 is on M)
 # Everything not listed is P.
-BM28_PINS = {    # pin -> net. Odd pins row A, even pins row B; pins (2k-1, 2k) face each other [T].
-    1: "GND", 2: "GND", 3: "MIC_CLK", 4: "GND", 5: "GND", 6: "MIC_VDD", 7: "MIC_DATA", 8: "GND", 9: "GND", 10: "GND",
-    11: "USB_DP", 12: "GND", 13: "USB_DM", 14: "GND", 15: "GND", 16: "GND", 17: "+3V0", 18: "+3V0", 19: "+3V0", 20: "GND",
-    21: "GND", 22: "TS", 23: "I2C_SCL", 24: "GND", 25: "I2C_SDA", 26: "CHG_INT", 27: "VBUS_SENSE", 28: "VBAT_SENSE",
-    29: "BTN", 30: "LED_K"}
-# Shielding: MIC_CLK(3) GND at 1,5,4; MIC_DATA(7) GND at 5,9,8; MIC_VDD(6) GND at 4,5,8; USB_DP/DM (11,13) pair with GND at 9 and 15 (row)
-# and 12, 14 (facing); +3V0 on 17,18,19 (3 contacts, <= 0.3 A each [T]: bridge peaks 315 mA sit on local C14 22 uF; mean < 0.1 A).
-# 16 signal/power + 14 GND. 20 contacts do not fit (16 + >= 6 GND shielding the PDM trio and the D+/D- pair).
-
+BM28_PINS = {    # pin -> net. Footprint numbering: pads 1-15 one row, 16-30 the other; pad n faces pad 31-n; the 180-deg reversed mate pairs n <-> n+/-15 [V: footprint geometry].
+    # K4-BM28-REV (2026-10-08): checkerboard. Signals only on odd pads 1-13 and 19-29, so every signal has GND on both row neighbours and across,
+    # and a reversed mate always puts a signal against a GND (never supply-vs-GND, never supply into a GPIO). Supply pairs mate themselves: 15<->30 (+3V0/+3V0),
+    # the 2 power contacts (tabs 31-34, 5 A, 30 mohm [T Hirose catalog]) are +3V0 too. GND/GND pairs: all remaining.
+    1: "LED_K", 2: "GND", 3: "MIC_CLK", 4: "GND", 5: "MIC_VDD", 6: "GND", 7: "MIC_DATA", 8: "GND", 9: "CHG_INT", 10: "GND",
+    11: "USB_DP", 12: "GND", 13: "USB_DM", 14: "GND", 15: "+3V0", 16: "GND", 17: "GND", 18: "GND", 19: "VBAT_SENSE", 20: "GND",
+    21: "TS", 22: "GND", 23: "I2C_SCL", 24: "GND", 25: "I2C_SDA", 26: "GND", 27: "VBUS_SENSE", 28: "GND",
+    29: "BTN", 30: "+3V0", 31: "+3V0", 32: "+3V0", 33: "+3V0", 34: "+3V0"}
+# Current budget [V sim/checks/k4_checks: bridge peak 315 mA, mean < 0.1 A, charger/VSYS never crosses]: +3V0 on 2 signal contacts + 2 power contacts (5 A):
+# worst contact 0.16 A at signal contacts if the tabs carried nothing, vs 0.3 A rating; GND return over 15 pins + shield. USB D+/D- and the MIC trio are GND-shielded both sides.
+# Reversal (n <-> n+/-15): signal-GND x13, +3V0-+3V0 x2 (+4 tabs pairwise), GND-GND x15: no short, nothing driven into a GPIO.
 
 # Placed-area estimate (V9 method): courtyard areas from hw/pod/draft_r2/out/routed.kicad_pcb (same mz2 package set), mm2.
 CY = {"C_0201_0603Metric": 0.959, "R_0201_0603Metric": 0.959, "C_0402_1005Metric": 1.647, "R_0402_1005Metric": 1.72,
