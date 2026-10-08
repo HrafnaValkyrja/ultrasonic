@@ -106,7 +106,7 @@
 				)
 			)
 		)
-		(property "Value" "X2SON-4_L1.0-W1.0-P0.65-TL-EP"
+		(property "Value" "TPS7A2030PDQNR"
 			(at 0 4.325 0)
 			(layer "F.Fab")
 			(uuid "e8821c3f-d538-40e6-bf28-fa426c604807")
@@ -410,7 +410,7 @@
 				)
 			)
 		)
-		(property "Value" "C_0201_0603Metric"
+		(property "Value" "2u2 10V"
 			(at 0 1.05 90)
 			(layer "F.Fab")
 			(uuid "7cd90984-2613-473b-891a-80ef603ba911")
@@ -550,7 +550,7 @@
 				)
 			)
 		)
-		(property "Value" "R_0201_0603Metric"
+		(property "Value" "100k"
 			(at 0 1.05 0)
 			(layer "F.Fab")
 			(uuid "0d5b91f4-d930-4868-95a0-52bedb3ed229")
@@ -690,7 +690,7 @@
 				)
 			)
 		)
-		(property "Value" "R_0201_0603Metric"
+		(property "Value" "1M"
 			(at 0 1.05 0)
 			(layer "F.Fab")
 			(uuid "4798882e-549c-4f16-8dc2-41a435eebe8d")
@@ -830,7 +830,7 @@
 				)
 			)
 		)
-		(property "Value" "D_SOD-882"
+		(property "Value" "PMEG3005EL"
 			(at 0 1.35 90)
 			(layer "F.Fab")
 			(uuid "750a84d8-4091-4c80-913f-aaf5b7a0e890")
@@ -1114,7 +1114,7 @@
 				)
 			)
 		)
-		(property "Value" "C_0201_0603Metric"
+		(property "Value" "1u 16V"
 			(at 0 1.05 90)
 			(layer "F.Fab")
 			(uuid "4d4eaac0-cd9d-4d96-9784-5a7585a73957")
@@ -1254,7 +1254,7 @@
 				)
 			)
 		)
-		(property "Value" "Knowles_LGA-5_3.5x2.65mm"
+		(property "Value" "SPH0641LU4H-1"
 			(at 0 3 0)
 			(layer "F.Fab")
 			(uuid "c9e45aa1-ab6f-494b-b011-e5bae9200272")
@@ -1573,7 +1573,7 @@
 				)
 			)
 		)
-		(property "Value" "DSBGA-8_L1.6-W0.9-R2-C4-P0.40-BL"
+		(property "Value" "BQ25180YBGR"
 			(at 0 4.2 90)
 			(layer "F.Fab")
 			(uuid "c7df0da4-46c4-4aec-9601-d235c8fc9df2")
@@ -1926,7 +1926,7 @@
 				)
 			)
 		)
-		(property "Value" "R_0201_0603Metric"
+		(property "Value" "1M"
 			(at 0 1.05 0)
 			(layer "F.Fab")
 			(uuid "787732ab-7308-48ff-bcff-04d4c949798a")
@@ -2064,7 +2064,7 @@
 				)
 			)
 		)
-		(property "Value" "CONN-SMD_BM28B0.6-30DS-2-0.35V-51"
+		(property "Value" "BM28B0.6-30DS/2-0.35V(51)"
 			(at 0 4.795 0)
 			(layer "F.Fab")
 			(uuid "dd8ccf65-8541-47cf-bc48-0c3b46a896a5")
@@ -2489,7 +2489,7 @@
 				)
 			)
 		)
-		(property "Value" "R_0201_0603Metric"
+		(property "Value" "2k2"
 			(at 0 1.05 0)
 			(layer "F.Fab")
 			(uuid "4cc823c4-76fe-4774-b652-873bcd246b93")
@@ -2629,7 +2629,7 @@
 				)
 			)
 		)
-		(property "Value" "C_0201_0603Metric"
+		(property "Value" "100n"
 			(at 0 1.05 90)
 			(layer "F.Fab")
 			(uuid "f5df6322-7370-43c1-b2ab-3540265acfa8")
@@ -2769,7 +2769,7 @@
 				)
 			)
 		)
-		(property "Value" "R_0201_0603Metric"
+		(property "Value" "100k"
 			(at 0 1.05 0)
 			(layer "F.Fab")
 			(uuid "9df075e2-f4b7-4592-a81b-6fc2489cab0b")
@@ -2907,7 +2907,7 @@
 				)
 			)
 		)
-		(property "Value" "X1SON-2_L1.0-W0.6-P0.65-BI-1"
+		(property "Value" "TPD1E10B06DPYR"
 			(at 0 4 0)
 			(layer "F.Fab")
 			(uuid "6de6e8ad-4702-4a2b-8bab-76481361335b")
@@ -3093,7 +3093,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "R_0402_1005Metric"
+		(property "Value" "0"
 			(at 0 -1.17 0)
 			(layer "B.Fab")
 			(uuid "7cd98ee1-4b72-4525-b575-17eeeddcd358")
@@ -3243,7 +3243,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "SOT-553-5_L1.6-W1.2-P0.50-LS1.6-TL-1"
+		(property "Value" "TPD2E2U06DRLR"
 			(at 0 -4.5 90)
 			(layer "B.Fab")
 			(uuid "d09e7163-2724-428a-b737-c545151a3d6f")
@@ -3450,7 +3450,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestPoint_Pad_D1.0mm"
+		(property "Value" "LED+"
 			(at 0 -1.55 0)
 			(layer "B.Fab")
 			(uuid "eda1e8ff-a561-467e-bfc3-6df2835bf813")
@@ -3553,7 +3553,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "R_0201_0603Metric"
+		(property "Value" "10k B3435"
 			(at 0 -1.05 90)
 			(layer "B.Fab")
 			(uuid "bc562c6c-b054-4eb0-851a-6774c123a65f")
@@ -3699,7 +3699,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestDot_D0.5mm"
+		(property "Value" "MIC_DATA"
 			(at 0 -0.9 0)
 			(layer "B.Fab")
 			(uuid "f1f246ea-b2ff-4080-b496-47e69e2e3c43")
@@ -3791,7 +3791,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestPoint_Pad_D1.0mm"
+		(property "Value" "NTC"
 			(at 0 -1.55 0)
 			(layer "B.Fab")
 			(uuid "181e4cfb-7c42-4439-9158-178a064ed753")
@@ -3894,7 +3894,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestPoint_Pad_D1.0mm"
+		(property "Value" "D+"
 			(at 0 -1.55 0)
 			(layer "B.Fab")
 			(uuid "8e761ce4-9202-40c3-b8c4-56e504902123")
@@ -3997,7 +3997,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "R_0201_0603Metric"
+		(property "Value" "2k2"
 			(at 0 -1.05 0)
 			(layer "B.Fab")
 			(uuid "9dcbc663-0848-432c-ae7a-c166b459bd2a")
@@ -4143,7 +4143,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "R_0201_0603Metric"
+		(property "Value" "10k"
 			(at 0 -1.05 0)
 			(layer "B.Fab")
 			(uuid "e3f9fbb9-b723-4b0e-9ad6-585001de0ae8")
@@ -4289,7 +4289,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestPoint_Pad_D1.0mm"
+		(property "Value" "VBUS"
 			(at 0 -1.55 0)
 			(layer "B.Fab")
 			(uuid "301da16e-0faf-457f-a210-96f57ca387d1")
@@ -4392,7 +4392,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "C_0201_0603Metric"
+		(property "Value" "100n"
 			(at 0 -1.05 0)
 			(layer "B.Fab")
 			(uuid "8325879f-e8ef-47eb-a915-f5628ca81ec7")
@@ -4538,7 +4538,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestPoint_Pad_D0.7mm"
+		(property "Value" "GND"
 			(at 0 -0.9 0)
 			(layer "B.Fab")
 			(uuid "92d3f29b-71c2-4f4a-a0ca-cd363320ee28")
@@ -4630,7 +4630,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestPoint_Pad_D0.7mm"
+		(property "Value" "3V0"
 			(at 0 -0.9 0)
 			(layer "B.Fab")
 			(uuid "2b649aff-1525-47c2-b3e2-07c647ec82c6")
@@ -4722,7 +4722,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "C_0402_1005Metric"
+		(property "Value" "4u7 25V"
 			(at 0 -1.16 90)
 			(layer "B.Fab")
 			(uuid "4e8c530f-4478-4fdb-b25e-fd7115f9df0e")
@@ -4874,7 +4874,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestPoint_Pad_D1.0mm"
+		(property "Value" "D-"
 			(at 0 -1.55 0)
 			(layer "B.Fab")
 			(uuid "ceb17a6c-32a2-4e70-8e53-130bf0675c2d")
@@ -4977,7 +4977,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "C_0402_1005Metric"
+		(property "Value" "10u"
 			(at 0 -1.16 90)
 			(layer "B.Fab")
 			(uuid "d667f333-96cc-4277-bd90-811a938461f6")
@@ -5129,7 +5129,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "WirePad_1.0x2.0mm"
+		(property "Value" "GND"
 			(at 0 -0.9 0)
 			(layer "B.Fab")
 			(uuid "8b2ffdb9-ce80-45db-8d23-47cff578e97e")
@@ -5222,7 +5222,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "C_0402_1005Metric"
+		(property "Value" "1u"
 			(at 0 -1.16 90)
 			(layer "B.Fab")
 			(uuid "11ea70c9-8c29-45dc-9274-06e3017d6a65")
@@ -5374,7 +5374,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "R_0201_0603Metric"
+		(property "Value" "10k"
 			(at 0 -1.05 0)
 			(layer "B.Fab")
 			(uuid "a6db1ca0-7e6e-44e9-917f-27d7e694f03f")
@@ -5520,7 +5520,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestPoint_Pad_D1.0mm"
+		(property "Value" "LED-"
 			(at 0 -1.55 0)
 			(layer "B.Fab")
 			(uuid "c0bd811d-09e6-43fe-bb33-618b636a2206")
@@ -5621,7 +5621,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "SW-SMD_4P-L3.0-W2.6-P1.85-LS3.4"
+		(property "Value" "KMT022NGJLHS"
 			(at 0 -4.925 0)
 			(layer "B.Fab")
 			(uuid "7f1f9d38-0622-48e5-a20e-b25238271b5a")
@@ -5832,7 +5832,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "R_0402_1005Metric"
+		(property "Value" "33"
 			(at 0 -1.17 90)
 			(layer "B.Fab")
 			(uuid "bed8f3cb-faa8-45aa-8c50-83a54f2dae8e")
@@ -5984,7 +5984,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestPoint_Pad_D0.7mm"
+		(property "Value" "VSYS"
 			(at 0 -0.9 0)
 			(layer "B.Fab")
 			(uuid "5062ca8f-2e2e-4bf8-8e83-e5a559785483")
@@ -6076,7 +6076,7 @@
 				(justify mirror)
 			)
 		)
-		(property "Value" "TestPoint_Pad_D1.0mm"
+		(property "Value" "BAT+"
 			(at 0 -1.55 0)
 			(layer "B.Fab")
 			(uuid "02a81380-4773-4e99-a752-c2ba5a4995cc")
