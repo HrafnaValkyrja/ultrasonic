@@ -26,3 +26,16 @@ Cavity depth y 4.9-9.7 = 4.8 (lid-hung stack 3.2 + cell 4.5 + tapes/swell). Stac
 1. **Stock cell only** + stack/gap trims: save 2.3 -> X0 ~20.0, 9.2 h. Cheap, no cell risk. Not enough.
 2. **Custom 26.8 mm cell + all trims** (rec if K4 must be trimmed): X0 24.2, 8.0 h worst, 1.95C peak. Still 5.3 over the line.
 3. To reach 29.5 you must give up a requirement: cell ~21 mm (~88 mAh) -> ~5.4 h worst and 2.5C peak, or relax peak clamp below 176 mA, or move vision line/pen test result. Recommend: do not chase; pick K1t or move the line.
+
+## Curve: X0 reached vs cost (added after R-vision 21d7274: line likely 11-21 mm, so X0 16-26 with 5 mm margin)
+Runtime worst = mAh x 0.75 / 10.55; cell mAh ~ 4.19 per mm of length at 4.5x12.7 (130/31). Order = cheapest first.
+| X0 | what it takes | cell | worst h | peak C @219 mA | cost |
+|---|---|---|---|---|---|
+| 17.65 | today | 31.0 / 130 | 9.2 | 1.7 | - |
+| 17.95-18.2 | wire gap 0.5, stop 0.10, front wall 0.5 (0.55 total) | 31.0 | 9.2 | 1.7 | tolerances only, no relayout |
+| 19.95 | + stack 13.75 long (boards re-laid 13.6 tall) | 31.0 | 9.2 | 1.7 | weeks of relayout + DRC, stock parts |
+| **21** | + cell 29.9 mm (custom ~125 mAh) | 29.9 / 125 | 8.9 | 1.75 | custom cell MOQ, small |
+| **24.2** | + cell 26.8 mm (112.5 mAh) = 8 h floor | 26.8 / 112.5 | 8.0 | 1.95 | custom cell, zero peak margin |
+| **26** | + cell 24.95 mm (~105 mAh... est 100) | 24.95 / 100 | 7.1 | 2.2 | breaks D18 >=8 h worst by 0.9 h, breaks 2C pulse; nominal method still ~11 h |
+| 29.5 | cell ~21 mm (~88 mAh) | 21 / 88 | 6.3 | 2.5 | needs peak clamp <= ~176 mA too |
+Cheap trims to X0 ~21: tolerances (0.55) + stack relayout (1.75) + a ~1 mm shorter custom cell (1.05) = 3.35 mm. To ~26: the same plus a 6 mm shorter cell, which costs the 8 h worst-case requirement (the only point on the curve that does); decide whether D18 is judged on worst or nominal.
