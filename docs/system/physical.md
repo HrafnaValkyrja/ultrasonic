@@ -172,6 +172,7 @@ Wire slack for lifting the lid with the board on its wires (DBG-17, computed 202
 - {q: VHB bonded, v: "~314 mm2 = 91 % of the tape outline", src: "interfaces.py clamp-bands; checks.json vhb_area_mm2 313.9"}
 - {q: pad contact below the temple centre, v: "z -25.0 (skin at y -3.0)", src: "frame.py PAD_CONTACT"}
 - {q: mass per side worn, v: "11.2-13.2 g (pod body 8.7-10.1) vs ~8 g target", src: "sim/checks/pod_mass.py 2026-10-07 (issue 8)"}
+- {q: mass per side worn, K4 variant (ULTRASONIC_DESIGN=k4), v: "9.05-10.15 g, CoM 36 mm behind hinge, nose 5.8-6.5 / ear 3.2-3.7 g (K1 same method: 10.08-12.04, CoM 28, 7.3-8.7 / 2.8-3.4)", src: "sim/checks/pod_mass.py 2026-10-08, sim/out/mech/pod_mass_k4.json"}
 ```
 
 ## Open issues (IDs stable; gaps = closed)

@@ -71,6 +71,7 @@ Phase-2 views are build outputs (gitignored): `python3 hw/mech/shell_r2.py` → 
 | Cell | Renata ICP501233PA-02 (Li-ion pouch with its protection circuit inside), 175 mAh, 35 × 12 × 5.3 mm | spec O16(1); `dims_r2.py` CELL |
 | Arm | NiTi (superelastic nickel-titanium) wire Ø0.80, 20 mm, 30° sweep | `frame.py`; spec O7b |
 | Pad force target | ≥ 1 N inward at the tragus | spec D1 |
+| Mass per pod, K4 variant (not the selected design; `ULTRASONIC_DESIGN=k4`, 2026-10-08) | **9.05–10.15 g per side worn** (pod body 6.49–7.04; cell 3.5), CoM 35.8–36.5 mm behind the hinge, nose 5.8–6.5 g / ear 3.2–3.7 g; K1 by the same method 10.08–12.04 g, CoM 28, nose 7.3–8.7 / ear 2.8–3.4 | `sim/checks/pod_mass.py` -> `sim/out/mech/pod_mass_k4.json` (shell_k4 STLs, dims_k4), V8 K4 balance note |
 | Mass per pod | **11.2–13.2 g per side, worn [derived 2026-10-07, `sim/checks/pod_mass.py`]**: pod body 8.7–10.1 g (cell 4.2 sourced; tub 1.52–1.56, lid + plate 0.99–1.02, board + copper + parts 0.89–1.22, dock target 0.81–1.63 [A], tapes, wires, solder) + adapter 0.50 + pad 0.99–1.02 + exciter 1.0–1.5 [Low] + NiTi 0.08. Widest unknowns: dock target (magnets) and exciter. Target ~8 g (not met by ~3–5 g), ~15 g hurts (D18, R20) | sim/out/mech/pod_mass.json from the shell_r2 STLs + pad checks.json, 2026-10-07 |
 | Current, full chain awake | 5.0 / 6.8 / 9.8 mA (low / nominal / high) | spec §7; `sim/checks/power.py` rev 2 (circuit unchanged since Rev G) |
 | Current, idle listening | 1.7 / 2.2 / 3.4 mA | same |

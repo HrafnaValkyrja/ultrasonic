@@ -93,6 +93,7 @@ evidence_pins:
   "sim/checks/niti_arm_real.py": "62944f12dd"
   "sim/checks/niti_closed_form.py": "262b850086"
   "sim/checks/ntf_compare.py": "89bf4f3e86"
+  "sim/checks/pod_mass.py": "8e0cff9c89"
   "sim/checks/power.py": "4be180d9b4"
   "sim/checks/pwm_ultrasonic_leak.py": "d1434d9786"
   "sim/checks/sot1216_footprint.py": "e90d73f50f"
@@ -821,8 +822,8 @@ requirements:
     status_by_stage: {C: partial, D: not-started}
     owner_items: [PHYSICAL, REG-POD-BODY, SUB-POWER]
     artefacts: [sim/checks/balance.py, hw/mech/shell_r1.py, hw/mech/frame.py, hw/mech/pod.py, E12, "interfaces:frame"]
-    planned: ["whole-pod mass and centre of mass from the rev-1 CAD with one density plus parts, dock target, adapter and wires"]
-    evidence: [sim/checks/balance.py, hw/mech/shell_r1.py]
+    planned: ["weigh the dummy pair and a printed K4 shell (the CAD mass uses assumed densities and [A] part ranges)"]
+    evidence: [sim/checks/balance.py, hw/mech/shell_r1.py, sim/checks/pod_mass.py]
     ecrs: [ECR-0001, ECR-0006]
     covers: [O28]
     related: [S1.2-C4, S1.3-T5, O20-finalsize]

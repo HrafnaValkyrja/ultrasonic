@@ -88,3 +88,20 @@ k1t:                                            # NON-DEFAULT study: what synthe
   shell_dims: hw/mech/dims_k1.py
   shell_out: hw/mech/out/k1t
   acoustic_scenario: phase2_r2
+
+k4:                                             # NON-DEFAULT (owner O33, ECR-0020/0021): end-to-end pod, two 6L boards P+M, 130 mAh cell, K4_DOCK=under
+  id: k4
+  name: "K4 end-to-end pod: two 6-layer boards (P upper, M lower) + Renata ICP401230UPR 130 mAh in line, flat 1.0 lid, dock under the cell"
+  ecr: ECR-0021
+  owner_decision: O33
+  packages: mz2
+  generate: "python3 hw/pod/k4/gen.py"
+  board: hw/pod/k4/routed_M.kicad_pcb
+  board_placed: hw/pod/k4/placement_M.yaml
+  placement: hw/pod/k4/placement_M.yaml
+  netlist: hw/pod/k4/pod_k4_M.net
+  bom: hw/pod/bom_jlc_mz2.csv
+  shell: hw/mech/shell_k4.py
+  shell_dims: hw/mech/dims_k4.py
+  shell_out: hw/mech/out/k4s
+  acoustic_scenario: phase2_r2
