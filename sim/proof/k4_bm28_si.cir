@@ -1,0 +1,43 @@
+K4 BM28 MIC_CLK signal integrity
+* K4 MIC_CLK edge through BM28: reflection + crosstalk into a quiet neighbour (I2C_SCL, 4.7k pull-up, 5 pF pin).
+* Line: U1 pin -> R2 33 ohm -> 12.5 mm (P) -> BM28 -> 7.1 mm (M) -> mic CLK pin (~2 pF). Lossless T-lines, Z0=70 ohm (microstrip 0.09 mm on ~0.1 mm prepreg, IPC-2141, ASSUMED stack),
+* delay 6.9 ps/mm (er_eff ~3.2 -> 6 ps/mm; 6.9 used = pessimistic). BM28 modelled 1 nH series + 0.3 pF. Coupling to the neighbour (GND pin between, 0.7 mm same-row pitch):
+* Cm = 0.2 pF and k = 0.2 total, both ASSUMED worst-case (no Hirose model, no field solve) -- bracketing, not measured.
+Vclk a 0 PULSE(0 1.8 0 2n 2n 160n 325n)
+Rs a b 33
+XT1 b c tl LEN=12.5
+Lc c d 1n
+Cc d 0 0.3p
+XT2 d e tl LEN=7.1
+Cmic e 0 2p
+* neighbour I2C_SCL: pull-up 4.7k to 3.0 V (quiet high), 5 pF pin
+Vpu pu 0 3.0
+Rpu pu v 4.7k
+Cv v 0 5p
+Cm d v 0.2p
+.subckt tl in out params: LEN=10
+* 6 LC sections; L'=Z0*td' = 70*6.9ps/mm = 0.483 nH/mm, C'=td'/Z0 = 0.0986 pF/mm
+.param ls={LEN*0.483n/6} cs={LEN*0.0986p/6}
+L1 in n1 {ls}
+C1 n1 0 {cs}
+L2 n1 n2 {ls}
+C2 n2 0 {cs}
+L3 n2 n3 {ls}
+C3 n3 0 {cs}
+L4 n3 n4 {ls}
+C4 n4 0 {cs}
+L5 n4 n5 {ls}
+C5 n5 0 {cs}
+L6 n5 out {ls}
+C6 out 0 {cs}
+.ends
+.tran 50p 700n
+.control
+set noaskquit
+run
+meas tran ovs max v(e) from=300n to=700n
+meas tran vhi_pk max v(v) from=300n to=700n
+meas tran vlo_pk min v(v) from=300n to=700n
+meas tran cmin min v(e) from=450n to=470n
+.endc
+.end

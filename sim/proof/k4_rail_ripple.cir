@@ -1,0 +1,34 @@
+* K4 +3V0 / VSYS ripple, AC impedance seen by the bridge load (1 A AC test current; V = Z * I_peak)
+* Assumptions (flagged): cell Rint 0.34 ohm (V2-cells.yaml: 88 mV @ 260 mA); R21 0.1 ohm sense; C21 10u/C4,C7 10u/C14 22u with
+* DC-bias derating factor kd (X5R at 3-4 V, estimate until A-CAP-CURVES); ESR from sim/noise/params.yaml;
+* U4 TPS7A2030 Zout: no curve in datasheet SBVS338H -> modelled 0.5 ohm || 1 uH (assumption, bracketed by 0.2..2 ohm).
+.param kd=0.5 rldo=0.5
+* VSYS side: cell + R21 + C21 (10u 0402 derated)
+Ibat 0 vsys DC 0 AC 1
+Rcell vsys cellm 0.34
+Vc cellm 0 0
+Rsns vsys v1 0.1
+Rl1 v1 0 1e9
+C21 vsys c21 {10u*kd}
+Rc21 c21 0 0.01
+* +3V0 side: LDO Zout (R||L) + local caps
+I3 0 v3 DC 0 AC 1
+Rldo v3 0 {rldo}
+Lldo v3 lx 1u
+Rlx lx 0 1e6
+C14 v3 c14 {22u*kd}
+Rc14 c14 0 0.008
+C4 v3 c4 {10u*kd}
+Rc4 c4 0 0.01
+C7 v3 c7 {10u*kd}
+Rc7 c7 0 0.01
+.control
+ac dec 20 1k 10meg
+meas ac z3_40k find vm(v3) at=40k
+meas ac z3_200k find vm(v3) at=200k
+meas ac z3_2m find vm(v3) at=2meg
+meas ac zs_40k find vm(vsys) at=40k
+meas ac zs_200k find vm(vsys) at=200k
+meas ac zs_2m find vm(vsys) at=2meg
+.endc
+.end
