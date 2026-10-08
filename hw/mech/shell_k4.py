@@ -1,0 +1,195 @@
+"""K4 end-to-end pod shell (owner O33; numbers in hw/mech/dims_k4.py). Parametric tub + flat lid, placeholder board stack.
+
+    systemd-run --user --scope --quiet -p MemoryMax=4G -p MemorySwapMax=0 python3 hw/mech/shell_k4.py     # -> hw/mech/out/k4s/*.stl, parts.json, checks.json
+    K4_RELIEF=lift python3 hw/mech/shell_k4.py                                                             # -> out/k4s_lift (cell to x 65.8, H +0.45)
+
+Reused from shell_r2: seam tongue/groove, rebate, heel (arm mount: socket, keel, conductor channel), dovetail rail, strut relief,
+VHB-hung board (board F face on the lid, mic duct = lid bore + VHB hole + board hole), KMT022 pocket + puck + skin, K1_DUCT=rec numbers.
+Dropped: belly + dock window (YZT0675 6.86 > T 6.4, DOCK_FIT), belly-step witness groove (no step: the rebate is continuous).
+
+Hand assembly (order; every fixing is glue/VHB, nothing screwed except the M1.4 set screw in the heel):
+ 1 tub on the bench, inner face down.  2 arm anchor + set screw in the heel socket (heel.py), arm wires out of the channel (x 64, z -8.6).
+ 3 VHB 0.25 on the cavity floor, cell pressed on (x 31..62); cell leads fold forward to the 0.8 gap.
+ 4 stack on its VHB to the lid inner face (F face up there: mic duct registered by the gauge pin as in r2), SW1 in the pocket, puck in the bore.
+ 5 solder 2 cell leads + 4 arm wires to the stack rear pads (x 34.4..), wires run in the 0.9 channel under the cell and the 0.8 gap, then stow.
+ 6 lid with the hanging stack down onto the tongue (cell and board share the cavity), bond the seam; skin over the button last.
+"""
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+from build123d import Box, Cylinder, Pos, Rot, RegularPolygon, export_stl, extrude, fillet
+
+HERE = Path(__file__).resolve().parent
+ROOT = HERE.parents[1]
+sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(ROOT / "sim" / "checks"))
+import dims_k4 as K  # noqa: E402
+from dims_k4 import *  # noqa: E402,F401,F403
+import blade  # noqa: E402
+import heel  # noqa: E402
+
+OUT = HERE / "out" / ("k4s" if RELIEF == "len" else "k4s_lift")
+
+
+def box(x0, x1, y0, y1, z0, z1):
+    return Pos((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2) * Box(x1 - x0, y1 - y0, z1 - z0)
+
+
+def ycyl(x, z, d, y0, y1):
+    return Pos(x, (y0 + y1) / 2, z) * Rot(90, 0, 0) * Cylinder(d / 2, y1 - y0)
+
+
+def outer_body():
+    return fillet(box(X0, X1, Y_IN, Y_OUT, Z0, Z1).edges(), 1.0)
+
+
+def cavity():
+    c = box(CAV["x0"], CAV["x1"], CAV["y0"], CAV["y1"] + 0.01, CAV["z0"], CAV["z1"])
+    top = CAV["y1"] + 0.01
+    es = [e for e in c.edges() if e.bounding_box().min.Y < top - 1e-3]      # leave the open top edges sharp
+    return fillet(es, 0.5)         # keeps the 1.0 outer round from thinning the wall at the corners (0.6 -> 0.64 min)
+
+
+def tongue(g=0.0):
+    t, k, y0, y1 = TONGUE_W + g, CORNER_KEEP, Y_SPLIT - 0.01, Y_SPLIT + TONGUE_H + g
+    c = CAV
+    runs = [(X0 + k, X1 - k, c["z1"] - g, c["z1"] + t), (X0 + k, X1 - k, c["z0"] - t, c["z0"] + g),
+            (c["x1"] - g, c["x1"] + t, Z0 + k, Z1 - k), (c["x0"] - t, c["x0"] + g, Z0 + k, Z1 - k)]
+    s = None
+    for xa, xb, za, zb in runs:
+        r = box(xa, xb, y0, y1, za, zb)
+        s = r if s is None else s + r
+    return s
+
+
+def seam_rebate():
+    band = box(X0 - 1, X1 + 1, Y_SPLIT - REBATE_H, Y_SPLIT + 0.01, Z0 - 1, Z1 + 1)
+    return band - box(X0 + REBATE_D, X1 - REBATE_D, Y_SPLIT - REBATE_H - 0.1, Y_SPLIT + 0.1, Z0 + REBATE_D, Z1 - REBATE_D)
+
+
+def tub_add():
+    """heel keel + rail (+ strut relief fill) on the outer body, before the cavity is cut."""
+    return blade.rail(zc=(Z0 + Z1) / 2) + heel.heel_add()
+
+
+def tub():
+    t = outer_body() & box(X0 - 1, X1 + 1, Y_IN - 2, Y_SPLIT, Z0 - 1, Z1 + 1)
+    t = t + tub_add()
+    t = t - cavity()
+    cz, y0 = CAV["z0"], CAV["y0"]
+    t = t + blade.prism_yz([(y0, cz), (y0 + 1.4, cz), (y0, cz + 1.4)], 62.0, CAV["x1"])    # relief fill: legs 1.4 keep >= 0.6 normal wall (r2: 1.0 at y0 5.1)
+    t = t - blade.prism_yz([(3.9, -12.5), (3.9, -3.65 - 3.9), (-3.65 + 12.5, -12.5)], 62.0, 68.5)
+    t = t - heel.heel_cut()        # after the relief fill: the conductor channel / socket must stay open through it
+    t = t + (tongue() & outer_body())
+    return t - seam_rebate()
+
+
+def lid():
+    l = outer_body() & box(X0 - 1, X1 + 1, Y_SPLIT, Y_OUT + 1, Z0 - 1, Z1 + 1)
+    l = l - tongue(GROOVE_CL)
+    l = l - ycyl(MIC[0], MIC[1], DUCT_D, Y_LID_IN - 0.01, Y_OUT + 0.01)
+    l = l - Pos(MIC[0], Y_OUT - HEX_DEPTH / 2, MIC[1]) * Rot(90, 0, 0) * extrude(RegularPolygon(HEX_R, 6), amount=HEX_DEPTH / 2, both=True)
+    l = l - box(SW[0] - POCKET["dx"] / 2, SW[0] + POCKET["dx"] / 2, Y_LID_IN - 0.01, POCKET["top"], SW[1] - POCKET["dz"] / 2, SW[1] + POCKET["dz"] / 2)
+    l = l - ycyl(SW[0], SW[1], BORE_D, POCKET["top"] - 0.01, Y_OUT + 0.01)
+    l = l - ycyl(SW[0], SW[1], SKIN_D, SKIN_FLOOR, Y_OUT + 0.01)
+    return l
+
+
+def puck():
+    y_sw = Y_F + SW1["h"]
+    return ycyl(SW[0], SW[1], NUB_D, y_sw, y_sw + NUB_H + 0.01) + ycyl(SW[0], SW[1], PUCK_D, y_sw + NUB_H, y_sw + PUCK_L)
+
+
+def placeholders():
+    top = box(STACK_X0, STACK_X1, Y_B, Y_F, STACK_Z0, STACK_Z1) - ycyl(MIC[0], MIC[1], MIC_HOLE_D, Y_B - 0.1, Y_F + 0.1)
+    body = box(STACK_X0 + 0.3, STACK_X1 - 0.3, STACK_Y0, Y_B - 1.08, STACK_Z0 + 0.3, STACK_Z1 - 0.3)   # lower board + parts + power board: PLACEHOLDER (V9 B+)
+    vhb = box(STACK_X0 + 0.2, STACK_X1 - 0.2, Y_LID_IN - VHB_T, Y_LID_IN, STACK_Z0 + 0.2, STACK_Z1 - 0.2)
+    vhb = vhb - ycyl(MIC[0], MIC[1], DUCT_D, Y_LID_IN - 1, Y_LID_IN + 1)
+    vhb = vhb - box(SW[0] - POCKET["dx"] / 2, SW[0] + POCKET["dx"] / 2, Y_LID_IN - 1, Y_LID_IN + 1, SW[1] - POCKET["dz"] / 2, SW[1] + POCKET["dz"] / 2)
+    cell = box(CELL_X0, CELL_X1, CELL_Y0, CELL_Y1, CELL_Z0, CELL_Z1)
+    ctape = box(CELL_X0, CELL_X1, CAV["y0"], CELL_Y0, CELL_Z0 + 0.4, CELL_Z1 - 0.4)   # tape narrower than the cell: clears the cavity corner round
+    u2 = box(U2["c"][0] - U2["dx"] / 2, U2["c"][0] + U2["dx"] / 2, Y_B - U2["h"], Y_B, U2["c"][1] - U2["dz"] / 2, U2["c"][1] + U2["dz"] / 2)
+    sw1 = box(SW[0] - SW1["body"][0] / 2, SW[0] + SW1["body"][0] / 2, Y_F, Y_F + SW1["h"], SW[1] - SW1["body"][1] / 2, SW[1] + SW1["body"][1] / 2)
+    skin = ycyl(SW[0], SW[1], SKIN_D - 0.1, SKIN_FLOOR, Y_OUT)
+    # wire paths (rendered as 0.35 square runs): cell leads front end -> stack rear pads; arm bundle stack rear -> heel channel mouth under the cell
+    bat = box(STACK_X1 - 0.5, CELL_X0 + 0.5, CELL_Y0 + 0.6, CELL_Y0 + 0.95, ZC + 3, ZC + 3.35) + box(STACK_X1 - 0.5, CELL_X0 + 0.5, CELL_Y0 + 0.6, CELL_Y0 + 0.95, ZC + 4, ZC + 4.35)
+    zw = CAV["z0"] + 0.3
+    arm = box(STACK_X1 - 0.5, STACK_X1 + 0.3, STACK_Y0 + 0.4, STACK_Y0 + 0.75, zw, STACK_Z0 + 1.5) + box(STACK_X1 - 0.5, 62.4, CAV["y0"] + 0.4, CAV["y0"] + 0.75, zw, zw + 0.35) + box(62.0, 62.4, CAV["y0"] + 0.4, CAV["y0"] + 1.9, zw, zw + 0.35) + box(62.0, 64.0, CAV["y0"] + 1.55, CAV["y0"] + 1.9, zw, zw + 0.35)
+    return dict(cell=cell, ctape=ctape, pcb_top=top, stack_body=body, vhb=vhb, u2_mic=u2, sw1=sw1, skin=skin, bat_wires=bat, arm_wires=arm)
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    t, l, pk, ph = tub(), lid(), puck(), placeholders()
+    c = {}
+    for k in ("cell", "ctape", "pcb_top", "stack_body", "vhb", "u2_mic", "sw1", "bat_wires", "arm_wires"):
+        for n, p in (("tub", t), ("lid", l)):
+            c[f"clash/{n}/{k}"] = round((p & ph[k]).volume, 4)
+    c["clash/tub/lid"] = round((t & l).volume, 4)
+    c["clash/cell/stack"] = round((ph["cell"] & ph["stack_body"]).volume, 4)
+    c["clash/puck/lid"] = round((pk & l).volume, 4)
+    c["clash/puck/sw1"] = round((pk & ph["sw1"]).volume, 4)
+    # drop-in corridors: cell falls along -y into the tub, lid + hanging stack come down along -y
+    c["corridor/cell_drop_in"] = round((t & box(CELL_X0, CELL_X1, CELL_Y0, Y_SPLIT + 1, CELL_Z0, CELL_Z1)).volume, 4)
+    c["corridor/stack_drop_in"] = round((t & box(STACK_X0, STACK_X1, STACK_Y0, Y_SPLIT + 3, STACK_Z0, STACK_Z1)).volume, 4)
+    # wall minimum: grow the cavity by w and see how much sticks out of the outer body (+ keel/rail) below the seam; 0 = every wall >= w
+    outer_all = (outer_body() + tub_add()) & box(X0 - 1, X1 + 1, Y_IN - 3, Y_SPLIT, Z0 - 3, Z1 + 3)
+    walls = {}
+    from build123d import offset
+    for w in (0.55, 0.6):
+        try:
+            g = offset(cavity(), amount=w - 0.005) & box(X0 - 3, X1 + 3, Y_IN - 3, Y_SPLIT - 0.02, Z0 - 3, Z1 + 3)
+            walls[f"cavity+{w}_outside_body_mm3"] = round((g - outer_all).volume, 3)
+        except Exception as e:      # noqa: BLE001
+            walls[f"cavity+{w}"] = f"offset failed: {e}"
+    walls.update(nominal=WALL, lid=LID_T, floor=WALL, rebate_residual=round(WALL - REBATE_D, 2), lid_over_groove=round(LID_T - (TONGUE_H + GROOVE_CL), 2),
+                 puck_guide=round(SKIN_FLOOR - POCKET["top"], 2), min_resin=0.6, src="frame.RESIN min_wall 0.6")
+    c["walls"] = walls
+    bb = ph["cell"].bounding_box()
+    c["cell"] = dict(x=[round(bb.min.X, 2), round(bb.max.X, 2)], lid_clear=round(Y_LID_IN - CELL_Y1, 3), under_channel=round(CH_UNDER, 2),
+                     rear_dead_zone=round(CAV["x1"] - CELL_X1, 2), relief=RELIEF)
+    c["stack"] = dict(x=[round(STACK_X0, 2), round(STACK_X1, 2)], T=STACK_T, floor_clear=round(STACK_Y0 - CAV["y0"], 2), front_gap=X_STOP_GAP,
+                      side_gap_z=round((CAV["z1"] - CAV["z0"] - STACK_H) / 2, 2), mic=MIC, button=SW)
+    c["button"] = dict(puck_L=round(PUCK_L, 3), puck_feasible=PUCK_L > NUB_H + 0.02, guide_bore=round(SKIN_FLOOR - POCKET["top"], 3), gap_nominal=PRE_GAP)
+    c["dock"] = DOCK_FIT
+    ev = outer_body().volume
+    c["envelope"] = dict(T=round(Y_OUT - Y_IN, 2), L=round(L, 2), H=round(H, 2), env_mm3=round(ev, 1), x=[round(X0, 2), X1], z=[Z0, round(Z1, 2)])
+    c["volumes"] = dict(tub=round(t.volume, 1), lid=round(l.volume, 1), puck=round(pk.volume, 3))
+    c["printable"] = {n: dict(solids=len(s.solids()), valid=bool(s.is_valid)) for n, s in (("tub", t), ("lid", l), ("puck", pk))}
+    c["mass"] = mass(t, l, pk, ph)
+    print(json.dumps(c, indent=1))
+    (OUT / "checks.json").write_text(json.dumps(c, indent=1))
+    mats = dict(cell="cell", ctape="silicone", pcb_top="pcb", stack_body="chips", vhb="silicone", u2_mic="chips", sw1="metal", skin="silicone",
+                bat_wires="metal", arm_wires="metal")
+    parts = {"tub": (t, "body"), "lid": (l, "armour"), "puck": (pk, "metal"), **{k: (v, mats[k]) for k, v in ph.items()}}
+    info = {}
+    for k, (s, m) in parts.items():
+        export_stl(s, str(OUT / f"{k}.stl"), tolerance=0.01, angular_tolerance=0.1)
+        info[k] = {"mat": m, "explode": [0, 0, 0]}
+    (OUT / "parts.json").write_text(json.dumps(info, indent=1))
+
+
+def mass(t, l, pk, ph):
+    """Pod body roll-up with sim/checks/pod_mass.py's densities and its [A] ranges (cell 3.5 g datasheet is the only sourced heavy item)."""
+    import pod_mass as M
+    r = M.rng
+    area = STACK_L * STACK_H
+    items = {
+        "tub (resin, incl. heel + rail)": r(t.volume, M.RESIN), "lid (resin)": r(l.volume, M.RESIN), "puck": r(pk.volume, M.RESIN),
+        "skin (silicone)": r(ph["skin"].volume, M.SILICONE), "VHB stack-to-lid": r(ph["vhb"].volume, M.VHB), "VHB cell tape": r(ph["ctape"].volume, M.VHB),
+        "cell ICP401230UPR": (3.5, 3.5),
+        "2 bare boards FR-4 11x12x0.8 [A]": r(2 * area * PCB_T, M.FR4),
+        "copper, 2 boards x 4 layers [A]": (2 * area * 0.1 * 0.5 * 8.96 / 1000, 2 * area * 0.1 * 0.8 * 8.96 / 1000),
+        "components + BM28 B2B (r2 74-part range) [A]": (0.20, 0.40),
+        "wires + solder + potting [A]": (0.10, 0.27),
+    }
+    lo, hi = sum(a for a, _ in items.values()), sum(b for _, b in items.values())
+    return dict(items_g={k: [round(a, 3), round(b, 3)] for k, (a, b) in items.items()}, pod_body_g=[round(lo, 2), round(hi, 2)],
+                excludes="adapter clip, arm, pad, exciter, NiTi (as pod_mass pod_body_only); dock target not placed (DOCK_FIT)", target_g=8.0)
+
+
+if __name__ == "__main__":
+    main()

@@ -64,10 +64,12 @@ evidence_pins:
   "docs/build/hardware_checks.py": "3b695bc5bf"
   "docs/build/tolerances.md": "13099f559e"
   "docs/research/A3-u575-plan.md": "ed9d824656"
+  "docs/research/drastic/V9-k4-board.yaml": "e0b731d4c9"
   "docs/research/ear-open-fit.md": "9989f8ab7c"
   "docs/research/pad-led.md": "74e219f7ee"
   "docs/system/integration-map.md": "691dac315d"
   "docs/system/physical.md": "be19a73b90"
+  "docs/system/plm/ecr/ECR-0020.md": "024f988335"
   "docs/system/sub-debug-test.md": "7e365f7d39"
   "docs/system/sub-dock-usb.md": "def7fd457b"
   "docs/system/sub-power.md": "12086e6fd3"
@@ -75,6 +77,7 @@ evidence_pins:
   "hw/mech/heel.py": "47a6a72f88"
   "hw/mech/pad.py": "00d8456a0d"
   "hw/mech/pod.py": "8c7cdb7476"
+  "hw/mech/shell_k4.py": "d57f906b3e"
   "hw/mech/shell_r1.py": "ad1df2fdfc"
   "hw/padboard/gen.py": "602c2ac9a9"
   "hw/pod/gen.py": "5a486628ed"
@@ -919,7 +922,7 @@ requirements:
     artefacts: [hw/pod/gen.py, ERC, "interfaces:pins", docs/system/sub-dock-usb.md]
     planned: ["boot stub and the ROM DFU round trip on rev 1 (bring-up step 6)", "dock cable, 5-pin head and pin order"]
     evidence: [hw/pod/gen.py, docs/system/sub-dock-usb.md]
-    ecrs: [ECR-0009, ECR-0010, ECR-0013]
+    ecrs: [ECR-0009, ECR-0010, ECR-0013, ECR-0019]
     related: [O18-firmware-fixable]
     next: "Design the boot stub and DFU entry; fix the dock cable and pin order"
     gap: >-
@@ -1044,6 +1047,7 @@ requirements:
     artefacts: [docs/system/sub-dock-usb.md, hw/pod/gen.py, hw/mech/shell_r1.py, ERC, "interfaces:pins"]
     planned: ["cut and check the USB-C keep-out in the shell (shell_r1.py defines it and never uses it)", "a cable-side head that is in stock and matches the target (5 contacts)", "mate, tug and release the cable on a built pod"]
     evidence: [docs/system/sub-dock-usb.md, hw/mech/shell_r1.py]
+    ecrs: [ECR-0019]
     covers: [O31]
     related: [O12-dock]
     next: "Fix the cable-side part number and stock; cut the USB-C keep-out in the shell model and check its overlap with the target"
@@ -1052,6 +1056,29 @@ requirements:
       contacts, two NdFeB magnets, C5126848) is glued flush into the belly floor and hand-wired to pads J3/J4/J10/J11/J12
       (sub-dock-usb.md). Open: the cable-side head (YZP0048, C5126847) showed no stock at JLC on 2026-10-02 and docs/build/bom.md
       lists a different 4-pin head (sub-dock-usb issue 1); the sealed USB-C fallback (Same Sky UJ32-C-H-G-MSMT) is dropped by O31 (2026-10-08; ECR-0019 moves Rd to the head). D: whether the magnets hold under wear, sweat and the cable's pull is untested.
+
+  - id: O33
+    kind: owner
+    source: "docs/spec.md O33"
+    spec_block: O33
+    spec_hash: 865703f4b9
+    text: "Pod layout = K4 end-to-end (130 mAh ICP401230UPR beside the board along the arm); redesign the board for minimum length; a two-board stack inside the cell-thickness envelope is allowed."
+    method: [Analysis, Inspection]
+    stage: [C, D]
+    c_role: surrogate
+    status: partial
+    status_by_stage: {C: partial, D: not-started}
+    owner_items: [REG-BOARD, REG-POD-BODY, SUB-POWER, SUB-PROCESSING]
+    artefacts: [docs/research/drastic/V9-k4-board.yaml, hw/mech/shell_k4.py, hw/pod/k4/gen.py, ERC]
+    planned: ["placement of M and P and a length measurement on the real outlines", "BM28 datasheet read (rating, mated height) and footprint fetch", "bring-up conduction test over the B2B (LN-V*) and an acoustic tap test of L1/C buzz"]
+    evidence: [docs/research/drastic/V9-k4-board.yaml, docs/system/plm/ecr/ECR-0020.md]
+    ecrs: [ECR-0020, ECR-0019]
+    next: "Owner review of ECR-0020; then lay out M and P"
+    gap: >-
+      C: V9 studies the shortest board (B+ two stacked 4L boards, ~11 x 12 mm; length figures are estimates, no placement run) and
+      the vertical noise model passes nominal, marginal in the pessimistic corner. ECR-0020 splits the schematic into two
+      netlists joined by a 30-contact Hirose BM28 (rating and height from a secondary source). K4 shell: hw/mech/shell_k4.py.
+      D: the real board length, the B2B contact resistance on VBUS-side nets and the SMPS contacts, and the stacked thickness.
 
   - id: O16-nohousingscrews
     kind: owner
@@ -1312,8 +1339,9 @@ requirements:
     owner_items: [REG-BOARD, REG-POD-BODY, PHYSICAL]
     artefacts: [hw/mech/shell_r1.py, hw/mech/frame.py, docs/build/tolerances.md, "interfaces:heights", E10, "interfaces:frame", "interfaces:outline"]
     planned: ["numeric board and pod envelopes set by the simplification study", "test-access cost in area and mass, per hook"]
-    evidence: [hw/mech/shell_r1.py, docs/build/tolerances.md]
-    ecrs: [ECR-0001, ECR-0006]
+    evidence: [hw/mech/shell_r1.py, docs/build/tolerances.md, hw/mech/shell_k4.py, docs/research/drastic/V9-k4-board.yaml]
+    ecrs: [ECR-0001, ECR-0006, ECR-0020]
+    covers: [O33]
     related: [S1.2-C4, D18-balance]
     known_fail: "The 34 x 13 mm board and the rev-1 shell were grown under O15 and are due for re-sizing (spec O20); the rev-1 pod measures 38.0 x 11.8 x 15.2 mm plus belly and spine, at least ~10.2 g (00-whole key numbers)."
     known_fail_ref: "none; the re-sizing is the simplification study (docs/research/simplify/size.md) and spec O20"
