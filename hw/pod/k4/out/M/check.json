@@ -13,14 +13,14 @@
   "port_keepout_mm": 1.76,
   "switching_parts_on_M": [],
   "gap_J3_J5_mm": 8.3,
-  "ratsnest_mm": 140.9,
+  "ratsnest_mm": 141.3,
   "board_mm2": 185.1,
   "courtyard_B_mm2": 52.1,
   "courtyard_F_mm2": 38.3,
   "U_B": 0.281,
   "U_F": 0.207,
   "U_both": 0.244,
-  "gnd_vias": 33,
+  "gnd_vias": 37,
   "gnd_fanout_skipped": 10
  }
 }

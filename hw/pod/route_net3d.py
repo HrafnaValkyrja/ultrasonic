@@ -11,7 +11,8 @@ import sys, math, heapq, pathlib, pcbnew
 M, mm = pcbnew.ToMM, pcbnew.FromMM
 TRACK, CLR, VIA, DRILL = 0.10, 0.10, 0.25, 0.15
 LAYS = [pcbnew.F_Cu, pcbnew.In3_Cu, pcbnew.In4_Cu, pcbnew.B_Cu]
-G = 0.05
+import os
+G = float(os.environ.get("GRID", 0.05))
 import os
 VIA_COST = float(os.environ.get("VIA_COST", 12))
 

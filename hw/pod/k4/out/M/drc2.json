@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-10-08T04:41:19",
+    "date": "2026-10-08T07:32:38",
     "ignored_checks": [
         {
             "description": "Footprint has no courtyard defined",
@@ -30,6 +30,30 @@
     "kicad_version": "10.0.6",
     "schematic_parity": [],
     "source": "routed2.kicad_pcb",
-    "unconnected_items": [],
+    "unconnected_items": [
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Track [GND] on F.Cu, length 0.6050 mm",
+                    "pos": {
+                        "x": 3.96,
+                        "y": 4.1299
+                    },
+                    "uuid": "9959d488-6ec4-4da9-8e3d-7747d8c9f093"
+                },
+                {
+                    "description": "Track [GND] on F.Cu, length 1.0100 mm",
+                    "pos": {
+                        "x": 4.39,
+                        "y": 3.81
+                    },
+                    "uuid": "3112ee0c-a11e-45dd-8c1f-70517c43b317"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        }
+    ],
     "violations": []
 }

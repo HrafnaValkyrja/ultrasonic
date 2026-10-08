@@ -1,7 +1,7 @@
 {
     "$schema": "https://schemas.kicad.org/drc.v1.json",
     "coordinate_units": "mm",
-    "date": "2026-10-08T03:45:26",
+    "date": "2026-10-08T07:34:43",
     "ignored_checks": [
         {
             "description": "Footprint has no courtyard defined",
@@ -40,7 +40,7 @@
                         "x": 0.53,
                         "y": 9.66
                     },
-                    "uuid": "2cc31d94-1e8b-45af-a159-690e22dbc062"
+                    "uuid": "77bd9e75-3058-49ec-a5ee-da16485a945f"
                 },
                 {
                     "description": "Pad 2 [+3V0] of R3 on F.Cu",
@@ -48,7 +48,7 @@
                         "x": 1.13,
                         "y": 9.76
                     },
-                    "uuid": "dc81959b-2883-4cae-a259-bd99d538dd71"
+                    "uuid": "f5fc538e-49f6-4f10-a71d-cd49e516b0a6"
                 }
             ],
             "severity": "error",
@@ -63,7 +63,7 @@
                         "x": 1.33,
                         "y": 9.905
                     },
-                    "uuid": "ee293fb6-2eb1-441c-9029-5347fdfe0501"
+                    "uuid": "a8278576-402a-436f-81a8-1e739dd21797"
                 },
                 {
                     "description": "Pad 2 [+3V0] of R3 on F.Cu",
@@ -71,7 +71,7 @@
                         "x": 1.13,
                         "y": 9.76
                     },
-                    "uuid": "dc81959b-2883-4cae-a259-bd99d538dd71"
+                    "uuid": "f5fc538e-49f6-4f10-a71d-cd49e516b0a6"
                 }
             ],
             "severity": "error",
@@ -81,66 +81,20 @@
             "description": "Missing connection between items",
             "items": [
                 {
-                    "description": "Pad 4 [+3V0] of Q2 on B.Cu",
-                    "pos": {
-                        "x": 1.33,
-                        "y": 9.905
-                    },
-                    "uuid": "ee293fb6-2eb1-441c-9029-5347fdfe0501"
-                },
-                {
-                    "description": "Track [+3V0] on F.Cu, length 0.0710 mm",
+                    "description": "Track [+3V0] on F.Cu, length 0.1177 mm",
                     "pos": {
                         "x": 2.63,
                         "y": 9.905
                     },
-                    "uuid": "8e714f1e-08c9-4742-85e5-6492029d6bd0"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Pad 29 [GA_P] of U1 on B.Cu",
-                    "pos": {
-                        "x": 9.05,
-                        "y": 1.3625
-                    },
-                    "uuid": "458578d6-b5bf-4b90-aebd-d221131fb64b"
+                    "uuid": "3c22f52d-64bd-4f06-a3aa-f68c26ab50ff"
                 },
                 {
-                    "description": "Track [GA_P] on F.Cu, length 0.0483 mm",
+                    "description": "Pad 4 [+3V0] of Q2 on B.Cu",
                     "pos": {
-                        "x": 2.28,
-                        "y": 9.6816
+                        "x": 1.33,
+                        "y": 9.905
                     },
-                    "uuid": "a8e542b2-a07d-4c6f-875e-cc6f534e794c"
-                }
-            ],
-            "severity": "error",
-            "type": "unconnected_items"
-        },
-        {
-            "description": "Missing connection between items",
-            "items": [
-                {
-                    "description": "Pad 15 [MIC_VDD] of U1 on B.Cu",
-                    "pos": {
-                        "x": 6.3625,
-                        "y": 6.55
-                    },
-                    "uuid": "b1c01e26-1602-4070-9755-3e62402fb3cd"
-                },
-                {
-                    "description": "Pad 6 [MIC_VDD] of J21 on F.Cu",
-                    "pos": {
-                        "x": 9.1,
-                        "y": 5.41
-                    },
-                    "uuid": "14fab64e-e54d-446b-86c8-968f3bcea13e"
+                    "uuid": "a8278576-402a-436f-81a8-1e739dd21797"
                 }
             ],
             "severity": "error",
@@ -155,7 +109,7 @@
                         "x": 0.53,
                         "y": 10.3
                     },
-                    "uuid": "156528ed-82e8-4011-aec4-f62a6a7a91a8"
+                    "uuid": "88506937-3643-4bec-a204-d6beeeef551d"
                 },
                 {
                     "description": "Pad 5 [GB_P] of Q2 on B.Cu",
@@ -163,7 +117,7 @@
                         "x": 1.68,
                         "y": 9.905
                     },
-                    "uuid": "5bf3714f-efc3-49df-a5d8-c1e6f47c2201"
+                    "uuid": "7be16293-7761-4e46-9ac5-151a4c540a27"
                 }
             ],
             "severity": "error",
@@ -178,7 +132,7 @@
                         "x": 1.68,
                         "y": 9.905
                     },
-                    "uuid": "5bf3714f-efc3-49df-a5d8-c1e6f47c2201"
+                    "uuid": "7be16293-7761-4e46-9ac5-151a4c540a27"
                 },
                 {
                     "description": "Pad 31 [GB_P] of U1 on B.Cu",
@@ -186,7 +140,30 @@
                         "x": 10.05,
                         "y": 1.3625
                     },
-                    "uuid": "a9730604-a026-4126-8576-0d68de323536"
+                    "uuid": "dc23b967-1703-4063-8795-d863cffc9304"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        },
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 45 [MDF_CCK] of U1 on B.Cu",
+                    "pos": {
+                        "x": 13.2375,
+                        "y": 6.05
+                    },
+                    "uuid": "95713941-7c95-42d7-a3ad-de055647dd0a"
+                },
+                {
+                    "description": "Pad 1 [MDF_CCK] of TP8 on B.Cu",
+                    "pos": {
+                        "x": 14.88,
+                        "y": 8.98
+                    },
+                    "uuid": "8deb0ac7-5402-4825-b78e-4dc426a05260"
                 }
             ],
             "severity": "error",
@@ -198,20 +175,20 @@
             "description": "Clearance violation ( clearance 0.0900 mm; actual 0.0894 mm)",
             "items": [
                 {
-                    "description": "Track [+3V0] on B.Cu, length 0.0943 mm",
-                    "pos": {
-                        "x": 5.4115,
-                        "y": 6.4612
-                    },
-                    "uuid": "52b40fbd-cc30-475e-a38b-222acb723d8e"
-                },
-                {
                     "description": "Pad 2 [GND] of C7 on B.Cu",
                     "pos": {
                         "x": 4.8,
                         "y": 6.825
                     },
-                    "uuid": "d6f60fbe-0297-4678-81ca-f4a5e598b879"
+                    "uuid": "2bc767d6-8420-43f9-876b-b351f9c5693d"
+                },
+                {
+                    "description": "Track [+3V0] on B.Cu, length 0.0943 mm",
+                    "pos": {
+                        "x": 5.4115,
+                        "y": 6.4612
+                    },
+                    "uuid": "ec9a45af-0498-46a9-b866-265da3bcf6c1"
                 }
             ],
             "severity": "error",
@@ -221,20 +198,20 @@
             "description": "Clearance violation ( clearance 0.0900 mm; actual 0.0894 mm)",
             "items": [
                 {
-                    "description": "Track [+3V0] on B.Cu, length 0.0244 mm",
-                    "pos": {
-                        "x": 5.3448,
-                        "y": 6.3945
-                    },
-                    "uuid": "351c8b75-accb-47c9-ae63-bb24fdb495db"
-                },
-                {
                     "description": "Pad 2 [GND] of C7 on B.Cu",
                     "pos": {
                         "x": 4.8,
                         "y": 6.825
                     },
-                    "uuid": "d6f60fbe-0297-4678-81ca-f4a5e598b879"
+                    "uuid": "2bc767d6-8420-43f9-876b-b351f9c5693d"
+                },
+                {
+                    "description": "Track [+3V0] on B.Cu, length 0.0244 mm",
+                    "pos": {
+                        "x": 5.3448,
+                        "y": 6.3945
+                    },
+                    "uuid": "b1a167e6-85d9-4f58-b065-4865f5a7e698"
                 }
             ],
             "severity": "error",

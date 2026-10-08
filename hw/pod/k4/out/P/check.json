@@ -9,15 +9,15 @@
    "preroute: +3V0 (8.55, 8.24)-(8.3, 9.43) no clear path",
    "preroute: NRST (9.55, 8.24)-(8.3, 10.23) no clear path"
   ],
-  "ratsnest_mm": 208.4,
+  "ratsnest_mm": 203.1,
   "board_mm2": 170.9,
-  "courtyard_B_mm2": 104.9,
-  "courtyard_F_mm2": 33.0,
-  "U_B": 0.614,
-  "U_F": 0.193,
+  "courtyard_B_mm2": 108.0,
+  "courtyard_F_mm2": 29.9,
+  "U_B": 0.632,
+  "U_F": 0.175,
   "U_both": 0.403,
-  "gnd_vias": 38,
-  "gnd_fanout_skipped": 31,
+  "gnd_vias": 43,
+  "gnd_fanout_skipped": 30,
   "stack": {
    "b2b_xy_P_stack": [
     9.8,

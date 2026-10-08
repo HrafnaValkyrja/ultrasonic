@@ -183,3 +183,5 @@ info_only:   # check WARNs that are tracked elsewhere, not work items
   - {id: CHK-PINS, t: "interfaces [pins] 3 known hazards (GB_N PB15, MIC_DATA PB4, TS PA2), ECR-0013 implemented"}
   - {id: CHK-SELFTEST, t: "interfaces [selftest] 5 skipped rules (design no longer has what they break)"}
 
+
+# 2026-10-08 K4-REROUTE-R5: P and M re-placed + re-routed after 9ec84ae, 0 DRC / 0 unconnected (ECR-0020 update). Open: K4-C9-ESR (C9 0201 ESR<20 mOhm @3 MHz, C17 DC bias; Samsung weblib curve unreachable headless, same as PWR-I14), K4-SILK (K4 silk pass, silk_* warnings only).

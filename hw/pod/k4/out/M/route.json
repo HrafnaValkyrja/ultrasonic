@@ -1,15 +1,20 @@
 {
- "tracks": 328,
- "vias": 65,
+ "tracks": 347,
+ "vias": 70,
  "drc_by_type": {},
- "unconnected": [],
+ "unconnected": [
+  [
+   "Track [GND] on F.Cu, length 0.6050 mm",
+   "Track [GND] on F.Cu, length 1.0100 mm"
+  ]
+ ],
  "passes": {
   "first": [
-   0,
+   1,
    0
   ],
   "second": [
-   0,
+   1,
    0
   ]
  }
