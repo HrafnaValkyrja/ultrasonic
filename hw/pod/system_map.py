@@ -134,6 +134,23 @@ PROTOCOL = """Every proposed change must state, and check against the sections a
 8. depends_on / conflicts_with: other domains' changes this one needs or excludes."""
 
 
+K4_SPLIT = """Netlists: hw/pod/k4/gen.py -> pod_k4_M.net (22 placed parts), pod_k4_P.net (32); ERC 0 errors both (2026-10-08). Board M (lower, mic on its outer face): U1 + its caps, Y1/C11/C12, U2/R2/C13, R1, R15/R16, C19, SWD/NRST/3V0/GND pads TP1-TP5, dots TP7-TP10, J20 BM28 receptacle. Board P (upper): charger U3 block, LDO U4 block, dock/ESD, VBAT/VBUS sense dividers, L1, bridge Q1/Q2 + shunt + C14, SW1 + R10, R14, wire pads, TP6, J21 BM28 plug. J12/R18/D6 and net CC are gone (ECR-0019).
+
+| BM28 pin | Net | BM28 pin | Net | BM28 pin | Net |
+|---|---|---|---|---|---|
+| 1 | GND | 11 | GND | 21 | GND |
+| 2 | +3V0 | 12 | I_SENSE | 22 | TS |
+| 3 | VLXSMPS | 13 | USB_DP | 23 | VBAT_SENSE |
+| 4 | GND | 14 | GND | 24 | VBUS_SENSE |
+| 5 | GND | 15 | USB_DM | 25 | GND |
+| 6 | VDD11 | 16 | GND | 26 | LED_K |
+| 7 | GA_P | 17 | GND | 27 | BTN |
+| 8 | GA_N | 18 | I2C_SCL | 28 | +3V0 |
+| 9 | GB_P | 19 | I2C_SDA | 29 | GND |
+| 10 | GB_N | 20 | CHG_INT | 30 | GND |
+
+30 contacts = 19 signal/power + 11 GND (odd pins row A, even row B [T]). Parts: P plug C424570 BM28B0.6-30DP/2-0.35V(51), M receptacle C424571 BM28B0.6-30DS/2-0.35V(51), JLC 2026-10-08. Rating 0.3 A per signal contact [T, secondary source]. VLXSMPS and VDD11 carry the SMPS inductor current on one contact each (unproven margin). Mated height 0.6 mm [T]."""
+
 def build():
     import gen                                           # noqa: E402  (sets SKiDL lib paths)
     with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
@@ -197,6 +214,7 @@ def main():
     L += ["", "## 7. Mechanical interfaces and keep-outs", ""] + [f"- {m}" for m in MECH]
     L += ["", "## 8. Firmware dependencies", ""] + [f"- {m}" for m in FIRMWARE]
     L += ["", "## 9. Constraints and owner decisions", ""] + [f"- {m}" for m in CONSTRAINTS]
+    L += ["", "## 11. K4 two-board split (ECR-0020, proposed; NOT the current design until adopted)", "", K4_SPLIT, ""]
     L += ["", "## 10. Required cross-check for every proposed change", "", PROTOCOL, ""]
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n".join(L))

@@ -10,13 +10,13 @@
    }
   },
   "INTEGRATION": {
-   "by": "claude-backlog",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks",
+   "note": "ECR-0020: K4 split section 11 added to integration-map and system_map.py (proposed, not current design)",
    "stamp": {
     "file:hw/current.yaml": "d1d7c9cc78083477",
     "file:hw/pod/gen.py": "3ed3676e85fb73eb",
-    "file:hw/pod/system_map.py": "14c172c853e5844f"
+    "file:hw/pod/system_map.py": "9515e835b9f57709"
    }
   },
   "PHYSICAL": {
