@@ -81,9 +81,9 @@
   "SPEC": {
    "by": "claude",
    "date": "2026-10-07",
-   "note": "O28-O32 (2026-10-08) recorded; whole.md owner_decisions updated, ECR-0019",
+   "note": "O28-O33 recorded; 00-whole updated",
    "stamp": {
-    "file:docs/spec.md": "14762701a89718d9"
+    "file:docs/spec.md": "ff22907041c4390c"
    }
   },
   "SUB-AUDIO-IN": {
@@ -161,9 +161,9 @@
   "WHOLE": {
    "by": "claude",
    "date": "2026-10-07",
-   "note": "O28-O32 (2026-10-08) recorded; whole.md owner_decisions updated, ECR-0019",
+   "note": "O28-O33 recorded; 00-whole updated",
    "stamp": {
-    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "1e2fd3d76d1e058f"
+    "grep:docs/spec.md::\\b[DO][0-9]+\\b": "6f512ddbcaab3d20"
    }
   }
  },
