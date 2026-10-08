@@ -21,6 +21,11 @@ Material inputs (all [A] = assumed, sources named so a reader can check):
 - Press: KMT022 operating force 2.0 N (sub-ui); abuse 10 N (hard thumb jab) [A].
 Run (fenced): systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 python3 sim/checks/sw1_press_fem.py
 Writes sim/out/mech/sw1_press_fem.json (+ .png plot of the soft case).
+
+K4 (2026-10-08, K4-SW1-PRESS): SW1_BOARD=k4 python3 sim/checks/sw1_press_fem.py  -> M board 14.0 x 12.0 x 0.8 (6L; routed_M.kicad_pcb), SW1 at M (5.325, 6.025),
+VHB bonded over the stack footprint (x 0.2..STACK_L 11, or all 14 with SW1_VHB_X=14), cut-outs: SW1 pocket, mic duct, TP6. P hangs 0.6 below on the BM28
+(J20 at M (9.825, 6.025), ~7.0 x 2.6): extra cases report the BM28 plug rotation under the press (pry of the 0.35 mm contacts) and a worst case where P rests on the
+floor (BM28 as a stiff column, [A]). Writes sw1_press_fem_k4.json/.png.
 """
 import json
 import sys
@@ -33,26 +38,45 @@ from skfem.helpers import dd, ddot, eye, trace
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "hw/mech"))
 import dims as D  # noqa: E402  (selected design: dims_r2 | dims_k1)
-TAG = "" if D.DESIGN.id == "phase2" else f"_{D.OUT_DIR.name}"   # variants write their own outputs (e.g. _k1t_dome)
-
-BW, BH, T = 30.0, 12.0, D.PCB_T if hasattr(D, "PCB_T") else 0.8
+import os  # noqa: E402
+K4 = os.environ.get("SW1_BOARD", "").strip().lower() == "k4"
+if K4:
+    import dims_k4 as K          # numpy-free; the K4 shell numbers
+    TAG = "_k4" + ("_vhb14" if os.environ.get("SW1_VHB_X") == "14" else "")
+    BW, BH, T = 14.0, 12.0, K.PCB_T
+    VHB_T = K.VHB_T
+    SW_XY = (5.325, 6.025)       # routed_M.kicad_pcb, board origin = outline corner
+    POCKET = (K.POCKET["dx"], K.POCKET["dz"])
+    BODY = K.SW1["body"]
+    MIC_XY, DUCT_R = (1.775, 5.275), K.DUCT_D / 2
+    TP_R = 1.0 / 2 + 0.4
+    F_PADS = {"TP6": (1.905, 2.905)}
+    BOND_X1 = float(os.environ.get("SW1_VHB_X") or K.STACK_L)     # VHB over the stack footprint (11) unless told all 14
+    BM28 = dict(c=(9.825, 6.025), L=7.0, W=2.6)                  # J20 courtyard [E]
+    B_MARGIN = round(K.STACK_Y0 - K.CAV["y0"], 3)                # P to the cavity floor: 0.2 free
+    TRAVEL = (0.05, 0.15, 0.25)
+else:
+    TAG = "" if D.DESIGN.id == "phase2" else f"_{D.OUT_DIR.name}"   # variants write their own outputs (e.g. _k1t_dome)
+    BW, BH, T = 30.0, 12.0, D.PCB_T if hasattr(D, "PCB_T") else 0.8
+    VHB_T = D.VHB_T                    # 0.25
+    SW_XY = (18.5, 6.0)
+    POCKET = (D.POCKET["dx"], D.POCKET["dz"])
+    BODY = D.SW1["body"]              # 3.0 x 2.6
+    MIC_XY, DUCT_R = D.MIC_XY, D.DUCT_D / 2
+    TP_R = D.TP_PAD_D / 2 + D.TP_CUT_MARGIN
+    F_PADS = D.F_PADS
+    BOND_X1, BM28 = BW, None
+    B_MARGIN = round(D.B_GAP - D.B_MAX, 3)        # 0.32: tallest B part to the cell plane
+    TRAVEL = D.SW1["travel"]
 E_PCB, NU = 20e3, 0.15            # N/mm2
-VHB_T = D.VHB_T                    # 0.25
 INSET = 0.2
-SW_XY = (18.5, 6.0)
-POCKET = (D.POCKET["dx"], D.POCKET["dz"])
-BODY = D.SW1["body"]              # 3.0 x 2.6
-MIC_XY, DUCT_R = D.MIC_XY, D.DUCT_D / 2
-TP_R = D.TP_PAD_D / 2 + D.TP_CUT_MARGIN
-F_PADS = D.F_PADS
-B_MARGIN = round(D.B_GAP - D.B_MAX, 3)        # 0.32: tallest B part to the cell plane
 E_VHB = (0.15, 0.5, 2.0, 10.0)                # MPa
 FORCES = (2.0, 10.0)                          # N
 
 
 def bonded(x, y):
     """1 where the VHB is bonded (board coords, mm), else 0."""
-    m = (x > INSET) & (x < BW - INSET) & (y > INSET) & (y < BH - INSET)
+    m = (x > INSET) & (x < BOND_X1 - INSET) & (y > INSET) & (y < BH - INSET)
     m &= ~((np.abs(x - SW_XY[0]) < POCKET[0] / 2) & (np.abs(y - SW_XY[1]) < POCKET[1] / 2))
     m &= ~((x - MIC_XY[0]) ** 2 + (y - MIC_XY[1]) ** 2 < DUCT_R ** 2)
     for px, py in F_PADS.values():
@@ -65,7 +89,7 @@ def load_area(x, y):
 
 
 def main():
-    nx, ny = 241, 97                          # h = 0.125 mm
+    nx, ny = int(round(BW / 0.125)) + 1, 97   # h = 0.125 mm
     mesh = MeshTri.init_tensor(np.linspace(0, BW, nx), np.linspace(0, BH, ny))
     ib = Basis(mesh, ElementTriMorley(), intorder=4)
 
@@ -83,8 +107,16 @@ def main():
     def press(v, w):
         return load_area(w.x[0], w.x[1]) * v
 
+    @BilinearForm
+    def conn(u, v, w):
+        return conn_area(w.x[0], w.x[1]) * u * v
+
+    def conn_area(x, y):
+        return ((np.abs(x - BM28["c"][0]) < BM28["L"] / 2) & (np.abs(y - BM28["c"][1]) < BM28["W"] / 2)).astype(float)
+
     K = asm(plate, ib)
     M = asm(found, ib)
+    Mc = asm(conn, ib) if BM28 else None
     P = asm(press, ib)
     a_load = BODY[0] * BODY[1]
 
@@ -120,13 +152,30 @@ def main():
                      board_strain_peak_ue=round(1e6 * float(eps.max()), 0),
                      board_strain_peak_off_sw1_ue=round(1e6 * float(eps[far].max()), 0),
                      reaction_N=round(reac, 3))
+            if BM28:
+                wn = w[ib.nodal_dofs[0]]
+                px, py = mesh.p
+                def wat(x, y):
+                    return float(wn[np.argmin((px - x) ** 2 + (py - y) ** 2)])
+                cx, cy = BM28["c"]
+                wa, wb = wat(cx - BM28["L"] / 2, cy), wat(cx + BM28["L"] / 2, cy)
+                r["bm28_end_w_um"] = [round(1e3 * wa, 2), round(1e3 * wb, 2)]
+                r["bm28_plug_tilt_urad"] = round(1e6 * abs(wb - wa) / BM28["L"], 1)
+                r["bm28_end_to_end_lift_um"] = round(1e3 * abs(wb - wa), 2)
+                r["p_floor_gap_mm"] = B_MARGIN
+                # P rests on the floor with zero gap: BM28 as a stiff column (3 GPa housing walls ~10 % of the footprint over the 0.6 mated height) [A]
+                kc = 0.10 * 3000.0 / 0.6      # N/mm3
+                w2 = solve(A + kc * Mc, (F / a_load) * P)
+                reac_c = float(kc * (ib.dx * conn_area(xq[0], xq[1]) * ib.interpolate(w2).value).sum())
+                r["p_bottomed_bm28_share_N"] = round(reac_c, 3)
+                r["p_bottomed_w_sw1_um"] = round(1e3 * float((ib.interpolate(w2).value * la).sum() / max(la.sum(), 1)), 2)
             results.append(r)
             if ev == E_VHB[0] and F == FORCES[0]:
                 plot_case = (w, k)
-    out = dict(src="sim/checks/sw1_press_fem.py", date="2026-10-07", model="Kirchhoff plate (Morley) on Winkler VHB over the bonded area; lid rigid",
+    out = dict(src="sim/checks/sw1_press_fem.py", date="2026-10-08" if K4 else "2026-10-07", model="Kirchhoff plate (Morley) on Winkler VHB over the bonded area; lid rigid",
                inputs=dict(board=[BW, BH, T], E_pcb_MPa=E_PCB, nu=NU, vhb_t=VHB_T, inset=INSET, pocket=list(POCKET), sw1_body=list(BODY),
-                           sw_xy=list(SW_XY), mic=list(MIC_XY), tp_cut_half=TP_R, mesh=[nx, ny]),
-               limits=dict(b_part_margin_to_cell_mm=B_MARGIN, kmt022_travel_mm=list(D.SW1["travel"])),
+                           sw_xy=list(SW_XY), mic=list(MIC_XY), tp_cut_half=TP_R, mesh=[nx, ny], bond_x1=BOND_X1, k4=K4),
+               limits=dict(b_part_margin_to_cell_mm=B_MARGIN, kmt022_travel_mm=list(TRAVEL)),
                results=results)
     od = ROOT / "sim/out/mech"
     od.mkdir(parents=True, exist_ok=True)

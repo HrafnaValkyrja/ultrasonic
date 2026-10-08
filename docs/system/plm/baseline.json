@@ -585,15 +585,15 @@
    }
   },
   "R-UI-BODY": {
-   "by": "claude-backlog",
-   "date": "2026-10-07",
-   "note": "round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT",
+   "by": "K4-SHELLCHK agent",
+   "date": "2026-10-08",
+   "note": "switch_stack refactored to take a namespace, values unchanged for r2 (verified equal); K4 reuse added; R-UI-BODY still valid",
    "stamp": {
     "ref:SW1": "6a5226a0b24dd9c5",
     "sym:hw/mech/dims_r2.py::POCKET": "0db9572e173f92f4",
     "sym:hw/mech/dims_r2.py::PUCK_L": "2835136689be5bb9",
     "sym:hw/mech/dims_r2.py::SW": "d595c80a5705b3f3",
-    "sym:hw/mech/dims_r2.py::switch_stack": "cb03b6eb9a581066",
+    "sym:hw/mech/dims_r2.py::switch_stack": "f71cb78c98466dbc",
     "sym:hw/mech/shell_r2.py::puck": "dc81383881142193",
     "yaml:hw/pod/draft_r2/placement.yaml::SW1": "bd42ba43c86e5ab1"
    }

@@ -154,9 +154,11 @@ def duct_offsets():
                 walls_never_fight_pin=walls_free, tolerances=tol)
 
 
-def switch_stack():
+def switch_stack(ns=None):
     """Puck top -> skin underside. Negative = switch pre-pressed. Tolerances [A] (C&K gives 0.65 nominal only)
     except vhb: 3M VHB 4914 TDS (rev 2024-09, SHA-256 prefix 2fc355523c5e5dff) thickness 0.25 mm +-15 % = +-0.0375."""
+    g = ns if ns is not None else globals()      # ns: a variant's dims module namespace (dims_k4.switch_stack reuses this function, 2026-10-08)
+    PRE_GAP, PUCK_L, PUCK_KIT, PUCK_STEP, SW1, POCKET, Y_F, VHB_T = (g[k] for k in ("PRE_GAP", "PUCK_L", "PUCK_KIT", "PUCK_STEP", "SW1", "POCKET", "Y_F", "VHB_T"))
     t = dict(vhb=round(0.15 * VHB_T, 4), sw_h=0.05, solder_lift=(0.0, 0.05), puck_print=0.05, recess_floor=0.05, lid_face=0.03)
     sym = t["vhb"] + t["sw_h"] + t["puck_print"] + t["recess_floor"] + t["lid_face"]
     g_min, g_max = PRE_GAP - sym - t["solder_lift"][1], PRE_GAP + sym

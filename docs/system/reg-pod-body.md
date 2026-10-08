@@ -184,3 +184,12 @@ src: `hw/mech/dims_k4.py` (dock block), `hw/mech/shell_k4.py` (dock_add/dock_cut
 - Pod length 49.15 -> 50.65 (DOCK_SHIFT 1.5 at the front); T 6.4 and H 14.8 unchanged; the cell cannot move back (strut-relief fill clip at x 62.0).
 - Clearances 2026-10-08: tab to bosses 0.4, tab to cell 0.55, boss top to cell and to M edge 0.15 (tightest). Remaining clashes tub/cell 0.14 mm3 and tub/arm_wires 0.11 mm3, not from the dock.
 - Assembly: pod magnets set with a marked jig (polarity from the jig); after M/P are hung, flow low-viscosity UV acrylic into the 0.1 gap and fillet each window web from the cavity side; leave the castellations open.
+
+## K4 shell checks (K4-SHELLCHK, 2026-10-08; sim/checks/k4_shellchk.py -> sim/out/mech/k4_shellchk.json)
+Run: `HEEL_TUB=k4 python3 hw/mech/heel.py; python3 hw/mech/shell_k4.py; K4_STACK_L=14.05 python3 sim/checks/k4_shellchk.py` (heel.py reuses shell_k4.tub(); dims_k4.switch_stack() reuses dims_r2.switch_stack).
+- **Seam rebate:** 0.4 high OK (>= 0.4 recess minimum), but 0.1 deep on a 0.6 wall leaves 0.5 (< RESIN min_wall 0.6) and 0.1 < min_feature 0.3. Open: owner/ECR (rebate 0.1 x 0.4 accepted for now; a 0.8 tub wall under the seam would restore r2's 0.2 x 0.4).
+- **Strut clearance (K4_RELIEF=len):** pad.py actual 1.176 worn, same as r2 (ARM-6D accepted); relief chamfer is frame-fixed. K4_RELIEF=lift not re-run.
+- **Switch stack, VHB +-15 %:** fixed -0.198..+0.287, ceiling worst 0.082, selective fit 0.005..0.135 PASS; identical to r2 (puck L 0.48).
+- **Lateral:** dims_k4 had MIC x 1.9 and SW x 8.0 (stack-local); routed_M.kicad_pcb has the U2 port at 1.75 and SW1 actuator at 5.3 (3.55 apart, not 6.1): the switch was 2.7 mm off its plunger. Fixed in dims_k4 (MIC 1.75, SW 5.3); nominal now 0.025, worst with the 0.2 stack 0.225 vs 0.15 = WARN as RPB-4 (selective fit).
+- **Board in pod:** routed M is 14.05 x 12.05 but STACK_L is 11.0: FAILS length until the pod grows 3.05 (K4_STACK_L=14.05 passes; owner/router decision on L). Height 12.05 in the 13.2 cavity (0.78 side gaps) OK. Floor clear 0.2 nominal, -0.038 worst (VHB +-15 % + 2 boards +-0.1; BM28 mated height not included): P may touch the floor; soft contact, WARN.
+- **Left pod:** mic, SW1, BM28 on the board centre line (+-0.025): flip moves them <= 0.05. heel.wire_route (left/right) still uses the r2 frame board and cell, NOT K4-valid; K4 arm-wire route is a placeholder (clash tub/arm_wires 0.111 mm3, tub/cell 0.140 mm3 unchanged).

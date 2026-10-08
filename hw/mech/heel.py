@@ -30,6 +30,7 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import sys
 from pathlib import Path
 
@@ -42,15 +43,31 @@ sys.path.insert(0, str(HERE))
 import frame as F  # noqa: E402
 import blade  # noqa: E402  (prism helpers, adapter(), shell())
 
+def _tub_k4():
+    """HEEL_TUB=k4: check the strut/heel against the K4 tub (shell_k4.tub(), K4_RELIEF len|lift). Frame facts (blade/pod/frame) stay the default design's: shell_k4 builds that way too."""
+    return (os.environ.get("HEEL_TUB") or "").strip().lower() == "k4"
+
+
 def _out_dir():
     """Phase 2 (default): out/parts/heel; a NON-DEFAULT variant (ULTRASONIC_DESIGN=k1/k1p): out/parts/heel_<id>."""
     sys.path.insert(0, str(HERE.parents[1] / "tools"))
     from current import current
     d = current().id
+    if _tub_k4():
+        return HERE / "out" / "parts" / "heel_k4tub"
     return HERE / "out" / "parts" / ("heel" if d in ("phase2", "revg") else f"heel_{d}")
 
 
 OUT = _out_dir()
+
+
+def _design_tub():
+    """The selected design's real tub with this heel: shell_k4.tub() for HEEL_TUB=k4 (K4_RELIEF picks len|lift), else shell_r2.tub(heel)."""
+    if _tub_k4():
+        import shell_k4 as SK
+        return SK.tub()
+    import shell_r2 as SR
+    return SR.tub(sys.modules[__name__])
 
 # ----------------------------------------------------------------------------- local frame at the mouth E
 E = F.E.astype(float)
@@ -778,8 +795,7 @@ def checks():
         "note": "plain blade.shell() WITHOUT the strut relief: a preview, not the build; the governing number is strut_clearance_to_r2_tub"}
     # 5b. the real tub (shell_r2.tub with this heel: strut relief, tongue, rebate) - reg-arm issue 6 (2026-10-07)
     try:
-        import shell_r2 as SR
-        r2 = SR.tub(sys.modules[__name__])
+        r2 = _design_tub()
         rcases = {k: _gap(v, r2) for k, v in solids.items()}
         act_min = min((v for k, v in rcases.items() if k.startswith("pad.py_actual")), default=None)
         res["strut_clearance_to_r2_tub"] = {
@@ -1097,8 +1113,7 @@ def main():
     export_step(heel_cut(undersize=True), str(OUT / "heel_cut_print.step"))
     export_step(parts["part_reamed"], str(OUT / "tub_with_heel_preview.step"))
     try:                                   # the real tub (strut relief etc.) for pad.py's cross-check (reg-arm issue 6)
-        import shell_r2 as SR
-        export_step(SR.tub(sys.modules[__name__]), str(OUT / "tub_r2_with_heel.step"))
+        export_step(_design_tub(), str(OUT / "tub_r2_with_heel.step"))
     except Exception as ex:  # noqa: BLE001
         print("r2 tub export failed:", repr(ex))
     export_stl(parts["heel_only"], str(OUT / "heel_only.stl"), tolerance=0.01, angular_tolerance=0.1)
@@ -1116,7 +1131,8 @@ def main():
     try:
         figure(parts, res, OUT / "heel_sections.png")
         views(parts, OUT / "heel_views.png")
-        route_figure(HERE.parents[1] / "docs/diagrams/heel-wire-route.png")
+        if OUT.name == "heel":      # the committed r2 picture; variants do not overwrite it
+            route_figure(HERE.parents[1] / "docs/diagrams/heel-wire-route.png")
     except Exception as ex:  # figures are a convenience; never block the checks
         print("figure failed:", repr(ex))
     print(json.dumps({k: v for k, v in res.items() if k not in ("outputs",)}, indent=1,

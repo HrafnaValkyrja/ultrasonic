@@ -644,3 +644,8 @@
 - 2026-10-07 22:53 checkin PHYSICAL by claude
 - 2026-10-07 22:53 checkin INTEGRATION by claude
 - 2026-10-08 00:49 review INTEGRATION by claude-pod-mass: k4 variant block added to hw/current.yaml for pod_mass; no interface change
+- 2026-10-08 02:57 review R-UI-BODY by K4-SHELLCHK agent: switch_stack refactored to take a namespace, values unchanged for r2 (verified equal); K4 reuse added; R-UI-BODY still valid
+- 2026-10-08 02:58 checkout REG-POD-BODY by K4-SHELLCHK agent: K4 shell checks 2026-10-08
+- 2026-10-08 02:58 checkin REG-POD-BODY by K4-SHELLCHK agent
+- 2026-10-08 02:58 checkout REG-ARM by K4-SHELLCHK agent: K4 shell checks 2026-10-08
+- 2026-10-08 02:58 checkin REG-ARM by K4-SHELLCHK agent

@@ -47,7 +47,7 @@ CELL_Z0 = CELL_Z1 - CELL_SPEC["W"]
 CH_UNDER = CELL_Z0 - CAV["z0"]         # wire channel under the cell
 
 # ---------------------------------------------------------------- board stack (placeholder block for B+ two-board stack, V9-k4-board.yaml B_plus)
-STACK_L, STACK_H, STACK_T = 11.0, 12.0, 4.3
+STACK_L, STACK_H, STACK_T = float(os.environ.get("K4_STACK_L") or 11.0), 12.0, 4.3   # K4_STACK_L=14.05: the committed routed M board is 14.05 x 12.05 (K4-SHELLCHK finding)
 PCB_T, F_GAP, VHB_T = 0.8, 0.30, 0.25
 Y_F = Y_LID_IN - F_GAP                 # 9.4 F face of the top board, bonded to the lid on VHB
 Y_B = Y_F - PCB_T                      # 8.6 B face (mic U2 hangs below it)
@@ -66,8 +66,8 @@ def sbpt(bx, bz):
     return STACK_X0 + bx, ZC + bz
 
 
-MIC = sbpt(1.9, 0.0)                   # port at the hinge end (F1); same offset from the front edge as the K1 board (1.88)
-SW = sbpt(8.0, 0.0)                    # button toward the stack rear (K1: board x 18.5 of 30)
+MIC = sbpt(1.75, 0.0)                  # U2 port NPTH on routed_M.kicad_pcb: board (1.75, 6.0) from the outline corner (K4-SHELLCHK 2026-10-08; was 1.9 = K1's 1.88)
+SW = sbpt(5.3, 0.0)                    # SW1 actuator = pad-bbox centre on routed_M.kicad_pcb: board (5.3, 6.0) (was 8.0, a pre-layout guess: 2.7 mm off the plunger)
 U2 = dict(c=MIC, dx=2.65, dz=3.5, h=1.08)
 MIC_HOLE_D = 0.65
 
@@ -78,9 +78,11 @@ POCKET = dict(dx=4.3, dz=3.1, top=Y_LID_IN + 0.6)
 BORE_D, PUCK_D, NUB_D, NUB_H = 2.6, 2.3, 1.0, 0.10
 SKIN_D, SKIN_T = 4.6, 0.1
 SKIN_FLOOR = Y_OUT - SKIN_T
-SW1 = dict(body=(3.0, 2.6), pads=(3.8, 2.6), h=0.65)
+SW1 = dict(body=(3.0, 2.6), pads=(3.8, 2.6), h=0.65, travel=(0.05, 0.15, 0.25))   # KMT022 travel 0.15 +-0.1 (as dims_r2)
 PRE_GAP = 0.07
 PUCK_L = SKIN_FLOOR - PRE_GAP - (Y_F + SW1["h"])
+PUCK_STEP = 0.05
+PUCK_KIT = tuple(round(PUCK_L + k * PUCK_STEP, 2) for k in (-2, -1, 0, 1, 2))
 TONGUE_W, TONGUE_H, GROOVE_CL, CORNER_KEEP = 0.35, 0.35, 0.05, 1.4   # tongue height 0.35 (r2: 0.5) so the 1.0 lid keeps 0.60 over the groove
 REBATE_D, REBATE_H = 0.1, 0.4          # r2: 0.2; a 0.6 wall keeps 0.5
 
@@ -103,3 +105,9 @@ TAB_STRIP_TOP = CELL_Z0 - 0.1            # tab part beyond the stack rear is a 0
 TAB_X = (PAD_X[0] - WIN_W / 2 - 0.3, PAD_X[-1] + WIN_W / 2 + 0.3)
 DOCK_FIT = dict(head_W=6.86, pod_T=T, head_overhang_each_side=round((6.86 - T) / 2, 2),
                 note="head 21.2 x 6.86 sits on the 4.4 flat belly (fillet 1.0) and overhangs T 6.4 by 0.23/side when centred; it is centred on DOCK_YC, not on T")
+
+
+def switch_stack():
+    """Same function as dims_r2.switch_stack (VHB +-15 % = +-0.0375 per the 3M TDS), evaluated on this module's numbers. Lazy import: dims_r2 reads the r2 board at import."""
+    import dims_r2
+    return dims_r2.switch_stack(globals())
