@@ -17,6 +17,7 @@ filler_spec_ECR-0023: "bonded-post filler = low-shrink epoxy, <= 0.5 % shrink (n
 blockers:
   - id: B4-STACKUP-0.8-6L
     what: "JLC publishes no 0.8 mm 6L build (K4-STACK6). Dielectric split chosen by JLC at order; do not order impedance control. Confirm on live quote."
+    recheck_2026-10-08: "https://jlcpcb.com/impedance (fetched 2026-10-08): 6-layer impedance stack-up table offers 1.2 / 1.6 / 2.0 mm only (e.g. 1.6 mm = Cu 0.035, 3313 0.0994, core 0.55 w/ 0.0152 Cu, 2116 0.1164 (or 0.1088 in JLC06161H-3313), core 0.55, 3313 0.0994, Cu 0.035); no 0.8 mm 6L. https://jlcpcb.com/capabilities/pcb-capabilities (2026-10-08): thickness tolerance +-0.1 mm quoted for 0.8 mm generally, 0.1 mm microvias for <=1 mm boards; no 6L 0.8 mm stack-up. No stack-up JSON found. STILL OPEN. k4_noise.py already bounds the unknown split (uniform vs thin_outer)."
   - id: B5-PIN1-UNCONFIRMED
     what: "7 parts still need the JLC placement preview against pin1_expected.png: J20 J21 U1 U3 Q1 Q2 SW1 (JLC's per-part rotation is unpublished; datasheet + EasyEDA geometry agree with our pad 1 for all but Q1/Q2, which have no EasyEDA footprint). Closed 2026-10-08 by datasheet pass (table below): U4 U6 D4 D5. No CPL rotation changed (no pin-1 disagreement found in tools/jlc_rotations.py output)."
     datasheet_pass_2026-10-08:
