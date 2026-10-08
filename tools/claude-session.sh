@@ -21,14 +21,17 @@ if tmux -L "$SOCK" has-session -t ultrasonic 2>/dev/null; then
   exec tmux -L "$SOCK" attach -t ultrasonic
 fi
 # optional first prompt (tools/keepalive.sh passes a wake prompt so the resumed session rebuilds its heartbeat)
-CMD="claude --continue; exec bash"
+# Resume THIS project's conversation by id (--continue picks whatever ran last in the folder) with Remote Control on,
+# so the owner can steer from her phone (owner OK 2026-10-08).
+SID="${CLAUDE_SESSION_ID:-759e00a7-254c-4cd3-926a-efbece430ab6}"
+CMD="claude --resume $SID --remote-control 'Ultrasonic Local Valhalla'; exec bash"
 if [ -n "${CLAUDE_WAKE_PROMPT:-}" ]; then
   printf '%s' "$CLAUDE_WAKE_PROMPT" > "$PWD/.claude-wake-prompt"
-  CMD='claude --continue "$(cat .claude-wake-prompt)"; rm -f .claude-wake-prompt; exec bash'
+  CMD="claude --resume $SID --remote-control 'Ultrasonic Local Valhalla' \"\$(cat .claude-wake-prompt)\"; rm -f .claude-wake-prompt; exec bash"
 fi
 
-MAX="${CLAUDE_MEM_MAX:-18G}"
-HIGH="${CLAUDE_MEM_HIGH:-14G}"
+MAX="${CLAUDE_MEM_MAX:-8G}"     # owner-set session fence 8G (2026-10-07), permanent since 2026-10-08
+HIGH="${CLAUDE_MEM_HIGH:-7G}"
 exec systemd-run --user --scope --quiet \
   -p MemoryHigh="$HIGH" -p MemoryMax="$MAX" -p MemorySwapMax=2G \
   tmux -L "$SOCK" new-session $DETACHED -s ultrasonic -c "$PWD" "$CMD"
