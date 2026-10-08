@@ -195,3 +195,5 @@ Source: hw/pod/k4/gen.py -> pod_k4_M.net / pod_k4_P.net, BOMs bom_jlc_M.csv (23 
 - B2B: BM28 30 contacts (16 signal/power incl. +3V0 on 3, 14 GND; map integration-map.md section 11, pin-contract.yaml k4_split). No switching node crosses; USB D+/D- are an adjacent pair with GND either side; the PDM trio is GND-guarded. 20 contacts do not fit.
 - Placement rules to carry: continuous GND under L1 and over the mic on both boards, BM28 slot offset from the L1 shadow, >= 4 GND pins near L1 (V9 B+ conditions); MP-01 10 mm port-to-L1 rule is relaxed only on those conditions. Not placed or routed; board outline, heights and TP accessibility are placement work.
 - ECR-0019 is folded in: no J12/R18/D6 or CC net in the K4 netlists.
+
+- K4 M rev 5 (2026-10-08, ECR-0020): +R30 33 ohm 0402 at B (1.3, 3.4) rot 90 (MIC_VDD -> MIC_VDDF, mic supply filter with C13), TP6 moved to B (6.9, 2.75); M re-placed and re-routed: place PASS, 0 unconnected, 0 DRC errors. P untouched.

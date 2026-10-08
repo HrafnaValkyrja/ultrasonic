@@ -47,9 +47,9 @@
    }
   },
   "REG-BOARD": {
-   "by": "backlog-agent",
-   "date": "2026-10-07",
-   "note": "round 8 router batch (ECR-0018 log): R23 1M I_SENSE offset (OUT-1B), TP2/TP4 swap (DBG-2), mic NPTH D0.65 at (1.90, 6.0) Port0.65 footprint (SAI-15D), local re-route of BTN/I_SENSE/SWCLK; DK-17D (R24/PA9) not routable locally, backed out (reg-board 22). DRC 0/0/0 all severities, place_r2 check PASS, noise smoke PASS (M03 1.32 %), acoustics MC60 mean +5.93 dB / R14 all-pass 0.63, interfaces/bom_check no FAIL, shell_r2 valid",
+   "by": "K4 mic filter agent",
+   "date": "2026-10-08",
+   "note": "K4 M rev5",
    "stamp": {
     "file:hw/pod/draft_r2/out/routed.kicad_pcb": "db9136df8bc9b089",
     "file:hw/pod/draft_r2/placement.yaml": "35192f3dd7427e78",
@@ -87,9 +87,9 @@
    }
   },
   "SUB-AUDIO-IN": {
-   "by": "backlog-agent",
-   "date": "2026-10-07",
-   "note": "round 8 router batch (ECR-0018 log): R23 1M I_SENSE offset (OUT-1B), TP2/TP4 swap (DBG-2), mic NPTH D0.65 at (1.90, 6.0) Port0.65 footprint (SAI-15D), local re-route of BTN/I_SENSE/SWCLK; DK-17D (R24/PA9) not routable locally, backed out (reg-board 22). DRC 0/0/0 all severities, place_r2 check PASS, noise smoke PASS (M03 1.32 %), acoustics MC60 mean +5.93 dB / R14 all-pass 0.63, interfaces/bom_check no FAIL, shell_r2 valid",
+   "by": "K4 mic filter agent",
+   "date": "2026-10-08",
+   "note": "K4 R30 filter section",
    "stamp": {
     "block:MIC": "cd7ced6b914e48c2",
     "sym:hw/mech/dims_r2.py::DUCT_D": "3fbb6d185c33173c",

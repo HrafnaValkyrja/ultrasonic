@@ -2,7 +2,7 @@
   (version "D")
   (design
     (source "gen.py")
-    (date "10/08/2026 03:38 AM")
+    (date "10/08/2026 04:06 AM")
     (tool "SKiDL (2.3.0)")
     (sheet
       (number 1)
@@ -475,7 +475,7 @@
         (field
           (name "SKiDL Tag") "J21")
         (field
-          (name "SKiDL Line") "gen.py:427"))
+          (name "SKiDL Line") "gen.py:430"))
       (libsource
         (lib "NO_LIB")
         (part "BM28_30"))

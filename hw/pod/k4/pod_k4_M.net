@@ -2,7 +2,7 @@
   (version "D")
   (design
     (source "gen.py")
-    (date "10/08/2026 03:38 AM")
+    (date "10/08/2026 04:06 AM")
     (tool "SKiDL (2.3.0)")
     (sheet
       (number 1)
@@ -241,7 +241,7 @@
         (field
           (name "SKiDL Tag") "D4")
         (field
-          (name "SKiDL Line") "gen.py:269"))
+          (name "SKiDL Line") "gen.py:272"))
       (libsource
         (lib "Device")
         (part "D_Schottky"))
@@ -267,7 +267,7 @@
         (field
           (name "SKiDL Tag") "D5")
         (field
-          (name "SKiDL Line") "gen.py:266"))
+          (name "SKiDL Line") "gen.py:269"))
       (libsource
         (lib "lcsc")
         (part "TPD1E10B06DPYR"))
@@ -345,7 +345,7 @@
         (field
           (name "SKiDL Tag") "J20")
         (field
-          (name "SKiDL Line") "gen.py:427"))
+          (name "SKiDL Line") "gen.py:430"))
       (libsource
         (lib "NO_LIB")
         (part "BM28_30"))
@@ -693,6 +693,32 @@
       (component_classes)
       (tstamps "6d059f79-f7fb-532a-98db-972feb6a8e76"))
     (comp
+      (ref "R30")
+      (value "33")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0402_1005Metric")
+      (fields
+        (field
+          (name "LCSC") "C25105")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0402_1005Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "R30")
+        (field
+          (name "SKiDL Line") "gen.py:146"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "f064446f-1abb-5ab7-9657-2f2853315805"))
+    (comp
       (ref "R8")
       (value "1M")
       (description "Resistor")
@@ -761,7 +787,7 @@
         (field
           (name "SKiDL Tag") "RT1")
         (field
-          (name "SKiDL Line") "gen.py:287"))
+          (name "SKiDL Line") "gen.py:290"))
       (libsource
         (lib "Device")
         (part "Thermistor_NTC"))
@@ -787,7 +813,7 @@
         (field
           (name "SKiDL Tag") "SW1")
         (field
-          (name "SKiDL Line") "gen.py:323"))
+          (name "SKiDL Line") "gen.py:326"))
       (libsource
         (lib "lcsc")
         (part "KMT022NGJLHS"))
@@ -943,7 +969,7 @@
         (field
           (name "SKiDL Tag") "U3")
         (field
-          (name "SKiDL Line") "gen.py:277"))
+          (name "SKiDL Line") "gen.py:280"))
       (libsource
         (lib "lcsc")
         (part "BQ25180YBGR"))
@@ -969,7 +995,7 @@
         (field
           (name "SKiDL Tag") "U4")
         (field
-          (name "SKiDL Line") "gen.py:309"))
+          (name "SKiDL Line") "gen.py:312"))
       (libsource
         (lib "lcsc")
         (part "TPS7A2030PDQNR"))
@@ -995,7 +1021,7 @@
         (field
           (name "SKiDL Tag") "U6")
         (field
-          (name "SKiDL Line") "gen.py:302"))
+          (name "SKiDL Line") "gen.py:305"))
       (libsource
         (lib "lcsc")
         (part "TPD2E2U06DRLR"))
@@ -1338,19 +1364,31 @@
       (name "MIC_VDD")
       (class "Default")
       (node
+        (ref "J20")
+        (pin "6")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R30")
+        (pin "1")
+        (pintype "PASSIVE")))
+    (net
+      (code 14)
+      (name "MIC_VDDF")
+      (class "Default")
+      (node
         (ref "C13")
         (pin "1")
         (pintype "PASSIVE"))
       (node
-        (ref "J20")
-        (pin "6")
+        (ref "R30")
+        (pin "2")
         (pintype "PASSIVE"))
       (node
         (ref "U2")
         (pin "5")
         (pintype "POWER-IN")))
     (net
-      (code 14)
+      (code 15)
       (name "TS")
       (class "Default")
       (node
@@ -1370,7 +1408,7 @@
         (pin "D1")
         (pintype "UNSPECIFIED")))
     (net
-      (code 15)
+      (code 16)
       (name "USB_DM")
       (class "Default")
       (node
@@ -1386,7 +1424,7 @@
         (pin "5")
         (pintype "UNSPECIFIED")))
     (net
-      (code 16)
+      (code 17)
       (name "USB_DP")
       (class "Default")
       (node
@@ -1402,7 +1440,7 @@
         (pin "3")
         (pintype "UNSPECIFIED")))
     (net
-      (code 17)
+      (code 18)
       (name "VBAT")
       (class "Default")
       (node
@@ -1422,7 +1460,7 @@
         (pin "C2")
         (pintype "UNSPECIFIED")))
     (net
-      (code 18)
+      (code 19)
       (name "VBAT_SENSE")
       (class "Default")
       (node
@@ -1442,7 +1480,7 @@
         (pin "1")
         (pintype "PASSIVE")))
     (net
-      (code 19)
+      (code 20)
       (name "VBUS")
       (class "Default")
       (node
@@ -1462,7 +1500,7 @@
         (pin "A2")
         (pintype "UNSPECIFIED")))
     (net
-      (code 20)
+      (code 21)
       (name "VBUS_SENSE")
       (class "Default")
       (node
@@ -1478,7 +1516,7 @@
         (pin "1")
         (pintype "PASSIVE")))
     (net
-      (code 21)
+      (code 22)
       (name "VSYS")
       (class "Default")
       (node

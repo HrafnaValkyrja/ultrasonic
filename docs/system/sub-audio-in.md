@@ -129,3 +129,8 @@ Firmware dependencies (integration-map §8): ADF1 on PB3/PB4 at 4 MHz; PA5 is a 
 
 ## Reference design (Rev F/G)
 `ULTRASONIC_DESIGN=revg` (`hw/current.yaml` reference): two-face 34 x 13 board `hw/pod/draft_r1/pod_r1_routed.kicad_pcb`, shell `hw/mech/shell_r1.py`. U2 origin (4.67, 6.5), port (3.9, 6.5) = pod x 34.5 (ECR-0011 aligned it; Rev E was 0.77 mm off). Duct: lid bore D1.0 0.9 long + hex window, **open 1.5 mm gap** board-to-lid (no seal, a water path and a side cavity); acoustics `as_built` mean -2.5 dB (MC p05 -9.3), resonance at 84.7 kHz Q15.5 for the D1.0 chimney option. R2 0402 at the mic end of a 16.6 mm N$2 run; C13 0402 X7R. Layout noise on Rev F: LN-M01 23.1 dB, LN-M02 12.2 dB (0.2 dB margin). History: git.
+
+## K4 mic-supply filter (ECR-0020 rev 5, 2026-10-08; K4 only, not the current design)
+- K4 M carries R30 33 ohm 0402 (Yageo 0402WGF330JTCE, C25105, Basic, stock 1,868,836 at JLC parts API 2026-10-08T08:03Z) in series from MIC_VDD (BM28 pin 6, from P's PA5) to a new local net MIC_VDDF = U2 VDD + C13 (100 nF 0201). Corner 1/(2 pi 33 ohm 50..70 nF) = 69..96 kHz; 3 MHz (SMPS) is 30 dB down ideal. Mic current 1.35 mA (params.yaml mic.r_load 2.2k at 3 V; datasheet ~1 mA) x 33 ohm = 45 mV < 50 mV, so the mic sees >= 2.95 V at VDD 3.0 V.
+- Why: sim/noise/k4_noise.py (corrected P geometry, real gap 0.6) puts F02 SMPS -> MIC_VDD at 8.0 dB worst corner (abs bound) without it, 26.4 dB with it (attenuation capped at 20 dB). A 1 uF at the node did not fit (see ECR-0020 rev 5): the F-face gap budget is 0.6 mm total and the B-face is inside the port keep-out.
+- Check at bring-up: MIC_VDDF DC >= 2.95 V with the mic running; LN-V* spur test on MIC_VDDF vs MIC_VDD.

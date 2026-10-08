@@ -651,3 +651,12 @@
 - 2026-10-08 02:58 checkin REG-ARM by K4-SHELLCHK agent
 - 2026-10-08 02:59 review REG-POD-BODY by K4-SHELLCHK agent: doc updated with K4 shell/strut checks 2026-10-08
 - 2026-10-08 02:59 review REG-ARM by K4-SHELLCHK agent: doc updated with K4 shell/strut checks 2026-10-08
+- 2026-10-08 04:12 checkout SUB-AUDIO-IN by K4 mic filter agent: K4 R30 mic-supply filter
+- 2026-10-08 04:12 checkout REG-BOARD by K4 mic filter agent: K4 M placement R30
+- 2026-10-08 04:12 review SUB-AUDIO-IN by K4 mic filter agent: K4 R30 filter section
+- 2026-10-08 04:12 review REG-BOARD by K4 mic filter agent: K4 M rev5
+- 2026-10-08 04:12 checkin SUB-AUDIO-IN by K4 mic filter agent
+- 2026-10-08 04:12 checkin REG-BOARD by K4 mic filter agent
+- 2026-10-08 04:13 checkout REG-BOARD by K4 mic filter agent: rev5 line
+- 2026-10-08 04:13 review REG-BOARD by K4 mic filter agent: K4 M rev5
+- 2026-10-08 04:13 checkin REG-BOARD by K4 mic filter agent

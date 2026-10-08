@@ -30,21 +30,34 @@ import budget, couple, pcbgeom  # noqa: E402
 
 MU0 = couple.MU0
 LAYERS6 = ["F.Cu", "In1.Cu", "In2.Cu", "In3.Cu", "In4.Cu", "B.Cu"]
-CU6 = {"F.Cu": 35, "In1.Cu": 15.2, "In2.Cu": 15.2, "In3.Cu": 15.2, "In4.Cu": 15.2, "B.Cu": 35}   # um; assumption JLC 6L 0.8
+CU6 = {"F.Cu": 35, "In1.Cu": 15.2, "In2.Cu": 15.2, "In3.Cu": 15.2, "In4.Cu": 15.2, "B.Cu": 35}   # um; JLC 6L copper 0.035 / 0.0152 (impedance page, read 2026-10-08)
+# K4-STACK6 (2026-10-08, headless Chromium, https://jlcpcb.com/impedance "6-Layer Impedance Control Stackup" and
+# https://jlcpcb.com/resources/6-layer-pcbs + /capabilities): JLC orders 6L at 0.8 mm (resources page: 0.8/1.0/1.2/1.6/2.0; FR4 0.4..2.0, tol +-0.1 mm
+# below 1.0 mm) but PUBLISHES 6L impedance stack-ups only for 1.2 / 1.6 / 2.0 mm (page tabs). Smallest published (1.2 mm) examples, all Cu 0.035 outer /
+# 0.0152 inner: JLC06161H-1080 = 1080 0.0764 / core 0.55 / 7628 0.2104 / core 0.55 / 1080 0.0764; JLC06161H-2116B = 2116 0.1164 / core 0.5 / 1080x2 0.1528 /
+# core 0.5 / 2116 0.1164. eps: core 4.6, prepreg 7628 4.4, 3313 4.1, 1080 3.91, 2116 4.16. NO 0.8 mm 6L build is published -> the dielectric split below is
+# unknown: 0.8 - 0.131 Cu = 0.669 mm over 5 layers. Two bounding models: "uniform" (0.134 each) and "thin_outer" (outer prepregs 0.0764 = 1080, the other
+# three 0.172). The total (0.8 +-0.1) and the gap are what matter at 3 MHz; the split only moves plane-to-trace distances inside one board.
+STACK_DIEL = {"uniform": [0.1338] * 5, "thin_outer": [0.0764, 0.1724, 0.1724, 0.1724, 0.0764]}
 AGG_ROOT = {"OUT_A": ("Q1", "3"), "OUT_B": ("Q2", "3"), "VLXSMPS": ("U1", "20"), "MIC_VDD": ("U1", "15"), "MIC_CLK": ("R2", "2"), "MIC_DATA": ("U2", "1")}
 FIELD_AGG = [("F01_BRIDGE_OUT", {"OUT_A": 1.0, "OUT_B": -1.0}, (0.2e6, 0.6e6, 2e6)), ("F02_SMPS_LX", {"VLXSMPS": 1.0}, (3e6, 6e6, 9e6, 27e6))]
 VICTIMS = [("FV1_MIC_VDD", "MIC_VDD"), ("FV2_MIC_DATA", "MIC_DATA"), ("FV3_MIC_CLK", "MIC_CLK")]
 
 
-def zstack(top: float, n6: bool = True) -> dict:
-    """layer centre z (mm, up) of a 0.8 mm board whose F face is at `top`."""
+STACK = {"mode": "uniform"}
+
+
+def zstack(top: float, flip: bool = False) -> dict:
+    """layer centre z (mm, up) of a 0.8 mm board whose top face is at `top`. flip: the file's B.Cu is the top face (board P: its file F is the inner face
+    that looks at M, place_k4.py header), else F.Cu is the top face."""
     cu = sum(CU6.values()) / 1000.0
-    d = (0.8 - cu) / 5.0
+    dd = STACK_DIEL[STACK["mode"]]
+    d = [x * (0.8 - cu) / sum(dd) for x in dd]
     z, out = top, {}
-    for L in LAYERS6:
+    for i, L in enumerate(reversed(LAYERS6) if flip else LAYERS6):
         t = CU6[L] / 1000.0
         out[L] = z - t / 2
-        z -= t + d
+        z -= t + (d[i] if i < 5 else 0)
     return out
 
 
@@ -132,6 +145,16 @@ def l1_body(geom, zmap, face_dir, h=0.5):
     return Pc
 
 
+def filter_att(f, args):
+    """voltage divider R30 (series) into the C13 node: |Zc| / |R + Zc|, Zc = ESR + j(wL - 1/wC) (0201 100 nF: ESR 50 mohm, ESL 0.4 nH [T]); floored at -filter_floor_db."""
+    if args.filter_r <= 0:
+        return 1.0
+    w = 2 * math.pi * f
+    zc = complex(0.05, w * 0.4e-9 - 1.0 / (w * args.filter_c_nf * 1e-9))
+    a = abs(zc) / abs(args.filter_r + zc)
+    return max(a, 10 ** (-args.filter_floor_db / 20))
+
+
 def T(f, fc):
     return 1.0 / math.sqrt(1.0 + (f / fc) ** 2)
 
@@ -200,9 +223,17 @@ def run(args):
     # ---- K4: P upper, M lower, gap g between P's B face and M's F face
     gP = load(REPO / "hw/pod/k4/routed_P.kicad_pcb")
     gM = load(REPO / "hw/pod/k4/routed_M.kicad_pcb")
+    flip = not args.legacy_noflip
+    if flip:     # P is mirrored across the long axis in the stack (x, y) -> (x, H - y); its file B.Cu is the outer top face
+        for g_ in (gP,):
+            for q in g_["segments"]:
+                q["y1"], q["y2"] = 12.0 - q["y1"], 12.0 - q["y2"]
+            for q in g_["vias"] + g_["pads"]:
+                q["y"] = 12.0 - q["y"]
     topM = 0.8
     topP = 0.8 + args.gap + 0.8
-    zM, zP = zstack(topM), zstack(topP)
+    zM, zP = zstack(topM), zstack(topP, flip)
+    fl_att = lambda f: filter_att(f, args)
     planes_k = [dict(z=zP["In1.Cu"], board="P"), dict(z=zP["In2.Cu"], board="P"), dict(z=zM["In1.Cu"], board="M"), dict(z=zM["In2.Cu"], board="M")]
     own_k = {"P": zP["In1.Cu"], "M": zM["In1.Cu"]}
 
@@ -211,16 +242,19 @@ def run(args):
         for n in ("OUT_A", "OUT_B", "VLXSMPS"):
             agg[n] = net_pieces(gP, n, zP, "P", pads_xy(gP, *AGG_ROOT[n]))
         if case_l1:
-            agg["VLXSMPS"] = concat(agg["VLXSMPS"], l1_body(gP, zP, -1))     # L1 on P's B face, body hangs into the gap toward M
+            agg["VLXSMPS"] = concat(agg["VLXSMPS"], l1_body(gP, zP, +1 if flip else -1))     # L1 on P's file-B face: flipped = outer top, body above it, away from M (legacy: toward M)
         for _, n in VICTIMS:
             vic[n] = []
             if n == "MIC_DATA":    # current runs mic -> MCU: M part first, root U2.1; P part root = connector J21.7
-                vic[n].append(("M", net_pieces(gM, n, zM, "M", pads_xy(gM, "U2", "1"))))
-                vic[n].append(("P", net_pieces(gP, n, zP, "P", pads_xy(gP, "J21", "7"))))
+                vic[n].append(("M", net_pieces(gM, n, zM, "M", pads_xy(gM, "U2", "1")), False))
+                vic[n].append(("P", net_pieces(gP, n, zP, "P", pads_xy(gP, "J21", "7")), False))
             else:                  # MCU -> mic: P part root at the MCU/R2 pin, M part root at connector J20
-                vic[n].append(("P", net_pieces(gP, n, zP, "P", pads_xy(gP, *AGG_ROOT[n]))))
+                filt = n == "MIC_VDD" and args.filter_r > 0     # PA5 -> BM28 -> R30 on M: everything upstream of the R30/C13 node is filtered
+                vic[n].append(("P", net_pieces(gP, n, zP, "P", pads_xy(gP, *AGG_ROOT[n])), filt))
                 num = {"MIC_VDD": "6", "MIC_CLK": "3"}[n]
-                vic[n].append(("M", net_pieces(gM, n, zM, "M", pads_xy(gM, "J20", num))))
+                vic[n].append(("M", net_pieces(gM, n, zM, "M", pads_xy(gM, "J20", num)), filt))
+                if filt:   # downstream of R30 (MIC_VDDF, C13 node -> mic pad): NOT attenuated
+                    vic[n].append(("M", net_pieces(gM, "MIC_VDDF", zM, "M", pads_xy(gM, "R30", "2")), False))
         return agg, vic, planes_k, own_k
 
     out = {}
@@ -234,10 +268,12 @@ def run(args):
                     perf = {}
                     for f in fs:
                         tot = 0.0; tabs = 0.0
-                        for vb, Vp in vic[vn]:
+                        for ent in vic[vn]:
+                            vb, Vp = ent[0], ent[1]
+                            att = fl_att(f) if (len(ent) > 2 and ent[2]) else 1.0
                             for na, sgn in nets.items():
                                 a_, b_ = meff(agg[na], Vp, own[vb] if label == "K4" else own["B"], planes, aboard, vb if label == "K4" else "B", f, rs, args.floor)
-                                tot += sgn * a_; tabs += b_
+                                tot += sgn * a_ * att; tabs += b_ * att
                         perf[f] = (tot, tabs)
                     rows[(aid, vid)] = perf
             out[(label, l1)] = rows
@@ -246,14 +282,26 @@ def run(args):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--gap", type=float, default=1.3, help="P B-face to M F-face air gap (mm); L1 1.0 + margin")
+    ap.add_argument("--gap", type=float, default=0.6, help="P inner face to M inner face gap (mm): BM28 mated height 0.6 [T] (place_k4.GAP); c5899c1 used 1.3")
+    ap.add_argument("--stack", choices=sorted(STACK_DIEL), default="uniform", help="0.8 mm 6L dielectric split (no JLC 0.8 mm 6L build is published, see STACK_DIEL)")
+    ap.add_argument("--legacy-noflip", action="store_true", help="c5899c1 geometry: P NOT mirrored in y, P file F.Cu on top (wrong: place_k4 flips P across the long axis)")
+    ap.add_argument("--filter-r", type=float, default=33.0, help="R30 on M, ohm (0 = no filter)")
+    ap.add_argument("--filter-c-nf", type=float, default=50.0, help="C13 effective at 3 V, nF (100 nF 0201 X5R, 50 %% derating assumed)")
+    ap.add_argument("--filter-floor-db", type=float, default=20.0, help="cap on the filter attenuation, dB (stray coupling past the R/C: pessimistic)")
     ap.add_argument("--floor", type=float, default=0.10, help="cross-board leakage floor on T (A3 of vertical_bplus)")
     ap.add_argument("--out", default=str(HERE / "out_k4"))
     args = ap.parse_args()
+    STACK["mode"] = args.stack
     out, *_ = run(args)
     base = json.load(open(HERE / "out_r2/budget.json"))
     mrows = {(r["aggressor"], r["victim"], r["mechanism"]): r for r in base["l2_rows"] if r.get("kind") in ("tone", "digital")}
     report = {"args": vars(args), "cases": {}}
+    if args.filter_r > 0:
+        ideal = argparse.Namespace(**{**vars(args), "filter_floor_db": 200.0})
+        report["filter"] = {"R_ohm": args.filter_r, "C_eff_nF": args.filter_c_nf, "floor_db": args.filter_floor_db,
+                            "att_db_ideal": {f: round(20 * math.log10(filter_att(f, ideal)), 1) for f in (3e6, 6e6, 9e6, 27e6)},
+                            "att_db_used": {f: round(20 * math.log10(filter_att(f, args)), 1) for f in (3e6, 6e6, 9e6, 27e6)}}
+        print("filter", report["filter"])
     db = lambda a, b: 20 * math.log10(max(abs(a), 1e-6) / max(abs(b), 1e-6))
     for l1 in (False, True):
         t, k = out[("today_draft_r2", l1)], out[("K4", l1)]

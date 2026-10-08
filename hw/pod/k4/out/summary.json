@@ -9,7 +9,10 @@
   "place_check": "PASS",
   "placement": "placement_M_L15.5.yaml (= L14 hand placement, outline 15.5)",
   "file": "hw/pod/k4/routed_M.kicad_pcb",
-  "dock_strip": "NOT done (geometry ambiguous: k4-dock.yaml castellated 2.5-pitch tab vs current J3..J5 column; needs owner/coordinator spec)"
+  "dock_strip": "NOT done (geometry ambiguous: k4-dock.yaml castellated 2.5-pitch tab vs current J3..J5 column; needs owner/coordinator spec)",
+  "date_rev5": "2026-10-08",
+  "parts": 27,
+  "note_rev5": "R30 33R mic-supply filter added (MIC_VDDF), TP6 moved; re-routed with route_k4 + close_gaps: 0 unconnected, 0 DRC errors, place PASS"
  },
  "P": {
   "L": 15.5,

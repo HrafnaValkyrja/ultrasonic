@@ -222,8 +222,11 @@ def build():
     u2.fields["LCSC"] = "C2879853"
     mic_vdd, mic_clk, mic_dat = Net("MIC_VDD"), Net("MIC_CLK"), Net("MIC_DATA")
     mic_vdd.drive = skidl.POWER                        # a GPIO is the supply here, on purpose
-    mic_vdd += u1["PA5"], u2["VDD"]                    # ~1 mA from a GPIO; off in Off mode (D12)
-    c = C("C13", "100n", "C100n"); c[1] += mic_vdd; c[2] += gnd        # X7R: no 0402 C0G at 100 nF
+    mic_vddf = Net("MIC_VDDF")                         # K4 (2026-10-08): local RC filter at the mic; MIC_VDD (PA5 + BM28 pin 6) is the unfiltered side
+    mic_vdd += u1["PA5"]                               # ~1 mA from a GPIO; off in Off mode (D12)
+    r = R("R30", "33", "R33"); r[1] += mic_vdd; r[2] += mic_vddf       # 33R x 1.35 mA (params.yaml mic.r_load 2.2k @3 V) = 45 mV < 50 mV; corner 1/(2pi 33R ~70nF derated C13) = ~69 kHz, 3 MHz is 33 dB down
+    mic_vddf += u2["VDD"]
+    c = C("C13", "100n", "C100n"); c[1] += mic_vddf; c[2] += gnd       # X7R: no 0402 C0G at 100 nF
     r = R("R2", "33", "R33"); r[1] += u1["PB3"]; r[2] += mic_clk       # tames the 4 MHz clock edge
     mic_clk += u2["CLOCK"]
     mic_dat += u2["DATA"], u1["PB4"]
@@ -363,7 +366,7 @@ def build():
 # Crossing nets: +3V0 (LDO on M feeds P; C14/C4/C7 local on P), the 3 mic nets, I2C x2, CHG_INT, TS, VBUS_SENSE, VBAT_SENSE, USB D+/D-, BTN, LED_K.
 # BM28 30 contacts: P carries the plug (DP), M the receptacle (DS), pin n to pin n [T].
 BOARD_OF = {r: "M" for r in (
-    "U2", "C13",                                   # mic
+    "U2", "C13", "R30",                            # mic + its local supply filter (R30 + C13: K4 noise fix, ECR-0020 rev 5)
     "U3", "C15", "C16", "C21", "U4", "C17", "C18", "R20", "TP6",       # charger, LDO (LDO_OUT -> R20 -> +3V0), VSYS pad
     "D4", "D5", "U6", "J3", "J4", "J10", "J11",    # dock: reverse block, ESD, 4 gold pads (VBUS, GND, D+, D-)
     "R12", "R13", "R8", "R9", "C19",               # VBUS / VBAT sense dividers (analogue nodes cross as VBUS_SENSE / VBAT_SENSE)

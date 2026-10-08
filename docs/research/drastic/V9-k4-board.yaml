@@ -131,4 +131,17 @@ k4_post_route_2026_10_08:   # Claude (Opus 5.5 subagent), commit after 0cf2de6. 
       - "docs/system (ECR-0018 -> ECR-0020/0021): reg-board.md, sub-power/dock-usb/ui/audio-in/output.md, physical.md, 00-whole.md, integration-map, rail-budget, pin-contract.yaml, vcrm; ECR-0020/0021 proposed -> approved (owner)."
       - "owner decisions still open: ECR-0020/0021 approval, worst-PSRR noise corner, K4-BM28-DS (contact R), K4-HEIGHTS, K4-STACK6."
     recommendation: "wait for K4-HEIGHTS + K4-STACK6 (both fast), then switch; making k4 default today would leave interfaces.py/bom_check/noise half-blind."
+k4_mic_filter_2026_10_08:   # Claude (Opus 5.5 subagent). Follows k4_post_route_2026_10_08; ECR-0020 rev 5. P placement/routing not touched.
+  glossary: {R30: "33 ohm series resistor on M between MIC_VDD (from P's PA5 via BM28 pin 6) and the mic-local net MIC_VDDF", MIC_VDDF: "filtered mic supply: U2 VDD + C13", K4-STACK6: "backlog item: record the JLC 6-layer 0.8 mm stack-up"}
+  stackup_K4_STACK6: "jlcpcb.com/impedance (headless Chromium, read 2026-10-08): 6L stack-ups published only for 1.2/1.6/2.0 mm (e.g. JLC06161H-1080: Cu 0.035 / 1080 0.0764 / core 0.55 / 7628 0.2104 / core 0.55 / 1080 0.0764 / Cu 0.035, inner Cu 0.0152; eps core 4.6, 7628 4.4, 3313 4.1, 1080 3.91, 2116 4.16). 0.8 mm 6L is orderable (jlcpcb.com/resources/6-layer-pcbs; FR4 0.4..2.0, tol +-0.1 mm under 1.0 mm, jlcpcb.com/capabilities) but NO 0.8 mm build is published: dielectric split unknown, bounded in k4_noise.py by --stack uniform|thin_outer (0.2 dB apart)."
+  model_corrections: "k4_noise.py c5899c1 did not mirror P (stack (x, 12 - y)) and put P file F.Cu on top; place_k4 says P file F is the INNER face. Fixed (--legacy-noflip reproduces the old geometry). Gap 0.6 (BM28 mated, [T]) instead of 1.3."
+  result_F02_smps_to_mic_vdd_worst_PSRR_corner_dB:   # abs-bound margin with the L1 body, sign-off >= 10
+    no_filter_corrected_model: {uniform_gap0.6: 8.0, thin_outer: 7.7, uniform_gap1.3: 8.1, signed_default: 10.6}
+    with_R30_33R_C13_50nF_att_floor_20dB: {uniform_gap0.6: 26.4, thin_outer: 26.2, uniform_gap1.3: 26.5, thin_outer_gap1.3: 26.3, signed_default: 29.7, wrong_legacy_geometry: 19.8}
+    filter_att_db_ideal_3_6_9_27_MHz: [-29.9, -36.1, -39.9, -53.4]
+  drop: "33 ohm x 1.35 mA (params.yaml mic.r_load 2.2k at 3 V) = 45 mV < 50 mV; datasheet ~1 mA gives 33 mV"
+  parts: "R30 Yageo 0402WGF330JTCE C25105 Basic 0402, stock 1,868,836 (JLC parts API 2026-10-08T08:03Z); C13 unchanged 100 nF 0201 C76934. A 1 uF 0402 (C52923 Basic, stock 8.35 M same date) was tried and does not fit: F-face gap budget (0.6 mm total vs P Q1 0.37 + 0.5) and B-face keep-out."
+  layout: "M place PASS (place_k4 --L 15.5 --fine --cx 9.8), route_k4 M + close_gaps: 0 unconnected, 0 DRC errors (kicad-cli, persisted JLC 6L rules), ERC 0 errors both. 27 parts on M incl. J20."
+  verdict: "worst-PSRR corner margin 26.4 dB (>= 10 in every corner and case). K4-HEIGHTS and K4-CONDUCT stay open; the 20 dB filter floor is an assumption until bring-up LN-V* measures MIC_VDDF vs MIC_VDD."
+  integration_map_crosscheck: "touches SUB-AUDIO-IN (mic supply path, +R30), REG-BOARD (M placement), SUB-PROCESSING (PA5 now drives 33 ohm + C13 in series; 1.35 mA, 45 mV drop, no firmware change). Spec/MVP untouched."
 integration_map_crosscheck_k4_post_route: "read-only analysis + two new tools; no design file edited. Touches reg-board (post-route evidence), sub-audio-in (mic noise margin in the worst corner), sub-power (conduction still open). plm status 0 suspect / 0 stale."
