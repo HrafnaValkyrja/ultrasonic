@@ -1,4 +1,4 @@
-# K4 release package (P + M boards) - 2026-10-08 - gate BLOCKED (see gate.yaml)
+# K4 release package (P + M boards) - 2026-10-08 - gate BLOCKED (see gate.yaml); rebuilt on 84a215d
 
 Files (per board X in P, M): `k4_X_gerber_drill.zip` (Protel-ext Gerbers F/In1-4/B Cu, masks, paste, silk, Edge.Cuts; Excellon PTH+NPTH; drill maps; job file),
 `bom_X.csv` (JLC columns Comment/Designator/Footprint/LCSC Part #), `cpl_X.csv` (Designator, Mid X, Mid Y, Layer, Rotation; absolute KiCad coordinates, y up, mm),
@@ -8,7 +8,7 @@ Board: 15.5 x 12.0 mm (bbox 15.55 x 12.05 with edge line), 6 copper layers, 0.8 
 
 ## Quantities (owner rule: 2 worn + 3 spares, O19)
 JLC PCBA minimum is 5. Order 5 P + 5 M assembled; every BOM line = qty/board x 5. Spares are whole boards, so a P/M pair is always available.
-MCU C5271013 stock was 19 on 2026-10-08 (5 needed): reserve early.
+MCU C5271013 stock was 19 on 2026-10-08 (08:40Z) (5 needed): reserve early.
 
 ## Stack-up / impedance
 No `(stackup)` block in the board files; JLC publishes 6L builds for 1.2/1.6/2.0 mm only, NOT 0.8 mm (read 2026-10-08, K4-STACK6). Order 6L 0.8 mm with JLC's default build, **no impedance control**: nothing here claims a controlled net (USB D+/D- are full speed, ~15 mm). Planes: In1 GND, In2/In3/In4 per router assignment; sim/noise assumed uniform dielectrics (0.2 dB spread to thin-outer). Copper outer 1 oz-class (35 um nominal on JLC 6L), inner 0.5 oz (15 um).
@@ -28,14 +28,17 @@ B. 5 P + 5 M in one 2-row panel: fewer panels, but a single bad row blocks both;
 C. Order loose and "Panel by JLCPCB" V-cut: not recommended (mouse-bite/V-cut leaves 0.4 mm tolerance against 0.35 mm-pitch connector edge placement and offers no fiducials).
 No panel file made (needs the final board hashes).
 
-## Cost estimate, 5 + 5 assembled (2026-10-08, JLC parts API 08:40Z; fees from JLC page read 2026-10-02: assembly.md)
+## Cost estimate, 5 + 5 assembled (2026-10-08, JLC parts API 11:53Z; fees from JLC page read 2026-10-02: assembly.md)
 | Line | USD | Basis |
 |---|---|---|
-| Parts (38 lines, 34 distinct LCSC, 5x each) | 78.32 | live API price at qty, `sourcing_dated.csv`; MCU alone 5 x 9.02 = 45.1 |
-| Feeder loading $1.53 per part type | 52 (58 if per board line) | 34 distinct (27 Extended) |
+| Parts (40 lines, 35 distinct LCSC, 5x each) | 78.40 | live API price at qty, `sourcing_dated.csv`; MCU alone 5 x 9.02 = 45.1 |
+| Feeder loading $1.53 per part type | 54 (61 if per board line) | 35 distinct (29 Extended) |
 | Setup + stencil, double-sided | 68 to 135 | $51.12 + $16.42 once for one combined order; double if P and M ordered separately |
 | X-ray (QFN48, DSBGA, LGA, X2SON, DFN, X1SON) | 25 to 70 | scaled from $10-28 per 4 boards; unquoted |
 | PCB 6L 0.8 ENIG, 0.15 vias, POFV, 5 panels | 60 to 160 | UNQUOTED: JLC headline "6L 5 pcs from $2" excludes ENIG, POFV, small-via fee |
 | Shipping, tax | not included | |
-| **Total** | **about 285 to 500** | mid ~390; over the ~$300 budget line (O13) unless the low end holds |
+| **Total** | **about 287 to 503** | mid ~395; over the ~$300 budget line (O13) unless the low end holds |
 Live quote is required before relying on any of this. Hand-off to the upload checklist: `operate-jlcpcb-order` (not started).
+
+## ECR-0023 filler
+Bonded-post filler: low-shrink epoxy, <= 0.5 % shrink (shell assembly, not a PCB line item).

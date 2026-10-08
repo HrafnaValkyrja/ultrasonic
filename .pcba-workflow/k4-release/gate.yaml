@@ -1,24 +1,29 @@
 # K4 release gate. Written 2026-10-08. Nothing ordered (O21); the owner places and pays.
 gate: BLOCKED          # artifacts are generated and self-consistent; the design is not frozen
 source_revision:
-  git_head_at_export: a6201ab   # K4 lid ledge 0.70 (ECR-0022)
-  boards: {routed_P: 17a588cb54be45b1376f04c00029062d9c0ae65a, routed_M: 66269155bdd2ead8a366426c43a43578fd33bc67}  # sha1, hw/pod/k4/
-  bom_source: git show a6201ab:hw/pod/k4/bom_jlc_{P,M}.csv  # copied to src/; working-tree BOMs are AHEAD of the boards (see blockers)
+  git_head_at_export: 84a215d   # f45aaa7 re-route (reversal-safe BM28 map, 0201 C9/C16/C17) + ECR-0022/0023 shell changes
+  boards: {routed_P: 7f18ac4b4c2f6aa1d945839651e44522aa009e7b, routed_M: 025d45253e5017da98f248f85488335bc8484dac}  # sha1, hw/pod/k4/
+  bom_source: hw/pod/k4/bom_jlc_{P,M}.csv at 84a215d (copied to src/; matches boards)
+  rebuilt: 2026-10-08 (gerbers via kicad-cli --board-plot-params, Excellon separate PTH/NPTH, build_release.py)
 checks_passed:
-  - "kicad-cli DRC (error severity, persisted JLC fine rules): P 0 / M 0 violations, 0 unconnected. Warnings only: silk (74 overlap, 64 over copper, 7 edge) - cosmetic, JLC trims silk over pads."
-  - "BOM refs == board assembled refs (excl. TP/J wire pads), both boards; CPL rows = BOM designators (P 29, M 26)"
-  - "stock >= qty x5 for every line (JLC API 2026-10-08T08:40Z); lowest margin MCU C5271013: 19 vs 5 needed"
+  - "kicad-cli DRC (error severity, persisted JLC fine rules): P 0 / M 0 violations (re-run 2026-10-08 on 84a215d), 0 unconnected. Warnings only: silk (74 overlap, 64 over copper, 7 edge) - cosmetic, JLC trims silk over pads."
+  - "BOM refs == board assembled refs (excl. TP/J wire pads), both boards; CPL rows = BOM designators (P 29, M 26; BOM lines P 19, M 21)"
+  - "stock >= qty x5 for every line (JLC API 2026-10-08T11:53Z); lowest margin MCU C5271013: 19 vs 5 needed"
+blockers_cleared_2026-10-08:
+  - "B1-HEIGHTS: ECR-0023 add.2 gap-filling bonded post + k4_heights never-negative (84a215d). Re-run sim/checks/k4_heights.py at freeze to confirm."
+  - "B2-REROUTE-PENDING: f45aaa7 re-routed P and M at L 15.5, 0 DRC / 0 unconnected; C9/C16/C17 now 0201 (C318539/C318540) in BOM, boards and CPL agree."
+  - "B3-BM28-LAND-PATTERN: pad dims from Hirose catalogue (b18670c); reversal-safe checkerboard pin map (9ec84ae)."
+filler_spec_ECR-0023: "bonded-post filler = low-shrink epoxy, <= 0.5 % shrink (not on the PCB release; for the shell assembly step)."
 blockers:
-  - id: B1-HEIGHTS
-    what: "B2B gap side fails in sim/checks/k4_heights.py (C16 -0.10, C17/C9 -0.05 mm, U3/D4 marginal). Design gate, not a release defect."
-  - id: B2-REROUTE-PENDING
-    what: "Another agent is changing the design right now: commit b18670c changed the BM28 plug footprint courtyard; uncommitted BOM edits swap C9 (P) and C16/C17 (M) to 0201 (C318539, C318540, 'dated lookup') and regenerate nets. routed_P/M.kicad_pcb are still the a6201ab files. Any re-route invalidates every artifact here. Re-export (build_release.py + commands in README) after their commit."
-  - id: B3-BM28-LAND-PATTERN
-    what: "BM28 pad dims were not taken from the Hirose drawing at the time of the original footprints (V10-hdi.yaml: 'Do not invent pad dims'). b18670c read the catalog but only moved the courtyard. Confirm pads vs Hirose CL0684 before freeze."
   - id: B4-STACKUP-0.8-6L
-    what: "JLC publishes no 0.8 mm 6L build (K4-STACK6). Dielectric split is chosen by JLC at order; do not order impedance control. Confirm on live quote."
+    what: "JLC publishes no 0.8 mm 6L build (K4-STACK6). Dielectric split chosen by JLC at order; do not order impedance control. Confirm on live quote."
+  - id: B5-PIN1-UNCONFIRMED
+    what: "12 parts not confirmable from data (J20 J21 Q1 Q2 U1 U2 U3 U4 U6 D4 SW1 + D5 check): must be eyeballed in JLC placement preview against pin1_expected.png."
+  - id: B6-PASSIVE-DATASHEET
+    what: "C9 ESR (2u2 0201 C318539) and C17 DC-bias (1u 0201 C318540) unverified against datasheets."
+order_flags: ["POFV (via-in-pad epoxy filled and capped): 67 vias on P pads (U1 EP, R3, R5), none on M", "6L 0.8 mm ENIG, 0.15/0.25 vias, no impedance control"]
 user_review_needed:
   - "JLC DFM + placement preview: CPL rotations now corrected by tools/jlc_rotations.py (EasyEDA pin-1 + community DB + 2022 bottom rule); 12 parts unconfirmed, see pin1_expected.png + jlc_rotation_corrections.csv. Preview still decides."
   - "Live quote: 6L 0.8 mm ENIG, 0.15/0.25 vias, POFV, panel. Cost below is an estimate, PCB line unquoted."
   - "Independent Gerber viewer pass not done (only kicad-cli export + drill histogram)."
-promote_to_PASS_when: [B1..B4 closed, boards frozen with new hash, build_release.py re-run on that hash, owner reviews JLC preview]
+promote_to_PASS_when: [B4..B6 closed, boards frozen with new hash, build_release.py re-run on that hash, owner reviews JLC preview]
