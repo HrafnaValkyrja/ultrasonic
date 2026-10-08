@@ -1,12 +1,12 @@
 # K4 release gate. Written 2026-10-08. Nothing ordered (O21); the owner places and pays.
 gate: BLOCKED          # artifacts are generated and self-consistent; the design is not frozen
 source_revision:
-  git_head_at_export: 84a215d   # f45aaa7 re-route (reversal-safe BM28 map, 0201 C9/C16/C17) + ECR-0022/0023 shell changes
-  boards: {routed_P: 7f18ac4b4c2f6aa1d945839651e44522aa009e7b, routed_M: 025d45253e5017da98f248f85488335bc8484dac}  # sha1, hw/pod/k4/
+  git_head_at_export: 9137d96   # f45aaa7 re-route (reversal-safe BM28 map, 0201 C9/C16/C17) + ECR-0022/0023 shell changes
+  boards: {routed_P: 50d00dbd888a597daa16daaac017948c741eef18, routed_M: cc080ba85bdb776fcad206e34182c95cb0d4e6bd}  # sha1, hw/pod/k4/
   bom_source: hw/pod/k4/bom_jlc_{P,M}.csv at 84a215d (copied to src/; matches boards)
   rebuilt: 2026-10-08 (gerbers via kicad-cli --board-plot-params, Excellon separate PTH/NPTH, build_release.py)
 checks_passed:
-  - "kicad-cli DRC (error severity, persisted JLC fine rules): P 0 / M 0 violations (re-run 2026-10-08 on 84a215d), 0 unconnected. Warnings only: silk (74 overlap, 64 over copper, 7 edge) - cosmetic, JLC trims silk over pads."
+  - "kicad-cli DRC (error severity, persisted JLC fine rules): P 0 / M 0 violations (re-run 2026-10-08 on 84a215d), 0 unconnected. Plain kicad-cli pcb drc (all severities): 0 violations, 0 warnings, 0 unconnected on both (silk cleanup 2026-10-08: refdes hidden, silk graphics removed on Y1 U1 L1 / U3 U4 D5 U2, redundant GB_P via + stubs on P replaced by one F.Cu track)."
   - "BOM refs == board assembled refs (excl. TP/J wire pads), both boards; CPL rows = BOM designators (P 29, M 26; BOM lines P 19, M 21)"
   - "stock >= qty x5 for every line (JLC API 2026-10-08T11:53Z); lowest margin MCU C5271013: 19 vs 5 needed"
 blockers_cleared_2026-10-08:
