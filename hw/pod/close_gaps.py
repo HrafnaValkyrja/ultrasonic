@@ -214,7 +214,11 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("board")
     ap.add_argument("--max-len", type=float, default=4.0)
+    ap.add_argument("--fine", action="store_true", help="JLC 6L fine rules: track 0.09, via 0.25/0.15, clearance 0.10")
     a = ap.parse_args()
+    global TRACK_W, VIA_D, VIA_DRILL, CLR
+    if a.fine:
+        TRACK_W, VIA_D, VIA_DRILL, CLR = 0.09, 0.25, 0.15, 0.10
     path = Path(a.board)
     base_err, unconn = drc(path)
     print(f"start: {base_err} DRC errors, {len(unconn)} unconnected")

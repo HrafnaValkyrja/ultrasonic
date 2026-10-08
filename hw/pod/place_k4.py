@@ -146,6 +146,9 @@ def pack(board, comps, nets, L):
                       "J3": (10.55, 1.6, 0, "B"), "J10": (10.55, 3.8, 0, "B"), "J11": (10.55, 6.0, 0, "B"),
                       "J4": (10.55, 8.5, 0, "B"), "J5": (10.55, 10.9, 0, "B")})
         blocked["B"] += [(6.4, 1.2, 9.4, 4.2), (6.4, 7.8, 9.4, 10.8)]       # magnet seats 3 x 3 [E, k4-dock.yaml A]
+        if VIP["on"]:     # room for the J20 via-in-pad rows (FreeRouting cannot escape the 0.35 mm pitch pads otherwise)
+            for rr in ((cx - 2.9, H / 2 - 2.1, cx + 1.2, H / 2 - 0.8), (cx - 2.9, H / 2 + 0.8, cx + 1.2, H / 2 + 2.1)):
+                blocked["F"].append(rr); blocked["B"].append(rr)
         _, port, _ = rel(comps["U2"], "U2", MIC_ROT, False)
         blocked["B"].append((MIC_CX + port[0] - 1.6, MIC_CY + port[1] - 1.6, MIC_CX + port[0] + 1.6, MIC_CY + port[1] + 1.6))   # duct-seat keep-out
         # P's inner-face parts block M's inner face wherever both would be taller than the gap together (all of them, simply)
@@ -416,6 +419,31 @@ def vip_vias(b, fps):
     return out
 
 
+def vip_j20(b, fps):
+    """M: via-in-pad at the outer end of every J20 signal pad (FreeRouting never drops a via on an SMD pad itself, and the 0.35 mm
+    pitch BM28 rows box the pads in). Skipped where another net's pad of a part sits on the via spot."""
+    out = []
+    j = fps["J20"]
+    rows = [MM(pd.GetPosition().y) for pd in j.Pads() if pd.GetNumber().isdigit()]
+    cy = (min(rows) + max(rows)) / 2
+    for pd in j.Pads():
+        n = pd.GetNetname()
+        if not (pd.GetNumber().isdigit() and n and n != "GND"):
+            continue
+        x, y = MM(pd.GetPosition().x), MM(pd.GetPosition().y)
+        y0 = y
+        for sgn in (1, -1):
+            y = y0 + sgn * math.copysign(0.39, y0 - cy)
+            if not any(p2.GetNetname() != n and p2.GetAttribute() != pcbnew.PAD_ATTRIB_NPTH and R1._d_rect(x, y, R1._rect(p2)) < 0.125 + 0.16
+                       for r2, f2 in fps.items() if r2 != "J20" for p2 in f2.Pads()) and not any(math.hypot(x - a, y - c) < 0.3 for a, c in out):
+                break
+        else:
+            continue
+        v = pcbnew.PCB_VIA(b); v.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y))); v.SetWidth(mm(0.25)); v.SetDrill(mm(0.15))
+        v.SetNet(b.FindNet(n)); v.SetLocked(True); b.Add(v); out.append((x, y))
+    return out
+
+
 def build(board, placement, L):
     comps, nets = P.parse_netlist(K4 / f"pod_k4_{board}.net")
     missing = set(placement) ^ set(comps)
@@ -458,7 +486,7 @@ def build(board, placement, L):
         px, py = -100.0, -100.0
         pre_bad = preroute_k4(b, fps)
     R2.PAD_RECTS[:] = [R1._rect(pd) for f in fps.values() for pd in f.Pads() if pd.GetAttribute() != pcbnew.PAD_ATTRIB_NPTH]
-    mine = vip_vias(b, fps) if (VIP["on"] and board == "P") else []
+    mine = vip_vias(b, fps) if (VIP["on"] and board == "P") else (vip_j20(b, fps) if (VIP["on"] and board == "M") else [])
     nvia0 = len([t for t in b.GetTracks() if t.GetClass() == "PCB_VIA"])
     R1.AVOID = lambda x, y, seg_from=None: R2._avoid(x, y, seg_from, px, py) or any(math.hypot(x - a, y - c) < 0.5 for a, c in mine)
     added, skipped = R1.gnd_fanout(b, fps, 0.0) if "U1" in fps else R2.net_fanout(b, fps, "GND", 0.0)

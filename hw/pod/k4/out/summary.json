@@ -1,0 +1,21 @@
+{
+ "date": "2026-10-08",
+ "L": 14.0,
+ "layers": 6,
+ "rules": "JLC 6L fine (via 0.25/0.15, track 0.09)",
+ "M": {
+  "unconnected": 0,
+  "drc": 0,
+  "place_check": "PASS",
+  "method": "J20 via-in-pad (place_k4 vip_j20) + keep-out rows, route_k4 --layers 6 --fine, close_gaps --fine; J20 mates J21 at stack (9.8,6.0)",
+  "file": "hw/pod/k4/routed_M.kicad_pcb"
+ },
+ "P": {
+  "unconnected": 8,
+  "place_check": "FAIL: near C7 3.00>2.0, C9 2.81>2.5, R1 4.22>4.0, R5 3.08>3.0, R6 3.78>3.0, R22 3.67>2.5 (stack gap ok)",
+  "file": "hw/pod/k4/routed_P.kicad_pcb",
+  "note": "nudge search stalls: near rules not satisfiable at L14; relax NEAR or grow L (owner)",
+  "drc": "6 (mask bridge 1, edge 1, courtyard 3, short 1)"
+ },
+ "open": "M dock strip outline (0.6 mm under cell) not modelled in M Edge.Cuts; STACK_L 11 vs L 14 to reconcile with dims_k4"
+}
