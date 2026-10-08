@@ -15,7 +15,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).parent)); import close_gaps as C
 M = pcbnew.ToMM
 path, net_name, ref, padnum = sys.argv[1:5]
 layer_name = sys.argv[5] if len(sys.argv) > 5 else "In2"
-LAY = {"In2": pcbnew.In2_Cu, "In1": pcbnew.In1_Cu, "F": pcbnew.F_Cu, "B": pcbnew.B_Cu}[layer_name]
+LAY = {"In3": pcbnew.In3_Cu, "In4": pcbnew.In4_Cu, "In2": pcbnew.In2_Cu, "In1": pcbnew.In1_Cu, "F": pcbnew.F_Cu, "B": pcbnew.B_Cu}[layer_name]
 b = pcbnew.LoadBoard(path); net = b.FindNet(net_name).GetNetCode()
 G = 0.05; bb = b.GetBoardEdgesBoundingBox()
 x0, y0, W, H = M(bb.GetLeft()), M(bb.GetTop()), M(bb.GetWidth()), M(bb.GetHeight())

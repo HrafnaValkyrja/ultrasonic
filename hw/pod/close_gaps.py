@@ -252,6 +252,8 @@ def main():
             for at, other in ((pa, pb), (pb, pa)):
                 v = try_via(board, net, at[:2])
                 if v:
+                    if not other[2]:
+                        board.Remove(v[0]); continue
                     l = next(iter(other[2]))
                     s = try_segment(board, net, l, at[:2], other[:2]) if math.hypot(at[0] - other[0], at[1] - other[1]) > 1e-3 else []
                     if s is not None:
