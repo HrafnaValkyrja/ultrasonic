@@ -165,6 +165,14 @@ def main():
     R["fix_ledge"] = dict(delta_down=round(delta, 3), lid_gap=round(K.VHB_T + delta, 3), floor_clear_nominal_after=round(fl["nominal_clear"] - delta, 3),
                           floor_clear_rss_after=round(fl["rss3"] - delta, 3), floor_clear_worst_after=round(fl["worst"] - delta, 3),
                           note="stack hangs on a printed lid ledge frame (height delta, ~0.5 wide, on the board perimeter where no part sits) with the VHB on its tip; pod T unchanged. SW1 puck +delta, mic duct gets a printed tube delta long.")
+    # 6. feasibility of the "swap parts, no lid change" route at a 0.1 mm worst-case margin target (2026-10-08)
+    MARG = 0.10
+    lid_allow = K.VHB_T - R["lid_side_M_fileB"]["tol_lin"] - MARG
+    gap_allow = 0.6 - TOL["bm28"] - MARG
+    lidp = [p for p in top(Mp, "B") if p["ref"] != "SW1"]
+    R["swap_route"] = dict(margin_target=MARG, lid_face_max_part_h=round(lid_allow, 3), n_lid_parts_over=sum(1 for p in lidp if p["h"] > lid_allow),
+                           gap_max_part_h=round(gap_allow, 3), gap_over=[g.get("m") or g.get("p") for g in chk if g["clear_worst"] < MARG],
+                           verdict=("INFEASIBLE: no SMD part is <= %.3f mm, so a flat lid + 0.25 VHB takes zero components on M file B; the gap side needs <= %.2f mm (0201/0402-0.4 only)" % (lid_allow, gap_allow)) if lid_allow < 0.2 else "feasible")
     print(json.dumps(R, indent=1, default=str) if "--json" in sys.argv else json.dumps({k: R[k] for k in R if k != "faces"} | {"faces": R["faces"]}, indent=1, default=str))
     (ROOT / "sim/out").mkdir(exist_ok=True)
     (ROOT / "sim/out/k4_heights.json").write_text(json.dumps(R, indent=1, default=str))
