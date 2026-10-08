@@ -2,7 +2,7 @@
   (version "D")
   (design
     (source "gen.py")
-    (date "10/08/2026 08:19 AM")
+    (date "10/08/2026 03:58 PM")
     (tool "SKiDL (2.3.0)")
     (sheet
       (number 1)
@@ -332,14 +332,14 @@
       (ref "J20")
       (value "BM28B0.6-30DS/2-0.35V(51)")
       (description "")
-      (footprint "lcsc:BM28B0.6-30DP_2-0.35V")
+      (footprint "lcsc:BM28B0.6-30DS_2-0.35V")
       (fields
         (field
           (name "LCSC") "C424571")
         (field
           (name "Description"))
         (field
-          (name "Footprint") "lcsc:BM28B0.6-30DP_2-0.35V")
+          (name "Footprint") "lcsc:BM28B0.6-30DS_2-0.35V")
         (field
           (name "Datasheet"))
         (field

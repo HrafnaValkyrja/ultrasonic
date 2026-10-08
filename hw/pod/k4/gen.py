@@ -435,7 +435,7 @@ def board_of(ref):
 def b2b_part(ref, lcsc, mpn):
     pins = [Pin(num=n, name=f"{n}_{net}", func=Pin.types.PASSIVE) for n, net in sorted(BM28_PINS.items())]
     j = Part(tool=SKIDL, name="BM28_30", ref_prefix="J", ref=ref, tag=ref, pins=pins,
-             footprint="lcsc:BM28B0.6-30DP_2-0.35V", value=mpn)    # footprint to be fetched at placement [T]
+             footprint="lcsc:BM28B0.6-30DS_2-0.35V" if "DS" in mpn else "lcsc:BM28B0.6-30DP_2-0.35V", value=mpn)    # footprint to be fetched at placement [T]
     j.fields["LCSC"] = lcsc
     return j
 
