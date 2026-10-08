@@ -1,12 +1,12 @@
-# NEXT 5 (ranked by value/effort; rebuilt each beat; 2026-10-08 16:3x ET)
-GitHub Issues migration is pending: creating issues was denied by this session's permission check (external write), so the owner has to allow it. The draft issue list is in docs/brief/issues-draft.yaml; IDs below are local until then.
+# NEXT 5 (ranked; 2026-10-08 16:2x ET, re-ranked on the owner's four-proofs ruling)
+Her words (via Stolas): "I want it working hard to verify that the board is electrically, thermally and physically possible, and that the device is possible to assemble (and easy enough for me to build)." The pen test moves to a weekend bench day; both pods stay alive. Evidence goes in docs/proof/<proof>/ (README + dark PNG); one status line per proof as it lands.
 
-1. N-K4-TOOLS (running): merge the 3 helper patches with phase2 still the default, hook green; the K4 flip is then one line after the ruling. ~30 min.
-2. N-K1T-RELEASE (guess, model both): release package for the phase-2 board (gerber/drill/BOM/CPL/gate via build_release.py), like .pcba-workflow/k4-release. ~1.5 h.
-3. N-6L-STACKUP: re-check JLC's published 6-layer 0.8 mm stack-up (K4 gate B4), dated source. ~15 min.
-4. N-K1T-DUCT (guess): mic duct R14 on the 0.6 lid fails nominally; acoustic re-run of the options, fenced. ~1 h.
-5. N-K1T-BUTTON (guess): KMT022 breaks the 0.6 lid; fix A = metal dome on new F pads (board edit + re-route, serial heavy job) or C = proud skin. ~1.5 h. Next after #4 (one heavy job at a time).
-Done today: N-K1T-PARITY (327bf77), N-PENTEST-CARD (a4df5b8), N-POST-GAP (9e03771: post+epoxy carries it; bench-test the fill).
-Note: resolved 16:1x: the parity doc used out/k4s (pre-lift); the current K4 is out/k4s_lift (L 49.85, X0 17.65, 11.85 inside the line). N-K4-TOOLS told to point shell_out there.
+1. P-ELEC: electrical proof, K4 P+M (power budget, rails, noise, SI on BM28/clock, DRC/ERC, part ratings with margin). ~1.5 h.
+2. P-THERM: thermal proof (worst-case dissipation: charge 130 mA + MCU + bridge; hotspots; path to the shell; cell temperature limit). ~1.5 h.
+3. P-PHYS: physical proof (stack-up, clearances, fit with tolerances, vision line for both pods). ~1.5 h.
+4. P-BUILD: assembly + buildability by her (step-by-step sequence, tools, hand-solder vs reflow, hardest steps flagged with easier alternatives). ~1.5 h.
+5. N-K4-TOOLS cherry-pick (a7b29cf), after N-K1T-RELEASE (running) finishes. ~10 min.
+Later: N-K1T-BUTTON (board edit + re-route, serial heavy job); the K4 heights entries for C16/C17/C21.
+Done today: N-K1T-PARITY, N-PENTEST-CARD, N-POST-GAP, N-6L-STACKUP (B4 still open: JLC lists 6L at 1.2/1.6/2.0 only), N-K1T-DUCT (425f8d6).
 
-Ruling-needed (hers, not ranked): A-K4-VISION (pen test), A-TODAY-BODY-MEASURE, A-IDLE-TRADE, A-6L-QUOTE (optional), A-CAP-CURVES (optional). Orders/payments: owner-only, never guessed.
+Ruling-needed (hers): A-K4-VISION (weekend bench day), A-TODAY-BODY-MEASURE, A-IDLE-TRADE, A-6L-QUOTE (optional), A-CAP-CURVES (optional), GitHub Issues permission. Orders/payments: owner-only.
