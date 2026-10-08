@@ -8,8 +8,8 @@
 <text x="716" y="183.5" font-size="13" fill="#1f2328" font-weight="normal" text-anchor="start">Lid ledge 0.70 + VHB 0.25 = 0.95</text>
 <text x="716" y="200.5" font-size="11.5" fill="#57606a" font-weight="normal" text-anchor="start">ledge band 0.5 wide, 0.2 in from the board edge; clear of M lid-face parts</text>
 <rect x="120" y="207.0" width="580" height="48.0" rx="2" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1.5"/>
-<text x="716" y="236.0" font-size="13" fill="#1f2328" font-weight="normal" text-anchor="start">Board M 0.8 (lid face = F)</text>
-<text x="716" y="253.0" font-size="11.5" fill="#57606a" font-weight="normal" text-anchor="start">SW1 button, wire pads J4 J5 J7 J8; B face: mic U2, U3, U4</text>
+<text x="716" y="236.0" font-size="13" fill="#1f2328" font-weight="normal" text-anchor="start">Board M 0.8 (lid face = file B)</text>
+<text x="716" y="253.0" font-size="11.5" fill="#57606a" font-weight="normal" text-anchor="start">lid face: SW1, wire pads J4 J5 J7 J8; inner face (file F): mic U2 (port through M to the lid), U3, U4</text>
 <rect x="120" y="255.0" width="580" height="36.0" rx="2" fill="#e8f0fb" stroke="#2a78d6" stroke-width="1.5"/>
 <text x="716" y="278.0" font-size="13" fill="#1f2328" font-weight="normal" text-anchor="start">BM28 mated gap 0.6</text>
 <text x="716" y="295.0" font-size="11.5" fill="#57606a" font-weight="normal" text-anchor="start">M parts hang in here (mic U2 port through the lid duct)</text>

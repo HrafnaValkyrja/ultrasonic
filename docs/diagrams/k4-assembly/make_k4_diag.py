@@ -29,7 +29,7 @@ def d_stack():
     y_led = y
     y = band(y, K.F_GAP, TO, ORG, f"Lid ledge 0.70 + VHB 0.25 = {K.F_GAP:.2f}", "ledge band 0.5 wide, 0.2 in from the board edge; clear of M lid-face parts")
     # lid-face parts on M poking into the ledge zone (SW1 etc)
-    y_m = y; y = band(y, 0.8, TG, GRN, "Board M 0.8 (lid face = F)", "SW1 button, wire pads J4 J5 J7 J8; B face: mic U2, U3, U4")
+    y_m = y; y = band(y, 0.8, TG, GRN, "Board M 0.8 (lid face = file B)", "lid face: SW1, wire pads J4 J5 J7 J8; inner face (file F): mic U2 (port through M to the lid), U3, U4")
     y_bm = y
     y = band(y, 0.6, TB, BLU, "BM28 mated gap 0.6", "M parts hang in here (mic U2 port through the lid duct)")
     y_p = y; y = band(y, 0.8, TG, GRN, "Board P 0.8 (file F.Cu = inner face)", "inner: Q1 Q2 (0.37 high); outer: U1 chip, L1 coil")
