@@ -7,6 +7,6 @@ GitHub Issues migration is pending: creating issues was denied by this session's
 4. N-K1T-DUCT (guess): mic duct R14 on the 0.6 lid fails nominally; acoustic re-run of the options, fenced. ~1 h.
 5. N-K1T-BUTTON (guess): KMT022 breaks the 0.6 lid; fix A = metal dome on new F pads (board edit + re-route, serial heavy job) or C = proud skin. ~1.5 h. Next after #4 (one heavy job at a time).
 Done today: N-K1T-PARITY (327bf77), N-PENTEST-CARD (a4df5b8), N-POST-GAP (9e03771: post+epoxy carries it; bench-test the fill).
-Note: the parity doc reads K4 L 53.65 / X0 13.85 from out/k4s; ECR-0024 says 49.85 / 17.65. Check which output is current.
+Note: resolved 16:1x: the parity doc used out/k4s (pre-lift); the current K4 is out/k4s_lift (L 49.85, X0 17.65, 11.85 inside the line). N-K4-TOOLS told to point shell_out there.
 
 Ruling-needed (hers, not ranked): A-K4-VISION (pen test), A-TODAY-BODY-MEASURE, A-IDLE-TRADE, A-6L-QUOTE (optional), A-CAP-CURVES (optional). Orders/payments: owner-only, never guessed.

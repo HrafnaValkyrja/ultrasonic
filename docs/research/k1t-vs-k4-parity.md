@@ -4,10 +4,10 @@ k1t shell checks re-run 2026-10-08: `ULTRASONIC_DESIGN=k1t python3 hw/mech/shell
 
 | Item | K4 | K1-thin (k1t) | Source |
 |---|---|---|---|
-| L x T x H (mm) | 53.65 x 6.4 x 14.8 (physical.md lists H 15.25 with lift relief) | 33.8 x 8.5 x 14.8 | hw/mech/out/k4s/checks.json envelope; docs/system/physical.md l.221; out/k1t/checks.json envelope |
+| L x T x H (mm) | 49.85 x 6.4 x 15.25 (out/k4s_lift) | 33.8 x 8.5 x 14.8 | hw/mech/out/k4s/checks.json envelope; docs/system/physical.md l.221; out/k1t/checks.json envelope |
 | Envelope | 5019 mm3 | 4779 mm3 | same |
 | Worn mass (pod) | 9.43-10.58 g (nose 6.16-6.84 / ear 3.27-3.73) | 9.6-11.5 g | physical.md l.221; docs/system/reg-pod-body.md Variants |
-| Front edge X0 vs VISION_X 29.5 (hw/mech/pod.py l.35) | 13.85: 15.65 mm inside the estimated no-go line (queue says 11.85 inside; passes only if pen test line <= 12.6 mm) | 33.7 (67.5-33.8): clear by 4.2 mm | out/k4s checks envelope.x; queue.yaml A-K4-VISION |
+| Front edge X0 vs VISION_X 29.5 (hw/mech/pod.py l.35) | 17.65 (out/k4s_lift, O34 lift default): 11.85 mm inside the estimated no-go line; passes only if the pen-test line is <= 12.6 mm | 33.7 (67.5-33.8): clear by 4.2 mm | out/k4s checks envelope.x; queue.yaml A-K4-VISION |
 | Cell / battery hours | Renata ICP401230UPR 130 mAh; ~10-16 h awake (175 mAh model x 0.74: 13.4-22.0 no LED -> 10.0-16.3) | identical cell and circuit: same | docs/system/sub-power.md l.177-181; fw/variants.yaml K1_130. Spec wants >= 8 h: both pass; scaled, not re-simulated for 130 mAh |
 | Charge time | 130 mA = 1C CC (~1 h) + taper; total TBD bench; <20 C is 50 mA (>= 2.6 h) | same (same U3 BQ25180, same cell) | sub-power.md l.146, l.186 |
 | Boards | 2 x 6-layer (P, M) at L 15.5: DRC 0 / 0 unconnected, place PASS | 1 x Phase-2 board routed.kicad_pcb: drc.json 0 viol / 0 unconnected (drc2.json 7 unconnected is a stale alt route) | hw/pod/k4/out/summary.json; hw/pod/draft_r2/out/drc.json |
