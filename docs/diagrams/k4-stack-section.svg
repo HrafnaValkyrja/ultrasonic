@@ -34,7 +34,7 @@
 <circle cx="70" cy="347.0" r="13" fill="#b8520a" stroke="#b8520a" stroke-width="1.5"/>
 <text x="70" y="352.0" font-size="14" fill="#ffffff" font-weight="bold" text-anchor="middle">B</text>
 <text x="70" y="377.0" font-size="12" fill="#57606a" font-weight="normal" text-anchor="middle">belly side</text>
-<text x="120" y="560" font-size="13" fill="#1f2328" font-weight="normal" text-anchor="start">Total board stack 3.2 mm; stack 15.5 x 12.0. The lid carries the stack on VHB; P hangs from M through BM28 and rests on nothing.</text>
+<text x="120" y="560" font-size="13" fill="#1f2328" font-weight="normal" text-anchor="start">Stack 3.2 mm = M 0.8 + gap 0.6 + P 0.8 + tallest P outer part (L1 1.0); M lid-face parts (max 0.7) sit inside the 0.95 ledge band; footprint stack 15.5 x 12.0. The lid carries the stack on VHB; P hangs from M through BM28 and rests on nothing.</text>
 <text x="120" y="584" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">Dock pads and magnets sit under the cell, not in this section: see k4-dock-section.</text>
 <text x="120" y="612" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">Pinch the pair only at the post: the dab stops lid push (SW1 press) from loading the BM28 contacts.</text>
 </svg>

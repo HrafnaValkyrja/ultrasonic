@@ -53,7 +53,7 @@ def d_stack():
     # direction cues
     s.badge(70, y_lid + 20, "A"); s.t(70, y_lid + 50, "lid side", 12, MUT, anc="middle")
     s.badge(70, y_pe + 8, "B"); s.t(70, y_pe + 38, "belly side", 12, MUT, anc="middle")
-    s.t(x0, 560, f"Total board stack {K.STACK_T} mm; stack {K.STACK_L} x {K.STACK_H}. The lid carries the stack on VHB; P hangs from M through BM28 and rests on nothing.", 13, INK)
+    s.t(x0, 560, f"Stack {K.STACK_T} mm = M 0.8 + gap 0.6 + P 0.8 + tallest P outer part (L1 1.0); M lid-face parts (max 0.7) sit inside the 0.95 ledge band; footprint stack {K.STACK_L} x {K.STACK_H}. The lid carries the stack on VHB; P hangs from M through BM28 and rests on nothing.", 13, INK)
     s.t(x0, 584, "Dock pads and magnets sit under the cell, not in this section: see k4-dock-section.", 13, MUT)
     s.t(x0, 612, "Pinch the pair only at the post: the dab stops lid push (SW1 press) from loading the BM28 contacts.", 13, MUT)
     save(s, "k4-stack-section.svg")
