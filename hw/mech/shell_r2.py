@@ -95,12 +95,19 @@ def tub_region():
 REBATE_D, REBATE_H = 0.2, 0.4   # depth leaves 0.6 wall (frame.RESIN min_wall); height 0.4 = tolerances.md "recesses < 0.4 may fuse"
 
 
+WITNESS_D = 0.1   # belly-step witness groove depth (<= 0.1 mm)
+
+
 def seam_rebate():
     """Tub-only REBATE_D x REBATE_H rebate round the outside on the y = Y_SPLIT runs (cut line for reopening).
-    Was 0.2 x 0.3 until 2026-10-07 (reg-pod-body issue 12). The belly step (z = CAV z0, x < X_BELLY) is left unmarked (open item)."""
+    Was 0.2 x 0.3 until 2026-10-07 (reg-pod-body issue 12). The belly step (z = CAV z0, x < X_BELLY) gets a 0.1 deep witness groove."""
     band = box(X0 - 1, X1 + 1, Y_SPLIT - REBATE_H, Y_SPLIT + 0.01, Z_BELLY - 1, Z1 + 1)
     band = band - box(X0 + REBATE_D, X1 - REBATE_D, Y_SPLIT - REBATE_H - 0.1, Y_SPLIT + 0.1, Z0 + REBATE_D, Z1 - REBATE_D)
-    return band - box(X0 - 2, X_BELLY, Y_SPLIT - 1, Y_SPLIT + 1, Z_BELLY - 2, CAV["z0"])
+    band = band - box(X0 - 2, X_BELLY, Y_SPLIT - 1, Y_SPLIT + 1, Z_BELLY - 2, CAV["z0"])
+    # belly step witness line: shallow groove (WITNESS_D deep, REBATE_H wide) on the outer face just below the step (z < CAV z0),
+    # tub side, so the cut line shows where the y = Y_SPLIT rebate stops (RPB-12). Too shallow to be a recess that fuses: it is a mark, not a gap.
+    y_top = Y_OUT + (PLATE_T if PLATE_T > 0 else 0.0)
+    return band + box(X0 - 1, X_BELLY, y_top - WITNESS_D, y_top + 1, CAV["z0"] - REBATE_H, CAV["z0"])
 
 
 def tub(heel_mod=None):
