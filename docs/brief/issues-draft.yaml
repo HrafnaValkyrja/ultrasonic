@@ -1,0 +1,16 @@
+# Draft GitHub Issues for HrafnaValkyrja/ultrasonic (RULES.md "Work selection and guesses", 2026-10-08).
+# Not created: the session's permission check denied the external write (2026-10-08 16:3x ET); the owner must allow it.
+labels: ["kind: ruling-needed", "kind: work", guess, owner-only, blocked]
+issues:
+  - {id: N-K4-TOOLS, labels: ["kind: work"], src: NEXT.md}
+  - {id: N-K1T-PARITY, labels: ["kind: work", guess], src: "NEXT.md; DIRECTION.md 2026-10-08 Ultrasonic"}
+  - {id: N-PENTEST-CARD, labels: ["kind: work"], src: NEXT.md}
+  - {id: N-POST-GAP, labels: ["kind: work"], src: "NEXT.md; worker (b) clamp check 2026-10-08"}
+  - {id: N-6L-STACKUP, labels: ["kind: work"], src: ".pcba-workflow/k4-release/gate.yaml"}
+  - {id: PWR-I14, labels: ["kind: work", blocked], src: docs/brief/backlog.yaml, blk: "C21 DC-bias curve (owner fetch)"}
+  - {id: A-K4-VISION, labels: ["kind: ruling-needed"], src: docs/brief/queue.yaml}
+  - {id: A-TODAY-BODY-MEASURE, labels: ["kind: ruling-needed"], src: docs/brief/queue.yaml}
+  - {id: A-IDLE-TRADE, labels: ["kind: ruling-needed"], src: docs/brief/queue.yaml}
+  - {id: A-6L-QUOTE, labels: ["kind: ruling-needed"], src: docs/brief/queue.yaml}
+  - {id: A-CAP-CURVES, labels: ["kind: ruling-needed"], src: docs/brief/queue.yaml}
+  - {id: ORDER-K4, labels: ["kind: ruling-needed", owner-only], t: "Order package (gerbers/BOM/CPL, 7 preview checks, live quote): owner places it after design freeze (O21); never guessed"}
