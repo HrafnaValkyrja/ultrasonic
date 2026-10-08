@@ -1,0 +1,24 @@
+# Phase-2 (r2, "mz2") release gate. Written 2026-10-08. Nothing ordered (O21); the owner places and pays.
+gate: BLOCKED          # artifacts generated and self-consistent; design not frozen, pin-1 unverified
+source_revision:
+  git_head_at_export: ced95e3
+  board: {file: hw/pod/draft_r2/out/routed.kicad_pcb, sha1: e816d94c62d60c4745f25af9f08189fa06d57e65}
+  bom_source: hw/pod/bom_jlc_mz2.csv (copied to src/)
+  board_facts: "30.05 x 12.05 mm bbox, 4 copper layers, 0.8 mm, 132 vias, 54 assembled refs, 31 BOM lines"
+checks_passed:
+  - "plain kicad-cli pcb drc (all severities) 2026-10-08: 0 violations, 0 unconnected"
+  - "BOM refs == board assembled refs (54 = 54); CPL rows 54"
+  - "stock >= qty x5 for every line (JLC API, see cost_inputs.json queried time); lowest margin MCU C5271013: 14 vs 5 needed"
+blockers:
+  - id: B1-PIN1-UNCONFIRMED
+    what: "Parts needing the JLC placement preview against pin1_expected.png (check_in_preview flag): D4 D5 D6 Q1 Q2 SW1 U1 U2 U3 U4 U6. Q1/Q2 (C19654206) have no EasyEDA footprint, so no data check at all. Datasheet pass done only for the K4 parts (see k4-release/gate.yaml)."
+  - id: B2-STACKUP-4L-0.8
+    what: "Confirm 4L 0.8 mm build and ENIG on the live quote; do not order impedance control (no controlled net claimed). No (stackup) block in the board file."
+  - id: B3-VIA-IN-PAD
+    what: "Not audited for r2: U1 QFN48 exposed pad vias (0.15 mm?) need POFV on the order, as on K4. Run the via-on-pad count before quote."
+  - id: B4-MCU-STOCK
+    what: "C5271013 STM32U575 stock 14 vs 5 needed; reserve early."
+  - id: B5-DESIGN-NOT-FROZEN
+    what: "Phase-2 board is a draft (hw/pod/draft_r2); no freeze evidence gate, no ECR for release. Gerbers must be re-exported after any layout change (hashes above)."
+  - id: B6-NO-PANEL
+    what: "30 x 12 mm board needs rails/tooling for JLC assembly; no panel file made."

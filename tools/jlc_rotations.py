@@ -357,19 +357,20 @@ def pin1_png(items, path):
 
 
 # ---------------------------------------------------------------- K4 release hook
-def release(rel_dir=".pcba-workflow/k4-release", bottom_rule="jlc2022"):
+def release(rel_dir=".pcba-workflow/k4-release", bottom_rule="jlc2022", jobs=None):
     """Write cpl_P/M.csv (corrected), jlc_rotation_corrections.csv and pin1_expected.png into the release folder.
     Boards = hw/pod/k4/routed_{P,M}.kicad_pcb, BOMs = <rel_dir>/src/bom_jlc_{P,M}.csv (the ones matching the boards)."""
     rel = ROOT / rel_dir
+    # jobs: optional [(tag, board_path, bom_path, cpl_suffix)]; default = the K4 P/M pair
     rules, allrows, items = read_db(), [], []
-    for b in "PM":
-        board = ROOT / f"hw/pod/k4/routed_{b}.kicad_pcb"
-        rows = analyse(board, rel / "src" / f"bom_jlc_{b}.csv", bottom_rule=bottom_rule, rules=rules)
+    jobs = jobs or [(f"K4-{b}", ROOT / f"hw/pod/k4/routed_{b}.kicad_pcb", rel / "src" / f"bom_jlc_{b}.csv", b) for b in "PM"]
+    for tag, board, bom, suf in jobs:
+        rows = analyse(board, bom, bottom_rule=bottom_rule, rules=rules)
         for r in rows:
-            r["board"] = f"K4-{b}"
-        write_cpl(rows, rel / f"cpl_{b}.csv")
+            r["board"] = tag
+        write_cpl(rows, rel / (f"cpl_{suf}.csv" if suf else "cpl.csv"))
         allrows += rows
-        items.append((f"K4-{b}", board, rows))
+        items.append((tag, board, rows))
     write_table(allrows, rel / "jlc_rotation_corrections.csv")
     pin1_png(items, rel / "pin1_expected.png")
     return allrows
