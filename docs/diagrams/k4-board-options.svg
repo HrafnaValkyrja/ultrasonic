@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 470" font-family="sans-serif">
+<rect width="760" height="470" fill="#ffffff"/>
+<text x="20" y="30" font-size="19" font-weight="bold" fill="#1f2328">Board zone, side cut (lengths to scale). Battery is to the right.</text>
+<!-- A -->
+<text x="20" y="70" font-size="16" font-weight="bold" fill="#2a78d6">A  one board, 6 layers: 17 mm → pod 51 mm</text>
+<rect x="40" y="90" width="238" height="11" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<rect x="60" y="76" width="98" height="14" fill="#e8f0fb" stroke="#2a78d6"/><text x="70" y="87" font-size="10" fill="#2a78d6">MCU</text>
+<rect x="200" y="101" width="40" height="14" fill="#fff4ea" stroke="#b8520a"/><text x="203" y="112" font-size="10" fill="#b8520a">power</text>
+<circle cx="66" cy="108" r="6" fill="#e34948"/><text x="40" y="134" font-size="11" fill="#57606a">mic</text>
+<rect x="300" y="70" width="420" height="63" fill="#fff4ea" stroke="#b8520a" stroke-dasharray="4 3"/><text x="440" y="106" font-size="13" fill="#b8520a">battery (30 mm, not to scale)</text>
+<!-- B -->
+<text x="20" y="180" font-size="16" font-weight="bold" fill="#1a7a55">B  two stacked boards + tiny connector: ~14.5 mm → pod 48.6 mm  (−2.5)</text>
+<rect x="40" y="225" width="203" height="11" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<rect x="40" y="200" width="203" height="11" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<rect x="120" y="211" width="76" height="14" fill="#c9c5b8" stroke="#57606a"/><text x="124" y="222" font-size="10" fill="#1f2328">connector</text>
+<text x="250" y="210" font-size="11" fill="#57606a">power + dock board</text><text x="250" y="235" font-size="11" fill="#57606a">MCU + mic board</text>
+<circle cx="66" cy="243" r="6" fill="#e34948"/>
+<rect x="400" y="190" width="320" height="63" fill="#fff4ea" stroke="#b8520a" stroke-dasharray="4 3"/>
+<!-- B+ -->
+<text x="20" y="300" font-size="16" font-weight="bold" fill="#8d7ff0" style="fill:#4a3aa7">B+  same, power board right over the mic: ~11 mm → pod ~45 mm  (−6)</text>
+<rect x="40" y="345" width="154" height="11" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<rect x="40" y="320" width="154" height="11" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<rect x="50" y="331" width="76" height="14" fill="#c9c5b8" stroke="#57606a"/>
+<circle cx="66" cy="363" r="6" fill="#e34948"/>
+<text x="210" y="342" font-size="12" fill="#4a3aa7">UNPROVEN: needs a noise simulation first —</text>
+<text x="210" y="358" font-size="12" fill="#4a3aa7">does a ground layer between the boards keep the switcher hiss off the mic?</text>
+<text x="20" y="410" font-size="13" fill="#57606a">Pod thickness stays 6.4 mm for all three (the stack fits beside the 4.5 mm battery).</text>
+<text x="20" y="432" font-size="13" fill="#57606a">Bendable folded board ruled out: our board maker doesn't make it.</text>
+<text x="20" y="454" font-size="13" fill="#57606a">Each board still arrives assembled by the factory; you only press the connector together.</text>
+</svg>
