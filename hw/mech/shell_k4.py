@@ -94,7 +94,7 @@ def dock_add():
     """inward bosses around the two magnet pockets (belly wall 0.6 is too thin for a 1.0 disc + 0.2 skin)."""
     z0 = CAV["z0"] - 0.05
     bs = [Pos(x, DOCK_YC, (z0 + BOSS_TOP) / 2) * Cylinder(BOSS_D / 2, BOSS_TOP - z0) for x in (MAG_X_FRONT, MAG_X_REAR)]
-    return bs[0] + bs[1]
+    return (bs[0] + bs[1]) & box(X0 - 1, X1 + 1, Y_IN - 1, Y_SPLIT, Z0 - 1, Z1 + 1)     # clipped at the seam: with the pads at M's mid-plane the boss would reach into the lid
 
 
 def dock_cut():

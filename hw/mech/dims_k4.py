@@ -136,7 +136,7 @@ REBATE_D, REBATE_H = 0.1, 0.4          # r2: 0.2; K4: 0.1 + a 0.1 inward ridge (
 # ---------------------------------------------------------------- dock, option A (docs/research/k4-dock.yaml option_A_design; head = Xinyangze YZP0048-20048-04025-03, C5126845)
 # 4 castellated gold half-hole pads on the M tab edge (pitch 2.5 = head pogo pitch) seen through 4 belly windows + 2 N52 discs 2.5 x 1.0 in bossed belly pockets.
 # [T] = inferred, to be calipered / compassed on a head sample: HEAD_MAG_PITCH, pogo stroke, polarity.
-DOCK_YC = 7.0 - 0.2                    # head centre line y (6.8); M mid-plane must sit here (pads are the 0.8 board edge). Flat belly y 5.3..9.7
+DOCK_YC = Y_F - PCB_T / 2          # head/pad/magnet centre line = M mid-plane (pads are the 0.8 M edge), derived from the board stack (K4-DOCK-YALIGN: was a constant 6.8 before ECR-0022 moved M to 8.35). Flat belly y 5.3..9.7
 DOCK_PITCH = 2.5
 HEAD_MAG_PITCH = 13.2                  # [T] magnet centre-to-centre along the head's long axis (21.2 racetrack; pins span 7.5)
 MAG_D, MAG_T, MAG_SKIN = 2.5, 1.0, 0.20
