@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640" font-family="DejaVu Sans, sans-serif">
+<rect width="1280" height="640" fill="#fbfaf7"/>
+<text x="24" y="36" font-size="22" fill="#1f2328" font-weight="bold" text-anchor="start">K4 dock: 4 gold pads + 2 magnets on the belly, under the cell</text>
+<text x="24" y="58" font-size="13" fill="#57606a" font-weight="normal" text-anchor="start">dims_k4.py (ECR-0022, option A). [T] = inferred, to be calipered on a head sample.</text>
+<text x="90" y="100" font-size="14" fill="#1f2328" font-weight="bold" text-anchor="start">Belly view (x along the pod, front left)</text>
+<rect x="90.00000000000003" y="130" width="707.4" height="179.20000000000002" rx="12" fill="#ffffff" stroke="#57606a" stroke-width="1.5"/>
+<circle cx="172.8" cy="219.60000000000002" r="45.0" fill="#fff4ea" stroke="#b8520a" stroke-width="2"/>
+<text x="172.8" y="223.60000000000002" font-size="11" fill="#b8520a" font-weight="bold" text-anchor="middle">N52</text>
+<circle cx="648.0000000000001" cy="219.60000000000002" r="45.0" fill="#fff4ea" stroke="#b8520a" stroke-width="2"/>
+<text x="648.0000000000001" y="223.60000000000002" font-size="11" fill="#b8520a" font-weight="bold" text-anchor="middle">N52</text>
+<rect x="252.00000000000003" y="198.00000000000003" width="46.800000000000004" height="43.199999999999996" rx="2" fill="#fff4ea" stroke="#b8520a" stroke-width="1.8"/>
+<text x="275.40000000000003" y="259.20000000000005" font-size="11.5" fill="#1f2328" font-weight="normal" text-anchor="middle">VBUS</text>
+<rect x="342.00000000000006" y="198.00000000000003" width="46.800000000000004" height="43.199999999999996" rx="2" fill="#fff4ea" stroke="#b8520a" stroke-width="1.8"/>
+<text x="365.40000000000003" y="259.20000000000005" font-size="11.5" fill="#1f2328" font-weight="normal" text-anchor="middle">D+</text>
+<rect x="432.0000000000001" y="198.00000000000003" width="46.800000000000004" height="43.199999999999996" rx="2" fill="#fff4ea" stroke="#b8520a" stroke-width="1.8"/>
+<text x="455.4000000000001" y="259.20000000000005" font-size="11.5" fill="#1f2328" font-weight="normal" text-anchor="middle">D-</text>
+<rect x="522.0000000000001" y="198.00000000000003" width="46.800000000000004" height="43.199999999999996" rx="2" fill="#fff4ea" stroke="#b8520a" stroke-width="1.8"/>
+<text x="545.4000000000001" y="259.20000000000005" font-size="11.5" fill="#1f2328" font-weight="normal" text-anchor="middle">GND</text>
+<text x="410.4000000000001" y="152.60000000000002" font-size="12" fill="#57606a" font-weight="normal" text-anchor="middle">pad pitch 2.5, magnet pitch 13.2 [T]</text>
+<text x="410.4000000000001" y="333.20000000000005" font-size="11" fill="#57606a" font-weight="normal" text-anchor="middle">net order per k4-dock.yaml option_A_design; D+/D- order set by the head cable [T]</text>
+<rect x="28.800000000000125" y="123.56000000000002" width="763.1999999999999" height="192.08" rx="12" fill="none" stroke="#2a78d6" stroke-width="2" stroke-dasharray="6 4"/>
+<text x="34.800000000000125" y="115.56000000000002" font-size="12" fill="#2a78d6" font-weight="normal" text-anchor="start">charging head 21.2 x 6.86 (overhangs the 6.4 pod by 0.23 each side)</text>
+<text x="90" y="380" font-size="14" fill="#1f2328" font-weight="bold" text-anchor="start">Section at a pad (looking along x; belly down)</text>
+<rect x="448.0" y="400" width="384.0" height="160" rx="10" fill="#ffffff" stroke="#57606a" stroke-width="1.5"/>
+<rect x="462.0" y="406" width="356.0" height="66" rx="3" fill="#e8f0fb" stroke="#2a78d6" stroke-width="1.5"/>
+<text x="640" y="444" font-size="12.5" fill="#2a78d6" font-weight="normal" text-anchor="middle">cell 4.5 (above the pad tab)</text>
+<rect x="570" y="482" width="140" height="28.799999999999997" rx="2" fill="#e8f3ec" stroke="#1a7a55" stroke-width="1.5"/>
+<text x="848.0" y="498" font-size="12" fill="#1a7a55" font-weight="normal" text-anchor="start">M tab, 0.6 strip in the wire channel</text>
+<rect x="601.0" y="530" width="78.0" height="30" rx="2" fill="#fff4ea" stroke="#b8520a" stroke-width="1.8"/>
+<text x="848.0" y="550" font-size="12" fill="#b8520a" font-weight="normal" text-anchor="start">window 1.3 x 1.2; gold half-hole pad</text>
+<rect x="535" y="562" width="210" height="22" rx="3" fill="#e8f0fb" stroke="#2a78d6" stroke-width="1.8"/>
+<text x="848.0" y="580" font-size="12" fill="#2a78d6" font-weight="normal" text-anchor="start">charging head, pogos touch the pads</text>
+<text x="90" y="620" font-size="12.5" fill="#57606a" font-weight="normal" text-anchor="start">Magnets sit in bossed pockets, 0.2 mm skin, boss top -8.45 (0.15 under the cell/M edge). Dock centre line = M mid-plane.</text>
+</svg>

@@ -42,3 +42,5 @@ Live quote is required before relying on any of this. Hand-off to the upload che
 
 ## ECR-0023 filler
 Bonded-post filler: low-shrink epoxy, <= 0.5 % shrink (shell assembly, not a PCB line item).
+
+**K4-STACK6 (2026-10-08):** stack-up we order = JLC 6L 0.8 mm default build, symmetric split assumed (sources: jlcpcb.com/resources/6-layer-pcbs, jlcpcb.com/impedance, read 2026-10-08). sim/noise/k4_noise.py re-run with both bounding splits: worst-PSRR corner 26.4 dB (uniform) / 26.2 dB (thin_outer), spread 0.2 dB, sign-off >= 10 PASS.
