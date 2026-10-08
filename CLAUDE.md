@@ -59,3 +59,9 @@ The eight skills in `.claude/skills/` (manage-pcba-program, plan-electronic-prod
 
 ## Git
 Work on the session's designated branch. Commit with the attribution trailer the session specifies. Never push to another branch.
+
+## Token efficiency (owner-approved 2026-10-07; full rules `~/.claude-shared/board/howto/EFFICIENCY.md`)
+- Let auto-compact run at ~200k; keep `resume-now.md` current so compaction loses nothing.
+- Subagents: Sonnet only (`subagent_type: "worker"`; medium, low for mechanical). Opus subagents only with the owner's OK.
+- Fresh short-lived worker per part (~30 tool calls, report ≤60 words); briefs ≤150 words with the context already held.
+- Fewer turns: batch worker reports; heartbeat at most every 2 h; no speculative research or standing reports.
