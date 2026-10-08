@@ -29,3 +29,5 @@ Method: lumped transient network (`thermal.py`, numbers reproducible, 3G fence):
 
 ## Verdict
 Possible with thin margin: docked charge keeps the cell under 45 °C by 1.5 K and the shell at the 43 °C line. The one real lever is current: capping charge at 65 mA (0.5C, already an open owner question A-SAFETY-REVIEW) halves U3 heat and gives ~20 K margin. Recommend: ship firmware default 0.5C, 130 mA only below ~30 °C ambient (RT1 reads).
+
+**Lead note 2026-10-08:** the owner ruled 130 mA (1C) in O34, so 1C stays the default. The hot case is already covered in hardware: U3 TS_HOT is set to 45 °C (sub-power.md register plan), so above that charging pauses and resumes once the cell cools; it never overheats. A 0.5C fallback above ~30 °C ambient (RT1) is a firmware option to raise only if the bench first charge (G5, thermocouple) shows pauses. Open: the LDO burst duty (row 8) and the touch-limit text re-fetch.
