@@ -6,7 +6,7 @@ Generated from `docs/build/bringup.yaml` by `docs/build/make_bringup.py` (2026-1
 
 ![sequence](../diagrams/bringup-sequence.png)
 
-9 stages, 40 steps. `[A]` = assumed tolerance, refine on board 1.
+10 stages, 50 steps. `[A]` = assumed tolerance, refine on board 1.
 
 ## Gates (never skip)
 
@@ -15,6 +15,8 @@ Generated from `docs/build/bringup.yaml` by `docs/build/make_bringup.py` (2026-1
 - **G2**: no 5 V dock power until C1 (current-limited cell-side power) passes
 - **G3**: no lid bond (physical.md step 8) until D4 (boot stub + DFU re-flash over USB) passes: SWD is gone after the bond (DBG-16)
 - **G4**: no exciter until E7 (|Z| on a resistor) and E8 (fault break) pass
+- **G6**: K4 (two stacked boards P/M, ECR-0020/0021): no BM28 mate until K1 and K2 pass (each board alone, no shorts); no power through the mated stack until K4 passes (reversal table)
+- **G7**: K4: no cell on the charger until K8 dock-pad/head check passes; first charge only fire-safe (K9)
 - **G5**: no wear on the head until H2 (Off current) and the supervised first charge (E6) pass (ECR-0009)
 
 ## Tools
@@ -481,6 +483,118 @@ Generated from `docs/build/bringup.yaml` by `docs/build/make_bringup.py` (2026-1
 | Closes | ECR-0006 |
 | Source | ECR-0006; PHYS-8D |
 
+## Stage K: K4 two-board stack (P + M, ECR-0020/0021): each board alone, BM28 mate, dock, first charge (gates G6, G7)
+
+### K1. board M bare (before any mate, cell, or head): meter on 0.1 ohm-resolution range, pads J3 VBUS / J4 GND / J5 BAT+ / J9 NTC / J7 LED+ / TP6 VSYS / TP4 +3V0 and BM28 J20 pins
+
+| | |
+|---|---|
+| Tools | multimeter, loupe |
+| Expect | J4(GND) to J5(BAT+): R8+R9 = 2 Mohm 1% (reads 1.6-2.0 Mohm with U3 BAT leakage, never <1 Mohm); J9(NTC) to GND: RT1 10 kohm 1% = 9.9-10.1 k at 25 C (Murata NCP03XH103F05RL); J3(+) to J4 diode mode: PMEG3005EL D4 forward into R12+R13 = 200 kohm, 0.2-0.35 V, reverse OL; J7 to TP6: R14 2.2 kohm 1% (2.18-2.22 k); BM28 pin25 (BTN) to GND: R10 2.2 kohm 1%, pin15 (+3V0) to pin7 (SCL) and pin9 (SDA): R15/R16 10 kohm 1%; pin27 (VBUS_SENSE) to GND: R13 100 kohm 1%; pin5 (VBAT_SENSE) to GND: R9 1 Mohm 1% (parallel R8 path = open); R20 0R: LDO_OUT to TP4 under 0.5 ohm; +3V0 to GND >100 kohm (C21/C17/C18 charge, the reading climbs: not a short); no VBUS/VSYS/+3V0 to GND under 1 kohm |
+| Pass | all within tolerance, no short |
+| On fail | hot-air or reflow touch-up of the named 0201; U3 DSBGA-8 0.4 mm bridge suspected if VSYS/VBUS < 1 kohm to GND: microscope, do not power |
+| Closes | K4-BRINGUP |
+| Source | hw/pod/k4/pod_k4_M.net; bom_jlc_M.csv; sub-power.md |
+
+### K2. board P bare: U1 supply pins, BM28 J21 pins, TP1-TP3, TP7-TP9, J1/J2
+
+| | |
+|---|---|
+| Tools | multimeter, loupe |
+| Expect | +3V0 (J21 pin15) to GND: no resistive short (>50 kohm; decoupling charges, the reading climbs); BOOT0 (U1 PH3) to GND: R1 10 kohm 1%; each TIM1 gate net to GND or +3V0 (R3-R6): 100 kohm 1% each; R21 0.1 ohm sense: 0.1 ohm +-1% (2-wire reads 0.2-0.4 ohm incl. leads: use the 4-wire/LCR) ; R23 1 Mohm; C14 22u/C4/C7 10u: LCR 1 kHz within +-20% of nominal minus DC-bias (unbiased); L1 2u2: 2.2 uH +-20% at 1 MHz (Murata DFE201610E-2R2M), DCR <= ~0.1 ohm [A]; Q1/Q2 diode mode: body diode 0.5-0.8 V one way, OL the other; J1-J2 across the exciter pads: open (no exciter yet) |
+| Pass | no short; passives within tolerance; U1 pin 1 orientation matches pin1_expected.png |
+| On fail | U1 QFN-48 bridging: inspect/reflow; wrong-rotation part (pin1 check B5 in .pcba-workflow/k4-release/gate.yaml) |
+| Closes | K4-BRINGUP |
+| Source | hw/pod/k4/pod_k4_P.net; bom_jlc_P.csv; gate.yaml B5 |
+
+### K3. M alone: inject 3.00 V (current limit 20 mA) at TP4 (+3V0) / GND, and again 4.0 V at J5 (BAT+, cell stand-in, limit 20 mA, no cell)
+
+| | |
+|---|---|
+| Tools | bench supply, multimeter, PPK2 |
+| Expect | at 3.0 V into TP4: current < 5 uA once caps settle (no load on M except pull-ups to idle MCU-less inputs, R10 not driven, mic VDD unpowered: PA5 on P); at 4.0 V on J5: U3 BAT FET path: VSYS (TP6) = about 4.0 V minus 55 mohm x load; U4 LDO_OUT (R20 side) = 3.00 V +-1% (TPS7A2030PDQNR fixed 3.0 V, SBVS338H) with +3V0 0.00-0.01 V drop across R20; supply current 6.5 uA LDO Iq + 3.2 uA U3 ship/battery-only Iq [datasheet typ] -> 8-20 uA total |
+| Pass | LDO 2.97-3.03 V; idle current < 30 uA |
+| On fail | LDO off: check U4 EN to VSYS and C17/C18 orientation-free; current > 100 uA: U6/D5 reverse leakage or flux residue (clean, bake) |
+| Closes | K4-BRINGUP, PWR-I14 |
+| Source | sub-power.md U4_noise_iq, U3_fet_iq; TPS7A2030 SBVS338H |
+
+### K4. mate P onto M normal (J21 into J20) with no power, then separately a DRY reversed attempt on the bare connectors only if the housings allow it (no board stress, 10-cycle budget: this uses 1 of 10 per connector)
+
+| | |
+|---|---|
+| Tools | multimeter, loupe |
+| Expect | normal mate: every signal pin continuity P-pin to M-pin <1 ohm per contact (Hirose 5 A power tabs 31-34 30 mohm [T catalog]); BM28 pins 31-34 and 15 and 30 all one +3V0 net; the 15 GND pins common; mate ordering from gen.py BM28_PINS (signals on odd pads 1-13 and 19-29, GND on neighbours). Reversed-mate table (pad n against pad n+-15, derived from gen.py): 13 pairs signal-GND, 1 pair +3V0-+3V0 (15<->30, plus the four tabs 31-34 pairwise), 1 pair GND-GND (2<->17): +3V0 to GND measured on the reversed stack must NOT read below 100 kohm and no two different non-GND nets may touch; but 13 signals shorted to GND is expected: so a reversed stack must stay UNPOWERED. After a normal mate: +3V0 (TP4) to GND still >100 kohm, VSYS to GND still >50 kohm |
+| Pass | no non-GND/non-GND short in either orientation, all 30+4 contacts continuous when mated normally |
+| On fail | open signal: reseat once (cycle budget 10); persistent: reflow J20/J21 pads under the housing (hot air 260 C max, Hirose BM28 sheet) or swap P/M |
+| Closes | K4-BRINGUP, K4-BM28-REV |
+| Source | hw/pod/k4/gen.py BM28_PINS comment (K4-BM28-REV 2026-10-08) |
+
+### K5. mated P+M, no cell: bench 3.0 V on TP4 (+3V0) via PPK2 source mode, limit 20 mA, no firmware; then SWD-flash the boot stub (as D2-D4)
+
+| | |
+|---|---|
+| Tools | PPK2, ST-LINK/SWD [A], multimeter |
+| Expect | U1 unflashed Stop/Run: draw < 1 mA, rising to ~5-15 mA only in Run at 160 MHz (spec off_D12 Off 15.5-22.7 uA is only for the flashed Stop 2 state: H2); VCAP/VDD11 rail from the internal SMPS reads 1.1 V +-5% at the C8 side (STM32U575 RM0456 SMPS) after the stub starts it; HSE-less LSE 32.768 kHz at Y1 (scope on OSC_OUT, 7 pF load: C11/C12 8.2 pF C0G, CL = 8.2/2+~3 = 7.1 pF) |
+| Pass | boot stub runs, SWD ID read, 1.1 V rail ok, no part above 40 C by finger |
+| On fail | current > 30 mA: power off, thermal camera/finger-check U1 and U4 for the hot part; 0 mA: BOOT0 wiring (R1 to PH3), SWD pins |
+| Closes | K4-BRINGUP, D2 |
+| Source | sub-processing.md; docs/build/bringup.yaml D2-D4 |
+
+### K6. mated stack alive: mic U2 powered via PA5 (MIC_VDD, pin1) with R30 33 ohm in series to U2 VDD (C13 100n at the mic), 4 MHz PDM clock (PB3) on
+
+| | |
+|---|---|
+| Tools | oscilloscope, multimeter |
+| Expect | DC across R30: I_mic x 33 ohm = 1.35 mA x 33 = 45 mV (+-15%: 38-52 mV) with the clock running; at the mic VDD pad ripple at the 4 MHz clock < 5 mV pk-pk (R30+C13 corner 1/(2 pi 33 ohm 70 nF derated) = 69 kHz, 4 MHz about 35 dB down: gen.py R30 comment); MIC_VDD pin to U2 VDD resistance power-off 31.4-34.7 ohm (33 ohm 5%, 0402WGF330JTCE); hum/ultrasound in the PDM record: noise floor within 3 dB of the same record with R30 shorted by tweezers (only if the 3 dB budget is violated, K4 noise fix ECR-0020 rev 5) |
+| Pass | 45 mV +-15% drop, ripple < 5 mV pp, no 4 MHz tone in the FFT |
+| On fail | drop > 60 mV: mic fault or short at C13; ripple high: C13 missing/cracked (0201 flex crack): replace; keep the R30 0402 (hand-solderable) as the tuning knob |
+| Closes | K4-BRINGUP |
+| Source | gen.py R30 L231; ECR-0020 rev 5; SPH0641LU4H-1 datasheet |
+
+### K7. P+M powered at 3.0 V (PPK2) running the boot stub through its modes: Run, Sleep, Stop 2, SMPS on/off; listen at 50 mm with an ear and with the board's own mic (record 10 s each, 4 MHz PDM, 20 Hz-100 kHz FFT)
+
+| | |
+|---|---|
+| Tools | ears, stethoscope tube [A], mic record via fw/tools/pod_test.py |
+| Expect | no tone 20 Hz-20 kHz above the quiet-room floor: L1 (Murata DFE201610E 2.2 uH) switches at about 3 MHz with burst skipping; a burst-mode envelope below 20 kHz is the audible risk: expect none at Run load, possible faint tone only at Stop-2 SMPS-off-to-on handoffs; ceramic piezo (C8/C9 2u2 10 V X5R 0402/0201) 'sing' shows up as a tone at the load-step rate; FFT peaks in 20-100 kHz must be < 6 dB above the quiet-room record taken with P unpowered |
+| Pass | inaudible at 50 mm; FFT no tone > 6 dB over floor |
+| On fail | tone found: log its frequency; options (owner decides): switch SMPS to forced-PWM in Sleep, swap C8 to a 0603 or stack C8 with a 1u, raise load via firmware dummy; 3 options with recommendation to owner |
+| Closes | K4-BRINGUP, OUT-5 |
+| Source | spec D11 (self-noise no louder than ambient); sub-output.md; RM0456 SMPS |
+
+### K8. no cell yet: fit head C5126845 (Xinyangze YZP0048-20048-04025-03, 4P, Extended stock 46 on 2026-10-08) against the four ENIG pads J3 VBUS / J4 GND / J10 D+ / J11 D- on M, N52 D2.5x1.0 magnets in the pod (ECR-0021); first caliper the head sample (K4-MAG-HEAD: magnet pitch guess 13.2 mm [T], polarity, stroke, tip dia)
+
+| | |
+|---|---|
+| Tools | kitchen scale 1 g, multimeter, calipers, second magnet or compass |
+| Expect | magnet attach force at full seat: idealised pull about 2.2 N vs 1.18 N spring -> net hold +1.0 N (sim/checks/dock_pull.py [T]); keying: reversed head is rejected or repelled; contact resistance per pad (head pin to pod pad, 2-wire) < 0.5 ohm [A] (head spec 50 mohm class + ENIG); pad-to-pad isolation > 10 Mohm (500 V megger not needed); VBUS pad to GND with head cable open: still R12+R13 = 200 kohm as K1; with 5 V from a current-limited supply (limit 50 mA) through the head: VBUS at U3 IN pin = 5.0 V minus PMEG3005EL drop (0.295 V at 100 mA, ~0.2 V at 10 mA) = about 4.75-4.85 V; C15 (4u7 25 V) no ripple; D5 TPD1E10B06 leakage < 1 uA; VBUS_SENSE (BM28 pin27) = VBUS/2 = 2.4 V (R12/R13 100k/100k) before the diode drop correction |
+| Pass | all 4 contacts hold under shake, reverse rejected, 5 V arrives at U3 IN |
+| On fail | pad lift or no contact: shim, check pad plating; polarity wrong: flip magnet in its pocket (epoxy not yet set); D+/D- swapped: re-order head wires, never at the pod |
+| Closes | K4-BRINGUP, DK-02, K4-MAG-HEAD |
+| Source | docs/research/k4-dock.yaml; ECR-0021; sub-dock-usb.md |
+
+### K9. first charge of the real 130 mAh cell (ICP401230UPR): cell sits in a metal/ceramic dish or LiPo bag, outdoors-ready on a non-flammable surface, extinguisher (sand/Class D or CO2) within reach, supervised; 5 V bench supply limit 100 mA; thermocouple (K-type [A]) taped to the cell, a second on U3; log VBAT, VSYS, VBUS, I_in and temperature every 30 s for the first 1 h (PPK2 + meter + sheet); no firmware: U3 default ICHG 10 mA = 0.08 C, VBATREG 4.20 V, safety timer 6 h (SLUSE99C)
+
+| | |
+|---|---|
+| Tools | PPK2, bench supply 100 mA limit, thermocouple + logger [A], fireproof bag/dish, timer |
+| Expect | start: cell 3.0-4.1 V (record, never charge a cell < 2.5 V); VSYS = 4.5 V (BQ25180 default SYS regulation with VBUS present); I_in = ICHG 10 mA + SYS load (LDO 6.5 uA + MCU stub up to ~10 mA) = 15-30 mA at 5 V; VBAT rises monotonic, CC at 10 mA until 4.20 V +-0.05 V then CV taper; cell temperature rise <= +3 K above ambient at 10 mA (expect ~0 K), U3 <= +10 K; charge LED on J7/J8 via R14 2.2 k from VSYS: 4.5 V - Vf(2.0 V) / 2.2 k = about 1 mA (visible); 6 h timer ends the charge at about 60 mAh (below full: expected, not a fault) |
+| Pass | no abnormal heat, VBAT monotonic, VSYS 4.5 V +-0.1 V, cell < 30 C absolute, ends clean |
+| On fail | ABORT at: cell > 40 C absolute, any swelling, smell, VBAT > 4.25 V, I_in > 60 mA: unplug the head FIRST, cell into the dish, 24 h watch, bin as hazardous; do not retry without a root cause and an ECR |
+| Closes | K4-BRINGUP, PWR-I4 |
+| Source | sub-power.md U3_defaults, charge_current; SLUSE99C §8.5.1; owner safety review A-SAFETY-REVIEW |
+
+### K10. after K1-K9 pass and the stack is in its tub: SW1 click check on the live board, then the gap-filling epoxy post per docs/build/k4-assembly.md step 'Do (gap-filling post, ECR-0023 add.2)'
+
+| | |
+|---|---|
+| Tools | multimeter or scope on BTN, 10 uL syringe, 30-min low-shrink epoxy, clamp |
+| Expect | SW1 (KMT022NGJLHS): BTN (BM28 pin25) open >1 Mohm unpressed; pressed: BTN pulled to +3V0 through SW1 with R10 2.2 kohm to GND, so BTN = 3.0 V (the 2.2 kohm only draws 1.4 mA while pressed, >= 1 mA contact wetting); one click at 1.2-2.0 N, none at rest (sw1_press_fem: 1.4-20 um board deflection, VHB 12-52 kPa vs 85 kPa limit); then 10 uL epoxy dab on the tub post (post printed 0.59 short of U1: air gap 0.05-1.125 mm): close within 15 min, clamp 1 h flat, no press on SW1 for 24 h; afterwards epoxy skirt only at the post, nothing on the BM28, SW1 still clicks once per press and BTN still toggles |
+| Pass | click + BTN levels as listed, post bonded, no epoxy on connectors |
+| On fail | SW1 no click: puck length too long (selective fit, step H1); epoxy on SW1/BM28: warm to 60-80 C and lift, do not scrape; dry-close builds get no dab |
+| Closes | K4-BRINGUP, K4-SW1-PRESS |
+| Source | docs/build/k4-assembly.md; ECR-0023 add.2; sw1_press_fem.py |
+
 ## Backlog items this plan closes
 
-ARM-1R, ARM-2, ARM-3, ARM-4, ARM-5, ARM-9, DBG-1, DBG-8, DK-02, DK-03, DK-11, DK-17, E2-ALGO, ECR-0006, ECR-0007, FMAC-RM-UNKNOWNS, OUT-4, OUT-5, OUT-7, OUT-8, PAD-11, PAD-4, PAD-8, PWR-I10, PWR-I12, PWR-I15, PWR-I4, PWR-I7, Q-A-PHYSICAL-FIRSTWINS, RB-4, RB-TOL, RPB-16, RPB-17, SAI-11, SAI-13, SAI-5, SAI-6, SAI-7, UI-7
+ARM-1R, ARM-2, ARM-3, ARM-4, ARM-5, ARM-9, D2, DBG-1, DBG-8, DK-02, DK-03, DK-11, DK-17, E2-ALGO, ECR-0006, ECR-0007, FMAC-RM-UNKNOWNS, K4-BM28-REV, K4-BRINGUP, K4-MAG-HEAD, K4-SW1-PRESS, OUT-4, OUT-5, OUT-7, OUT-8, PAD-11, PAD-4, PAD-8, PWR-I10, PWR-I12, PWR-I14, PWR-I15, PWR-I4, PWR-I7, Q-A-PHYSICAL-FIRSTWINS, RB-4, RB-TOL, RPB-16, RPB-17, SAI-11, SAI-13, SAI-5, SAI-6, SAI-7, UI-7

@@ -462,6 +462,9 @@ def vip_j20(b, fps):
     return out
 
 
+VALUES = {b: (json.loads((K4 / f"values_{b}.json").read_text()) if (K4 / f"values_{b}.json").exists() else {}) for b in "MP"}
+
+
 def build(board, placement, L):
     comps, nets = P.parse_netlist(K4 / f"pod_k4_{board}.net")
     missing = set(placement) ^ set(comps)
@@ -483,6 +486,8 @@ def build(board, placement, L):
         fp = pcbnew.FootprintLoad(R1.P.fp_lib(lib), name)
         assert fp is not None, f"footprint {fpid} not found"
         fp.SetReference(ref)
+        if ref in VALUES.get(board, {}):
+            fp.SetValue(VALUES[board][ref])   # BOM value from gen.py (values_<board>.json), not the footprint name
         x, y, rot, side = placement[ref]
         fp.SetPosition(pcbnew.VECTOR2I(mm(x), mm(y))); fp.SetOrientationDegrees(rot)
         b.Add(fp)

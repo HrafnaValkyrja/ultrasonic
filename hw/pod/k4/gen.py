@@ -470,7 +470,11 @@ def bom(board):
         if "DNP_BOM" in p.fields:
             continue
         rows.setdefault((p.value, p.footprint, p.fields.get("LCSC", "")), []).append(p.ref)
+    import json   # ref -> Value, read by hw/pod/place_k4.py so the board Value fields are the BOM values, not footprint names (K4-BOM-STOCK)
+    vals = {p.ref: str(p.value) for p in builtins.default_circuit.parts}
+    (HERE / f"values_{board}.json").write_text(json.dumps(dict(sorted(vals.items())), indent=0))
     lock = {r["lcsc"]: r for r in csv.DictReader(open(REPO / ".pcba-workflow/sourcing-lock.csv"))}
+    lock.update({r["supplier_part_number"]: r for r in csv.DictReader(open(REPO / ".pcba-workflow/k4-sourcing-lock.csv"))})   # K4 lock (skill format), K4-BOM-STOCK
     with open(HERE / f"bom_jlc_{board}.csv", "w", newline="") as f:
         w = csv.writer(f)
         w.writerow(["Comment", "Designator", "Footprint", "LCSC Part #", "Qty", "In sourcing lock"])

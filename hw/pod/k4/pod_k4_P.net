@@ -2,7 +2,7 @@
   (version "D")
   (design
     (source "gen.py")
-    (date "10/08/2026 05:06 AM")
+    (date "10/08/2026 08:19 AM")
     (tool "SKiDL (2.3.0)")
     (sheet
       (number 1)
@@ -13,7 +13,7 @@
         (company)
         (rev)
         (date)
-        (source "../../../gen.py")
+        (source "gen.py")
         (comment
           (number "1")
           (value ""))
