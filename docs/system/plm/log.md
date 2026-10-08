@@ -649,3 +649,5 @@
 - 2026-10-08 02:58 checkin REG-POD-BODY by K4-SHELLCHK agent
 - 2026-10-08 02:58 checkout REG-ARM by K4-SHELLCHK agent: K4 shell checks 2026-10-08
 - 2026-10-08 02:58 checkin REG-ARM by K4-SHELLCHK agent
+- 2026-10-08 02:59 review REG-POD-BODY by K4-SHELLCHK agent: doc updated with K4 shell/strut checks 2026-10-08
+- 2026-10-08 02:59 review REG-ARM by K4-SHELLCHK agent: doc updated with K4 shell/strut checks 2026-10-08

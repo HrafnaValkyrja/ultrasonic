@@ -37,12 +37,12 @@
    }
   },
   "REG-ARM": {
-   "by": "claude-backlog",
-   "date": "2026-10-07",
-   "note": "round 10: K1 variant hook; phase2 values identical (regressions 0 diffs); docs carry the variant note; K1 facts in reg-pod-body Variants",
+   "by": "K4-SHELLCHK agent",
+   "date": "2026-10-08",
+   "note": "doc updated with K4 shell/strut checks 2026-10-08",
    "stamp": {
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
-    "file:hw/mech/heel.py": "7d4d3eb0aaa25d99",
+    "file:hw/mech/heel.py": "37f8dda276f86d83",
     "file:sim/checks/niti_arm_real.py": "62944f12dde4e774"
    }
   },
@@ -68,12 +68,12 @@
    }
   },
   "REG-POD-BODY": {
-   "by": "claude",
-   "date": "2026-10-07",
-   "note": "ECR-0021 K4 own dock: K4 dock sections added",
+   "by": "K4-SHELLCHK agent",
+   "date": "2026-10-08",
+   "note": "doc updated with K4 shell/strut checks 2026-10-08",
    "stamp": {
     "file:hw/mech/blade.py": "ad6b4d86e46c5d84",
-    "file:hw/mech/dims_r2.py": "d5e3fa6b93c2df7d",
+    "file:hw/mech/dims_r2.py": "99cbaaf4302a2566",
     "file:hw/mech/shell_r2.py": "98ab986aa83fc405",
     "file:hw/mech/styles.py": "23dcb6bfe495f82f"
    }
