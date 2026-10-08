@@ -8,4 +8,4 @@ Four proofs landed (docs/proof/): electrical PASS with the fw clamp (b1501b0), t
 5. N-K1T-BUTTON (guess, model both): KMT022 breaks the K1-thin 0.6 lid; dome on new F pads (board edit + re-route, serial heavy job) or proud skin. ~1.5 h.
 Done: N-K4-TOOLS 56cf4fd (K4 flip = hw/current.yaml default line + fw/gen regen; old WIP in stash@{0}), N-K1T-RELEASE (r2-release in 6eba28a, gate BLOCKED), N-K1T-DUCT, N-6L-STACKUP, N-K1T-PARITY, N-PENTEST-CARD, N-POST-GAP.
 
-Ruling-needed (hers): A-K4-VISION (weekend bench day), A-TODAY-BODY-MEASURE, A-IDLE-TRADE, A-6L-QUOTE (optional), A-CAP-CURVES (optional), GitHub Issues permission. Orders/payments: owner-only.
+Ruling-needed (hers): A-K4-VISION (weekend bench day), A-TODAY-BODY-MEASURE, A-IDLE-TRADE, A-6L-QUOTE (optional), A-CAP-CURVES (optional). Orders/payments: owner-only.

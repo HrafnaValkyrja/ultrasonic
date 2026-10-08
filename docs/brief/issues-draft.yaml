@@ -1,5 +1,5 @@
 # Draft GitHub Issues for HrafnaValkyrja/ultrasonic (RULES.md "Work selection and guesses", 2026-10-08).
-# Not created: the session's permission check denied the external write (2026-10-08 16:3x ET); the owner must allow it.
+# Created 2026-10-08 as GitHub issues #1-#14 (HrafnaValkyrja/ultrasonic) after the owner's allow rule.
 labels: ["kind: ruling-needed", "kind: work", guess, owner-only, blocked]
 issues:
   - {id: N-K4-TOOLS, labels: ["kind: work"], src: NEXT.md}
