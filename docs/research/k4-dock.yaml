@@ -1,0 +1,38 @@
+# K4 dock connector search. Date 2026-10-08. Author: worker. Context: ECR-0019 (4 contacts VBUS GND D+ D-), O12/O31 (pre-built magnetic, no connector board), O33.
+# Targets: belly <= ~5.0 wide (cavity 6.4-2x0.6 = 5.2) x <= 2.5 deep; or rear end face 6.4 (y) x 14.8 (z).
+verdict: >
+  NO off-the-shelf stocked 4-pin magnetic connector that I could verify fits either face. Every JLC/LCSC part is a 21-22 mm racetrack
+  with a >=5.7 mm body and 6.9-7.7 mm flange. The only candidate that fits on paper (14.5 x 4.7, 2.2 mm pitch, JLC C9900155216) has
+  0 stock and no datasheet. Dimensions are read off the vendor drawings (250 dpi crop, +-0.1 mm).
+jlc_checked:   # JLC parts API 2026-10-08T02:07-02:09Z, qty-1 USD, all Extended
+  - {lcsc: C5126844, mpn: YZ92015035T-04025-01, role: receptacle 4P 2.5 mm pitch, stock: 5, price: 2.02, body_LxW: "21.2 x 6.86 flange, ~4.86 inner body (est.)", H: 2.8, I: "5 A (12 V static)", pa9t: true, fit: "NO as bought; option C trims the flange", ds: "Xinyangze 2022-08-08"}
+  - {lcsc: C6276862, mpn: YZ103915020T-04025-02, role: receptacle 4P 2.54 pitch, stock: 155, price: 1.77, body_LxW: "22.3 x 7.7 outer (5.7 body)", H: "2.02 (1.5 flange)", I: "3 A static", fit: NO, ds: "Xinyangze 2021-09-02"}
+  - {lcsc: C5126846, mpn: YZT0675-20048-04025-01, role: receptacle 4P, stock: 0, price: 1.97, fit: "NO, same 21.2 x 6.86 body"}
+  - {lcsc: C42463273, mpn: YZT0675-20048-04025-04, role: 4P plug-in version, stock: 18, price: 2.49, fit: NO}
+  - {lcsc: C5126845, mpn: YZP0048-20048-04025-03, role: cable head 4P pogo (mates 2.5 pitch family), stock: 46, price: 2.72, I: "1 A, 30 gf +-20%/pin, 12 V", H: "4.8 total, 21.2 x 6.86", ds: "2022-08-08"}
+  - {lcsc: C5200680, mpn: YZP0048-20048-04025-02, role: head 4P (listing omits magnetic), stock: 216, price: 1.13}
+  - {lcsc: C9900155216, mpn: "Straight 4 pins magnetic connector Male", package: "CONN-TH 4P L14.5 W4.7 P2.20", stock: 0, price: 0.04 (placeholder), fit: "ON PAPER (4.7 wide); no datasheet, no height, no female listed, unusable until sampled"}
+  - {note: "searches 'magnetic pogo 2mm', 'Magnetic Pogo Pin Male Connector', Chinese keywords found nothing smaller. 2P/3P YZT0243/YZT0755/YZR0158 are too few contacts."}
+other_sources:
+  - {item: "Adafruit 5358 4-pin right angle + cable 5412", dims: "21 x 7 x 7", I: "2 A, 36 V", T: "-30..65 C", pitch: 2.54, price: "US$6.50 (adafruit.com 2026-10-08)", fit: NO, note: "has USB-A cable head 5412 (A$11.73 pakronics 2026-10-08, 19 in stock)"}
+  - {item: "Adafruit straight 2.2 mm pitch family (6..9 contacts at thepihut/coolcomponents)", fit: "4P not listed by any retailer I found; probably the same part as JLC C9900155216", note: "ask Adafruit/Xinyangze for dims"}
+  - {item: "Promax Pogo Pin NF/NC 4-pin (32 models, e.g. NF4730-04PA, NF5493-04PA, NF708-04PD; X6706/NF4808 cable pair)", I: "3 A/contact, 1 A on cable male", IP: "IP66 (NF4808)", sample: "free samples, info@promaxpogopin.com", dims: "NOT on web pages (datasheet download only); unverified", fit: UNKNOWN}
+  - {item: "Sunmon smeconn.com 4-pin 903-000xx", note: "all custom pitch/height; no stock dims"}
+  - {item: "probots.co.in PRO5420 circular polarised 4P", pitch: 2.8, I: "1 A 5 V", fit: "round, size not given, pitch 2.8 on a circle likely > 6.4; unlikely"}
+electrical_notes:
+  charge_0p5A: "All Xinyangze types pass (1 A head, 3-5 A receptacle). Use 2 mA..1 A, so head 1 A is the limit; fine for 0.5 A."
+  usb_fs: "12 Mbit/s over 2 unshielded gold pogos + short pod wires: OK; spec contact R <= 50 mohm. Not measured. Keep D+/D- adjacent, 2.5 mm pitch gives ~no controlled impedance; accept."
+  pull_force: "Not in any datasheet. Pogo force 30 gf/pin (YZP0048) is the only number. Measure on sample."
+  alignment: "Magnet polarity keys (Adafruit: reversed halves repel). YZ family: S/N marks on racetrack ends (drawing), keyed by magnet polarity, so a flipped mate is rejected."
+options:
+  A: {name: "Custom 4P short body from Xinyangze/Promax (<= 14 x 4.6 x 2.3, 2.0 pitch)", pros: "fits belly or rear face; same maker as our head", cons: "not off the shelf (NRE+MOQ unknown, contradicts O12 spirit), lead time 15-20 d per Promax", status: unverified}
+  B: {name: "JLC C9900155216 14.5 x 4.7 x P2.2 4P straight male (+ female/head)", pros: "only stocked-class listing that fits; 4.7 < 5.2", cons: "0 stock, no datasheet, no height/rating, mating head unknown", next: "request a sample/datasheet; do not design in until dims known"}
+  C: {name: "C5126844 (YZ92015035T 4P, 5 A) with flange trimmed to <= 5.2 wide", pros: "buyable now, mates C5126845 head, body ~4.86 wide fits cavity 5.2 (0.17 each side)", cons: "hand-filing PA9T racetrack flange (owner builds by hand OK), only 5 in stock, inner body width is my drawing read +-0.1, thin 0.17 slack, height 2.8 > 2.5 belly depth unless flange is removed and body sits 1.8 deep", status: needs a caliper on a sample}
+recommendation: >
+  C as the fallback to buy now (3-5 samples of C5126844 + head C5126845, ~US$25), plus ask Promax/Xinyangze for a datasheet on B/A in parallel.
+  Do not freeze the dock geometry until one sample is calipered (matches DK-02/DK-03). Owner decides (spec 0 rules); O21 means no order yet.
+cad_fix:
+  files: [hw/mech/dims_k4.py]
+  change: "cell tape 0.25 -> 0.10 (thin transfer tape instead of VHB 0.25); cell-to-lid clearance 0.05 -> 0.20 mm (assert >= 0.2 added); T stays 6.4, H/L unchanged"
+  check: "hw/mech/out/k4s/checks.json cell.lid_clear = 0.2 (shell_k4.py run 2026-10-08); mass change negligible"
+  caveat: "0.10 tape needs a ~0.06 mm acrylic transfer film (3M 467MP class), not VHB; cell swap peels with heat. Alternative if owner dislikes: floor wall 0.6 -> 0.45, or T 6.55."

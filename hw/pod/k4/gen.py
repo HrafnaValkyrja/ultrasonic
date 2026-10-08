@@ -354,22 +354,19 @@ def build():
 
 
 
-# ============================================================ K4 two-board split (ECR-0020, spec O33, V9 option B+)
-# M = lower board (mic on its outer face, MCU). P = upper board (power, bridge, dock, button), directly over M.
-# Hirose BM28 0.35 mm stack: P carries the plug (DP), M the receptacle (DS), pin n to pin n [T].
-BOARD_OF = {}
-for _r in ("U1 U2 L1 Y1 R1 R2 R15 R16 C1 C2 C3 C4 C5 C6 C7 C8 C9 C10 C11 C12 C13 C19 "
-           "TP1 TP2 TP3 TP4 TP5 TP7 TP8 TP9 TP10").split():
-    BOARD_OF[_r] = "M"
-# Everything not listed as M is P (charger, LDO, bridge Q1/Q2 + R3-R6/R21-R23/C14/C22, dock, ESD, SW1+R10, LED, VSYS/VBAT sense).
-BOARD_OF["L1"] = "P"            # B+ premise: switch-node aggressor sits on the upper board over the mic
-BM28_PINS = {    # pin -> net. Two rows: odd pins row A, even pins row B; pin pair (2k-1, 2k) face each other [T].
-    1: "GND", 2: "+3V0",   3: "VLXSMPS", 4: "GND",   5: "GND",     6: "VDD11",
-    7: "GA_P", 8: "GA_N",  9: "GB_P", 10: "GB_N",   11: "GND", 12: "I_SENSE",
-    13: "USB_DP", 14: "GND", 15: "USB_DM", 16: "GND", 17: "GND", 18: "I2C_SCL",
-    19: "I2C_SDA", 20: "CHG_INT", 21: "GND", 22: "TS", 23: "VBAT_SENSE", 24: "VBUS_SENSE",
-    25: "GND", 26: "LED_K", 27: "BTN", 28: "+3V0", 29: "GND", 30: "GND"}
-# odd = row A, even = row B.  A2-style guard: VLXSMPS (pin 3) has GND at pin 1 (same row), pin 5 (same row), pin 4 (facing)
+# ============================================================ K4 two-board split (ECR-0020 rev 2, spec O33, V9 option B+)
+# Rule (review of d2a70d9): no switching node crosses the B2B. VLXSMPS, L1, C8/C9 (VDD11), C7 (VDDSMPS) stay on U1's board.
+# P = upper board: everything electrical (MCU U1 + its SMPS, charger, LDO, bridge, dock, button), the B+ aggressors.
+# M = lower board: only the mic U2 + its 100 nF C13 (mic on M's outer face, port through M). The PDM clock, data and the
+# GPIO-switched mic supply are the only signals that cross. Hirose BM28 0.35 mm stack, 10 contacts: P carries the plug (DP),
+# M the receptacle (DS), pin n to pin n [T].
+BOARD_OF = {"U2": "M", "C13": "M"}
+# Everything not listed is P.
+BM28_PINS = {    # pin -> net. Odd pins row A, even pins row B; pins (2k-1, 2k) face each other [T].
+    1: "GND", 2: "MIC_VDD", 3: "MIC_CLK", 4: "GND", 5: "GND",
+    6: "GND", 7: "MIC_DATA", 8: "GND", 9: "GND", 10: "GND"}
+# MIC_CLK (3): GND at 1 and 5 (same row) and 4 (facing). MIC_DATA (7): GND at 5, 9 and 8. MIC_VDD (2): GND at 4 and 1.
+# 3 signals + 7 GND. MIC_VDD is a ~1 mA GPIO supply (PA5), CLK/DATA 3-4 MHz 3 V PDM: no current or switching-node risk on the contacts.
 
 
 def board_of(ref):
@@ -378,8 +375,8 @@ def board_of(ref):
 
 def b2b_part(ref, lcsc, mpn):
     pins = [Pin(num=n, name=f"{n}_{net}", func=Pin.types.PASSIVE) for n, net in sorted(BM28_PINS.items())]
-    j = Part(tool=SKIDL, name="BM28_30", ref_prefix="J", ref=ref, tag=ref, pins=pins,
-             footprint="lcsc:BM28B0.6-30DP_2-0.35V", value=mpn)    # footprint to be fetched at placement [T]
+    j = Part(tool=SKIDL, name="BM28_10", ref_prefix="J", ref=ref, tag=ref, pins=pins,
+             footprint="lcsc:BM28B0.6-10DP_2-0.35V", value=mpn)    # footprint to be fetched at placement [T]
     j.fields["LCSC"] = lcsc
     return j
 
@@ -398,8 +395,8 @@ def split(board):
     cross = crossing_nets()
     pinnets = set(BM28_PINS.values())
     assert set(cross) == pinnets, ("B2B net list mismatch", sorted(set(cross) ^ pinnets))
-    j = b2b_part("J20" if board == "M" else "J21", "C424571" if board == "M" else "C424570",
-                 "BM28B0.6-30DS/2-0.35V(51)" if board == "M" else "BM28B0.6-30DP/2-0.35V(51)")
+    j = b2b_part("J20" if board == "M" else "J21", "C424563" if board == "M" else "C424562",
+                 "BM28B0.6-10DS/2-0.35V(51)" if board == "M" else "BM28B0.6-10DP/2-0.35V(51)")
     for num, nname in BM28_PINS.items():
         j[num] += cross[nname]
     for p in list(builtins.default_circuit.parts):

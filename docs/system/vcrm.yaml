@@ -1077,8 +1077,8 @@ requirements:
     gap: >-
       C: V9 studies the shortest board (B+ two stacked 4L boards, ~11 x 12 mm; length figures are estimates, no placement run) and
       the vertical noise model passes nominal, marginal in the pessimistic corner. ECR-0020 splits the schematic into two
-      netlists joined by a 30-contact Hirose BM28 (rating and height from a secondary source). K4 shell: hw/mech/shell_k4.py.
-      D: the real board length, the B2B contact resistance on VBUS-side nets and the SMPS contacts, and the stacked thickness.
+      netlists joined by a 10-contact Hirose BM28 (rev 2: M = mic only, U1 + SMPS on P; height from a secondary source). K4 shell: hw/mech/shell_k4.py.
+      D: the real board length, the B2B ground-return contact resistance for the mic, and the stacked thickness.
 
   - id: O16-nohousingscrews
     kind: owner

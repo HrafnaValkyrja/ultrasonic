@@ -31,11 +31,13 @@ CAV = dict(y0=Y_IN + WALL, y1=Y_LID_IN, z0=Z0 + WALL, z1=Z1 - WALL, x1=X1 - WALL
 
 # ---------------------------------------------------------------- cell (Renata ICP401230UPR, V2-cells.yaml; datasheet ICP401230 V02 08/2019)
 CELL_SPEC = dict(part="Renata ICP401230UPR", mAh=130, g=3.5, T=4.5, W=12.7, L=31.0)
-TAPE = 0.25                            # VHB under the cell (cell swap = peel)
+TAPE = 0.10                            # thin transfer tape under the cell (cell swap = peel); was VHB 0.25, cut to buy lid clearance (2026-10-08, k4-dock.yaml)
+LID_CLEAR_MIN = 0.2                    # cell swell allowance
 CELL_X1 = 62.0 if RELIEF == "len" else CAV["x1"] - 1.1   # 65.8: heel exit (frame-fixed 65.8-66.6) stays free
 CELL_X0 = CELL_X1 - CELL_SPEC["L"]
 CELL_Y0 = CAV["y0"] + TAPE
-CELL_Y1 = CELL_Y0 + CELL_SPEC["T"]     # 9.65: 0.05 under the lid for the 4.5 max envelope (swelling unknown)
+CELL_Y1 = CELL_Y0 + CELL_SPEC["T"]     # 9.50: 0.20 under the lid (4.5 max envelope + swell); T stays 6.4
+assert Y_LID_IN - CELL_Y1 >= LID_CLEAR_MIN - 1e-9, "cell-to-lid clearance"
 CELL_Z1 = CAV["z1"] - 0.1              # cell hangs under the cavity top (0.1 clear); free channel underneath (wires)
 CELL_Z0 = CELL_Z1 - CELL_SPEC["W"]
 CH_UNDER = CELL_Z0 - CAV["z0"]         # wire channel under the cell
