@@ -123,8 +123,18 @@ def notch_rect():
     return (-0.5, H - MIC_CY - _MIC_R[3], MIC_CX + _MIC_R[2] + 0.1, H - MIC_CY - _MIC_R[1])   # P file frame (y mirrored)
 
 
+SOLDER_WIN = {"on": False}                          # P: through cutout over M's cell-wire pads J4/J5 (stack x 10.55, M y 7.9..11.6), P file frame y = H - y
+
+
+def solder_win():
+    return (9.45, H - 11.6, 11.65, H - 7.9)
+
+
+CX_FIX = [None]                                      # --cx: hold the J20/J21 mate x while L grows
+
+
 def u1_cx(L):
-    return L - 4.15 - 0.05
+    return CX_FIX[0] if CX_FIX[0] is not None else L - 4.15 - 0.05
 
 
 def pack(board, comps, nets, L):
@@ -137,6 +147,8 @@ def pack(board, comps, nets, L):
     if board == "P":
         n = notch_rect()
         blocked["F"].append(n); blocked["B"].append(n)
+        if SOLDER_WIN["on"]:
+            w = solder_win(); blocked["F"].append(w); blocked["B"].append(w)
         blocked["F"] += PINNER
         fixed.update({"U1": (cx, U1_CY, U1_ROT, "B"), "J21": (cx, H / 2, 180, "F")})
         if VIP["on"]:     # no inner-face part over U1's exposed pad: a +3V0 / signal via there would short to the EP (GND)
@@ -277,6 +289,12 @@ def outline_k4(b, board, L):
     for a, c in segs:
         s = pcbnew.PCB_SHAPE(b); s.SetShape(pcbnew.SHAPE_T_SEGMENT); s.SetLayer(pcbnew.Edge_Cuts)
         s.SetStart(V(*a)); s.SetEnd(V(*c)); s.SetWidth(mm(0.05)); b.Add(s)
+    if SOLDER_WIN["on"]:
+        w = solder_win()
+        pts = [(w[0], w[1]), (w[2], w[1]), (w[2], w[3]), (w[0], w[3])]
+        for q in range(4):
+            s = pcbnew.PCB_SHAPE(b); s.SetShape(pcbnew.SHAPE_T_SEGMENT); s.SetLayer(pcbnew.Edge_Cuts)
+            s.SetStart(V(*pts[q])); s.SetEnd(V(*pts[(q + 1) % 4])); s.SetWidth(mm(0.05)); b.Add(s)
     k = r * (1 - math.sqrt(0.5))
     for st, mid, en in (((0, r), (k, k), (r, 0)), ((x1 - r, 0), (x1 - k, k), (x1, r)),
                         ((x1, H - r), (x1 - k, H - k), (x1 - r, H)), ((r, H), (k, H - k), (0, H - r))):
@@ -686,10 +704,14 @@ def main():
     ap.add_argument("--u1rot", type=int, default=90)
     ap.add_argument("--u1cy", type=float, default=4.8)
     ap.add_argument("--fine", action="store_true", help="JLC 6L minimum rules (via 0.25/0.15, annular 0.05, hole clearance 0.14)")
+    ap.add_argument("--cx", type=float, default=None, help="fixed U1/J20/J21 x (default L-4.2)")
+    ap.add_argument("--win", action="store_true", help="P solder-access window over M cell-wire pads")
     ap.add_argument("--vip", action="store_true", help="pre-placed via-in-pad on U1 / J21 pads (P only)")
     a = ap.parse_args()
     FINE["on"], VIP["on"] = a.fine, a.vip
     L = a.L
+    CX_FIX[0] = a.cx
+    SOLDER_WIN["on"] = a.win
     global MIC_ROT, _MIC_R, MIC_CY, U1_ROT, U1_CY
     U1_ROT, U1_CY = a.u1rot, a.u1cy
     MIC_ROT, _MIC_R, MIC_CY = _mic_rot(P.parse_netlist(K4 / 'pod_k4_M.net')[0]['U2'])

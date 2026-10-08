@@ -1,21 +1,24 @@
 {
  "date": "2026-10-08",
- "L": 14.0,
+ "L_status": "P not closed up to 16.0",
  "layers": 6,
- "rules": "JLC 6L fine (via 0.25/0.15, track 0.09)",
  "M": {
+  "L": 15.5,
   "unconnected": 0,
   "drc": 0,
   "place_check": "PASS",
-  "method": "J20 via-in-pad (place_k4 vip_j20) + keep-out rows, route_k4 --layers 6 --fine, close_gaps --fine; J20 mates J21 at stack (9.8,6.0)",
-  "file": "hw/pod/k4/routed_M.kicad_pcb"
+  "placement": "placement_M_L15.5.yaml (= L14 hand placement, outline 15.5)",
+  "file": "hw/pod/k4/routed_M.kicad_pcb",
+  "dock_strip": "NOT done (geometry ambiguous: k4-dock.yaml castellated 2.5-pitch tab vs current J3..J5 column; needs owner/coordinator spec)"
  },
  "P": {
-  "unconnected": 8,
-  "place_check": "FAIL: near C7 3.00>2.0, C9 2.81>2.5, R1 4.22>4.0, R5 3.08>3.0, R6 3.78>3.0, R22 3.67>2.5 (stack gap ok)",
-  "file": "hw/pod/k4/routed_P.kicad_pcb",
-  "note": "nudge search stalls: near rules not satisfiable at L14; relax NEAR or grow L (owner)",
-  "drc": "6 (mask bridge 1, edge 1, courtyard 3, short 1)"
- },
- "open": "M dock strip outline (0.6 mm under cell) not modelled in M Edge.Cuts; STACK_L 11 vs L 14 to reconcile with dims_k4"
+  "L": 15.5,
+  "place_check": "PASS (pack+nudge_k4.py, cx 9.8, u1 rot90 cy4.8)",
+  "unconnected": "5-7",
+  "drc": "2 (clearance 0.0894 vs 0.09) to 12 across reruns",
+  "file": "hw/pod/k4/routed_P_L15.5_best_7open_2drc.kicad_pcb",
+  "stuck_nets": "I2C_SCL, VBAT_SENSE (J21/U1), GB_P (R5/Q2/U1), MDF_CCK",
+  "note": "L14.5 and L15.0: place FAIL after pack+nudge (5 variants); L16.0: place FAIL (R22 near U1.16). FreeRouting -us Hybrid/Global no better.",
+  "solder_window": "--win implemented in place_k4/nudge_k4 (Edge.Cuts cutout over M J4/J5, P file x9.45-11.65 y0.4-4.1); with it U1 must move (cy 8.3) and near rules fail (4+ violations at 15.5); not routed"
+ }
 }
