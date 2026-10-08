@@ -20,7 +20,7 @@ blockers:
   - id: B5-PIN1-UNCONFIRMED
     what: "12 parts not confirmable from data (J20 J21 Q1 Q2 U1 U2 U3 U4 U6 D4 SW1 + D5 check): must be eyeballed in JLC placement preview against pin1_expected.png."
   - id: B6-PASSIVE-DATASHEET
-    what: "C9 ESR (2u2 0201 C318539) and C17 DC-bias (1u 0201 C318540) unverified against datasheets."
+    what: "C9 ESR (2u2 0201 C318539) and C17 DC-bias (1u 0201 C318540) unverified against datasheets. 2026-10-08 attempt: LCSC reference sheets read (X5R, 0.30+-0.09 mm thick = 0.39 max OK, 10 V/16 V) but contain NO bias/ESR curves; Samsung weblib HTTP 500 headless, no static curve found. STILL OPEN, needs owner-side KSIM download (see docs/brief/backlog.yaml K4-C9-ESR)."
 order_flags: ["POFV (via-in-pad epoxy filled and capped): 67 vias on P pads (U1 EP, R3, R5), none on M", "6L 0.8 mm ENIG, 0.15/0.25 vias, no impedance control"]
 user_review_needed:
   - "JLC DFM + placement preview: CPL rotations now corrected by tools/jlc_rotations.py (EasyEDA pin-1 + community DB + 2022 bottom rule); 12 parts unconfirmed, see pin1_expected.png + jlc_rotation_corrections.csv. Preview still decides."
