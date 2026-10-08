@@ -2,7 +2,7 @@
   (version "D")
   (design
     (source "gen.py")
-    (date "10/08/2026 04:38 AM")
+    (date "10/08/2026 05:06 AM")
     (tool "SKiDL (2.3.0)")
     (sheet
       (number 1)
@@ -13,7 +13,7 @@
         (company)
         (rev)
         (date)
-        (source "gen.py")
+        (source "../../../gen.py")
         (comment
           (number "1")
           (value ""))
@@ -345,7 +345,7 @@
         (field
           (name "SKiDL Tag") "J20")
         (field
-          (name "SKiDL Line") "gen.py:434"))
+          (name "SKiDL Line") "gen.py:437"))
       (libsource
         (lib "NO_LIB")
         (part "BM28_30"))
@@ -1037,15 +1037,27 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "17")
+        (pin "15")
         (pintype "PASSIVE"))
       (node
         (ref "J20")
-        (pin "18")
+        (pin "30")
         (pintype "PASSIVE"))
       (node
         (ref "J20")
-        (pin "19")
+        (pin "31")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J20")
+        (pin "32")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J20")
+        (pin "33")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J20")
+        (pin "34")
         (pintype "PASSIVE"))
       (node
         (ref "R15")
@@ -1077,7 +1089,7 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "29")
+        (pin "25")
         (pintype "PASSIVE"))
       (node
         (ref "R10")
@@ -1097,7 +1109,7 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "26")
+        (pin "23")
         (pintype "PASSIVE"))
       (node
         (ref "U3")
@@ -1157,10 +1169,6 @@
         (pintype "UNSPECIFIED"))
       (node
         (ref "J20")
-        (pin "1")
-        (pintype "PASSIVE"))
-      (node
-        (ref "J20")
         (pin "10")
         (pintype "PASSIVE"))
       (node
@@ -1173,11 +1181,15 @@
         (pintype "PASSIVE"))
       (node
         (ref "J20")
-        (pin "15")
+        (pin "16")
         (pintype "PASSIVE"))
       (node
         (ref "J20")
-        (pin "16")
+        (pin "17")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J20")
+        (pin "18")
         (pintype "PASSIVE"))
       (node
         (ref "J20")
@@ -1189,7 +1201,7 @@
         (pintype "PASSIVE"))
       (node
         (ref "J20")
-        (pin "21")
+        (pin "22")
         (pintype "PASSIVE"))
       (node
         (ref "J20")
@@ -1197,19 +1209,23 @@
         (pintype "PASSIVE"))
       (node
         (ref "J20")
+        (pin "26")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J20")
+        (pin "28")
+        (pintype "PASSIVE"))
+      (node
+        (ref "J20")
         (pin "4")
         (pintype "PASSIVE"))
       (node
         (ref "J20")
-        (pin "5")
+        (pin "6")
         (pintype "PASSIVE"))
       (node
         (ref "J20")
         (pin "8")
-        (pintype "PASSIVE"))
-      (node
-        (ref "J20")
-        (pin "9")
         (pintype "PASSIVE"))
       (node
         (ref "J4")
@@ -1265,7 +1281,7 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "23")
+        (pin "7")
         (pintype "PASSIVE"))
       (node
         (ref "R15")
@@ -1281,7 +1297,7 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "25")
+        (pin "9")
         (pintype "PASSIVE"))
       (node
         (ref "R16")
@@ -1325,7 +1341,7 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "30")
+        (pin "19")
         (pintype "PASSIVE"))
       (node
         (ref "J8")
@@ -1349,7 +1365,7 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "7")
+        (pin "21")
         (pintype "PASSIVE"))
       (node
         (ref "TP10")
@@ -1365,7 +1381,7 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "6")
+        (pin "1")
         (pintype "PASSIVE"))
       (node
         (ref "R30")
@@ -1393,7 +1409,7 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "22")
+        (pin "29")
         (pintype "PASSIVE"))
       (node
         (ref "J9")
@@ -1417,7 +1433,7 @@
         (pintype "PASSIVE"))
       (node
         (ref "J20")
-        (pin "13")
+        (pin "11")
         (pintype "PASSIVE"))
       (node
         (ref "U6")
@@ -1433,7 +1449,7 @@
         (pintype "PASSIVE"))
       (node
         (ref "J20")
-        (pin "11")
+        (pin "13")
         (pintype "PASSIVE"))
       (node
         (ref "U6")
@@ -1469,7 +1485,7 @@
         (pintype "PASSIVE"))
       (node
         (ref "J20")
-        (pin "28")
+        (pin "5")
         (pintype "PASSIVE"))
       (node
         (ref "R8")

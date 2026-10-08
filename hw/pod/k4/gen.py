@@ -383,10 +383,11 @@ BM28_PINS = {    # pin -> net. Footprint numbering: pads 1-15 one row, 16-30 the
     # K4-BM28-REV (2026-10-08): checkerboard. Signals only on odd pads 1-13 and 19-29, so every signal has GND on both row neighbours and across,
     # and a reversed mate always puts a signal against a GND (never supply-vs-GND, never supply into a GPIO). Supply pairs mate themselves: 15<->30 (+3V0/+3V0),
     # the 2 power contacts (tabs 31-34, 5 A, 30 mohm [T Hirose catalog]) are +3V0 too. GND/GND pairs: all remaining.
-    1: "LED_K", 2: "GND", 3: "MIC_CLK", 4: "GND", 5: "MIC_VDD", 6: "GND", 7: "MIC_DATA", 8: "GND", 9: "CHG_INT", 10: "GND",
-    11: "USB_DP", 12: "GND", 13: "USB_DM", 14: "GND", 15: "+3V0", 16: "GND", 17: "GND", 18: "GND", 19: "VBAT_SENSE", 20: "GND",
-    21: "TS", 22: "GND", 23: "I2C_SCL", 24: "GND", 25: "I2C_SDA", 26: "GND", 27: "VBUS_SENSE", 28: "GND",
-    29: "BTN", 30: "+3V0", 31: "+3V0", 32: "+3V0", 33: "+3V0", 34: "+3V0"}
+    1: "MIC_VDD", 2: "GND", 3: "MIC_CLK", 4: "GND", 5: "VBAT_SENSE", 6: "GND", 7: "I2C_SCL", 8: "GND", 9: "I2C_SDA", 10: "GND",
+    11: "USB_DM", 12: "GND", 13: "USB_DP", 14: "GND", 15: "+3V0", 16: "GND", 17: "GND", 18: "GND", 19: "LED_K", 20: "GND",
+    21: "MIC_DATA", 22: "GND", 23: "CHG_INT", 24: "GND", 25: "BTN", 26: "GND", 27: "VBUS_SENSE", 28: "GND",
+    29: "TS", 30: "+3V0", 31: "+3V0", 32: "+3V0", 33: "+3V0", 34: "+3V0"}
+    # (assignment follows U1's pin geography: west MIC_VDD/VBAT, north SCL/SDA/USB, south BTN/VBUS/TS, east LED_K/MIC_DATA/CHG_INT; signals on N-row odd pads 1-13 and S-row odd pads 19-29)
 # Current budget [V sim/checks/k4_checks: bridge peak 315 mA, mean < 0.1 A, charger/VSYS never crosses]: +3V0 on 2 signal contacts + 2 power contacts (5 A):
 # worst contact 0.16 A at signal contacts if the tabs carried nothing, vs 0.3 A rating; GND return over 15 pins + shield. USB D+/D- and the MIC trio are GND-shielded both sides.
 # Reversal (n <-> n+/-15): signal-GND x13, +3V0-+3V0 x2 (+4 tabs pairwise), GND-GND x15: no short, nothing driven into a GPIO.

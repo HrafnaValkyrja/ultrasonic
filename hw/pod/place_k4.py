@@ -49,7 +49,7 @@ SW1_X = 5.3
 CONN_XY = None                                       # set in plan(): BM28 centre in the stack frame
 F_PREF = {  # packer: faces to try in order. B = outer (P top / M belly). 'F' = inner (<= GAP tall)
     "P": {"Q1": "BF", "Q2": "BF", "R3": "FB", "R4": "FB", "R5": "FB", "R6": "FB", "R21": "FB", "R22": "FB", "R23": "FB",
-          "C22": "FB", "R15": "FB", "R16": "FB", "C14": "B", "C4": "B", "C7": "B", "L1": "B", "Y1": "B", "J1": "BF", "J2": "BF"},
+          "C22": "FB", "R15": "FB", "R16": "FB", "C14": "B", "C4": "B", "C7": "B", "L1": "B", "Y1": "B", "J1": "B", "J2": "B"},
     "M": {"J5": "B", "J7": "B", "J8": "B", "J9": "B", "J3": "B", "J4": "B", "J10": "B", "J11": "B", "SW1": "B", "C21": "B",
           "TP6": "B"}}
 
