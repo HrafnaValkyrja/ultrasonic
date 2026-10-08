@@ -51,6 +51,12 @@ def cavity():
     c = box(CAV["x0"], CAV["x1"], CAV["y0"], CAV["y1"] + 0.01, CAV["z0"], CAV["z1"])
     top = CAV["y1"] + 0.01
     es = [e for e in c.edges() if e.bounding_box().min.Y < top - 1e-3]      # leave the open top edges sharp
+    bb = lambda e: e.bounding_box()
+    # cell-corner relief: the y0/z1 long edge (the cell's tape-side/top edge sits 0.1/0.1 from the sharp corner) gets R0.25 instead of R0.5; the corner stays clear of the round (0.21 from centre vs R0.25) and the wall there gains resin
+    rel = [e for e in es if abs(bb(e).min.Y - CAV["y0"]) < 1e-3 and abs(bb(e).max.Y - CAV["y0"]) < 1e-3 and abs(bb(e).min.Z - CAV["z1"]) < 1e-3 and abs(bb(e).max.Z - CAV["z1"]) < 1e-3]
+    assert len(rel) == 1, len(rel)
+    c = fillet(rel, CELL_RELIEF_R)
+    es = [e for e in c.edges() if e.bounding_box().min.Y < top - 1e-3 and not (abs(e.bounding_box().min.Z - CAV["z1"] + CELL_RELIEF_R) < 1e-3 and abs(e.bounding_box().min.Y - CAV["y0"] - CELL_RELIEF_R) < 1e-3 and e.bounding_box().size.X > 10) and e.length > 0]
     return fillet(es, 0.5)         # keeps the 1.0 outer round from thinning the wall at the corners (0.6 -> 0.64 min)
 
 
@@ -121,6 +127,7 @@ def tub(with_post=True):
     t = t + (seam_ridge() & outer_body())
     cz, y0 = CAV["z0"], CAV["y0"]
     t = t + blade.prism_yz([(y0, cz), (y0 + 1.4, cz), (y0, cz + 1.4)], 62.0, CAV["x1"])    # relief fill: legs 1.4 keep >= 0.6 normal wall (r2: 1.0 at y0 5.1)
+    t = t - box(max(CELL_X0, 62.0), min(CELL_X1, CAV["x1"]), CELL_Y0 - 0.2, CELL_Y0 + 0.2, CELL_Z0 - 0.2, CELL_Z0 + 0.2)    # cell-corner relief 0.2 in the strut fill (cell stays unshrunk); fill hypotenuse wall 0.99 -> >= 0.71
     t = t - blade.prism_yz([(3.9, -12.5), (3.9, -3.65 - 3.9), (-3.65 + 12.5, -12.5)], 62.0, 68.5)
     t = t - heel.heel_cut()        # after the relief fill: the conductor channel / socket must stay open through it
     t = t + (tongue() & outer_body())
@@ -209,13 +216,6 @@ def puck():
     return ycyl(SW[0], SW[1], NUB_D, y_sw, y_sw + NUB_H + 0.01) + ycyl(SW[0], SW[1], PUCK_D, y_sw + NUB_H, y_sw + PUCK_L)
 
 
-def cell_edges(b):
-    ce = CELL_EDGE_CHAMFER
-    for z, sg in ((CELL_Z1, -1), (CELL_Z0, 1)):
-        b = b - blade.prism_yz([(CELL_Y0 - 0.01, z + sg * ce), (CELL_Y0 - 0.01, z - sg * 0.01), (CELL_Y0 + ce, z - sg * 0.01)], CELL_X0 - 0.01, CELL_X1 + 0.01)
-    return b
-
-
 def placeholders():
     top = box(STACK_X0, STACK_X1, Y_B, Y_F, STACK_Z0, STACK_Z1) - ycyl(MIC[0], MIC[1], MIC_HOLE_D, Y_B - 0.1, Y_F + 0.1)
     body = box(STACK_X0 + 0.3, STACK_X1 - 0.3, STACK_Y0, Y_B - 1.08, STACK_Z0 + 0.3, STACK_Z1 - 0.3)   # lower board + parts + power board: PLACEHOLDER (V9 B+)
@@ -223,9 +223,7 @@ def placeholders():
     vhb = vhb - ycyl(MIC[0], MIC[1], DUCT_D, Y_LID_IN - 1, Y_LID_IN + 1)
     vhb = vhb - box(SW[0] - POCKET["dx"] / 2, SW[0] + POCKET["dx"] / 2, Y_LID_IN - 1, Y_LID_IN + 1, SW[1] - POCKET["dz"] / 2, SW[1] + POCKET["dz"] / 2)
     cell = box(CELL_X0, CELL_X1, CELL_Y0, CELL_Y1, CELL_Z0, CELL_Z1)
-    # CELL_EDGE_CHAMFER (both y0 long edges; the bottom one clears the strut-relief fill, 0.005 mm3): the cell's tape-side/top long edge sits in the cavity's R0.5 fillet (0.145 mm3 clash at a sharp corner); a 0.15 edge break clears it
-    # (corner 0.57 from the fillet centre vs R0.5). Wall untouched (>= 0.6). Open: confirm the ICP401230 case edge radius >= 0.15 on the first cell (assembly check).
-    cell = cell_edges(cell)
+    # cell is modelled with sharp edges (bought part, edge radius unknown); the cavity y0/z1 edge carries the relief instead (cavity(), CELL_RELIEF_R)
     ctape = box(CELL_X0, CELL_X1, CAV["y0"], CELL_Y0, CELL_Z0 + 0.4, CELL_Z1 - 0.4)   # tape narrower than the cell: clears the cavity corner round
     u2 = box(U2["c"][0] - U2["dx"] / 2, U2["c"][0] + U2["dx"] / 2, Y_B - U2["h"], Y_B, U2["c"][1] - U2["dz"] / 2, U2["c"][1] + U2["dz"] / 2)
     sw1 = box(SW[0] - SW1["body"][0] / 2, SW[0] + SW1["body"][0] / 2, Y_F, Y_F + SW1["h"], SW[1] - SW1["body"][1] / 2, SW[1] + SW1["body"][1] / 2)
@@ -278,7 +276,7 @@ def main():
     c["clash/puck/lid"] = round((pk & l).volume, 4)
     c["clash/puck/sw1"] = round((pk & ph["sw1"]).volume, 4)
     # drop-in corridors: cell falls along -y into the tub, lid + hanging stack come down along -y
-    c["corridor/cell_drop_in"] = round((t & cell_edges(box(CELL_X0, CELL_X1, CELL_Y0, Y_SPLIT + 1, CELL_Z0, CELL_Z1))).volume, 4)
+    c["corridor/cell_drop_in"] = round((t & box(CELL_X0, CELL_X1, CELL_Y0, Y_SPLIT + 1, CELL_Z0, CELL_Z1)).volume, 4)
     c["corridor/stack_drop_in"] = round((t_np & box(STACK_X0, STACK_X1, STACK_Y0, Y_SPLIT + 3, STACK_Z0, STACK_Z1)).volume, 4)
     # wall minimum: grow the cavity by w and see how much sticks out of the outer body (+ keel/rail) below the seam; 0 = every wall >= w
     outer_all = (outer_body() + tub_add()) & box(X0 - 1, X1 + 1, Y_IN - 3, Y_SPLIT, Z0 - 3, Z1 + 3)

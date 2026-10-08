@@ -10,11 +10,11 @@
    }
   },
   "INTEGRATION": {
-   "by": "claude-pod-mass",
+   "by": "claude-worker",
    "date": "2026-10-08",
-   "note": "k4 variant block added to hw/current.yaml for pod_mass; no interface change",
+   "note": "integration-map updated for k4 variant keys (56cf4fd)",
    "stamp": {
-    "file:hw/current.yaml": "805335b7f70bd7a7",
+    "file:hw/current.yaml": "dd16ec73dd49f2b5",
     "file:hw/pod/gen.py": "3ed3676e85fb73eb",
     "file:hw/pod/system_map.py": "9515e835b9f57709"
    }
