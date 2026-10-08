@@ -2,7 +2,7 @@
 src: hw/mech/dims_k4.py (LEDGE_W 0.5, inset 0.2, POST_PRINT_GAP 0.5875, POST_CHAIN_LIN); ECR-0023 add.2/3; 3M VHB TDS rev 2024-09 (85 kPa dynamic design factor, datasheet-provenance.md).
 
 ## 1. Is gap <= 0.03 realistic?
-- Add.3 (supersedes the shim fit) removed the 0.03 criterion: post printed short, air gap 0.05..1.125 mm at every corner, filled by epoxy dab bonded at zero gap. Gap ~0 by design; the print chain (+-0.54 linear) no longer matters.
+- ECR-0023 add.2 (supersedes the shim fit) removed the 0.03 criterion: post printed short, air gap 0.05..1.125 mm at every corner, filled by epoxy dab bonded at zero gap. Gap ~0 by design; the print chain (+-0.54 linear) no longer matters.
 - Residual risk is the fill, not the gap: voids/under-fill, epoxy shrink (FEM: stiff VHB E 2 fails at 2 % shrink for fill t >= 0.6 mm: 92-157 kPa), Kapton peel layer debond, and fill thickness up to 1.125 mm. Epoxy shrink is [A], bench-unverified (ECR open item).
 - If the fill under-fills or shrinks, load returns to the ledge: 104 kPa mean (113-187 peak) vs 85.
 
@@ -13,4 +13,4 @@ src: hw/mech/dims_k4.py (LEDGE_W 0.5, inset 0.2, POST_PRINT_GAP 0.5875, POST_CHA
 - Tape grade: no stronger grade at 0.25 mm known to me; thicker foam grades lose lid clearance (F_GAP). Not verified; no source fetched.
 
 ## Verdict
-Real but bounded risk: only if the epoxy fill fails. Best fix: keep the post + epoxy (add.3) and gate it with a bench test (shrink, voids, 600k presses, MZV-11), spec fill t <= 0.3 mm (fill dab sized, post printed closer, less air gap) to cover stiff VHB. Do not rely on widening the ledge.
+Real but bounded risk: only if the epoxy fill fails. Best fix: keep the post + epoxy (ECR-0023 add.2) and gate it with a bench test (shrink, voids, 600k presses, MZV-11), spec fill t <= 0.3 mm (fill dab sized, post printed closer, less air gap) to cover stiff VHB. Do not rely on widening the ledge.
