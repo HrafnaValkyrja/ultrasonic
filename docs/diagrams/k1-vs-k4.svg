@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 420" font-family="sans-serif">
+<rect width="720" height="420" fill="#ffffff"/>
+<text x="20" y="32" font-size="20" font-weight="bold" fill="#1f2328">Top view along the glasses arm (to scale, 8 px = 1 mm)</text>
+<!-- temple arm -->
+<rect x="40" y="118" width="640" height="6" fill="#888"/><text x="40" y="112" font-size="13" fill="#57606a">temple arm (hinge at left)</text>
+<!-- K1: L 33.6, T 8.5 -->
+<text x="40" y="70" font-size="16" font-weight="bold" fill="#2a78d6">TODAY (stacked): 8.5 mm thick, 34 mm long, 8–10 h worst day</text>
+<rect x="60" y="124" width="269" height="68" fill="#e8f0fb" stroke="#2a78d6" stroke-width="2"/>
+<rect x="72" y="132" width="240" height="36" fill="#fff4ea" stroke="#b8520a"/><text x="120" y="155" font-size="13" fill="#b8520a">130 mAh battery (4 mm)</text>
+<rect x="72" y="170" width="240" height="16" fill="#e8f3ec" stroke="#1a7a55"/><text x="150" y="183" font-size="12" fill="#1a7a55">board + parts</text>
+<line x1="340" y1="124" x2="340" y2="192" stroke="#1f2328"/><text x="346" y="163" font-size="14" fill="#1f2328">8.5 mm</text>
+<!-- K4: L 51.1, T 6.4 -->
+<text x="40" y="250" font-size="16" font-weight="bold" fill="#1a7a55">END TO END: 6.4 mm thick (−2.1), 51 mm long (+17), same battery, same runtime</text>
+<rect x="40" y="290" width="640" height="6" fill="#888"/>
+<rect x="60" y="296" width="409" height="51" fill="#e8f3ec" stroke="#1a7a55" stroke-width="2"/>
+<rect x="68" y="304" width="136" height="20" fill="#e8f3ec" stroke="#1a7a55"/><text x="74" y="319" font-size="12" fill="#1a7a55">board 17 mm</text>
+<rect x="212" y="302" width="248" height="38" fill="#fff4ea" stroke="#b8520a"/><text x="250" y="326" font-size="13" fill="#b8520a">130 mAh battery, lying flat</text>
+<line x1="480" y1="296" x2="480" y2="347" stroke="#1f2328"/><text x="486" y="327" font-size="14" fill="#1f2328">6.4 mm</text>
+<text x="40" y="378" font-size="14" fill="#57606a">Height about the same (14.8 vs 14.1 mm). Still ends 31–36 mm before your ear. Balance slightly better.</text>
+<text x="40" y="402" font-size="14" fill="#57606a">Cost: board needs 6 layers instead of 4, board gets redone. Weight ~10.3 g per pod.</text>
+</svg>
