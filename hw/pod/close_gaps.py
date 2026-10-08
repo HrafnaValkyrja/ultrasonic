@@ -153,6 +153,8 @@ def via_spots(board, net, anc, radii=(0.0, 0.45, 0.6, 0.8, 1.0, 1.2, 1.5), n_ang
             circ = pcbnew.SHAPE_CIRCLE(pcbnew.VECTOR2I(mm(pt[0]), mm(pt[1])), mm(VIA_D / 2))
             if not all(clear(board, net, l, circ) for l in OUTER):
                 continue
+            if not anc[2]:
+                continue
             lay = next(iter(anc[2]))
             if r:
                 seg = pcbnew.SHAPE_SEGMENT(pcbnew.VECTOR2I(mm(anc[0]), mm(anc[1])), pcbnew.VECTOR2I(mm(pt[0]), mm(pt[1])), mm(TRACK_W))

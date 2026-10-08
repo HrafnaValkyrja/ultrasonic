@@ -1,0 +1,40 @@
+{
+ "board": "P",
+ "L": 15.5,
+ "H": 12.0,
+ "pass": true,
+ "violations": [],
+ "metrics": {
+  "preroute_warn": [
+   "preroute: +3V0 (8.55, 8.24)-(8.3, 9.43) no clear path",
+   "preroute: NRST (9.55, 8.24)-(8.3, 10.23) no clear path"
+  ],
+  "ratsnest_mm": 208.3,
+  "board_mm2": 170.9,
+  "courtyard_B_mm2": 104.9,
+  "courtyard_F_mm2": 26.9,
+  "U_B": 0.614,
+  "U_F": 0.157,
+  "U_both": 0.386,
+  "gnd_vias": 43,
+  "gnd_fanout_skipped": 26,
+  "stack": {
+   "b2b_xy_P_stack": [
+    9.8,
+    6.0
+   ],
+   "b2b_xy_M": [
+    9.8,
+    6.0
+   ],
+   "mate_max_dx_mm": 0.0,
+   "max_stacked_pair_mm": 0.0,
+   "P_switching_to_port_mm": {
+    "L1": 4.3,
+    "Q1": 4.4,
+    "Q2": 4.3,
+    "U1": 8.1
+   }
+  }
+ }
+}

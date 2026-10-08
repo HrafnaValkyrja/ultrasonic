@@ -158,7 +158,7 @@ router:   # needs placement/re-route (forbidden to parallel agents)
   - {id: DBG-2, t: "TP row +3V0 beside GND (TP4|TP5 0.8 mm): reorder at the next placement edit", st_r2: "done 2026-10-07 round 8: TP2 SWCLK / TP4 +3V0 swapped (row GND, SWCLK, +3V0, SWDIO)", st: "stale-closed 2026-10-08 (K4: r2 TP row; K4 TP1-TP5 on P: row order re-check at P placement)"}
 
   - {id: K4-J4-ACCESS, t: "cell - shares dock GND pad J4 (ASM-09): can the cell leads reach J4 physically on M (ECR-0020 'check at placement')?", opts: "decide at the M pass", blk: "router (M placement)"}
-  - {id: K4-P-ROUTE, t: "board P 8 open + 6 near unrouted (427315a); another agent routing", blk: "router (in progress)"}
+  - {id: K4-P-ROUTE, t: "board P 8 open + 6 near unrouted (427315a); another agent routing", blk: none, st: "done 2026-10-08: 5-part unload P->M + BM28 pins 26/27 swap (ECR-0020 rev 4); M and P both 0 unconnected / 0 DRC / place PASS at L15.5 (hw/pod/k4/routed_P.kicad_pcb, routed_M.kicad_pcb). Solder window (--win) not done: U1 must move and near rules fail"}
 
 fw_agent:   # owned by the firmware agent (fw/, docs/sim/firmware-emulation.yaml)
   - {id: PROC-4, dup: [UI-6], t: "idle plan Run vs Stop 2 + ADF + LPDMA (also LED PWM in Stop 2)"}

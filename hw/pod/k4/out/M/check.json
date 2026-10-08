@@ -1,0 +1,26 @@
+{
+ "board": "M",
+ "L": 15.5,
+ "H": 12.0,
+ "pass": true,
+ "violations": [],
+ "metrics": {
+  "preroute_warn": [],
+  "port_xy": [
+   1.75,
+   6.0
+  ],
+  "port_keepout_mm": 1.76,
+  "switching_parts_on_M": [],
+  "gap_J3_J5_mm": 8.3,
+  "ratsnest_mm": 138.7,
+  "board_mm2": 185.1,
+  "courtyard_B_mm2": 53.0,
+  "courtyard_F_mm2": 39.7,
+  "U_B": 0.286,
+  "U_F": 0.214,
+  "U_both": 0.25,
+  "gnd_vias": 32,
+  "gnd_fanout_skipped": 11
+ }
+}

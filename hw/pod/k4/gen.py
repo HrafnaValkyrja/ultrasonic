@@ -369,12 +369,13 @@ BOARD_OF = {r: "M" for r in (
     "R12", "R13", "R8", "R9", "C19",               # VBUS / VBAT sense dividers (analogue nodes cross as VBUS_SENSE / VBAT_SENSE)
     "RT1", "J9", "J5",                             # NTC, NTC pad, cell BAT+ wire pad (cell - lands on dock GND pad J4, ASM-09)
     "SW1", "R10",                                  # button (+3V0 from the LDO on M; BTN crosses)
-    "R14", "J7", "J8")}                            # LED feed (VSYS), LED wire pads; LED_K crosses to PB7
+    "R14", "J7", "J8",                             # LED feed (VSYS), LED wire pads; LED_K crosses to PB7
+    "TP4", "TP5", "TP10", "R15", "R16")}           # 2026-10-08 unload P->M (ECR-0020 rev 4): +3V0/GND/MIC_DATA pads, I2C pull-ups (+3V0 is on M)
 # Everything not listed is P.
 BM28_PINS = {    # pin -> net. Odd pins row A, even pins row B; pins (2k-1, 2k) face each other [T].
     1: "GND", 2: "GND", 3: "MIC_CLK", 4: "GND", 5: "GND", 6: "MIC_VDD", 7: "MIC_DATA", 8: "GND", 9: "GND", 10: "GND",
     11: "USB_DP", 12: "GND", 13: "USB_DM", 14: "GND", 15: "GND", 16: "GND", 17: "+3V0", 18: "+3V0", 19: "+3V0", 20: "GND",
-    21: "GND", 22: "TS", 23: "I2C_SCL", 24: "GND", 25: "I2C_SDA", 26: "VBUS_SENSE", 27: "CHG_INT", 28: "VBAT_SENSE",
+    21: "GND", 22: "TS", 23: "I2C_SCL", 24: "GND", 25: "I2C_SDA", 26: "CHG_INT", 27: "VBUS_SENSE", 28: "VBAT_SENSE",
     29: "BTN", 30: "LED_K"}
 # Shielding: MIC_CLK(3) GND at 1,5,4; MIC_DATA(7) GND at 5,9,8; MIC_VDD(6) GND at 4,5,8; USB_DP/DM (11,13) pair with GND at 9 and 15 (row)
 # and 12, 14 (facing); +3V0 on 17,18,19 (3 contacts, <= 0.3 A each [T]: bridge peaks 315 mA sit on local C14 22 uF; mean < 0.1 A).

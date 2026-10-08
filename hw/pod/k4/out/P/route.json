@@ -1,0 +1,47 @@
+{
+ "tracks": 409,
+ "vias": 91,
+ "drc_by_type": {
+  "clearance": 2
+ },
+ "unconnected": [
+  [
+   "Pad 2 [+3V0] of R5 on B.Cu",
+   "Pad 2 [+3V0] of R3 on F.Cu"
+  ],
+  [
+   "Pad 4 [+3V0] of Q2 on B.Cu",
+   "Pad 2 [+3V0] of R3 on F.Cu"
+  ],
+  [
+   "Pad 4 [+3V0] of Q2 on B.Cu",
+   "Pad 4 [+3V0] of Q1 on F.Cu"
+  ],
+  [
+   "Pad 29 [GA_P] of U1 on B.Cu",
+   "Track [GA_P] on F.Cu, length 0.0015 mm"
+  ],
+  [
+   "Pad 15 [MIC_VDD] of U1 on B.Cu",
+   "Pad 6 [MIC_VDD] of J21 on F.Cu"
+  ],
+  [
+   "Pad 1 [GB_P] of R5 on B.Cu",
+   "Pad 5 [GB_P] of Q2 on B.Cu"
+  ],
+  [
+   "Pad 5 [GB_P] of Q2 on B.Cu",
+   "Pad 31 [GB_P] of U1 on B.Cu"
+  ]
+ ],
+ "passes": {
+  "first": [
+   7,
+   2
+  ],
+  "second": [
+   7,
+   2
+  ]
+ }
+}

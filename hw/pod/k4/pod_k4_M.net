@@ -2,7 +2,7 @@
   (version "D")
   (design
     (source "gen.py")
-    (date "10/07/2026 10:14 PM")
+    (date "10/08/2026 03:38 AM")
     (tool "SKiDL (2.3.0)")
     (sheet
       (number 1)
@@ -13,7 +13,7 @@
         (company)
         (rev)
         (date)
-        (source "../../../gen.py")
+        (source "gen.py")
         (comment
           (number "1")
           (value ""))
@@ -345,7 +345,7 @@
         (field
           (name "SKiDL Tag") "J20")
         (field
-          (name "SKiDL Line") "gen.py:426"))
+          (name "SKiDL Line") "gen.py:427"))
       (libsource
         (lib "NO_LIB")
         (part "BM28_30"))
@@ -615,6 +615,58 @@
       (component_classes)
       (tstamps "fc87fb8d-6ec9-5f6a-ba62-fc9d37c462e7"))
     (comp
+      (ref "R15")
+      (value "10k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
+      (fields
+        (field
+          (name "LCSC") "C473048")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "R15")
+        (field
+          (name "SKiDL Line") "gen.py:146"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "17eaf0a6-9932-5348-b523-0122128974c2"))
+    (comp
+      (ref "R16")
+      (value "10k")
+      (description "Resistor")
+      (footprint "Resistor_SMD:R_0201_0603Metric")
+      (fields
+        (field
+          (name "LCSC") "C473048")
+        (field
+          (name "Description") "Resistor")
+        (field
+          (name "Footprint") "Resistor_SMD:R_0201_0603Metric")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "R16")
+        (field
+          (name "SKiDL Line") "gen.py:146"))
+      (libsource
+        (lib "Device")
+        (part "R"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "0ffe9dd6-18d7-5bd8-8f5c-a4cd816c10e4"))
+    (comp
       (ref "R20")
       (value "0")
       (description "Resistor")
@@ -744,6 +796,84 @@
         (tstamps "/"))
       (component_classes)
       (tstamps "ccd6b1b1-065e-52d8-bb15-76892f2b4e17"))
+    (comp
+      (ref "TP10")
+      (value "MIC_DATA")
+      (description "test point")
+      (footprint "pod:TestDot_D0.5mm")
+      (fields
+        (field
+          (name "DNP_BOM") "pad")
+        (field
+          (name "Description") "test point")
+        (field
+          (name "Footprint") "pod:TestDot_D0.5mm")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "TP10")
+        (field
+          (name "SKiDL Line") "gen.py:158"))
+      (libsource
+        (lib "Connector")
+        (part "TestPoint"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "96ec807f-2b34-5ae2-8bad-1cdcc5458929"))
+    (comp
+      (ref "TP4")
+      (value "3V0")
+      (description "test point")
+      (footprint "pod:TestPoint_Pad_D0.7mm")
+      (fields
+        (field
+          (name "DNP_BOM") "pad")
+        (field
+          (name "Description") "test point")
+        (field
+          (name "Footprint") "pod:TestPoint_Pad_D0.7mm")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "TP4")
+        (field
+          (name "SKiDL Line") "gen.py:158"))
+      (libsource
+        (lib "Connector")
+        (part "TestPoint"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "2b772136-9490-52ee-a6b6-3823f884de0d"))
+    (comp
+      (ref "TP5")
+      (value "GND")
+      (description "test point")
+      (footprint "pod:TestPoint_Pad_D0.7mm")
+      (fields
+        (field
+          (name "DNP_BOM") "pad")
+        (field
+          (name "Description") "test point")
+        (field
+          (name "Footprint") "pod:TestPoint_Pad_D0.7mm")
+        (field
+          (name "Datasheet"))
+        (field
+          (name "SKiDL Tag") "TP5")
+        (field
+          (name "SKiDL Line") "gen.py:158"))
+      (libsource
+        (lib "Connector")
+        (part "TestPoint"))
+      (sheetpath
+        (names "/")
+        (tstamps "/"))
+      (component_classes)
+      (tstamps "3ef9c998-1bfd-52d6-903a-2314b2d59b7d"))
     (comp
       (ref "TP6")
       (value "VSYS")
@@ -892,6 +1022,14 @@
         (pin "19")
         (pintype "PASSIVE"))
       (node
+        (ref "R15")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R16")
+        (pin "2")
+        (pintype "PASSIVE"))
+      (node
         (ref "R20")
         (pin "2")
         (pintype "PASSIVE"))
@@ -902,7 +1040,11 @@
       (node
         (ref "SW1")
         (pin "2")
-        (pintype "UNSPECIFIED")))
+        (pintype "UNSPECIFIED"))
+      (node
+        (ref "TP4")
+        (pin "1")
+        (pintype "PASSIVE")))
     (net
       (code 2)
       (name "BTN")
@@ -929,7 +1071,7 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "27")
+        (pin "26")
         (pintype "PASSIVE"))
       (node
         (ref "U3")
@@ -1064,6 +1206,10 @@
         (pin "2")
         (pintype "PASSIVE"))
       (node
+        (ref "TP5")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
         (ref "U2")
         (pin "2")
         (pintype "INPUT"))
@@ -1096,6 +1242,10 @@
         (pin "23")
         (pintype "PASSIVE"))
       (node
+        (ref "R15")
+        (pin "1")
+        (pintype "PASSIVE"))
+      (node
         (ref "U3")
         (pin "B1")
         (pintype "UNSPECIFIED")))
@@ -1106,6 +1256,10 @@
       (node
         (ref "J20")
         (pin "25")
+        (pintype "PASSIVE"))
+      (node
+        (ref "R16")
+        (pin "1")
         (pintype "PASSIVE"))
       (node
         (ref "U3")
@@ -1170,6 +1324,10 @@
       (node
         (ref "J20")
         (pin "7")
+        (pintype "PASSIVE"))
+      (node
+        (ref "TP10")
+        (pin "1")
         (pintype "PASSIVE"))
       (node
         (ref "U2")
@@ -1309,7 +1467,7 @@
       (class "Default")
       (node
         (ref "J20")
-        (pin "26")
+        (pin "27")
         (pintype "PASSIVE"))
       (node
         (ref "R12")

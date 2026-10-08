@@ -138,9 +138,9 @@ hazards:
 k4_split:
   ecr: ECR-0020
   connector: {M: "J20 BM28B0.6-30DS/2-0.35V(51) C424571 receptacle", P: "J21 BM28B0.6-30DP/2-0.35V(51) C424570 plug", pitch_mm: 0.35, mated_h_mm: "0.6 [T]", rating_a_per_contact: "0.3 signal [T, secondary source]; +3V0 on 3 contacts (bridge peaks 315 mA sit on C14 on P)", jlc_checked: "2026-10-08T02:09Z"}
-  pins: {1: GND, 2: GND, 3: MIC_CLK, 4: GND, 5: GND, 6: MIC_VDD, 7: MIC_DATA, 8: GND, 9: GND, 10: GND, 11: USB_DP, 12: GND, 13: USB_DM, 14: GND, 15: GND, 16: GND, 17: +3V0, 18: +3V0, 19: +3V0, 20: GND, 21: GND, 22: TS, 23: I2C_SCL, 24: GND, 25: I2C_SDA, 26: VBUS_SENSE, 27: CHG_INT, 28: VBAT_SENSE, 29: BTN, 30: LED_K}
-  counts: {signal_power: 16, gnd: 14}   # rev 3 area re-balance 2026-10-08
+  pins: {1: GND, 2: GND, 3: MIC_CLK, 4: GND, 5: GND, 6: MIC_VDD, 7: MIC_DATA, 8: GND, 9: GND, 10: GND, 11: USB_DP, 12: GND, 13: USB_DM, 14: GND, 15: GND, 16: GND, 17: +3V0, 18: +3V0, 19: +3V0, 20: GND, 21: GND, 22: TS, 23: I2C_SCL, 24: GND, 25: I2C_SDA, 26: CHG_INT, 27: VBUS_SENSE, 28: VBAT_SENSE, 29: BTN, 30: LED_K}
+  counts: {signal_power: 16, gnd: 14}   # rev 3 area re-balance 2026-10-08; rev 4 (same day): pins 26/27 swapped (CHG_INT 26, VBUS_SENSE 27) so neither crosses under U1 EP
   rule: "no switching node (VLXSMPS, VDD11, OUT_A/B) crosses the B2B; SMPS loop (U1, L1, C7, C8/C9) on one board (P)"
-  on_M: "U2 mic + C13, U3 charger + C15/C16/C21, U4 LDO + C17/C18/R20, D4/D5/U6, dock pads J3/J4/J10/J11 (+2 magnets), SW1/R10, R8/R9/R12/R13/C19, RT1/J9, R14/J7/J8, J5, TP6, J20 (23 parts)"
-  on_P: "U1 + C1-C12, Y1, L1, R1/R2, R15/R16, Q1/Q2 + R3-R6, R21-R23/C22/C14, J1/J2, TP1-TP5/TP7-TP10, J21 (31 parts)"
+  on_M: "U2 mic + C13, U3 charger + C15/C16/C21, U4 LDO + C17/C18/R20, D4/D5/U6, dock pads J3/J4/J10/J11 (+2 magnets), SW1/R10, R8/R9/R12/R13/C19, RT1/J9, R14/J7/J8, J5, TP6, TP4/TP5/TP10, R15/R16 (I2C pull-ups), J20 (28 parts; rev 4 unload 2026-10-08)"
+  on_P: "U1 + C1-C12, Y1, L1, R1/R2, Q1/Q2 + R3-R6, R21-R23/C22/C14, J1/J2, TP1-TP3/TP7-TP9, J21 (26 parts)"
   risks: ["BM28 numbering pin n <-> pin n and datasheet ratings [T]", "PA5/PB3/PB4 routing on P must stay away from L1/VLXSMPS (in-plane victim, V9 B_plus_noise.rerun_2026_10_08_partition_v2)"]

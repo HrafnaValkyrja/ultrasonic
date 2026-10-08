@@ -1,0 +1,106 @@
+{
+    "$schema": "https://schemas.kicad.org/drc.v1.json",
+    "coordinate_units": "mm",
+    "date": "2026-10-08T03:28:24",
+    "ignored_checks": [
+        {
+            "description": "Footprint has no courtyard defined",
+            "key": "missing_courtyard"
+        },
+        {
+            "description": "Track endpoint not centered on via",
+            "key": "track_not_centered_on_via"
+        },
+        {
+            "description": "Tuning profile track geometries",
+            "key": "tuning_profile_track_geometries"
+        },
+        {
+            "description": "Footprint doesn't match symbol's footprint filters",
+            "key": "footprint_filters_mismatch"
+        },
+        {
+            "description": "Footprint component type doesn't match footprint pads",
+            "key": "footprint_type_mismatch"
+        }
+    ],
+    "included_severities": [
+        "error"
+    ],
+    "kicad_version": "10.0.6",
+    "schematic_parity": [],
+    "source": "w.kicad_pcb",
+    "unconnected_items": [
+        {
+            "description": "Missing connection between items",
+            "items": [
+                {
+                    "description": "Pad 11 [VBUS_SENSE] of U1 on B.Cu",
+                    "pos": {
+                        "x": 7.55,
+                        "y": 8.2375
+                    },
+                    "uuid": "2f4db16f-250a-474e-ac66-a6c6b46b188b"
+                },
+                {
+                    "description": "Pad 26 [VBUS_SENSE] of J21 on F.Cu",
+                    "pos": {
+                        "x": 8.75,
+                        "y": 6.59
+                    },
+                    "uuid": "8df0c4e7-b8c9-4f87-9d25-f086c43d3de2"
+                }
+            ],
+            "severity": "error",
+            "type": "unconnected_items"
+        }
+    ],
+    "violations": [
+        {
+            "description": "Clearance violation ( clearance 0.0900 mm; actual 0.0894 mm)",
+            "items": [
+                {
+                    "description": "Track [+3V0] on B.Cu, length 0.0244 mm",
+                    "pos": {
+                        "x": 5.3448,
+                        "y": 6.3945
+                    },
+                    "uuid": "37b4769a-b75c-431a-bbc1-fab99e4c3189"
+                },
+                {
+                    "description": "Pad 2 [GND] of C7 on B.Cu",
+                    "pos": {
+                        "x": 4.8,
+                        "y": 6.825
+                    },
+                    "uuid": "7b8a09d5-00a4-40ee-b74b-62a1f45282a9"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        },
+        {
+            "description": "Clearance violation ( clearance 0.0900 mm; actual 0.0894 mm)",
+            "items": [
+                {
+                    "description": "Track [+3V0] on B.Cu, length 0.0943 mm",
+                    "pos": {
+                        "x": 5.4115,
+                        "y": 6.4612
+                    },
+                    "uuid": "08bbee4d-3df8-44e9-a518-aa6cef737edd"
+                },
+                {
+                    "description": "Pad 2 [GND] of C7 on B.Cu",
+                    "pos": {
+                        "x": 4.8,
+                        "y": 6.825
+                    },
+                    "uuid": "7b8a09d5-00a4-40ee-b74b-62a1f45282a9"
+                }
+            ],
+            "severity": "error",
+            "type": "clearance"
+        }
+    ]
+}

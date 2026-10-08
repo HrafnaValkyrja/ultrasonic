@@ -141,8 +141,8 @@ def main():
 
     info = [padinfo(s) for s in pads]
     if os.environ.get("DBG"):
-        for yy in [6.6 + 0.1 * q for q in range(0, 14)]:
-            c_ = cell((8.4, yy)); print(round(yy, 2), [tb[k][c_[0] * ny + c_[1]] for k in range(nl)], [vb[k][c_[0] * ny + c_[1]] for k in range(nl)])
+        for yy in [float(os.environ.get("DY", 6.6)) + 0.1 * q for q in range(0, 20)]:
+            c_ = cell((float(os.environ.get("DX", 8.4)), yy)); print(round(yy, 2), [tb[k][c_[0] * ny + c_[1]] for k in range(nl)], [vb[k][c_[0] * ny + c_[1]] for k in range(nl)])
     for a, c in zip(info, info[1:]):
         path_ = route(a, c)
         if not path_:

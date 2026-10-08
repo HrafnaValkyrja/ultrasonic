@@ -1,6 +1,6 @@
 {
  "date": "2026-10-08",
- "L_status": "P not closed up to 16.0",
+ "L_status": "P and M closed at 15.5 (rev 4 unload+swap)",
  "layers": 6,
  "M": {
   "L": 15.5,
@@ -13,12 +13,11 @@
  },
  "P": {
   "L": 15.5,
-  "place_check": "PASS (pack+nudge_k4.py, cx 9.8, u1 rot90 cy4.8)",
-  "unconnected": "5-7",
-  "drc": "2 (clearance 0.0894 vs 0.09) to 12 across reruns",
-  "file": "hw/pod/k4/routed_P_L15.5_best_7open_2drc.kicad_pcb",
-  "stuck_nets": "I2C_SCL, VBAT_SENSE (J21/U1), GB_P (R5/Q2/U1), MDF_CCK",
-  "note": "L14.5 and L15.0: place FAIL after pack+nudge (5 variants); L16.0: place FAIL (R22 near U1.16). FreeRouting -us Hybrid/Global no better.",
+  "place_check": "PASS",
+  "unconnected": 0,
+  "drc": 0,
+  "file": "hw/pod/k4/routed_P.kicad_pcb",
+  "note": "5-part unload to M + BM28 26/27 swap; route_k4 --layers 6 --fine + close_gaps + route_net3d (MIC_VDD, GA_P, GB_P, +3V0, MIC_CLK, MDF_SDI)",
   "solder_window": "--win implemented in place_k4/nudge_k4 (Edge.Cuts cutout over M J4/J5, P file x9.45-11.65 y0.4-4.1); with it U1 must move (cy 8.3) and near rules fail (4+ violations at 15.5); not routed"
  }
 }

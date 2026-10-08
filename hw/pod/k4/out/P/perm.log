@@ -1,0 +1,28 @@
+./kicad/include/properties/property.h(607): assert "m_choices.GetCount() > 0" failed in PROPERTY_ENUM(): No enum choices defined
+./kicad/include/properties/property.h(607): assert "m_choices.GetCount() > 0" failed in PROPERTY_ENUM(): No enum choices defined
+./kicad/include/properties/property.h(607): assert "m_choices.GetCount() > 0" failed in PROPERTY_ENUM(): No enum choices defined
+True
+('CHG_INT', 'VBUS_SENSE', 'BTN', 'VBAT_SENSE') fail at VBUS_SENSE
+('CHG_INT', 'VBUS_SENSE', 'VBAT_SENSE', 'BTN') fail at VBUS_SENSE
+('CHG_INT', 'BTN', 'VBUS_SENSE', 'VBAT_SENSE') fail at VBUS_SENSE
+('CHG_INT', 'BTN', 'VBAT_SENSE', 'VBUS_SENSE') fail at VBAT_SENSE
+('CHG_INT', 'VBAT_SENSE', 'VBUS_SENSE', 'BTN') fail at VBUS_SENSE
+('CHG_INT', 'VBAT_SENSE', 'BTN', 'VBUS_SENSE') fail at BTN
+('VBUS_SENSE', 'CHG_INT', 'BTN', 'VBAT_SENSE') fail at CHG_INT
+('VBUS_SENSE', 'CHG_INT', 'VBAT_SENSE', 'BTN') fail at CHG_INT
+('VBUS_SENSE', 'BTN', 'CHG_INT', 'VBAT_SENSE') fail at CHG_INT
+('VBUS_SENSE', 'BTN', 'VBAT_SENSE', 'CHG_INT') fail at VBAT_SENSE
+('VBUS_SENSE', 'VBAT_SENSE', 'CHG_INT', 'BTN') fail at CHG_INT
+('VBUS_SENSE', 'VBAT_SENSE', 'BTN', 'CHG_INT') fail at BTN
+('BTN', 'CHG_INT', 'VBUS_SENSE', 'VBAT_SENSE') fail at VBUS_SENSE
+('BTN', 'CHG_INT', 'VBAT_SENSE', 'VBUS_SENSE') fail at VBAT_SENSE
+('BTN', 'VBUS_SENSE', 'CHG_INT', 'VBAT_SENSE') fail at CHG_INT
+('BTN', 'VBUS_SENSE', 'VBAT_SENSE', 'CHG_INT') fail at VBAT_SENSE
+('BTN', 'VBAT_SENSE', 'CHG_INT', 'VBUS_SENSE') fail at CHG_INT
+('BTN', 'VBAT_SENSE', 'VBUS_SENSE', 'CHG_INT') fail at VBUS_SENSE
+('VBAT_SENSE', 'CHG_INT', 'VBUS_SENSE', 'BTN') fail at VBUS_SENSE
+('VBAT_SENSE', 'CHG_INT', 'BTN', 'VBUS_SENSE') fail at BTN
+('VBAT_SENSE', 'VBUS_SENSE', 'CHG_INT', 'BTN') fail at CHG_INT
+('VBAT_SENSE', 'VBUS_SENSE', 'BTN', 'CHG_INT') fail at BTN
+('VBAT_SENSE', 'BTN', 'CHG_INT', 'VBUS_SENSE') fail at BTN
+('VBAT_SENSE', 'BTN', 'VBUS_SENSE', 'CHG_INT') fail at BTN
