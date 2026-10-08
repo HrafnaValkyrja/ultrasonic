@@ -210,7 +210,7 @@ def main():
     items = [TOL["vhb"], TOL["board"], TOL["bm28"], TOL["board"], TOL["cavity"], TOL["cavity"], K.U1_H_TOL]
     lin_p, rss_p = tol_stack(items)
     j21 = next(p for p in Pp if p["ref"] == "J21")
-    meas_err = 0.02
+    meas_err = 0.015
     R["floor_post"] = dict(
         post_board_x=[round(px0, 2), round(px1, 2)], post_board_y=[round(pz0, 2), round(pz1, 2)], p_file_box=[round(v, 2) for v in pbox], u1_body_p_file=[round(v, 2) for v in ubody],
         inside_u1_body_with_0p5_edge_margin=inside(pbox, ubody, 0.5), other_p_floor_face_parts_hit=others, in_bm28_x_span=bool(j21["box"][0] <= pbox[0] and pbox[2] <= j21["box"][2]),

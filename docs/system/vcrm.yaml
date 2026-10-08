@@ -90,6 +90,7 @@ evidence_pins:
   "sim/checks/dock_pull.py": "a827110ebd"
   "sim/checks/dsp_phase1_summary.json": "97250ccd9f"
   "sim/checks/idle_detector.py": "dfda96c50e"
+  "sim/checks/k4_conduct.py": "12e084dc04"
   "sim/checks/niti_arm_real.py": "62944f12dd"
   "sim/checks/niti_closed_form.py": "262b850086"
   "sim/checks/ntf_compare.py": "89bf4f3e86"
@@ -97,6 +98,7 @@ evidence_pins:
   "sim/checks/power.py": "4be180d9b4"
   "sim/checks/pwm_ultrasonic_leak.py": "d1434d9786"
   "sim/checks/sot1216_footprint.py": "e90d73f50f"
+  "sim/checks/sw1_press_fem.py": "6e0b573fee"
   "sim/checks/tragus_spring.py": "989334e909"
   "sim/data/sph0641_ultrasonic_response.json": "e564317789"
   "sim/dsp/nature_demo.py": "48ca02df64"
@@ -1085,7 +1087,7 @@ requirements:
       C: V9 studies the shortest board (B+ two stacked 4L boards, ~11 x 12 mm; length figures are estimates, no placement run) and
       the vertical noise model passes nominal, marginal in the pessimistic corner. ECR-0020 splits the schematic into two
       netlists joined by a 30-contact Hirose BM28 (rev 3 area re-balance: P = U1 + SMPS + bridge, M = mic + charger/LDO/dock/button; height from a secondary source). K4 shell: hw/mech/shell_k4.py.
-      D: the real board length, the B2B ground-return contact resistance for the mic, and the stacked thickness.
+      D: the real board length, the measured B2B ground-return contact resistance for the mic (C-side bound done: sim/checks/k4_conduct.py), and the stacked thickness.
 
   - id: O16-nohousingscrews
     kind: owner
@@ -1125,15 +1127,15 @@ requirements:
     functions: [F11]
     artefacts: ["interfaces:switch", "bom_check:identity", "bom_check:jlc-bom", hw/pod/gen.py, hw/mech/shell_r1.py, docs/build/tolerances.md, ERC]
     planned: ["press test on a scale (1.6 N is about 163 g) and a one-click-per-press check with the lid just closed"]
-    evidence: [hw/pod/gen.py, docs/build/tolerances.md, 779872e]
-    ecrs: [ECR-0012]
+    evidence: [hw/pod/gen.py, docs/build/tolerances.md, 779872e, sim/checks/sw1_press_fem.py]
+    ecrs: [ECR-0012, ECR-0023]
     related: [O12-sealing, O16-oneboard]
-    next: "Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale"
+    next: "Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale; K4: fit the ECR-0023 floor post (gap 0.015 +-0.015) and press-test with it"
     gap: >-
       C: SW1 is the C&K KMT022NGJLHS (IP68, 1.6 N, 0.15 +-0.1 mm travel; LCSC C221707) in the schematic and JLC BOM. The
       placed board's footprint copy may still carry the pre-cleanup C221708 (the 3.4 N KMT031): bom_check:identity reads it
       live and ECR-0012 covers the cleanup. The plunger head sits 0.40 mm under the skin recess floor, so pre-press or no-click is
-      set nowhere (sub-ui issue 1); nothing rigid backs SW1 (issue 2); the skin that seals the lid bore is not chosen (issue 4).
+      set nowhere (sub-ui issue 1); nothing rigid backs SW1 on r2 (issue 2; K4: ECR-0023 floor post on the U1 top, FEM 2 N SW1 4-34 um, VHB 7-62 kPa for gap 0-30 um); the skin that seals the lid bore is not chosen (issue 4).
       D: click feel and stuck-button current (+1.36 mA if pre-pressed).
 
   - id: O16-oneboard
@@ -1346,7 +1348,7 @@ requirements:
     owner_items: [REG-BOARD, REG-POD-BODY, PHYSICAL]
     artefacts: [hw/mech/shell_r1.py, hw/mech/frame.py, docs/build/tolerances.md, "interfaces:heights", E10, "interfaces:frame", "interfaces:outline"]
     planned: ["numeric board and pod envelopes set by the simplification study", "test-access cost in area and mass, per hook"]
-    evidence: [hw/mech/shell_r1.py, docs/build/tolerances.md, hw/mech/shell_k4.py, docs/research/drastic/V9-k4-board.yaml]
+    evidence: [hw/mech/shell_r1.py, docs/build/tolerances.md, hw/mech/shell_k4.py, docs/research/drastic/V9-k4-board.yaml, sim/checks/k4_conduct.py]
     ecrs: [ECR-0001, ECR-0006, ECR-0020]
     covers: [O33]
     related: [S1.2-C4, D18-balance]

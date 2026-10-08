@@ -55,6 +55,7 @@ if K4:
     BM28 = dict(c=(9.825, 6.025), L=7.0, W=2.6)                  # J20 courtyard [E]
     B_MARGIN = round(K.STACK_Y0 - K.CAV["y0"], 3)                # P to the cavity floor: 0.2 free
     TRAVEL = (0.05, 0.15, 0.25)
+    POST_W = K.POST_W
     LEDGE = os.environ.get("SW1_LEDGE", "1") != "0"   # ECR-0022: VHB only on the notched ledge tip (default); SW1_LEDGE=0 = old full-face bond
     if LEDGE:
         TAG = "_k4_ledge" + ("_vhb14" if os.environ.get("SW1_VHB_X") == "14" else "")
@@ -187,6 +188,34 @@ def main():
                 reac_c = float(kc * (ib.dx * conn_area(xq[0], xq[1]) * ib.interpolate(w2).value).sum())
                 r["p_bottomed_bm28_share_N"] = round(reac_c, 3)
                 r["p_bottomed_w_sw1_um"] = round(1e3 * float((ib.interpolate(w2).value * la).sum() / max(la.sum(), 1)), 2)
+            if BM28 and os.environ.get("SW1_POST", "1") != "0":
+                # ECR-0023 floor post: press path M -> BM28 housing -> P -> U1 top -> post -> floor, closing after a fitted gap g. Series stiffness [A]:
+                # BM28 housing column 500 N/mm3 x footprint (as above), P through-thickness 0.8 mm E_z 3 GPa over 2x the post area, post 1.0 mm resin 2 GPa over 2.4 x 2.4. Unilateral: the
+                # support acts only where w > g (rhs term kc*g), checked after the solve.
+                A_b, A_p = BM28["L"] * BM28["W"], POST_W ** 2
+                k_abs = 1.0 / (1.0 / (500.0 * A_b) + 0.8 / (3000.0 * 2 * A_p) + 1.0 / (2000.0 * A_p))
+                kc_p = k_abs / A_b
+                px_, py_ = mesh.p
+
+                @LinearForm
+                def conn_g(v, w):
+                    return conn_area(w.x[0], w.x[1]) * v
+                Pg = asm(conn_g, ib)
+                rp = {}
+                for g in (0.0, 0.01, 0.02, 0.03, 0.05, 0.10):
+                    w3 = solve(A + kc_p * Mc, (F / a_load) * P + kc_p * g * Pg)
+                    wv3 = ib.interpolate(w3).value
+                    wsw = float((wv3 * la).sum() / max(la.sum(), 1))
+                    wc = float((wv3 * conn_area(xq[0], xq[1])).sum() / max(conn_area(xq[0], xq[1]).sum(), 1))
+                    sig3 = k * wv3 * bq
+                    Fp = float(kc_p * (ib.dx * conn_area(xq[0], xq[1]) * (wv3 - g)).sum()) if wc > g else 0.0
+                    if wc <= g:       # post not reached: the free (ledge-only) solution is the answer
+                        wsw, sig3 = r["w_sw1_mm"], k * ib.interpolate(w).value * bq
+                        vsh = float(k * (ib.dx * ib.interpolate(w).value * bq).sum())
+                    else:
+                        wsw, vsh = wsw, float(k * (ib.dx * wv3 * bq).sum())
+                    rp[f"gap{int(round(g * 1e3))}um"] = dict(w_sw1_um=round(1e3 * wsw, 1), post_N=round(Fp, 2), active=wc > g, vhb_tension_peak_kPa=round(1e3 * float(sig3.max()), 1), vhb_share_N=round(vsh, 3))
+                r["post"] = dict(k_post_N_per_mm=round(k_abs), **rp)
             results.append(r)
             if ev == E_VHB[0] and F == FORCES[0]:
                 plot_case = (w, k)

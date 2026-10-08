@@ -673,3 +673,12 @@
 - 2026-10-08 04:38 checkout REG-BOARD by K4 gap agent: ECR-0022 thin MLCCs C16/C17/C9
 - 2026-10-08 04:49 review REG-BOARD by K4 gap agent: ECR-0022 thin MLCCs
 - 2026-10-08 04:49 checkin REG-BOARD by K4 gap agent
+- 2026-10-08 04:53 checkout REG-BOARD by k4-conduct-agent: K4-DOCS-MPLANE: mid-plane note
+- 2026-10-08 04:53 checkout PHYSICAL by k4-conduct-agent: K4-DOCS-MPLANE: mid-plane note
+- 2026-10-08 04:53 checkin REG-BOARD by k4-conduct-agent
+- 2026-10-08 04:53 checkin PHYSICAL by k4-conduct-agent
+- 2026-10-08 04:53 checkout REG-BOARD by k4-conduct-agent: K4-DOCS-MPLANE
+- 2026-10-08 04:53 checkout PHYSICAL by k4-conduct-agent: K4-DOCS-MPLANE
+- 2026-10-08 04:53 checkin REG-BOARD by k4-conduct-agent
+- 2026-10-08 04:53 checkin PHYSICAL by k4-conduct-agent
+- 2026-10-08 04:53 ECR-0023 raised by claude: K4 floor post on U1 top under the BM28 line: SW1 press path lid-M-BM28-P-U1-post-floor, shim-fitted gap (ECR-0022 follow-up)

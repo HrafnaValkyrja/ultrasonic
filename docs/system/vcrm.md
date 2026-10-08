@@ -128,7 +128,7 @@ The matrix never overrides the spec. If a row shows the design cannot meet a req
 | `O16-connector` | Inspection, Test | partial (surrogate) | not-started |  | 0019, 0021 | Fix the cable-side part number and stock; cut the USB-C keep-out in the shell model and check its overlap with the target |
 | `O33` | Analysis, Inspection | partial (surrogate) | not-started |  | 0020, 0019 | Owner review of ECR-0020; then lay out M and P |
 | `O16-nohousingscrews` | Inspection | done (decides) | not-started |  |  | Confirm on the built pod |
-| `O16-ip68switch` | Inspection, Test | partial (surrogate) | not-started |  | 0012 | Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale |
+| `O16-ip68switch` | Inspection, Test | partial (surrogate) | not-started |  | 0012, 0023 | Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale; K4: fit the ECR-0023 floor post (gap 0.015 +-0.015) and press-test with it |
 | `O16-oneboard` | Inspection, Analysis | partial (decides) | not-started |  | 0011, 0001 | Script the left-pod board mapping and check the off-centre parts in both shells |
 | `O16-pad` | Inspection, Test | partial (decides) | not-started | yes |  | Search for a pre-made pad; try Sugru inserts of about 8 x 14 mm |
 | `O17-wiring` | Inspection, Test, Demonstration | partial (surrogate) | not-started |  | 0006 | Check the conductor path for clearance in both arm states; include the bundle in the ECR-0006 flex test |

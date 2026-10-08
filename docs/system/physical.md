@@ -210,7 +210,7 @@ Wire slack for lifting the lid with the board on its wires (DBG-17, computed 202
 
 ## K4 dock envelope (ECR-0021, proposed)
 - Pod envelope T 6.4 x H 14.8 x L 50.65 (was 49.15): the extra 1.5 mm is at the front for the dock magnet; stack moves to pod x 17.7-28.7, wire gap 0.8 -> 2.3.
-- Dock pads: M tab x 21.05-30.45, y mid 6.8, 0.8 thick, bottom z -9.0 (0.7 recessed from the outer belly); magnets x 19.15 / 32.35. M mid-plane pinned at y 6.8; its parts on the floor face (1.3 high), lid face flat.
+- Dock pads: M tab x 21.05-30.45, y mid 6.8, 0.8 thick, bottom z -9.0 (0.7 recessed from the outer belly); magnets x 19.15 / 32.35. M mid-plane pinned at y 6.8; its parts on the floor face (1.3 high), lid face flat. **SUPERSEDED/CONFLICT (2026-10-08, sim/checks/k4_mplane.py):** after ECR-0022 M is the lid-side board with mid-plane y 8.35 (F 8.75 / B 7.95) and parts on both faces; the pads miss the y-6.8 windows by 1.55 mm. Options (owner decides; rec A): A) move DOCK_YC (windows, magnets, tab) to 8.35 - shell-only; the 6.86 head then spans y 4.92-11.78 and overhangs the lid side by 1.1 mm (never docked while worn, O32), belly flat y 5.3-9.7 so pockets fit. B) swap the stack (P lid-side, M floor-side: mid-plane 6.95, inside the 1.2 window) - moves SW1, mic port, ledge, heights: a re-do. C) keep 6.8 and add a stepped 0.8 tab board - extra part, rejected. Tracked: backlog K4-DOCK-YALIGN.
 - Replaces the `Dock target` row (YZT0675 21.2 x 6.86 x 2.8) when adopted. src `hw/mech/dims_k4.py`, `docs/research/k4-dock.yaml`.
 
 ## K4 stack chain after the lid ledge (ECR-0022)

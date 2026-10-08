@@ -109,7 +109,12 @@ def dock_cut():
     return cut
 
 
-def tub():
+def post():
+    """ECR-0023: floor post under P (bears on the U1 top, shimmed to POST_GAP at assembly); printed short by POST_PRINT_GAP."""
+    return box(STACK_X0 + POST_X - POST_W / 2, STACK_X0 + POST_X + POST_W / 2, CAV["y0"] - 0.01, POST_TOP_Y, SW[1] - POST_W / 2, SW[1] + POST_W / 2)
+
+
+def tub(with_post=True):
     t = outer_body() & box(X0 - 1, X1 + 1, Y_IN - 2, Y_SPLIT, Z0 - 1, Z1 + 1)
     t = t + tub_add()
     t = t - cavity()
@@ -119,6 +124,8 @@ def tub():
     t = t - blade.prism_yz([(3.9, -12.5), (3.9, -3.65 - 3.9), (-3.65 + 12.5, -12.5)], 62.0, 68.5)
     t = t - heel.heel_cut()        # after the relief fill: the conductor channel / socket must stay open through it
     t = t + (tongue() & outer_body())
+    if with_post:
+        t = t + post()
     t = t + (dock_add() & outer_body())
     t = t - dock_cut()
     return t - seam_rebate()
@@ -238,12 +245,18 @@ def placeholders():
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
     t, l, pk, ph = tub(), lid(), puck(), placeholders()
+    t_np = tub(False)      # clash/corridor checks run without the post: it bears on U1 inside the crude stack_body placeholder by design (checked in c['post'])
     c = {}
     for k in ("cell", "ctape", "pcb_top", "stack_body", "vhb", "u2_mic", "sw1", "bat_wires", "arm_wires", "dock_mags"):
-        for n, p in (("tub", t), ("lid", l)):
+        for n, p in (("tub", t_np), ("lid", l)):
             c[f"clash/{n}/{k}"] = round((p & ph[k]).volume, 4)
     c["clash/tub/lid"] = round((t & l).volume, 4)
     c["ledge"] = ledge_check()
+    c["post"] = dict(x=[round(STACK_X0 + POST_X - POST_W / 2, 2), round(STACK_X0 + POST_X + POST_W / 2, 2)], z=[round(SW[1] - POST_W / 2, 2), round(SW[1] + POST_W / 2, 2)], height_above_floor_printed=round(POST_TOP_Y - CAV["y0"], 3),
+                     u1_top_y=round(U1_TOP_Y, 3), fitted_top_y=round(U1_TOP_Y - POST_GAP, 3), print_air_gap=POST_PRINT_GAP, fit_gap=POST_GAP, chain_lin=round(POST_CHAIN_LIN, 3),
+                     shim_add_or_trim=[-round(POST_CHAIN_LIN, 3), round(POST_CHAIN_LIN, 3)],
+                     overlap_stack_placeholder_by_design=round((post() & ph["stack_body"]).volume, 4), overlap_pcb_top=round((post() & ph["pcb_top"]).volume, 4), post_mm3=round(post().volume, 3),
+                     note="printed at the nominal fit gap; fit range +-chain_lin (linear worst case): + = add PET/Kapton shim on the post top, - = trim the top. overlap with the crude stack_body placeholder is the U1 volume the post bears on (checked against the routed P in k4_heights post section)")
     c["clash/cell/m_tab"] = round((ph["cell"] & ph["m_tab"]).volume, 4)
     c["clash/m_tab/stack_body_overlap_is_intended"] = round((ph["m_tab"] & ph["stack_body"]).volume, 4)
     c["clash/tub/m_tab"] = round((t & ph["m_tab"]).volume, 4)
@@ -256,7 +269,7 @@ def main():
     c["clash/puck/sw1"] = round((pk & ph["sw1"]).volume, 4)
     # drop-in corridors: cell falls along -y into the tub, lid + hanging stack come down along -y
     c["corridor/cell_drop_in"] = round((t & box(CELL_X0, CELL_X1, CELL_Y0, Y_SPLIT + 1, CELL_Z0, CELL_Z1)).volume, 4)
-    c["corridor/stack_drop_in"] = round((t & box(STACK_X0, STACK_X1, STACK_Y0, Y_SPLIT + 3, STACK_Z0, STACK_Z1)).volume, 4)
+    c["corridor/stack_drop_in"] = round((t_np & box(STACK_X0, STACK_X1, STACK_Y0, Y_SPLIT + 3, STACK_Z0, STACK_Z1)).volume, 4)
     # wall minimum: grow the cavity by w and see how much sticks out of the outer body (+ keel/rail) below the seam; 0 = every wall >= w
     outer_all = (outer_body() + tub_add()) & box(X0 - 1, X1 + 1, Y_IN - 3, Y_SPLIT, Z0 - 3, Z1 + 3)
     walls = {}
