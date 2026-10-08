@@ -613,3 +613,5 @@
 - 2026-10-07 17:44 review R-BODY-ARM by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT
 - 2026-10-07 17:44 review SUB-UI by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT
 - 2026-10-07 17:44 review REG-POD-BODY by claude-backlog: round 12: button/thin-lid overrides (SW1/POCKET hooks, trace groove + step key thin-lid guards); phase2 dims snapshot identical, phase2 shell checks.json = before + info fields only; K1-thin dome is NON-DEFAULT
+- 2026-10-07 20:49 checkout REG-POD-BODY by claude: RPB-12 close
+- 2026-10-07 20:49 checkin REG-POD-BODY by claude
