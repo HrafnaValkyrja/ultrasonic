@@ -1,6 +1,7 @@
 /* Loudness fix (docs/proof/electrical/loudness.md, 2026-10-08): alert tone at 2-3 kHz + look-ahead soft-knee limiter at the R64 clamp.
  * Checks: tone frequency, no clicks (bounded step, ramps), never above the ceiling / clamp through the full output stage, knob off = legacy. */
 #include <math.h>
+#include <string.h>
 
 #include "dsp.h"
 #include "fw.h"
@@ -135,6 +136,60 @@ void test_loud_ceiling_and_clamp(void)
     init_la(&st, 1);
     fw_alert_trigger(&st);
     TF_CHECK(st.alert.total > 0u);
+}
+
+/* ---- D17 loud mode: loud_db drive gain ahead of the limiter; off = bit-identical, on = still inside limiter + R64 clamp ---- */
+static uint32_t loud_run(int la, int32_t loud_db, uint32_t on, uint16_t *rec, uint32_t *hits_o, uint32_t *viol_o, float *peak_o)
+{
+    fw_knobs_t k;
+    fw_knobs_defaults(&k);
+    fw_knob_set(&k, FW_KNOB_lim_lookahead, la);
+    fw_knob_set(&k, FW_KNOB_loud_db, loud_db);
+    fw_dsp_t d;
+    fw_dsp_init(&d, &k, 200u, 1u);
+    fw_dsp_set_loud(&d, on);
+    fw_ccr_bounds_t b = fw_ccr_bounds(200u, fw_out_amp_max_ppm(&k));
+    fw_alert_t a;
+    fw_alert_start(&a, 2500, 0, 300);
+    float y[8];
+    uint16_t ccr[FW_CCR_MAX_PER_HOP];
+    fw_out_info_t oi;
+    uint32_t tot = 0, hits = 0, viol = 0;
+    float peak = 0.0f;
+    for (uint32_t h = 0; h < 600u; h++) {
+        if (!fw_alert_hop(&a, y)) for (int i = 0; i < 8; i++) y[i] = 0.0f;
+        size_t n = fw_dsp_out(&d, y, 0u, &b, ccr, &oi);
+        peak = oi.true_peak > peak ? oi.true_peak : peak;
+        hits += oi.clamp_hits;
+        for (size_t j = 0; j < n; j++) {
+            viol += fabs(2.0 * ccr[j] / 200.0 - 1.0) > fw_out_amp_max_ppm(&k) * 1e-6 + 1e-9;
+            if (rec) rec[tot] = ccr[j];
+            tot++;
+        }
+    }
+    *hits_o = hits; *viol_o = viol; *peak_o = peak;
+    return tot;
+}
+
+void test_loud_mode(void)
+{
+    static uint16_t r0[600u * FW_CCR_MAX_PER_HOP], r1[600u * FW_CCR_MAX_PER_HOP], r2[600u * FW_CCR_MAX_PER_HOP];
+    for (int la = 0; la < 2; la++) {
+        uint32_t h, v; float p0, p1;
+        uint32_t n0 = loud_run(la, 0, 1u, r0, &h, &v, &p0);          /* knob 0: toggle is a no-op */
+        uint32_t n1 = loud_run(la, 12, 0u, r1, &h, &v, &p1);         /* knob 12 but toggled off */
+        uint32_t n2 = loud_run(la, 0, 0u, r2, &h, &v, &p0);          /* legacy */
+        TF_CHECK_EQ(n0, n1); TF_CHECK_EQ(n0, n2);
+        TF_CHECK(memcmp(r0, r2, n0 * sizeof r0[0]) == 0);
+        TF_CHECK(memcmp(r1, r2, n0 * sizeof r0[0]) == 0);            /* off = bit-identical */
+        float pl;
+        loud_run(la, 12, 1u, r1, &h, &v, &pl);                       /* +12 dB on */
+        TF_CHECK_EQ(v, 0);                                           /* R64 clamp (208 mA) never exceeded */
+        fw_knobs_t k; fw_knobs_defaults(&k);
+        float cap = (float)fw_out_amp_max_ppm(&k) * 1e-6f - (float)FW_SHAPER_EXCURSION_PPM * 1e-6f;
+        if (la) { TF_CHECK(pl <= cap + 1e-4f); TF_CHECK_EQ(h, 0); }  /* limiter catches the peaks; clamp never bites */
+        else TF_CHECK(pl <= 0.2511886f + 1e-4f);
+    }
 }
 
 /* ---- I-010 tactile alert: 2-3 pulses at 150-250 Hz, 100 ms, default off ---- */

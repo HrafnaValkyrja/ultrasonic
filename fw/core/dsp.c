@@ -145,6 +145,8 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr, uint32_t reps)
     /* output stage */
     d->lim_c = fw_db20_to_lin((float)k->ceiling_cdb * 0.01f);
     d->lim_rel = fw_om_exp(1000.0f / (FS_OUT_HZ * (float)k->limiter_release_ms));
+    d->loud_lin = k->loud_db ? fw_db20_to_lin((float)k->loud_db) : 1.0f;
+    d->loud_on = 0u;
     d->la_on = k->lim_lookahead ? 1u : 0u;
     if (d->la_on) {   /* loudness fix: ceiling = R64 clamp minus the noise-shaper excursion bound (so the clamp never bites); D17 fixed ceiling */
         float amp = (float)fw_out_amp_max_ppm(k) * 1e-6f - (float)FW_SHAPER_EXCURSION_PPM * 1e-6f;
@@ -168,6 +170,11 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr, uint32_t reps)
     d->h1 = -(ntf_2cos[ri] + 1.0f);                                 /* ntf = (1 - z^-1)(1 - 2c z^-1 + z^-2): h = ntf[1:] */
     d->h2 = ntf_2cos[ri] + 1.0f;
     d->dither = 22695477u;                                          /* xorshift32 seed (determinism rules: fixed) */
+}
+
+void fw_dsp_set_loud(fw_dsp_t *d, uint32_t on)
+{
+    d->loud_on = (on && d->loud_lin != 1.0f) ? 1u : 0u;
 }
 
 void fw_dsp_set_gain_cdb(fw_dsp_t *d, int32_t volume_cdb)
@@ -580,6 +587,13 @@ NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8_in[8], uint32_t force_squelc
 {
     float yl[8];
     const float *y8 = y8_in;
+    float yd[8];
+    if (d->loud_on) {                     /* D17 loud mode: drive gain ahead of the limiter; limiter + R64 clamp still bound the output */
+        for (uint32_t i = 0; i < 8u; i++)
+            yd[i] = y8_in[i] * d->loud_lin;
+        y8_in = yd;
+        y8 = yd;
+    }
     if (d->la_on) {
         fw_lahead_hop(&d->la, y8_in, yl);
         y8 = yl;

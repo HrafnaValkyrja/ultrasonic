@@ -175,6 +175,11 @@ void fw_poll(fw_state_t *st, uint64_t now_us)
     if (st->squelched && st->now_us - st->boot_us >= (uint64_t)st->knobs.power_on_hold_ms * 1000u)
         st->squelched = 0u;
     fw_sys_poll(&st->sys, &st->knobs, st->now_us);
+    if (st->sys.gestures[FW_RG_HOLD2] != st->loud_hold2_seen) {   /* loud mode toggle = HOLD2 (options A, B; C maps HOLD2 to off) */
+        st->loud_hold2_seen = st->sys.gestures[FW_RG_HOLD2];
+        if (st->knobs.loud_db && st->knobs.gesture_option != 3 && st->sys.mode != (uint32_t)FW_ST_OFF)
+            fw_dsp_set_loud(&st->dsp, !st->dsp.loud_on);
+    }
     sync_volume(st);
 }
 

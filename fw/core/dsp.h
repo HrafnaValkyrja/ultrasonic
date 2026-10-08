@@ -55,11 +55,13 @@ typedef struct {
     uint32_t fmac_faults;
     float lim_g, e1, e2, e3, sq_env;
     uint32_t dither, sq_quiet;
+    float loud_lin; uint32_t loud_on;             /* knob loud_db: pre-limiter drive gain, applied only while loud_on (user toggle) */
     uint32_t la_on;                               /* knob lim_lookahead: look-ahead soft-knee limiter ahead of the interpolator */
     fw_lahead_t la;
 } fw_dsp_t;
 
 void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr, uint32_t reps);   /* reps = PWM periods per PCM sample */
+void fw_dsp_set_loud(fw_dsp_t *d, uint32_t on);   /* loud mode toggle; no-op when knob loud_db = 0 */
 void fw_dsp_set_gain_cdb(fw_dsp_t *d, int32_t volume_cdb);   /* fixed 30 dB + volume (knob volume_cdb + gesture steps) */
 int fw_dsp_set_noise(fw_dsp_t *d, const float *band_energy, uint32_t n);   /* unit calibration; n must equal the band count */
 /* D2 front end: 256 words at 400 kS/s -> 128 PCM (DR-word units) */
