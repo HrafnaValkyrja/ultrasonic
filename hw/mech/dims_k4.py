@@ -121,13 +121,17 @@ PUCK_L = SKIN_FLOOR - PRE_GAP - (Y_F + SW1["h"])
 # Rigid post = no fixed height works (floor-side tolerance chain +-0.54 linear, ~+-0.2 RSS), so it is printed at the nominal gap and fitted to a MEASURED gap POST_GAP: PET/Kapton shim on top (gap too big) or trim the top (gap too small).
 POST_X = 8.2                           # board x of the post centre (U1 body 6.3..13.3; SW1 5.3; BM28 6.2..13.5)
 POST_W = 2.4                           # square pad 2.4 x 2.4 on U1 top (0.35 MPa at 2 N, 1.7 MPa at 10 N)
-POST_GAP = 0.015                       # fitted gap post-top to U1 top (measure +-0.015): 0.000..0.030, never negative (FEM: VHB tension < 85 kPa needs gap <= 0.03 at E 0.5, <= 0.01 at E 2)
+POST_GAP = 0.0                         # ECR-0023 addendum 2: no fitting; the gap is filled at assembly by a bonded epoxy dab (was: fitted gap 0.015 post-top to U1 top (measure +-0.015): 0.000..0.030, never negative (FEM: VHB tension < 85 kPa needs gap <= 0.03 at E 0.5, <= 0.01 at E 2)
 U1_H, U1_H_TOL = 0.60, 0.05            # ST DS13737 UFQFPN48 A max 0.60; +-0.05 [T]
 POST_CHAIN_LIN = 0.15 * VHB_T + 4 * 0.10 + 0.05 + U1_H_TOL   # VHB + M board + P board + 2 cavity prints (floor, lid) + BM28 + U1 = linear worst case
-POST_PRINT_GAP = POST_GAP                                    # printed at the nominal fitted gap (centres the +-chain fit range); fitted at assembly by shim (add) or trim (remove), never by guess
+POST_MARGIN = 0.05                                           # min air gap at the worst tolerance corner (must stay > 0: post never preloads U1)
+POST_PRINT_GAP = round(POST_CHAIN_LIN + POST_MARGIN, 4)      # ECR-0023 add.2: printed SHORT by the full linear chain + margin -> gap 0.05..1.125 at every corner; filled by the cured dab (FILL_*). OLD: = POST_GAP                                    # printed at the nominal fitted gap (centres the +-chain fit range); fitted at assembly by shim (add) or trim (remove), never by guess
 P_OUT_Y = Y_F - 2 * PCB_T - 0.6              # P file-B (floor-facing) board face
 U1_TOP_Y = P_OUT_Y - U1_H                    # nominal U1 top (package max)
-POST_TOP_Y = U1_TOP_Y - POST_PRINT_GAP       # printed post top; shimmed up to U1_TOP_Y - POST_GAP at assembly
+POST_TOP_Y = U1_TOP_Y - POST_PRINT_GAP       # printed post top (nominal U1 top minus 0.5875); the dab fills up to U1 (Kapton-covered)
+POST_GAP_MAX = round(2 * POST_CHAIN_LIN + POST_MARGIN, 3)    # largest air gap to fill 1.125
+FILL_VOL_MM3 = round(POST_W ** 2 * POST_GAP_MAX * 1.5, 1)    # dab volume: post top area x max gap x 1.5 (squeeze-out allowance, spreads into a 0.3 wide skirt) = 9.7 mm3 ~ 10 uL
+FILL_E_MPA, FILL_SHRINK = 350.0, 0.02    # [A] cured 5-min epoxy: secant 350 MPa (2500 psi @ 5 % elong., Devcon 5 Minute data via vendor listings, searched 2026-10-08), shrink 2 % assumed; see sw1_press_fem.py fill sweep
 PUCK_STEP = 0.05
 PUCK_KIT = tuple(round(PUCK_L + k * PUCK_STEP, 2) for k in (-2, -1, 0, 1, 2))
 TONGUE_W, TONGUE_H, GROOVE_CL, CORNER_KEEP = 0.35, 0.35, 0.05, 1.4   # tongue height 0.35 (r2: 0.5) so the 1.0 lid keeps 0.60 over the groove

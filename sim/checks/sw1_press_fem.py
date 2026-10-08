@@ -216,6 +216,24 @@ def main():
                         wsw, vsh = wsw, float(k * (ib.dx * wv3 * bq).sum())
                     rp[f"gap{int(round(g * 1e3))}um"] = dict(w_sw1_um=round(1e3 * wsw, 1), post_N=round(Fp, 2), active=wc > g, vhb_tension_peak_kPa=round(1e3 * float(sig3.max()), 1), vhb_share_N=round(vsh, 3))
                 r["post"] = dict(k_post_N_per_mm=round(k_abs), **rp)
+                if os.environ.get("SW1_FILL", "1") != "0":
+                    # ECR-0023 addendum 2 (gap-filling bonded post): a cured filler layer t_f (0.05..1.15 mm = printed gap range) replaces the air gap; series stiffness gets
+                    # t_f/(E_f*A_f) on the post area (filler spreads over the 2.4 sq post top, no extra area credit). g = residual gap from cure shrink (bonded to post, may
+                    # release from the Kapton-covered U1): 0 and shrink*t_f.
+                    fl = {}
+                    for Ef in (350.0, 1000.0, 2500.0):            # MPa; 350 = secant from 17.2 MPa @ 5 % (Devcon 5 Minute, 2500 psi/5 %) [A], 1000/2500 = typical cured 5-min / UV epoxy [A]
+                        for tf in (0.05, 0.3, 0.6, 0.9, 1.15):
+                            for shr in (0.0, 0.02):
+                                kf = 1.0 / (1.0 / k_abs + tf / (Ef * A_p))
+                                kcf = kf / A_b
+                                g = shr * tf
+                                w3 = solve(A + kcf * Mc, (F / a_load) * P + kcf * g * Pg)
+                                wv3 = ib.interpolate(w3).value
+                                wc = float((wv3 * conn_area(xq[0], xq[1])).sum() / max(conn_area(xq[0], xq[1]).sum(), 1))
+                                sig3 = k * wv3 * bq
+                                fl[f"E{int(Ef)}_t{int(tf*1000)}_shr{int(shr*100)}"] = dict(k_N_per_mm=round(kf), w_sw1_um=round(1e3 * float((wv3 * la).sum() / max(la.sum(), 1)), 1),
+                                                                                          vhb_tension_peak_kPa=round(1e3 * float(sig3.max()), 1), active=wc > g)
+                    r["fill"] = fl
             results.append(r)
             if ev == E_VHB[0] and F == FORCES[0]:
                 plot_case = (w, k)

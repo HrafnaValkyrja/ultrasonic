@@ -1130,12 +1130,12 @@ requirements:
     evidence: [hw/pod/gen.py, docs/build/tolerances.md, 779872e, sim/checks/sw1_press_fem.py]
     ecrs: [ECR-0012, ECR-0023]
     related: [O12-sealing, O16-oneboard]
-    next: "Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale; K4: fit the ECR-0023 floor post (gap 0.015 +-0.015) and press-test with it. 2026-10-08: foam-pad replacement fails (sw1_pad_fem.py, ECR-0023 addendum), owner decision pending"
+    next: "Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale; K4: ECR-0023 add.2 gap-filling bonded post (post 0.5875 short + epoxy dab on Kapton peel); press-test with it. 2026-10-08: foam-pad replacement fails (sw1_pad_fem.py, ECR-0023 addendum), owner decision pending"
     gap: >-
       C: SW1 is the C&K KMT022NGJLHS (IP68, 1.6 N, 0.15 +-0.1 mm travel; LCSC C221707) in the schematic and JLC BOM. The
       placed board's footprint copy may still carry the pre-cleanup C221708 (the 3.4 N KMT031): bom_check:identity reads it
       live and ECR-0012 covers the cleanup. The plunger head sits 0.40 mm under the skin recess floor, so pre-press or no-click is
-      set nowhere (sub-ui issue 1); nothing rigid backs SW1 on r2 (issue 2; K4: ECR-0023 floor post on the U1 top, FEM 2 N SW1 4-34 um, VHB 7-62 kPa for gap 0-30 um); the skin that seals the lid bore is not chosen (issue 4).
+      set nowhere (sub-ui issue 1); nothing rigid backs SW1 on r2 (issue 2; K4: ECR-0023 add.2 gap-filling bonded post on the U1 top, FEM 2 N SW1 1.7-32 um, VHB <= 60 kPa for VHB E <= 0.5); the skin that seals the lid bore is not chosen (issue 4).
       D: click feel and stuck-button current (+1.36 mA if pre-pressed).
 
   - id: O16-oneboard

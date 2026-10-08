@@ -106,10 +106,15 @@ Follow `docs/build/bringup.md` stages B to E. Short version for this pod:
 1. **Do:** die-cut VHB onto the lid ledge tip only (ledge 0.70 high, 0.5 wide, with notches round J5/J7/J8 and the mic tube). Mic: slide a 0.60 pin gauge through the lid bore, VHB hole and M's hole; press M down; pull the pin last.
 2. **Do:** press through a foam pad over P (about 30 N), hold 30 s. M's pads stay in the ledge notches.
 3. **Do (button):** depth-gauge from the skin recess floor to SW1's top, puck length = depth - 0.07, pick from the kit (1.03 to 1.23). Skin on unbonded, press 10 times: one click each, none at rest. Then bond the skin.
-4. **Check:** J5-J4 still 3.5 to 4.2 V; mic hole clear to a 0.60 pin.
-5. **If it fails:** puck too long = click at rest, take the next shorter; peel VHB (warm 60 to 80 C, floss).
+4. **Do (peel layer):** stick a 3 x 3 mm square of Kapton tape on U1's top (the big QFN on P's outer face, centre of the BM28 line). The post dab will bond to this, never to the chip.
+5. **Check:** J5-J4 still 3.5 to 4.2 V; mic hole clear to a 0.60 pin.
+6. **If it fails:** puck too long = click at rest, take the next shorter; peel VHB (warm 60 to 80 C, floss).
 
 ## 9. Close and seal (O12, IPX4 minimum, IPX5 preferred)
+
+0. **Do (gap-filling post, ECR-0023 add.2, final build only):** the tub post is printed 0.59 short of U1 on purpose (air gap 0.05 to 1.125 mm). Mix about 10 uL (a 3 mm blob) of 30-minute low-shrink two-part epoxy and put it on the post top; keep it off the cell side. Close the pod (step 9.1 to 9.4) within 15 min; the dab squeezes out to the real gap against the Kapton. Clamp the closed pod 1 h flat, no press on SW1 for 24 h. Check: epoxy skirt visible only at the post, nothing on the BM28. Rework: warm the pod to 60 to 80 C and the dab lets go from the Kapton, not from U1. Dry-close builds get no dab.
+
+![post](../diagrams/k4-assembly/08-gap-fill-post.png)
 
 1. **Do:** fold the cell leads forward to the cell front lead and solder them (cell + to J5's lead, cell - to J4's). Arm wires run flat under the cell in the 0.9 mm lane (z -8.8), then up to the heel exit. Kapton tape across.
 2. **Do:** dry-close first with tape round the seam (test build). Look through the seam that nothing is pinched.

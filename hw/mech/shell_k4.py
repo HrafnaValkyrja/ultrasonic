@@ -110,7 +110,7 @@ def dock_cut():
 
 
 def post():
-    """ECR-0023: floor post under P (bears on the U1 top, shimmed to POST_GAP at assembly); printed short by POST_PRINT_GAP."""
+    """ECR-0023: floor post under P (bears on the U1 top, gap filled by a bonded epoxy dab at assembly (add.2)); printed short by POST_PRINT_GAP."""
     return box(STACK_X0 + POST_X - POST_W / 2, STACK_X0 + POST_X + POST_W / 2, CAV["y0"] - 0.01, POST_TOP_Y, SW[1] - POST_W / 2, SW[1] + POST_W / 2)
 
 

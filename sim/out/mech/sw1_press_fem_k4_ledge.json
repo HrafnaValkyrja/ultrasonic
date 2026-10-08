@@ -109,6 +109,188 @@
      "vhb_tension_peak_kPa": 60.6,
      "vhb_share_N": 1.493
     }
+   },
+   "fill": {
+    "E350_t50_shr0": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 4.8,
+     "vhb_tension_peak_kPa": 7.4,
+     "active": true
+    },
+    "E350_t50_shr2": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 5.8,
+     "vhb_tension_peak_kPa": 7.9,
+     "active": true
+    },
+    "E350_t300_shr0": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 6.2,
+     "vhb_tension_peak_kPa": 8.9,
+     "active": true
+    },
+    "E350_t300_shr2": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 12.0,
+     "vhb_tension_peak_kPa": 12.0,
+     "active": true
+    },
+    "E350_t600_shr0": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 7.8,
+     "vhb_tension_peak_kPa": 10.6,
+     "active": true
+    },
+    "E350_t600_shr2": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 19.2,
+     "vhb_tension_peak_kPa": 16.8,
+     "active": true
+    },
+    "E350_t900_shr0": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 9.2,
+     "vhb_tension_peak_kPa": 12.3,
+     "active": true
+    },
+    "E350_t900_shr2": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 26.2,
+     "vhb_tension_peak_kPa": 21.4,
+     "active": true
+    },
+    "E350_t1150_shr0": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 10.4,
+     "vhb_tension_peak_kPa": 13.5,
+     "active": true
+    },
+    "E350_t1150_shr2": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 32.0,
+     "vhb_tension_peak_kPa": 25.1,
+     "active": true
+    },
+    "E1000_t50_shr0": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 4.7,
+     "vhb_tension_peak_kPa": 7.2,
+     "active": true
+    },
+    "E1000_t50_shr2": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 5.6,
+     "vhb_tension_peak_kPa": 7.7,
+     "active": true
+    },
+    "E1000_t300_shr0": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 5.2,
+     "vhb_tension_peak_kPa": 7.7,
+     "active": true
+    },
+    "E1000_t300_shr2": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 10.9,
+     "vhb_tension_peak_kPa": 10.9,
+     "active": true
+    },
+    "E1000_t600_shr0": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 5.7,
+     "vhb_tension_peak_kPa": 8.4,
+     "active": true
+    },
+    "E1000_t600_shr2": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 17.3,
+     "vhb_tension_peak_kPa": 14.6,
+     "active": true
+    },
+    "E1000_t900_shr0": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 6.3,
+     "vhb_tension_peak_kPa": 9.0,
+     "active": true
+    },
+    "E1000_t900_shr2": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 23.6,
+     "vhb_tension_peak_kPa": 18.4,
+     "active": true
+    },
+    "E1000_t1150_shr0": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 6.8,
+     "vhb_tension_peak_kPa": 9.5,
+     "active": true
+    },
+    "E1000_t1150_shr2": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 28.8,
+     "vhb_tension_peak_kPa": 21.4,
+     "active": true
+    },
+    "E2500_t50_shr0": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 4.6,
+     "vhb_tension_peak_kPa": 7.1,
+     "active": true
+    },
+    "E2500_t50_shr2": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 5.6,
+     "vhb_tension_peak_kPa": 7.6,
+     "active": true
+    },
+    "E2500_t300_shr0": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 4.8,
+     "vhb_tension_peak_kPa": 7.3,
+     "active": true
+    },
+    "E2500_t300_shr2": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 10.6,
+     "vhb_tension_peak_kPa": 10.5,
+     "active": true
+    },
+    "E2500_t600_shr0": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 5.0,
+     "vhb_tension_peak_kPa": 7.6,
+     "active": true
+    },
+    "E2500_t600_shr2": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 16.6,
+     "vhb_tension_peak_kPa": 13.9,
+     "active": true
+    },
+    "E2500_t900_shr0": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 5.3,
+     "vhb_tension_peak_kPa": 7.9,
+     "active": true
+    },
+    "E2500_t900_shr2": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 22.6,
+     "vhb_tension_peak_kPa": 17.3,
+     "active": true
+    },
+    "E2500_t1150_shr0": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 5.5,
+     "vhb_tension_peak_kPa": 8.1,
+     "active": true
+    },
+    "E2500_t1150_shr2": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 27.6,
+     "vhb_tension_peak_kPa": 20.1,
+     "active": true
+    }
    }
   },
   {
@@ -174,6 +356,188 @@
      "active": true,
      "vhb_tension_peak_kPa": 88.0,
      "vhb_share_N": 1.758
+    }
+   },
+   "fill": {
+    "E350_t50_shr0": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 24.2,
+     "vhb_tension_peak_kPa": 36.8,
+     "active": true
+    },
+    "E350_t50_shr2": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 25.2,
+     "vhb_tension_peak_kPa": 37.4,
+     "active": true
+    },
+    "E350_t300_shr0": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 31.1,
+     "vhb_tension_peak_kPa": 44.6,
+     "active": true
+    },
+    "E350_t300_shr2": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 36.9,
+     "vhb_tension_peak_kPa": 47.7,
+     "active": true
+    },
+    "E350_t600_shr0": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 38.8,
+     "vhb_tension_peak_kPa": 53.2,
+     "active": true
+    },
+    "E350_t600_shr2": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 50.2,
+     "vhb_tension_peak_kPa": 59.4,
+     "active": true
+    },
+    "E350_t900_shr0": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 46.1,
+     "vhb_tension_peak_kPa": 61.3,
+     "active": true
+    },
+    "E350_t900_shr2": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 63.1,
+     "vhb_tension_peak_kPa": 70.4,
+     "active": true
+    },
+    "E350_t1150_shr0": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 51.9,
+     "vhb_tension_peak_kPa": 67.7,
+     "active": true
+    },
+    "E350_t1150_shr2": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 73.5,
+     "vhb_tension_peak_kPa": 79.2,
+     "active": true
+    },
+    "E1000_t50_shr0": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 23.3,
+     "vhb_tension_peak_kPa": 35.8,
+     "active": true
+    },
+    "E1000_t50_shr2": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 24.3,
+     "vhb_tension_peak_kPa": 36.3,
+     "active": true
+    },
+    "E1000_t300_shr0": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 25.8,
+     "vhb_tension_peak_kPa": 38.6,
+     "active": true
+    },
+    "E1000_t300_shr2": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 31.6,
+     "vhb_tension_peak_kPa": 41.8,
+     "active": true
+    },
+    "E1000_t600_shr0": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 28.7,
+     "vhb_tension_peak_kPa": 41.9,
+     "active": true
+    },
+    "E1000_t600_shr2": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 40.2,
+     "vhb_tension_peak_kPa": 48.2,
+     "active": true
+    },
+    "E1000_t900_shr0": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 31.5,
+     "vhb_tension_peak_kPa": 45.1,
+     "active": true
+    },
+    "E1000_t900_shr2": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 48.7,
+     "vhb_tension_peak_kPa": 54.4,
+     "active": true
+    },
+    "E1000_t1150_shr0": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 33.8,
+     "vhb_tension_peak_kPa": 47.6,
+     "active": true
+    },
+    "E1000_t1150_shr2": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 55.8,
+     "vhb_tension_peak_kPa": 59.5,
+     "active": true
+    },
+    "E2500_t50_shr0": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 23.0,
+     "vhb_tension_peak_kPa": 35.4,
+     "active": true
+    },
+    "E2500_t50_shr2": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 23.9,
+     "vhb_tension_peak_kPa": 35.9,
+     "active": true
+    },
+    "E2500_t300_shr0": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 24.0,
+     "vhb_tension_peak_kPa": 36.6,
+     "active": true
+    },
+    "E2500_t300_shr2": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 29.8,
+     "vhb_tension_peak_kPa": 39.7,
+     "active": true
+    },
+    "E2500_t600_shr0": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 25.2,
+     "vhb_tension_peak_kPa": 37.9,
+     "active": true
+    },
+    "E2500_t600_shr2": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 36.8,
+     "vhb_tension_peak_kPa": 44.3,
+     "active": true
+    },
+    "E2500_t900_shr0": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 26.4,
+     "vhb_tension_peak_kPa": 39.3,
+     "active": true
+    },
+    "E2500_t900_shr2": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 43.7,
+     "vhb_tension_peak_kPa": 48.7,
+     "active": true
+    },
+    "E2500_t1150_shr0": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 27.3,
+     "vhb_tension_peak_kPa": 40.4,
+     "active": true
+    },
+    "E2500_t1150_shr2": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 49.5,
+     "vhb_tension_peak_kPa": 52.4,
+     "active": true
     }
    }
   },
@@ -241,6 +605,188 @@
      "vhb_tension_peak_kPa": 112.7,
      "vhb_share_N": 2.019
     }
+   },
+   "fill": {
+    "E350_t50_shr0": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 4.1,
+     "vhb_tension_peak_kPa": 19.5,
+     "active": true
+    },
+    "E350_t50_shr2": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 5.0,
+     "vhb_tension_peak_kPa": 20.9,
+     "active": true
+    },
+    "E350_t300_shr0": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 5.2,
+     "vhb_tension_peak_kPa": 23.0,
+     "active": true
+    },
+    "E350_t300_shr2": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 10.5,
+     "vhb_tension_peak_kPa": 30.9,
+     "active": true
+    },
+    "E350_t600_shr0": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 6.3,
+     "vhb_tension_peak_kPa": 26.6,
+     "active": true
+    },
+    "E350_t600_shr2": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 16.8,
+     "vhb_tension_peak_kPa": 41.8,
+     "active": true
+    },
+    "E350_t900_shr0": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 7.3,
+     "vhb_tension_peak_kPa": 29.8,
+     "active": true
+    },
+    "E350_t900_shr2": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 22.8,
+     "vhb_tension_peak_kPa": 52.0,
+     "active": true
+    },
+    "E350_t1150_shr0": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 8.0,
+     "vhb_tension_peak_kPa": 32.3,
+     "active": true
+    },
+    "E350_t1150_shr2": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 27.7,
+     "vhb_tension_peak_kPa": 59.9,
+     "active": true
+    },
+    "E1000_t50_shr0": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 4.0,
+     "vhb_tension_peak_kPa": 19.0,
+     "active": true
+    },
+    "E1000_t50_shr2": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 4.9,
+     "vhb_tension_peak_kPa": 20.4,
+     "active": true
+    },
+    "E1000_t300_shr0": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 4.4,
+     "vhb_tension_peak_kPa": 20.3,
+     "active": true
+    },
+    "E1000_t300_shr2": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 9.8,
+     "vhb_tension_peak_kPa": 28.4,
+     "active": true
+    },
+    "E1000_t600_shr0": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 4.8,
+     "vhb_tension_peak_kPa": 21.8,
+     "active": true
+    },
+    "E1000_t600_shr2": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 15.6,
+     "vhb_tension_peak_kPa": 37.7,
+     "active": true
+    },
+    "E1000_t900_shr0": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 5.2,
+     "vhb_tension_peak_kPa": 23.2,
+     "active": true
+    },
+    "E1000_t900_shr2": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 21.3,
+     "vhb_tension_peak_kPa": 46.8,
+     "active": true
+    },
+    "E1000_t1150_shr0": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 5.6,
+     "vhb_tension_peak_kPa": 24.3,
+     "active": true
+    },
+    "E1000_t1150_shr2": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 26.0,
+     "vhb_tension_peak_kPa": 54.1,
+     "active": true
+    },
+    "E2500_t50_shr0": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 3.9,
+     "vhb_tension_peak_kPa": 18.8,
+     "active": true
+    },
+    "E2500_t50_shr2": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 4.9,
+     "vhb_tension_peak_kPa": 20.2,
+     "active": true
+    },
+    "E2500_t300_shr0": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 4.1,
+     "vhb_tension_peak_kPa": 19.4,
+     "active": true
+    },
+    "E2500_t300_shr2": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 9.6,
+     "vhb_tension_peak_kPa": 27.5,
+     "active": true
+    },
+    "E2500_t600_shr0": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 4.3,
+     "vhb_tension_peak_kPa": 20.0,
+     "active": true
+    },
+    "E2500_t600_shr2": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 15.2,
+     "vhb_tension_peak_kPa": 36.2,
+     "active": true
+    },
+    "E2500_t900_shr0": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 4.5,
+     "vhb_tension_peak_kPa": 20.6,
+     "active": true
+    },
+    "E2500_t900_shr2": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 20.7,
+     "vhb_tension_peak_kPa": 44.8,
+     "active": true
+    },
+    "E2500_t1150_shr0": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 4.6,
+     "vhb_tension_peak_kPa": 21.1,
+     "active": true
+    },
+    "E2500_t1150_shr2": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 25.4,
+     "vhb_tension_peak_kPa": 51.9,
+     "active": true
+    }
    }
   },
   {
@@ -306,6 +852,188 @@
      "active": true,
      "vhb_tension_peak_kPa": 230.6,
      "vhb_share_N": 5.135
+    }
+   },
+   "fill": {
+    "E350_t50_shr0": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 20.7,
+     "vhb_tension_peak_kPa": 97.5,
+     "active": true
+    },
+    "E350_t50_shr2": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 21.6,
+     "vhb_tension_peak_kPa": 98.8,
+     "active": true
+    },
+    "E350_t300_shr0": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 25.9,
+     "vhb_tension_peak_kPa": 114.9,
+     "active": true
+    },
+    "E350_t300_shr2": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 31.3,
+     "vhb_tension_peak_kPa": 122.8,
+     "active": true
+    },
+    "E350_t600_shr0": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 31.4,
+     "vhb_tension_peak_kPa": 133.0,
+     "active": true
+    },
+    "E350_t600_shr2": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 42.0,
+     "vhb_tension_peak_kPa": 148.3,
+     "active": true
+    },
+    "E350_t900_shr0": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 36.4,
+     "vhb_tension_peak_kPa": 149.2,
+     "active": true
+    },
+    "E350_t900_shr2": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 52.0,
+     "vhb_tension_peak_kPa": 171.3,
+     "active": true
+    },
+    "E350_t1150_shr0": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 40.2,
+     "vhb_tension_peak_kPa": 161.5,
+     "active": true
+    },
+    "E350_t1150_shr2": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 59.8,
+     "vhb_tension_peak_kPa": 189.0,
+     "active": true
+    },
+    "E1000_t50_shr0": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 20.0,
+     "vhb_tension_peak_kPa": 95.0,
+     "active": true
+    },
+    "E1000_t50_shr2": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 20.9,
+     "vhb_tension_peak_kPa": 96.3,
+     "active": true
+    },
+    "E1000_t300_shr0": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 21.9,
+     "vhb_tension_peak_kPa": 101.6,
+     "active": true
+    },
+    "E1000_t300_shr2": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 27.3,
+     "vhb_tension_peak_kPa": 109.6,
+     "active": true
+    },
+    "E1000_t600_shr0": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 24.1,
+     "vhb_tension_peak_kPa": 108.9,
+     "active": true
+    },
+    "E1000_t600_shr2": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 34.9,
+     "vhb_tension_peak_kPa": 124.9,
+     "active": true
+    },
+    "E1000_t900_shr0": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 26.2,
+     "vhb_tension_peak_kPa": 115.9,
+     "active": true
+    },
+    "E1000_t900_shr2": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 42.3,
+     "vhb_tension_peak_kPa": 139.5,
+     "active": true
+    },
+    "E1000_t1150_shr0": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 27.9,
+     "vhb_tension_peak_kPa": 121.4,
+     "active": true
+    },
+    "E1000_t1150_shr2": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 48.3,
+     "vhb_tension_peak_kPa": 151.2,
+     "active": true
+    },
+    "E2500_t50_shr0": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 19.7,
+     "vhb_tension_peak_kPa": 94.2,
+     "active": true
+    },
+    "E2500_t50_shr2": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 20.6,
+     "vhb_tension_peak_kPa": 95.5,
+     "active": true
+    },
+    "E2500_t300_shr0": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 20.5,
+     "vhb_tension_peak_kPa": 96.9,
+     "active": true
+    },
+    "E2500_t300_shr2": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 26.0,
+     "vhb_tension_peak_kPa": 105.0,
+     "active": true
+    },
+    "E2500_t600_shr0": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 21.4,
+     "vhb_tension_peak_kPa": 100.0,
+     "active": true
+    },
+    "E2500_t600_shr2": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 32.3,
+     "vhb_tension_peak_kPa": 116.2,
+     "active": true
+    },
+    "E2500_t900_shr0": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 22.3,
+     "vhb_tension_peak_kPa": 103.1,
+     "active": true
+    },
+    "E2500_t900_shr2": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 38.6,
+     "vhb_tension_peak_kPa": 127.3,
+     "active": true
+    },
+    "E2500_t1150_shr0": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 23.1,
+     "vhb_tension_peak_kPa": 105.6,
+     "active": true
+    },
+    "E2500_t1150_shr2": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 43.8,
+     "vhb_tension_peak_kPa": 136.3,
+     "active": true
     }
    }
   },
@@ -373,6 +1101,188 @@
      "vhb_tension_peak_kPa": 119.8,
      "vhb_share_N": 2.019
     }
+   },
+   "fill": {
+    "E350_t50_shr0": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 2.8,
+     "vhb_tension_peak_kPa": 41.1,
+     "active": true
+    },
+    "E350_t50_shr2": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 3.7,
+     "vhb_tension_peak_kPa": 43.6,
+     "active": true
+    },
+    "E350_t300_shr0": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 3.4,
+     "vhb_tension_peak_kPa": 45.9,
+     "active": true
+    },
+    "E350_t300_shr2": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 8.1,
+     "vhb_tension_peak_kPa": 65.8,
+     "active": true
+    },
+    "E350_t600_shr0": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 4.0,
+     "vhb_tension_peak_kPa": 50.4,
+     "active": true
+    },
+    "E350_t600_shr2": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 13.1,
+     "vhb_tension_peak_kPa": 95.6,
+     "active": true
+    },
+    "E350_t900_shr0": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 4.5,
+     "vhb_tension_peak_kPa": 54.0,
+     "active": true
+    },
+    "E350_t900_shr2": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 17.8,
+     "vhb_tension_peak_kPa": 127.1,
+     "active": false
+    },
+    "E350_t1150_shr0": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 4.8,
+     "vhb_tension_peak_kPa": 56.5,
+     "active": true
+    },
+    "E350_t1150_shr2": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 21.5,
+     "vhb_tension_peak_kPa": 156.9,
+     "active": false
+    },
+    "E1000_t50_shr0": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 2.8,
+     "vhb_tension_peak_kPa": 40.3,
+     "active": true
+    },
+    "E1000_t50_shr2": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 3.6,
+     "vhb_tension_peak_kPa": 42.9,
+     "active": true
+    },
+    "E1000_t300_shr0": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 3.0,
+     "vhb_tension_peak_kPa": 42.2,
+     "active": true
+    },
+    "E1000_t300_shr2": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 7.8,
+     "vhb_tension_peak_kPa": 62.9,
+     "active": true
+    },
+    "E1000_t600_shr0": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 3.2,
+     "vhb_tension_peak_kPa": 44.3,
+     "active": true
+    },
+    "E1000_t600_shr2": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 12.7,
+     "vhb_tension_peak_kPa": 92.0,
+     "active": true
+    },
+    "E1000_t900_shr0": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 3.5,
+     "vhb_tension_peak_kPa": 46.1,
+     "active": true
+    },
+    "E1000_t900_shr2": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 17.5,
+     "vhb_tension_peak_kPa": 125.9,
+     "active": false
+    },
+    "E1000_t1150_shr0": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 3.6,
+     "vhb_tension_peak_kPa": 47.6,
+     "active": true
+    },
+    "E1000_t1150_shr2": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 21.4,
+     "vhb_tension_peak_kPa": 157.7,
+     "active": false
+    },
+    "E2500_t50_shr0": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 2.7,
+     "vhb_tension_peak_kPa": 40.1,
+     "active": true
+    },
+    "E2500_t50_shr2": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 3.5,
+     "vhb_tension_peak_kPa": 42.6,
+     "active": true
+    },
+    "E2500_t300_shr0": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 2.8,
+     "vhb_tension_peak_kPa": 40.9,
+     "active": true
+    },
+    "E2500_t300_shr2": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 7.7,
+     "vhb_tension_peak_kPa": 61.8,
+     "active": true
+    },
+    "E2500_t600_shr0": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 2.9,
+     "vhb_tension_peak_kPa": 41.8,
+     "active": true
+    },
+    "E2500_t600_shr2": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 12.5,
+     "vhb_tension_peak_kPa": 90.6,
+     "active": true
+    },
+    "E2500_t900_shr0": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 3.0,
+     "vhb_tension_peak_kPa": 42.7,
+     "active": true
+    },
+    "E2500_t900_shr2": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 17.4,
+     "vhb_tension_peak_kPa": 125.5,
+     "active": false
+    },
+    "E2500_t1150_shr0": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 3.1,
+     "vhb_tension_peak_kPa": 43.4,
+     "active": true
+    },
+    "E2500_t1150_shr2": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 21.4,
+     "vhb_tension_peak_kPa": 157.9,
+     "active": false
+    }
    }
   },
   {
@@ -438,6 +1348,188 @@
      "active": false,
      "vhb_tension_peak_kPa": 599.1,
      "vhb_share_N": 10.096
+    }
+   },
+   "fill": {
+    "E350_t50_shr0": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 14.2,
+     "vhb_tension_peak_kPa": 205.3,
+     "active": true
+    },
+    "E350_t50_shr2": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 15.1,
+     "vhb_tension_peak_kPa": 207.8,
+     "active": true
+    },
+    "E350_t300_shr0": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 17.1,
+     "vhb_tension_peak_kPa": 229.5,
+     "active": true
+    },
+    "E350_t300_shr2": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 21.8,
+     "vhb_tension_peak_kPa": 243.6,
+     "active": true
+    },
+    "E350_t600_shr0": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 19.9,
+     "vhb_tension_peak_kPa": 251.9,
+     "active": true
+    },
+    "E350_t600_shr2": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 29.0,
+     "vhb_tension_peak_kPa": 278.4,
+     "active": true
+    },
+    "E350_t900_shr0": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 22.3,
+     "vhb_tension_peak_kPa": 269.8,
+     "active": true
+    },
+    "E350_t900_shr2": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 35.6,
+     "vhb_tension_peak_kPa": 311.5,
+     "active": true
+    },
+    "E350_t1150_shr0": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 24.0,
+     "vhb_tension_peak_kPa": 282.3,
+     "active": true
+    },
+    "E350_t1150_shr2": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 40.7,
+     "vhb_tension_peak_kPa": 343.9,
+     "active": true
+    },
+    "E1000_t50_shr0": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 13.8,
+     "vhb_tension_peak_kPa": 201.6,
+     "active": true
+    },
+    "E1000_t50_shr2": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 14.6,
+     "vhb_tension_peak_kPa": 204.1,
+     "active": true
+    },
+    "E1000_t300_shr0": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 14.9,
+     "vhb_tension_peak_kPa": 211.2,
+     "active": true
+    },
+    "E1000_t300_shr2": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 19.7,
+     "vhb_tension_peak_kPa": 226.1,
+     "active": true
+    },
+    "E1000_t600_shr0": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 16.2,
+     "vhb_tension_peak_kPa": 221.5,
+     "active": true
+    },
+    "E1000_t600_shr2": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 25.6,
+     "vhb_tension_peak_kPa": 250.5,
+     "active": true
+    },
+    "E1000_t900_shr0": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 17.3,
+     "vhb_tension_peak_kPa": 230.7,
+     "active": true
+    },
+    "E1000_t900_shr2": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 31.3,
+     "vhb_tension_peak_kPa": 275.7,
+     "active": true
+    },
+    "E1000_t1150_shr0": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 18.2,
+     "vhb_tension_peak_kPa": 237.8,
+     "active": true
+    },
+    "E1000_t1150_shr2": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 35.9,
+     "vhb_tension_peak_kPa": 304.3,
+     "active": true
+    },
+    "E2500_t50_shr0": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 13.7,
+     "vhb_tension_peak_kPa": 200.3,
+     "active": true
+    },
+    "E2500_t50_shr2": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 14.5,
+     "vhb_tension_peak_kPa": 202.9,
+     "active": true
+    },
+    "E2500_t300_shr0": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 14.1,
+     "vhb_tension_peak_kPa": 204.4,
+     "active": true
+    },
+    "E2500_t300_shr2": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 19.0,
+     "vhb_tension_peak_kPa": 219.6,
+     "active": true
+    },
+    "E2500_t600_shr0": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 14.7,
+     "vhb_tension_peak_kPa": 209.0,
+     "active": true
+    },
+    "E2500_t600_shr2": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 24.3,
+     "vhb_tension_peak_kPa": 239.1,
+     "active": true
+    },
+    "E2500_t900_shr0": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 15.2,
+     "vhb_tension_peak_kPa": 213.4,
+     "active": true
+    },
+    "E2500_t900_shr2": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 29.5,
+     "vhb_tension_peak_kPa": 260.3,
+     "active": true
+    },
+    "E2500_t1150_shr0": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 15.6,
+     "vhb_tension_peak_kPa": 216.8,
+     "active": true
+    },
+    "E2500_t1150_shr2": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 33.8,
+     "vhb_tension_peak_kPa": 286.4,
+     "active": true
     }
    }
   },
@@ -505,6 +1597,188 @@
      "vhb_tension_peak_kPa": 187.0,
      "vhb_share_N": 2.019
     }
+   },
+   "fill": {
+    "E350_t50_shr0": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 1.8,
+     "vhb_tension_peak_kPa": 76.5,
+     "active": true
+    },
+    "E350_t50_shr2": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 2.5,
+     "vhb_tension_peak_kPa": 92.4,
+     "active": true
+    },
+    "E350_t300_shr0": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 2.1,
+     "vhb_tension_peak_kPa": 85.0,
+     "active": true
+    },
+    "E350_t300_shr2": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 6.1,
+     "vhb_tension_peak_kPa": 176.0,
+     "active": false
+    },
+    "E350_t600_shr0": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 2.3,
+     "vhb_tension_peak_kPa": 92.6,
+     "active": true
+    },
+    "E350_t600_shr2": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 10.1,
+     "vhb_tension_peak_kPa": 292.2,
+     "active": false
+    },
+    "E350_t900_shr0": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 2.6,
+     "vhb_tension_peak_kPa": 98.5,
+     "active": true
+    },
+    "E350_t900_shr2": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 13.8,
+     "vhb_tension_peak_kPa": 417.6,
+     "active": false
+    },
+    "E350_t1150_shr0": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 2.7,
+     "vhb_tension_peak_kPa": 102.7,
+     "active": true
+    },
+    "E350_t1150_shr2": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 16.6,
+     "vhb_tension_peak_kPa": 515.3,
+     "active": false
+    },
+    "E1000_t50_shr0": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 1.7,
+     "vhb_tension_peak_kPa": 75.2,
+     "active": true
+    },
+    "E1000_t50_shr2": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 2.4,
+     "vhb_tension_peak_kPa": 91.2,
+     "active": true
+    },
+    "E1000_t300_shr0": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 1.8,
+     "vhb_tension_peak_kPa": 78.6,
+     "active": true
+    },
+    "E1000_t300_shr2": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 6.0,
+     "vhb_tension_peak_kPa": 172.9,
+     "active": false
+    },
+    "E1000_t600_shr0": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 2.0,
+     "vhb_tension_peak_kPa": 82.2,
+     "active": true
+    },
+    "E1000_t600_shr2": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 10.2,
+     "vhb_tension_peak_kPa": 297.2,
+     "active": false
+    },
+    "E1000_t900_shr0": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 2.1,
+     "vhb_tension_peak_kPa": 85.4,
+     "active": true
+    },
+    "E1000_t900_shr2": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 14.2,
+     "vhb_tension_peak_kPa": 435.4,
+     "active": false
+    },
+    "E1000_t1150_shr0": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 2.2,
+     "vhb_tension_peak_kPa": 87.8,
+     "active": true
+    },
+    "E1000_t1150_shr2": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 17.5,
+     "vhb_tension_peak_kPa": 548.2,
+     "active": false
+    },
+    "E2500_t50_shr0": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 1.7,
+     "vhb_tension_peak_kPa": 74.8,
+     "active": true
+    },
+    "E2500_t50_shr2": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 2.4,
+     "vhb_tension_peak_kPa": 90.8,
+     "active": true
+    },
+    "E2500_t300_shr0": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 1.7,
+     "vhb_tension_peak_kPa": 76.2,
+     "active": true
+    },
+    "E2500_t300_shr2": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 6.0,
+     "vhb_tension_peak_kPa": 171.8,
+     "active": false
+    },
+    "E2500_t600_shr0": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 1.8,
+     "vhb_tension_peak_kPa": 77.9,
+     "active": true
+    },
+    "E2500_t600_shr2": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 10.2,
+     "vhb_tension_peak_kPa": 298.4,
+     "active": false
+    },
+    "E2500_t900_shr0": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 1.9,
+     "vhb_tension_peak_kPa": 79.4,
+     "active": true
+    },
+    "E2500_t900_shr2": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 14.4,
+     "vhb_tension_peak_kPa": 442.3,
+     "active": false
+    },
+    "E2500_t1150_shr0": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 1.9,
+     "vhb_tension_peak_kPa": 80.6,
+     "active": true
+    },
+    "E2500_t1150_shr2": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 17.8,
+     "vhb_tension_peak_kPa": 562.4,
+     "active": false
+    }
    }
   },
   {
@@ -570,6 +1844,188 @@
      "active": false,
      "vhb_tension_peak_kPa": 935.2,
      "vhb_share_N": 10.096
+    }
+   },
+   "fill": {
+    "E350_t50_shr0": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 8.8,
+     "vhb_tension_peak_kPa": 382.7,
+     "active": true
+    },
+    "E350_t50_shr2": {
+     "k_N_per_mm": 4088,
+     "w_sw1_um": 9.5,
+     "vhb_tension_peak_kPa": 398.6,
+     "active": true
+    },
+    "E350_t300_shr0": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 10.3,
+     "vhb_tension_peak_kPa": 424.9,
+     "active": true
+    },
+    "E350_t300_shr2": {
+     "k_N_per_mm": 2713,
+     "w_sw1_um": 14.3,
+     "vhb_tension_peak_kPa": 515.9,
+     "active": true
+    },
+    "E350_t600_shr0": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 11.6,
+     "vhb_tension_peak_kPa": 462.8,
+     "active": true
+    },
+    "E350_t600_shr2": {
+     "k_N_per_mm": 1933,
+     "w_sw1_um": 19.4,
+     "vhb_tension_peak_kPa": 636.7,
+     "active": true
+    },
+    "E350_t900_shr0": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 12.8,
+     "vhb_tension_peak_kPa": 492.7,
+     "active": true
+    },
+    "E350_t900_shr2": {
+     "k_N_per_mm": 1501,
+     "w_sw1_um": 24.0,
+     "vhb_tension_peak_kPa": 743.1,
+     "active": true
+    },
+    "E350_t1150_shr0": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 13.6,
+     "vhb_tension_peak_kPa": 513.6,
+     "active": true
+    },
+    "E350_t1150_shr2": {
+     "k_N_per_mm": 1265,
+     "w_sw1_um": 27.4,
+     "vhb_tension_peak_kPa": 823.4,
+     "active": true
+    },
+    "E1000_t50_shr0": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 8.6,
+     "vhb_tension_peak_kPa": 376.2,
+     "active": true
+    },
+    "E1000_t50_shr2": {
+     "k_N_per_mm": 4376,
+     "w_sw1_um": 9.3,
+     "vhb_tension_peak_kPa": 392.1,
+     "active": true
+    },
+    "E1000_t300_shr0": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 9.1,
+     "vhb_tension_peak_kPa": 393.2,
+     "active": true
+    },
+    "E1000_t300_shr2": {
+     "k_N_per_mm": 3677,
+     "w_sw1_um": 13.3,
+     "vhb_tension_peak_kPa": 487.4,
+     "active": true
+    },
+    "E1000_t600_shr0": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 9.8,
+     "vhb_tension_peak_kPa": 411.1,
+     "active": true
+    },
+    "E1000_t600_shr2": {
+     "k_N_per_mm": 3086,
+     "w_sw1_um": 18.0,
+     "vhb_tension_peak_kPa": 596.0,
+     "active": true
+    },
+    "E1000_t900_shr0": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 10.3,
+     "vhb_tension_peak_kPa": 427.0,
+     "active": true
+    },
+    "E1000_t900_shr2": {
+     "k_N_per_mm": 2659,
+     "w_sw1_um": 22.5,
+     "vhb_tension_peak_kPa": 699.5,
+     "active": true
+    },
+    "E1000_t1150_shr0": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 10.8,
+     "vhb_tension_peak_kPa": 439.0,
+     "active": true
+    },
+    "E1000_t1150_shr2": {
+     "k_N_per_mm": 2384,
+     "w_sw1_um": 26.1,
+     "vhb_tension_peak_kPa": 782.4,
+     "active": true
+    },
+    "E2500_t50_shr0": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 8.5,
+     "vhb_tension_peak_kPa": 374.0,
+     "active": true
+    },
+    "E2500_t50_shr2": {
+     "k_N_per_mm": 4478,
+     "w_sw1_um": 9.2,
+     "vhb_tension_peak_kPa": 390.0,
+     "active": true
+    },
+    "E2500_t300_shr0": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 8.7,
+     "vhb_tension_peak_kPa": 381.2,
+     "active": true
+    },
+    "E2500_t300_shr2": {
+     "k_N_per_mm": 4155,
+     "w_sw1_um": 13.0,
+     "vhb_tension_peak_kPa": 476.6,
+     "active": true
+    },
+    "E2500_t600_shr0": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 9.0,
+     "vhb_tension_peak_kPa": 389.3,
+     "active": true
+    },
+    "E2500_t600_shr2": {
+     "k_N_per_mm": 3824,
+     "w_sw1_um": 17.4,
+     "vhb_tension_peak_kPa": 578.6,
+     "active": true
+    },
+    "E2500_t900_shr0": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 9.3,
+     "vhb_tension_peak_kPa": 397.0,
+     "active": true
+    },
+    "E2500_t900_shr2": {
+     "k_N_per_mm": 3542,
+     "w_sw1_um": 21.8,
+     "vhb_tension_peak_kPa": 678.7,
+     "active": true
+    },
+    "E2500_t1150_shr0": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 9.5,
+     "vhb_tension_peak_kPa": 403.1,
+     "active": true
+    },
+    "E2500_t1150_shr2": {
+     "k_N_per_mm": 3337,
+     "w_sw1_um": 25.4,
+     "vhb_tension_peak_kPa": 760.7,
+     "active": true
     }
    }
   }

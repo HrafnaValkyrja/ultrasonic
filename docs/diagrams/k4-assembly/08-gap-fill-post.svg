@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360" font-family="sans-serif" font-size="13">
+<rect width="640" height="360" fill="#ffffff"/>
+<text x="20" y="26" font-size="16" font-weight="bold" fill="#222">Gap-filling bonded post (ECR-0023 add.2) - section through U1, not to scale</text>
+<g fill="#ddd" stroke="#333"><rect x="60" y="60" width="300" height="26"/><rect x="60" y="100" width="300" height="12" fill="#8c8"/></g>
+<text x="370" y="78" fill="#222">M board (lid side, up)</text>
+<text x="370" y="110" fill="#222">P board, U1 hangs below</text>
+<rect x="130" y="112" width="160" height="30" fill="#bbb" stroke="#333"/>
+<text x="150" y="132" fill="#222">U1 (QFN48, top = bearing face)</text>
+<rect x="165" y="144" width="90" height="12" fill="#e8c040" stroke="#333"/>
+<text x="262" y="154" fill="#222">Kapton peel layer (reworkable)</text>
+<rect x="165" y="156" width="90" height="50" fill="#e07040" stroke="#333"/>
+<text x="262" y="184" fill="#222">cured epoxy dab: 0.05 to 1.125 mm, ~10 uL</text>
+<rect x="165" y="206" width="90" height="70" fill="#6a8fd8" stroke="#333"/>
+<text x="262" y="244" fill="#222">printed post 2.4 x 2.4, set SHORT by 0.5875</text>
+<rect x="40" y="276" width="400" height="22" fill="#999" stroke="#333"/>
+<text x="450" y="292" fill="#222">tub floor</text>
+<text x="20" y="330" fill="#222">1 dab on post top  2 close pod, dab squeezes to the real gap  3 clamp, cure  4 press path: lid-M-BM28-P-U1-dab-post-floor</text>
+<text x="20" y="348" fill="#222">Min air gap at worst corner 0.05 mm: the post never preloads U1.</text>
+</svg>
