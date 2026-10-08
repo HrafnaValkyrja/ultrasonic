@@ -377,11 +377,20 @@ def release(rel_dir=".pcba-workflow/k4-release", bottom_rule="jlc2022", jobs=Non
 
 
 # ---------------------------------------------------------------- CLI
-JOBS = [
-    ("K4-P", "hw/pod/k4/routed_P.kicad_pcb", ".pcba-workflow/k4-release/src/bom_jlc_P.csv"),
-    ("K4-M", "hw/pod/k4/routed_M.kicad_pcb", ".pcba-workflow/k4-release/src/bom_jlc_M.csv"),
-    ("r2", "hw/pod/draft_r2/out/routed.kicad_pcb", None),          # regression: no BOM, LCSC via footprint name
-]
+def jobs(design=None, with_r2=False):
+    """(tag, board, bom) per board of the selected design (tools/current.py; default = hw/current.yaml). Two-board designs (K4): P then M."""
+    import sys
+    sys.path.insert(0, str(ROOT / "tools"))
+    from current import current
+    d = current(design)
+    rel = lambda p: str(Path(p).relative_to(ROOT)) if p else None
+    if d.board_p:
+        out = [(f"{d.id}-P", rel(d.board_p), rel(d.bom_p)), (f"{d.id}-M", rel(d.board), rel(d.bom))]
+    else:
+        out = [(d.id, rel(d.board), rel(d.bom))]
+    if with_r2:
+        out.append(("r2", "hw/pod/draft_r2/out/routed.kicad_pcb", None))      # regression: no BOM, LCSC via footprint name
+    return out
 
 
 def main():
@@ -389,6 +398,8 @@ def main():
     ap.add_argument("--write-table")
     ap.add_argument("--png")
     ap.add_argument("--release", action="store_true", help="write the K4 release CPLs + table + picture, then exit")
+    ap.add_argument("--design", help="explicit design (default: hw/current.yaml via tools/current.py), e.g. phase2, k4, revg")
+    ap.add_argument("--with-r2", action="store_true", help="add the r2 no-BOM regression board")
     ap.add_argument("--bottom-rule", default="jlc2022", choices=["jlc2022", "asis"])
     a = ap.parse_args()
     if a.release:
@@ -397,7 +408,10 @@ def main():
         return
     rules = read_db()
     fp_lcsc = {}
-    for _, b, bom in JOBS[:2]:
+    JOBS = jobs(a.design, a.with_r2)
+    for _, b, bom in JOBS:
+        if not bom:
+            continue
         for r in csv.DictReader(open(ROOT / bom)):
             fp_lcsc[r["Footprint"]] = r["LCSC Part #"]
     allrows, items = [], []
@@ -415,7 +429,7 @@ def main():
     if a.write_table:
         write_table(allrows, a.write_table)
     if a.png:
-        pin1_png(items[:2], a.png)
+        pin1_png(items[:2] if len(items) > 2 else items, a.png)
 
 
 if __name__ == "__main__":

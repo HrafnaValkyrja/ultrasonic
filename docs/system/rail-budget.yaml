@@ -38,6 +38,7 @@ unmodelled:
   VBAT: "the cell, the same current as VSYS: rated on the VSYS rail"
   LDO_OUT: "U4 OUT, the 0R link R20 to +3V0: the +3V0 rail carries it"
   MIC_VDD: "U2's supply from GPIO PA5: its current is a +3V0 load row; the PA5 output-current rating is not checked here"
+  MIC_VDDF: "K4 only: MIC_VDD through the local RC filter at U2 (R+C, 2026-10-08); same current, the +3V0 load row covers it"
   VLXSMPS: "the MCU core SMPS switch node: part of the VDD11 exclusive rail"
 
 rails:

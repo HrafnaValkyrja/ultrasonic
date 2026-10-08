@@ -22,7 +22,8 @@ from pathlib import Path
 import numpy as np
 HERE = Path(__file__).resolve().parent
 REPO = HERE.parents[1]
-sys.path.insert(0, str(HERE))
+sys.path.insert(0, str(HERE)); sys.path.insert(0, str(REPO / "tools"))
+from current import current  # noqa: E402  (hw/current.yaml: the design under test = K4 P/M boards; baseline = the phase2 variant)
 import pcbnew  # noqa: E402
 _orig = pcbnew.BOARD.GetCopperLayerCount
 pcbnew.BOARD.GetCopperLayerCount = lambda s: 4          # pcbgeom's 4L assert; we use only its segment/pad/via reader
@@ -194,7 +195,7 @@ def run(args):
     rs = params["materials"]["rho_cu_ohm_m"] / (15.2e-6)
     res = {}
     # ---- today's board (draft_r2), one board, 4L: same function
-    gb = load(REPO / "hw/pod/draft_r2/out/routed.kicad_pcb")
+    gb = load(Path(args.baseline_board) if args.baseline_board else current("phase2").board)
     zb4 = zstack4(0.0)
     zb4 = {k: v - 0.0 for k, v in zb4.items()}
     planes_b = [dict(z=zb4["In1.Cu"] - 0.0, board="B"), dict(z=zb4["In2.Cu"], board="B")]
@@ -221,8 +222,8 @@ def run(args):
         return agg, vic, planes_b, {"B": own_b}
 
     # ---- K4: P upper, M lower, gap g between P's B face and M's F face
-    gP = load(REPO / "hw/pod/k4/routed_P.kicad_pcb")
-    gM = load(REPO / "hw/pod/k4/routed_M.kicad_pcb")
+    gP = load(Path(args.board_p) if args.board_p else current().board_p)
+    gM = load(Path(args.board_m) if args.board_m else current().board)
     flip = not args.legacy_noflip
     if flip:     # P is mirrored across the long axis in the stack (x, y) -> (x, H - y); its file B.Cu is the outer top face
         for g_ in (gP,):
@@ -289,6 +290,9 @@ def main():
     ap.add_argument("--filter-c-nf", type=float, default=50.0, help="C13 effective at 3 V, nF (100 nF 0201 X5R, 50 %% derating assumed)")
     ap.add_argument("--filter-floor-db", type=float, default=20.0, help="cap on the filter attenuation, dB (stray coupling past the R/C: pessimistic)")
     ap.add_argument("--floor", type=float, default=0.10, help="cross-board leakage floor on T (A3 of vertical_bplus)")
+    ap.add_argument("--board-p", help="override: P board .kicad_pcb (default hw/current.yaml board_p)")
+    ap.add_argument("--board-m", help="override: M board .kicad_pcb (default hw/current.yaml board)")
+    ap.add_argument("--baseline-board", help="override: single-board baseline (default: the phase2 variant's board in hw/current.yaml)")
     ap.add_argument("--out", default=str(HERE / "out_k4"))
     args = ap.parse_args()
     STACK["mode"] = args.stack

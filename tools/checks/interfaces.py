@@ -432,7 +432,12 @@ def import_pcbnew():
     return pcbnew
 
 
-def read_board(path):
+def is_k4_m(path):
+    """K4 M board (mounted file-F down), by file name. A selftest copy of it gets the original's answer via read_board(k4_m=)."""
+    return Path(path).name.startswith("routed_M") and DESIGN is not None and DESIGN.id == "k4"
+
+
+def read_board(path, k4_m=None):
     pcbnew = import_pcbnew()
     mm = pcbnew.ToMM
     with quiet_stderr():
@@ -447,10 +452,13 @@ def read_board(path):
             ys += [mm(bb.GetTop() + hw), mm(bb.GetBottom() - hw)]
     attrs = {pcbnew.PAD_ATTRIB_PTH: "PTH", pcbnew.PAD_ATTRIB_SMD: "SMD", pcbnew.PAD_ATTRIB_CONN: "CONN", pcbnew.PAD_ATTRIB_NPTH: "NPTH"}
     fps, seen = {}, Counter()
+    k4_m = is_k4_m(path) if k4_m is None else k4_m
     for f in board.GetFootprints():
         seen[f.GetReference()] += 1
         face = "B" if f.IsFlipped() else "F"
         poly = f.GetCourtyard(pcbnew.B_CrtYd if face == "B" else pcbnew.F_CrtYd)
+        if k4_m:                                                    # K4 M is mounted file-F down: its file F is the shell's B (cell side), file B the lid side
+            face = "F" if face == "B" else "B"
         pts = [(mm(poly.CVertex(i).x), mm(poly.CVertex(i).y)) for i in range(poly.FullPointCount())] if poly.OutlineCount() else []
         name = str(f.GetFPID().GetLibItemName())
         pads = []
@@ -527,12 +535,26 @@ def read_schematic():
     with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as tmp:
         os.chdir(tmp)
         try:
-            import system_map                                       # noqa: E402
-            if READ_ONCE:                                           # gen.build() adds to SKiDL's default circuit: a second read must start clean
+            if DESIGN is not None and DESIGN.id == "k4":            # K4: the whole-pod circuit is hw/pod/k4/gen.py build() (before it splits P/M)
+                import importlib.util
+                spec = importlib.util.spec_from_file_location("k4_gen", CFG.root / "hw/pod/k4/gen.py")
+                k4 = importlib.util.module_from_spec(spec)
+                sys.modules["k4_gen"] = k4
+                spec.loader.exec_module(k4)
                 import builtins
-                builtins.default_circuit.reset()
-            READ_ONCE.append(True)
-            circ = system_map.build()
+                if READ_ONCE:
+                    builtins.default_circuit.reset()
+                READ_ONCE.append(True)
+                k4.build()
+                k4.apply_packages()
+                circ = builtins.default_circuit
+            else:
+              import system_map                                     # noqa: E402
+              if READ_ONCE:                                           # gen.build() adds to SKiDL's default circuit: a second read must start clean
+                  import builtins
+                  builtins.default_circuit.reset()
+              READ_ONCE.append(True)
+              circ = system_map.build()
         finally:
             os.chdir(cwd)
             sys.path.remove(pod)
@@ -847,6 +869,19 @@ def check_vhb(sh, brd, table):
         return Result("clamp-bands", FAIL, "the board has no footprints")
     cuts = vhb_cutouts(sh)
     inside = lambda e, c: e[0] >= c[0] - EPS and e[1] >= c[1] - EPS and e[2] <= c[2] + EPS and e[3] <= c[3] + EPS  # noqa: E731
+    if sh.get("design") == "k4":
+        # K4 n/a (ECR-0022): the M board hangs on VHB only on the lid ledge's tip (0.5 mm band, inset 0.2, notched round every lid-face courtyard),
+        # not on a full-face tape, so "every F part sits in a VHB cut-out" and the bonded-fraction rule have no K4 meaning; the notching and the
+        # kept bond area are gated by shell_k4.ledge_check (CAD import, so not run here) and sim/checks/k4_heights.py. The lid pocket over SW1 is real: keep that rule.
+        sw = brd.fps.get(sh["pocket"]["ref"])
+        if sw is None:
+            return Result("clamp-bands", FAIL, f"{sh['pocket']['ref']} (the button) is not on the board")
+        e = extent(sw, solder_margin(table))
+        if not inside(e, cuts[0]):
+            return Result("clamp-bands", FAIL, f"{sw.ref} (F) extent {e[0]:.2f},{e[1]:.2f} to {e[2]:.2f},{e[3]:.2f} is not inside its lid pocket "
+                          f"{cuts[0][0]:.2f},{cuts[0][1]:.2f} to {cuts[0][2]:.2f},{cuts[0][3]:.2f}")
+        return Result("clamp-bands", PASS, f"K4: {sw.ref} sits in its lid pocket; full-face VHB cut-out and clamp-band rules n/a (VHB only on the notched ledge tip, "
+                      "shell_k4.ledge_check / k4_heights.py)")
     bad, ok_ = [], []
     for f in sorted(brd.fps.values(), key=lambda f: nat(f.ref)):
         if f.face != "F":
@@ -873,7 +908,68 @@ def check_vhb(sh, brd, table):
     return Result("clamp-bands", PASS, head, d)
 
 
+def ledge_geometry(sh, brd, table):
+    """K4 notched ledge from the board's lid-face (F) courtyards: kept share of the band centre line (sampled every 0.05 mm), kept area, runs, duct-tube clash.
+    Same method as shell_k4.ledge_check, CAD-free. Board mm, origin at the outline corner."""
+    L = sh["ledge"]
+    ox0, oy0, ox1, oy1 = brd.outline
+    Lb, Hb = ox1 - ox0, oy1 - oy0
+    cl, w = L["clear"], L["w"]
+    rects = []
+    for f in brd.fps.values():
+        if f.face != "F" or f.ref in ("U2", sh["pocket"]["ref"]):
+            continue
+        e = f.courtyard or extent(f)
+        rects.append((f.ref, e[0] - ox0 - cl, e[1] - oy0 - cl, e[2] - ox0 + cl, e[3] - oy0 + cl))
+    xa, xb, za, zb = L["inset"] + w / 2, Lb - L["inset"] - w / 2, L["inset"] + w / 2, Hb - L["inset"] - w / 2
+    st = 0.05
+    nx, nz = int(round((xb - xa) / st)), int(round((zb - za) / st))
+    path = [(xa + i * st, za) for i in range(nx + 1)] + [(xb, za + i * st) for i in range(1, nz + 1)] + \
+           [(xb - i * st, zb) for i in range(1, nx + 1)] + [(xa, zb - i * st) for i in range(1, nz)]
+    keep, notch = [], set()
+    for x, z in path:
+        hit = [r[0] for r in rects if r[1] - w / 2 < x < r[3] + w / 2 and r[2] - w / 2 < z < r[4] + w / 2]
+        keep.append(not hit)
+        notch.update(hit)
+    runs, cur = [], 0
+    for k in keep + [False]:
+        if k:
+            cur += 1
+        elif cur:
+            runs.append(cur * st)
+            cur = 0
+    mic = (sh["MIC"][0] - sh["PCB"]["x0"], sh["MIC"][1] - sh["ZC"] + Hb / 2)
+    tube = [r[0] for r in rects if math.hypot(max(r[1], min(mic[0], r[3])) - mic[0], max(r[2], min(mic[1], r[4])) - mic[1]) < L["tube_d"] / 2 + 0.1]
+    return dict(area=sum(keep) * st * w, kept=sum(keep) / len(keep), runs=runs, notch=sorted(notch, key=nat), tube=tube)
+
+
+def check_ledge(sh, brd, table):
+    """K4 replacement of the clamp bands (ECR-0022): the stack hangs on a printed lid ledge, VHB on its tip only. The kept tip must carry the SW1 press
+    (2 N) at <= the 85 kPa VHB limit; where it cannot (area < F/limit) the ECR-0023 floor post must take the load (post gap <= 0.03 mm)."""
+    L = sh["ledge"]
+    if brd.outline is None:
+        return Result("clamp-bands", FAIL, "no Edge.Cuts outline to measure the ledge from")
+    if not brd.fps:
+        return Result("clamp-bands", FAIL, "the board has no footprints")
+    g = ledge_geometry(sh, brd, table)
+    need = L["press_N"] / (L["limit_kPa"] * 1e-3)                       # mm2 so that 2 N / A <= 85 kPa (1 kPa = 1e-3 N/mm2)
+    p_kpa = 1e3 * L["press_N"] / g["area"] if g["area"] > 0 else float("inf")
+    post_ok = L["post_gap"] <= L["post_gap_max"] + EPS
+    d = [f"ledge band {L['w']} wide, {L['inset']} inset, {L['h']} high; notched for {refs_str(g['notch']) or 'nothing'}; kept {100 * g['kept']:.1f} % = {g['area']:.1f} mm2 in {len(g['runs'])} run(s), shortest {min(g['runs'], default=0):.2f} mm",
+         f"SW1 press {L['press_N']} N on the kept tip = {p_kpa:.0f} kPa vs {L['limit_kPa']:.0f} kPa limit (area needed {need:.1f} mm2); floor post gap {L['post_gap']} (needs <= {L['post_gap_max']})"]
+    if g["tube"]:
+        return Result("clamp-bands", FAIL, f"duct tube D{L['tube_d']} clashes with lid-face part(s) {refs_str(g['tube'])}", d)
+    if not g["runs"]:
+        return Result("clamp-bands", FAIL, "no ledge tip left to bond the VHB to", d)
+    if p_kpa > L["limit_kPa"] and not post_ok:
+        return Result("clamp-bands", FAIL, f"ledge VHB {g['area']:.1f} mm2 sees {p_kpa:.0f} kPa under the 2 N SW1 press (limit {L['limit_kPa']:.0f}) and the floor post gap {L['post_gap']} mm is over {L['post_gap_max']} mm", d)
+    how = "VHB alone" if p_kpa <= L["limit_kPa"] else f"relieved by the floor post (gap {L['post_gap']} <= {L['post_gap_max']} mm); VHB alone would see {p_kpa:.0f} kPa"
+    return Result("clamp-bands", PASS, f"K4 ledge (no clamp bands): {g['area']:.1f} mm2 of VHB kept ({100 * g['kept']:.0f} % of the band, {len(g['runs'])} runs); 2 N press {how}", d)
+
+
 def check_clamp(sh, brd, table):
+    if sh.get("ledge"):
+        return check_ledge(sh, brd, table)
     if sh.get("vhb"):
         return check_vhb(sh, brd, table)
     band = sh["clamp_band"]
@@ -926,12 +1022,27 @@ def band_of(sh, f):
         e = f.courtyard
         if e[0] >= c[0] - EPS and e[1] >= c[1] - EPS and e[2] <= c[2] + EPS and e[3] <= c[3] + EPS:
             return pk["band"]
+    bs = sh.get("bstack")
+    if bs and f.face == "B":                                         # K4: M's inner face hangs in the BM28 gap above P (P's notch frees the mic)
+        return bs["gap"] + (bs["p"] if f.ref in bs["notch_refs"] else 0.0)
     return sh["bands"][f.face]
+
+
+def check_stack(sh):
+    """K4 B side: M + BM28 gap + P + tallest P outer part must fit between the lid-face VHB plane and the tub floor. Returns (margin mm, text)."""
+    bs = sh["bstack"]
+    need = bs["m"] + bs["gap"] + bs["p"] + bs["l1"]
+    return bs["avail"] - need, f"stack M {bs['m']:.2f} + gap {bs['gap']:.2f} + P {bs['p']:.2f} + L1 {bs['l1']:.2f} = {need:.2f} mm in {bs['avail']:.2f} mm to the floor"
 
 
 def check_heights(sh, brd, sch, table):
     if not brd.fps:
         return Result("heights", FAIL, "the board has no footprints")
+    txt = margin = None
+    if sh.get("bstack"):
+        margin, txt = check_stack(sh)
+        if margin < -EPS:
+            return Result("heights", FAIL, f"B side: {txt}: {-margin:.2f} mm over")
     tall, over, unknown = {}, [], []
     for f in brd.fps.values():
         h, src = part_height(f, sch, table)
@@ -949,9 +1060,9 @@ def check_heights(sh, brd, sch, table):
     if over:
         return Result("heights", FAIL, f"{len(over)} part(s) taller than the band of their face: {refs_str([o[0] for o in over])}; {summ}", d)
     if unknown:
-        return Result("heights", WARN, f"{len(unknown)} part(s) with no height in part_heights.yaml ({refs_str([u[0] for u in unknown])}); the rest fit: {summ}", d,
+        return Result("heights", WARN, f"{len(unknown)} part(s) with no height in part_heights.yaml ({refs_str([u[0] for u in unknown])}); the rest fit: {summ}" + (f"; {txt} (margin {margin:.2f})" if txt else ""), d,
                       [f"heights:unknown {u[0]}" for u in unknown])
-    return Result("heights", PASS, f"all {len(brd.fps)} parts fit their face's height band: {summ}")
+    return Result("heights", PASS, f"all {len(brd.fps)} parts fit their face's height band: {summ}" + (f"; {txt} (margin {margin:.2f})" if txt else ""))
 
 
 # ------------------------------------------------------------------------------------------- [board-nets]
@@ -1158,13 +1269,25 @@ def hazard_findings(F, contract, data, nets, placed):
             F.add(level, f"{i}: net {net} on {h['port']}: {h['note']} [{tag}; {h['source']}]", f"{i} on {h['port']} [{tag}]", key=f"hazard {i} {h['port']}", kind="hazard")
 
 
+def mcu_netlist():
+    """The netlist that carries U1: CFG.netlist, or for K4 (two boards) the P board's, because the MCU sits on P."""
+    if DESIGN is not None and DESIGN.id == "k4" and CFG.netlist == DESIGN.netlist:
+        return CFG.root / "hw/pod/k4/pod_k4_P.net"
+    return CFG.netlist
+
+
 def netlist_findings(F, sch):
     """hw/pod/pod.net is what the placer reads: its U1 connectivity must be the SKiDL circuit's."""
-    path = CFG.netlist
+    path = mcu_netlist()
     if not path.exists():
         F.add(WARN, f"{path.name} is missing: cannot confirm the placer reads the same U1 connections", key="netlist missing")
         return
     got, want = netlist_connectivity(path), schematic_connectivity(sch)
+    if DESIGN is not None and DESIGN.id == "k4":
+        # K4 is a two-board pod: this netlist holds one board, the SKiDL circuit both. Compare only the parts this board's netlist carries.
+        here = {r for r, _ in got}
+        want = {k: frozenset(x for x in v if x[0] in here) for k, v in want.items() if k in got or k[0] in here}
+        got = {k: frozenset(x for x in v if x[0] in sch.parts) for k, v in got.items()}      # drop the board-to-board connector halves
     diff = sorted({k for k in set(got) | set(want) if k[0] == "U1" and got.get(k) != want.get(k)}, key=lambda k: int(k[1]))
     for ref, pin in diff[:6]:
         F.add(FAIL, f"{path.name} is stale: U1 pin {pin} connects to {refs_str({r for r, _ in got.get((ref, pin), ())} or {'nothing'})}, "
@@ -1508,6 +1631,7 @@ class Case:
     run: object
     expect: str = FAIL
     marker: str = None
+    na: bool = False        # the rule has no meaning for this design (reason in the name): listed, not counted as a skipped proof
 
 
 def copy_sch(sch):
@@ -1579,7 +1703,7 @@ def other_netlist(edit):
     with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as tmp:
         p = Path(tmp) / "pod.net"
         if edit:
-            p.write_text(edit(CFG.netlist.read_text()))
+            p.write_text(edit(mcu_netlist().read_text()))              # K4: the P board's netlist (it holds U1); the check reads this copy instead
         saved, CFG.netlist = CFG.netlist, p
         try:
             yield
@@ -1597,7 +1721,7 @@ def board_round_trip(path, edit):
             edit(board, pcbnew)
             pcbnew.SaveBoard(str(out), board)
         try:
-            return read_board(out), None
+            return read_board(out, k4_m=is_k4_m(path)), None            # the copy is not named routed_M*: keep the original's face mapping
         except OSError as e:
             return None, str(e)
 
@@ -1621,6 +1745,7 @@ def pins_without_netlist(contract, sch, data):
 def selftest_cases(ctx):
     """Case list. A case that needs a part the design no longer has is reported as skipped (LookupError), never a crash."""
     sh, brd, sch, table, contract, data, budget = (ctx[k] for k in ("sh", "brd", "sch", "table", "contract", "data", "budget"))
+    schb = ctx.get("schb") or sch                                   # the circuit share of THIS board (K4: M or P alone; others: the whole circuit)
     ox0, oy0, ox1, oy1 = brd.outline
     cases = []
     first = lambda prefix: next(f for r, f in sorted(brd.fps.items(), key=lambda kv: nat(kv[0])) if re.match(prefix + r"\d", r) and not f.copper_only)
@@ -1629,13 +1754,18 @@ def selftest_cases(ctx):
         try:
             cases.append(build())
         except (LookupError, KeyError, StopIteration, ValueError) as e:
-            cases.append(Case(f"skipped: {build.__name__} ({e or 'part not in the design'})", None))
+            msg = str(e.args[0]) if isinstance(e, LookupError) and not isinstance(e, KeyError) and e.args else ""
+            if msg.startswith("n/a"):                                  # explicit "no meaning for this design", with the reason
+                cases.append(Case(f"{msg} [{build.__name__}]", None, na=True))
+            else:
+                cases.append(Case(f"skipped: {build.__name__} ({e or 'part not in the design'})", None))
 
     def mic_origin():
         u2 = brd.fps[MIC_REF]
         port = max((p for p in u2.pads if p.attr == "NPTH" and p.drill > 0), key=lambda p: p.drill)
-        dx = (sh["MIC"][0] - sh["PCB"]["x0"]) - u2.x               # the footprint ORIGIN put at the lid-port x: the ECR-0011 defect
-        return Case(f"mic-port: footprint origin at the lid port (hole at board x {port.x + dx:.2f}, the ECR-0011 defect)", lambda: check_mic(sh, moved(brd, MIC_REF, dx=dx), table, sch), FAIL, "off the lid port")
+        dx = (sh["MIC"][0] - sh["PCB"]["x0"]) - u2.x               # the footprint ORIGIN put at the lid port: the ECR-0011 defect
+        dy = (sh["PCB"]["z1"] - sh["MIC"][1]) - u2.y               # both axes: the K4 mic footprint's port is offset from its origin in y (r2: in x)
+        return Case(f"mic-port: footprint origin at the lid port (hole at board ({port.x + dx:.2f}, {port.y + dy:.2f}), the ECR-0011 defect)", lambda: check_mic(sh, moved(brd, MIC_REF, dx=dx, dy=dy), table, sch), FAIL, "off the lid port")
 
     def mic_stack():
         return Case("mic-port: 0.10 mm off the lid port: inside the 0.20 limit, but not with the tolerance stack", lambda: check_mic(sh, moved(brd, MIC_REF, dx=0.10), table, sch), WARN, "worst-case stack exceeds")
@@ -1652,7 +1782,13 @@ def selftest_cases(ctx):
 
         def run():
             hole = max((p for p in u2.pads if p.attr == "NPTH" and p.drill > 0), key=lambda p: p.drill)
-            shifted = tuple(dataclasses.replace(p, x=p.x + 0.12, box=(p.box[0] + 0.12, p.box[1], p.box[2] + 0.12, p.box[3])) if p is hole else p for p in u2.pads)
+            spec = ((table.get("by_lcsc") or {}).get(sch.parts.get(MIC_REF, {}).get("lcsc")) or {}).get("port")
+            exp = expected_port(u2, spec) if spec else None
+            ax, ay = (hole.x - exp[0], hole.y - exp[1]) if exp else (0.0, 0.0)
+            n = math.hypot(ax, ay)
+            ux, uy = (ax / n, ay / n) if n > 0.005 else (1.0, 0.0)   # away from the datasheet port, so the extra 0.12 mm always adds to the error (K4's hole sits 0.02 on one side)
+            sx, sy = 0.12 * ux, 0.12 * uy
+            shifted = tuple(dataclasses.replace(p, x=p.x + sx, y=p.y + sy, box=(p.box[0] + sx, p.box[1] + sy, p.box[2] + sx, p.box[3] + sy)) if p is hole else p for p in u2.pads)
             return check_mic(sh, dataclasses.replace(brd, fps={**brd.fps, MIC_REF: dataclasses.replace(u2, pads=shifted)}), table, sch)
         return Case("mic-port: the hole 0.12 mm off the datasheet port (still inside the lid port)", run, FAIL, "datasheet port")
 
@@ -1680,7 +1816,11 @@ def selftest_cases(ctx):
 
     def switch_stack():
         brd.fps[SWITCH_REF]
-        return Case("switch: 0.00 mm nominal, but the worst-case stack exceeds the 0.15 limit", lambda: check_switch(sh, brd), WARN, "worst-case stack exceeds")
+        tol = (sh["switch_bore_d"] - sh["plunger_head_d"]) / 2
+        off = max(0.0, tol - STACK_MM) + 0.02                      # nominal inside the limit, nominal + stack just over it (r2: 0.15 limit, K4: 0.25)
+        if off >= tol:
+            raise LookupError(f"n/a: the limit {tol:.2f} mm is not wider than the stack {STACK_MM:.2f} mm")
+        return Case(f"switch: {off:.2f} mm off, inside the {tol:.2f} limit, but the worst-case stack exceeds it", lambda: check_switch(sh, moved(brd, SWITCH_REF, dx=off)), WARN, "worst-case stack exceeds")
 
     def outline_wide():
         return Case("outline: board 0.20 mm wider than the shell", lambda: check_outline(sh, dataclasses.replace(brd, outline=(ox0, oy0, ox1 + 0.20, oy1))), FAIL, "over the shell")
@@ -1734,6 +1874,8 @@ def selftest_cases(ctx):
     def vhb_flip():
         if not sh.get("vhb"):
             raise LookupError("revg: clamp ribs, no VHB face")
+        if sh.get("design") == "k4":
+            raise LookupError("n/a (K4): VHB only on the notched lid-ledge tip (ECR-0022), no full-face tape for a part to sit under; notching is gated by shell_k4.ledge_check")
         v = next(f for r, f in sorted(brd.fps.items(), key=lambda kv: nat(kv[0])) if f.face == "B" and not f.copper_only and f.courtyard)
         return Case(f"clamp-bands: {v.ref} turned onto the F face, under the VHB", lambda: check_clamp(sh, dataclasses.replace(brd, fps={**brd.fps, v.ref: dataclasses.replace(v, face="F")}), table),
                     FAIL, "under the vhb")
@@ -1741,11 +1883,15 @@ def selftest_cases(ctx):
     def vhb_pocket():
         if not sh.get("vhb"):
             raise LookupError("revg: no SW1 pocket")
+        if sh.get("ledge"):
+            raise LookupError("K4: VHB on the ledge tip only, not the Phase 2 full-face rule")
         return Case(f"clamp-bands: {SWITCH_REF} moved 2.5 mm, out of its lid pocket", lambda: check_clamp(sh, moved(brd, SWITCH_REF, dx=2.5), table), FAIL, SWITCH_REF)
 
     def vhb_bond():
         if not sh.get("vhb"):
             raise LookupError("revg: no VHB")
+        if sh.get("design") == "k4":
+            raise LookupError("n/a (K4): no per-pad VHB cut-outs; the bond is the notched ledge tip, its area gated by shell_k4.ledge_check / k4_heights.py")
         big = {**sh, "vhb": {**sh["vhb"], "tp_cut_r": 6.0}}     # per-pad cut-outs blown up to 12 x 12 mm (board is 12 tall): most of the tape gone
         return Case("clamp-bands: test-pad cut-outs grown to 12 mm squares: too little VHB left", lambda: check_clamp(big, brd, table), WARN, "stays bonded")
 
@@ -1773,6 +1919,24 @@ def selftest_cases(ctx):
         dy = (oy1 - 0.2) - max(p.box[3] for p in j.pads)
         return Case(f"clamp-bands: wire pad {j.ref} 0.2 mm from the long edge", lambda: check_clamp(sh, moved(brd, j.ref, dy=dy), table), FAIL, "clamp bands")
 
+    def ledge_post():
+        if not sh.get("ledge"):
+            raise LookupError("not K4: no VHB ledge")
+        bad = {**sh, "ledge": {**sh["ledge"], "post_gap": 0.2}}      # post fitted 0.2 mm short: the 19 mm2 ledge VHB carries the 2 N press alone
+        return Case("clamp-bands: floor post gap 0.2 mm, ledge VHB alone under the 2 N press", lambda: check_clamp(bad, brd, table), FAIL, "floor post")
+
+    def ledge_wide():
+        if not sh.get("ledge"):
+            raise LookupError("not K4: no VHB ledge")
+        bad = {**sh, "ledge": {**sh["ledge"], "w": 3.0, "post_gap": 0.2}}      # band 3 mm wide: every lid-face part forces a notch, little tip left
+        return Case("clamp-bands: ledge band 3 mm wide, post gap 0.2: tip area collapses", lambda: check_clamp(bad, brd, table), FAIL, "floor post")
+
+    def stack_tall():
+        if not sh.get("bstack"):
+            raise LookupError("not K4: no stacked B side")
+        bad = {**sh, "bstack": {**sh["bstack"], "l1": sh["bstack"]["avail"]}}      # tallest P outer part as tall as the whole free depth
+        return Case("heights: tallest P outer part grown to the whole stack depth", lambda: check_heights(bad, brd, sch, table), FAIL, "B side")
+
     def heights():
         f = max((f for f in brd.fps.values() if part_height(f, sch, table)[0] is not None), key=lambda f: part_height(f, sch, table)[0])
         tall, lcsc = copy.deepcopy(table), sch.parts.get(f.ref, {}).get("lcsc")
@@ -1784,20 +1948,28 @@ def selftest_cases(ctx):
         if not sh.get("pocket"):
             raise LookupError("revg: no lid pocket")
         sw = brd.fps[SWITCH_REF]
+        hsw, _ = part_height(sw, sch, table)
+        if hsw is not None and hsw <= sh["bands"]["F"] + EPS:
+            raise LookupError(f"n/a: the F gap {sh['bands']['F']:.2f} mm holds {SWITCH_REF} ({hsw:.2f} mm) with or without its lid pocket (K4)")
         return Case(f"heights: {SWITCH_REF} moved 2.5 mm out of its lid pocket meets the 0.30 mm F gap", lambda: check_heights(sh, moved(brd, sw.ref, dx=2.5), sch, table), FAIL, SWITCH_REF)
 
     def heights_empty():
         return Case("heights: a board with no footprints", lambda: check_heights(sh, dataclasses.replace(brd, fps={}), sch, table), FAIL, "no footprints")
 
     def nets_swap():
-        a, b = (pin_of(sch, "U1", n) for n in ("GA_P", "GB_P"))
+        # the MCU's GA_P / GB_P pads; K4 has U1 on the P board, so the M board (the one the checks take) gets two pads of its own IC instead
+        ref, nets = ("U1", ("GA_P", "GB_P")) if "U1" in brd.fps else (None, None)
+        if ref is None:
+            ref = next(r for r, f in sorted(brd.fps.items(), key=lambda kv: nat(kv[0])) if r.startswith("U") and len({p.net for p in f.pads if p.net}) >= 2)
+            nets = tuple(list(dict.fromkeys(p.net for p in brd.fps[ref].pads if p.net and p.net != "GND"))[:2])
+        a, b = (pin_of(schb, ref, n) for n in nets)
 
         def run():
-            u1 = brd.fps["U1"]
+            u1 = brd.fps[ref]
             na, nb = (next(p.net for p in u1.pads if p.num == n) for n in (a, b))
             pads = tuple(dataclasses.replace(p, net=nb if p.num == a else na if p.num == b else p.net) for p in u1.pads)
-            return check_board_nets(dataclasses.replace(brd, fps={**brd.fps, "U1": dataclasses.replace(u1, pads=pads)}), sch)
-        return Case(f"board-nets: U1 pads {a} and {b} (GA_P and GB_P) swapped on the board", run, FAIL, "board U1 pad")
+            return check_board_nets(dataclasses.replace(brd, fps={**brd.fps, ref: dataclasses.replace(u1, pads=pads)}), schb)
+        return Case(f"board-nets: {ref} pads {a} and {b} ({nets[0]} and {nets[1]}) swapped on the board", run, FAIL, f"board {ref} pad")
 
     def nets_missing():
         ref = first("R").ref
@@ -2012,15 +2184,19 @@ def selftest_cases(ctx):
         return Case(f"rails: a load naming {stranger}, which is not on net {rail['net']}", lambda: check_rails(c, sch), FAIL, "not on net")
 
     def frame_expired():
-        def run():
+        try:
             f0, p0 = frame_pod_facts(sh.get("design"))
+        except AssertionError as e:                                 # pod.py asserts the spec s8 vision limit at import (K4: A-K4-VISION open). The frame CHECK still runs and FAILs with this text.
+            raise LookupError(f"n/a: pod.py cannot be imported for this design, so the proof has no pod facts to break ({e}); the frame check itself reports it as FAIL")
+
+        def run():
             stale = dict(f0, ZC=f0["ZC"] + 0.45)              # a pod constant re-hard-coded in frame.py (the pre-ECR-0001 state)
             with ecr_states(ECR_0001="closed"):
                 return check_frame(sh, frame=stale, pod=p0)
         return Case("frame: frame.py's pod centre re-hard-coded 0.45 mm off the shell, ECR-0001 closed", run, FAIL, "ECR-0001")
 
     for build in (mic_origin, mic_stack, mic_lid, mic_face, mic_ap, mic_locating, mic_located, switch_locating, switch_off, switch_stack, outline_wide, outline_tall, outline_thick, outline_drag, round_trip_mic,
-                  dup_ref, inside_far, inside_rear, clamp_body, clamp_tiny, clamp_wire_pad, vhb_flip, vhb_pocket, vhb_bond, heights, heights_pocket, heights_empty, nets_swap, nets_missing,
+                  dup_ref, inside_far, inside_rear, clamp_body, clamp_tiny, clamp_wire_pad, vhb_flip, vhb_pocket, vhb_bond, heights, heights_pocket, ledge_post, ledge_wide, stack_tall, heights_empty, nets_swap, nets_missing,
                   pin_wrong, pair, power_pin, ep, netlist, hazard_expired, hazard_mitigated_closed, rows_deleted, contract_empty, power_rows_deleted, unconstrained, budget_unusable, budget_no_d11, hazards_deleted, absent_wrong, absent_removed,
                   ecr_format, waiver_removed, waiver_expired, overload, waiver_ceiling, hard_limit, assumes, derive, calc_moves, rail_order_, d11_inductor, d11_vdd11,
                   new_rail, topology, frame_expired):
@@ -2035,9 +2211,10 @@ def ecr_open_in(ecr, ecr_dir):
 def selftest(ctx):
     """Every rule must fire on a deliberately broken copy of its inputs (and stay quiet on a harmless one): a check that cannot fail proves nothing."""
     ran, skipped, missed = [], [], []
+    na = []
     for c in selftest_cases(ctx):
         if c.run is None:
-            skipped.append(c.name)
+            (na if c.na else skipped).append(c.name)
             continue
         try:
             got = c.run()
@@ -2049,7 +2226,7 @@ def selftest(ctx):
         ran.append((c.name, got.status, ok))
         if not ok:
             missed.append(f"{c.name} -> {got.status} (wanted {c.expect}{f' with {c.marker!r}' if c.marker else ''}): {got.msg[:140]}")
-    d = [f"caught: {n} -> {s}" for n, s, ok in ran if ok] + [f"NOT CAUGHT: {m}" for m in missed] + skipped
+    d = [f"caught: {n} -> {s}" for n, s, ok in ran if ok] + [f"NOT CAUGHT: {m}" for m in missed] + skipped + na
     if missed:
         return Result("selftest", FAIL, f"{len(missed)} of {len(ran)} rule checks went wrong: {missed[0]}", d)
     if skipped:
@@ -2090,14 +2267,25 @@ def run(cfg, do_selftest=True):
         errs["data"] = f"ST pin data: {err}" if err else None
     else:
         inputs["data"], errs["data"] = None, errs["contract"]
+    inputs["schb"], errs["schb"] = inputs.get("sch"), errs.get("sch")
+    if inputs.get("sch") is not None and DESIGN is not None and DESIGN.id == "k4":       # K4: this board's share of the whole-pod circuit (J20/J21 are the board-to-board halves, not in it)
+        nl = cfg.netlist
+        here = {r for r, _ in netlist_connectivity(nl)} - {"J20", "J21"} if nl.exists() else set(inputs["sch"].parts)
+        sp = {r: p for r, p in inputs["sch"].parts.items() if r in here}
+        sn = {n: [m for m in mem if m[0] in sp] for n, mem in inputs["sch"].nets.items()}
+        inputs["schb"] = Sch(sp, {n: m for n, m in sn.items() if m})
+        if inputs.get("brd") is not None:
+            pass
     brd, why = None, f"board: no board at {cfg.board}"
     if cfg.board.exists():
         brd, err = attempt(read_board, cfg.board)
         why = f"board: cannot read {cfg.board.name}: {err}" if err else None
+    if brd is not None and DESIGN is not None and DESIGN.id == "k4":
+        brd = dataclasses.replace(brd, fps={r: f for r, f in brd.fps.items() if r not in ("J20", "J21")})   # board-to-board connector halves: not in the whole-pod circuit
     inputs["brd"], errs["brd"] = brd, why
-    plan = (("mic-port", check_mic, ("sh", "brd", "table", "sch")), ("switch", check_switch, ("sh", "brd")), ("outline", check_outline, ("sh", "brd")),
-            ("inside", check_inside, ("sh", "brd", "table")), ("clamp-bands", check_clamp, ("sh", "brd", "table")), ("heights", check_heights, ("sh", "brd", "sch", "table")),
-            ("board-nets", check_board_nets, ("brd", "sch")), ("pins", check_pins, ("contract", "sch", "data")), ("rails", check_rails, ("budget", "sch")),
+    plan = (("mic-port", check_mic, ("sh", "brd", "table", "schb")), ("switch", check_switch, ("sh", "brd")), ("outline", check_outline, ("sh", "brd")),
+            ("inside", check_inside, ("sh", "brd", "table")), ("clamp-bands", check_clamp, ("sh", "brd", "table")), ("heights", check_heights, ("sh", "brd", "schb", "table")),
+            ("board-nets", check_board_nets, ("brd", "schb")), ("pins", check_pins, ("contract", "sch", "data")), ("rails", check_rails, ("budget", "sch")),
             ("frame", check_frame, ("sh",)))
     out = []
     for cid, fn, names in plan:

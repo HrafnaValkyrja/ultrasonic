@@ -126,7 +126,8 @@ U1_H, U1_H_TOL = 0.60, 0.05            # ST DS13737 UFQFPN48 A max 0.60; +-0.05 
 POST_CHAIN_LIN = 0.15 * VHB_T + 4 * 0.10 + 0.05 + U1_H_TOL   # VHB + M board + P board + 2 cavity prints (floor, lid) + BM28 + U1 = linear worst case
 POST_MARGIN = 0.05                                           # min air gap at the worst tolerance corner (must stay > 0: post never preloads U1)
 POST_PRINT_GAP = round(POST_CHAIN_LIN + POST_MARGIN, 4)      # ECR-0023 add.2: printed SHORT by the full linear chain + margin -> gap 0.05..1.125 at every corner; filled by the cured dab (FILL_*). OLD: = POST_GAP                                    # printed at the nominal fitted gap (centres the +-chain fit range); fitted at assembly by shim (add) or trim (remove), never by guess
-P_OUT_Y = Y_F - 2 * PCB_T - 0.6              # P file-B (floor-facing) board face
+BM28_GAP, P_OUTER_MAX = 0.6, 1.0         # BM28 mated gap M inner face -> P inner face; tallest P outer-face part (L1)
+P_OUT_Y = Y_F - 2 * PCB_T - BM28_GAP              # P file-B (floor-facing) board face
 U1_TOP_Y = P_OUT_Y - U1_H                    # nominal U1 top (package max)
 POST_TOP_Y = U1_TOP_Y - POST_PRINT_GAP       # printed post top (nominal U1 top minus 0.5875); the dab fills up to U1 (Kapton-covered)
 POST_GAP_MAX = round(2 * POST_CHAIN_LIN + POST_MARGIN, 3)    # largest air gap to fill 1.125
@@ -206,3 +207,41 @@ def switch_stack():
     """Same function as dims_r2.switch_stack (VHB +-15 % = +-0.0375 per the 3M TDS), evaluated on this module's numbers. Lazy import: dims_r2 reads the r2 board at import."""
     import dims_r2
     return dims_r2.switch_stack(globals())
+
+
+# ---------------------------------------------------------------- interface facts for tools/checks/interfaces.py (K4, 2026-10-08)
+# The checks read the M board (mic U2, SW1, lid-face parts, VHB) and the stack footprint; P sits under M and is checked by its own netlist.
+def interface_facts():
+    """Same shape as dims_r2.interface_facts (pod frame mm). PCB = the M board footprint in the stack; F_PADS none (K4 M has no bare F-face test pads)."""
+    pcb = dict(x0=STACK_X0, x1=STACK_X1, y0=Y_B, y1=Y_F, z0=STACK_Z0, z1=STACK_Z1)
+    return dict(PCB=pcb, CAV=dict(CAV), MIC=MIC, SWITCH=SW, ZC=ZC, X0=X0, X1=X1, Z0=Z0,
+                CELL=dict(x0=CELL_X0, x1=CELL_X1, y0=CELL_Y0, y1=CELL_Y1, z0=CELL_Z0, z1=CELL_Z1),
+                mic_port_d=DUCT_D, mic_hole_d=MIC_HOLE_D, switch_bore_d=BORE_D, plunger_head_d=PUCK_D,
+                bands=dict(B=Y_B - (Y_IN + WALL), F=F_GAP),
+                pocket=dict(ref="SW1", centre=SW, dx=POCKET["dx"], dz=POCKET["dz"], band=POCKET["top"] - Y_F),
+                vhb=dict(t=VHB_T, inset=0.2, duct_d=DUCT_D, tp_cut_r=0.9, f_pads={}),
+                x_stop_gap=X_STOP_GAP,
+                # ECR-0022: VHB only on the notched lid ledge tip (not full-face); limits = sw1_press_fem.py (2 N press, 85 kPa 3M dynamic factor) + ECR-0023 post (VHB < 85 kPa needs gap <= 0.03)
+                ledge=dict(w=LEDGE_W, inset=LEDGE_INSET, h=LID_STANDOFF, tube_d=DUCT_TUBE_D, press_N=2.0, limit_kPa=85.0, post_gap=POST_GAP, post_gap_max=0.03, clear=0.1),
+                # B side = the whole stack under the lid-face VHB: M + BM28 gap + P + tallest P outer part must fit Y_F -> tub floor; M inner-face parts live in the gap (U2 also in the P notch)
+                bstack=dict(m=PCB_T, gap=BM28_GAP, p=PCB_T, l1=P_OUTER_MAX, avail=Y_F - CAV["y0"], notch_refs=("U2",)))
+
+
+def duct_offsets():
+    """Bore axis vs board-hole axis (as dims_r2.duct_offsets; MIC is read from the routed M board, so nominal is 0 by construction)."""
+    import math
+    tol = dict(print_bore_pos=0.05, bore_ream=(1.00, 1.02), pin_body=0.98, pin_tip=0.50, pin_runout=0.02, hole=(0.60, 0.70), outline_to_hole=0.20)
+    pin_r = (tol["bore_ream"][1] - tol["pin_body"]) / 2 + (tol["hole"][1] - tol["pin_tip"]) / 2 + tol["pin_runout"]
+    stop_dx = X_STOP_GAP + tol["outline_to_hole"] + tol["print_bore_pos"]
+    stop_dz = (CAV["z1"] - CAV["z0"] - STACK_H) / 2 + tol["outline_to_hole"] + tol["print_bore_pos"]
+    lim = DUCT_D / 2 - MIC_HOLE_D / 2
+    walls_free = X_STOP_GAP > tol["outline_to_hole"] and (CAV["z1"] - CAV["z0"] - STACK_H) / 2 > tol["outline_to_hole"]
+    return dict(limit_R_ACO_P5=round(lim, 3), nominal=0.0, worst_walls_only=round(math.hypot(stop_dx, stop_dz), 3),
+                worst_walls_only_pass=math.hypot(stop_dx, stop_dz) <= lim, worst_with_gauge_pin=round(pin_r, 3),
+                worst_with_gauge_pin_pass=pin_r <= lim + 1e-9, walls_never_fight_pin=walls_free, tolerances=tol)
+
+
+# aliases the generic readers (hw/mech/frame.py pod_facts, tools/checks/interfaces.py) expect from a dims module
+W = WALL
+PCB = dict(x0=STACK_X0, x1=STACK_X1, y0=Y_B, y1=Y_F, z0=STACK_Z0, z1=STACK_Z1)       # the M board footprint in the stack
+CELL = dict(x0=CELL_X0, x1=CELL_X1, y0=CELL_Y0, y1=CELL_Y1, z0=CELL_Z0, z1=CELL_Z1)

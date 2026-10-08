@@ -70,6 +70,7 @@ try:                                    # the ONE design pointer (hw/current.yam
     DEFAULT_BOARD, NETLIST, JLC_BOM, GENERATE = DESIGN.board, DESIGN.netlist, DESIGN.bom, DESIGN.generate
 except ImportError:
     DESIGN, DEFAULT_BOARD, NETLIST, JLC_BOM, GENERATE = None, Path("/nonexistent"), Path("/nonexistent"), Path("/nonexistent"), "hw/pod/gen.py"
+POD_BOARD = None                        # "P" / "M": two-board design (K4), set by --pod-board; selects that board's board/netlist/bom and its gen.py split
 COST_BOM = REPO / "docs/build/bom.py"
 COST_CSV = REPO / "docs/build/bom.csv"
 LOCK = REPO / ".pcba-workflow/sourcing-lock.csv"
@@ -332,8 +333,16 @@ def read_schematic():
     with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as tmp:
         os.chdir(tmp)
         try:
-            import system_map                                       # noqa: E402
-            circ = system_map.build()
+            if POD_BOARD:                                           # two-board design: that board's partition of the K4 circuit (one board per process)
+                import builtins
+                spec = importlib.util.spec_from_file_location("k4gen", REPO / "hw/pod/k4/gen.py")
+                k4gen = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(k4gen)
+                k4gen.split(POD_BOARD)
+                circ = builtins.default_circuit
+            else:
+                import system_map                                       # noqa: E402
+                circ = system_map.build()
         finally:
             os.chdir(cwd)
     parts = {}
@@ -1478,15 +1487,57 @@ def run(board_path, board_err, do_selftest=True):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--board", type=Path, help="placed or routed .kicad_pcb to check (default: hw/current.yaml board)")
+    ap.add_argument("--pod-board", choices=["P", "M", "all"], help="two-board design (K4): check board P or M against its own netlist/BOM (board_p/netlist_p/bom_p); default 'all' when the design has board_p")
     ap.add_argument("--no-board", action="store_true", help="skip the board checks (a WARN says so)")
     ap.add_argument("--json", action="store_true", help="machine-readable results")
     ap.add_argument("-v", "--verbose", action="store_true", help="print detail lines under each non-PASS result")
     ap.add_argument("--strict", action="store_true", help="treat WARN as FAIL (release gate)")
     ap.add_argument("--no-selftest", action="store_true", help="skip the deliberately-broken-input proofs")
     args = ap.parse_args(argv)
+    global POD_BOARD, DEFAULT_BOARD, NETLIST, JLC_BOM
+    two = DESIGN is not None and getattr(DESIGN, "board_p", None)
+    sel = args.pod_board or ("all" if two and not args.board else None)
+    if sel == "all":                                    # one process per board (SKiDL keeps global state)
+        import subprocess
+        rc, docs = 0, []
+        passthru = [a for a in (argv if argv is not None else sys.argv[1:])]
+        for b in "PM":
+            r = subprocess.run([sys.executable, __file__, "--pod-board", b] + passthru, capture_output=args.json, text=True)
+            rc |= r.returncode
+            if args.json:
+                docs.append(json.loads(r.stdout))
+            else:
+                print(f"=== board {b} ===")
+        if args.json:        # merge: per check id the worst status of P and M, messages prefixed with the board
+            merged = docs[0]
+            order = {PASS: 0, WARN: 1, FAIL: 2}
+            for b, doc in zip("PM", docs):
+                for c in doc["checks"]:
+                    c["message"] = f"[{b}] {c['message']}"
+            by_id = {}
+            for doc in docs:
+                for c in doc["checks"]:
+                    o = by_id.get(c["id"])
+                    if o is None:
+                        by_id[c["id"]] = c
+                    else:
+                        w, l = (c, o) if order[c["status"]] > order[o["status"]] else (o, c)
+                        w["message"] += " | " + l["message"]
+                        by_id[c["id"]] = w
+            merged["checks"] = list(by_id.values())
+            merged["counts"] = {st: sum(c["status"] == st for c in merged["checks"]) for st in (PASS, WARN, FAIL)}
+            merged["board"] = "P+M"
+            print(json.dumps(merged, indent=2))
+        return rc
+    if sel:
+        if not two:
+            sys.exit(f"--pod-board: design {getattr(DESIGN, 'id', None)} has no board_p")
+        POD_BOARD = sel
+        if sel == "P":
+            DEFAULT_BOARD, NETLIST, JLC_BOM = DESIGN.board_p, DESIGN.netlist_p, DESIGN.bom_p
     env_error = ensure_env()
     path, board_err = (None, None) if env_error else resolve_board(args.board, args.no_board)
-    results = [Result("env", FAIL, env_error)] if env_error else run(path, board_err, not args.no_selftest)
+    results = [Result("env", FAIL, env_error)] if env_error else run(path, board_err, not (args.no_selftest or POD_BOARD))   # selftest mutations name Phase-2 refs (R3, R8): not valid on a K4 partition
     if args.strict:
         for r in results:
             if r.status == WARN:

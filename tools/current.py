@@ -23,6 +23,7 @@ REPO = Path(__file__).resolve().parents[1]
 POINTER = REPO / "hw/current.yaml"
 ENV = "ULTRASONIC_DESIGN"
 PATH_KEYS = ("board", "board_placed", "placement", "netlist", "bom", "shell", "shell_dims", "shell_out")
+OPT_PATH_KEYS = ("board_p", "netlist_p", "bom_p")      # second board of a two-board design (K4: P); None when absent
 META_KEYS = ("id", "name", "ecr", "owner_decision", "packages", "generate", "acoustic_scenario")
 
 
@@ -59,6 +60,8 @@ def current(design=None, root=None):
     ns = SimpleNamespace(root=root, is_reference=is_ref, rel={k: block[k] for k in PATH_KEYS})
     for k in PATH_KEYS:
         setattr(ns, k, root / block[k])
+    for k in OPT_PATH_KEYS:
+        setattr(ns, k, root / block[k] if block.get(k) else None)
     for k in META_KEYS:
         setattr(ns, k, block.get(k))
     return ns

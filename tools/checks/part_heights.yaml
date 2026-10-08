@@ -106,9 +106,8 @@ by_lcsc:
       source: "Syntiant SPH0641LU4H-1 datasheet pp.9-10"
   C3682423:
     part: TI BQ25180YBGR charger, DSBGA-8 (YBG)
-    max_mm: 0.65
-    source: TI BQ25180 Rev C (Nov 2025), tape-and-reel table K0 = 0.65 mm (pocket depth made to fit the part's thickness); upper bound, the outline drawing is not in the PDF text
-    variant_note: a bound, not the part's own A-max; confirm on TI's YBG0008 drawing when the footprint is next reviewed
+    max_mm: 0.50
+    source: TI BQ25180 SLUSE99C (Jan 2023) p.53 package drawing YBG0008-C01 'DSBGA - 0.5 mm max height' (read 2026-10-08, sim/checks/k4_heights.py); was 0.65 = tape K0 upper bound
   C5220164:
     part: TI TPS7A2030PDQNR LDO, X2SON-4 (DQN) 1 x 1 mm
     max_mm: 0.40
