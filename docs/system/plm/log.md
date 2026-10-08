@@ -643,3 +643,4 @@
 - 2026-10-07 22:53 checkin REG-POD-BODY by claude
 - 2026-10-07 22:53 checkin PHYSICAL by claude
 - 2026-10-07 22:53 checkin INTEGRATION by claude
+- 2026-10-08 00:49 review INTEGRATION by claude-pod-mass: k4 variant block added to hw/current.yaml for pod_mass; no interface change

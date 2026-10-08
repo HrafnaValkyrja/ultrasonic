@@ -10,11 +10,11 @@
    }
   },
   "INTEGRATION": {
-   "by": "claude",
-   "date": "2026-10-07",
-   "note": "ECR-0021 K4 own dock: K4 dock sections added",
+   "by": "claude-pod-mass",
+   "date": "2026-10-08",
+   "note": "k4 variant block added to hw/current.yaml for pod_mass; no interface change",
    "stamp": {
-    "file:hw/current.yaml": "d1d7c9cc78083477",
+    "file:hw/current.yaml": "805335b7f70bd7a7",
     "file:hw/pod/gen.py": "3ed3676e85fb73eb",
     "file:hw/pod/system_map.py": "9515e835b9f57709"
    }
