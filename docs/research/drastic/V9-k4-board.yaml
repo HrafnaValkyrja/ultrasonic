@@ -1,0 +1,61 @@
+# V9: shortest board for the K4 end-to-end pod (O33, 2026-10-08). AI-facing. Design study only: NO placement/routing/FreeRouting run; all L are [E] arithmetic on repo figures.
+# Written 2026-10-08 by Claude (Opus 5.5 subagent). Conf: H measured, M derived, L inference. [V] = read this session, [T] = unverified (datasheet/quote not read).
+meta:
+  question: "min board length L for the K4 pod (cell 4.0/4.5max x 12 x 30 beside the board; pod L = 31.0 cell + board + 3.1 walls, V8 K4). Board H 12 (O27). Board zone T budget 4.5 inside walls (pod T 6.4 - floor 0.6 - lid 1.0 - gap 0.3), pod H 14.8."
+  baseline: {board: "hw/pod/draft_r2/out/routed.kicad_pcb 30x12, 4L, DRC clean, 75 footprints, 195 pins, one face (B 54 % util)", dens: "V5-density.yaml"}
+  glossary: {QFN48: "7x7 mm 48-pin leadless MCU package (STM32U575CIU6Q)", WLCSP-90: "wafer-level chip-scale MCU, 0.4 mm balls", B2B: "board-to-board connector", FPC: "flexible printed circuit", castellation: "half-cut plated holes on a board edge, soldered side-on to pads below", BM28: "Hirose BM28 0.35 mm-pitch B2B", DF40: "Hirose DF40 0.4 mm-pitch B2B", PDM: "pulse-density-modulated digital mic stream (mic U2 is digital, so no analogue ADC next to the SMPS; the exposure is MIC_VDD and acoustic/EM pickup)", SMPS: "MCU core switcher U1 + L1 (D11, the only allowed one)"}
+  heights_mm: {src: "docs/system/reg-board.md, packages.md [V]", mic_U2_B: 1.08, L1: 1.0, SW1_F: 0.65, QFN48: "~0.6 [T]", C_0603: "~0.55", R_C_0402: 0.5, R_C_0201: 0.3, board: 0.8}
+hard_floor:   # applies to ALL options
+  rule_10mm: "L1/Q1/Q2 centres >= 10 mm from the mic port (port x 1.88 on the board front) = x >= 11.9; Q1/Q2/L1 courtyards ~1.5-2 mm -> L >= ~13.5. Today's measured port->nearest pad: L1 12.87, Q1 15.76 (reg-board.md). In-plane rule: a second board 2-3 mm up does not relax it."
+  mcu: "QFN48 7x7 + 0.6 ring = ~8.2 mm of length; WLCSP 4.2 x 3.95"
+  so_what: "no option goes below ~13.5-14 mm for QFN48. Option gains are bounded to 17 -> ~14: ~3 mm of a 51 mm pod (6 %)."
+options:
+  A_one_board_6L_two_face:
+    L_mm: "17 (QFN48, shortest legal, V5 [H placement]); 15 with WLCSP-90 (needs via-in-pad on ~every ball; not reworkable, O18/O19). ECR-0019 (drops J12/R18/D6, ~2-3 mm2) does not break 17: 16 failed on SW1 axis + C21 in the MCU escape ring, not on area. [M]"
+    pod_L_mm: "51.1 (17) / 49.1 (15)"
+    stack_T_mm: "0.8 board + 1.08 mic (B) + 1.0 L1 or 0.65 SW1 (F) = ~2.9 [E]; 1.6 mm of the 4.5 budget unused"
+    layers: "6 (planes GND + 3V0 kept, 2 inner signal). 4L load x2.46 at 17 mm = unlikely (V5). 6L x0.83 = likely [M]"
+    jlc_build: "6L 0.8 mm is a standard JLC option (jlcpcb.com/resources/6-layer-pcbs: thickness 0.8/1.0/1.2/1.6/2.0, read 2026-10-08). Price: JLC headline '5 pcs 6L from $2' (jlcpcb.com/events/6-layer-pcb, coupon page, no 30x12 quote); secondary: 6L ~ +65 % over 4L (atlaspcb.com multilayer-cost article, 2026) [T]. For 2 pods a few boards: cost is noise vs the pod. Assembly quote with the real BOM NOT run (owner places orders, O21)."
+    hand_rework: "worst: 195 pins on ~200 mm2, 0201s both faces, QFN48 on B between mic and L1; probing/rework only via the pads. Same as today's difficulty x ~2 density."
+    noise: "same topology as today: port->L1 >= 12 mm, mic and MCU on one 17 mm board, 6L gives an extra inner-layer pair for mic return isolation. Unchanged risk class; tightest packing (MCU escape next to mic nets)."
+  B_two_stacked_boards:
+    partition: "P (power+dock): U3 charger BGA, U4 LDO, D4, D5, U6 ESD, RT1, C1-C4/C7/C14 bulk, dock wire pads J3-J5, cell leads, SW1 on its F (top) face. M (MCU+audio+output) : U1, L1, Y1, C5-C13/C15-C18, U2 mic (B, outer bottom, port through shell), Q1/Q2/R3-R6/R21 bridge, OUT_A/B pads J1/J2, SWD/test dots. Order top->bottom: SW1 | P | gap | M | mic port."
+    inter_board_signals: "~16-18 [E, pin-contract.yaml not read for the final map]: GND x4, VSYS x2 (bridge 315 mA peak, parallel pins), +3V0 x2, USB_DP, USB_DN, CHG_INT, I2C SDA/SCL (charger, PB6/PA1), BTN, plus 1-2 spares. 20-pin B2B suffices; 24 if SWD is routed through."
+    L_mm: "~14.5 (range 14-15.5) [E]: floor from hard_floor (13.5) + 4 faces at ~U 0.35 + B2B footprint (~5.4 x 2 mm on each inner face) ; M is the length-setting board (QFN48 + L1 >= 12 mm behind the port); P can be shorter and ends earlier. Gain vs A(17): -2.5; vs A-WLCSP(15): only -0.5."
+    pod_L_mm: "48.6"
+    layers: "4L + 4L. Per-board ~100-118 pins on ~174 mm2 = 0.57-0.68 pins/mm2 = x1.05-1.25 of today's 0.543 (proven 4L ceiling x1.00, 'likely' <=1.15, 'possible' 1.15-1.5, V5 bands) -> 4L 'possible', 6L on M only is the fallback [M-L]"
+    connector_choice:   # JLC parts API 2026-10-08T01:53Z (tools/jlc.py)
+      BM28B0.6-20DP/2-0.35V: {lcsc: C424566, class: Extended, stock: 25043, usd: 0.1985, mated_h_mm: "0.6 [T: from P/N, datasheet not read]", pitch_mm: 0.35, note: "ONLY one that fits: stack 0.8+0.6+0.8 + 1.08 mic + 0.65-1.0 = 3.9-4.3 <= 4.5 [E]. Gap parts limited to 0201 (0.3) / 0402 (0.5). Alt C3643381 $1.43 stock 57 (other variant). Plug and receptacle halves: confirm which P/N is which [T]. 0.35 mm pitch: no hand soldering, no hand rework; mating by tweezers/jig, retention ~N small [T]; hand-assembly = press fit only."}
+      DF40C-20DP-0.4V: {lcsc: C424637, class: Extended, stock: 32994, usd: 0.3010, mated_h_mm: "1.5 [T]", pitch_mm: 0.4, note: "stack 4.8-5.2 > 4.5: FAILS thickness (+0.3..0.7 mm on pod T). Sturdier and cheaper; fallback if T may grow."}
+      castellated_or_header_soldered: {mated_h_mm: "0.6-0.8 set by solder paste/pads [E]", note: "JLC will not assemble a stacked pair; owner hot-airs 12 mm edge, 16+ joints at 0.5 mm pitch on a 0.6 mm gap, solder bridging and no re-open without desolder. Strongest mechanically, worst serviceability. NOT recommended."}
+      FPC_jumper: {part: "FH12-class 0.5 mm ZIF (e.g. C22459558, 10P, stock 2210, $0.0813, 2026-10-08)", note: "ZIF ~1 mm tall each + fold radius: stack > 4.5 unless boards sit side by side (then no length gain). Rejected for stacking."}
+    stack_T_mm: "3.9-4.3 with BM28 [E]: fits the 4.5 board zone, so pod T stays 6.4 (no change). Margin 0.2-0.6 mm only, tolerance stack [T]."
+    jlc_build: "two ordinary 4L 0.8 mm boards (cheapest known path), 2 small connectors; assembly both sides; the mate is a manual step by owner. 2 PCBs + 2 BOM lines instead of 1."
+    hand_rework: "BEST for serviceability: unplug M from P to swap charger board or MCU board; each half has half the density. WORST for fragility: 0.35 mm B2B can't be hand-repaired, mating cycles limited [T], shock/pull-out in a worn pod [T]."
+    noise: "L1/Q1/Q2 + mic all on M, so the SMPS is NOT separated from the mic; the P board only moves charger/LDO away. Gains: VSYS bridge pulses cross the B2B (needs 2 pins + local 22 uF C14 on M) ; MIC_VDD stays on M. New risks: B2B contact resistance on VSYS (bridge 315 mA, ~2 x 30-50 mohm [T]) ; GND return across 4 pins; USB D+/D- impedance over the B2B (full-speed only, tolerant). Net: neutral to slightly worse than A."
+  C_rigid_flex_folded:
+    L_mm: "~13.5-14 [E] (two rigid halves folded 180 degrees, flex tail ~2-3 mm fold radius, same floor as B with no B2B footprint: -0.5 vs B)"
+    pod_L_mm: "~47.5"
+    stack_T_mm: "~3.7 [E] (no connector gap, fold radius sets 1.0-1.5 gap) "
+    layers: "rigid 4L/6L + 2L flex core [T]"
+    jlc_build: "NOT BUILDABLE AT JLC: 'rigid-flex PCBs are not yet supported' (JLC capabilities/blog search 2026-10-08; also miniaturization-prelim.md BL-5 and MZR-02 '[V flex FAQ 2026-10-03]'). JLC makes 1-4L FPC with FR4/PI stiffeners only (jlcpcb.com/capabilities/flex-pcb-capabilities, read 2026-10-08), which BL-5 already rejected (SW1 needs rigid back, stiffener returns the thickness). Other fabs: quote not obtained [T]; expect much higher NRE, JLC assembly lost, and parts sourced by hand."
+    hand_rework: "no connector to unplug; one failure scraps the whole assembly; fold is a static bend (fatigue ok) but unserviceable. Contradicts O19 serviceability."
+    noise: "same as B."
+    verdict: "REJECT: saves 0.5 mm over B but loses the JLC process and serviceability."
+compare:   # L mm | pod L | T board zone | layers | JLC | rework | noise
+  A: {L: 17, pod_L: 51.1, T: 2.9, layers: 6, jlc: "yes, 1 board", rework: "poor, dense", noise: "baseline", risk: "known placements; 6L routing unproven (V5 open item)"}
+  A_wlcsp: {L: 15, pod_L: 49.1, T: 2.9, layers: 6, jlc: "yes, via-in-pad cost/capability unchecked", rework: "worst (no BGA rework/probe)", noise: "baseline", risk: "synthetic ballout (V5)"}
+  B_bm28: {L: 14.5, pod_L: 48.6, T: "3.9-4.3", layers: "4+4", jlc: "yes, 2 boards, cheap", rework: "best serviceability, fragile 0.35 mm B2B", noise: "same-or-slightly-worse", risk: "stack margin 0.2-0.6 mm; no placement run yet"}
+  C: {L: 14, pod_L: 47.5, T: 3.7, layers: "rigid-flex", jlc: "NO", rework: "none", noise: "same as B", risk: "not buildable at JLC"}
+recommendation:
+  pick: "A (one 6L two-face board, QFN48, 17 mm, pod L 51.1) is the baseline. B (BM28 stack, ~14.5 mm, pod 48.6) is the length option if the owner wants -2.5 mm (5 %). Reject C. Do NOT take A-WLCSP: B gets within 0.5 mm of it without via-in-pad."
+  why_blunt: "the 10 mm mic-to-switcher rule and the 7 mm QFN48 floor the board at ~14 mm in every option; two boards buy 2.5 mm for +1 board, 2 fragile connectors and a thickness margin of 0.2-0.6 mm. Length gain is real but small relative to the 51 mm pod; A has zero new mechanical interfaces. Owner decides (spec 0 rule)."
+  owner_decision_needed: "is -2.5 mm pod length worth a 0.35 mm B2B and a split board? If yes, B with BM28."
+open_items:
+  - "placement trial of B (M and P outlines, place_r2 two-board variant) and of A with ECR-0019 applied, to replace these [E] lengths (lead session only; no autorouter by parallel agents)"
+  - "read BM28 and DF40 datasheets (mated height, current, retention, mating cycles) and confirm plug/receptacle LCSC numbers [T]"
+  - "JLC quote with real BOM for 4L vs 6L 0.8 mm 30x12 / 17x12 (owner places orders, O21); price figures here are headlines only"
+  - "final inter-board net count from pin-contract.yaml after partition is chosen"
+  - "part heights not yet read: QFN48, C14 0603, U3 BGA (assumed <= 0.6)"
+integration_map_crosscheck: "read-only research, no ECR; tools/plm.py impact not run. If B adopted: affects sub-power (VSYS across B2B), sub-dock-usb (D+/D- across B2B, ECR-0019 Rd at dock head), sub-ui (SW1 moves to P face), sub-audio-in (mic stays on M), reg-board (new outlines), reg-pod-body/physical (board zone T 3.9-4.3), rail-budget (B2B series R on VSYS); if A with ECR-0019: reg-board length only."
+src: ["V5-density.yaml", "V8-thin-long.yaml K4", "docs/system/reg-board.md", "docs/research/mini/packages.md", "miniaturization-prelim.md BL-5/MZR-02", "tools/jlc.py 2026-10-08T01:53Z", "jlcpcb.com/resources/6-layer-pcbs", "jlcpcb.com/events/6-layer-pcb", "jlcpcb.com/capabilities/flex-pcb-capabilities", "atlaspcb.com multilayer-pcb-cost-scaling-optimization (secondary)"]
