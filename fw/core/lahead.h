@@ -17,9 +17,12 @@ void fw_lahead_hop(fw_lahead_t *l, const float in[8], float out[8]);   /* out ma
 
 typedef struct {
     uint32_t ph, inc, pos, total, ramp;
+    uint32_t period, pulse;    /* haptic burst: pulse and period in samples (period 0 = single tone) */
     float amp;
 } fw_alert_t;
 void fw_alert_start(fw_alert_t *a, uint32_t hz, int32_t cdb, uint32_t ms);
+/* haptic burst (I-010): n pulses of pulse_ms at hz, one every period_ms, raised-cosine edges; same hop as the tone */
+void fw_haptic_start(fw_alert_t *a, uint32_t hz, int32_t cdb, uint32_t n, uint32_t pulse_ms, uint32_t gap_ms);
 /* fills y[8]; returns 1 while the alert is playing (y written), 0 otherwise (y untouched) */
 uint32_t fw_alert_hop(fw_alert_t *a, float y[8]);
 #endif

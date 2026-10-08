@@ -136,3 +136,80 @@ void test_loud_ceiling_and_clamp(void)
     fw_alert_trigger(&st);
     TF_CHECK(st.alert.total > 0u);
 }
+
+/* ---- I-010 tactile alert: 2-3 pulses at 150-250 Hz, 100 ms, default off ---- */
+void test_haptic_default_off(void)
+{
+    fw_knobs_t k;
+    fw_knobs_defaults(&k);
+    TF_CHECK_EQ(k.haptic_on, 0);
+    TF_CHECK(k.haptic_hz >= 150 && k.haptic_hz <= 250);
+    TF_CHECK(k.haptic_n >= 2 && k.haptic_n <= 3);
+    TF_CHECK_EQ(k.haptic_ms, 100);
+    fw_state_t st;
+    init_la(&st, 0);
+    fw_alert_trigger(&st);                                               /* off: the normal tone */
+    TF_CHECK_EQ(st.alert.period, 0u);
+    st.knobs.haptic_on = 1;
+    fw_alert_trigger(&st);
+    TF_CHECK(st.alert.period != 0u);
+}
+
+void test_haptic_burst(void)
+{
+    static const uint32_t hz[3] = {150, 200, 250};
+    for (int c = 0; c < 3; c++)
+        for (uint32_t n = 2; n <= 3; n++) {
+            fw_alert_t a;
+            fw_haptic_start(&a, hz[c], 0, n, 100, 100);
+            float y[8], prev = 0.0f, maxstep = 0.0f, peak = 0.0f;
+            uint32_t pulses = 0, cross = 0, s = 0, inpulse_prev = 0, nz_run_end = 0;
+            while (fw_alert_hop(&a, y))
+                for (int i = 0; i < 8; i++, s++) {
+                    float d = fabsf(y[i] - prev);
+                    maxstep = d > maxstep ? d : maxstep;
+                    peak = fabsf(y[i]) > peak ? fabsf(y[i]) : peak;
+                    int nz = y[i] != 0.0f;
+                    if (nz && !inpulse_prev) pulses++;
+                    inpulse_prev = (uint32_t)nz;
+                    if (nz) nz_run_end = s;
+                    if (s >= 160u && s < 1090u && prev < 0.0f && y[i] >= 0.0f) cross++;   /* steady part of pulse 1: samples 160..1090 */
+                    prev = y[i];
+                }
+            (void)nz_run_end;
+            TF_CHECK_EQ(pulses, n);
+            TF_CHECK(peak <= 1.0f);
+            /* carrier step bound 2 sin(pi f/fs) = 0.15 at 250 Hz; soft edges must not exceed it (no click, T6) */
+            TF_CHECK(maxstep < 0.16f);
+            TF_CHECK(fabsf(prev) < 1e-3f);
+            float f = (float)cross * 12500.0f / 930.0f;
+            TF_CHECK(fabsf(f - (float)hz[c]) < 15.0f);
+        }
+}
+
+void test_haptic_clamp(void)
+{
+    fw_knobs_t k;
+    fw_knobs_defaults(&k);
+    TF_CHECK_EQ(fw_knob_set(&k, FW_KNOB_lim_lookahead, 1), FW_KNOB_OK);
+    fw_dsp_t d;
+    fw_dsp_init(&d, &k, 200u, 1u);
+    fw_ccr_bounds_t b = fw_ccr_bounds(200u, fw_out_amp_max_ppm(&k));
+    fw_alert_t a;
+    fw_haptic_start(&a, 200, 0, 3, 100, 100);                            /* full-scale burst */
+    float y[8];
+    uint16_t ccr[FW_CCR_MAX_PER_HOP];
+    fw_out_info_t oi;
+    float peak = 0.0f;
+    uint32_t viol = 0;
+    for (uint32_t h = 0; h < 900u; h++) {
+        if (!fw_alert_hop(&a, y)) for (int i = 0; i < 8; i++) y[i] = 0.0f;
+        size_t n = fw_dsp_out(&d, y, 0u, &b, ccr, &oi);
+        peak = oi.true_peak > peak ? oi.true_peak : peak;
+        for (size_t j = 0; j < n; j++)
+            viol += fabs(2.0 * ccr[j] / 200.0 - 1.0) > fw_out_amp_max_ppm(&k) * 1e-6 + 1e-9;
+    }
+    float cap = (float)fw_out_amp_max_ppm(&k) * 1e-6f - (float)FW_SHAPER_EXCURSION_PPM * 1e-6f;
+    TF_CHECK_EQ(viol, 0);                                                /* R64 clamp */
+    TF_CHECK(peak <= cap + 1e-4f);                                       /* D17 ceiling */
+}

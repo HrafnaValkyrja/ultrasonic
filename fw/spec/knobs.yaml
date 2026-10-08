@@ -97,3 +97,10 @@ knobs:
   - {id: alert_hz, def: 2500, min: 500, max: 4000, unit: Hz, src: "loudness.md fix 1a: sensation level peaks at 2-3 kHz (Surendran 2023 front-of-tragus threshold min 29.5 dB at 2.5 kHz); legacy 1000 Hz"}
   - {id: alert_cdb, def: 0, min: -4000, max: 0, unit: cdBFS, src: "alert tone peak before the limiter (0 = full scale; the limiter/clamp sets the real ceiling)"}
   - {id: alert_ms, def: 300, min: 50, max: 2000, unit: ms, src: "alert length including the 10 ms raised-cosine ramps (assumed)"}
+  # ---- tactile alert (ledger I-010, docs/proof/electrical/loudness.md "Tactile alert"): 2-3 pulses at 150-250 Hz through the tragus exciter, for loud places
+  - {id: haptic_on, def: 0, min: 0, max: 1, unit: bool, src: "I-010: 1 = alert is a vibrotactile burst instead of the 2-3 kHz tone; default OFF (owner decides after bench E1 force check)"}
+  - {id: haptic_hz, def: 200, min: 150, max: 250, unit: Hz, src: "I-010: skin vibrotactile sensitivity peaks near 200-250 Hz (Pacinian); loudness.md tactile section"}
+  - {id: haptic_n, def: 2, min: 2, max: 3, unit: count, src: "I-010: 2-3 pulses"}
+  - {id: haptic_ms, def: 100, min: 50, max: 200, unit: ms, src: "I-010: pulse length incl. 10 ms raised-cosine edges (no clicks, T6)"}
+  - {id: haptic_gap_ms, def: 100, min: 50, max: 400, unit: ms, src: "I-010: silence between pulses (assumed)"}
+  - {id: haptic_cdb, def: 0, min: -4000, max: 0, unit: cdBFS, src: "I-010: burst peak before the output stage; R64 clamp and D17 ceiling still apply"}

@@ -208,6 +208,11 @@ size_t fw_selftest_hop(fw_state_t *st, float y8[FW_DSP_OUT_N], const fw_ccr_boun
 
 void fw_alert_trigger(fw_state_t *st)
 {
+    if (st->knobs.haptic_on) {                         /* I-010: tactile burst through the same exciter, default off */
+        fw_haptic_start(&st->alert, (uint32_t)st->knobs.haptic_hz, st->knobs.haptic_cdb, (uint32_t)st->knobs.haptic_n,
+                        (uint32_t)st->knobs.haptic_ms, (uint32_t)st->knobs.haptic_gap_ms);
+        return;
+    }
     fw_alert_start(&st->alert, (uint32_t)st->knobs.alert_hz, st->knobs.alert_cdb, (uint32_t)st->knobs.alert_ms);
 }
 

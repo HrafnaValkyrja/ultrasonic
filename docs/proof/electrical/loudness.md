@@ -58,3 +58,17 @@ Script `loudness_fw.py`, plot `loudness_fw.png`. Same chain as above (front site
 Net gain +4.5 dB (after - before; the band mean already sat near 2-3 kHz, so the tone move alone is -1.8 dB against the 1.5-4 kHz mean, which includes the 1.5 kHz point); the limiter supplies +6.3 dB. The limiter ceiling is the R64 clamp (0.6353) minus the noise-shaper excursion bound (0.1150) = 0.5203, 1.7 dB under the ideal, so the clamp never bites. Office goes from failing to marginal (p05) / passing (nominal); street still fails (needs +20 dB: exciter Bl, not firmware).
 
 **Knobs** (`fw/spec/knobs.yaml`, v5): `lim_lookahead` (0 = legacy, **default 0** until the pinned golden vectors and the D17 -12 dBFS ceiling are re-signed by the owner), `lim_knee_pct` (70), `alert_hz` (2500; legacy 1000), `alert_cdb` (0), `alert_ms` (300). Code: `fw/core/lahead.c` (soft-knee limiter: 4-sample look-ahead min + moving average, one-pole release, 3-sample delay, |out| <= ceiling by construction; raised-cosine alert ramps 10 ms), `fw_alert_trigger()`. Tests: `fw/test/test_loud.c` (tone frequency, no clicks, bound/step, ceiling and clamp through `fw_dsp_out`); full `fwsim all` PASS (35 rows).
+
+## Tactile alert option (ledger I-010, 2026-10-08)
+Firmware: knobs `haptic_on` (def 0 = OFF), `haptic_hz` (200; 150-250), `haptic_n` (2; 2-3), `haptic_ms` (100), `haptic_gap_ms` (100), `haptic_cdb` (0). When on, `fw_alert_trigger` plays the burst instead of the 2-3 kHz tone, through the same limiter, D17 ceiling and R64 clamp; 10 ms raised-cosine edges, phase restarts at zero each pulse. Host tests `test_haptic_*` (frequency, step bound 0.16 = carrier bound at 250 Hz, clamp/ceiling).
+
+**Force at 208 mA** (bone.py network, nominal, current-driven so the clamp is exact): peak force 0.049 / 0.107 / 0.222 N at 150 / 200 / 250 Hz = **90.7 / 97.5 / 103.9 dB re 1 uN rms**; skin-load displacement **1.9 / 4.0 / 8.2 um peak** (the model rises toward the 350 Hz exciter resonance; Bl 1 N/A and tissue values assumed, as above). Sound check: the 200 Hz burst is also audible/bone-conducted, but it is a sensation-level question handled by the tone chain.
+
+**Vibrotactile thresholds (from memory of the literature, NOT re-fetched this session; Consensus quota exhausted, verify before relying):**
+- Glabrous skin, large contactor (2.9 cm^2), 250 Hz: about 0.1-0.3 um peak (Verrillo 1963, JASA 35:1962; Bolanowski et al. 1988, JASA 84:1680).
+- Small contactor (no spatial summation, our pad is well under 1 cm^2): about +15 to +20 dB (Verrillo 1963 area slope about 3 dB per doubling).
+- Hairy/facial skin: about 10-20 dB less sensitive than the fingertip (Verrillo 1971 hairy-skin work; face is among the more sensitive hairy sites, Weinstein 1968 for pressure).
+=> plausible threshold at the tragus, 200-250 Hz: about 0.1-0.3 um x 7 (+17 dB) x 3-10 (+10-20 dB) = **roughly 2-20 um peak**, centre about 6 um.
+
+**Margin estimate:** 200 Hz nominal 4 um vs 2-20 um: **-14 to +6 dB, centre about -4 dB (marginal, may be below threshold)**; at 250 Hz 8.2 um: **-8 to +12 dB, centre about +2 dB**. So 250 Hz is the better default for detectability (set `haptic_hz` 250); a 10-20 dB suprathreshold alert (comfortably felt on a street) is NOT demonstrated. Pad contact force and stiffness shift this; the estimate has about +-15 dB uncertainty. Retire on bench E1: drive 250 Hz burst, owner reports detection at 6 dB steps.
+Verdict: option is cheap and safe (current-limited, no new hardware) but unproven; do not enable by default.

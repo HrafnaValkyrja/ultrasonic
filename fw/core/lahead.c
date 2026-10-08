@@ -63,6 +63,17 @@ void fw_alert_start(fw_alert_t *a, uint32_t hz, int32_t cdb, uint32_t ms)
     a->total = ms * 25u / 2u;                    /* ms x 12.5 samples */
     a->ramp = a->total < 2u * ALERT_RAMP ? a->total / 2u : ALERT_RAMP;
     a->amp = fw_db20_to_lin((float)cdb * 0.01f);
+    a->period = 0u;
+    a->pulse = 0u;
+}
+
+void fw_haptic_start(fw_alert_t *a, uint32_t hz, int32_t cdb, uint32_t n, uint32_t pulse_ms, uint32_t gap_ms)
+{
+    fw_alert_start(a, hz, cdb, pulse_ms);
+    a->pulse = pulse_ms * 25u / 2u;
+    a->period = (pulse_ms + gap_ms) * 25u / 2u;
+    a->total = (n - 1u) * a->period + a->pulse;
+    a->ramp = a->pulse < 2u * ALERT_RAMP ? a->pulse / 2u : ALERT_RAMP;
 }
 
 uint32_t fw_alert_hop(fw_alert_t *a, float y[8])
@@ -75,8 +86,21 @@ uint32_t fw_alert_hop(fw_alert_t *a, float y[8])
             y[i] = 0.0f;
             continue;
         }
+        uint32_t p0 = 0u, pl = a->total;                 /* position inside the current pulse, pulse length */
+        if (a->period != 0u) {
+            p0 = a->pos % a->period;
+            pl = a->pulse;
+            if (p0 >= pl) {                              /* gap between pulses: silence, phase restarts at 0 */
+                a->ph = 0u;
+                y[i] = 0.0f;
+                a->pos++;
+                continue;
+            }
+        } else {
+            p0 = a->pos;
+        }
         if (a->ramp != 0u) {
-            uint32_t d = a->pos < a->ramp ? a->pos : (a->pos + a->ramp >= a->total ? a->total - a->pos : a->ramp);
+            uint32_t d = p0 < a->ramp ? p0 : (p0 + a->ramp >= pl ? pl - p0 : a->ramp);
             if (d < a->ramp) {
                 float s = fw_sin_turns((uint32_t)(((uint64_t)d << 30) / a->ramp));   /* quarter turn */
                 e = s * s;
