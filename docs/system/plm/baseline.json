@@ -10,11 +10,11 @@
    }
   },
   "INTEGRATION": {
-   "by": "claude-worker",
+   "by": "claude-lead",
    "date": "2026-10-08",
-   "note": "integration-map updated for k4 variant keys (56cf4fd)",
+   "note": "integration-map covers the current.yaml cell key (rails reads it), 2026-10-08",
    "stamp": {
-    "file:hw/current.yaml": "dd16ec73dd49f2b5",
+    "file:hw/current.yaml": "23b7b1c63ece5cc3",
     "file:hw/pod/gen.py": "3ed3676e85fb73eb",
     "file:hw/pod/system_map.py": "9515e835b9f57709"
    }

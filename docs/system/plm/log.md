@@ -690,3 +690,4 @@
 - 2026-10-08 08:41 review REG-ARM by claude: O34/ECR-0024 lift default: spec O34 and whole doc consistent
 - 2026-10-08 10:53 review SUB-PROCESSING by SAI-13 worker: pipeline.py gained eq_notch_power (mic-port notch); doc line 80 updated
 - 2026-10-08 16:23 review INTEGRATION by claude-worker: integration-map updated for k4 variant keys (56cf4fd)
+- 2026-10-08 16:50 review INTEGRATION by claude-lead: integration-map covers the current.yaml cell key (rails reads it), 2026-10-08
