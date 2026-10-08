@@ -1420,7 +1420,20 @@ def load_row(ld, totals, rows, sch, F, rid):
     return a, b, c
 
 
-def rail_totals(budget, sch, F=None):
+def design_cell():
+    """The design's cell and the FWSIM-R64 bridge clamp, from hw/current.yaml `cell` (absent = fw/variants.yaml default_cell) and fw/variants.yaml:
+    i_peak_max = min(cell_derate x pulse, u4_derate x U4 rating). None when variants.yaml is not readable."""
+    try:
+        v = load_yaml(CFG.root / "fw/variants.yaml")
+        cid = (getattr(DESIGN, "cell", None) if DESIGN else None) or v["default_cell"]
+        c, b = v["cells"][cid], v["bridge"]
+        clamp = min(b["cell_derate"]["val"] * c["pulse_ma"], b["u4_derate"]["val"] * b["u4_rating_ma"]["val"])
+        return dict(id=cid, capacity_ma=c["capacity_mah"], pulse_ma=c["pulse_ma"], clamp_ma=clamp)
+    except (OSError, KeyError, TypeError):
+        return None
+
+
+def rail_totals(budget, sch, F=None, clamp=None):
     """{rail id: {avg_lo, avg_hi, peak}} and the per-row figures, for every rail except the exclusive ones (computed in dependency order)."""
     F = F or Findings("rails")
     totals, rows = {}, {}
@@ -1432,6 +1445,8 @@ def rail_totals(budget, sch, F=None):
         for ld in rail.get("loads", []):
             try:
                 a, b, c = load_row(ld, totals, rows, sch, F, rail["id"])
+                if clamp is not None and ld.get("id") == "exciter":
+                    c = min(c, clamp)
             except KeyError:
                 F.add(FAIL, f"{rail['id']}: load '{ld.get('name', '?')[:40]}' draws from a rail that has no totals yet")
                 continue
@@ -1538,13 +1553,22 @@ def unmodelled_findings(F, budget, sch):
                         "budget it or say why it is not modelled", f"net {net} feeds {pins[0][0]}.{pins[0][1]} with no rail row")
 
 
-def check_rails(budget, sch):
+def check_rails(budget, sch, clamped=True):
+    """clamped=False judges the raw full-drive peak (the waiver machinery's own selftests use it)."""
     F = Findings("rails")
     problems = validate_budget(budget)
     if problems:
         return Result("rails", FAIL, f"rail-budget.yaml is unusable: {problems[0]}" + (f" (+{len(problems) - 1} more)" if len(problems) > 1 else ""), problems)
     margin = budget.get("margin_warn", 0.10)
-    totals, _ = rail_totals(budget, sch, F)
+    cell = design_cell() if clamped else None
+    unclamped, _ = rail_totals(budget, sch, Findings("unclamped"))
+    totals, _ = rail_totals(budget, sch, F, clamp=cell["clamp_ma"] if cell else None)
+    if cell:                                                        # judge on the clamped peak; the cell's own rating replaces the typed one
+        budget = copy.deepcopy(budget)
+        for rail in budget["rails"]:
+            for rt in rail.get("ratings", []):
+                if rt.get("cell_rating"):
+                    rt["continuous_ma"], rt["peak_ma"] = cell["capacity_ma"], cell["pulse_ma"]
     for rail in rail_order(budget["rails"], Findings("order")):
         rid, net = rail["id"], rail["net"]
         if net not in sch.nets:
@@ -1564,7 +1588,10 @@ def check_rails(budget, sch):
             continue
         topology_findings(F, rail, sch)
         rating_findings(F, rail, t["avg_hi"], t["peak"], margin, sch)
-        F.add(PASS, f"{rid}: average {t['avg_lo']:.1f}-{t['avg_hi']:.1f} mA, peak {t['peak']:.1f} mA over {len(rail['loads'])} declared loads" + "".join(f"; note: {n}" for n in rail.get("notes", [])))
+        cl = ""
+        if cell and abs(unclamped[rid]["peak"] - t["peak"]) > EPS:
+            cl = f" clamped (unclamped {unclamped[rid]['peak']:.1f} mA; FWSIM-R64 i_peak_max {cell['clamp_ma']:.0f} mA for cell {cell['id']}, pulse {cell['pulse_ma']} mA)"
+        F.add(PASS, f"{rid}: average {t['avg_lo']:.1f}-{t['avg_hi']:.1f} mA, peak {t['peak']:.1f} mA{cl} over {len(rail['loads'])} declared loads" + "".join(f"; note: {n}" for n in rail.get("notes", [])))
     d11_findings(F, budget, sch)
     unmodelled_findings(F, budget, sch)
     return F.result(f"{len(budget['rails'])} rails within their ratings, D11 holds on the whole circuit", "rail", warn_lead=f"{len(budget['rails'])} rails; ")
@@ -2094,14 +2121,14 @@ def selftest_cases(ctx):
         bare = copy.deepcopy(budget)
         for r in bare["rails"]:
             r.pop("waivers", None)
-        return Case(f"rails: the {rail['waivers'][0]['ecr']} waiver removed from {rail['id']}", lambda: check_rails(bare, sch), FAIL, "no ECR waiver")
+        return Case(f"rails: the {rail['waivers'][0]['ecr']} waiver removed from {rail['id']}", lambda: check_rails(bare, sch, False), FAIL, "no ECR waiver")
 
     def waiver_expired():
         rail = next(r for r in budget["rails"] if r.get("waivers"))
 
         def run():
             with ecr_states(**{rail["waivers"][0]["ecr"].replace("-", "_"): "closed"}):
-                return check_rails(budget, sch)
+                return check_rails(budget, sch, False)
         return Case(f"rails: the {rail['waivers'][0]['ecr']} waiver's ECR closed", run, FAIL, "waiver")
 
     def overload():
@@ -2114,6 +2141,18 @@ def selftest_cases(ctx):
                 ld["peak_ma"] = 10 * max(rt.get("peak_ma") or 0 for rt in r["ratings"])
         return Case(f"rails: {rail['id']} given a load ten times its rating, no waiver", lambda: check_rails(big, sch), FAIL, "no ECR waiver")
 
+    def clamp_overload():
+        cell = design_cell()
+        if not cell:
+            raise LookupError("n/a: fw/variants.yaml not readable, no clamp to test")
+        big = copy.deepcopy(budget)
+        for r in big["rails"]:
+            r.pop("waivers", None)
+            if r["id"] == "VSYS":                                   # a non-bridge load: the bridge clamp cannot hide it
+                next(ld for ld in r["loads"] if "avg_ma" in ld)["peak_ma"] = cell["pulse_ma"]
+        return Case(f"rails: VSYS given a {cell['pulse_ma']} mA non-bridge load on top of the clamped bridge ({cell['id']}): the cell pulse rating must trip",
+                    lambda: check_rails(big, sch), FAIL, "no ECR waiver")
+
     def waiver_ceiling():
         rail = next(r for r in budget["rails"] if any(w.get("max_ma") for w in r.get("waivers", [])))
         big = copy.deepcopy(budget)
@@ -2122,7 +2161,7 @@ def selftest_cases(ctx):
                 rt.pop("hard_limit_ma", None)                      # leave only the waiver's own ceiling
             for w in r.get("waivers", []):
                 w["max_ma"] = 310
-        return Case(f"rails: {rail['id']} peak above the waiver ceiling (no hard limit in play)", lambda: check_rails(big, sch), FAIL, "waiver ceiling")
+        return Case(f"rails: {rail['id']} peak above the waiver ceiling (no hard limit in play)", lambda: check_rails(big, sch, False), FAIL, "waiver ceiling")
 
     def hard_limit():
         rail = next(r for r in budget["rails"] if any("hard_limit_ma" in rt for rt in r.get("ratings", [])))
@@ -2144,7 +2183,7 @@ def selftest_cases(ctx):
         rt = next(rt for r in budget["rails"] for rt in r.get("ratings", []) if "derive" in rt)
         bad = copy_sch(sch)
         bad.parts[rt["derive"]["ref"]]["value"] = "3"
-        return Case(f"rails: {rt['derive']['ref']} 3R instead of its value: the derived power rating falls with it", lambda: check_rails(budget, bad), FAIL, "BRIDGE_RTN peak")
+        return Case(f"rails: {rt['derive']['ref']} 3R instead of its value: the derived power rating falls with it", lambda: check_rails(budget, bad, False), FAIL, "BRIDGE_RTN peak")
 
     def calc_moves():
         ref = next(r for ld in (ld for rl in budget["rails"] for ld in rl.get("loads", []) if "calc" in ld) for r in ld["calc"].get("parallel") or ld["calc"]["series"])
@@ -2198,7 +2237,7 @@ def selftest_cases(ctx):
     for build in (mic_origin, mic_stack, mic_lid, mic_face, mic_ap, mic_locating, mic_located, switch_locating, switch_off, switch_stack, outline_wide, outline_tall, outline_thick, outline_drag, round_trip_mic,
                   dup_ref, inside_far, inside_rear, clamp_body, clamp_tiny, clamp_wire_pad, vhb_flip, vhb_pocket, vhb_bond, heights, heights_pocket, ledge_post, ledge_wide, stack_tall, heights_empty, nets_swap, nets_missing,
                   pin_wrong, pair, power_pin, ep, netlist, hazard_expired, hazard_mitigated_closed, rows_deleted, contract_empty, power_rows_deleted, unconstrained, budget_unusable, budget_no_d11, hazards_deleted, absent_wrong, absent_removed,
-                  ecr_format, waiver_removed, waiver_expired, overload, waiver_ceiling, hard_limit, assumes, derive, calc_moves, rail_order_, d11_inductor, d11_vdd11,
+                  ecr_format, waiver_removed, waiver_expired, overload, clamp_overload, waiver_ceiling, hard_limit, assumes, derive, calc_moves, rail_order_, d11_inductor, d11_vdd11,
                   new_rail, topology, frame_expired):
         add(build)
     return cases

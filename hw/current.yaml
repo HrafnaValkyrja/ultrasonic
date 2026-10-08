@@ -93,6 +93,7 @@ k4:                                             # NON-DEFAULT (owner O33, ECR-00
   id: k4
   name: "K4 end-to-end pod: two 6-layer boards (P upper, M lower) + Renata ICP401230UPR 130 mAh in line, flat 1.0 lid, dock under the cell"
   ecr: ECR-0021
+  cell: K1_130                                      # fw/variants.yaml cells key (rails check, FWSIM-R64 clamp); absent = default_cell
   owner_decision: O33
   packages: mz2
   generate: "python3 hw/pod/k4/gen.py"

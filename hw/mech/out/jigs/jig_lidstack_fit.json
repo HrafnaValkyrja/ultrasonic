@@ -1,0 +1,42 @@
+{
+ "v_M_Fface": 4.95,
+ "v_M_Bface": 5.75,
+ "v_pin_tip": 4.4,
+ "v_lid_inner": 4.0,
+ "ledge_top_v": 4.7,
+ "interf_lid_jig": 0,
+ "interf_M_jig": 0,
+ "interf_M_lid": 0,
+ "interf_U2_jig": 0,
+ "interf_U2_lid": 0,
+ "interf_gauge_jig": 0,
+ "interf_gauge_lid": 0,
+ "interf_gauge_M": 0,
+ "interf_gauge_U2": 0,
+ "interf_clips_lid": 0,
+ "interf_clips_M_U2": 0,
+ "interf_clips_body": 0,
+ "interf_gauge_clips": 0,
+ "gap_lid_cradle_per_side_mm": 0.15,
+ "lid_bbox_u": [
+  17.65,
+  67.5
+ ],
+ "lid_bbox_w": [
+  -9.7,
+  5.55
+ ],
+ "M_front_edge_to_pin1_face_mm": 0.05,
+ "M_lower_edge_to_pin2_face_mm": 0.05,
+ "pin1_tip_above_lid_inner_mm": 0.4,
+ "pin_tip_vs_M_Fface_mm": 0.55,
+ "mic_path_radial_mm": {
+  "gauge_r": 0.3,
+  "jig_hole": 0.3,
+  "lid_bore": 0.2,
+  "M_hole": 0.025000000000000022
+ },
+ "clip_pull_overlap_mm3_max": 0.0,
+ "lid_lift_overlap_mm3_max": 0.0,
+ "lid_lift_first_blocked_at_mm": null
+}

@@ -24,7 +24,7 @@ POINTER = REPO / "hw/current.yaml"
 ENV = "ULTRASONIC_DESIGN"
 PATH_KEYS = ("board", "board_placed", "placement", "netlist", "bom", "shell", "shell_dims", "shell_out")
 OPT_PATH_KEYS = ("board_p", "netlist_p", "bom_p")      # second board of a two-board design (K4: P); None when absent
-META_KEYS = ("id", "name", "ecr", "owner_decision", "packages", "generate", "acoustic_scenario")
+META_KEYS = ("id", "name", "ecr", "owner_decision", "packages", "generate", "acoustic_scenario", "cell")
 
 
 def _load(path=POINTER):

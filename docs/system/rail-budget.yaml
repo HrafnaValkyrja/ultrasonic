@@ -114,8 +114,9 @@ rails:
     source: "U3 BQ25180YBGR SYS (power path): VBUS when docked, the Renata cell through U3's battery FET otherwise"
     source_refs: [U3]
     ratings:
-      - name: "Renata ICP501233PA-02 cell discharge (on battery VSYS is the cell)"
-        short: "the cell's 2C pulse rating"
+      - name: "Renata cell discharge (on battery VSYS is the cell); values below are the 175 mAh default, interfaces.py swaps in the design's cell from hw/current.yaml `cell` / fw/variants.yaml"
+        short: "the cell's pulse rating"
+        cell_rating: true
         continuous_ma: 175
         peak_ma: 350
         source: "Renata spec Rev V03 (08/2019): 175 mA continuous (1C), 350 mA (2C) in pulses; pulse duration not stated; sub-power.md Constraints"
