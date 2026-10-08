@@ -216,6 +216,8 @@ Netlists (rev 3, area re-balance 2026-10-08): hw/pod/k4/gen.py -> pod_k4_M.net (
 
 30 contacts = 16 signal/power + 14 GND (odd pins row A, even row B [T]). Parts: P plug C424570 BM28B0.6-30DP/2-0.35V(51), M receptacle C424571 BM28B0.6-30DS/2-0.35V(51), JLC 2026-10-08. Rating 0.3 A per signal contact [T, secondary source]; +3V0 (LDO on M to P) uses 3 contacts, the 315 mA bridge peaks are served by C14/C4/C7 on P. No VLXSMPS, VDD11 or bridge node crosses. Mated height 0.6 mm [T].
 
+K4 dock (ECR-0021, proposed; docs/research/k4-dock.yaml option_A_design, 2026-10-08): J3 / J11 / J10 / J4 are 4 castellated ENIG pads (pitch 2.5) on the 0.8 mm tab of board M, seen through 4 belly windows, with 2 N52 D2.5 x 1.0 magnets in bossed belly pockets; they replace the YZT0675 target (J3/J4/J10/J11 wired). Head YZP0048-20048-04025-03 (C5126845). Nets and D4/D5/U6 unchanged; pod L 49.15 -> 50.65. Magnet pitch, polarity and stroke of the head are [T] until a sample is calipered.
+
 ## 10. Required cross-check for every proposed change
 
 Every proposed change must state, and check against the sections above:

@@ -129,3 +129,13 @@ rec: check magnet keying on a sample; if unkeyed, VBUS on centre pin 3 so a rota
 - hw/current.yaml `reference` (env `ULTRASONIC_DESIGN=revg`): `hw/pod/draft_r1/pod_r1_routed.kicad_pcb`, `hw/mech/shell_r1.py`; history = git.
 - Dock pads on F at x 31.4 (J3/J4) and 33.0 (J10/J11/J12) with J4 GND between J3 and J5 (ASM-09); 0.60 mm pad gaps (J3–J4, J3–J10, J4–J5 ...); D5 on F at (29.9, 3.2); D6 on B behind J12; D4 1N5819WS SOD-323 (C191023, Basic); R12/R13/R18 0402.
 - shell_r1: `DOCK` z −13.2…−10.4, 2.3 mm from the target back face to the cell; `USBC_KEEPOUT` x 47.9–55.0 declared (overlapped the target rear by 4.8 mm), never cut.
+
+## K4 own dock (ECR-0021, proposed; not the current design until ECR-0019/0020/0021 are adopted)
+src: `docs/research/k4-dock.yaml` option_A_design (2026-10-08), `hw/mech/dims_k4.py`, `hw/mech/shell_k4.py`, `sim/checks/dock_pull.py`. [T] = inferred, not from a datasheet.
+- Target YZT0675 (C5126848) is replaced by the pod's own contacts: 4 castellated half-hole ENIG pads on the 0.8 mm tab of board M, pitch 2.5, order J3 DOCK_VBUS, J11 USB_DM, J10 USB_DP, J4 GND (USB-standard order; head wire order unknown, closes at the sample, DK-02). J12/R18/D6 gone (ECR-0019); D4, D5, U6 on M.
+- Head: Xinyangze YZP0048-20048-04025-03, LCSC C5126845, 4-pin pogo, stock 46 on 2026-10-08, pitch 2.5, 1 A/pin, 30 gf/pin (listing). Unpublished [T]: magnet pitch (13.2 assumed), pogo stroke (>= 0.9), tip dia, magnet polarity.
+- Seating: 2 N52 D2.5 x 1.0 magnets in the belly pockets; pull about 2.2 N vs spring 1.18 N, net about +1.0 N (idealised model, real 0.7-0.9x; sim/checks/dock_pull.py). Polarity keyed opposite to the head's.
+- Finish: ENIG 2-5 u-inch (hard gold not offered on castellated edges, JLC blog 2026-10-08). Wear untested (O16-connector stage D).
+- Sealing: 4 windows 1.3 x 1.2 in the 0.6 wall plus a 0.1 gap; inner UV acrylic/silicone fillet; sweat leakage between 1.6 mm-spaced barrels is the risk (dock unpowered unless a head is seated).
+- DK-11 (open, 2026-10-08): caliper a C5126845 sample (magnet pitch, stroke, tip, polarity) before the shell freezes; fallback A2 = bought 4-pad dock chip in a belly window, wired to M. Magnets: sourcing step, nothing ordered (O21).
+- Cross-doc: reg-pod-body (windows, pockets, +1.5 mm length), physical (envelope), reg-board (M tab at mid-plane y 6.8).

@@ -12,7 +12,7 @@
   "INTEGRATION": {
    "by": "claude",
    "date": "2026-10-07",
-   "note": "ECR-0020: K4 split section 11 added to integration-map and system_map.py (proposed, not current design)",
+   "note": "ECR-0021 K4 own dock: K4 dock sections added",
    "stamp": {
     "file:hw/current.yaml": "d1d7c9cc78083477",
     "file:hw/pod/gen.py": "3ed3676e85fb73eb",
@@ -20,9 +20,9 @@
    }
   },
   "PHYSICAL": {
-   "by": "claude-backlog",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "round 11: duct/k1t/coupon non-default; phase2 values identical (snapshot: only REAR_GAP added = 1.1); puck() guard only for infeasible stacks",
+   "note": "ECR-0021 K4 own dock: K4 dock sections added",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
@@ -70,7 +70,7 @@
   "REG-POD-BODY": {
    "by": "claude",
    "date": "2026-10-07",
-   "note": "RPB-12: belly-step witness groove 0.1x0.4; reopen.md; shell checks unchanged",
+   "note": "ECR-0021 K4 own dock: K4 dock sections added",
    "stamp": {
     "file:hw/mech/blade.py": "ad6b4d86e46c5d84",
     "file:hw/mech/dims_r2.py": "d5e3fa6b93c2df7d",
@@ -107,9 +107,9 @@
    }
   },
   "SUB-DOCK-USB": {
-   "by": "claude-backlog",
+   "by": "claude",
    "date": "2026-10-07",
-   "note": "round 10: K1 variant hook; phase2 values identical (regressions 0 diffs); docs carry the variant note; K1 facts in reg-pod-body Variants",
+   "note": "ECR-0021 K4 own dock: K4 dock sections added",
    "stamp": {
     "block:DOCK_USB": "afe17caa4e770b93",
     "sym:hw/mech/dims_r2.py::DOCK": "9f3e8ca2743ae3a7"

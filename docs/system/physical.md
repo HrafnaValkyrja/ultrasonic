@@ -206,3 +206,8 @@ Wire slack for lifting the lid with the board on its wires (DBG-17, computed 202
 
 ## Reference design (Rev F/G)
 `hw/mech/shell_r1.py` + `hw/pod/place_r1.py` (env `ULTRASONIC_DESIGN=revg`): board 34 × 13 at pod x 30.6-64.6, parts on both faces (bands 1.2 each), clamped at y 12.1-12.9 between two lid ribs (F edge bands) and 1.5 mm foam strips with 0.1 mm of cell under each; seam y 14.4 with a lid lip round the main cavity, butt joint round a 3.5 mm belly; open 1.5 mm gap board → lid bore Ø1.0 at pod 34.5; floating plunger at pod 52.6; J pads on F in two columns at pod 62.0/63.6, wires up a 2.1 mm gap behind the board; pod 38.0 × 11.8 × 15.2. Board ↔ pod z: pod z = board y − 8.6 (CAD pod), centre line board 6.5 = pod −2.1. Full text: git history of this file (before 2026-10-07).
+
+## K4 dock envelope (ECR-0021, proposed)
+- Pod envelope T 6.4 x H 14.8 x L 50.65 (was 49.15): the extra 1.5 mm is at the front for the dock magnet; stack moves to pod x 17.7-28.7, wire gap 0.8 -> 2.3.
+- Dock pads: M tab x 21.05-30.45, y mid 6.8, 0.8 thick, bottom z -9.0 (0.7 recessed from the outer belly); magnets x 19.15 / 32.35. M mid-plane pinned at y 6.8; its parts on the floor face (1.3 high), lid face flat.
+- Replaces the `Dock target` row (YZT0675 21.2 x 6.86 x 2.8) when adopted. src `hw/mech/dims_k4.py`, `docs/research/k4-dock.yaml`.

@@ -66,6 +66,7 @@ evidence_pins:
   "docs/research/A3-u575-plan.md": "ed9d824656"
   "docs/research/drastic/V9-k4-board.yaml": "e0b731d4c9"
   "docs/research/ear-open-fit.md": "9989f8ab7c"
+  "docs/research/k4-dock.yaml": "3e03ebb731"
   "docs/research/pad-led.md": "74e219f7ee"
   "docs/system/integration-map.md": "691dac315d"
   "docs/system/physical.md": "be19a73b90"
@@ -86,6 +87,7 @@ evidence_pins:
   "sim/checks/balance.py": "3b9348b1ac"
   "sim/checks/bridge_spice.py": "01edb203ac"
   "sim/checks/deadtime_switching.py": "195db1493e"
+  "sim/checks/dock_pull.py": "a827110ebd"
   "sim/checks/dsp_phase1_summary.json": "97250ccd9f"
   "sim/checks/idle_detector.py": "dfda96c50e"
   "sim/checks/niti_arm_real.py": "62944f12dd"
@@ -921,8 +923,8 @@ requirements:
     functions: [F5, F9, F10, F15]
     artefacts: [hw/pod/gen.py, ERC, "interfaces:pins", docs/system/sub-dock-usb.md]
     planned: ["boot stub and the ROM DFU round trip on rev 1 (bring-up step 6)", "dock cable, 5-pin head and pin order"]
-    evidence: [hw/pod/gen.py, docs/system/sub-dock-usb.md]
-    ecrs: [ECR-0009, ECR-0010, ECR-0013, ECR-0019]
+    evidence: [hw/pod/gen.py, docs/system/sub-dock-usb.md, sim/checks/dock_pull.py, docs/research/k4-dock.yaml]
+    ecrs: [ECR-0009, ECR-0010, ECR-0013, ECR-0019, ECR-0021]
     related: [O18-firmware-fixable]
     next: "Design the boot stub and DFU entry; fix the dock cable and pin order"
     gap: >-
@@ -932,6 +934,7 @@ requirements:
       decides; with charger watchdog option B (the recommended one) a DFU session longer than 160 s power-cycles the pod unless the
       boot stub disables it first; the 5-pin cable head
       has no JLC stock. D: enumerate over the dock, jump to ROM DFU and re-flash, charge, with the magnets in place.
+      K4 (ECR-0021, 2026-10-08): own castellated pads + 2 N52 D2.5x1.0 magnets; idealised pull about 2.2 N vs 1.18 N spring (net +1.0 N, sim/checks/dock_pull.py); head magnet pitch, polarity and stroke are [T] until a C5126845 sample is calipered.
 
   - id: O12-sealing
     kind: owner
@@ -1046,8 +1049,8 @@ requirements:
     functions: [F5, F10]
     artefacts: [docs/system/sub-dock-usb.md, hw/pod/gen.py, hw/mech/shell_r1.py, ERC, "interfaces:pins"]
     planned: ["cut and check the USB-C keep-out in the shell (shell_r1.py defines it and never uses it)", "a cable-side head that is in stock and matches the target (5 contacts)", "mate, tug and release the cable on a built pod"]
-    evidence: [docs/system/sub-dock-usb.md, hw/mech/shell_r1.py]
-    ecrs: [ECR-0019]
+    evidence: [docs/system/sub-dock-usb.md, hw/mech/shell_r1.py, sim/checks/dock_pull.py, hw/mech/shell_k4.py, docs/research/k4-dock.yaml]
+    ecrs: [ECR-0019, ECR-0021]
     covers: [O31]
     related: [O12-dock]
     next: "Fix the cable-side part number and stock; cut the USB-C keep-out in the shell model and check its overlap with the target"
@@ -1056,6 +1059,7 @@ requirements:
       contacts, two NdFeB magnets, C5126848) is glued flush into the belly floor and hand-wired to pads J3/J4/J10/J11/J12
       (sub-dock-usb.md). Open: the cable-side head (YZP0048, C5126847) showed no stock at JLC on 2026-10-02 and docs/build/bom.md
       lists a different 4-pin head (sub-dock-usb issue 1); the sealed USB-C fallback (Same Sky UJ32-C-H-G-MSMT) is dropped by O31 (2026-10-08; ECR-0019 moves Rd to the head). D: whether the magnets hold under wear, sweat and the cable's pull is untested.
+      K4 (ECR-0021, 2026-10-08): the pod-side target is replaced by own pads (4 castellated ENIG on M) + 2 N52 magnets for head C5126845 (YZP0048-04025-03, stock 46 on 2026-10-08); own magnets are within O16(3). Pull is modelled (about 2.2 N vs 1.18 N spring, sim/checks/dock_pull.py), not measured.
 
   - id: O33
     kind: owner

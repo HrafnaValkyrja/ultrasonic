@@ -630,3 +630,16 @@
 - 2026-10-08 ECR-0020 rev 3 by claude: area re-balance, M = mic+charger+LDO+dock+button (23 parts), P = MCU+SMPS+bridge (31); BM28 30 contacts (16 signal, 14 GND); est. L P ~11.5, M ~9 mm
 - 2026-10-07 22:16 review SPEC by claude: O28-O33 recorded; 00-whole updated
 - 2026-10-07 22:16 review WHOLE by claude: O28-O33 recorded; 00-whole updated
+- 2026-10-07 22:52 checkout SUB-DOCK-USB by claude: ECR-0021 K4 own dock
+- 2026-10-07 22:52 checkout REG-POD-BODY by claude: ECR-0021 K4 own dock
+- 2026-10-07 22:52 checkout PHYSICAL by claude: ECR-0021 K4 own dock
+- 2026-10-07 22:52 checkout INTEGRATION by claude: ECR-0021 K4 own dock
+- 2026-10-07 22:52 ECR-0021 raised by claude: K4 own dock target: 4 castellated ENIG pads on M + belly windows + 2 N52 magnets (replaces YZT0675; builds on ECR-0019/0020)
+- 2026-10-07 22:52 review SUB-DOCK-USB by claude: ECR-0021 K4 own dock: K4 dock sections added
+- 2026-10-07 22:52 review REG-POD-BODY by claude: ECR-0021 K4 own dock: K4 dock sections added
+- 2026-10-07 22:52 review PHYSICAL by claude: ECR-0021 K4 own dock: K4 dock sections added
+- 2026-10-07 22:52 review INTEGRATION by claude: ECR-0021 K4 own dock: K4 dock sections added
+- 2026-10-07 22:53 checkin SUB-DOCK-USB by claude
+- 2026-10-07 22:53 checkin REG-POD-BODY by claude
+- 2026-10-07 22:53 checkin PHYSICAL by claude
+- 2026-10-07 22:53 checkin INTEGRATION by claude

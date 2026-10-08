@@ -179,7 +179,7 @@ relations:
   - id: R-DOCK-BODY
     a: SUB-DOCK-USB
     b: REG-POD-BODY
-    what: "magnetic target in the belly bay + window (the whole belly is tub in Phase 2), wired to J3/J4/J10/J11/J12; the USB-C fallback is dropped (O31, ECR-0019)"
+    what: "magnetic target in the belly bay + window (the whole belly is tub in Phase 2), wired to J3/J4/J10/J11/J12; the USB-C fallback is dropped (O31, ECR-0019); K4 (ECR-0021, proposed): own 4 castellated ENIG pads on M + 4 belly windows + 2 N52 magnets replace the target (pod L +1.5 mm)"
     watch: ["sym:hw/mech/dims_r2.py::DOCK", "sym:hw/mech/dims_r2.py::BAY", "sym:hw/mech/shell_r2.py::tub"]
   - id: R-DOCK-BOARD
     a: SUB-DOCK-USB

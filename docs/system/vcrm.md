@@ -62,13 +62,13 @@ The matrix never overrides the spec. If a row shows the design cannot meet a req
 
 | Stage | Rows | done | partial | not-started |
 |---|---|---|---|---|
-| C: in a computer, before hardware | 48 | 1 | 45 | 2 |
-| D: on rev 1: bench, wear, field | 46 | 0 | 0 | 46 |
-| whole row | 49 | 0 | 46 | 3 |
+| C: in a computer, before hardware | 49 | 1 | 46 | 2 |
+| D: on rev 1: bench, wear, field | 47 | 0 | 0 | 47 |
+| whole row | 50 | 0 | 47 | 3 |
 
 **No stage-C verification defined (rev 1 must reveal these, O18):** `D7-transducer`
 
-**Stage C is a surrogate only; the requirement itself is judged on rev 1 (34):** `S1.1-goal`, `S1.2-C1`, `S1.2-C2`, `S1.2-C3`, `S1.2-C4`, `S1.3-T1`, `S1.3-T2`, `S1.3-T3`, `S1.3-T4`, `S1.3-T5`, `S1.3-T6`, `D1-force`, `D2-nolink`, `D6-output`, `D11-selfnoise`, `D12-off`, `D13-mic`, `D16-crystal`, `D17-popfree`, `D18-runtime`, `D18-balance`, `O8-led`, `O10-twostage`, `O12-dock`, `O12-sealing`, `O12-fastcharge`, `O16-cell`, `O16-connector`, `O16-ip68switch`, `O17-wiring`, `O18-firmware-fixable`, `O19-reliability`, `O19-serviceability`, `O20-finalsize`
+**Stage C is a surrogate only; the requirement itself is judged on rev 1 (35):** `S1.1-goal`, `S1.2-C1`, `S1.2-C2`, `S1.2-C3`, `S1.2-C4`, `S1.3-T1`, `S1.3-T2`, `S1.3-T3`, `S1.3-T4`, `S1.3-T5`, `S1.3-T6`, `D1-force`, `D2-nolink`, `D6-output`, `D11-selfnoise`, `D12-off`, `D13-mic`, `D16-crystal`, `D17-popfree`, `D18-runtime`, `D18-balance`, `O8-led`, `O10-twostage`, `O12-dock`, `O12-sealing`, `O12-fastcharge`, `O16-cell`, `O16-connector`, `O33`, `O16-ip68switch`, `O17-wiring`, `O18-firmware-fixable`, `O19-reliability`, `O19-serviceability`, `O20-finalsize`
 
 **Stage C can decide (14):** `D3`, `D9`, `D10`, `D11-topology`, `D12-modes`, `D14-clocks`, `D17-ceiling`, `O9-prototype`, `O13-budget`, `O16-nohousingscrews`, `O16-oneboard`, `O16-pad`, `O18-diagnosability`, `O18-stageC-classes`
 
@@ -120,12 +120,13 @@ The matrix never overrides the spec. If a row shows the design cannot meet a req
 | `O8-led` | Inspection, Analysis, Demonstration | partial (surrogate) | not-started |  |  | Add LED current to power.py; settle the LED PWM against the idle-mode plan |
 | `O9-prototype` | Inspection | partial (decides) | - |  | 0010 | Design the snap-off test frame and pogo jig; decide the SWD probe or a BOOT0 pad |
 | `O10-twostage` | Inspection, Demonstration | partial (surrogate) | not-started |  |  | Write the sealing-and-service note; cut open and re-seal a printed pod |
-| `O12-dock` | Analysis, Test, Demonstration | partial (surrogate) | not-started |  | 0009, 0010, 0013 | Design the boot stub and DFU entry; fix the dock cable and pin order |
+| `O12-dock` | Analysis, Test, Demonstration | partial (surrogate) | not-started |  | 0009, 0010, 0013, 0019, 0021 | Design the boot stub and DFU entry; fix the dock cable and pin order |
 | `O12-sealing` | Inspection, Test | partial (surrogate) | not-started | yes |  | Design the mic seal and mesh, choose skin and adhesive, write the spray-test plan |
 | `O12-fastcharge` | Analysis, Test | partial (surrogate) | not-started |  | 0009, 0002, 0008, 0013 | Write the charger register plan as firmware; compute charge time; plan the supervised first charge |
 | `O13-budget` | Analysis, Inspection | partial (decides) | not-started |  |  | Compute the first-order total against $300 once the simplification study fixes the part list; price the TBD items |
 | `O16-cell` | Inspection, Analysis, Test | partial (surrogate) | not-started |  | 0001, 0008 | Dry-fit the real pouch; re-check the heel exit against it |
-| `O16-connector` | Inspection, Test | partial (surrogate) | not-started |  |  | Fix the cable-side part number and stock; cut the USB-C keep-out in the shell model and check its overlap with the target |
+| `O16-connector` | Inspection, Test | partial (surrogate) | not-started |  | 0019, 0021 | Fix the cable-side part number and stock; cut the USB-C keep-out in the shell model and check its overlap with the target |
+| `O33` | Analysis, Inspection | partial (surrogate) | not-started |  | 0020, 0019 | Owner review of ECR-0020; then lay out M and P |
 | `O16-nohousingscrews` | Inspection | done (decides) | not-started |  |  | Confirm on the built pod |
 | `O16-ip68switch` | Inspection, Test | partial (surrogate) | not-started |  | 0012 | Regenerate the board after the footprint cleanup; set the plunger reach; press-test on a scale |
 | `O16-oneboard` | Inspection, Analysis | partial (decides) | not-started |  | 0011, 0001 | Script the left-pod board mapping and check the off-centre parts in both shells |
@@ -136,7 +137,7 @@ The matrix never overrides the spec. If a row shows the design cannot meet a req
 | `O18-stageC-classes` | Analysis, Inspection | partial (decides) | - |  |  | Add checks for noise coupling, thermal, ESD and assembly yield |
 | `O19-reliability` | Analysis, Test, Inspection | partial (surrogate) | not-started |  | 0006, 0008 | Flex-cycle the arm joint; build the spares list; complete the sourcing lock |
 | `O19-serviceability` | Inspection, Demonstration | partial (surrogate) | not-started |  |  | Time a cell swap and an arm swap on a printed pod |
-| `O20-finalsize` | Analysis, Inspection, Demonstration | partial (surrogate) | not-started | yes | 0001, 0006 | Set numeric board and pod envelopes in the simplification study |
+| `O20-finalsize` | Analysis, Inspection, Demonstration | partial (surrogate) | not-started | yes | 0001, 0006, 0020 | Set numeric board and pod envelopes in the simplification study |
 
 ### Spec items with no row (recorded waivers, `not_verifiable`)
 

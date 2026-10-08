@@ -177,3 +177,10 @@ k1t_button_round12: {src: "sim/checks/button_concepts.py -> sim/out/mech/button_
 
 ## Reference design (Rev F/G)
 `hw/mech/shell_r1.py` (env `ULTRASONIC_DESIGN=revg`), last changed 2026-10-01: seam at y 14.4 with a 0.5 lid lip round the main cavity only (butt joint round the belly); board 34 × 13 clamped by two lid ribs on 0.6 mm F edge bands over 1.5 mm foam strips with 0.1 mm of cell under each; open D1.0 lid bore over a 1.5 mm unsealed gap (no mesh, no duct); floating printed plunger Ø2.9 in a Ø3.2 bore over SW1 at board (22.0, 6.5); USB-C keep-out behind a 3.5 mm belly; spine top a separate floating solid; envelope 38.0 × 11.8 × 15.2, 7801 mm³; tub 1289 / lid 1023 / spine 160 mm³. Full text: git history of this file (before 2026-10-07).
+
+## K4 dock bay (ECR-0021, proposed; replaces the YZT0675 window above when adopted)
+src: `hw/mech/dims_k4.py` (dock block), `hw/mech/shell_k4.py` (dock_add/dock_cut), `docs/research/k4-dock.yaml` option_A_design.
+- Belly: 4 windows 1.3 x 1.2 through the 0.6 wall (webs 1.2) over pads at pod x 22.0, 24.5, 27.0, 29.5, y 6.8; 2 bossed magnet pockets D2.6 at x 19.15 and 32.35 (0.2 outer skin, boss D2.9, top z -8.45); front pocket edge 1.0 behind the pod front, where the belly round starts.
+- Pod length 49.15 -> 50.65 (DOCK_SHIFT 1.5 at the front); T 6.4 and H 14.8 unchanged; the cell cannot move back (strut-relief fill clip at x 62.0).
+- Clearances 2026-10-08: tab to bosses 0.4, tab to cell 0.55, boss top to cell and to M edge 0.15 (tightest). Remaining clashes tub/cell 0.14 mm3 and tub/arm_wires 0.11 mm3, not from the dock.
+- Assembly: pod magnets set with a marked jig (polarity from the jig); after M/P are hung, flow low-viscosity UV acrylic into the 0.1 gap and fillet each window web from the cavity side; leave the castellations open.
