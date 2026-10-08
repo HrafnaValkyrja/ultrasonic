@@ -660,3 +660,13 @@
 - 2026-10-08 04:13 checkout REG-BOARD by K4 mic filter agent: rev5 line
 - 2026-10-08 04:13 review REG-BOARD by K4 mic filter agent: K4 M rev5
 - 2026-10-08 04:13 checkin REG-BOARD by K4 mic filter agent
+- 2026-10-08 04:33 checkout REG-POD-BODY by K4 ledge agent: ECR-0022 lid ledge
+- 2026-10-08 04:33 checkout REG-BOARD by K4 ledge agent: ECR-0022 C21 0402 M reroute
+- 2026-10-08 04:33 checkout PHYSICAL by K4 ledge agent: ECR-0022 stack chain
+- 2026-10-08 04:34 review REG-POD-BODY by K4 ledge agent: ECR-0022 ledge + C21 0402
+- 2026-10-08 04:34 checkin REG-POD-BODY by K4 ledge agent
+- 2026-10-08 04:34 review REG-BOARD by K4 ledge agent: ECR-0022 ledge + C21 0402
+- 2026-10-08 04:34 checkin REG-BOARD by K4 ledge agent
+- 2026-10-08 04:34 review PHYSICAL by K4 ledge agent: ECR-0022 ledge + C21 0402
+- 2026-10-08 04:34 checkin PHYSICAL by K4 ledge agent
+- 2026-10-08 04:34 ECR-0022 raised by K4 ledge agent: K4 lid ledge (VHB on its tip) + C21 10 uF 0603 -> 0402, pod T unchanged

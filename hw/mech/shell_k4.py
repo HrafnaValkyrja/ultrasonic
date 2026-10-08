@@ -17,6 +17,7 @@ Hand assembly (order; every fixing is glue/VHB, nothing screwed except the M1.4 
 from __future__ import annotations
 
 import json
+import math
 import sys
 from pathlib import Path
 
@@ -123,9 +124,71 @@ def tub():
     return t - seam_rebate()
 
 
+def _m_lid_face_rects(expand=0.1):
+    """M lid-face (file B) courtyards from routed_M.kicad_pcb as stack-frame rects (x from the outline corner, z from the top edge) grown by `expand`, plus the outline size."""
+    import pcbnew
+    b = pcbnew.LoadBoard(str(Path(__file__).resolve().parents[2] / "hw/pod/k4/routed_M.kicad_pcb"))
+    bb = b.GetBoardEdgesBoundingBox(); x0, y0 = pcbnew.ToMM(bb.GetLeft()), pcbnew.ToMM(bb.GetTop())
+    out = []
+    for f in b.GetFootprints():
+        if not f.IsFlipped():          # file F = inner face; the lid face is file B
+            continue
+        cy = f.GetCourtyard(pcbnew.B_CrtYd); r = cy.BBox() if cy.OutlineCount() else f.GetBoundingBox(False)
+        out.append((f.GetReference(), pcbnew.ToMM(r.GetLeft()) - x0 - expand, pcbnew.ToMM(r.GetTop()) - y0 - expand,
+                    pcbnew.ToMM(r.GetRight()) - x0 + expand, pcbnew.ToMM(r.GetBottom()) - y0 + expand))
+    return out, (pcbnew.ToMM(bb.GetWidth()), pcbnew.ToMM(bb.GetHeight()))
+
+
+def ledge_ring(y0, y1):
+    """ECR-0022: perimeter ledge frame (LEDGE_W wide, LEDGE_INSET in from the board edge) + a tube round the mic port bore, between y0 and y1.
+    Notched (0.1 clear) wherever an M lid-face courtyard (wire pads, TP, NTC) sits on the band; the notched frame is what is printed and where the VHB goes."""
+    xa, xb, za, zb = STACK_X0 + LEDGE_INSET, STACK_X1 - LEDGE_INSET, STACK_Z0 + LEDGE_INSET, STACK_Z1 - LEDGE_INSET
+    ring = box(xa, xb, y0, y1, za, zb) - box(xa + LEDGE_W, xb - LEDGE_W, y0 - 1, y1 + 1, za + LEDGE_W, zb - LEDGE_W)
+    rects, (Lb, Hb) = _m_lid_face_rects()
+    for ref, rx0, rz0, rx1, rz1 in rects:
+        if ref in ("U2", "SW1"):
+            continue
+        ring = ring - box(STACK_X0 + rx0, STACK_X0 + rx1, y0 - 1, y1 + 1, STACK_Z0 + rz0, STACK_Z0 + rz1)
+    ring = ring + ycyl(MIC[0], MIC[1], DUCT_TUBE_D, y0, y1)
+    return ring - ycyl(MIC[0], MIC[1], DUCT_D, y0 - 1, y1 + 1)
+
+
+def ledge_check():
+    """Notched ledge vs the M lid-face courtyards: which parts force a notch, how much of the band centre line is kept, shortest kept run, duct-tube clash."""
+    rects, (Lb, Hb) = _m_lid_face_rects()
+    xa, xb, za, zb = LEDGE_INSET + LEDGE_W / 2, Lb - LEDGE_INSET - LEDGE_W / 2, LEDGE_INSET + LEDGE_W / 2, Hb - LEDGE_INSET - LEDGE_W / 2
+    pts, n = [], 0
+    step = 0.05
+    path = [(xa + i * step, za) for i in range(int((xb - xa) / step) + 1)] + [(xb, za + i * step) for i in range(1, int((zb - za) / step) + 1)] \
+        + [(xb - i * step, zb) for i in range(1, int((xb - xa) / step) + 1)] + [(xa, zb - i * step) for i in range(1, int((zb - za) / step))]
+    notch_parts = set()
+    keep = []
+    for (x, z) in path:
+        hit = [r[0] for r in rects if r[0] not in ("U2", "SW1") and r[1] - LEDGE_W / 2 < x < r[3] + LEDGE_W / 2 and r[2] - LEDGE_W / 2 < z < r[4] + LEDGE_W / 2]
+        keep.append(not hit); notch_parts.update(hit)
+    runs, cur = [], 0
+    for k in keep + [False]:
+        if k:
+            cur += 1
+        elif cur:
+            runs.append(cur * step); cur = 0
+    mic = (MIC[0] - STACK_X0, MIC[1] - ZC + Hb / 2)
+    tube_hits = []
+    for ref, x0, z0, x1, z1 in rects:
+        cx, cz = max(x0, min(mic[0], x1)), max(z0, min(mic[1], z1))
+        if ref != "U2" and math.hypot(cx - mic[0], cz - mic[1]) < DUCT_TUBE_D / 2 + 0.1:
+            tube_hits.append(ref)
+    L_total = len(path) * step
+    return dict(band=dict(inset=LEDGE_INSET, width=LEDGE_W, height=LID_STANDOFF), notched_for=sorted(notch_parts), kept_fraction=round(sum(keep) / len(keep), 3),
+                kept_length_mm=round(sum(keep) * step, 1), band_area_kept_mm2=round(sum(keep) * step * LEDGE_W, 1), n_runs=len(runs), shortest_run_mm=round(min(runs), 2) if runs else 0,
+                longest_run_mm=round(max(runs), 2) if runs else 0, duct_tube_clash=tube_hits, outline=[round(Lb, 3), round(Hb, 3)],
+                note="band centre line sampled every 0.05 mm; a sample is dropped if a lid-face courtyard (+0.1 clear, + half band) covers it; VHB only on the kept ledge tip")
+
+
 def lid():
     l = outer_body() & box(X0 - 1, X1 + 1, Y_SPLIT, Y_OUT + 1, Z0 - 1, Z1 + 1)
     l = l - tongue(GROOVE_CL)
+    l = l + (ledge_ring(Y_LID_IN - LID_STANDOFF, Y_LID_IN + 0.01) & outer_body())
     l = l - ycyl(MIC[0], MIC[1], DUCT_D, Y_LID_IN - 0.01, Y_OUT + 0.01)
     l = l - Pos(MIC[0], Y_OUT - HEX_DEPTH / 2, MIC[1]) * Rot(90, 0, 0) * extrude(RegularPolygon(HEX_R, 6), amount=HEX_DEPTH / 2, both=True)
     l = l - box(SW[0] - POCKET["dx"] / 2, SW[0] + POCKET["dx"] / 2, Y_LID_IN - 0.01, POCKET["top"], SW[1] - POCKET["dz"] / 2, SW[1] + POCKET["dz"] / 2)
@@ -142,7 +205,7 @@ def puck():
 def placeholders():
     top = box(STACK_X0, STACK_X1, Y_B, Y_F, STACK_Z0, STACK_Z1) - ycyl(MIC[0], MIC[1], MIC_HOLE_D, Y_B - 0.1, Y_F + 0.1)
     body = box(STACK_X0 + 0.3, STACK_X1 - 0.3, STACK_Y0, Y_B - 1.08, STACK_Z0 + 0.3, STACK_Z1 - 0.3)   # lower board + parts + power board: PLACEHOLDER (V9 B+)
-    vhb = box(STACK_X0 + 0.2, STACK_X1 - 0.2, Y_LID_IN - VHB_T, Y_LID_IN, STACK_Z0 + 0.2, STACK_Z1 - 0.2)
+    vhb = ledge_ring(Y_LID_IN - LID_STANDOFF - VHB_T, Y_LID_IN - LID_STANDOFF)           # VHB only on the ledge tip (ECR-0022)
     vhb = vhb - ycyl(MIC[0], MIC[1], DUCT_D, Y_LID_IN - 1, Y_LID_IN + 1)
     vhb = vhb - box(SW[0] - POCKET["dx"] / 2, SW[0] + POCKET["dx"] / 2, Y_LID_IN - 1, Y_LID_IN + 1, SW[1] - POCKET["dz"] / 2, SW[1] + POCKET["dz"] / 2)
     cell = box(CELL_X0, CELL_X1, CELL_Y0, CELL_Y1, CELL_Z0, CELL_Z1)
@@ -180,6 +243,7 @@ def main():
         for n, p in (("tub", t), ("lid", l)):
             c[f"clash/{n}/{k}"] = round((p & ph[k]).volume, 4)
     c["clash/tub/lid"] = round((t & l).volume, 4)
+    c["ledge"] = ledge_check()
     c["clash/cell/m_tab"] = round((ph["cell"] & ph["m_tab"]).volume, 4)
     c["clash/m_tab/stack_body_overlap_is_intended"] = round((ph["m_tab"] & ph["stack_body"]).volume, 4)
     c["clash/tub/m_tab"] = round((t & ph["m_tab"]).volume, 4)

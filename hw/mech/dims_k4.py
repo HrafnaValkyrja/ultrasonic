@@ -73,10 +73,16 @@ def routed_board_length() -> tuple[float, str]:
 
 
 _RB = routed_board_length()
-STACK_L, STACK_H, STACK_T = float(os.environ.get("K4_STACK_L") or _RB[0]), 12.0, 4.3   # follows the router (Edge.Cuts of routed_P/M); STACK_L_SRC says where from
+STACK_L, STACK_H, STACK_T = float(os.environ.get("K4_STACK_L") or _RB[0]), 12.0, 3.2   # (T 3.2 = M 0.8 + gap 0.6 + P 0.8 + tallest P outer part L1 1.0; was a 4.3 placeholder) follows the router (Edge.Cuts of routed_P/M); STACK_L_SRC says where from
 STACK_L_SRC = "K4_STACK_L env" if os.environ.get("K4_STACK_L") else _RB[1]
 PCB_T, VHB_T = 0.8, 0.25
-F_GAP = VHB_T                          # was 0.30 (0.05 slack above the VHB); K4-SHELLCHK: slack removed so the worst-case floor clearance (VHB +-15 %, 2 boards +-0.1) is >= 0
+# ECR-0022 (2026-10-08, V9 option B_A_plus_C21_to_0402): the stack hangs on a printed ledge frame on the lid underside, VHB on its tip.
+# Lid-face gap = LID_STANDOFF + VHB_T. Sized in sim/checks/k4_heights.py: tallest M lid-face part C21 0402 10 uF 0.70 max (Samsung CL05A106MP5NUNC spec sheet)
+# + 0.10 margin + VHB +-0.0375 + lid print +-0.1 = 0.94 -> 0.70 ledge. Ledge band: LEDGE_W wide, inset LEDGE_INSET from the board edge, on a band free of M lid-face courtyards (shell_k4.ledge_check).
+LID_STANDOFF = 0.70
+LEDGE_W, LEDGE_INSET = 0.5, 0.2
+DUCT_TUBE_D = 2.4                       # printed tube round the mic port bore, same height as the ledge; VHB ring on its tip (acoustic seal)
+F_GAP = VHB_T + LID_STANDOFF; F_GAP_FLAT = VHB_T                          # was 0.30 (0.05 slack above the VHB); K4-SHELLCHK: slack removed so the worst-case floor clearance (VHB +-15 %, 2 boards +-0.1) is >= 0
 Y_F = Y_LID_IN - F_GAP                 # 9.4 F face of the top board, bonded to the lid on VHB
 Y_B = Y_F - PCB_T                      # 8.6 B face (mic U2 hangs below it)
 STACK_Y1, STACK_Y0 = Y_F, Y_F - STACK_T   # 9.4 .. 5.1 (floor 4.9: 0.2 free)

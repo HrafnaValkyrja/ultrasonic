@@ -132,7 +132,8 @@ PAD_GND2 = "pod:WirePad_1.0x2.0mm"             # Rev F shared GND wire pad (dock
 LCSC = {
     "R33": "C25105", "R2k2": "C25879", "R10k": "C25744", "R22k": "C25768", "R100k": "C25741", "R1M": "C26083",
     "C15p": "C1548", "C100n": "C1525", "C1u": "C52923", "C4u7": "C23733",
-    "C10u_0603": "C19702", "C22u_0603": "C59461", "R5k1": "C25905",
+    "C10u_0603": "C19702", "C10u_0402": "C315248",   # C315248 Samsung CL05A106MP5NUNC 10 uF 10 V X5R 0402 T 0.5 +-0.2 (Samsung spec sheet; JLC Extended, stock 390164, JLC API 2026-10-08)
+    "C22u_0603": "C59461", "R5k1": "C25905",
     # Rev E, JLC parts API 2026-10-01T22:55Z
     "R0": "C17168", "R0R1_1206": "C25334", "R1k": "C11702", "C10n": "C15195",
     # Rev F, JLC parts API 2026-10-02T23:48-50Z
@@ -292,7 +293,7 @@ def build():
     rt[1] += ts; rt[2] += gnd                                            # board NTC: DNP-able if the cell carries one
     c = C("C15", "4u7 25V", "C4u7_25V"); c[1] += vbus; c[2] += gnd     # USB attach limit <= 10 uF; 25 V per TI 9.2.2.1
     c = C("C16", "4u7", "C4u7"); c[1] += vbat; c[2] += gnd
-    c = C("C21", "10u", "C10u_0603", C0603); c[1] += vsys; c[2] += gnd  # TI: >= 10 uF on SYS
+    c = C("C21", "10u", "C10u_0402"); c[1] += vsys; c[2] += gnd  # TI: >= 10 uF on SYS; 0402 10 V (ECR-0022, lid ledge option B: 0603 0.9 -> 0402 0.70 max)
     # VBUS sense: firmware knows it is docked (DFU entry, charge mode). 2.5 V at PA1 from 5 V.
     vbs = Net("VBUS_SENSE")
     r = R("R12", "100k", "R100k"); r[1] += vbus; r[2] += vbs

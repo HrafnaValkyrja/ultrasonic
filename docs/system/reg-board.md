@@ -197,3 +197,5 @@ Source: hw/pod/k4/gen.py -> pod_k4_M.net / pod_k4_P.net, BOMs bom_jlc_M.csv (23 
 - ECR-0019 is folded in: no J12/R18/D6 or CC net in the K4 netlists.
 
 - K4 M rev 5 (2026-10-08, ECR-0020): +R30 33 ohm 0402 at B (1.3, 3.4) rot 90 (MIC_VDD -> MIC_VDDF, mic supply filter with C13), TP6 moved to B (6.9, 2.75); M re-placed and re-routed: place PASS, 0 unconnected, 0 DRC errors. P untouched.
+
+- K4 M rev 6 (2026-10-08, ECR-0022): C21 10 uF 0603 -> 0402 (C315248 Samsung CL05A106MP5NUNC 10 V X5R, T 0.70 max); M re-placed/re-routed: place PASS, route 0 unconnected, 0 DRC errors (kicad-cli, persisted rules), ERC 0 errors. P untouched. Heights (sim/checks/k4_heights.py, datasheet max heights, 2026-10-08): lid worst +0.112, floor worst +0.163, B2B gap side FAILS the 0.1 target (C16 -0.10, C17/C9 -0.05, D4/U3 +0.05 worst; options in V9).

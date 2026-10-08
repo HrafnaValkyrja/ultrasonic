@@ -20,9 +20,9 @@
    }
   },
   "PHYSICAL": {
-   "by": "claude",
-   "date": "2026-10-07",
-   "note": "ECR-0021 K4 own dock: K4 dock sections added",
+   "by": "K4 ledge agent",
+   "date": "2026-10-08",
+   "note": "ECR-0022 ledge + C21 0402",
    "stamp": {
     "file:docs/build/tolerances.md": "9cf0f09793a546f6",
     "file:hw/mech/frame.py": "36c8b2f5a9f8c15e",
@@ -47,9 +47,9 @@
    }
   },
   "REG-BOARD": {
-   "by": "K4 mic filter agent",
+   "by": "K4 ledge agent",
    "date": "2026-10-08",
-   "note": "K4 M rev5",
+   "note": "ECR-0022 ledge + C21 0402",
    "stamp": {
     "file:hw/pod/draft_r2/out/routed.kicad_pcb": "db9136df8bc9b089",
     "file:hw/pod/draft_r2/placement.yaml": "35192f3dd7427e78",
@@ -68,9 +68,9 @@
    }
   },
   "REG-POD-BODY": {
-   "by": "K4-SHELLCHK agent",
+   "by": "K4 ledge agent",
    "date": "2026-10-08",
-   "note": "doc updated with K4 shell/strut checks 2026-10-08",
+   "note": "ECR-0022 ledge + C21 0402",
    "stamp": {
     "file:hw/mech/blade.py": "ad6b4d86e46c5d84",
     "file:hw/mech/dims_r2.py": "99cbaaf4302a2566",

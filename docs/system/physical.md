@@ -212,3 +212,6 @@ Wire slack for lifting the lid with the board on its wires (DBG-17, computed 202
 - Pod envelope T 6.4 x H 14.8 x L 50.65 (was 49.15): the extra 1.5 mm is at the front for the dock magnet; stack moves to pod x 17.7-28.7, wire gap 0.8 -> 2.3.
 - Dock pads: M tab x 21.05-30.45, y mid 6.8, 0.8 thick, bottom z -9.0 (0.7 recessed from the outer belly); magnets x 19.15 / 32.35. M mid-plane pinned at y 6.8; its parts on the floor face (1.3 high), lid face flat.
 - Replaces the `Dock target` row (YZT0675 21.2 x 6.86 x 2.8) when adopted. src `hw/mech/dims_k4.py`, `docs/research/k4-dock.yaml`.
+
+## K4 stack chain after the lid ledge (ECR-0022)
+- From the lid down: ledge 0.70 | VHB 0.25 | M 0.8 | gap 0.6 | P 0.8 | L1 1.0 | floor; STACK_T 3.2 (dims_k4); floor clear 0.65 nominal, 0.163 worst-case. Pod T/H/L unchanged.
