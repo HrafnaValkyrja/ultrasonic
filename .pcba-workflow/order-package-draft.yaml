@@ -1,0 +1,689 @@
+status: DRAFT - NOT FROZEN. Nothing is ordered (O21). Owner places every order.
+queue_item: B-ORDER-PACKAGE
+drafted: 2026-10-07 (session date); JLC query_utc below
+jlc_query_utc:
+- 2026-10-08T00:57Z
+source:
+  bom: hw/pod/bom_jlc_mz2.csv (Phase-2 MZ-2, hw/current.yaml)
+  price_tool: tools/jlc.py (JLCPCB parts API)
+  alternates: .pcba-workflow/sourcing-lock.csv
+  note: 'bom_check.py not run: needs the full KiCad/SKiDL harness; BOM read directly'
+assumptions:
+- 'One board design serves both pods (O16). JLC PCBA minimum 5 boards: 2 worn + 3 spares, so spares are whole boards and every line is qty x 5.'
+- Standard (non-economic) PCBA charges a feeder fee per BOM line, Basic or Extended (JLC help, Sep 2026); extended-fee total not computed here.
+- Prices are qty-1 and first 3 breaks; at 5 boards the lowest break reached is shown by price_breaks.
+- 'Re-run tools/jlc.py at order time: stock moves daily.'
+single_source_flags:
+  MCU: 'STM32U575CIU6Q C5271013: live stock very low (26); reserve first, ECR-0008 option C fallback on paper only'
+  mic: Knowles SPH0641LU4H-1 C2879853 (stock ~1049), no alternate
+  cell: 'Renata ICP501233PA-02: no public price, quote needed'
+  exciter: 'RC-BC02: marketplace only, listings unsaved, impedance 8 vs 12 ohm unknown (E1)'
+  NiTi: Kellogg's W-NITI-0.75-SE only source costed
+  VHB: 3M VHB 4914 0.25 mm only candidate (retention + duct seal)
+  mesh: Saatifil Acoustex 042 (42 rayl, 29 % open, 46 um) via distributor (marianinc.com TDS); hydrophobic treatment open
+jlc_lines:
+- refs: C1,C10,C13,C19,C2,C3,C6
+  lcsc: C76934
+  part: 100 nF decoupling cap 0201 (Murata GRM033R61A104KE15D)
+  mpn_live: GRM033R61A104KE15D
+  qty_per_board: 7
+  boards_assumed: 5
+  qty_total_5_boards: 35
+  library: Extended
+  stock_live: 891913
+  price_usd_qty1: 0.0039
+  price_breaks:
+  - - 1
+    - 0.0039
+  - - 1000
+    - 0.0029
+  - - 3000
+    - 0.0025
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: C11,C12
+  lcsc: C161441
+  part: 8.2 pF C0G 0201 cap, crystal load (Murata)
+  mpn_live: GRM0335C1H8R2BA01D
+  qty_per_board: 2
+  boards_assumed: 5
+  qty_total_5_boards: 10
+  library: Extended
+  stock_live: 23841
+  price_usd_qty1: 0.0043
+  price_breaks:
+  - - 1
+    - 0.0043
+  - - 1000
+    - 0.0034
+  - - 3000
+    - 0.0029
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: C14
+  lcsc: C59461
+  part: 22 uF 0603 bulk cap (Samsung)
+  mpn_live: CL10A226MQ8NRNC
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Basic
+  stock_live: 7919093
+  price_usd_qty1: 0.0311
+  price_breaks:
+  - - 1
+    - 0.0311
+  - - 200
+    - 0.0233
+  - - 600
+    - 0.0199
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: C15
+  lcsc: C2858031
+  part: 4.7 uF 25 V 0402 charger-input cap (Murata)
+  mpn_live: GRM155R61E475ME15D
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 122900
+  price_usd_qty1: 0.0833
+  price_breaks:
+  - - 1
+    - 0.0833
+  - - 100
+    - 0.0717
+  - - 300
+    - 0.0659
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: C16
+  lcsc: C23733
+  part: 4.7 uF 0402 cap (Samsung CL05A475)
+  mpn_live: CL05A475MP5NRNC
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Basic
+  stock_live: 2212818
+  price_usd_qty1: 0.0166
+  price_breaks:
+  - - 1
+    - 0.0166
+  - - 500
+    - 0.0128
+  - - 1500
+    - 0.0112
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: C22
+  lcsc: C85930
+  part: 10 nF 0201 cap (Murata)
+  mpn_live: GRM033R71E103KE14D
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 513766
+  price_usd_qty1: 0.0047
+  price_breaks:
+  - - 1
+    - 0.0047
+  - - 1000
+    - 0.0037
+  - - 3000
+    - 0.0032
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: C21,C4,C7
+  lcsc: C19702
+  part: 10 uF 10 V 0603 SMPS-input cap (Samsung)
+  mpn_live: CL10A106KP8NNNC
+  qty_per_board: 3
+  boards_assumed: 5
+  qty_total_5_boards: 15
+  library: Basic
+  stock_live: 9773561
+  price_usd_qty1: 0.0319
+  price_breaks:
+  - - 1
+    - 0.0319
+  - - 200
+    - 0.0249
+  - - 600
+    - 0.0213
+  stock_ok_for_order: true
+  alternate: 'C315248 CL05A106MP5NUNC (Extended, lock stock 524766 2026-09-30T06:48Z): 0402 10 V X5R, Extended (smaller)'
+  single_source: false
+- refs: C17,C18,C5
+  lcsc: C52923
+  part: 1 uF 0402 cap (Samsung)
+  mpn_live: CL05A105KA5NQNC
+  qty_per_board: 3
+  boards_assumed: 5
+  qty_total_5_boards: 15
+  library: Basic
+  stock_live: 8273675
+  price_usd_qty1: 0.0107
+  price_breaks:
+  - - 1
+    - 0.0107
+  - - 500
+    - 0.0083
+  - - 1500
+    - 0.0073
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: C8,C9
+  lcsc: C107369
+  part: 2.2 uF 10 V 0402 MCU core-supply cap (Samsung)
+  mpn_live: CL05A225KP5NSNC
+  qty_per_board: 2
+  boards_assumed: 5
+  qty_total_5_boards: 10
+  library: Extended
+  stock_live: 852835
+  price_usd_qty1: 0.0129
+  price_breaks:
+  - - 1
+    - 0.0129
+  - - 500
+    - 0.0091
+  - - 1500
+    - 0.0073
+  stock_ok_for_order: true
+  alternate: 'C23630 CL10A225KO8NNNC (Basic, lock stock 2605124 2026-09-30T06:48Z): Basic option: 0603 16 V X5R (bigger)'
+  single_source: false
+- refs: D4
+  lcsc: C282565
+  part: PMEG3005EL Schottky diode, reverse-dock protection (Nexperia)
+  mpn_live: PMEG3005EL,315
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 43342
+  price_usd_qty1: 0.115
+  price_breaks:
+  - - 1
+    - 0.115
+  - - 50
+    - 0.0885
+  - - 150
+    - 0.0753
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: D5,D6
+  lcsc: C48260
+  part: TPD1E10B06 single-line ESD diode (TI)
+  mpn_live: TPD1E10B06DPYR
+  qty_per_board: 2
+  boards_assumed: 5
+  qty_total_5_boards: 10
+  library: Extended
+  stock_live: 299555
+  price_usd_qty1: 0.0417
+  price_breaks:
+  - - 1
+    - 0.0417
+  - - 200
+    - 0.0334
+  - - 600
+    - 0.0296
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: L1
+  lcsc: C337891
+  part: 2.2 uH SMPS inductor (Murata DFE201610E)
+  mpn_live: DFE201610E-2R2M=P2
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 2544
+  price_usd_qty1: 0.1366
+  price_breaks:
+  - - 1
+    - 0.1366
+  - - 50
+    - 0.1125
+  - - 150
+    - 0.1005
+  stock_ok_for_order: true
+  alternate: 'C695610 TFM201610ALM-2R2MTAA (Extended, lock stock 401 2026-09-30T06:48Z): TDK thin-film metal 2.0x1.6x1.0; DCR 130 typ/146 max mOhm; Isat 2.4/2.6 A.
+    Only 401 stock'
+  single_source: false
+- refs: Q1,Q2
+  lcsc: C19654206
+  part: PMCXB290UE N+P MOSFET pair, H-bridge half (Nexperia)
+  mpn_live: PMCXB290UEZ
+  qty_per_board: 2
+  boards_assumed: 5
+  qty_total_5_boards: 10
+  library: Extended
+  stock_live: 5000
+  price_usd_qty1: 0.1706
+  price_breaks:
+  - - 1
+    - 0.1706
+  - - 50
+    - 0.1337
+  - - 150
+    - 0.1179
+  stock_ok_for_order: true
+  alternate: 'C177025 DMC2400UV-7 (Extended, lock stock 113 2026-09-30T06:48Z): Genuine Diodes Inc. Lowest Qg (0.5 nC @4.5 V; model 0.24 nC N @3 V). Rds @3.0 V N
+    0.43 / P'
+  single_source: single source in practice (alternates differ in footprint, see lock)
+- refs: R1
+  lcsc: C25744
+  part: 10k 0402 resistor
+  mpn_live: 0402WGF1002TCE
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Basic
+  stock_live: 20673366
+  price_usd_qty1: 0.0034
+  price_breaks:
+  - - 1
+    - 0.0034
+  - - 1000
+    - 0.0027
+  - - 3000
+    - 0.0023
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: R10,R14
+  lcsc: C473508
+  part: 2.2k 0201 resistor
+  mpn_live: 0201WMF2201TEE
+  qty_per_board: 2
+  boards_assumed: 5
+  qty_total_5_boards: 10
+  library: Extended
+  stock_live: 320846
+  price_usd_qty1: 0.0015
+  price_breaks:
+  - - 1
+    - 0.0015
+  - - 1000
+    - 0.0012
+  - - 3000
+    - 0.001
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: R15,R16
+  lcsc: C473048
+  part: 10k 0201 resistor
+  mpn_live: 0201WMF1002TEE
+  qty_per_board: 2
+  boards_assumed: 5
+  qty_total_5_boards: 10
+  library: Extended
+  stock_live: 9910454
+  price_usd_qty1: 0.0014
+  price_breaks:
+  - - 1
+    - 0.0014
+  - - 1000
+    - 0.0011
+  - - 3000
+    - 0.0009
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: R18
+  lcsc: C270344
+  part: 5.1k 0201 resistor (USB-C CC)
+  mpn_live: 0201WMF5101TEE
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 73204
+  price_usd_qty1: 0.0015
+  price_breaks:
+  - - 1
+    - 0.0015
+  - - 1000
+    - 0.0012
+  - - 3000
+    - 0.001
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: R2
+  lcsc: C473457
+  part: 33 ohm 0201 resistor
+  mpn_live: 0201WMF330JTEE
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 7947
+  price_usd_qty1: 0.0017
+  price_breaks:
+  - - 1
+    - 0.0017
+  - - 1000
+    - 0.0014
+  - - 3000
+    - 0.0012
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: R20
+  lcsc: C17168
+  part: 0 ohm 0402 link
+  mpn_live: 0402WGF0000TCE
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Basic
+  stock_live: 9006072
+  price_usd_qty1: 0.0025
+  price_breaks:
+  - - 1
+    - 0.0025
+  - - 1000
+    - 0.0019
+  - - 3000
+    - 0.0016
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: R21
+  lcsc: C409058
+  part: 0.1 ohm 1% 0402 current shunt (Panasonic ERJ2BSFR10X)
+  mpn_live: ERJ2BSFR10X
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 15878
+  price_usd_qty1: 0.0732
+  price_breaks:
+  - - 1
+    - 0.0732
+  - - 100
+    - 0.0589
+  - - 300
+    - 0.0519
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: R22
+  lcsc: C270365
+  part: 1k 0201 resistor
+  mpn_live: 0201WMF1001TEE
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 1674894
+  price_usd_qty1: 0.0013
+  price_breaks:
+  - - 1
+    - 0.0013
+  - - 1000
+    - 0.001
+  - - 3000
+    - 0.0009
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: R23,R8,R9
+  lcsc: C473482
+  part: 1M 0201 resistor
+  mpn_live: 0201WMF1004TEE
+  qty_per_board: 3
+  boards_assumed: 5
+  qty_total_5_boards: 15
+  library: Extended
+  stock_live: 327887
+  price_usd_qty1: 0.0015
+  price_breaks:
+  - - 1
+    - 0.0015
+  - - 1000
+    - 0.0012
+  - - 3000
+    - 0.001
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: R12,R13,R3,R4,R5,R6
+  lcsc: C270364
+  part: 100k 0201 resistor
+  mpn_live: 0201WMF1003TEE
+  qty_per_board: 6
+  boards_assumed: 5
+  qty_total_5_boards: 30
+  library: Extended
+  stock_live: 431127
+  price_usd_qty1: 0.0015
+  price_breaks:
+  - - 1
+    - 0.0015
+  - - 1000
+    - 0.0012
+  - - 3000
+    - 0.0011
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: RT1
+  lcsc: C98098
+  part: 10k B3435 NTC thermistor 0201 (Murata NCP03XH103F05RL)
+  mpn_live: NCP03XH103F05RL
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 175759
+  price_usd_qty1: 0.0166
+  price_breaks:
+  - - 1
+    - 0.0166
+  - - 500
+    - 0.0135
+  - - 1500
+    - 0.0118
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: SW1
+  lcsc: C221707
+  part: C&K KMT022NGJLHS IP68 sealed tact switch
+  mpn_live: KMT022NGJLHS
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 4884
+  price_usd_qty1: 0.3902
+  price_breaks:
+  - - 1
+    - 0.3902
+  - - 10
+    - 0.3447
+  - - 30
+    - 0.3252
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: U1
+  lcsc: C5271013
+  part: 'STM32U575CIU6Q: ST Cortex-M33 MCU, 2 MB flash, UFQFPN48'
+  mpn_live: STM32U575CIU6Q
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 26
+  price_usd_qty1: 9.024
+  price_breaks:
+  - - 1
+    - 9.024
+  - - 10
+    - 8.8062
+  - - 30
+    - 8.6632
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: 'single source: only STM32U575 meets the spec; live JLC stock thin (see stock); fallback per ECR-0008 option C'
+- refs: U2
+  lcsc: C2879853
+  part: 'SPH0641LU4H-1: Knowles ultrasonic PDM MEMS microphone'
+  mpn_live: SPH0641LU4H-1
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 1049
+  price_usd_qty1: 1.9915
+  price_breaks:
+  - - 1
+    - 1.9915
+  - - 10
+    - 1.6859
+  - - 30
+    - 1.494
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: 'single source: Knowles SPH0641LU4H-1 is the only ultrasonic PDM mic chosen; no pin-compatible alternate'
+- refs: U3
+  lcsc: C3682423
+  part: 'BQ25180YBGR: TI Li-ion charger with power path and NTC, DSBGA-8'
+  mpn_live: BQ25180YBGR
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 4234
+  price_usd_qty1: 2.0419
+  price_breaks:
+  - - 1
+    - 2.0419
+  - - 10
+    - 1.72
+  - - 30
+    - 1.5184
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: single source (TI BQ25180 chip-scale); MCP73832 retired
+- refs: U4
+  lcsc: C5220164
+  part: 'TPS7A2030PDQNR: TI 3.0 V low-noise LDO regulator, X2SON-4'
+  mpn_live: TPS7A2030PDQNR
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 3281
+  price_usd_qty1: 0.2176
+  price_breaks:
+  - - 1
+    - 0.2176
+  - - 50
+    - 0.1708
+  - - 150
+    - 0.148
+  stock_ok_for_order: true
+  alternate: 'C965900 RT9080-30GJ5 (Extended, lock stock 3329 2026-09-30T06:48Z): RT9080: 2 uA Iq; 42 uVrms; 310 mV typ/530 mV max @600 mA; ILIM 610 mA min; use if
+    bridge p'
+  single_source: false
+- refs: U6
+  lcsc: C1972959
+  part: 'TPD2E2U06DRLR: TI 2-line USB ESD protection'
+  mpn_live: TPD2E2U06DRLR
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 7416
+  price_usd_qty1: 0.3224
+  price_breaks:
+  - - 1
+    - 0.3224
+  - - 50
+    - 0.2571
+  - - 150
+    - 0.2289
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+- refs: Y1
+  lcsc: C99009
+  part: 32.768 kHz 7 pF crystal 2012 (Epson X1A0000610006)
+  mpn_live: X1A0000610006
+  qty_per_board: 1
+  boards_assumed: 5
+  qty_total_5_boards: 5
+  library: Extended
+  stock_live: 23416
+  price_usd_qty1: 0.2125
+  price_breaks:
+  - - 1
+    - 0.2125
+  - - 50
+    - 0.1653
+  - - 150
+    - 0.1421
+  stock_ok_for_order: true
+  alternate: 'none in lock: any same-value/package part of the same class (re-check at order time)'
+  single_source: false
+jlc_line_count: 31
+non_jlc:
+- item: Bone-conduction exciter RC-BC02 (8 or 12 ohm)
+  qty: 2 worn + 1-2 spares; sim doc asks 2-3 for E1 measurement; buy 3+ from two listings
+  source: marketplace (AliExpress-class), listings never saved; price TBD
+  src: docs/build/bom.csv, docs/research/simplification-study.md l.226, review-2026-09-30.md l.52
+  status: 'open: find 2 listings, measure R/L (E1)'
+- item: NiTi superelastic wire 0.75 mm
+  qty: 0.1 ft per arm; one 5 ft spool (~76 arms) covers all
+  source: Kellogg's W-NITI-0.75-SE, $13.49 per 5 ft
+  src: docs/build/bom.csv (O7b); docs/system/reg-arm.md
+  status: price from bom.csv, not re-queried today
+- item: Li-ion cell Renata ICP501233PA-02 (175 mAh, PCM inside)
+  qty: 2 + 2 spares (cells age; serviceable)
+  source: Renata distributor quote; not on Digi-Key, Mouser blocks reads
+  src: docs/build/bom.csv O16; integration-map VBAT
+  status: 'quote request pending; bench stand-in Adafruit #1570 105 mAh'
+- item: Saatifil Acoustex 042 acoustic mesh (microphone cover, hex seat)
+  qty: one small piece per pod; buy a sample sheet
+  source: Saati via distributor (Marian Inc; TDS PDF 2024-09-26)
+  src: docs/system/sub-audio-in.md l.109, docs/sim/acoustics.yaml l.41
+  status: mesh part number/format TBD; hydrophobic treatment to ask distributor
+- item: Tactile dome HYP 600-415S (4 mm dome, 0.20 mm, 150-250 gf, 1M cycles)
+  qty: 2 + spares (cheap)
+  source: drawing 600-0000-000 rev F; supplier not recorded in docs
+  src: docs/system/reg-pod-body.md l.140
+  status: supplier and price TBD
+- item: 3M VHB 4914 tape 0.25 mm (die-cut at duct, SW1 pocket, TP pads; cell bed)
+  qty: enough for ~5 lids + cell beds
+  source: 3M distributor
+  src: docs/system/reg-pod-body.md l.19
+  status: price TBD; die-cut by owner
+- item: Magnetic dock cable head YZP0048-20048-05025-01 (5-pin pogo)
+  qty: 1 per cable (0.5 per pod)
+  source: LCSC/Xinyangze direct; JLC stock 0
+  src: docs/build/bom.csv
+  status: $1.39 qty1
+- item: Litz 7/44 wire, M1.4 set screws, Sugru pad, resin
+  qty: small
+  source: elecify.com, Polar Bear/FastenerMart, retail, Siraya Tech
+  src: docs/build/bom.csv
+  status: owner has resin

@@ -22,7 +22,7 @@ case "$src" in
       python3 "$(dirname "${BASH_SOURCE[0]}")/darken.py" "$src" "$tmp"
       src="$tmp"
     fi
-    read -r w h < <(grep -o 'viewBox="[^"]*"' "$src" | head -1 | tr -d '"' | awk '{print $3, $4}')
+    read -r w h < <(grep -o 'viewBox="[^"]*"' "$src" | head -1 | tr -d '"' | awk '{printf "%d %d\n", int($3)+($3>int($3)), int($4)+($4>int($4))}')  # round UP: Chromium needs integer window sizes
     here="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
     # shellcheck source=/dev/null
     . "$here/tools/env.sh"
