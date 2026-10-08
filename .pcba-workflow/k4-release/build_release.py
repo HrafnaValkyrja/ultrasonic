@@ -28,18 +28,14 @@ for b in "PM":
     asm = {k for k in asm if not (k.startswith("J") and k not in ("J20","J21"))}
     print(b, "bom-only", sorted(bomrefs - set(fp)), "board-only(non TP/J)", sorted(asm - bomrefs))
     BOMS[b] = (rows, fp, bomrefs)
-# CPL
+# CPL: KiCad rotation -> JLC rotation via tools/jlc_rotations.py (EasyEDA pin-1 geometry + community DB + bottom-side rule);
+# also writes jlc_rotation_corrections.csv and pin1_expected.png (placement-preview checklist)
+import jlc_rotations
+jlc_rotations.release(R)
 for b in "PM":
     rows, fp, bomrefs = BOMS[b]
-    raw = {r["Ref"]: r for r in csv.DictReader(open(f"{R}/pos_raw_{b}.csv"))}
-    with open(f"{R}/cpl_{b}.csv", "w", newline="") as f:
-        w = csv.writer(f); w.writerow(["Designator", "Mid X", "Mid Y", "Layer", "Rotation"])
-        for ref in sorted(raw, key=lambda s: (re.sub(r"\d", "", s), int(re.sub(r"\D", "", s) or 0))):
-            if ref not in bomrefs: continue
-            r = raw[ref]
-            w.writerow([ref, f"{float(r['PosX']):.4f}mm", f"{float(r['PosY']):.4f}mm", "Top" if r["Side"] == "top" else "Bottom", f"{float(r['Rot']) % 360:g}"])
-    missing = bomrefs - set(raw)
-    print(b, "cpl rows", len(bomrefs & set(raw)), "bom refs not in CPL", sorted(missing))
+    n_cpl = len(list(csv.DictReader(open(f"{R}/cpl_{b}.csv"))))
+    print(b, "cpl rows", n_cpl, "bom refs", len(bomrefs), "(TP/wire pads in BOM-less refs are excluded)")
     # BOM with JLC columns
     with open(f"{R}/bom_{b}.csv", "w", newline="") as f:
         w = csv.writer(f); w.writerow(["Comment", "Designator", "Footprint", "LCSC Part #"])

@@ -1,0 +1,56 @@
+board,ref,footprint,lcsc,side,kicad_rot,jlc_rot,corr,off_x,off_y,source,confidence,check_in_preview,notes
+K4-P,C1,C_0201_0603Metric,C76934,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.10 mm (not a rigid origin shift; no offset applied)
+K4-P,C2,C_0201_0603Metric,C76934,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.10 mm (not a rigid origin shift; no offset applied)
+K4-P,C3,C_0201_0603Metric,C76934,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.10 mm (not a rigid origin shift; no offset applied)
+K4-P,C4,C_0603_1608Metric,C19702,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.15 mm (not a rigid origin shift; no offset applied)
+K4-P,C5,C_0402_1005Metric,C52923,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.12 mm (not a rigid origin shift; no offset applied)
+K4-P,C6,C_0201_0603Metric,C76934,bottom,180.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.10 mm (not a rigid origin shift; no offset applied)
+K4-P,C7,C_0603_1608Metric,C19702,bottom,270.0,270.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.15 mm (not a rigid origin shift; no offset applied)
+K4-P,C8,C_0402_1005Metric,C107369,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.12 mm (not a rigid origin shift; no offset applied)
+K4-P,C9,C_0402_1005Metric,C107369,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.12 mm (not a rigid origin shift; no offset applied)
+K4-P,C10,C_0201_0603Metric,C76934,bottom,180.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.10 mm (not a rigid origin shift; no offset applied)
+K4-P,C11,C_0201_0603Metric,C161441,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.10 mm (not a rigid origin shift; no offset applied)
+K4-P,C12,C_0201_0603Metric,C161441,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.10 mm (not a rigid origin shift; no offset applied)
+K4-P,C14,C_0603_1608Metric,C59461,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.15 mm (not a rigid origin shift; no offset applied)
+K4-P,C22,C_0201_0603Metric,C85930,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.10 mm (not a rigid origin shift; no offset applied)
+K4-P,J21,BM28B0.6-30DP_2-0.35V,C424570,top,180.0,180.0,0,0.0,0.0,EasyEDA pin-1 geometry,medium,True,
+K4-P,L1,L0806,C337891,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,
+K4-P,Q1,Nexperia_SOT1216_DFN1010B-6,C19654206,top,0.0,0.0,0,0.0,0.0,none (default 0),low,True,no EasyEDA footprint (fetch failed: LCSC part not in EasyEDA API); pin-1 not data-derived
+K4-P,Q2,Nexperia_SOT1216_DFN1010B-6,C19654206,bottom,180.0,0.0,0,0.0,0.0,none (default 0),low,True,no EasyEDA footprint (fetch failed: LCSC part not in EasyEDA API); pin-1 not data-derived
+K4-P,R1,R_0402_1005Metric,C25744,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-P,R2,R_0201_0603Metric,C473457,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-P,R3,R_0201_0603Metric,C270364,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-P,R4,R_0201_0603Metric,C270364,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-P,R5,R_0201_0603Metric,C270364,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-P,R6,R_0201_0603Metric,C270364,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-P,R21,R_0402_1005Metric,C409058,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-P,R22,R_0201_0603Metric,C270365,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-P,R23,R_0201_0603Metric,C473482,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-P,U1,QFN-48-1EP_7x7mm_P0.5mm_EP5.6x5.6mm,C5271013,bottom,90.0,0.0,270,0.0,0.0,EasyEDA pin-1 geometry,low,True,pad sets differ by up to 0.23 mm (not a rigid origin shift; no offset applied)
+K4-P,Y1,Crystal_SMD_2012-2Pin_2.0x1.2mm,C99009,bottom,180.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.32 mm (not a rigid origin shift; no offset applied)
+K4-M,C13,C_0201_0603Metric,C76934,bottom,180.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.10 mm (not a rigid origin shift; no offset applied)
+K4-M,C15,C_0402_1005Metric,C2858031,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.12 mm (not a rigid origin shift; no offset applied)
+K4-M,C16,C_0402_1005Metric,C23733,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.12 mm (not a rigid origin shift; no offset applied)
+K4-M,C17,C_0402_1005Metric,C52923,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.12 mm (not a rigid origin shift; no offset applied)
+K4-M,C18,C_0402_1005Metric,C52923,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.12 mm (not a rigid origin shift; no offset applied)
+K4-M,C19,C_0201_0603Metric,C76934,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.10 mm (not a rigid origin shift; no offset applied)
+K4-M,C21,C_0402_1005Metric,C315248,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.12 mm (not a rigid origin shift; no offset applied)
+K4-M,D4,D_SOD-882,C282565,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,medium,True,
+K4-M,D5,X1SON-2_L1.0-W0.6-P0.65-BI-1,C48260,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,medium,True,
+K4-M,J20,BM28B0.6-30DS_2-0.35V,C424571,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,medium,True,
+K4-M,R8,R_0201_0603Metric,C473482,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,R9,R_0201_0603Metric,C473482,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,R10,R_0201_0603Metric,C473508,bottom,180.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,R12,R_0201_0603Metric,C270364,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,R13,R_0201_0603Metric,C270364,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,R14,R_0201_0603Metric,C473508,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,R15,R_0201_0603Metric,C473048,bottom,180.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,R16,R_0201_0603Metric,C473048,bottom,180.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,R20,R_0402_1005Metric,C17168,bottom,180.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,R30,R_0402_1005Metric,C25105,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,RT1,R_0201_0603Metric,C98098,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,high,False,pad sets differ by up to 0.16 mm (not a rigid origin shift; no offset applied)
+K4-M,SW1,SW-SMD_4P-L3.0-W2.6-P1.85-LS3.4,C221707,bottom,180.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,medium,True,
+K4-M,U2,Knowles_LGA-5_3.5x2.65mm_Port0.65,C2879853,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,medium,True,
+K4-M,U3,DSBGA-8_L1.6-W0.9-R2-C4-P0.40-BL,C3682423,top,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,medium,True,
+K4-M,U4,X2SON-4_L1.0-W1.0-P0.65-TL-EP,C5220164,top,0.0,0.0,0,0.0,0.0,EasyEDA pin-1 geometry,medium,True,
+K4-M,U6,SOT-553-5_L1.6-W1.2-P0.50-LS1.6-TL-1,C1972959,bottom,90.0,90.0,0,0.0,0.0,EasyEDA pin-1 geometry,medium,True,

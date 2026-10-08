@@ -18,7 +18,7 @@ blockers:
   - id: B4-STACKUP-0.8-6L
     what: "JLC publishes no 0.8 mm 6L build (K4-STACK6). Dielectric split is chosen by JLC at order; do not order impedance control. Confirm on live quote."
 user_review_needed:
-  - "JLC DFM + placement preview, bottom-side rotations (CPL uses KiCad's raw rotation; see README table). Never verified against JLC's rotation DB."
+  - "JLC DFM + placement preview: CPL rotations now corrected by tools/jlc_rotations.py (EasyEDA pin-1 + community DB + 2022 bottom rule); 12 parts unconfirmed, see pin1_expected.png + jlc_rotation_corrections.csv. Preview still decides."
   - "Live quote: 6L 0.8 mm ENIG, 0.15/0.25 vias, POFV, panel. Cost below is an estimate, PCB line unquoted."
   - "Independent Gerber viewer pass not done (only kicad-cli export + drill histogram)."
 promote_to_PASS_when: [B1..B4 closed, boards frozen with new hash, build_release.py re-run on that hash, owner reviews JLC preview]
