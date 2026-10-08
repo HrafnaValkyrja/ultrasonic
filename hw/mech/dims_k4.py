@@ -44,6 +44,7 @@ CELL_Y1 = CELL_Y0 + CELL_SPEC["T"]     # 9.50: 0.20 under the lid (4.5 max envel
 assert Y_LID_IN - CELL_Y1 >= LID_CLEAR_MIN - 1e-9, "cell-to-lid clearance"
 CELL_Z1 = CAV["z1"] - 0.1              # cell hangs under the cavity top (0.1 clear); free channel underneath (wires)
 CELL_Z0 = CELL_Z1 - CELL_SPEC["W"]
+CELL_EDGE_CHAMFER = 0.15             # cell edge break at (CELL_Y0, CELL_Z1): clears the cavity R0.5 fillet (shell_k4.placeholders)
 CH_UNDER = CELL_Z0 - CAV["z0"]         # wire channel under the cell
 
 # ---------------------------------------------------------------- board stack (placeholder block for B+ two-board stack, V9-k4-board.yaml B_plus)

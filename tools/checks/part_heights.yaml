@@ -54,6 +54,19 @@ by_lcsc:
     part: Samsung CL10A226MQ8NRNC, 22 uF 6.3 V X5R 0603
     max_mm: 1.00
     source: same catalogue, row CL10A226MQ8NRN, Thickness Max. 1.00
+  C318539:
+    part: Samsung CL03A225MP3CRNC, 2.2 uF 10 V X5R 0201 (K4 M C16, P C9)
+    max_mm: 0.39
+    source: "Samsung CL03A series 0201 outline T 0.30 +-0.09 (read 2026-10-08 from the sibling sheet CL03A105MO3NRNC, C318540, LCSC copy); ECR-0022 quotes T 0.39 max for this code. The LCSC PDF link for C318539 returned an HTML page, so the exact-code sheet was not read"
+    variant_note: exact-code datasheet not read (download returned HTML); same 0201 T class as C318540
+  C318540:
+    part: Samsung CL03A105MO3NRNC, 1 uF 16 V X5R 0201 (K4 M C17)
+    max_mm: 0.39
+    source: Samsung CL03A105MO3NRNC datasheet (LCSC copy lcsc_datasheet_2007201008..C318540), dimension table "T 0.30+-0.09", read 2026-10-08
+  C315248:
+    part: Samsung CL05A106MP5NUNC, 10 uF 10 V X5R 0402 (K4 M C21)
+    max_mm: 0.70
+    source: Samsung CL05A106MP5NUNC datasheet (LCSC copy, C315248), dimension table "T 0.50 +-0.20" and spec line "Thickness 0.50 +-0.20 mm", read 2026-10-08
   C1548:
     part: FH (Fenghua) 0402CG150J500NT, 15 pF 50 V C0G 0402
     max_mm: 0.70
