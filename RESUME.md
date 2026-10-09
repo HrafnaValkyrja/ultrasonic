@@ -1,6 +1,6 @@
 # RESUME (on ice 2026-10-08 ~22:55 ET, owner: "Put Ultrasonic on ice for today.")
 Branch claude/clever-mayer-s5rxuw, all session work committed + pushed (last: b92e59c + this file).
-Not mine / left as found: pre-existing dirty K4 diagram/STEP/route files in the working tree (from before this session); stash@{0} = ECR-0025 dome prep (#11), stash@{1}/@{2} older WIP (k4 pointer).
+Stashes: stash@{0} = pre-session K4 scratch/render outputs parked at freeze (restore with `git stash pop` if wanted); stash@{1} = ECR-0025 dome prep (#11); older WIP below that.
 
 ## State
 - Four proofs PASS (docs/proof/). D17 = A+L BUILT (owner 22:3x): limiter on, ceiling at clamp, loud mode +12 (triple press in gesture B, HOLD2 in A, off at boot), battery saver off + knob toggle. fwsim all PASS 35 rows.
