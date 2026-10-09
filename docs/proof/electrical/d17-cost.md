@@ -32,3 +32,17 @@ U4 junction worst ~35 + 3 (shell) + 6.3 = ~45 C vs 125 C limit. Cell: I_rms 34-4
 - Heat: PASS for every option (largest realistic +6.3 K, shell/touch unchanged within 0.1 K).
 - Runtime: A (limiter, no extra drive) PASS: >= 7.8 h worst, 10-17 h typical. **A + 12 dB drive FAILS 8 h** unless scenes are sparse (>= 8.3 h at 18 % active); dense/continuous calls give 4-6 h. TEAX does not change this.
 - Recommendation (owner decides): ship A (+TEAX if bought, which gives +7.6 dB acoustically for ~2 % current, the cheapest loudness); treat +12 dB drive as a user "loud" mode, or use the slow AGC variant (gain only on quiet calls) which raises mean current far less than blanket +12 dB (not simulated here for current). Needs a 4-6 h runtime caveat if +12 dB is default. OPEN: 130 mAh derating (cold, age) would worsen every row; bench current log (PWR-I12) not done.
+
+## Adversarial check of ledger I-019 (TEAX + 4.4 dB drive = current driver + 12 dB), 2026-10-08
+Script `sim/acoustics/teax_drive_check.py` (reuses audibility_reconciled.py chain, limiter, 5-call margins; current as above with TEAX x1.022; scenes dense / continuous / sparse 18 %; runtime nominal base, LED on). Margin = per-call dB over masked threshold, median (worst call).
+| Config | pk mA | mean mA dense / cont / sparse | runtime h dense / cont / sparse | Private office | Open office | Heavy traffic | Cafe 67 | Car 68 |
+|---|---|---|---|---|---|---|---|---|
+| A + 12 (current driver) | 166 | 14.5 / 24.9 / 7.6 | 6.2 / 4.1 / 9.3 | +23.3 (+12.5) | +18.3 (+7.5) | +10.2 (-0.5) | +8.6 (-2.1) | +6.2 (-4.5) |
+| A + TEAX +0 | 148 | 5.0 / 8.9 / 2.4 | 11.4 / 8.5 / 14.7 | +24.7 (+8.1) | +19.7 (+3.1) | +11.7 (-4.9) | +10.1 (-6.5) | +7.7 (-8.9) |
+| A + TEAX +4.4 | 161 | 7.8 / 13.8 / 3.8 | 9.1 / 6.4 / 12.7 | +27.6 (+12.5) | +22.6 (+7.5) | +14.6 (-0.5) | +13.0 (-2.1) | +10.6 (-4.5) |
+| A + TEAX +6 | 164 | 9.1 / 16.0 / 4.5 | 8.4 / 5.8 / 11.9 | +28.5 (+14.1) | +23.5 (+9.1) | +15.4 (+1.1) | +13.8 (-0.5) | +11.4 (-2.9) |
+| A + TEAX +12 | 170 | 14.9 / 25.5 / 7.7 | 6.1 / 4.1 / 9.2 | +30.9 (+20.1) | +25.9 (+15.1) | +17.8 (+7.1) | +16.2 (+5.5) | +13.8 (+3.1) |
+(Street-day row omitted; it tracks open office +2.)
+
+Verdict: **PARTLY CONFIRMED.** Audibility: TEAX+4.4 has the SAME worst-call margin as current+12 in every scene (identical to 0.1 dB; the limiter ceiling sets the worst call) and a median 4.4 dB better. Current: the ~8 mA / 9 h figure holds for the dense file only (7.8 mA, 9.1 h). Continuous calls give 13.8 mA and 6.4 h (misses 8 h), so "8.5-9 h" is not general. Savings vs current+12: 46 % in mean mA (14.5 -> 7.8), +2.9 h dense.
+Drive keeping >= 8 h: dense scenes TEAX +6 (8.4 h; worst-call +1.1 heavy traffic, -0.5 cafe, -2.9 car, best of those that pass); continuous scenes only TEAX +0 (8.5 h nominal, 7.7 h high base; worst-call -4.9 heavy traffic). Sparse: any drive up to +12 passes. No drive meets 8 h continuous AND the +12 worst-call margin; that needs a larger cell or a loud mode (owner decides).
