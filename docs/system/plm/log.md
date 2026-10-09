@@ -693,3 +693,6 @@
 - 2026-10-08 16:50 review INTEGRATION by claude-lead: integration-map covers the current.yaml cell key (rails reads it), 2026-10-08
 - 2026-10-08 22:47 checkout SPEC by w: D17 ruling text
 - 2026-10-08 22:48 checkin SPEC by w
+- 2026-10-08 22:53 checkout SPEC by claude-worker: clear stale after D17 spec edit
+- 2026-10-08 22:53 checkin SPEC by claude-worker
+- 2026-10-08 22:53 review SPEC by claude-worker: D17 = A+L ruling already in spec §D17 (71e376f); reviewed against sub-output/loudness docs

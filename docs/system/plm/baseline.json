@@ -79,11 +79,11 @@
    }
   },
   "SPEC": {
-   "by": "claude",
+   "by": "claude-worker",
    "date": "2026-10-08",
-   "note": "O34/ECR-0024 lift default: spec O34 and whole doc consistent",
+   "note": "D17 = A+L ruling already in spec \u00a7D17 (71e376f); reviewed against sub-output/loudness docs",
    "stamp": {
-    "file:docs/spec.md": "f84d1d5fbeb08569"
+    "file:docs/spec.md": "e6cf45887b4b6ea5"
    }
   },
   "SUB-AUDIO-IN": {

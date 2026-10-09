@@ -159,8 +159,10 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr, uint32_t reps)
     }
     d->la_on = k->lim_lookahead ? 1u : 0u;
     if (d->la_on) {   /* loudness fix: ceiling = R64 clamp minus the noise-shaper excursion bound (so the clamp never bites); D17 fixed ceiling */
-        float amp = (float)fw_out_amp_max_ppm(k) * 1e-6f - (float)FW_SHAPER_EXCURSION_PPM * 1e-6f;
-        d->lim_c = amp > d->lim_c ? amp : d->lim_c;
+        /* shaper excursion = sum|ntf| x 1.5 LSB / (ARR/2) scales 1/ARR: FW_SHAPER_EXCURSION_PPM is the ARR 200 value */
+        float exc = (float)FW_SHAPER_EXCURSION_PPM * 1e-6f * 200.0f / (float)(arr ? arr : 200u);
+        float amp = (float)fw_out_amp_max_ppm(k) * 1e-6f - exc;
+        d->lim_c = amp > 0.01f ? amp : 0.01f;   /* per-carrier: true peak + excursion stays under the clamp */
         fw_lahead_init(&d->la, d->lim_c, (uint32_t)k->lim_knee_pct, d->lim_rel);
     }
     d->shape_s = d->lim_c * d->loud_lin;                 /* flat-top full scale = ceiling x loud gain */

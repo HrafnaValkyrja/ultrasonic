@@ -104,7 +104,7 @@ int main(int argc, char **argv)
                     if (a > cmax_b) cmax_b = a;
                     if (a > bound_b + 1e-9) viol_b++;
                 }
-                if (t.clamp_hits && c->khz == 200) viol_c++;   /* D17 A + L: the lim_c margin is sized for ARR 200 (FW_SHAPER_EXCURSION_PPM); at ARR 100/50 the clamp may bite (safe, R64 hard stop) */
+                if (t.clamp_hits) viol_c++;   /* lim_c is sized per ARR (dsp.c), so the clamp never bites at any carrier */
                 total++;
             }
             if (cmax_a > worst_a) worst_a = cmax_a;
