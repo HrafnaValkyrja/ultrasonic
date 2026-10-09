@@ -296,3 +296,74 @@ void test_hiz_idle(void)
     b.dsp_squelched = 0u;
     TF_CHECK(fw_outputs(&b).bridge_run == 1u);                      /* signal back: bridge re-enabled */
 }
+
+/* ---- D17 loud toggle gesture (bf5d6bd): HOLD2 (hold2_ms = 4 s) toggles loud_on in options A and B; C maps HOLD2 to Off; short press / HOLD1 never toggle ---- */
+static uint64_t lg_press(fw_state_t *st, uint64_t t, uint32_t ms)
+{
+    fw_event(st, FW_EV_BTN_EDGE, 1, t);
+    for (uint32_t i = 1; i < ms; i++)
+        fw_poll(st, t + (uint64_t)i * 1000u);
+    t += (uint64_t)ms * 1000u;
+    fw_event(st, FW_EV_BTN_EDGE, 0, t);
+    for (uint32_t i = 1; i <= 400; i++)                                  /* let the double window and debounce expire */
+        fw_poll(st, t + (uint64_t)i * 1000u);
+    return t + 400000u + 100000u;
+}
+
+static void lg_init(fw_state_t *st, int32_t gesture, int32_t loud_db)
+{
+    fw_knobs_t k;
+    fw_knobs_defaults(&k);
+    TF_CHECK_EQ(fw_knob_set(&k, FW_KNOB_gesture_option, gesture), FW_KNOB_OK);
+    TF_CHECK_EQ(fw_knob_set(&k, FW_KNOB_loud_db, loud_db), FW_KNOB_OK);
+#if FW_VAR_DOCKED_OUTPUT_MAX
+    TF_CHECK_EQ(fw_knob_set(&k, FW_KNOB_docked_output, 1), FW_KNOB_OK);
+#endif
+    fw_init(st, &k, 0u);
+    st->knobs = k;
+}
+
+void test_loud_gesture(void)
+{
+    for (int32_t g = 1; g <= 3; g++) {
+        fw_state_t st;
+        lg_init(&st, g, 12);
+        uint64_t t = 1000000u;
+        TF_CHECK_EQ(st.dsp.loud_on, 0);
+        t = lg_press(&st, t, 80u);                                       /* short press: no toggle (A cycles the mode, may reach Off) */
+        TF_CHECK_EQ(st.dsp.loud_on, 0);
+        if (st.sys.mode == (uint32_t)FW_ST_OFF && g != 2 && g != 3) t = lg_press(&st, t, 80u);   /* press in Off = On */
+        if (g != 2) {                                                    /* HOLD1 (2 s): A repeats volume, C volume; B = Off so skipped */
+            t = lg_press(&st, t, 2300u);
+            TF_CHECK_EQ(st.dsp.loud_on, 0);
+            TF_CHECK(st.sys.gestures[FW_RG_HOLD1] >= 1u);
+            TF_CHECK_EQ(st.sys.gestures[FW_RG_HOLD2], 0u);
+        }
+        if (g == 1) {                                                    /* A: HOLD2 toggles on, then off; mode stays on */
+            TF_CHECK(st.sys.mode != (uint32_t)FW_ST_OFF);
+            t = lg_press(&st, t, 4300u);
+            TF_CHECK_EQ(st.dsp.loud_on, 1);
+            TF_CHECK(st.sys.mode != (uint32_t)FW_ST_OFF);
+            t = lg_press(&st, t, 80u);                                   /* a short press leaves it on (and may cycle the mode) */
+            TF_CHECK_EQ(st.dsp.loud_on, 1);
+            if (st.sys.mode == (uint32_t)FW_ST_OFF) t = lg_press(&st, t, 80u);
+            t = lg_press(&st, t, 4300u);
+            TF_CHECK_EQ(st.dsp.loud_on, 0);
+        } else if (g == 2) {                                             /* B: HOLD1 already switched Off at 2 s, so HOLD2 finds the mode Off: no toggle */
+            t = lg_press(&st, t, 4300u);
+            TF_CHECK_EQ(st.sys.mode, (uint32_t)FW_ST_OFF);
+            TF_CHECK_EQ(st.sys.gestures[FW_RG_HOLD2], 1u);
+            TF_CHECK_EQ(st.dsp.loud_on, 0);
+        } else {                                                         /* C: HOLD2 = Off, never loud */
+            t = lg_press(&st, t, 4300u);
+            TF_CHECK_EQ(st.sys.mode, (uint32_t)FW_ST_OFF);
+            TF_CHECK_EQ(st.dsp.loud_on, 0);
+        }
+        (void)t;
+        /* loud_db = 0: HOLD2 never toggles, in any option */
+        fw_state_t s0;
+        lg_init(&s0, g, 0);
+        lg_press(&s0, 1000000u, 4300u);
+        TF_CHECK_EQ(s0.dsp.loud_on, 0);
+    }
+}

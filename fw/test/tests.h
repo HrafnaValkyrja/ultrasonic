@@ -17,7 +17,7 @@
     T(test_docked_interlock, "FWSIM-R19") T(test_cdc_paths_clamp, "FWSIM-R64") T(test_cdc_frame_stream, "FWSIM-R28") T(test_usb_cdc_lifecycle_clamp, "FWSIM-R28") T(test_usb_ilim, "FWSIM-R20") T(test_dfu_handoff, "FWSIM-R21") T(test_usb_diag, "FWSIM-R58") T(test_charger_plan, "FWSIM-R20") \
     T(test_charger_watchdog_faults, "FWSIM-R20") T(test_break_always_on, "FWSIM-R65") \
     T(test_stop2_sequence, "FWSIM-R23") T(test_led_duty, "FWSIM-R29") T(test_volume_ticks, "FWSIM-R29") T(test_idle_detector, "FWSIM-R18") \
-    T(test_alert_tone_frequency, "FWSIM-R64") T(test_alert_no_clicks, "FWSIM-R64") T(test_lahead_bound_and_step, "FWSIM-R64") T(test_loud_ceiling_and_clamp, "FWSIM-R64") T(test_loud_mode, "FWSIM-R64") T(test_hiz_idle, "FWSIM-R64") T(test_haptic_default_off, "FWSIM-R64") T(test_haptic_burst, "FWSIM-R64") T(test_haptic_clamp, "FWSIM-R64")
+    T(test_alert_tone_frequency, "FWSIM-R64") T(test_alert_no_clicks, "FWSIM-R64") T(test_lahead_bound_and_step, "FWSIM-R64") T(test_loud_ceiling_and_clamp, "FWSIM-R64") T(test_loud_mode, "FWSIM-R64") T(test_hiz_idle, "FWSIM-R64") T(test_loud_gesture, "FWSIM-R64") T(test_haptic_default_off, "FWSIM-R64") T(test_haptic_burst, "FWSIM-R64") T(test_haptic_clamp, "FWSIM-R64")
 #define FW_TEST_DECL(fn, req) void fn(void);
 FW_TESTS(FW_TEST_DECL)
 #undef FW_TEST_DECL

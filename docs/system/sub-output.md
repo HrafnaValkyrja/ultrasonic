@@ -89,6 +89,8 @@ LN-M05: "bridge rail ripple 1.5-8 kHz x 10 % leg asymmetry <= 50 uV rms"
 |---|---|---|
 | PWM | 200.02 kHz, ARR 200, 201 levels; TIM1 clock 80.009 MHz | `sub-processing.md`, A3-u575-plan §2 (2026-09-30) |
 | Dead time | start 12.5 ns (1 tick); option 25 ns + firmware compensation | C3 §5, D6 (2026-09-30) |
+| Loud mode `loud_db` (knob, 0..12 dB, default 0 = off, bit-identical) | +loud_db dB drive ahead of the limiter while the user toggle is on; still bounded by the look-ahead limiter and the FWSIM-R64 208 mA clamp (`fw/test/test_loud.c` test_loud_mode, 2026-10-08). D17 ruling pending (NEXT.md #2) | `fw/spec/knobs.yaml`, bf5d6bd |
+| Idle Hi-Z `hiz_idle` (knob, 0/1, default 0) | 1 = bridge Hi-Z (MOE 0, break disarmed) while the squelch holds the exact 50 % square wave; saves ~0.4-0.5 mA at 1 tick dead time (SPICE only, not bench; E1/PWR-I12 closes). Interacts with F3 break/dead-time | `sim/checks/bridge_hiz_idle.py`, `docs/brainstorm/D-hiz-idle.md`, fdac294 (2026-10-08) |
 | Idle bus current (DMC2400UV model as stand-in) | 0 ns: 4.3 mA (shoot-through) · 12.5 ns: 0.49 / 0.42 mA (0.3 / 1.26 mH) · 25 ns: 0.20 / 0.10 mA | `sim/checks/bridge_spice.py`, C3 §5 |
 | Gate drive / gate pulls | 0.28 mA (SPICE); 0.30 mA est. for PMCXB290UE / 0.06 mA | C3 §5; B-parts §2; `power.py` |
 | THD+N at 12.5 ns | −61 dB at −40 dBFS; −52 dB at −12 dBFS | C3 §5 |
