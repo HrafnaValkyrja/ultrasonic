@@ -268,3 +268,31 @@ void test_haptic_clamp(void)
     TF_CHECK_EQ(viol, 0);                                                /* R64 clamp */
     TF_CHECK(peak <= cap + 1e-4f);                                       /* D17 ceiling */
 }
+
+/* ---- I-027 hiz_idle: bridge Hi-Z while the DSP squelch holds the 50 % square wave; default OFF = legacy ---- */
+void test_hiz_idle(void)
+{
+    static int32_t in[FW_HOP_N];
+    static uint16_t c0[FW_CCR_MAX_PER_HOP], c1[FW_CCR_MAX_PER_HOP];
+    fw_knobs_t k;
+    fw_knobs_defaults(&k);
+    TF_CHECK_EQ(k.hiz_idle, 0);
+    fw_state_t a, b;
+    fw_init(&a, &k, 0u);
+    k.hiz_idle = 1;
+    fw_init(&b, &k, 0u);
+    TF_CHECK(fw_outputs(&a).bridge_run == 1u);                      /* listening, undocked */
+    uint64_t n0 = 0, n1 = 0;
+    for (int h = 0; h < 40; h++) {                                  /* silence: squelch engages after squelch_hold_ms */
+        a.now_us = b.now_us = 1000000u + (uint64_t)h * 5120u;
+        n0 = fw_hop(&a, in, c0, FW_CCR_MAX_PER_HOP, NULL);
+        n1 = fw_hop(&b, in, c1, FW_CCR_MAX_PER_HOP, NULL);
+        TF_CHECK_EQ(n0, n1);
+        TF_CHECK(memcmp(c0, c1, n0 * sizeof c0[0]) == 0);           /* the DSP stream is untouched by the knob */
+    }
+    TF_CHECK(a.dsp_squelched == 1u && b.dsp_squelched == 1u);
+    TF_CHECK(fw_outputs(&a).bridge_run == 1u);                      /* knob off: legacy keeps switching */
+    TF_CHECK(fw_outputs(&b).bridge_run == 0u && fw_outputs(&b).brk_armed == 0u);   /* knob on: Hi-Z */
+    b.dsp_squelched = 0u;
+    TF_CHECK(fw_outputs(&b).bridge_run == 1u);                      /* signal back: bridge re-enabled */
+}

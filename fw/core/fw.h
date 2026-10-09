@@ -65,6 +65,7 @@ typedef struct {
     uint32_t pwm_reps;        /* PWM periods per PCM sample = effective pwm_khz / 200 (1, 2, 4) */
     uint32_t dt_rise, dt_fall;  /* dead time in TIM1 ticks at the running plan (knobs are P80 ticks) */
     uint32_t amp_max_ppm;     /* FWSIM-R64 bound in use */
+    uint32_t dsp_squelched;   /* DSP squelch state at the end of the last hop (hiz_idle gate) */
     uint32_t squelched;       /* 1 until power_on_hold_ms elapsed (e2e F4) */
     uint32_t vbus;            /* docked: output disabled unless exemption (ECR-0009) */
     uint32_t clamp_hits;

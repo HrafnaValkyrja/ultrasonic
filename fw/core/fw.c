@@ -72,7 +72,12 @@ static void sync_volume(fw_state_t *st)
 
 fw_outputs_t fw_outputs(const fw_state_t *st)
 {
-    return fw_sys_outputs(&st->sys);
+    fw_outputs_t o = fw_sys_outputs(&st->sys);
+    if (st->knobs.hiz_idle && st->dsp_squelched && st->sys.mode != (uint32_t)FW_ST_DOCKED_SELFTEST) {   /* I-027: Hi-Z while squelched */
+        o.bridge_run = 0u;
+        o.brk_armed = 0u;
+    }
+    return o;
 }
 
 static size_t hop_pcm(fw_state_t *st, const float pcm[FW_HOP_N], uint16_t *ccr, fw_taps_t *taps)
@@ -130,6 +135,7 @@ static size_t hop_pcm(fw_state_t *st, const float pcm[FW_HOP_N], uint16_t *ccr, 
 #endif
     size_t n = fw_dsp_out(&st->dsp, y8, (st->squelched || !o.output_enable) ? 1u : 0u, &b, ccr, &oi);
     st->clamp_hits += oi.clamp_hits;
+    st->dsp_squelched = oi.squelched;
     st->hop_count++;
     if (taps != NULL) {
         memcpy(taps->dsp_out, y8, sizeof y8);
