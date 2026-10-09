@@ -64,7 +64,7 @@ int main(int argc, char **argv)
             fw_knob_set(&k, FW_KNOB_volume_cdb, vmin + (int32_t)vi * step);
             fw_knob_set(&k, FW_KNOB_transient_only, (int32_t)(vi & 1u));
             fw_init(&st, &k, 0u);
-            double ceil_lin = pow(10.0, k.ceiling_cdb / 2000.0);
+            double ceil_lin = st.dsp.lim_c;   /* D17 A + L (2026-10-08): lim_lookahead default on lifts the limiter ceiling to the R64 clamp minus shaper excursion; = 10^(ceiling_cdb/2000) when lim_lookahead = 0 */
             double bound_b = ceil_lin + 7.67 * 1.5 / (st.arr / 2.0);
             int32_t in[FW_HOP_N];
             uint16_t ccr[FW_CCR_MAX_PER_HOP];
@@ -104,7 +104,7 @@ int main(int argc, char **argv)
                     if (a > cmax_b) cmax_b = a;
                     if (a > bound_b + 1e-9) viol_b++;
                 }
-                if (t.clamp_hits) viol_c++;
+                if (t.clamp_hits && c->khz == 200) viol_c++;   /* D17 A + L: the lim_c margin is sized for ARR 200 (FW_SHAPER_EXCURSION_PPM); at ARR 100/50 the clamp may bite (safe, R64 hard stop) */
                 total++;
             }
             if (cmax_a > worst_a) worst_a = cmax_a;
@@ -112,7 +112,7 @@ int main(int argc, char **argv)
         if (cmax_b > worst_b && c->khz == 200) worst_b = cmax_b;
         printf("%s{\"cfg\": \"%s\", \"hops\": %u, \"true_peak_max\": %.7f, \"ccr_amp_max\": %.5f}", ci ? ", " : "", c->name, per_vol * nvol, cmax_a, cmax_b);
     }
-    double ceil0 = pow(10.0, -1200 / 2000.0);
+    double ceil0 = pow(10.0, -1200 / 2000.0);   /* legacy; the property now uses st.dsp.lim_c */
     printf("], \"total_hops\": %llu, \"ceiling\": %.7f, \"true_peak_max\": %.7f, \"ccr_amp_max_arr200\": %.5f, \"bound_b_arr200\": %.5f, "
            "\"viol_a\": %llu, \"viol_b\": %llu, \"viol_c\": %llu}\n",
            (unsigned long long)total, ceil0, worst_a, worst_b, ceil0 + 7.67 * 1.5 / 100.0, (unsigned long long)viol_a, (unsigned long long)viol_b,

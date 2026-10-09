@@ -293,6 +293,7 @@ Each decision gives the choice, the reasoning, and what was rejected. **vX.Y** m
 ### D17. Output safety: fixed ceiling and pop-free start `[High]` as requirements — **New v0.5**
 - A **fixed output ceiling** (soft clip), identical on both sides. With fixed gain (D3), a loud nearby source would otherwise become a loud output. Examples: an ultrasonic pest repeller, or the HC-SR04 up close.
 - Power-up, mode changes and squelch transitions must not click (D6 soft start).
+- **Owner ruling 2026-10-08 (decisions-log #2): "A + L".** The limiter ceiling rises from -12 dBFS to the firmware current clamp (look-ahead limiter on by default, `lim_lookahead` 1); the loud toggle is live (`loud_db` 12; HOLD2 in gesture option A, triple press in B) and loud mode is OFF at every boot. The ceiling is still fixed and identical on both sides. Cost: `docs/proof/electrical/d17-cost.md`. Battery saver (idle doze) stays off by default with a manual toggle (knob `idle_enable`).
 
 ### D18. Runtime and weight balance `[High]` as requirements — **New v0.6 (owner, 2026-09-30)**
 - **Runtime:** ≥8 h per charge, target ~12 h. Nightly charging.

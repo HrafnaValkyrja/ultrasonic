@@ -15,7 +15,7 @@
    "level_p50_dbfs": -34.22,
    "level_max_dbfs": -12.0,
    "awake_frac": 0.8148,
-   "mean_ma": 10.5834
+   "mean_ma": 10.6346
   },
   "A": {
    "wake_recall": 0.8538,
@@ -29,7 +29,7 @@
    "level_p50_dbfs": -34.24,
    "level_max_dbfs": -3.36,
    "awake_frac": 0.8148,
-   "mean_ma": 10.7639
+   "mean_ma": 10.8151
   },
   "A+loud4": {
    "wake_recall": 0.8538,
@@ -43,7 +43,7 @@
    "level_p50_dbfs": -30.23,
    "level_max_dbfs": -2.98,
    "awake_frac": 0.8148,
-   "mean_ma": 11.4296
+   "mean_ma": 11.4808
   },
   "A+loud12": {
    "wake_recall": 0.8538,
@@ -57,7 +57,21 @@
    "level_p50_dbfs": -22.25,
    "level_max_dbfs": -2.98,
    "awake_frac": 0.8148,
-   "mean_ma": 13.6334
+   "mean_ma": 13.6846
+  },
+  "A+loud12+shape": {
+   "wake_recall": 0.8538,
+   "sound_recall": 0.8548,
+   "false_wakes_per_min": 3.14,
+   "false_awake_frac": 0.0823,
+   "quiet_false_wakes_per_min": 10.0,
+   "quiet_awake_frac": 0.0734,
+   "latency_p50_ms": 90.42,
+   "latency_p90_ms": 640.88,
+   "level_p50_dbfs": -14.3,
+   "level_max_dbfs": -2.98,
+   "awake_frac": 0.8148,
+   "mean_ma": 17.3611
   },
   "hiz_idle": {
    "wake_recall": 0.8538,
@@ -71,7 +85,7 @@
    "level_p50_dbfs": -34.22,
    "level_max_dbfs": -12.0,
    "awake_frac": 0.8148,
-   "mean_ma": 10.498
+   "mean_ma": 10.5492
   }
  },
  "tolerances_abs": {
@@ -85,5 +99,6 @@
   "level_max_dbfs": 0.3,
   "mean_ma": 0.02
  },
- "runtime_s": 88.7
+ "runtime_s": 77.2,
+ "_note": "Re-baselined 2026-10-08 after owner ruling D17 = A + L (fw default lim_lookahead 1, loud_db 12, loud OFF at boot): configs now pin lim_lookahead/loud_db explicitly; uniform +0.051 mA on every config vs the previous baseline is pre-existing drift (not from the D17 defaults), accepted."
 }

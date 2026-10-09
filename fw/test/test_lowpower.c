@@ -196,3 +196,18 @@ void test_idle_detector(void)
         }
     }
 }
+
+/* owner 2026-10-08: battery saver (idle doze, knob idle_enable) is OFF by default and is a user toggle through the knob/settings path */
+void test_battery_saver_toggle(void)
+{
+    fw_knobs_t k;
+    fw_knobs_defaults(&k);
+    TF_CHECK_EQ(k.idle_enable, 0);
+    TF_CHECK_EQ(fw_knob_set(&k, FW_KNOB_idle_enable, 1), FW_KNOB_OK);
+    TF_CHECK_EQ(k.idle_enable, 1);
+    fw_state_t st;
+    fw_init(&st, &k, 0u);
+    TF_CHECK_EQ(st.knobs.idle_enable, 1);                        /* the saver is live after the setting is applied (detector tested in test_idle_detector) */
+    TF_CHECK_EQ(fw_knob_set(&k, FW_KNOB_idle_enable, 0), FW_KNOB_OK);
+    TF_CHECK_EQ(k.idle_enable, 0);
+}

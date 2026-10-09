@@ -46,12 +46,12 @@ PM = ch.PM_DIR
 BASELINE = HERE / "port_meadow_baseline.json"
 BASE_KNOBS = {"algo": 2, "transient_only": 1, "idle_enable": 1}
 CONFIGS = {
-    "today": ({}, False),
-    "A": ({"lim_lookahead": 1}, False),
+    "today": ({"lim_lookahead": 0, "loud_db": 0}, False),   # pre-D17 legacy; since 2026-10-08 the fw DEFAULT is A + loud_db 12 (loud OFF at boot), so these are pinned explicitly
+    "A": ({"lim_lookahead": 1, "loud_db": 0}, False),   # = shipped default with the loud toggle never used (battery cost of A alone)
     "A+loud4": ({"lim_lookahead": 1, "loud_db": 4}, True),
     "A+loud12": ({"lim_lookahead": 1, "loud_db": 12}, True),
     "A+loud12+shape": ({"lim_lookahead": 1, "loud_db": 12, "loud_shape": 1}, True),   # I-034 flat-top, k = 2.5 (default knob)
-    "hiz_idle": ({"hiz_idle": 1}, False),
+    "hiz_idle": ({"hiz_idle": 1, "lim_lookahead": 0, "loud_db": 0}, False),
 }
 IDLE_ST = 3
 HOP_S = 0.00064

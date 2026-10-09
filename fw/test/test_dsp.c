@@ -182,9 +182,9 @@ void test_dsp_ceiling_short(void)
         tone_hop(in, &ph, 20e3 + 20.0 * h, 0.999);
         fw_poll(&st, (uint64_t)h * 640u);
         size_t n = fw_hop(&st, in, ccr, FW_CCR_MAX_PER_HOP, &t);
-        bad += t.pre_q_true_peak > 0.2511886f + 1e-6f;
+        bad += t.pre_q_true_peak > st.dsp.lim_c + 1e-6f;   /* D17 A + L: lim_c = R64 clamp - shaper excursion (0.2511886 with lim_lookahead = 0) */
         for (size_t j = 0; j < n; j++)
-            bad += fabs(2.0 * ccr[j] / 200.0 - 1.0) > 0.36624;
+            bad += fabs(2.0 * ccr[j] / 200.0 - 1.0) > (double)st.dsp.lim_c + 0.11505 + 1e-9;
         bad += t.clamp_hits;
     }
     TF_CHECK_EQ(bad, 0);

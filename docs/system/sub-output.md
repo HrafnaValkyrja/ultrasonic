@@ -76,6 +76,7 @@ mechanism:
 D6: "200 kHz, centre-aligned, 201 levels, AD, dead time 1-2 ticks, gate pulls mandatory, integrated bridge ICs rejected (DRV8837/8210/8833 timing 10-40x too coarse)"
 D7: "exciter disputed: 8 ohm / 12.5x5x3.5 mm vs 12 ohm / 12.6x6x4 mm; no inductance data; E1 measures it"
 D17: "fixed ceiling, identical both sides; no clicks. No ceiling number in spec; SPICE assumes -12 dBFS (C3 §5)"
+D17_ruling: "OWNER 2026-10-08 (docs/brief/decisions-log.yaml #2): A + L. fw defaults: lim_lookahead 1 (ceiling = R64 clamp minus shaper excursion, 0.5203 class, was -12 dBFS), loud_db 12 (toggle live; loud mode OFF at boot). -12 dBFS legacy = lim_lookahead 0. Cost: docs/proof/electrical/d17-cost.md"
 s7_rail: "bridge on regulated 3.0 V so gain doesn't track charge (~1.8 dB otherwise); AD prefers full 3.0 V"
 s6_caps: "keep audio-rate ripple off class-2 ceramics on the bridge rail, or use low-acoustic-noise types"
 T6: "self-noise no louder than ambient; owner hears high (8-16 kHz band to protect)"
@@ -89,7 +90,7 @@ LN-M05: "bridge rail ripple 1.5-8 kHz x 10 % leg asymmetry <= 50 uV rms"
 |---|---|---|
 | PWM | 200.02 kHz, ARR 200, 201 levels; TIM1 clock 80.009 MHz | `sub-processing.md`, A3-u575-plan §2 (2026-09-30) |
 | Dead time | start 12.5 ns (1 tick); option 25 ns + firmware compensation | C3 §5, D6 (2026-09-30) |
-| Loud mode `loud_db` (knob, 0..12 dB, default 0 = off, bit-identical) | +loud_db dB drive ahead of the limiter while the user toggle is on; still bounded by the look-ahead limiter and the FWSIM-R64 208 mA clamp (`fw/test/test_loud.c` test_loud_mode, 2026-10-08). D17 ruling pending (NEXT.md #2) | `fw/spec/knobs.yaml`, bf5d6bd |
+| Loud mode `loud_db` (knob, 0..12 dB, default 12 since the 2026-10-08 D17 ruling; loud mode itself OFF at boot; 0 = feature off, bit-identical) | +loud_db dB drive ahead of the limiter while the user toggle is on; still bounded by the look-ahead limiter and the FWSIM-R64 208 mA clamp (`fw/test/test_loud.c` test_loud_mode, 2026-10-08). D17 ruling pending (NEXT.md #2) | `fw/spec/knobs.yaml`, bf5d6bd |
 | Loud flat-top `loud_shape` (0/1, default 0 = bit-identical) + `loud_shape_k` (x0.1, default 25) | I-034 (docs/brainstorm/D-r6-crest.md): tanh flat-top (65-pt table, no libm) between loud gain and look-ahead limiter, active only while loud mode is on; S = ceiling x loud gain; limiter + 208 mA clamp still bound the output (`test_loud_shape`, FWSIM-R64: off bit-identical, clamp hits 0, >= 2 dB). Port Meadow 54 clips (sim/perf/port_meadow.py `A+loud12+shape`, 2026-10-08, model): call level p50 -22.3 -> -14.3 dBFS, mean 13.6 -> 17.3 mA (x1.27 mean; per-call x1.7), expected runtime 10.9 -> 8.6 h (175 mAh). Owner decides with D17 |
 | Idle Hi-Z `hiz_idle` (knob, 0/1, default 0) | 1 = bridge Hi-Z (MOE 0, break disarmed) while the squelch holds the exact 50 % square wave; saves ~0.4-0.5 mA at 1 tick dead time (SPICE only, not bench; E1/PWR-I12 closes). Interacts with F3 break/dead-time | `sim/checks/bridge_hiz_idle.py`, `docs/brainstorm/D-hiz-idle.md`, fdac294 (2026-10-08) |
 | Idle bus current (DMC2400UV model as stand-in) | 0 ns: 4.3 mA (shoot-through) · 12.5 ns: 0.49 / 0.42 mA (0.3 / 1.26 mH) · 25 ns: 0.20 / 0.10 mA | `sim/checks/bridge_spice.py`, C3 §5 |
