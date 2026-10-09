@@ -97,3 +97,6 @@ void shim_fmac_bank(const int16_t *coef, uint32_t n_phase, uint32_t taps, uint32
 {
     fw_fmac_model_bank(coef, n_phase, taps, r_gain, x, n_new, y);
 }
+
+/* D17 loud toggle (the HOLD2 gesture's effect), for sim/perf: no-op unless the loud_db knob is non-zero */
+void shim_set_loud(fw_state_t *st, uint32_t on) { fw_dsp_set_loud(&st->dsp, on); }

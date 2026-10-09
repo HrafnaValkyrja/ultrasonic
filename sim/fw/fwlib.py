@@ -71,6 +71,8 @@ def lib(cc="gcc", opt="-O2", defines=()):
     L.shim_run.restype = C.c_int32
     L.shim_out.argtypes = [C.c_void_p, F32P, C.c_uint32, U16P, F32P, U32P]
     L.shim_out.restype = C.c_int32
+    L.shim_set_loud.argtypes = [C.c_void_p, C.c_uint32]
+    L.shim_set_loud.restype = None
     _LIBS[key] = L
     return L
 
@@ -113,6 +115,9 @@ class Firmware:
         r["floor"] = r["floor"].reshape(n, 28)
         r["norm"] = r["norm"].reshape(n, 3)
         return r
+
+    def set_loud(self, on=True):
+        self.L.shim_set_loud(self.buf, int(on))
 
     def out_stage(self, y12k):
         y = np.ascontiguousarray(y12k, np.float32)
