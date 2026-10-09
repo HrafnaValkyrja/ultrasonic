@@ -2,6 +2,8 @@
 
 Answer: **option A as shipped (limiter, ceiling 0.5203) costs ~2.5 mA and still meets 8 h with margin. A with +12 dB drive into the limiter (the variant that gets the cafe/car margin) costs ~12 mA extra: 8 h is MISSED in the continuous-calls and cell-pessimistic cases (4-6 h), met only for sparse scenes. U4/cell heat is a non-issue (+3.6 K worst realistic).** TEAX14C02-8 (7.8 ohm vs 8 ohm exciter) adds only ~2 % current.
 
+**SCOPE (2026-10-08, reconciled: current-models-reconciled.md):** this table is the cost of PLAYING A LOUD PROGRAMME (the 75-dB-per-call translated nature file, calls at the top of the level range, 51 % active frames) or its continuous worst case. It is NOT the cost of wearing the pod outdoors: for that, `sim/perf/port_meadow.py` (real clips, relative levels, gated by the squelch) gives loud12 +3.1 mA over today, not +12. The 14.5-25 mA figures are a cafe/car loud-mode ceiling; use them only for hours spent in that mode.
+
 ## Method
 - Programme: `sim/out/nature/2_translated_only.wav` (20 s, 51 % of 100 ms frames active), same chain/limiter port as `sim/acoustics/audibility_reconciled.py` (`lahead`, `tp_limit`, ceilings 0.251 / 0.5203). Sample = bridge duty fraction; supply current = mean |x| x 327 mA (full-scale 3.0 V into 8 ohm + FETs + 0.1 ohm, audibility-requirement.md l.7). The H-bridge draws |i| from +3V0 (U4 passes it 1:1 from VSYS).
 - The `bats*.npz` vectors are mic PDM input words, not output; no firmware run was made (limiter port used, as in the audibility doc). Scenes: dense = the file as is; continuous = active-frame mean held 100 % of the time (worst); sparse = 18 % active (rail-budget "quiet room", sub-power.md l.176), background from the file's inactive frames.

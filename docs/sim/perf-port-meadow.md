@@ -15,10 +15,12 @@ Configs: today = defaults; A = lim_lookahead 1 (D17 rec A, fbfb38b); A+loud4/12 
 | output level per call p50 (dBFS pre-quantiser) | -34.2 | -34.2 | -30.2 | -22.3 | -34.2 | 0.3 |
 | output level per call max (dBFS) | -12.0 | -3.4 | -3.0 | -3.0 | -12.0 | 0.3 |
 | awake fraction | 0.815 | 0.815 | 0.815 | 0.815 | 0.815 | (via mean mA) |
-| mean current (mA, model) | 7.154 | 7.192 | 7.333 | 7.799 | 7.152 | 0.02 |
+| mean current (mA, model, this scene, reconciled 2026-10-08) | 10.58 | 10.76 | 11.43 | 13.63 | 10.50 | 0.02 |
 
 Reading it
 - Wake, false-wake and awake numbers are identical across configs: the knobs act downstream of the idle detector. Only the output side and current move.
 - A raises the peak ceiling (-12 -> -3.4 dBFS) with p50 unchanged; loud12 lifts the median call +12 dB and the ceiling is held by the limiter/clamp (-3.0).
-- Mean current: +0.04 mA (A), +0.18 (loud4), +0.65 (loud12) over today; hiz_idle saves only 0.002 mA here because the pod is awake 81 % of this dense bat scene and rarely squelched while awake. Its real win is quiet scenes (not scored by the model: IDLE row has no bridge term).
-- Caveats: false wakes use incomplete labels (real calls unlabelled count as false); latency is first-call-of-episode to first unsquelched hop and includes the algorithm's own gating (p90 is dominated by trains where the squelch stays closed); the current is the runtime_fw.py B1 model (spec B P112, exciter 1.1 mA guess scaled by PWM drive), not a bench number; the 3x tiling makes the scene stationary.
+- Mean current (reconciled, see docs/proof/electrical/current-models-reconciled.md): exciter is now physical, 0.327 A x mean|x| (x = |CCR-centre|/128) on awake hops, not the 1.1 mA guess scaled by relative drive (that anchored on a guess and understated the delta ~5x). Delta over today: +0.18 (A), +0.85 (loud4), +3.05 (loud12) mA. Awake-hop bridge current 5.2 / 5.4 / 8.9 mA (today / A / loud12) is an upper bound: it includes ambient/noise that passes the squelch and ignores coil L filtering.
+- hiz_idle: squelch is set on 19 % of hops but on only 0.6 % of awake hops (it is the IDLE state), so the old awake-only credit was ~0. Squelched hops keep the bridge's 0.45 mA switching ripple (D-hiz-idle.md s1) which the IDLE row omits; now charged to every config but hiz_idle. Saving here 0.08 mA (19 % squelched); in a quiet scene (82 % squelched) ~0.37 mA.
+- Runtime on 130 mAh nominal (0.85 usable in brackets), if the whole day looked like: dense flypasts (81 % awake) / bat-rich walk (40 %) / quiet dusk (18 %): today 12.3 (10.4) / 20.7 (17.6) / 32.5 (27.6) h; A 12.1 / 20.4 / 32.2; loud12 9.5 (8.1) / 16.7 (14.2) / 27.8 (23.7); hiz_idle 12.4 / 21.6 / 35.8 h.
+- Caveats: false wakes use incomplete labels (real calls unlabelled count as false); latency is first-call-of-episode to first unsquelched hop and includes the algorithm's own gating (p90 is dominated by trains where the squelch stays closed); the current is the runtime_fw.py B1 model (spec B P112) with a physical exciter term; 128 counts per unit duty read off today's 32-count / 0.251 peak, not a bench number; the 3x tiling makes the scene stationary.

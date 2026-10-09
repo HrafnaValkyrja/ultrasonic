@@ -15,8 +15,7 @@ edges with no annotated call in [start-10 ms, end+30 ms]; the BatDetect2 labels 
 fraction (awake hops >50 ms from any call), wake-to-sound latency (first call of an episode, >=0.5 s gap, to first unsquelched hop
 when it was squelched before; hop = 0.64 ms), output level per call (max pre-quantiser true peak, dBFS, in [start, start+30 ms]),
 mean current (model, below). Current = spec B nominal awake mA (sim/checks/runtime_fw.py) x awake + IDLE x idle + LED, with the exciter
-row (1.1 mA nominal, guess PWR-04) scaled by mean |CCR - centre| (PWM drive) on awake hops relative to `today`, and hiz_idle credited 0.45 mA (SPICE,
-I-027) on awake hops whose DSP squelch is set. Model, not bench.
+row replaced by 0.327 A x mean|CCR - centre|/128 on awake hops (physical, as d17-cost.md), plus 0.45 mA bridge ripple on squelched hops unless hiz_idle (I-027). Model, not bench.
     python3 sim/perf/port_meadow.py            # check against sim/perf/port_meadow_baseline.json (exit 1 on regression)
     python3 sim/perf/port_meadow.py --bless    # rewrite the baseline
 Run fenced: systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0 python3 sim/perf/port_meadow.py
@@ -143,23 +142,29 @@ def score(r, calls, t0):
         m = pk[iv(s, s + 0.030)]
         lvl.append(20 * np.log10(max(float(m.max()) if len(m) else 0.0, 1e-6)))
     return dict(dur=dur, calls=len(calls), wake=sum(wake), sound=sum(sound), fw=fw_n, fa_hops=int((a & ~near).sum()), hops=len(a),
-                awake_hops=int(a.sum()), awake_sq_hops=int((a & sqf).sum()), rms_awake=float(rms[a].sum()), lat=lat, lvl=lvl)
+                awake_hops=int(a.sum()), awake_sq_hops=int((a & sqf).sum()), sq_hops=int(sqf.sum()), rms_awake=float(rms[a].sum()), lat=lat, lvl=lvl)
 
 
-def current(awake_frac, sq_frac_awake, rms_rel, hiz):
+BRIDGE_A_PER_UNIT = 0.327   # A per unit duty fraction (3.0 V into 8 ohm + FETs + 0.1 ohm; d17-cost.md, audibility-requirement.md l.7)
+CCR_HALF = 128.0            # counts per unit duty (today: 32 counts = peak 0.251); L filtering ignored, as in d17-cost.md
+BRIDGE_IDLE_MA = 0.45       # bridge keeps switching 50 % while squelched (D-hiz-idle.md s1); SPICE ripple, hiz_idle removes it
+
+
+def current(awake_frac, sq_frac_all, rms_counts, hiz):
+    """Reconciled 2026-10-08 (docs/proof/electrical/current-models-reconciled.md). Exciter = physical 0.327 A x mean|x| on awake hops
+    (replaces 1.1 mA guess x relative drive). Squelched hops (mostly IDLE; the IDLE row has no bridge term) carry the bridge's 0.45 mA
+    switching ripple unless hiz_idle."""
     m = rt.mcu(*[json.loads((REPO / "fw/out/dsp_icount.json").read_text())["B"]["MHz_qemu_corrected_V4ovh"]][0], "P112")
-    aw = rt.awake(m[2], m[3])[1]
-    aw += (rms_rel - 1.0) * rt.B1["exciter (guess, PWR-04)"][1]
-    if hiz:
-        aw -= 0.45 * sq_frac_awake
-    return awake_frac * aw + (1 - awake_frac) * rt.IDLE[1] + rt.LED[1]
+    aw = rt.awake(m[2], m[3])[1] - rt.B1["exciter (guess, PWR-04)"][1] + 1e3 * BRIDGE_A_PER_UNIT * rms_counts / CCR_HALF
+    ripple = 0.0 if hiz else BRIDGE_IDLE_MA * sq_frac_all
+    return awake_frac * aw + (1 - awake_frac) * rt.IDLE[1] + rt.LED[1] + ripple
 
 
 def evaluate(n_clips):
     real, quiet = scenes(n_clips)
     out, ref_rms = {}, None
     for cfg, (knobs, loud) in CONFIGS.items():
-        t_ = dict(dur=0, calls=0, wake=0, sound=0, fw=0, fa_hops=0, hops=0, awake_hops=0, awake_sq_hops=0, rms_awake=0.0, lat=[], lvl=[])
+        t_ = dict(dur=0, calls=0, wake=0, sound=0, fw=0, fa_hops=0, hops=0, awake_hops=0, awake_sq_hops=0, sq_hops=0, rms_awake=0.0, lat=[], lvl=[])
         for _, words, calls, t0 in real:
             s = score(run_cfg(knobs, loud, words), calls, t0)
             for k in t_:
@@ -179,9 +184,9 @@ def evaluate(n_clips):
             "quiet_false_wakes_per_min": round(q_fw / q_dur * 60, 2), "quiet_awake_frac": round(q_aw / q_h, 4),
             "latency_p50_ms": round(float(np.nanmedian(L)), 2), "latency_p90_ms": round(float(np.nanpercentile(L, 90)), 2),
             "level_p50_dbfs": round(float(np.median(V)), 2), "level_max_dbfs": round(float(V.max()), 2),
-            "awake_frac": round(af, 4), "_rms": rms_mean, "_sqa": t_["awake_sq_hops"] / max(t_["awake_hops"], 1)}
+            "awake_frac": round(af, 4), "_rms": rms_mean, "_sqa": t_["sq_hops"] / t_["hops"]}
     for cfg, o in out.items():
-        o["mean_ma"] = round(current(o["awake_frac"], o.pop("_sqa"), o.pop("_rms") / ref_rms, cfg == "hiz_idle"), 4)
+        o["mean_ma"] = round(current(o["awake_frac"], o.pop("_sqa"), o.pop("_rms"), cfg == "hiz_idle"), 4)
     n_calls = t_["calls"]
     return {"clips": len(real), "calls": n_calls, "audio_s": round(t_["dur"], 1), "configs": out}
 

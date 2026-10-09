@@ -15,7 +15,7 @@
    "level_p50_dbfs": -34.22,
    "level_max_dbfs": -12.0,
    "awake_frac": 0.8148,
-   "mean_ma": 7.1542
+   "mean_ma": 10.5834
   },
   "A": {
    "wake_recall": 0.8538,
@@ -29,7 +29,7 @@
    "level_p50_dbfs": -34.24,
    "level_max_dbfs": -3.36,
    "awake_frac": 0.8148,
-   "mean_ma": 7.1924
+   "mean_ma": 10.7639
   },
   "A+loud4": {
    "wake_recall": 0.8538,
@@ -43,7 +43,7 @@
    "level_p50_dbfs": -30.23,
    "level_max_dbfs": -2.98,
    "awake_frac": 0.8148,
-   "mean_ma": 7.3334
+   "mean_ma": 11.4296
   },
   "A+loud12": {
    "wake_recall": 0.8538,
@@ -57,7 +57,7 @@
    "level_p50_dbfs": -22.25,
    "level_max_dbfs": -2.98,
    "awake_frac": 0.8148,
-   "mean_ma": 7.7994
+   "mean_ma": 13.6334
   },
   "hiz_idle": {
    "wake_recall": 0.8538,
@@ -71,7 +71,7 @@
    "level_p50_dbfs": -34.22,
    "level_max_dbfs": -12.0,
    "awake_frac": 0.8148,
-   "mean_ma": 7.1522
+   "mean_ma": 10.498
   }
  },
  "tolerances_abs": {
@@ -85,5 +85,5 @@
   "level_max_dbfs": 0.3,
   "mean_ma": 0.02
  },
- "runtime_s": 93.5
+ "runtime_s": 88.7
 }

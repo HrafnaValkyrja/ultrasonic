@@ -18,3 +18,7 @@ Caveat: at 2-tick dead time idle is only 0.10-0.20 mA (C3 table); gain shrinks t
 
 ## 4. Open
 Bench PWR-I12 with real coil (kills if < 0.15 mA); listen test for the re-enable tick; re-enable latency on target.
+
+
+## Scope note (2026-10-08)
+The 0.42-0.49 mA saving applies to SQUELCHED time (bridge switching 50 % with no signal), which is mostly IDLE. In awake bat scenes squelch is almost never set (0.6 % of awake hops, Port Meadow), so scene-averaged saving = 0.45 x squelched fraction: 0.08 mA dense flypasts, ~0.37 mA quiet dusk (docs/proof/electrical/current-models-reconciled.md).
