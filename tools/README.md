@@ -26,6 +26,7 @@ container installs everything automatically.
 | ARM GCC + newlib | 13.2.1 | Cortex-M4F cross-compiling (hard-float) | — |
 | build123d | 0.13.0 | Parametric CAD, mass properties, STL/STEP | cad-mech |
 | scikit-fem | 12.0.2 | Finite elements (spring arm force, stiffness) | cad-mech |
+| sounddevice + libportaudio2 | 0.5.6 / 19.7 | Live audio I/O for `bench/rig/` scripts (licences: python-sounddevice MIT, PortAudio MIT-style) | bench |
 | numpy / scipy / matplotlib | 2.5.3 / 1.18.1 / 3.11.2 | DSP models, plots (`tools/plotstyle.py`) | — |
 | mermaid-cli | 11.17.0 (uses the preinstalled Chromium) | Flowcharts and mind maps to PNG | visual-explainer |
 | headless Chromium | preinstalled (`/opt/pw-browsers`) | SVG diagrams to PNG (`docs/diagrams/render.sh`) | visual-explainer |
@@ -47,6 +48,7 @@ minutes. The KiCad 3D-model library is optional: `--with-3d` adds 3.2 GB.
 | arm-gcc | Cortex-M4F object uses the FPU |
 | build123d | Exact volume and centroid of a part with a window; STL + STEP |
 | scikit-fem | Cantilever tip deflection matches beam theory to 0.1% |
+| sounddevice + libportaudio2 | 0.5.6 / 19.7 | Live audio I/O for `bench/rig/` scripts (licences: python-sounddevice MIT, PortAudio MIT-style) | bench |
 | render | SVG and Mermaid diagrams to PNG |
 | easyeda2kicad | Fetches the SPH0641LU4H-1 footprint and symbol (C2879853) — network |
 | jlc-api | Live JLC lookup — network |

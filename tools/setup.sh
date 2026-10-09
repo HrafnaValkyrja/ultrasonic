@@ -48,7 +48,8 @@ done
 # qemu-system-arm: GPL-2.0 (qemu.org), Ubuntu 1:10.2.1; Cortex-M33 machine mps2-an505 for firmware ARM L0 tests (FWSIM-R7); installed 2026-10-07 under the FOSS rule
 APT_PKGS=(qemu-system-arm ngspice gcc-arm-none-eabi binutils-arm-none-eabi libnewlib-arm-none-eabi
           kicad kicad-symbols kicad-footprints openjdk-25-jre-headless
-          librsvg2-bin python3-venv cmake ninja-build)   # python3-venv tracks the distro python3
+          librsvg2-bin python3-venv cmake ninja-build
+          libportaudio2)   # python3-venv tracks the distro python3
 if [ "$WITH_3D" = 1 ]; then APT_PKGS+=(kicad-packages3d); fi
 
 SUDO=()
