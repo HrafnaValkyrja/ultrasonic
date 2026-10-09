@@ -17,6 +17,7 @@ typedef struct {
     uint64_t vbus_edge_us;
     uint32_t btn_raw, btn;                 /* raw edge level, debounced level */
     uint64_t btn_raw_us, press_us, release_us, last_rep_us;
+    uint32_t triples;                      /* completed triple presses (option B, loud_db > 0 only) */
     uint32_t taps, hold1, hold2, stuck, consumed, bounces;
     uint32_t st_active;                    /* self-test drive running (variant a) */
     uint64_t st_start_us;

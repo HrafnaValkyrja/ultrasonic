@@ -138,7 +138,13 @@ void fw_sys_poll(fw_sys_t *s, const fw_knobs_t *k, uint64_t now_us)
             s->stuck = 0u;
             if (!was_hold) {
                 if (gm->double_used && s->mode != (uint32_t)FW_ST_OFF) {
-                    if (s->taps == 1u) {
+                    if (s->taps == 2u) {                 /* third tap inside the window: D17 loud toggle (only armed when loud_db > 0) */
+                        s->taps = 0u;
+                        s->triples++;
+                    } else if (s->taps == 1u && k->loud_db) {
+                        s->taps = 2u;                    /* hold the double back one more window so a third tap can claim it */
+                        s->release_us = t;
+                    } else if (s->taps == 1u) {
                         s->taps = 0u;
                         gesture(s, k, FW_RG_DOUBLE, now_us);
                     } else {
@@ -150,6 +156,10 @@ void fw_sys_poll(fw_sys_t *s, const fw_knobs_t *k, uint64_t now_us)
                 }
             }
         }
+    }
+    if (s->taps == 2u && !s->btn && now_us - s->release_us >= (uint64_t)k->double_window_ms * 1000u) {
+        s->taps = 0u;
+        gesture(s, k, FW_RG_DOUBLE, now_us);
     }
     if (s->taps == 1u && !s->btn && now_us - s->release_us >= (uint64_t)k->double_window_ms * 1000u) {
         s->taps = 0u;

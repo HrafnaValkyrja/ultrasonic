@@ -100,7 +100,7 @@ Source: `hw/mech/dims_r2.py` (run 2026-10-07).
 | Quantity | Value | Source (date) |
 |---|---|---|
 | SW1 force / life | 1.6 N ± 25 % (1.2–2.0 N), tactile feel ≥ 30 %, 600,000 cycles | C&K KMT0 datasheet p.B-9, 21 Mar 2018; LCSC copy fetched 2026-10-01 (SHA-256 a7791d9888a26610) |
-| Loud-mode toggle = HOLD2 (`hold2_ms` 4 s) when knob `loud_db` > 0 | Option A: toggles (HOLD2 unmapped); B: the 2 s hold already switched Off, so HOLD2 sees Off and cannot toggle; C: HOLD2 = Off. Short press and HOLD1 never toggle; `loud_db` 0 = never. Tested for A, B, C in `fw/test/test_loud.c` test_loud_gesture (2026-10-08). Finding: B cannot reach loud mode via HOLD2, so D17 needs a different gesture under B | `fw/core/fw.c` fw_poll, bf5d6bd |
+| Loud-mode toggle when knob `loud_db` > 0 | Option A: HOLD2 (`hold2_ms` 4 s). Option B (recommended default): TRIPLE press (3 taps, each gap < `double_window_ms`); the 2 s hold already means Off. Armed only while `loud_db` > 0, which delays B's double by one extra window (`loud_db` 0 = legacy timing, bit-identical). Option C: none (HOLD2 = Off; adding a triple would delay its immediate short). Short, double, HOLD1 never toggle; `loud_db` 0 = never. Tested A, B, C in `fw/test/test_loud.c` test_loud_gesture (triple toggles in B, double still = volume, double + later single is no triple) | `fw/core/modes.c`, `fw/core/fw.c` fw_poll, 2026-10-08 |
 | SW1 travel / height / size | 0.15 ± 0.1 mm / 0.65 mm / 3.0 × 2.6 mm | same |
 | SW1 electrical | 1–50 mA, 20 mV–32 VDC, 0.5 VA max, ≤ 150 mΩ contact, bounce ≤ 6 ms, −40…85 °C, IP68 | same |
 | Contact current while pressed | 1.33–1.40 mA (2.955–3.045 V / 2.2 kΩ ± 1 %) | derived: SBVS338H rail via sub-power |

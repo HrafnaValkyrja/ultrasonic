@@ -297,7 +297,7 @@ void test_hiz_idle(void)
     TF_CHECK(fw_outputs(&b).bridge_run == 1u);                      /* signal back: bridge re-enabled */
 }
 
-/* ---- D17 loud toggle gesture (bf5d6bd): HOLD2 (hold2_ms = 4 s) toggles loud_on in options A and B; C maps HOLD2 to Off; short press / HOLD1 never toggle ---- */
+/* ---- D17 loud toggle gesture (bf5d6bd): HOLD2 (4 s) toggles loud_on in option A only; B uses a TRIPLE press; C has none; short press / HOLD1 never toggle ---- */
 static uint64_t lg_press(fw_state_t *st, uint64_t t, uint32_t ms)
 {
     fw_event(st, FW_EV_BTN_EDGE, 1, t);
@@ -308,6 +308,21 @@ static uint64_t lg_press(fw_state_t *st, uint64_t t, uint32_t ms)
     for (uint32_t i = 1; i <= 400; i++)                                  /* let the double window and debounce expire */
         fw_poll(st, t + (uint64_t)i * 1000u);
     return t + 400000u + 100000u;
+}
+
+static uint64_t lg_taps(fw_state_t *st, uint64_t t, uint32_t n, uint32_t gap_ms)   /* n quick taps (50 ms down, gap_ms up), then settle */
+{
+    for (uint32_t j = 0; j < n; j++) {
+        fw_event(st, FW_EV_BTN_EDGE, 1, t);
+        for (uint32_t i = 1; i < 50u; i++) fw_poll(st, t + (uint64_t)i * 1000u);
+        t += 50000u;
+        fw_event(st, FW_EV_BTN_EDGE, 0, t);
+        uint32_t w = j + 1 < n ? gap_ms : 1u;
+        for (uint32_t i = 1; i <= w; i++) fw_poll(st, t + (uint64_t)i * 1000u);
+        t += (uint64_t)w * 1000u;
+    }
+    for (uint32_t i = 1; i <= 800u; i++) fw_poll(st, t + (uint64_t)i * 1000u);
+    return t + 900000u;
 }
 
 static void lg_init(fw_state_t *st, int32_t gesture, int32_t loud_db)
@@ -349,11 +364,49 @@ void test_loud_gesture(void)
             if (st.sys.mode == (uint32_t)FW_ST_OFF) t = lg_press(&st, t, 80u);
             t = lg_press(&st, t, 4300u);
             TF_CHECK_EQ(st.dsp.loud_on, 0);
-        } else if (g == 2) {                                             /* B: HOLD1 already switched Off at 2 s, so HOLD2 finds the mode Off: no toggle */
+        } else if (g == 2) {                                             /* B: HOLD2 finds the mode Off (no toggle); triple press toggles */
             t = lg_press(&st, t, 4300u);
             TF_CHECK_EQ(st.sys.mode, (uint32_t)FW_ST_OFF);
             TF_CHECK_EQ(st.sys.gestures[FW_RG_HOLD2], 1u);
             TF_CHECK_EQ(st.dsp.loud_on, 0);
+            t = lg_press(&st, t, 80u);                                   /* press in Off = On */
+            TF_CHECK(st.sys.mode != (uint32_t)FW_ST_OFF);
+            uint32_t m0 = st.sys.mode;
+            t = lg_taps(&st, t, 3u, 100u);
+            TF_CHECK_EQ(st.sys.triples, 1u);
+            TF_CHECK_EQ(st.dsp.loud_on, 1);
+            TF_CHECK_EQ(st.sys.mode, m0);                                /* triple does not change mode or volume */
+            TF_CHECK_EQ(st.sys.gestures[FW_RG_DOUBLE], 0u);
+            t = lg_taps(&st, t, 3u, 100u);
+            TF_CHECK_EQ(st.dsp.loud_on, 0);
+            uint32_t d0 = st.sys.gestures[FW_RG_DOUBLE];
+            t = lg_taps(&st, t, 2u, 100u);                               /* double still = volume, no toggle */
+            TF_CHECK_EQ(st.sys.gestures[FW_RG_DOUBLE], d0 + 1u);
+            TF_CHECK_EQ(st.sys.triples, 2u);
+            TF_CHECK_EQ(st.dsp.loud_on, 0);
+            /* double + single slower than the window: a double, then a short; never a triple */
+            t = lg_taps(&st, t, 2u, 100u);
+            t = lg_press(&st, t, 80u);
+            TF_CHECK_EQ(st.sys.triples, 2u);
+            TF_CHECK_EQ(st.dsp.loud_on, 0);
+            /* loud_db = 0: triples never armed, double fires at the legacy time (first window, not two) */
+            fw_state_t s0;
+            lg_init(&s0, 2, 0);
+            uint64_t u = lg_press(&s0, 1000000u, 80u);
+            uint64_t q = u;
+            fw_event(&s0, FW_EV_BTN_EDGE, 1, q);
+            for (uint32_t i = 1; i < 60; i++) fw_poll(&s0, q + (uint64_t)i * 1000u);
+            q += 60000u;
+            fw_event(&s0, FW_EV_BTN_EDGE, 0, q);
+            for (uint32_t i = 1; i < 80; i++) fw_poll(&s0, q + (uint64_t)i * 1000u);
+            q += 80000u;
+            fw_event(&s0, FW_EV_BTN_EDGE, 1, q);
+            for (uint32_t i = 1; i < 60; i++) fw_poll(&s0, q + (uint64_t)i * 1000u);
+            q += 60000u;
+            fw_event(&s0, FW_EV_BTN_EDGE, 0, q);
+            for (uint32_t i = 1; i < 30; i++) fw_poll(&s0, q + (uint64_t)i * 1000u);   /* 30 ms: debounce passed, well inside one window */
+            TF_CHECK_EQ(s0.sys.gestures[FW_RG_DOUBLE], 1u);
+            TF_CHECK_EQ(s0.sys.triples, 0u);
         } else {                                                         /* C: HOLD2 = Off, never loud */
             t = lg_press(&st, t, 4300u);
             TF_CHECK_EQ(st.sys.mode, (uint32_t)FW_ST_OFF);

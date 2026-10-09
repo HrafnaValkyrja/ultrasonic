@@ -78,6 +78,7 @@ typedef struct {
     float lb_out[FW_HOP_N];
     uint32_t lb_head;
     fw_sys_t sys;             /* modes, gestures, docked interlock, self-test, break latch (FWSIM-R18, R19, R29, R65) */
+    uint32_t loud_triple_seen; /* triple-press count already consumed by the loud-mode toggle (option B) */
     uint32_t loud_hold2_seen; /* HOLD2 gesture count already consumed by the loud-mode toggle */
     int32_t vol_offset_cdb;   /* volume applied to the DSP gain */
     uint32_t usb_enumerated;
