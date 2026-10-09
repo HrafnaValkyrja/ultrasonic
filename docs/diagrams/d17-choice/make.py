@@ -25,7 +25,7 @@ o = [f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {W} {H}" font-family
 def t(x, y, s, sz=18, c=TX, a="start", b=False):
     o.append(f'<text x="{x}" y="{y}" font-size="{sz}" fill="{c}" text-anchor="{a}"{" font-weight=\"bold\"" if b else ""}>{s}</text>')
 t(40, 52, "Which loudness do we ship?", 32, TX, b=True)
-t(40, 84, "Can she hear every bat call, in each place she might walk? Pick a column.", 18, T2)
+t(40, 84, "Can you hear every bat call, wherever you walk? Pick a column.", 18, T2)
 for i, (n, tag, rec) in enumerate(cols):
     x = x0 + i * cw
     o.append(f'<rect x="{x+6}" y="{top-62}" width="{cw-12}" height="{H-top-110}" rx="14" fill="{PANEL}" stroke="{CY if rec else GR}" stroke-width="{4 if rec else 1.5}"/>')
@@ -72,6 +72,7 @@ ly = H - 74
 lx = 40
 for s, lab in enumerate(["every call heard", "most heard, the faintest missed", "faint calls lost", "lost"]):
     dot(lx + 15, ly, s); t(lx + 40, ly + 6, lab, 15, T2); lx += 40 + 9 * len(lab) + 50
-t(40, H - 24, "Sources: 2969b65, 31fba64 (hearing); 3414ce5, b944df6 (loud-mode battery); cea34fe (real-use battery). Dense = calls 81% of the time, dusk = 18%; loud music = nonstop; A+X+L battery scaled +2%. Call level 75 dB assumed.", 12, T2)
+t(40, H - 40, "Sources: 2969b65, 31fba64 (hearing); 3414ce5, b944df6 (loud-mode battery); cea34fe (real-use battery).", 12, T2)
+t(40, H - 22, "Dense = calls 81% of the time, dusk = 18%; loud music = nonstop; A+X+L battery scaled +2%. Call level 75 dB assumed.", 12, T2)
 o.append('</svg>')
 pathlib.Path(__file__).with_name("d17-choice.svg").write_text("\n".join(o))

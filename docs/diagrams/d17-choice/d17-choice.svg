@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 980" font-family="DejaVu Sans, Arial, sans-serif">
 <rect width="1400" height="980" fill="#000000"/>
 <text x="40" y="52" font-size="32" fill="#e8e8e5" text-anchor="start" font-weight="bold">Which loudness do we ship?</text>
-<text x="40" y="84" font-size="18" fill="#a4a9b0" text-anchor="start">Can she hear every bat call, in each place she might walk? Pick a column.</text>
+<text x="40" y="84" font-size="18" fill="#a4a9b0" text-anchor="start">Can you hear every bat call, wherever you walk? Pick a column.</text>
 <rect x="256" y="128" width="268" height="680" rx="14" fill="#141518" stroke="#2c2e34" stroke-width="1.5"/>
 <text x="390.0" y="164" font-size="30" fill="#e8e8e5" text-anchor="middle" font-weight="bold">B</text>
 <text x="390.0" y="186" font-size="14" fill="#a4a9b0" text-anchor="middle">today</text>
@@ -99,5 +99,6 @@
 <text x="683" y="912" font-size="15" fill="#a4a9b0" text-anchor="start">faint calls lost</text>
 <circle cx="892" cy="906" r="15" fill="#f09bbd"/><path d="M885 899L899 913M899 899L885 913" stroke="#000000" stroke-width="3.5"/>
 <text x="917" y="912" font-size="15" fill="#a4a9b0" text-anchor="start">lost</text>
-<text x="40" y="956" font-size="12" fill="#a4a9b0" text-anchor="start">Sources: 2969b65, 31fba64 (hearing); 3414ce5, b944df6 (loud-mode battery); cea34fe (real-use battery). Dense = calls 81% of the time, dusk = 18%; loud music = nonstop; A+X+L battery scaled +2%. Call level 75 dB assumed.</text>
+<text x="40" y="940" font-size="12" fill="#a4a9b0" text-anchor="start">Sources: 2969b65, 31fba64 (hearing); 3414ce5, b944df6 (loud-mode battery); cea34fe (real-use battery).</text>
+<text x="40" y="958" font-size="12" fill="#a4a9b0" text-anchor="start">Dense = calls 81% of the time, dusk = 18%; loud music = nonstop; A+X+L battery scaled +2%. Call level 75 dB assumed.</text>
 </svg>
