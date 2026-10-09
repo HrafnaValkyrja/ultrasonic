@@ -147,12 +147,24 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr, uint32_t reps)
     d->lim_rel = fw_om_exp(1000.0f / (FS_OUT_HZ * (float)k->limiter_release_ms));
     d->loud_lin = k->loud_db ? fw_db20_to_lin((float)k->loud_db) : 1.0f;
     d->loud_on = 0u;
+    d->shape_on = (k->loud_shape && k->loud_db) ? 1u : 0u;
+    if (d->shape_on) {   /* lut[i] = tanh(kk i/64) / tanh(kk); tanh(a) = (1 - e^-2a)/(1 + e^-2a), e^-2a = 1 - fw_om_exp(2a); no libm */
+        float kk = (float)k->loud_shape_k * 0.1f, e;
+        e = 1.0f - fw_om_exp(2.0f * kk);
+        float tk = (1.0f - e) / (1.0f + e);
+        for (uint32_t i = 0; i <= 64u; i++) {
+            e = 1.0f - fw_om_exp(2.0f * kk * (float)i * (1.0f / 64.0f));
+            d->shape_lut[i] = (1.0f - e) / (1.0f + e) / tk;
+        }
+    }
     d->la_on = k->lim_lookahead ? 1u : 0u;
     if (d->la_on) {   /* loudness fix: ceiling = R64 clamp minus the noise-shaper excursion bound (so the clamp never bites); D17 fixed ceiling */
         float amp = (float)fw_out_amp_max_ppm(k) * 1e-6f - (float)FW_SHAPER_EXCURSION_PPM * 1e-6f;
         d->lim_c = amp > d->lim_c ? amp : d->lim_c;
         fw_lahead_init(&d->la, d->lim_c, (uint32_t)k->lim_knee_pct, d->lim_rel);
     }
+    d->shape_s = d->lim_c * d->loud_lin;                 /* flat-top full scale = ceiling x loud gain */
+    d->shape_inv_s = 1.0f / d->shape_s;
     d->lim_g = 1.0f;
     d->guard_g = 1.0f;
     {
@@ -591,6 +603,21 @@ NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8_in[8], uint32_t force_squelc
     if (d->loud_on) {                     /* D17 loud mode: drive gain ahead of the limiter; limiter + R64 clamp still bound the output */
         for (uint32_t i = 0; i < 8u; i++)
             yd[i] = y8_in[i] * d->loud_lin;
+        if (d->shape_on) {                /* I-034 flat-top: odd tanh curve via table, |x| >= S -> S; the limiter after it keeps the bound */
+            for (uint32_t i = 0; i < 8u; i++) {
+                float u = fabsf(yd[i]) * d->shape_inv_s * 64.0f;
+                float r;
+                if (u >= 64.0f) {
+                    r = 1.0f;
+                } else {
+                    uint32_t j = (uint32_t)u;
+                    float f = u - (float)j;
+                    r = d->shape_lut[j] + f * (d->shape_lut[j + 1u] - d->shape_lut[j]);
+                }
+                r *= d->shape_s;
+                yd[i] = yd[i] < 0.0f ? -r : r;
+            }
+        }
         y8_in = yd;
         y8 = yd;
     }

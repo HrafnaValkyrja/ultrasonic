@@ -186,7 +186,7 @@ Nets inside one block only: CC, DOCK_VBUS, LDO_OUT, MIC_CLK, N$1
 - I2C2 on PB13/PB14 to the charger, EXTI on PA15 (CHG_INT).
 - USB FS on PA11/PA12 (HSI48 + CRS), ROM DFU (the ROM loader pulls PA10 up itself, AN2606 Table 199); PB6 USART1_TX debug printf (TP7).
 - Wake: PA0 = WKUP1 (button). LED: PB7 open-drain, PWM duty set from VBAT.
-- Knobs `loud_db` (D17 loud mode, toggled by the HOLD2 gesture in option A only in practice; default off) and `hiz_idle` (bridge Hi-Z while squelched, I-027; default off): both default to legacy behaviour, bit-identical; touch F3 (drive, limiter, R64 clamp) and F11 (gestures). Tests `fw/test/test_loud.c`.
+- Knob `loud_shape`/`loud_shape_k` (I-034 flat-top inside loud mode; default off, bit-identical; fw/core/dsp.c only, no new interface). Knobs `loud_db` (D17 loud mode, toggled by the HOLD2 gesture in option A only in practice; default off) and `hiz_idle` (bridge Hi-Z while squelched, I-027; default off): both default to legacy behaviour, bit-identical; touch F3 (drive, limiter, R64 clamp) and F11 (gestures). Tests `fw/test/test_loud.c`.
 - SWD on PA13/PA14. Low-power modes Stop 2 / Off (D12).
 
 ## 9. Constraints and owner decisions

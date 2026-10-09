@@ -420,3 +420,59 @@ void test_loud_gesture(void)
         TF_CHECK_EQ(s0.dsp.loud_on, 0);
     }
 }
+
+/* ---- I-034 loud_shape: tanh flat-top ahead of the limiter, loud mode only. off = bit-identical; on = inside the R64 clamp, >= 2 dB more level ---- */
+static uint32_t shape_run(int32_t shape, uint32_t on, float amp, uint32_t *hits_o, uint32_t *viol_o, double *rms_o, uint16_t *rec)
+{
+    fw_knobs_t k;
+    fw_knobs_defaults(&k);
+    fw_knob_set(&k, FW_KNOB_lim_lookahead, 1);
+    fw_knob_set(&k, FW_KNOB_loud_db, 12);
+    fw_knob_set(&k, FW_KNOB_loud_shape, shape);
+    fw_dsp_t d;
+    fw_dsp_init(&d, &k, 200u, 1u);
+    fw_dsp_set_loud(&d, on);
+    fw_ccr_bounds_t b = fw_ccr_bounds(200u, fw_out_amp_max_ppm(&k));
+    float y[8];
+    uint16_t ccr[FW_CCR_MAX_PER_HOP];
+    fw_out_info_t oi;
+    uint32_t tot = 0, hits = 0, viol = 0, ph = 0;
+    double acc = 0.0;
+    for (uint32_t h = 0; h < 600u; h++) {
+        for (int i = 0; i < 8; i++, ph++)
+            y[i] = amp * sinf(6.2831853f * 2500.0f / 12500.0f * (float)(ph % 5u));   /* 5-sample period: exact 2.5 kHz at 12.5 kHz */
+        size_t n = fw_dsp_out(&d, y, 0u, &b, ccr, &oi);
+        hits += oi.clamp_hits;
+        for (size_t j = 0; j < n; j++) {
+            double v = 2.0 * ccr[j] / 200.0 - 1.0;
+            viol += fabs(v) > fw_out_amp_max_ppm(&k) * 1e-6 + 1e-9;
+            if (h >= 300u) acc += v * v;
+            if (rec) rec[tot] = ccr[j];
+            tot++;
+        }
+    }
+    *hits_o = hits; *viol_o = viol; *rms_o = sqrt(acc / (double)tot);
+    return tot;
+}
+
+void test_loud_shape(void)
+{
+    static uint16_t r0[600u * FW_CCR_MAX_PER_HOP], r1[600u * FW_CCR_MAX_PER_HOP], r2[600u * FW_CCR_MAX_PER_HOP];
+    uint32_t h, v; double rm0, rm1, rm2;
+    uint32_t n0 = shape_run(0, 0u, 0.1f, &h, &v, &rm0, r0);        /* legacy, loud off */
+    uint32_t n1 = shape_run(1, 0u, 0.1f, &h, &v, &rm1, r1);        /* shape knob set but loud toggled off */
+    TF_CHECK_EQ(n0, n1);
+    TF_CHECK(memcmp(r0, r1, n0 * sizeof r0[0]) == 0);               /* off / toggle off = bit-identical */
+    fw_knobs_t kd; fw_knobs_defaults(&kd);
+    float cap = (float)fw_out_amp_max_ppm(&kd) * 1e-6f - (float)FW_SHAPER_EXCURSION_PPM * 1e-6f;   /* limiter ceiling of this build */
+    static const float frac[2] = {0.1f, 0.2f};                          /* test vectors: sine at 10 / 20 % of the ceiling, pre-gain */
+    for (int a = 0; a < 2; a++) {
+        float amp = frac[a] * cap;
+        shape_run(0, 1u, amp, &h, &v, &rm0, r0);
+        shape_run(1, 1u, amp, &h, &v, &rm2, r2);
+        TF_CHECK_EQ(v, 0); TF_CHECK_EQ(h, 0);                       /* FWSIM-R64: 208 mA clamp never exceeded, never bites */
+        double gain_db = 20.0 * log10(rm2 / rm0);
+        TF_CHECK(gain_db >= 2.0);                                   /* level gain >= 2 dB (a sine already at the ceiling gains less, by construction) */
+    }
+    (void)rm1;
+}

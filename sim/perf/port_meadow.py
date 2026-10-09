@@ -9,6 +9,7 @@ for false wakes. Configs (firmware knobs):
   today      defaults (limiter off, loud_db 0, hiz_idle 0)
   A          lim_lookahead 1 (D17 rec A: look-ahead limiter at the R64 clamp)
   A+loud4/12 A + loud_db 4 / 12 with the loud toggle ON
+  A+loud12+shape  A+loud12 + loud_shape 1 (tanh flat-top k 2.5, I-034)
   hiz_idle   today + hiz_idle 1
 Metrics: wake recall (awake within 10 ms of call start), sound recall (output unsquelched within 30 ms), false wakes/min (IDLE->awake
 edges with no annotated call in [start-10 ms, end+30 ms]; the BatDetect2 labels miss some real calls, so an upper bound), false awake
@@ -49,6 +50,7 @@ CONFIGS = {
     "A": ({"lim_lookahead": 1}, False),
     "A+loud4": ({"lim_lookahead": 1, "loud_db": 4}, True),
     "A+loud12": ({"lim_lookahead": 1, "loud_db": 12}, True),
+    "A+loud12+shape": ({"lim_lookahead": 1, "loud_db": 12, "loud_shape": 1}, True),   # I-034 flat-top, k = 2.5 (default knob)
     "hiz_idle": ({"hiz_idle": 1}, False),
 }
 IDLE_ST = 3
