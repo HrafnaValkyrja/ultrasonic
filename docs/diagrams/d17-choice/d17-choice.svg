@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 980" font-family="DejaVu Sans, Arial, sans-serif">
+<rect width="1400" height="980" fill="#000000"/>
+<text x="40" y="52" font-size="32" fill="#e8e8e5" text-anchor="start" font-weight="bold">Which loudness do we ship?</text>
+<text x="40" y="84" font-size="18" fill="#a4a9b0" text-anchor="start">Can she hear every bat call, in each place she might walk? Pick a column.</text>
+<rect x="256" y="128" width="268" height="680" rx="14" fill="#141518" stroke="#2c2e34" stroke-width="1.5"/>
+<text x="390.0" y="164" font-size="30" fill="#e8e8e5" text-anchor="middle" font-weight="bold">B</text>
+<text x="390.0" y="186" font-size="14" fill="#a4a9b0" text-anchor="middle">today</text>
+<text x="390.0" y="208" font-size="12" fill="#a4a9b0" text-anchor="middle">quiet-street level; no limiter</text>
+<rect x="536" y="128" width="268" height="680" rx="14" fill="#141518" stroke="#2c2e34" stroke-width="1.5"/>
+<text x="670.0" y="164" font-size="30" fill="#e8e8e5" text-anchor="middle" font-weight="bold">A</text>
+<text x="670.0" y="186" font-size="14" fill="#a4a9b0" text-anchor="middle">limiter</text>
+<text x="670.0" y="208" font-size="12" fill="#a4a9b0" text-anchor="middle">safe volume ceiling</text>
+<rect x="816" y="128" width="268" height="680" rx="14" fill="#141518" stroke="#5fd8ff" stroke-width="4"/>
+<text x="950.0" y="164" font-size="30" fill="#5fd8ff" text-anchor="middle" font-weight="bold">A + L</text>
+<text x="950.0" y="186" font-size="14" fill="#5fd8ff" text-anchor="middle" font-weight="bold">RECOMMENDED</text>
+<text x="950.0" y="208" font-size="12" fill="#a4a9b0" text-anchor="middle">A plus a Loud mode (+12 dB)</text>
+<rect x="1096" y="128" width="268" height="680" rx="14" fill="#141518" stroke="#2c2e34" stroke-width="1.5"/>
+<text x="1230.0" y="164" font-size="30" fill="#e8e8e5" text-anchor="middle" font-weight="bold">A + X + L</text>
+<text x="1230.0" y="186" font-size="14" fill="#a4a9b0" text-anchor="middle">bigger exciter</text>
+<text x="1230.0" y="208" font-size="12" fill="#a4a9b0" text-anchor="middle">A + heavier exciter + Loud mode</text>
+<text x="40" y="244" font-size="14" fill="#a4a9b0" text-anchor="start" font-weight="bold">HEARING</text>
+<text x="40" y="280" font-size="20" fill="#e8e8e5" text-anchor="start">Quiet street</text>
+<circle cx="296" cy="274" r="15" fill="none" stroke="#5fd8ff" stroke-width="3"/><circle cx="296" cy="274" r="8" fill="#5fd8ff"/>
+<text x="324" y="280" font-size="15" fill="#e8e8e5" text-anchor="start">most heard</text>
+<circle cx="576" cy="274" r="15" fill="#5fd8ff"/>
+<text x="604" y="280" font-size="15" fill="#e8e8e5" text-anchor="start">every call heard</text>
+<circle cx="856" cy="274" r="15" fill="#5fd8ff"/>
+<text x="884" y="280" font-size="15" fill="#e8e8e5" text-anchor="start">every call heard</text>
+<circle cx="1136" cy="274" r="15" fill="#5fd8ff"/>
+<text x="1164" y="280" font-size="15" fill="#e8e8e5" text-anchor="start">every call heard</text>
+<line x1="40" y1="305" x2="1364" y2="305" stroke="#2c2e34"/>
+<text x="40" y="342" font-size="20" fill="#e8e8e5" text-anchor="start">Day street</text>
+<circle cx="296" cy="336" r="15" fill="none" stroke="#5fd8ff" stroke-width="3"/><circle cx="296" cy="336" r="8" fill="#5fd8ff"/>
+<text x="324" y="342" font-size="15" fill="#e8e8e5" text-anchor="start">most heard</text>
+<circle cx="576" cy="336" r="15" fill="none" stroke="#5fd8ff" stroke-width="3"/><circle cx="576" cy="336" r="8" fill="#5fd8ff"/>
+<text x="604" y="342" font-size="15" fill="#e8e8e5" text-anchor="start">most heard</text>
+<circle cx="856" cy="336" r="15" fill="#5fd8ff"/>
+<text x="884" y="342" font-size="15" fill="#e8e8e5" text-anchor="start">every call heard</text>
+<circle cx="1136" cy="336" r="15" fill="#5fd8ff"/>
+<text x="1164" y="342" font-size="15" fill="#e8e8e5" text-anchor="start">every call heard</text>
+<line x1="40" y1="367" x2="1364" y2="367" stroke="#2c2e34"/>
+<text x="40" y="404" font-size="20" fill="#e8e8e5" text-anchor="start">Heavy traffic</text>
+<circle cx="296" cy="398" r="15" fill="none" stroke="#f09bbd" stroke-width="3"/><circle cx="296" cy="398" r="4" fill="#f09bbd"/>
+<text x="324" y="404" font-size="15" fill="#f09bbd" text-anchor="start">faint calls lost</text>
+<circle cx="576" cy="398" r="15" fill="none" stroke="#5fd8ff" stroke-width="3"/><circle cx="576" cy="398" r="8" fill="#5fd8ff"/>
+<text x="604" y="404" font-size="15" fill="#e8e8e5" text-anchor="start">most heard</text>
+<circle cx="856" cy="398" r="15" fill="none" stroke="#5fd8ff" stroke-width="3"/><circle cx="856" cy="398" r="8" fill="#5fd8ff"/>
+<text x="884" y="404" font-size="15" fill="#e8e8e5" text-anchor="start">most heard</text>
+<circle cx="1136" cy="398" r="15" fill="#5fd8ff"/>
+<text x="1164" y="404" font-size="15" fill="#e8e8e5" text-anchor="start">every call heard</text>
+<line x1="40" y1="429" x2="1364" y2="429" stroke="#2c2e34"/>
+<text x="40" y="466" font-size="20" fill="#e8e8e5" text-anchor="start">Cafe</text>
+<circle cx="296" cy="460" r="15" fill="none" stroke="#f09bbd" stroke-width="3"/><circle cx="296" cy="460" r="4" fill="#f09bbd"/>
+<text x="324" y="466" font-size="15" fill="#f09bbd" text-anchor="start">faint calls lost</text>
+<circle cx="576" cy="460" r="15" fill="none" stroke="#5fd8ff" stroke-width="3"/><circle cx="576" cy="460" r="8" fill="#5fd8ff"/>
+<text x="604" y="466" font-size="15" fill="#e8e8e5" text-anchor="start">most heard</text>
+<circle cx="856" cy="460" r="15" fill="none" stroke="#5fd8ff" stroke-width="3"/><circle cx="856" cy="460" r="8" fill="#5fd8ff"/>
+<text x="884" y="466" font-size="15" fill="#e8e8e5" text-anchor="start">most heard</text>
+<circle cx="1136" cy="460" r="15" fill="#5fd8ff"/>
+<text x="1164" y="466" font-size="15" fill="#e8e8e5" text-anchor="start">every call heard</text>
+<line x1="40" y1="491" x2="1364" y2="491" stroke="#2c2e34"/>
+<text x="40" y="528" font-size="20" fill="#e8e8e5" text-anchor="start">Car</text>
+<circle cx="296" cy="522" r="15" fill="#f09bbd"/><path d="M289 515L303 529M303 515L289 529" stroke="#000000" stroke-width="3.5"/>
+<text x="324" y="528" font-size="15" fill="#f09bbd" text-anchor="start">lost</text>
+<circle cx="576" cy="522" r="15" fill="none" stroke="#f09bbd" stroke-width="3"/><circle cx="576" cy="522" r="4" fill="#f09bbd"/>
+<text x="604" y="528" font-size="15" fill="#f09bbd" text-anchor="start">faint calls lost</text>
+<circle cx="856" cy="522" r="15" fill="none" stroke="#5fd8ff" stroke-width="3"/><circle cx="856" cy="522" r="8" fill="#5fd8ff"/>
+<text x="884" y="528" font-size="15" fill="#e8e8e5" text-anchor="start">most heard</text>
+<circle cx="1136" cy="522" r="15" fill="#5fd8ff"/>
+<text x="1164" y="528" font-size="15" fill="#e8e8e5" text-anchor="start">every call heard</text>
+<line x1="40" y1="576" x2="1364" y2="576" stroke="#a4a9b0" stroke-width="1.5"/>
+<text x="40" y="612" font-size="20" fill="#e8e8e5" text-anchor="start">Battery, dense calls</text>
+<text x="390.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">12.3 h</text>
+<text x="670.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">12.1 h</text>
+<text x="950.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">9.5 h</text>
+<text x="1230.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">~9.3 h</text>
+<text x="40" y="648" font-size="20" fill="#e8e8e5" text-anchor="start">Battery, quiet dusk</text>
+<text x="390.0" y="648" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">32 h</text>
+<text x="670.0" y="648" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">32 h</text>
+<text x="950.0" y="648" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">28 h</text>
+<text x="1230.0" y="648" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">~27 h</text>
+<text x="40" y="684" font-size="20" fill="#e8e8e5" text-anchor="start">Battery, loud music</text>
+<text x="390.0" y="684" font-size="14" fill="#a4a9b0" text-anchor="middle">(not tested)</text>
+<text x="670.0" y="684" font-size="14" fill="#a4a9b0" text-anchor="middle">(not tested)</text>
+<text x="950.0" y="684" font-size="20" fill="#f09bbd" text-anchor="middle" font-weight="bold">4 h</text>
+<text x="1230.0" y="684" font-size="20" fill="#f09bbd" text-anchor="middle" font-weight="bold">4 h</text>
+<line x1="40" y1="702" x2="1364" y2="702" stroke="#2c2e34"/>
+<text x="40" y="738" font-size="20" fill="#e8e8e5" text-anchor="start">Weight at the ear</text>
+<text x="390.0" y="738" font-size="26" fill="#e8e8e5" text-anchor="middle" font-weight="bold">1.2 g</text>
+<text x="670.0" y="738" font-size="26" fill="#e8e8e5" text-anchor="middle" font-weight="bold">1.2 g</text>
+<text x="950.0" y="738" font-size="26" fill="#e8e8e5" text-anchor="middle" font-weight="bold">1.2 g</text>
+<text x="1230.0" y="738" font-size="26" fill="#f09bbd" text-anchor="middle" font-weight="bold">12.8 g</text>
+<text x="1230.0" y="762" font-size="14" fill="#f09bbd" text-anchor="middle">10x heavier</text>
+<circle cx="55" cy="906" r="15" fill="#5fd8ff"/>
+<text x="80" y="912" font-size="15" fill="#a4a9b0" text-anchor="start">every call heard</text>
+<circle cx="289" cy="906" r="15" fill="none" stroke="#5fd8ff" stroke-width="3"/><circle cx="289" cy="906" r="8" fill="#5fd8ff"/>
+<text x="314" y="912" font-size="15" fill="#a4a9b0" text-anchor="start">most heard, the faintest missed</text>
+<circle cx="658" cy="906" r="15" fill="none" stroke="#f09bbd" stroke-width="3"/><circle cx="658" cy="906" r="4" fill="#f09bbd"/>
+<text x="683" y="912" font-size="15" fill="#a4a9b0" text-anchor="start">faint calls lost</text>
+<circle cx="892" cy="906" r="15" fill="#f09bbd"/><path d="M885 899L899 913M899 899L885 913" stroke="#000000" stroke-width="3.5"/>
+<text x="917" y="912" font-size="15" fill="#a4a9b0" text-anchor="start">lost</text>
+<text x="40" y="956" font-size="12" fill="#a4a9b0" text-anchor="start">Sources: 2969b65, 31fba64 (hearing); 3414ce5, b944df6 (loud-mode battery); cea34fe (real-use battery). Dense = calls 81% of the time, dusk = 18%; loud music = nonstop; A+X+L battery scaled +2%. Call level 75 dB assumed.</text>
+</svg>
