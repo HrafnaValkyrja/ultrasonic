@@ -1,11 +1,10 @@
-# NEXT 5 (ranked; 2026-10-08 ~16:45 ET)
-Four proofs landed (docs/proof/): electrical PASS with the fw clamp (b1501b0), thermal PASS thin (1b15176), physical PASS with 3 open items (a20ec65), buildability PASS with 2 hard steps (4cabf8c). Pen test: weekend bench day. Both pods alive.
+# NEXT 5 (ranked; 2026-10-08 21:05 ET)
+Four proofs PASS (docs/proof/). Iterative Improvement rounds 1-5 judged (JUDGE-r4/r5). Bench day 1 sheet: docs/bench/bench-day-1.md (+ k4-dummy-template.pdf).
 
-1. P-ELEC-OPEN: close the electrical OPEN rows (K4 rail ripple, USB D+/D- through BM28, BM28 SI, cap DC-bias derating); sync ECR-0020 noise text (26.4/26.2 vs 34.8 dB on the re-routed boards). ~1.5 h.
-2. P-THERM-BURST: LDO transducer-burst duty from firmware (thermal row 8) -> U4 temperature rise at the clamped 208 mA; re-fetch the touch-limit standard text. ~1 h.
-3. P-PHYS-GRAZE: tub/cell 0.145 mm3 graze in the K4 shell; part_heights entries for C16/C17/C21. ~45 min.
-4. P-BUILD-EASY: ease the 2 hard build steps (cell with welded tab leads: sourcing; printed alignment jig for the lid stack: model + STL). ~1.5 h.
-5. N-K1T-BUTTON (guess, model both): KMT022 breaks the K1-thin 0.6 lid; dome on new F pads (board edit + re-route, serial heavy job) or proud skin. ~1.5 h.
-Done: N-K4-TOOLS 56cf4fd (K4 flip = hw/current.yaml default line + fw/gen regen; old WIP in stash@{0}), N-K1T-RELEASE (r2-release in 6eba28a, gate BLOCKED), N-K1T-DUCT, N-6L-STACKUP, N-K1T-PARITY, N-PENTEST-CARD, N-POST-GAP.
-
-Ruling-needed (hers): A-K4-VISION (weekend bench day), A-TODAY-BODY-MEASURE, A-IDLE-TRADE, A-6L-QUOTE (optional), A-CAP-CURVES (optional). Orders/payments: owner-only.
+1. D17 ruling (#2, Rec A+X+L) -> on tap: limiter + loud_db 0/4/12 defaults (bf5d6bd knob), re-bless goldens, ECR for the TEAX14C02-8 pad, hiz_idle decision (fdac294). ~1.5 h. BLOCKED on her tap.
+2. Pen test + cardboard dummy (#1, I-029) on bench day -> pick K4 as is / K4-trim / slide-rearward / K1-thin. BLOCKED on bench day.
+3. K1-thin button (#11): D4 dome blocks U1 F escapes; next try = 2-arc D4 pad (moves I2C_SCL, CHG_INT; ~1 h lead re-route, prep in stash@{0}); fallback proud skin. Parked until #1 (K4 passing makes K1t moot).
+4. Bench items (#14): masked threshold, car log, exciter sweeps (I-021/22), 4 kHz A/B (I-028), idle drain (I-027). BLOCKED on bench day / rig.
+5. II round 6 when a new question appears (open: none desk-checkable; all live rows need bench evidence).
+Proof of "nothing unblocked": every open row above waits on her tap or the bench; Rec blocks on #1-#8.
+Done today: d17-cost 3414ce5, TEAX drive b944df6, loud mode bf5d6bd, hiz_idle fdac294, spectra 31fba64, bench sheet f3e134c, dummy template, I-018/I-020/I-031 killed.
