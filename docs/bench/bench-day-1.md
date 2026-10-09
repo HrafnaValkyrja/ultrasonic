@@ -30,3 +30,11 @@ Checklist picture: `bench-day-1.png` (same order).
 ## Suggested order
 
 A (about 15 min) first, then the prints in C5 while epoxy cures, then B, then C1 to C4 last (they need the most setup). Total with everything: about 5 hours; A alone is under half an hour and unlocks the K4 call.
+
+## Rig scripts (bench/rig/, CLI only)
+
+`--dry-run` on each writes stimulus WAVs and a CSV template to `bench/rig/out/` with no hardware; live runs need `pip install sounddevice` and the sound card. Host tests: `python3 -c "import sys;sys.path.insert(0,'bench/rig');import test_rig"` (pytest style functions in `bench/rig/test_rig.py`).
+- B1 masked threshold: `bench/rig/masked_threshold.py --noise street.wav --run N` (2-down-1-up).
+- B3 I-021 impedance sweep: `bench/rig/imp_sweep.py --load light --rs 10` (f0, Q; wiring in its docstring). Synthetic self-check recovers f0 within 3 %, Q within about 30 % (sweep noise); trust f0 drift more than absolute Q.
+- B4 I-022 force sweep: `bench/rig/force_sweep.py` (prompts per force step, gain vs 0 N).
+- I-028 2.5 vs 4 kHz A/B: `bench/rig/ab_2k5_4k.py --trials 20` (matched RMS, randomised, logged).
