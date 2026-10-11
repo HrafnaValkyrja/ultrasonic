@@ -44,8 +44,11 @@ def ycyl(x, z, d, y0, y1):
     return Pos(x, (y0 + y1) / 2, z) * Rot(90, 0, 0) * Cylinder(d / 2, y1 - y0)
 
 
+BODY_CH = 0.5    # crisp facets like r2/blade (chamfer 1.0 would leave 0.35 wall at the 0.6 cavity corners; 0.5 leaves ~0.7)
+
+
 def outer_body():
-    return fillet(box(X0, X1, Y_IN, Y_OUT, Z0, Z1).edges(), 1.0)
+    return chamfer(box(X0, X1, Y_IN, Y_OUT, Z0, Z1).edges(), BODY_CH)
 
 
 def cavity():
@@ -130,7 +133,8 @@ def post():
 SPINE_SX = (L * 0.60) / 22.8                # 1.31
 SPINE_X1 = 66.8
 SPINE_DY = -4.9                    # r1 y 10.2..14.9 -> 5.3..10.0 (4.7 wide on the 6.4 mm T, clear of the inner rail)
-SPINE_H = 0.6 + 0.9 + 0.32 * 5     # 3.1 above Z1
+SPINE_STEP = 0.4
+SPINE_H = 0.6 + 0.9 + SPINE_STEP * 5     # 3.5 above Z1
 
 
 def _sx(x):
@@ -138,20 +142,23 @@ def _sx(x):
 
 
 def spine():
+    """Vertebrae stepping UP toward the rear (x+): each is a raked wedge (low front, high rear), chamfered, on a chamfered rail; heights 0.9 + 0.4 i."""
     zb = Z1 - 0.15
-    s = box(_sx(44.0), SPINE_X1, 10.5 + SPINE_DY, 14.6 + SPINE_DY, zb, Z1 + 0.6)
+    s = box(_sx(44.0), SPINE_X1, 5.6, 9.7, zb, Z1 + 0.6)
     s = chamfer(s.edges().group_by(Axis.Z)[-1], 0.3)
     for i, x in enumerate((46.0, 49.4, 52.8, 56.2, 59.6, 63.0)):
-        h = 0.9 + 0.32 * i
-        seg = box(_sx(x), _sx(x) + 2.4 * SPINE_SX, 10.2 + SPINE_DY, 14.9 + SPINE_DY, Z1 + 0.5, Z1 + 0.6 + h)
-        seg = chamfer(seg.edges().group_by(Axis.Z)[-1], min(0.5, h * 0.45))
+        h = 0.9 + SPINE_STEP * i
+        x0, x1 = _sx(x), _sx(x) + 2.4 * SPINE_SX
+        z0 = Z1 + 0.5
+        seg = blade.prism_xz([(x0, z0), (x1, z0), (x1, Z1 + 0.6 + h), (x0, Z1 + 0.6 + 0.45 * h)], 5.3, 9.7)
+        seg = chamfer(seg.edges().filter_by(Axis.X, reverse=True).group_by(Axis.Z)[-1], min(0.35, h * 0.3)) if False else seg
         s = s + seg
     return s
 
 
 def _zt(z):
     """r1 trace z (-11 .. 2.6) -> K4 lid face z, kept 1.6 above the bottom and 2.4 below the top edge."""
-    return (Z0 + 1.6) + (z + 11.0) * ((Z1 - 2.4) - (Z0 + 1.6)) / 13.6
+    return (Z0 + 1.8) + (z + 11.0) * ((Z1 - 2.4) - (Z0 + 1.8)) / 13.6
 
 
 def _xt(x):
@@ -159,7 +166,41 @@ def _xt(x):
 
 
 TRACE = [(_xt(x), _zt(z)) for x, z in [(36.5, -11.0), (51.0, -11.0), (55.5, -6.0), (63.8, -6.0), (63.8, 2.6)]]
-TRACE_W, TRACE_DEPTH = 0.7, 0.35       # lid 1.0 -> 0.65 left (>= 0.6 min resin wall)
+TRACE_W, TRACE_DEPTH = 0.7, 0.45       # groove in the armour plate (floor 0.05 above the lid face: lid untouched)
+
+# armour plate (blade.armour_and_trace pts, x scaled to K4): chamfered plate on the lid face, stepped front wedge, upper plate with twin slash grooves,
+# raised hex boss round the mic window, two screw-head bosses (decorative: K4 is bonded, nothing screwed). PLATE_T adds to T (see checks.look).
+PLATE_T, PLATE_CH, BOSS_T = 0.5, 0.3, 0.25
+
+
+def _xm(x):
+    return X0 + (x - 29.5) * (X1 - X0) / (67.5 - 29.5)
+
+
+PLATE_PTS = [(X0 + 1.0, Z1 - 1.25), (_xm(46.0), Z1 - 1.25), (_xm(46.0) + 1.8, Z1 - 0.1), (66.2, Z1 - 0.1), (66.2, -7.2), (61.0, -8.6), (_xm(37.0), -8.6), (X0 + 1.0, -3.6)]
+UPPER_PTS = [(_xm(34.5), Z1 - 1.9), (_xm(44.0) + 1.0, Z1 - 1.9), (_xm(44.0) - 1.2, Z1 - 4.2), (_xm(34.5), Z1 - 4.2)]
+SCREWS = [(59.8, 2.7), (59.8, -6.4)]
+Y_PL = Y_OUT + PLATE_T
+
+
+def exterior_plate():
+    from styles import plate as _plate
+    p = _plate(PLATE_PTS, Y_OUT - 0.05, PLATE_T + 0.05, PLATE_CH)
+    up = _plate(UPPER_PTS, Y_PL - 0.05, 0.35, 0.15)
+    for k in (0, 1):                       # twin slash grooves across the upper plate
+        xa = (UPPER_PTS[0][0] + UPPER_PTS[1][0]) / 2 - 2.2 + 3.0 * k
+        up = up - slot([(xa, Z1 - 4.4), (xa + 2.4, Z1 - 1.7)], Y_PL + 0.35, 0.4, 0.25)
+    p = p + up
+    hexb = Pos(MIC[0], Y_PL + BOSS_T / 2 - 0.05, MIC[1]) * Rot(90, 0, 0) * extrude(RegularPolygon(HEX_R + 0.8, 6), amount=(BOSS_T + 0.1) / 2, both=True)
+    p = p + chamfer(hexb.edges().group_by(Axis.Y)[-1], 0.12)
+    for sx, sz in SCREWS:
+        hd = ycyl(sx, sz, 2.6, Y_PL - 0.05, Y_PL + BOSS_T)
+        hd = chamfer(hd.edges().group_by(Axis.Y)[-1], 0.12) - Pos(sx, Y_PL + BOSS_T, sz) * Rot(90, 0, 0) * extrude(RegularPolygon(0.55, 6), amount=0.3, both=True)
+        p = p + hd
+    p = p - slot(TRACE, Y_PL, TRACE_W, TRACE_DEPTH)
+    p = p - Pos(MIC[0], Y_OUT, MIC[1]) * Rot(90, 0, 0) * extrude(RegularPolygon(HEX_R, 6), amount=2.0, both=True)
+    return p
+
 
 
 def tub(with_post=True):
@@ -245,8 +286,7 @@ def ledge_check():
 def lid():
     l = outer_body() & box(X0 - 1, X1 + 1, Y_SPLIT, Y_OUT + 1, Z0 - 1, Z1 + 1)
     l = l - tongue(GROOVE_CL)
-    l = l + (spine() & box(X0 - 1, X1 + 1, Y_SPLIT, Y_OUT + 1, Z0 - 1, Z1 + 9))
-    l = l - slot(TRACE, Y_OUT, TRACE_W, TRACE_DEPTH)
+    l = l + exterior_plate()
     l = l + (ledge_ring(Y_LID_IN - LID_STANDOFF, Y_LID_IN + 0.01) & outer_body())
     l = l - ycyl(MIC[0], MIC[1], DUCT_D, Y_LID_IN - 0.01, Y_OUT + 0.01)
     l = l - Pos(MIC[0], Y_OUT - HEX_DEPTH / 2, MIC[1]) * Rot(90, 0, 0) * extrude(RegularPolygon(HEX_R, 6), amount=HEX_DEPTH / 2, both=True)
@@ -320,7 +360,7 @@ def main():
     c["clash/cell/stack"] = round((ph["cell"] & ph["stack_body"]).volume, 4)
     sp = spine()
     c["look"] = dict(spine_segments=6, spine_sx=round(SPINE_SX, 3), spine_h_above_Z1=round(SPINE_H, 2), spine_x=[round(_sx(44.0), 1), SPINE_X1], spine_in_tub_lid=[round((sp & t).volume, 2), round((sp & l).volume, 2)],
-                     spine_vs_cell=round((sp & ph["cell"]).volume, 4), trace_pts=[(round(a, 1), round(b, 1)) for a, b in TRACE], trace_depth=TRACE_DEPTH, lid_residual=round(LID_T - TRACE_DEPTH, 2),
+                     spine_vs_cell=round((sp & ph["cell"]).volume, 4), trace_pts=[(round(a, 1), round(b, 1)) for a, b in TRACE], trace_depth=TRACE_DEPTH, plate=dict(t=PLATE_T, chamfer=PLATE_CH, pts=[(round(a,1),round(b,1)) for a,b in PLATE_PTS], upper_plate_twin_slash=2, hex_boss=True, screw_bosses=len(SCREWS)),
                      colour="black, one print, no UV/glow parts", note="parity with O17 spine, O29 trace, v0.14 Night City (INC-2026-10-11-K4-EXTERIOR)")
     c["clash/puck/lid"] = round((pk & l).volume, 4)
     c["clash/puck/sw1"] = round((pk & ph["sw1"]).volume, 4)
@@ -356,7 +396,7 @@ def main():
               pad_recess=round(TAB_Z_BOTTOM - Z0, 2), cell_shift=DOCK_SHIFT, mode=DOCK, tab_strip_to_cell_z=round(CELL_Z0 - TAB_STRIP_TOP, 2), tab_under_cell_x=round(max(0.0, TAB_X[1] - CELL_X0), 2))
     c["dock"] = dk
     ev = outer_body().volume
-    c["envelope"] = dict(T=round(Y_OUT - Y_IN, 2), L=round(L, 2), H=round(H, 2), env_mm3=round(ev, 1), x=[round(X0, 2), X1], z=[Z0, round(Z1, 2)])
+    c["envelope"] = dict(T=round(Y_OUT - Y_IN, 2), T_with_plate=round(Y_PL - Y_IN, 2), T_at_hex_boss=round(Y_PL + BOSS_T - Y_IN, 2), L=round(L, 2), H=round(H, 2), env_mm3=round(ev, 1), x=[round(X0, 2), X1], z=[Z0, round(Z1, 2)])
     c["volumes"] = dict(tub=round(t.volume, 1), lid=round(l.volume, 1), puck=round(pk.volume, 3))
     c["printable"] = {n: dict(solids=len(s.solids()), valid=bool(s.is_valid)) for n, s in (("tub", t), ("lid", l), ("puck", pk))}
     c["mass"] = mass(t, l, pk, ph)
