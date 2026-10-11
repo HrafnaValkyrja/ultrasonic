@@ -15,3 +15,4 @@ All of this is simulated or checked on paper. Nothing is measured on hardware ye
 ## since 07:30
 - Simulated: slim B (P72) vs shipping B (P112) on Port Meadow: same wake recall 0.854 and false wakes, sound recall -0.4 pt, 1.8 mA less (+2.0 h dense usable); slim is the better trade unless E2 listening hears the 16 bands (docs/sim/alt-slim-vs-b.md).
 - Simulated: hiz_idle ON vs OFF (B/slim): +0 h dense, +0.7/+1.0 h walk, +2.7/+3.3 h dusk usable; re-enable/stop click SPICEd (real fw start phase, motional coil) is 30-46 dB under tragus threshold, no soft-start needed; default stays OFF pending PWR-I12 and a restart-AF-mux check (docs/sim/alt-hiz-idle.md).
+- Firmware bug found and fixed (c472455): after the speaker driver was parked once (hiz_idle), its pins were never handed back to the timer, so the bridge would have stayed silent. Register test added; fwsim 35/35 PASS. hiz_idle stays off until the bench idle-current check.
