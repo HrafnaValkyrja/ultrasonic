@@ -16,7 +16,7 @@ Goal: how translated bat calls feel and sound by bone conduction on the tragus. 
 
 ## Run order (about 20 min)
 1. `nature_audible_only` then `nature_translated_only` then `nature_both`. Which one do you notice first?
-2. For each bat call set, play the three versions in order: `normal`, `loud` (+12 dB), `loud_shape` (+12 dB, flat-top). Levels between the three are kept, so loud really is louder (normal is quiet: raise the volume until normal is just clear, then do not touch it again for the set).
+2. For each bat call set, play the three versions in order: `normal`, `loud` (+12 dB), `loud_shape` (+12 dB, flat-top). Levels between the three are kept, so loud really is louder (normal is quiet: raise the volume until normal is just clear, then do not touch it again for the set). Heads-up: loud is +12 dB, about 4x the sound power of normal, so keep a finger on the volume and turn it down at once if it is too much.
 3. Repeat once with the pad off the tragus (on the cheekbone) for comparison.
 
 ## Write down (per file)
