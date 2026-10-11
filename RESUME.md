@@ -1,8 +1,10 @@
-# RESUME (live 2026-10-11 16:1x; pace slow, 1 worker; may be frozen at short notice)
+# RESUME (iced 2026-10-11 19:08 ET: pacing freeze, priority 4 this week)
 Next she-uses-it milestone: bench day 1 (pen test + cardboard dummy pick the pod; Shokz/tragus listen to loud mode).
 Branch claude/clever-mayer-s5rxuw, all pushed. Stashes: @{0} pre-session K4 scratch outputs, @{1} ECR-0025 dome prep (#11).
 
 ## Since 16:1x thaw
+- Thermal (a50ee35 + re-score): vs 43 C long-wear (partly secondary cites) normal use OK 1.6-5.9 K; nonstop loud fails -4..-11 K (no-airflow bound). Fold-back knob built, default OFF; ON after worn-shell temp log with first pod (bench item 8). In her batch via Stolas.
+- NEXT on thaw: cap check if inbox files landed; her batch answers (slim vs B, insects, fold-back); next alternative idea: verify 43 C row from a primary source.
 - hiz_idle (7930c14, c472455, 6449fa9): +2.7-3.3 h dusk sim, click inaudible; REAL BUG fixed (bridge pins never restored to TIM1 AF after Hi-Z); default stays OFF until bench PWR-I12 (bench-day item 6).
 - False wakes (55656e7, 25fc262): no cheap detector fix beats B; most "false" wakes were scoring errors or real bats. Scorer v2: 3.14 -> 1.71/min, recall same (v1 kept). Remaining ~6 bursts 15-40 kHz (insects?) audible ~0.5 s blips; packet Q via Stolas (default keep).
 - Alternative slim vs B (edc6e3d, docs/sim/alt-slim-vs-b.md): same detection, slim +2 h dense battery; sound needs her ears -> blind A/B pair in the Shokz kit (docs/bench/shokz/playlist/ab, ab_blind_sheet.md). Packet question sent to Stolas (default: keep B).
