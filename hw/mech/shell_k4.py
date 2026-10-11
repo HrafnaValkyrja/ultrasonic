@@ -33,7 +33,9 @@ import blade  # noqa: E402
 import heel  # noqa: E402
 from styles import slot  # noqa: E402
 
-OUT = HERE / "out" / ("k4s" if RELIEF == "len" else "k4s_lift")
+import os as _os
+SOFT = _os.environ.get("K4_SPINE") == "soft"       # alt spine: max +2.0 above Z1, gentler rise, rounded caps
+OUT = HERE / "out" / (("k4s" if RELIEF == "len" else "k4s_lift") + ("_soft" if SOFT else ""))
 
 
 def box(x0, x1, y0, y1, z0, z1):
@@ -133,8 +135,8 @@ def post():
 SPINE_SX = (L * 0.60) / 22.8                # 1.31
 SPINE_X1 = 66.8
 SPINE_DY = -4.9                    # r1 y 10.2..14.9 -> 5.3..10.0 (4.7 wide on the 6.4 mm T, clear of the inner rail)
-SPINE_STEP = 0.4
-SPINE_H = 0.6 + 0.9 + SPINE_STEP * 5     # 3.5 above Z1
+SPINE_STEP, SPINE_H0 = (0.18, 0.5) if SOFT else (0.4, 0.9)
+SPINE_H = 0.6 + SPINE_H0 + SPINE_STEP * 5     # 3.5 above Z1 (soft: 2.0)
 
 
 def _sx(x):
@@ -147,11 +149,15 @@ def spine():
     s = box(_sx(44.0), SPINE_X1, 5.6, 9.7, zb, Z1 + 0.6)
     s = chamfer(s.edges().group_by(Axis.Z)[-1], 0.3)
     for i, x in enumerate((46.0, 49.4, 52.8, 56.2, 59.6, 63.0)):
-        h = 0.9 + SPINE_STEP * i
+        h = SPINE_H0 + SPINE_STEP * i
         x0, x1 = _sx(x), _sx(x) + 2.4 * SPINE_SX
         z0 = Z1 + 0.5
-        seg = blade.prism_xz([(x0, z0), (x1, z0), (x1, Z1 + 0.6 + h), (x0, Z1 + 0.6 + 0.45 * h)], 5.3, 9.7)
-        seg = chamfer(seg.edges().filter_by(Axis.X, reverse=True).group_by(Axis.Z)[-1], min(0.35, h * 0.3)) if False else seg
+        seg = blade.prism_xz([(x0, z0), (x1, z0), (x1, Z1 + 0.6 + h), (x0, Z1 + 0.6 + (0.7 if SOFT else 0.45) * h)], 5.3, 9.7)
+        if SOFT:                       # rounded vertebra caps
+            try:
+                seg = fillet(seg.faces().sort_by(Axis.Z)[-1].edges(), 0.3)
+            except Exception:      # noqa: BLE001
+                seg = chamfer(seg.faces().sort_by(Axis.Z)[-1].edges(), 0.2)
         s = s + seg
     return s
 
