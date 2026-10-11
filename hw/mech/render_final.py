@@ -4,6 +4,7 @@
 CPU Cycles (Ubuntu's Blender has no working GPU backend here). Units: mm STL imported at 0.001.
 """
 import json
+import os
 import math
 from pathlib import Path
 
@@ -69,12 +70,16 @@ def scene(mode):
         if mode == "exploded":
             dx, dy, dz = v["explode"]
             o.location = (dx * 0.001, dy * 0.001, dz * 0.001)
-    bpy.ops.mesh.primitive_plane_add(size=1.0, location=(0.05, 0.0, -0.05))
-    t = bpy.context.object
+    if os.environ.get("BLACK") == "1":
+        t = None
+    else:
+      bpy.ops.mesh.primitive_plane_add(size=1.0, location=(0.05, 0.0, -0.05))
+      t = bpy.context.object
     tm = bpy.data.materials.new("table")
     tm.use_nodes = True
     tm.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.42, 0.40, 0.37, 1)
-    t.data.materials.append(tm)
+    if t is not None:
+        t.data.materials.append(tm)
     w = bpy.data.worlds.new("w")
     bpy.context.scene.world = w
     w.use_nodes = True
@@ -103,6 +108,7 @@ def shoot(c, loc, lens, out):
     s.cycles.use_denoising = True
     s.render.resolution_x, s.render.resolution_y = 1500, 1000
     s.view_settings.view_transform = "AgX"
+    s.render.film_transparent = os.environ.get("BLACK") == "1"
     s.render.filepath = str(out)
     bpy.ops.render.render(write_still=True)
 

@@ -701,3 +701,5 @@
 - 2026-10-11 07:19 checkout SUB-POWER by claude: ECR-0027 clock_plan default P112
 - 2026-10-11 07:19 checkin SUB-PROCESSING by claude
 - 2026-10-11 07:19 checkin SUB-POWER by claude
+- 2026-10-11 19:20 review R-EXT-SHELL by claude-worker: exterior restored on K4 (spine, trace), look check in checks.json
+- 2026-10-11 19:21 review EXT-NIGHTCITY by claude-worker: baseline

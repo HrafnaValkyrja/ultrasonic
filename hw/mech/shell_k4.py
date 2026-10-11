@@ -21,7 +21,7 @@ import math
 import sys
 from pathlib import Path
 
-from build123d import Box, Cylinder, Pos, Rot, RegularPolygon, export_stl, extrude, fillet
+from build123d import Axis, Box, Cylinder, Pos, Rot, RegularPolygon, chamfer, export_stl, extrude, fillet
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parents[1]
@@ -31,6 +31,7 @@ import dims_k4 as K  # noqa: E402
 from dims_k4 import *  # noqa: E402,F401,F403
 import blade  # noqa: E402
 import heel  # noqa: E402
+from styles import slot  # noqa: E402
 
 OUT = HERE / "out" / ("k4s" if RELIEF == "len" else "k4s_lift")
 
@@ -120,6 +121,47 @@ def post():
     return box(STACK_X0 + POST_X - POST_W / 2, STACK_X0 + POST_X + POST_W / 2, CAV["y0"] - 0.01, POST_TOP_Y, SW[1] - POST_W / 2, SW[1] + POST_W / 2)
 
 
+# ---- EXTERIOR (owner-approved looks, restored 2026-10-11, INC-2026-10-11-K4-EXTERIOR; PLM item EXT-NIGHTCITY) ----
+# O17 Spine (top/fin = vertebra segments stepping up toward the rear; r1 shell_r1.concept_spine, r2 shell_r2.top_concept),
+# O29 engraved circuit trace on the 1.0 lid (no armour plate), v0.14 Night City exterior: black, one print, NO UV/glow parts.
+# Spine and trace are adapted, not redesigned: r1/r2 spine x-run (22.8 mm of a 38 mm pod = 60 %) is scaled by SPINE_SX to the
+# same 60 % of the 49.85 mm K4 (segment pitch and length x1.31, rear-anchored, same 6 segments, same heights 0.9..2.5 + 0.6 rail).
+# Heights unchanged: the spine adds SPINE_H on top of H at its rear end only (envelope of the print minus spine is unchanged).
+SPINE_SX = (L * 0.60) / 22.8                # 1.31
+SPINE_X1 = 66.8
+SPINE_DY = -4.9                    # r1 y 10.2..14.9 -> 5.3..10.0 (4.7 wide on the 6.4 mm T, clear of the inner rail)
+SPINE_H = 0.6 + 0.9 + 0.32 * 5     # 3.1 above Z1
+
+
+def _sx(x):
+    return SPINE_X1 - (SPINE_X1 - x) * SPINE_SX
+
+
+def spine():
+    zb = Z1 - 0.15
+    s = box(_sx(44.0), SPINE_X1, 10.5 + SPINE_DY, 14.6 + SPINE_DY, zb, Z1 + 0.6)
+    s = chamfer(s.edges().group_by(Axis.Z)[-1], 0.3)
+    for i, x in enumerate((46.0, 49.4, 52.8, 56.2, 59.6, 63.0)):
+        h = 0.9 + 0.32 * i
+        seg = box(_sx(x), _sx(x) + 2.4 * SPINE_SX, 10.2 + SPINE_DY, 14.9 + SPINE_DY, Z1 + 0.5, Z1 + 0.6 + h)
+        seg = chamfer(seg.edges().group_by(Axis.Z)[-1], min(0.5, h * 0.45))
+        s = s + seg
+    return s
+
+
+def _zt(z):
+    """r1 trace z (-11 .. 2.6) -> K4 lid face z, kept 1.6 above the bottom and 2.4 below the top edge."""
+    return (Z0 + 1.6) + (z + 11.0) * ((Z1 - 2.4) - (Z0 + 1.6)) / 13.6
+
+
+def _xt(x):
+    return X0 + (x - 29.5) * (X1 - X0) / (67.5 - 29.5)
+
+
+TRACE = [(_xt(x), _zt(z)) for x, z in [(36.5, -11.0), (51.0, -11.0), (55.5, -6.0), (63.8, -6.0), (63.8, 2.6)]]
+TRACE_W, TRACE_DEPTH = 0.7, 0.35       # lid 1.0 -> 0.65 left (>= 0.6 min resin wall)
+
+
 def tub(with_post=True):
     t = outer_body() & box(X0 - 1, X1 + 1, Y_IN - 2, Y_SPLIT, Z0 - 1, Z1 + 1)
     t = t + tub_add()
@@ -135,7 +177,8 @@ def tub(with_post=True):
         t = t + post()
     t = t + (dock_add() & outer_body())
     t = t - dock_cut()
-    return t - seam_rebate()
+    t = t - seam_rebate()
+    return t + (spine() & box(X0 - 1, X1 + 1, Y_IN, Y_SPLIT, Z0 - 1, Z1 + 9))
 
 
 def _m_lid_face_rects(expand=0.1):
@@ -202,6 +245,8 @@ def ledge_check():
 def lid():
     l = outer_body() & box(X0 - 1, X1 + 1, Y_SPLIT, Y_OUT + 1, Z0 - 1, Z1 + 1)
     l = l - tongue(GROOVE_CL)
+    l = l + (spine() & box(X0 - 1, X1 + 1, Y_SPLIT, Y_OUT + 1, Z0 - 1, Z1 + 9))
+    l = l - slot(TRACE, Y_OUT, TRACE_W, TRACE_DEPTH)
     l = l + (ledge_ring(Y_LID_IN - LID_STANDOFF, Y_LID_IN + 0.01) & outer_body())
     l = l - ycyl(MIC[0], MIC[1], DUCT_D, Y_LID_IN - 0.01, Y_OUT + 0.01)
     l = l - Pos(MIC[0], Y_OUT - HEX_DEPTH / 2, MIC[1]) * Rot(90, 0, 0) * extrude(RegularPolygon(HEX_R, 6), amount=HEX_DEPTH / 2, both=True)
@@ -273,6 +318,10 @@ def main():
     c["clash/arm_wires/dock_boss"] = round((ph["arm_wires"] & dock_add()).volume, 4)
     c["clash/ctape/dock_boss"] = round((ph["ctape"] & dock_add()).volume, 4)
     c["clash/cell/stack"] = round((ph["cell"] & ph["stack_body"]).volume, 4)
+    sp = spine()
+    c["look"] = dict(spine_segments=6, spine_sx=round(SPINE_SX, 3), spine_h_above_Z1=round(SPINE_H, 2), spine_x=[round(_sx(44.0), 1), SPINE_X1], spine_in_tub_lid=[round((sp & t).volume, 2), round((sp & l).volume, 2)],
+                     spine_vs_cell=round((sp & ph["cell"]).volume, 4), trace_pts=[(round(a, 1), round(b, 1)) for a, b in TRACE], trace_depth=TRACE_DEPTH, lid_residual=round(LID_T - TRACE_DEPTH, 2),
+                     colour="black, one print, no UV/glow parts", note="parity with O17 spine, O29 trace, v0.14 Night City (INC-2026-10-11-K4-EXTERIOR)")
     c["clash/puck/lid"] = round((pk & l).volume, 4)
     c["clash/puck/sw1"] = round((pk & ph["sw1"]).volume, 4)
     # drop-in corridors: cell falls along -y into the tub, lid + hanging stack come down along -y

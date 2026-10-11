@@ -9,6 +9,17 @@
     "file:hw/pod/bom_jlc_mz2.csv": "649e7295cae00ab8"
    }
   },
+  "EXT-NIGHTCITY": {
+   "by": "claude-worker",
+   "date": "2026-10-11",
+   "note": "baseline",
+   "stamp": {
+    "file:hw/mech/styles.py": "23dcb6bfe495f82f",
+    "sym:hw/mech/shell_k4.py::TRACE": "9f581f714fb99210",
+    "sym:hw/mech/shell_k4.py::spine": "b59212f0d816d325",
+    "sym:hw/mech/shell_r2.py::top_concept": "b5744b1d73099011"
+   }
+  },
   "INTEGRATION": {
    "by": "claude-lead",
    "date": "2026-10-08",
@@ -329,6 +340,16 @@
     "sym:hw/mech/dims_r2.py::BAY": "d933f8dc8c3634dd",
     "sym:hw/mech/dims_r2.py::DOCK": "9f3e8ca2743ae3a7",
     "sym:hw/mech/shell_r2.py::tub": "8d92edde67354657"
+   }
+  },
+  "R-EXT-SHELL": {
+   "by": "claude-worker",
+   "date": "2026-10-11",
+   "note": "exterior restored on K4 (spine, trace), look check in checks.json",
+   "stamp": {
+    "file:hw/mech/dims_k4.py": "b9413c55c13fcedc",
+    "file:hw/mech/shell_k4.py": "11075c6e9bf8f20d",
+    "file:hw/mech/shell_r2.py": "98ab986aa83fc405"
    }
   },
   "R-OUT-ARM": {

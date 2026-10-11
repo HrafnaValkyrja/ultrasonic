@@ -67,6 +67,11 @@ items:
     title: Housing, retention, dock bay, sealing
     doc: docs/system/reg-pod-body.md
     owns: [file:hw/mech/shell_r2.py, file:hw/mech/dims_r2.py, file:hw/mech/blade.py, file:hw/mech/styles.py]
+  EXT-NIGHTCITY:
+    kind: region
+    title: Owner-approved exterior look (Spine O17, engraved trace O29, Night City black, no UV/glow, strut arm O11, pad ring O8)
+    doc: docs/system/reg-pod-body.md
+    owns: ["sym:hw/mech/shell_k4.py::spine", "sym:hw/mech/shell_k4.py::TRACE", "sym:hw/mech/shell_r2.py::top_concept", file:hw/mech/styles.py]
   REG-BOARD:
     kind: region
     title: The PCB (outline, faces, floorplan, routing)
@@ -89,6 +94,11 @@ items:
     owns: [file:docs/build/bom.py, file:hw/pod/bom_jlc_mz2.csv]
 
 relations:
+  - id: R-EXT-SHELL
+    a: EXT-NIGHTCITY
+    b: REG-POD-BODY
+    what: "A shell variant (shell_r2, shell_k4, any future fork) is not done until the approved exterior is carried: Spine (O17: 6 vertebra segments stepping up to the rear), engraved trace (O29), black, no UV/glow, strut arm (O11), pad ring (O8). K4 dropped it once (INC-2026-10-11-K4-EXTERIOR). Check: shell_k4 checks.json `look`."
+    watch: [file:hw/mech/shell_k4.py, file:hw/mech/dims_k4.py, file:hw/mech/shell_r2.py]
   # ---------------------------------------------------------------- electrical interfaces (from the schematic)
   - id: R-PWR-OUT-RAIL
     a: SUB-POWER

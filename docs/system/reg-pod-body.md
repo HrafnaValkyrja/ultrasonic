@@ -9,7 +9,7 @@ Status: Phase-2 shell CAD `hw/mech/shell_r2.py` (constants `hw/mech/dims_r2.py`)
 - Mechanical half of: **F1** sealed mic duct in the lid; **F11** SW1 pocket, puck and skin; **F5/F9/F10/F15** dock window in the belly; **F3/F12** stowage zone + heel + wire channel (`integration-map.md` §1).
 - Mounts to the glasses through a removable frame adapter (spec §8; adapter work deferred, O26).
 - Two-stage build (O10): taped test build, bonded final build that can be cut open. Sealing IPX4 min, IPX5 preferred (O12b).
-- Exterior: "Spine" top (O17), carried over from r1 onto the Phase-2 top.
+- Exterior: "Spine" top (O17), carried over from r1 onto the Phase-2 top. **K4 (2026-10-11, INC-2026-10-11-K4-EXTERIOR):** restored in `shell_k4.py` (`spine()`: 6 segments, x-run scaled x1.31 to the same 60 % of the 49.85 mm pod, heights unchanged, +3.1 mm above Z1 at the rear; `TRACE`: O29 groove 0.7 x 0.35 on the 1.0 lid, 0.65 left); black, one print, no UV/glow; check `checks.json look`; item EXT-NIGHTCITY. Render: `docs/diagrams/k4-review/exterior-old-vs-new.png`.
 
 ## Big picture
 Renders (build outputs, gitignored; `shell_r2.py` writes them): `hw/mech/out/r2/section.png` (y-z section through mic and SW1), `hw/mech/out/r2/plan.png` (x-z plan through the lid: board, mic, SW1 pocket, dock, stowage, seam keys). No 3D render dump of r2 yet (issue 9).
