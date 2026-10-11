@@ -705,3 +705,5 @@
 - 2026-10-11 19:21 review EXT-NIGHTCITY by claude-worker: baseline
 - 2026-10-11 19:25 review R-EXT-SHELL by claude-worker: exterior v2 carried on K4; reg-pod-body updated
 - 2026-10-11 19:25 review EXT-NIGHTCITY by claude-worker: exterior v2 carried on K4; reg-pod-body updated
+- 2026-10-11 19:28 review R-EXT-SHELL by claude-worker: soft-spine option K4_SPINE=soft; rear proof
+- 2026-10-11 19:28 review EXT-NIGHTCITY by claude-worker: soft-spine option K4_SPINE=soft; rear proof
