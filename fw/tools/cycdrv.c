@@ -26,6 +26,7 @@ int main(int argc, char **argv)
     size_t n = fread(w, sizeof w[0], sizeof w / sizeof w[0], f);
     fclose(f);
     int d2 = atoi(argv[2]);
+    int loud_on = 0;
     fw_knobs_t k;
     fw_knobs_defaults(&k);
     for (int i = 3; i < argc; i++) {
@@ -33,6 +34,10 @@ int main(int argc, char **argv)
         if (!eq)
             return 2;
         *eq = '\0';
+        if (strcmp(argv[i], "loud_on") == 0) {   /* pseudo-knob: loud mode toggled on after init (cycle model of loud + shape) */
+            loud_on = atoi(eq + 1);
+            continue;
+        }
         for (uint32_t j = 0; j < (uint32_t)FW_KNOB_COUNT; j++)
             if (strcmp(fw_knob_meta[j].name, argv[i]) == 0 && fw_knob_set(&k, j, atoi(eq + 1)) != FW_KNOB_OK)
                 return 3;
@@ -41,6 +46,8 @@ int main(int argc, char **argv)
     static fw_taps_t t;
     uint16_t ccr[FW_CCR_MAX_PER_HOP];
     fw_init(&st, &k, 0u);
+    if (loud_on)
+        fw_dsp_set_loud(&st.dsp, 1u);
     size_t per = d2 ? 256u : 128u, hops = n / per;
     for (size_t h = 0; h < hops; h++) {
         fw_poll(&st, (uint64_t)h * 640u);
