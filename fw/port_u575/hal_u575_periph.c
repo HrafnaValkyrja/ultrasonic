@@ -89,8 +89,9 @@ hal_status_t hal_pwm_start(void)
         return HAL_EINVAL;
     if (REG_R(T(TIM_SR)) & (1u << 7))
         return HAL_BUSY;                                         /* break latched (BIF): MOE would be refused */
-    /* restore the TIM1 AF on the four bridge pins: hal_pwm_stop leaves them analog (hiz_idle, I-027). RM0456 Rev 7 sec. GPIO: AFR before
-     * MODER (hal_gpio_mode does this); with MOE = 0 and OSSI = 1 the pins are driven to the idle level (low) as soon as they are AF, so no glitch */
+    /* restore the TIM1 AF on the four bridge pins: hal_pwm_stop leaves them analog (hiz_idle, I-027). AFR before MODER is our
+     * convention (RM0456 Rev 7 sec. 13.4.1 sets no order). While CCER = 0 the pins stay Hi-Z after the AF switch (RM0456 54.6.20, Table 554),
+     * same as the analog state they leave, so no glitch; they reach the idle level only once CCER is written below */
     if (hal_gpio_mode(BOARD_PIN_GA_P, HAL_GPIO_AF) != HAL_OK || hal_gpio_mode(BOARD_PIN_GA_N, HAL_GPIO_AF) != HAL_OK ||
         hal_gpio_mode(BOARD_PIN_GB_P, HAL_GPIO_AF) != HAL_OK || hal_gpio_mode(BOARD_PIN_GB_N, HAL_GPIO_AF) != HAL_OK)
         return HAL_EINVAL;
