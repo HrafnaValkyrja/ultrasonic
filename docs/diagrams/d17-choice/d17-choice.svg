@@ -70,15 +70,15 @@
 <text x="1164" y="528" font-size="15" fill="#e8e8e5" text-anchor="start">every call heard</text>
 <line x1="40" y1="576" x2="1364" y2="576" stroke="#a4a9b0" stroke-width="1.5"/>
 <text x="40" y="612" font-size="20" fill="#e8e8e5" text-anchor="start">Battery, dense calls</text>
-<text x="390.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">12.3 h</text>
-<text x="670.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">12.1 h</text>
-<text x="950.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">9.5 h</text>
-<text x="1230.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">~9.3 h</text>
+<text x="390.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">12.2 h</text>
+<text x="670.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">11.9 h</text>
+<text x="950.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">8.8 h</text>
+<text x="1230.0" y="612" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">~8.6 h</text>
 <text x="40" y="648" font-size="20" fill="#e8e8e5" text-anchor="start">Battery, quiet dusk</text>
 <text x="390.0" y="648" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">32 h</text>
 <text x="670.0" y="648" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">32 h</text>
-<text x="950.0" y="648" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">28 h</text>
-<text x="1230.0" y="648" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">~27 h</text>
+<text x="950.0" y="648" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">26 h</text>
+<text x="1230.0" y="648" font-size="22" fill="#e8e8e5" text-anchor="middle" font-weight="bold">~25 h</text>
 <text x="40" y="684" font-size="20" fill="#e8e8e5" text-anchor="start">Battery, loud music</text>
 <text x="390.0" y="684" font-size="14" fill="#a4a9b0" text-anchor="middle">(not tested)</text>
 <text x="670.0" y="684" font-size="14" fill="#a4a9b0" text-anchor="middle">(not tested)</text>

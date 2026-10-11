@@ -57,8 +57,8 @@ def row(label, vals, yy, sz=22, note=None):
     for i, v in enumerate(vals):
         c = PK if (isinstance(v, tuple) and v[1]) else TX
         t(x0 + i * cw + cw/2, yy, v[0] if isinstance(v, tuple) else v, sz, c, "middle", True)
-row("Battery, dense calls", ["12.3 h", "12.1 h", "9.5 h", "~9.3 h"], yb + 22)
-row("Battery, quiet dusk", ["32 h", "32 h", "28 h", "~27 h"], yb + 58)
+row("Battery, dense calls", ["12.2 h", "11.9 h", "8.8 h", "~8.6 h"], yb + 22)
+row("Battery, quiet dusk", ["32 h", "32 h", "26 h", "~25 h"], yb + 58)
 t(40, yb + 94, "Battery, loud music", 20)
 for i, v in enumerate(["(not tested)", "(not tested)", "4 h", "4 h"]):
     t(x0 + i*cw + cw/2, yb + 94, v, 20 if v[0] != "(" else 14, PK if v == "4 h" else T2, "middle", v[0] != "(")

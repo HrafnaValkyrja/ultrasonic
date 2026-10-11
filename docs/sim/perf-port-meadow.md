@@ -1,4 +1,17 @@
-# Port Meadow end-to-end performance regression (2026-10-08)
+# Port Meadow end-to-end performance regression (2026-10-08; table re-run 2026-10-11)
+
+**2026-10-11 re-run (authoritative):** after fe405bf (bridge duty normalised by plan ARR/2) and a070a87 (shipping clock P112, ECR-0027), baseline PASS, 54 clips, 2059 calls. Mean mA (dense) / runtime h on 130 mAh (0.85 usable) at dense 81 % / walk 40 % / dusk 18 % awake (aw = awake mA from scene; idle 1.60 + 0.45 bridge ripple unless hiz_idle; LED 0.08):
+
+| config | mean mA | dense 81 % | walk 40 % | dusk 18 % |
+|---|---|---|---|---|
+| today | 10.67 | 12.2 (10.4) | 20.6 (17.5) | 32.4 (27.5) |
+| A (shipping, loud off at boot) | 10.91 | 11.9 (10.1) | 20.2 (17.2) | 31.9 (27.1) |
+| A+loud4 | 11.82 | 11.0 (9.3) | 18.9 (16.0) | 30.4 (25.9) |
+| A+loud12 | 14.83 | 8.8 (7.5) | 15.5 (13.2) | 26.3 (22.4) |
+| A+loud12+shape | 19.86 | 6.5 (5.6) | 12.0 (10.2) | 21.5 (18.3) |
+| hiz_idle | 10.59 | 12.3 (10.4) | 21.5 (18.3) | 35.6 (30.3) |
+
+Old -> new mean mA: 10.58->10.67, 10.76->10.91, 11.43->11.82, 13.63->14.83, 10.50->10.59 (shape 17.36 [10-08 re-bless] -> 19.86). Level/latency/recall rows below unchanged except A max -3.4 -> -3.0, loud max -3.0 -> -2.6 dBFS. Older tables below (10-08) are superseded; they quoted pre-fix currents.
 
 Script `sim/perf/port_meadow.py`, baseline `sim/perf/port_meadow_baseline.json`, runtime ~95 s fenced (3G). `--bless` rewrites the baseline; default run exits 1 if any metric leaves its tolerance.
 Data: Zenodo 22079773 (Port Meadow, AudioMoth 192 kS/s, CC-BY-4.0), receiver_3 of all 54 flypasts, 2059 annotated calls (BatDetect2 det_prob >= 0.5), 210 s scored. One global Pa scale (loudest 10 ms of the 172626 clip = 75 dB SPL; calibration unknown). Each clip tiled 3x, last copy scored. Chain: sim/e2e front end -> host firmware (spec B, transient only, idle detector on).
@@ -13,9 +26,9 @@ Configs: today = defaults; A = lim_lookahead 1 (D17 rec A, fbfb38b); A+loud4/12 
 | false wakes /min, call-free scenes (silence, house walk) | 10.0 | 10.0 | 10.0 | 10.0 | 10.0 | informational |
 | wake-to-sound latency p50 / p90 (ms) | 89.7 / 641 | 90.1 / 642 | 90.4 / 641 | 90.4 / 641 | 89.7 / 641 | 0.7 / 1.4 |
 | output level per call p50 (dBFS pre-quantiser) | -34.2 | -34.2 | -30.2 | -22.3 | -34.2 | 0.3 |
-| output level per call max (dBFS) | -12.0 | -3.4 | -3.0 | -3.0 | -12.0 | 0.3 |
+| output level per call max (dBFS) | -12.0 | -3.0 | -2.6 | -2.6 | -12.0 | 0.3 |
 | awake fraction | 0.815 | 0.815 | 0.815 | 0.815 | 0.815 | (via mean mA) |
-| mean current (mA, model, this scene, reconciled 2026-10-08) | 10.58 | 10.76 | 11.43 | 13.63 | 10.50 | 0.02 |
+| mean current (mA, model, this scene, reconciled 2026-10-08) | 10.67 | 10.91 | 11.82 | 14.83 | 10.59 | 0.02 |
 
 Reading it
 - Wake, false-wake and awake numbers are identical across configs: the knobs act downstream of the idle detector. Only the output side and current move.

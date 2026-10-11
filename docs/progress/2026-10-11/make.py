@@ -39,7 +39,7 @@ yb = 1060
 card(60, yb, 760, 590)
 T(90, yb+20, "Loudness we propose: A + Loud mode", 30, BLU, True)
 lo = [("Quiet street, day street", "every bat call heard", GRN), ("Heavy traffic, cafe, car", "most heard, faintest missed", BLU),
-      ("Battery, calls all day", "9.5 h (12 h without Loud)", INK), ("Battery, quiet dusk", "28 h", INK),
+      ("Battery, calls all day", "8.8 h (12 h without Loud)", INK), ("Battery, quiet dusk", "26 h", INK),
       ("Battery, loud music", "4 h", RED), ("Weight at the ear", "1.2 g", INK)]
 yy = yb+85
 for a, b2, c in lo:
@@ -47,8 +47,8 @@ for a, b2, c in lo:
 card(850, yb, 740, 590)
 T(880, yb+20, "Firmware (simulated on a PC)", 30, BLU, True)
 fw = [("Fits the chip", "58 KB flash, 31 KB RAM + 8 KB stack", GRN),
-      ("Tests", "53 of 57 test programs pass", AMB),
-      ("Speed", "CPU too tight at 80 MHz; fix is the", AMB), ("", "112 MHz plan (78% load). In progress.", AMB),
+      ("Tests", "All committed test programs pass", GRN),
+      ("Speed", "CPU fixed: 112 MHz plan (78% load), done", GRN),
       ("Not yet", "Real chip, real audio: none", RED)]
 yy = yb+85
 for a, b2, c in fw:

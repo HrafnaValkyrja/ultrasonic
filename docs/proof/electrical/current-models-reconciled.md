@@ -29,3 +29,15 @@ Awake fraction: dense flypasts 81 % (the clips) / bat-rich walk 40 % / quiet dus
 | hiz_idle | 10.50 | 12.4 (10.5) | 21.6 (18.4) | 35.8 (30.5) |
 So loud12 costs ~3 mA when awake in bats and still clears 8 h even in the dense scene with derating (8.1 h); the d17 4-6 h result applies only to continuous loud-programme playback (cafe/car mode).
 Changed: `sim/perf/port_meadow.py` (current model; baseline re-blessed, mean_ma only), `sim/perf/port_meadow_current.py` (physical check), docs/sim/perf-port-meadow.md, d17-cost.md (scope), D-hiz-idle.md (scope note).
+
+## Erratum 2026-10-11 (supersedes the runtime table above)
+Model corrected in fe405bf (bridge duty normalised by plan ARR/2, clock-independent) with shipping clock P112 (a070a87, ECR-0027); port_meadow re-run, baseline PASS. Mean mA dense, old -> new: today 10.58 -> 10.67; A 10.76 -> 10.91; A+loud4 11.43 -> 11.82; A+loud12 13.63 -> 14.83; hiz_idle 10.50 -> 10.59; A+loud12+shape 17.36 -> 19.86. Runtime h dense/walk/dusk (usable 0.85 in brackets), old -> new:
+| Config | dense 81 % | walk 40 % | dusk 18 % |
+|---|---|---|---|
+| today | 12.3 -> 12.2 (10.4) | 20.7 -> 20.6 (17.5) | 32.5 -> 32.4 (27.5) |
+| A | 12.1 -> 11.9 (10.1) | 20.4 -> 20.2 (17.2) | 32.2 -> 31.9 (27.1) |
+| A+loud4 | 11.4 -> 11.0 (9.3) | 19.4 -> 18.9 (16.0) | 31.1 -> 30.4 (25.9) |
+| A+loud12 | 9.5 -> 8.8 (7.5) | 16.7 -> 15.5 (13.2) | 27.8 -> 26.3 (22.4) |
+| A+loud12+shape | 7.5 -> 6.5 (5.6) | n/a -> 12.0 (10.2) | n/a -> 21.5 (18.3) |
+| hiz_idle | 12.4 -> 12.3 (10.4) | 21.6 -> 21.5 (18.3) | 35.8 -> 35.6 (30.3) |
+A+loud12 dense with derating is now 7.5 h (was 8.1), below the 8 h line the paragraph above cites. Authoritative table: docs/sim/perf-port-meadow.md.
