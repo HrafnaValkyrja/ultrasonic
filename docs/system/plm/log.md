@@ -703,3 +703,5 @@
 - 2026-10-11 07:19 checkin SUB-POWER by claude
 - 2026-10-11 19:20 review R-EXT-SHELL by claude-worker: exterior restored on K4 (spine, trace), look check in checks.json
 - 2026-10-11 19:21 review EXT-NIGHTCITY by claude-worker: baseline
+- 2026-10-11 19:25 review R-EXT-SHELL by claude-worker: exterior v2 carried on K4; reg-pod-body updated
+- 2026-10-11 19:25 review EXT-NIGHTCITY by claude-worker: exterior v2 carried on K4; reg-pod-body updated

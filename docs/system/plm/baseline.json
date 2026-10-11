@@ -12,11 +12,11 @@
   "EXT-NIGHTCITY": {
    "by": "claude-worker",
    "date": "2026-10-11",
-   "note": "baseline",
+   "note": "exterior v2 carried on K4; reg-pod-body updated",
    "stamp": {
     "file:hw/mech/styles.py": "23dcb6bfe495f82f",
     "sym:hw/mech/shell_k4.py::TRACE": "9f581f714fb99210",
-    "sym:hw/mech/shell_k4.py::spine": "b59212f0d816d325",
+    "sym:hw/mech/shell_k4.py::spine": "69eb5532e5f7cb69",
     "sym:hw/mech/shell_r2.py::top_concept": "b5744b1d73099011"
    }
   },
@@ -345,10 +345,10 @@
   "R-EXT-SHELL": {
    "by": "claude-worker",
    "date": "2026-10-11",
-   "note": "exterior restored on K4 (spine, trace), look check in checks.json",
+   "note": "exterior v2 carried on K4; reg-pod-body updated",
    "stamp": {
     "file:hw/mech/dims_k4.py": "b9413c55c13fcedc",
-    "file:hw/mech/shell_k4.py": "11075c6e9bf8f20d",
+    "file:hw/mech/shell_k4.py": "86790e3dce481dd5",
     "file:hw/mech/shell_r2.py": "98ab986aa83fc405"
    }
   },
