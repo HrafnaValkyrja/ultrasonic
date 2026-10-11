@@ -1,24 +1,19 @@
-# RESUME (thawed 2026-10-11 ~03:00 ET; lean until Sun 06:00 reset)
-Next she-uses-it milestone: bench day 1 (pen test + cardboard dummy pick the pod; listen to loud mode on the tragus rig).
-Branch claude/clever-mayer-s5rxuw, all session work committed + pushed (last: b92e59c + this file).
-Stashes: stash@{0} = pre-session K4 scratch/render outputs parked at freeze (restore with `git stash pop` if wanted); stash@{1} = ECR-0025 dome prep (#11); older WIP below that.
+# RESUME (on ice 2026-10-11 ~05:00 ET for the reset handoff)
+Next she-uses-it milestone: bench day 1 (pen test + cardboard dummy pick the pod; Shokz/tragus listen to loud mode).
+Branch claude/clever-mayer-s5rxuw, all pushed. Stashes: @{0} pre-session K4 scratch outputs, @{1} ECR-0025 dome prep (#11).
 
 ## State
-- Four proofs PASS (docs/proof/). D17 = A+L BUILT (owner 22:3x): limiter on, ceiling at clamp, loud mode +12 (triple press in gesture B, HOLD2 in A, off at boot), battery saver off + knob toggle. fwsim all PASS 35 rows.
-- Ceiling-test restore DONE (b92e59c): lim_c scales 1/ARR; clamp-hit check covers 200/400/800 kHz, 0 hits / 1.36M hops; plm 0 stale.
-- Real-use runtime (cea34fe, 130 mAh, 0.85 usable): loud12 8.1 h dense / 23.7 h dusk. loud_shape (I-034, OFF) would give 6.4 h dense -> off unless bench likes it.
-- Iterative Improvement rounds 1-6 judged; ledger docs/brainstorm/LEDGER.md (to I-040). TEAX exciter dropped (12.8 g).
-- Bench day kit: docs/bench/bench-day-1.md + .png, k4-dummy-template.pdf, bench/rig/ scripts (sounddevice installed).
+- D17 = A+L BUILT and tested (limiter on, loud +12 via triple press, off at boot; battery saver off + knob). Clamp check all carriers (b92e59c). fwsim green.
+- Runtime real use (130 mAh, 0.85 usable): loud12 8.1 h dense / 23.7 h dusk. loud_shape (OFF): 6.4 h dense.
+- Ready for bench: docs/bench/bench-day-1.md (+png), k4-dummy-template.pdf, bench/rig/ (sounddevice installed), docs/bench/shokz/ (protocol, playlist, teardown).
+- K4-trim 13.75 x 13.6 boards fit the existing cavity if 9 parts move; ~8-12 h lead re-route; only if pen test lands 12.6-15 (5be49b4).
+- tools/check_perf.sh = manual Port Meadow regression after fw changes (not in the hook; agents never edit .githooks/pre-commit).
+- Heartbeat cron recreated on thaw must run `python3 tools/board_card.py` each beat.
 
 ## NEXT (movable)
-1. #7 cap derating as soon as ./inbox has the Samsung files (CL03A225MP3CRNC K4-P C9, CL03A105MO3NRNC K4-M C17).
-2. Ask the taste WHY for D17 (prediction C missed; she chose A+L).
-3. II round 7 (new question needed; all live rows are bench-gated).
-4. NEXT.md refill per the work-selection rule (movable top 5 + Waiting).
+1. #7 cap derating when ./inbox has the Samsung files (CL03A225MP3CRNC, CL03A105MO3NRNC).
+2. Taste WHY for D17 (prediction missed).
+3. II round 7 (needs a fresh question; live rows are bench-gated).
 
 ## Waiting
-- #7 cap files from her (ruled A: download now) -> ./inbox.
-- #1 pen test + I-029 cardboard dummy (bench day) -> pod pick.
-- #11 K1-thin button: 2-arc D4 pad re-route (~1 h, stash@{0}) only if K1t still needed after #1.
-- #14 bench: masked threshold, car log, I-021/22/27/28, loud_shape A/B, BCE-1 Bl.
-- #4 body measure (bench day), #8 order (after freeze, owner-only).
+- #7 files from her; bench day (#1 pen test + I-029 dummy, #14 list); #11 K1t button only if K1t still needed; #4 body measure; #8 order after freeze (owner-only).
