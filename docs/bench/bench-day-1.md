@@ -27,6 +27,9 @@ Checklist picture: `bench-day-1.png` (same order).
 4. **First supervised charge, G5, with thermocouple (#14).** Settles: cell temperature during charge. Have: built charger board, the cell, a thermocouple, a fire-safe tray. Not owned yet: cell and board **after the freeze order**. Stay in the room. **~45 min.** Write down: temperature every 5 min, current, stop time.
 5. **Prints: jig clip fit (0.05 mm gap), 0.6 mm wall coupon (K1t), epoxy post fill (#14).** Settles: whether the printed clip, the thin wall and the epoxy fill hold. Have: printed jig and coupon (printer), calipers, epoxy already on hand. Steps: test fit the clip and measure the gap; load the 0.6 mm wall with a gentle push; fill a post and check for voids once cured. **~40 min.** Write down: gap in mm, any crack, any void.
 
+6. **PWR-I12 hiz_idle on vs off.** Settles: pass if idle current saving is 0.15 mA or more; pass makes hiz_idle default ON (c472455 fw fix). Have: a built pod, a uA meter. Steps: measure idle current with hiz_idle off, then on. **~15 min.** Write down: both currents and the difference.
+7. **Shokz blind A/B, fuller vs lighter.** Settles: which sounds better, blind. Have: the Shokz rig and the clips. Steps: follow [shokz/ab_blind_sheet.md](shokz/ab_blind_sheet.md); check the key only after scoring. **~20 min.** Write down: the scored sheet.
+
 ## Suggested order
 
 A (about 15 min) first, then the prints in C5 while epoxy cures, then B, then C1 to C4 last (they need the most setup). Total with everything: about 5 hours; A alone is under half an hour and unlocks the K4 call.
