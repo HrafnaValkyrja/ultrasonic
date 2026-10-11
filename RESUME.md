@@ -3,6 +3,8 @@ Next she-uses-it milestone: bench day 1 (pen test + cardboard dummy pick the pod
 Branch claude/clever-mayer-s5rxuw, all pushed. Stashes: @{0} pre-session K4 scratch outputs, @{1} ECR-0025 dome prep (#11).
 
 ## Since 16:1x thaw
+- hiz_idle (7930c14, c472455, 6449fa9): +2.7-3.3 h dusk sim, click inaudible; REAL BUG fixed (bridge pins never restored to TIM1 AF after Hi-Z); default stays OFF until bench PWR-I12 (bench-day item 6).
+- False wakes (55656e7, 25fc262): no cheap detector fix beats B; most "false" wakes were scoring errors or real bats. Scorer v2: 3.14 -> 1.71/min, recall same (v1 kept). Remaining ~6 bursts 15-40 kHz (insects?) audible ~0.5 s blips; packet Q via Stolas (default keep).
 - Alternative slim vs B (edc6e3d, docs/sim/alt-slim-vs-b.md): same detection, slim +2 h dense battery; sound needs her ears -> blind A/B pair in the Shokz kit (docs/bench/shokz/playlist/ab, ab_blind_sheet.md). Packet question sent to Stolas (default: keep B).
 
 ## Since 06:47 thaw
