@@ -23,19 +23,19 @@ Method: lumped transient network (`thermal.py`, numbers reproducible, 3G fence):
 
 **Row 8 re-run 2026-10-08 (SIM-FID-U4; datasheet SBVS338H, θJA 166.1, ψJT 3.0 so case top is within 0.2 K of the die).** Heat into the shell = all extra battery power (4.2 V x extra mA; acoustic output negligible) at row 7's 44 K/W (docked-like) to 85 K/W (bound); U4 = (VSYS-3.0) 1.2-1.5 V x I x 166. Ambient 35 °C.
 
-| Case (exciter mean mA; source) | Pod P | Shell | U4 junction | Touch margin vs 48 °C (TS1) |
+| Case (exciter mean mA; source) | Pod P | Shell | U4 junction | Margin vs 43 °C long-wear (vs TS1 48 °C >1 min) |
 |---|---|---|---|---|
-| Today, rail budget 2.5 | 48 mW | 37.1-39.1 | ~39-41 | 8.9-10.9 K |
-| A+loud12, real use bats (8.9 awake hops; current-models-reconciled.md) | ~75 mW | 38.3-41.4 | 41.9-45.0 | 6.6-9.7 K |
-| A+loud12 dense programme (14.5; d17-cost.md) | ~98 mW | 39.3-43.3 | ~44-49 | 4.7-8.7 K |
-| A+loud12 nonstop loud, calls continuous (24.9) | ~142 mW | 41.2-47.1 | 48-55.5 | **0.9-6.8 K** |
+| Today, rail budget 2.5 | 48 mW | 37.1-39.1 | ~39-41 | 3.9-5.9 K (8.9-10.9) |
+| A+loud12, real use bats (8.9 awake hops; current-models-reconciled.md) | ~75 mW | 38.3-41.4 | 41.9-45.0 | 1.6-4.7 K (6.6-9.7) |
+| A+loud12 dense programme (14.5; d17-cost.md) | ~98 mW | 39.3-43.3 | ~44-49 | **-0.3 to 3.7 K** (4.7-8.7) |
+| A+loud12 nonstop loud, calls continuous (24.9) | ~142 mW | 41.2-47.1 | 48-55.5 | **-4.1 to 1.8 K FAIL in bound** (0.9-6.8) |
 
-All junctions far under 125 °C (even +33 K pulse on top: <90 °C). Shell touch is the limiter: nonstop loud playback in the bound (worn, no airflow) case is 0.9 K from TS1 48 °C, thin but passing; docked-like 6.8 K. Note row 5/6 charging limits (43 °C skin) are separate and do not combine with playback (docked, not worn). Still ASSUMED: ambient 35 °C, R_shell 44-85 K/W (row 7), VSYS 4.2-4.5 V, mean mA from sim not firmware.
+All junctions far under 125 °C (even +33 K pulse on top: <90 °C). Shell touch is the limiter. CORRECTED 2026-10-11: the pod is worn for hours, so the 43 °C long-contact limit applies, not TS1 48 °C (>1 min). Normal use (rail budget, real bats) passes with 1.6-5.9 K; dense programme is marginal (-0.3 K in the bound); nonstop loud FAILS in the bound (-4.1 K), passes docked-like (+1.8 K). See docs/sim/alt-thermal-loud.md. Note row 5/6 charging limits (43 °C skin) are separate and do not combine with playback (docked, not worn). Still ASSUMED: ambient 35 °C, R_shell 44-85 K/W (row 7), VSYS 4.2-4.5 V, mean mA from sim not firmware.
 | 9 | Cell ESR, h, R_BS | assumed, not measured | OPEN: log board+cell temperature through a full charge (PWR-I12 / ECR-0009 item 3) |
 
 ## Limits (sources; touch text re-fetched 2026-10-08)
 - Cell charge 0-45 °C: Renata ICP401230 V02 08/2019 (as in `sub-power.md`).
-- Touch: IEC 62368-1 (TS1 table, Table 42 in ed. 2.0 2010; Table 38 in later editions): TS1 max 48 °C, metal and plastic, contact > 1 min; 51 °C metal / 60 °C plastic for 10-60 s; TS2 = TS1 + 10 K. Source: UL Japan tech brief 'Touch Temperature' (Copyright 2010 UL), https://japan.ul.com/wp-content/uploads/sites/27/2014/06/1_techbrief_touchtemp.pdf, fetched 2026-10-08 (secondary source; the standard text itself is paywalled). The earlier '~43 °C' is NOT the 62368-1 number: it is the IEC 60601-1 applied-part limit (recall, still unconfirmed). Project line stays 43 °C (conservative, worn on skin ~33-35 °C): rows 5/6 verdicts unchanged; against 62368-1 TS1 48 °C, row 5 has 5 K margin and row 6 (48.9 °C) is a marginal FAIL.
+- Touch: IEC 62368-1 (TS1 table, Table 42 in ed. 2.0 2010; Table 38 in later editions): TS1 max 48 °C, metal and plastic, contact > 1 min; 51 °C metal / 60 °C plastic for 10-60 s; TS2 = TS1 + 10 K. Source: UL Japan tech brief 'Touch Temperature' (Copyright 2010 UL), https://japan.ul.com/wp-content/uploads/sites/27/2014/06/1_techbrief_touchtemp.pdf, fetched 2026-10-08 (secondary source; the standard text itself is paywalled). The earlier '~43 °C' is NOT the 62368-1 number: it is the IEC 60601-1 applied-part limit (recall, still unconfirmed). LONG-WEAR LIMIT 43 °C (2026-10-11): 62368-1 >8 h row NOT verified (standard paywalled; no free source shows one); 43 °C supported by IEC 60601-1:2005 Tables 23/24 applied part, contact >=10 min, all materials (SL Power/Advanced Energy AN-G012 v0719, 2019, secondary) and EN 563 8 h 43 °C (cited in patents, secondary). Project line stays 43 °C (conservative, worn on skin ~33-35 °C): rows 5/6 verdicts unchanged; against 62368-1 TS1 48 °C, row 5 has 5 K margin and row 6 (48.9 °C) is a marginal FAIL.
 - U3 numbers: TI BQ25180 SLUSE99C §7.3, §8.3.7.7 (via `docs/system/audit-datasheet-claims.md` row 7, 2026-10-02).
 
 ## Verdict
