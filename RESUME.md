@@ -1,4 +1,5 @@
-# RESUME (on ice 2026-10-08 ~22:55 ET, owner: "Put Ultrasonic on ice for today.")
+# RESUME (thawed 2026-10-11 ~03:00 ET; lean until Sun 06:00 reset)
+Next she-uses-it milestone: bench day 1 (pen test + cardboard dummy pick the pod; listen to loud mode on the tragus rig).
 Branch claude/clever-mayer-s5rxuw, all session work committed + pushed (last: b92e59c + this file).
 Stashes: stash@{0} = pre-session K4 scratch/render outputs parked at freeze (restore with `git stash pop` if wanted); stash@{1} = ECR-0025 dome prep (#11); older WIP below that.
 
