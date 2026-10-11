@@ -17,7 +17,9 @@ Goal: how translated bat calls feel and sound by bone conduction on the tragus. 
 ## Run order (about 20 min)
 1. `nature_audible_only` then `nature_translated_only` then `nature_both`. Which one do you notice first?
 2. For each bat call set, play the three versions in order: `normal`, `loud` (+12 dB), `loud_shape` (+12 dB, flat-top). Levels between the three are kept, so loud really is louder (normal is quiet: raise the volume until normal is just clear, then do not touch it again for the set). Heads-up: loud is +12 dB, about 4x the sound power of normal, so keep a finger on the volume and turn it down at once if it is too much.
-3. Repeat once with the pad off the tragus (on the cheekbone) for comparison.
+3. Fuller vs lighter (sim says they detect identically; slim gives +2 h battery; only your ears can settle the sound, `docs/sim/alt-slim-vs-b.md`). Play `playlist/ab/<clip>_fuller.wav` then `<clip>_lighter.wav` for bat_call_1-3 and nature (loudness-matched, keep the volume fixed). Which sounds more natural?
+4. Blind: fill `ab_blind_sheet.md` using `playlist/ab/blind_NN_1/2.wav` (8 trials, random order) and only then open `ab_blind_key.md`. Can you tell them apart at all? (Score: guesses right out of 8; 7+ is real, 5 or fewer is chance.)
+5. Repeat once with the pad off the tragus (on the cheekbone) for comparison.
 
 ## Write down (per file)
 - Heard? (no / faint / clear)
