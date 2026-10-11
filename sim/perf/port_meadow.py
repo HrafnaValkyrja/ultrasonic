@@ -54,6 +54,8 @@ CONFIGS = {
     "slim": ({"lim_lookahead": 1, "loud_db": 0, "b_variant": 1}, False),   # alternative: slim B (16 bands) at P72 R2; MCU row from dsp_icount "slim" (docs/sim/alt-slim-vs-b.md). Not a firmware default
     "slim+loud12": ({"lim_lookahead": 1, "loud_db": 12, "b_variant": 1}, True),
     "hiz_idle": ({"hiz_idle": 1, "lim_lookahead": 0, "loud_db": 0}, False),
+    "A+hiz": ({"hiz_idle": 1, "lim_lookahead": 1, "loud_db": 0}, False),   # alternative: B (= A) with hiz_idle on (docs/sim/alt-hiz-idle.md); not a default
+    "slim+hiz": ({"hiz_idle": 1, "lim_lookahead": 1, "loud_db": 0, "b_variant": 1}, False),
 }
 IDLE_ST = 3
 HOP_S = 0.00064
@@ -192,7 +194,7 @@ def evaluate(n_clips):
             "level_p50_dbfs": round(float(np.median(V)), 2), "level_max_dbfs": round(float(V.max()), 2),
             "awake_frac": round(af, 4), "_rms": rms_mean, "_sqa": t_["sq_hops"] / t_["hops"]}
     for cfg, o in out.items():
-        o["mean_ma"] = round(current(o["awake_frac"], o.pop("_sqa"), o.pop("_rms"), cfg == "hiz_idle", cfg.startswith("slim")), 4)
+        o["mean_ma"] = round(current(o["awake_frac"], o.pop("_sqa"), o.pop("_rms"), "hiz" in cfg, cfg.startswith("slim")), 4)
     n_calls = t_["calls"]
     return {"clips": len(real), "calls": n_calls, "audio_s": round(t_["dur"], 1), "configs": out}
 

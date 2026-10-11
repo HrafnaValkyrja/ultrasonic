@@ -114,6 +114,34 @@
    "level_max_dbfs": -12.0,
    "awake_frac": 0.8148,
    "mean_ma": 10.5864
+  },
+  "A+hiz": {
+   "wake_recall": 0.8538,
+   "sound_recall": 0.8548,
+   "false_wakes_per_min": 3.14,
+   "false_awake_frac": 0.0823,
+   "quiet_false_wakes_per_min": 10.0,
+   "quiet_awake_frac": 0.0734,
+   "latency_p50_ms": 90.06,
+   "latency_p90_ms": 641.98,
+   "level_p50_dbfs": -34.23,
+   "level_max_dbfs": -3.03,
+   "awake_frac": 0.8148,
+   "mean_ma": 10.8265
+  },
+  "slim+hiz": {
+   "wake_recall": 0.8538,
+   "sound_recall": 0.8504,
+   "false_wakes_per_min": 3.14,
+   "false_awake_frac": 0.0823,
+   "quiet_false_wakes_per_min": 10.0,
+   "quiet_awake_frac": 0.0734,
+   "latency_p50_ms": 89.74,
+   "latency_p90_ms": 642.83,
+   "level_p50_dbfs": -34.48,
+   "level_max_dbfs": -3.46,
+   "awake_frac": 0.8148,
+   "mean_ma": 8.9792
   }
  },
  "tolerances_abs": {
@@ -127,5 +155,5 @@
   "level_max_dbfs": 0.3,
   "mean_ma": 0.02
  },
- "runtime_s": 65.7
+ "runtime_s": 124.7
 }
