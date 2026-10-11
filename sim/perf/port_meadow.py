@@ -51,6 +51,8 @@ CONFIGS = {
     "A+loud4": ({"lim_lookahead": 1, "loud_db": 4}, True),
     "A+loud12": ({"lim_lookahead": 1, "loud_db": 12}, True),
     "A+loud12+shape": ({"lim_lookahead": 1, "loud_db": 12, "loud_shape": 1}, True),   # I-034 flat-top, k = 2.5 (default knob)
+    "slim": ({"lim_lookahead": 1, "loud_db": 0, "b_variant": 1}, False),   # alternative: slim B (16 bands) at P72 R2; MCU row from dsp_icount "slim" (docs/sim/alt-slim-vs-b.md). Not a firmware default
+    "slim+loud12": ({"lim_lookahead": 1, "loud_db": 12, "b_variant": 1}, True),
     "hiz_idle": ({"hiz_idle": 1, "lim_lookahead": 0, "loud_db": 0}, False),
 }
 IDLE_ST = 3
@@ -154,11 +156,11 @@ CCR_HALF = 140.0            # counts per unit duty = ARR/2 at the default plan P
 BRIDGE_IDLE_MA = 0.45       # bridge keeps switching 50 % while squelched (D-hiz-idle.md s1); SPICE ripple, hiz_idle removes it
 
 
-def current(awake_frac, sq_frac_all, rms_counts, hiz):
+def current(awake_frac, sq_frac_all, rms_counts, hiz, slim=False):
     """Reconciled 2026-10-08 (docs/proof/electrical/current-models-reconciled.md). Exciter = physical 0.327 A x mean|x| on awake hops
     (replaces 1.1 mA guess x relative drive). Squelched hops (mostly IDLE; the IDLE row has no bridge term) carry the bridge's 0.45 mA
     switching ripple unless hiz_idle."""
-    m = rt.mcu(*[json.loads((REPO / "fw/out/dsp_icount.json").read_text())["B"]["MHz_qemu_corrected_V4ovh"]][0], PLAN_NAME[BASE_KNOBS.get("clock_plan", 4)])
+    m = rt.mcu(*json.loads((REPO / "fw/out/dsp_icount.json").read_text())["slim" if slim else "B"]["MHz_qemu_corrected_V4ovh"], "P72" if slim else PLAN_NAME[BASE_KNOBS.get("clock_plan", 4)])
     aw = rt.awake(m[2], m[3])[1] - rt.B1["exciter (guess, PWR-04)"][1] + 1e3 * BRIDGE_A_PER_UNIT * rms_counts / (PLAN_ARR[BASE_KNOBS.get("clock_plan", 4)] / 2)
     ripple = 0.0 if hiz else BRIDGE_IDLE_MA * sq_frac_all
     return awake_frac * aw + (1 - awake_frac) * rt.IDLE[1] + rt.LED[1] + ripple
@@ -190,7 +192,7 @@ def evaluate(n_clips):
             "level_p50_dbfs": round(float(np.median(V)), 2), "level_max_dbfs": round(float(V.max()), 2),
             "awake_frac": round(af, 4), "_rms": rms_mean, "_sqa": t_["sq_hops"] / t_["hops"]}
     for cfg, o in out.items():
-        o["mean_ma"] = round(current(o["awake_frac"], o.pop("_sqa"), o.pop("_rms"), cfg == "hiz_idle"), 4)
+        o["mean_ma"] = round(current(o["awake_frac"], o.pop("_sqa"), o.pop("_rms"), cfg == "hiz_idle", cfg.startswith("slim")), 4)
     n_calls = t_["calls"]
     return {"clips": len(real), "calls": n_calls, "audio_s": round(t_["dur"], 1), "configs": out}
 

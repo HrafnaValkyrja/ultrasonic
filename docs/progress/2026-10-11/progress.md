@@ -11,3 +11,6 @@ All of this is simulated or checked on paper. Nothing is measured on hardware ye
 - **Firmware:** 58 KB flash, 31 KB RAM + 8 KB stack; committed fwsim is green (the earlier "53/57" was a mid-edit run); CPU fix DONE at the 112 MHz plan (78 % load).
 - **Bench day 1:** run sheet ready (pen test, arm caliper, body photos, Shokz listening).
 - **Unknown:** does the pod block the vision line; real loudness on the tragus; any hardware measurement.
+
+## since 07:30
+- Simulated: slim B (P72) vs shipping B (P112) on Port Meadow: same wake recall 0.854 and false wakes, sound recall -0.4 pt, 1.8 mA less (+2.0 h dense usable); slim is the better trade unless E2 listening hears the 16 bands (docs/sim/alt-slim-vs-b.md).
