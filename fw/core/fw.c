@@ -103,7 +103,7 @@ static size_t hop_pcm(fw_state_t *st, const float pcm[FW_HOP_N], uint16_t *ccr, 
     /* idle detector (spec C9): every 8 hops while listening or idle; Transient -> IDLE when quiet, IDLE -> back on activity */
     uint32_t m = st->sys.mode;
     if (st->knobs.idle_enable && (m == (uint32_t)FW_ST_FULL || m == (uint32_t)FW_ST_TRANSIENT || m == (uint32_t)FW_ST_IDLE) &&
-        fw_idle_hop(&st->idle, &st->dsp, pcm)) {
+        fw_idle_hop(&st->idle, &st->dsp, pcm, &st->knobs)) {
         if (st->idle.active && m == (uint32_t)FW_ST_IDLE)
             fw_sys_fsm(&st->sys, &st->knobs, FW_FE_WAKE, st->now_us);
         else if (!st->idle.active && m != (uint32_t)FW_ST_IDLE && st->idle.frames > st->idle.hang_hops)

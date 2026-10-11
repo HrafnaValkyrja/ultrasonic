@@ -6,6 +6,7 @@
 #include <stdint.h>
 
 #include "dsp.h"
+#include "knobs.h"
 
 #define FW_IDLE_EVERY 8u                  /* hops per snapshot */
 #define FW_IDLE_NBIN 83u                  /* bins 26..108 = 20.3-84.4 kHz (f_lo <= f < f_hi) */
@@ -16,9 +17,11 @@ typedef struct {
     uint32_t init, hang, hang_hops, active, frames, hits, bin0;
     float pcm[256];                       /* the detector's own ring of the CURRENT samples (the algorithm may run on a delayed stream) */
     uint32_t hops, pcm_old;
+    uint32_t run;                         /* consecutive raw hits (idle_confirm) */
+    float ema, om_ema, a_ema;             /* idle_adapt_pct: slow EMA of min(rmax, thr) */
 } fw_idle_t;
 
 void fw_idle_init(fw_idle_t *s);
 /* call every hop with the hop's PCM; returns 1 when a snapshot was evaluated this hop */
-uint32_t fw_idle_hop(fw_idle_t *s, const fw_dsp_t *d, const float pcm[128]);
+uint32_t fw_idle_hop(fw_idle_t *s, const fw_dsp_t *d, const float pcm[128], const fw_knobs_t *k);
 #endif

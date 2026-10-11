@@ -15,6 +15,9 @@ void fw_idle_init(fw_idle_t *s)
     s->thr = fw_db20_to_lin(30.0f);             /* 10^(15/10) */
     s->peak = fw_db20_to_lin(20.0f);            /* 10^(10/10) */
     s->hang_hops = (uint32_t)(0.3f / hop_s);    /* int(hang_s / hop_s) as the reference */
+    s->om_ema = fw_om_exp(hop_s / 5.0f);
+    s->a_ema = 1.0f - s->om_ema;
+    s->ema = 4.0f;                  /* about the best-bin ratio of stationary noise */
     s->bin0 = 26u;                              /* 26 x 781.25 = 20.3 kHz >= 20 kHz; 108 x 781.25 = 84.4 kHz < 85 kHz */
 }
 
@@ -33,7 +36,7 @@ static float median(float *v, uint32_t n)
     return v[n / 2u];
 }
 
-uint32_t fw_idle_hop(fw_idle_t *s, const fw_dsp_t *d, const float pcm[128])
+uint32_t fw_idle_hop(fw_idle_t *s, const fw_dsp_t *d, const float pcm[128], const fw_knobs_t *k)
 {
     s->hops++;
     uint32_t w = (s->hops & 1u) * 128u;
@@ -51,14 +54,29 @@ uint32_t fw_idle_hop(fw_idle_t *s, const fw_dsp_t *d, const float pcm[128])
         s->init = 1u;
     }
     float rmax = 0.0f;
+    uint32_t wide = 0u;
+    const float wthr = s->thr * 0.1f;
     for (uint32_t i = 0; i < FW_IDLE_NBIN; i++) {
         float f = s->bfloor[i];
         r[i] = pb[i] / f;
         rmax = r[i] > rmax ? r[i] : rmax;
+        wide += r[i] > wthr;
         s->bfloor[i] = pb[i] > f ? s->b_up * f + s->om_b_up * pb[i] : s->b_dn * f + s->om_b_dn * pb[i];
     }
     float med = median(r, FW_IDLE_NBIN);
-    uint32_t hit = rmax > s->thr && rmax > s->peak * med;
+    float thr = s->thr;
+    if (k->idle_adapt_pct) {                       /* ALT-3 */
+        float a = (float)k->idle_adapt_pct * 0.01f * s->ema;
+        thr = a > thr ? a : thr;
+        s->ema = s->a_ema * (rmax < s->thr ? rmax : s->thr) + s->om_ema * s->ema;
+    }
+    uint32_t hit = rmax > thr && rmax > s->peak * med;
+    if (k->idle_width_max && wide > (uint32_t)k->idle_width_max)   /* ALT-2 */
+        hit = 0u;
+    if (k->idle_confirm > 1) {                      /* ALT-1 */
+        s->run = hit ? s->run + 1u : 0u;
+        hit = hit && s->run >= (uint32_t)k->idle_confirm;
+    }
     s->hits += hit;
     s->hang = hit ? s->hang_hops : (s->hang > 0u ? s->hang - 1u : 0u);
     s->active = s->hang > 0u;

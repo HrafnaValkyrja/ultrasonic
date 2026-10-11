@@ -108,3 +108,6 @@ knobs:
   - {id: haptic_ms, def: 100, min: 50, max: 200, unit: ms, src: "I-010: pulse length incl. 10 ms raised-cosine edges (no clicks, T6)"}
   - {id: haptic_gap_ms, def: 100, min: 50, max: 400, unit: ms, src: "I-010: silence between pulses (assumed)"}
   - {id: haptic_cdb, def: 0, min: -4000, max: 0, unit: cdBFS, src: "I-010: burst peak before the output stage; R64 clamp and D17 ceiling still apply"}
+  - {id: idle_confirm, def: 0, min: 0, max: 8, unit: frames, src: "docs/sim/alt-false-wake.md ALT-1: wake needs this many consecutive 5 ms detector hits (0/1 = legacy, bit-identical). Alternative, not a default"}
+  - {id: idle_width_max, def: 0, min: 0, max: 83, unit: bin, src: "docs/sim/alt-false-wake.md ALT-2: a hit is rejected when more than this many of the 83 bins are >= 5 dB (thr/10) over their floors (broadband click / wind vs a narrowband bat call). 0 = off, bit-identical"}
+  - {id: idle_adapt_pct, def: 0, min: 0, max: 2000, unit: pct, src: "docs/sim/alt-false-wake.md ALT-3: threshold = max(15 dB, pct/100 x slow EMA (tau 5 s) of min(best-bin ratio, thr)): rises in fluctuating noise. 0 = off, bit-identical"}
