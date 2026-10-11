@@ -1,5 +1,5 @@
 """Refresh this session's Valhalla board cards (sessions/ultrasonic.json, status/ultrasonic.json): updated time, pid, heavy_now.
-Run every heartbeat: python3 tools/board_card.py ["heavy_now text"] ["headline"]"""
+Run every heartbeat: python3 tools/board_card.py "heavy_now" ["headline"] ["status"] ["now one line"]"""
 import json, os, sys, datetime, pathlib
 B = pathlib.Path.home() / ".claude-shared/board"
 now = datetime.datetime.now().astimezone().isoformat(timespec="seconds")
@@ -7,6 +7,8 @@ s = B / "sessions/ultrasonic.json"
 d = json.loads(s.read_text())
 d["updated"], d["pid"] = now, os.getppid()
 d["heavy_now"] = sys.argv[1] if len(sys.argv) > 1 else "none"
+d["status"] = sys.argv[3] if len(sys.argv) > 3 else d.get("status") or "working"
+d["now"] = sys.argv[4] if len(sys.argv) > 4 else d.get("now") or d["heavy_now"]
 d["session_fence"] = "18 GB session fence (tools/claude-session.sh); heavy jobs fenced 3-4G"
 s.write_text(json.dumps(d, indent=1))
 t = B / "status/ultrasonic.json"
