@@ -29,6 +29,7 @@ Checklist picture: `bench-day-1.png` (same order).
 
 6. **PWR-I12 hiz_idle on vs off.** Settles: pass if idle current saving is 0.15 mA or more; pass makes hiz_idle default ON (c472455 fw fix). Have: a built pod, a uA meter. Steps: measure idle current with hiz_idle off, then on. **~15 min.** Write down: both currents and the difference.
 7. **Shokz blind A/B, fuller vs lighter.** Settles: which sounds better, blind. Have: the Shokz rig and the clips. Steps: follow [shokz/ab_blind_sheet.md](shokz/ab_blind_sheet.md); check the key only after scoring. **~20 min.** Write down: the scored sheet.
+8. **Worn-shell temperature log (needs the first real pod, not bench day 1).** Settles: whether the loud-mode heat fold-back turns on by default (docs/sim/alt-thermal-loud.md). Have: pod, thermocouple or skin thermometer under the shell. Steps: loud mode nonstop, 30 min, warm room; log shell temp every minute. **~35 min.** Write down: the log; pass if it stays under 43 °C.
 
 ## Suggested order
 
