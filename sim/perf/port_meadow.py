@@ -148,7 +148,9 @@ def score(r, calls, t0):
 
 
 BRIDGE_A_PER_UNIT = 0.327   # A per unit duty fraction (3.0 V into 8 ohm + FETs + 0.1 ohm; d17-cost.md, audibility-requirement.md l.7)
-CCR_HALF = 140.0            # counts per unit duty = ARR/2 at the default plan P112 (ARR 280; ECR-0027). Was 128 (pre-ECR-0027 P80 ARR 200 gave 100: overstated drive by 1.28x)
+PLAN_NAME = {0: "P112", 4: "P112"}   # MCU current model only has P112 (no P80 row); plan 0 isolates the PWM-clock effect
+PLAN_ARR = {0: 200.0, 4: 280.0}   # 400 kHz carrier: ARR = f_clk / 0.4 MHz (fw_arr_for_khz)
+CCR_HALF = 140.0            # counts per unit duty = ARR/2 at the default plan P112 (ARR 280; ECR-0027); derived per plan in current() (clock-independent duty). Was 128, wrong for both plans (P80 ARR 200 -> 100)
 BRIDGE_IDLE_MA = 0.45       # bridge keeps switching 50 % while squelched (D-hiz-idle.md s1); SPICE ripple, hiz_idle removes it
 
 
@@ -156,8 +158,8 @@ def current(awake_frac, sq_frac_all, rms_counts, hiz):
     """Reconciled 2026-10-08 (docs/proof/electrical/current-models-reconciled.md). Exciter = physical 0.327 A x mean|x| on awake hops
     (replaces 1.1 mA guess x relative drive). Squelched hops (mostly IDLE; the IDLE row has no bridge term) carry the bridge's 0.45 mA
     switching ripple unless hiz_idle."""
-    m = rt.mcu(*[json.loads((REPO / "fw/out/dsp_icount.json").read_text())["B"]["MHz_qemu_corrected_V4ovh"]][0], "P112")
-    aw = rt.awake(m[2], m[3])[1] - rt.B1["exciter (guess, PWR-04)"][1] + 1e3 * BRIDGE_A_PER_UNIT * rms_counts / CCR_HALF
+    m = rt.mcu(*[json.loads((REPO / "fw/out/dsp_icount.json").read_text())["B"]["MHz_qemu_corrected_V4ovh"]][0], PLAN_NAME[BASE_KNOBS.get("clock_plan", 4)])
+    aw = rt.awake(m[2], m[3])[1] - rt.B1["exciter (guess, PWR-04)"][1] + 1e3 * BRIDGE_A_PER_UNIT * rms_counts / (PLAN_ARR[BASE_KNOBS.get("clock_plan", 4)] / 2)
     ripple = 0.0 if hiz else BRIDGE_IDLE_MA * sq_frac_all
     return awake_frac * aw + (1 - awake_frac) * rt.IDLE[1] + rt.LED[1] + ripple
 
