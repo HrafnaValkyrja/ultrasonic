@@ -1,6 +1,9 @@
-# RESUME (iced 2026-10-11 ~08:20 ET: Ultrasonic is priority 4 this week, below Bonsai; usage pacing)
+# RESUME (live 2026-10-11 16:1x; pace slow, 1 worker; may be frozen at short notice)
 Next she-uses-it milestone: bench day 1 (pen test + cardboard dummy pick the pod; Shokz/tragus listen to loud mode).
 Branch claude/clever-mayer-s5rxuw, all pushed. Stashes: @{0} pre-session K4 scratch outputs, @{1} ECR-0025 dome prep (#11).
+
+## Since 16:1x thaw
+- Alternative slim vs B (edc6e3d, docs/sim/alt-slim-vs-b.md): same detection, slim +2 h dense battery; sound needs her ears -> blind A/B pair in the Shokz kit (docs/bench/shokz/playlist/ab, ab_blind_sheet.md). Packet question sent to Stolas (default: keep B).
 
 ## Since 06:47 thaw
 - CPU fixed: clock_plan default P112 (ECR-0027 a070a87), fwsim green. Runtime model corrected (fe405bf, 2370328): dense nominal (usable) A 11.9 (10.1), loud12 8.8 (7.5), shape 6.5 (5.6); dusk 26 h.
