@@ -2,6 +2,12 @@
 Next she-uses-it milestone: bench day 1 (pen test + cardboard dummy pick the pod; Shokz/tragus listen to loud mode).
 Branch claude/clever-mayer-s5rxuw, all pushed. Stashes: @{0} pre-session K4 scratch outputs, @{1} ECR-0025 dome prep (#11).
 
+## 19:14 her direct order (via Stolas): DONE
+- Exploded K4 render v2 d0c54b3 (docs/diagrams/k4-review/exploded-full.png; cell/tape/tab boxes, pad not re-fitted).
+- Approved exterior adapted to K4 (00eb32a/23e51f1): Spine (O17), plate/trace (O29), hex boss, strut, pad ring; T 6.4->6.9; old|tall|soft panels; recommend soft (K4_SPINE=soft). Awaiting her pick.
+- Incident docs/incidents/2026-10-11-k4-dropped-approved-exterior.md (+PLM R-EXT-SHELL); O34 look approval likely on spine-less render.
+- DECIDED: two boards (P+M stack, O33).
+
 ## Since 16:1x thaw
 - Thermal (a50ee35 + re-score): vs 43 C long-wear (partly secondary cites) normal use OK 1.6-5.9 K; nonstop loud fails -4..-11 K (no-airflow bound). Fold-back knob built, default OFF; ON after worn-shell temp log with first pod (bench item 8). In her batch via Stolas.
 - NEXT on thaw: cap check if inbox files landed; her batch answers (slim vs B, insects, fold-back); next alternative idea: verify 43 C row from a primary source.
