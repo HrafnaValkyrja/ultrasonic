@@ -1,6 +1,11 @@
-# RESUME (on ice 2026-10-11 ~05:00 ET for the reset handoff)
+# RESUME (iced 2026-10-11 ~08:20 ET: Ultrasonic is priority 4 this week, below Bonsai; usage pacing)
 Next she-uses-it milestone: bench day 1 (pen test + cardboard dummy pick the pod; Shokz/tragus listen to loud mode).
 Branch claude/clever-mayer-s5rxuw, all pushed. Stashes: @{0} pre-session K4 scratch outputs, @{1} ECR-0025 dome prep (#11).
+
+## Since 06:47 thaw
+- CPU fixed: clock_plan default P112 (ECR-0027 a070a87), fwsim green. Runtime model corrected (fe405bf, 2370328): dense nominal (usable) A 11.9 (10.1), loud12 8.8 (7.5), shape 6.5 (5.6); dusk 26 h.
+- Screening page for her: docs/progress/2026-10-11/progress.png (+ .md). Cap harness ready: python3 sim/checks/cap_derating.py (sourced reqs, adabe80).
+- Issue sweep: open = #9 #11 #12 (mine), #1 #4 #7 #8 #14 (her chores, owner-only). Her word: chores another week.
 
 ## State
 - D17 = A+L BUILT and tested (limiter on, loud +12 via triple press, off at boot; battery saver off + knob). Clamp check all carriers (b92e59c). fwsim green.
