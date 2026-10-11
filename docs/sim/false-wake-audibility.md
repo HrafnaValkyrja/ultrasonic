@@ -30,3 +30,29 @@ Audible seconds per hour = time the 200 ms-integrated best band is above thresho
 - 75 dB scale is an assumption; at 65 dB scene level subtract 10 dB from every margin: quiet room median would still be +26 dB (audible), office would fall to ~0 (borderline).
 - The transfer function is the nominal Monte Carlo centre (5-95 % band is +-15 dB at some frequencies) and the threshold has 6-9 dB subject SD; absolute margins are +-10 dB, ordering across configs is solid.
 - Quiet-room column uses q (masking offset) only, no real room noise floor.
+
+## What are the 13 episodes? Spectrogram triage (2026-10-11, SIMULATED/offline analysis)
+Src: raw `receiver_3.wav` + `events_3.csv` (BatDetect2 machine labels: det_prob, start/end, high/low freq, species; the sim keeps det_prob >= 0.5 only, `port_meadow.load_clips`). Episodes re-found with config A (`false_wake_audibility.episodes`); per episode: STFT 1024/768 overlap, level over the clip median in 5 bands (2-15, 15-25, 25-40, 40-70, 70-95 kHz) within +-30 ms of onset, spectral flatness 15-30 kHz, 40-70 kHz pulse count. Scratch scripts not kept (fenced 3 G, ~1 min).
+**Finding 1: 2 of the 13 are not corpus sound at all.** They are the synthetic `house_walk` quiet scene (3.2-3.5 s, 4.21-4.79 s) = simulated footsteps/handling. 11 are real Port Meadow clips (2025-10-21 dusk). Both are in the 3.5/min.
+
+| # | clip, onset (s), awake | onset evidence (dB over clip median) | class |
+|---|---|---|---|
+| 1 | 172912, 0.04, 0.30 s | 40-70k +11; labelled Pipistrellus call (det 0.67) starts 0.072, 27 ms after onset | bat, label-tolerance artefact (rule allows 10 ms) |
+| 7 | 174106, 0.88, 0.57 s | 40-70k +20; labelled call (det 0.71) ends ~0.833, onset 17 ms past end+30 ms | bat, label-tolerance artefact |
+| 11 | 175718, 5.00, 4 ms | 40-70k +16, 4 ms long, at the clip-loop splice (clip is 5 s) | simulation splice artefact |
+| 2, 4, 5 | 173155 / 174003 / 174035; 1.06 / 3.12 / 3.47 s | onset +1 to +5 dB, flat noise (flatness 0.8), 12-39 pulses in 40-70k during the episode; 2 and 4 run to clip end | wake held/retriggered inside an active bat pass (labelled Pipistrellus 45-55 kHz every ~0.1 s), the gaps and quiet calls between labels; not a blip |
+| 8 | 174242, 0.64, 0.30 s | 25-40k +12, nothing 40-70k, between labelled calls | weak, faint call or noise trip (undecidable) |
+| 3 | 173324, 1.08, 1.92 s (to clip end) | 15-25k +27, 40-70k +20; 20.4 kHz tonal (flatness 0.04), 24 pulses 40-70k | unlabelled low call (noctule-like 20 kHz) plus bat tail |
+| 6 | 174048, 3.51, 0.45 s | 15-25k +32, 25-40k +24, 40-70k +8; flatness 0.19 | broadband 15-40 kHz burst: stridulation (bush-cricket-like) or low bat |
+| 9 | 174242, 1.07, 0.32 s | 15-25k +34, 25-40k +13; flatness 0.10; label det 0.39 (below the 0.5 cut) at 58 kHz | as 6; a faint labelled call is also present |
+| 10 | 174648, 3.86, 0.74 s | 15-25k +30, 25-40k +19; flatness 0.14 | as 6 |
+| 12, 13 | house_walk 3.2 / 4.21 s (synthetic) | simulated footsteps | mechanical (sim input), not corpus |
+
+Tally: real 15-40 kHz non-bat-labelled sound 4 (3, 6, 9, 10); bat-pass tail/noise 4 (2, 4, 5, 8); label-tolerance 2 (1, 7); splice 1 (11); synthetic mechanical 2. Nothing looks like wind or handling in the real clips (2-15 kHz within +-5 dB on all 11).
+
+Limits: (a) one mic channel, 192 kS/s, no ground truth; 3/6/9/10 cannot be told apart as orthopteran vs noctule/serotine-type bat by these stats alone (needs a repetition/FM look at the clip, or a listening pass). Late October in Oxfordshire makes bush-crickets unlikely but not excluded; I assert neither. (b) Counts are 11 clips, so +-1 event is 9 points.
+
+## Verdict on the 13
+- Roughly 6-8 of 13 (1, 7, 3, 6, 9, 10, plus the bat-pass tails 2, 4, 5) are real in-band sound, mostly bat or bat-adjacent; 3 are simulation artefacts (11, 12, 13); 1 undecidable (8). The "false wake" tag is mostly a labelling/scoring artefact, not a detector fault.
+- Would she want to hear them: bat-pass tails and labelled-call edges, yes (it is the §1 product: translating ultrasound she can't hear). The 15-40 kHz bursts (3, 6, 9, 10), if insect or a low bat, are also sound a bat/ultrasound listener would reasonably welcome; a 15-25 kHz tonal burst is partly audible to a young ear anyway. Her call, not mine, whether insects count as wanted.
+- Recommendation: leave the firmware as is. Targeted fix on the metric, not the device: (1) relabel/score with a +-50 ms tolerance and det_prob >= 0.3 in `port_meadow.score` (removes #1, #7 and likely #8/#9), (2) exclude splice edges and report `house_walk` separately (removes 11, 12, 13), (3) the residual 15-40 kHz bursts become a "non-bat in-band" class, checked at the E2 listening session. Net false-wake rate on real corpus after 1+2 is about 0.4/min-equivalent (6 of 13 left) instead of 3.5; not simulated, estimate only.
