@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """Capacitor DC-bias derating check for the two K4 0201 caps (owner ruling #7, A-CAP-CURVES).
 
-  K4-P C9  = Samsung CL03A225MP3CRNC  2.2 uF 10 V X5R 0201, VDD11 (MCU core SMPS output, with C8)
-  K4-M C17 = Samsung CL03A105MO3NRNC  1 uF 16 V X5R 0201, VSYS (TPS7A2030 LDO input / charger SYS)
+  K4-P C9  = Samsung CL03A225MP3CRNC  2.2 uF 10 V X5R 0201, VDD11 (MCU core SMPS output, paired with C8)
+  K4-M C17 = Samsung CL03A105MO3NRNC  1 uF 16 V X5R 0201, VSYS = TPS7A2030 LDO input cap
 
 USAGE (one command once the owner drops Samsung files in ./inbox):
   python3 sim/checks/cap_derating.py                  # auto-scan ./inbox for both parts
   python3 sim/checks/cap_derating.py --c9 FILE --c17 FILE   # explicit files
   python3 sim/checks/cap_derating.py --placeholder    # self-test on SYNTHETIC curves (NOT an answer)
-  options: --t-hot 60 --t-cold 0 (deg C)  --vdd11 1.2  --vsys-nom 4.2 --vsys-max 4.9
-           --c9-min 2.0 --c17-min 1.0 (requirements, uF effective)  --c8-eff 1.8 (uF)  --csv-out FILE
+  options: --t-hot 60 --t-cold 0 (deg C)  --vdd11 1.1  --vsys-nom 4.2 --vsys-max 4.9
+           --c9-min 3.52 --c9-max 5.28 --c17-min 0.47 (uF effective, sourced)  --c8 FILE  --c8-eff 1.8 (uF, assumed)  --csv-out FILE
 
 INPUT FORMATS (file whose name contains the part number; or a path given with --c9/--c17):
   .csv/.txt/.tsv : DC-bias table. First numeric column = bias in V. Capacitance column chosen by header:
@@ -21,13 +21,19 @@ INPUT FORMATS (file whose name contains the part number; or a path given with --
                    publishes models at 0 V and some at rated bias; the file header comment is echoed); R/L/C
                    in one series branch also give ESR and |Z| at 3 MHz. A SPICE file gives ONE bias point only,
                    so it can set nominal C / ESR but not the bias curve: a DC-bias table is still needed for PASS.
-RULES / ASSUMPTIONS (override on the CLI, each printed in the report):
+RULES (override on the CLI, each printed in the report):
   worst case = table C at bias x (1 - tol 20 %, 'M' suffix) x (1 - 15 % X5R temperature, -55..85 C bound).
-  Samsung curves are typical, so the typical-only result is printed too; PASS needs the WORST case >= req.
-  C9: VDD11 ~1.2 V; req total effective on VDD11 >= --c9-min with C8 (0402 2.2 uF 10 V) assumed --c8-eff.
-      ASSUMPTION to verify against ST DS13737 Rev 10 p.153 (SMPS output cap spec) when the PDF is at hand.
-  C17: VSYS up to 4.9 V (gen.py comment: SYS <= 4.9 V; charger regulation 4.2-4.5 V); req >= 1 uF effective
-      (TI SLUSE99C Table 9-2 CSYS/CBAT min 1 uF after derating; TPS7A20 CIN 1 uF). Checked at --vsys-max.
+  Samsung curves are typical, so the typical-only result is printed too; PASS needs the WORST case in range.
+  C8+C9 (VDD11 PAIR, K4-P: C8 0402 CL05A225KP5NSNC + C9 0201 CL03A225MP3CRNC): SOURCED requirement,
+      ST DS13737 Rev 10 p.153 (read 2026-10-11): COUT = 2 x 2.2 uF +/-20 % => total effective 3.52..5.28 uF
+      at VDD11 = 1.1 V (--vdd11); ESR < 20 mOhm at 3 MHz; rated >= 10 V. Low bound uses -tol on both caps,
+      high bound +tol on both (typical curve). C8 curve: --c8 FILE (Samsung CL05A225KP5NSNC data) else C8 is
+      ASSUMED at --c8-eff uF and the report says so (public Samsung curve not fetched, 2026-10-11).
+      Pair ESR = parallel of the two SPICE/ESR values; if either is missing the ESR line is FLAGGED, not passed.
+  C17 (K4-M, CL03A105MO3NRNC 1 uF 16 V): it is the TPS7A2030 (U4) INPUT cap on VSYS (gen.py l.319: IN/EN on VSYS;
+      C21 10 uF is the charger SYS cap). SOURCED requirement: TI SBVS338H (Jul 2024) Recommended Operating
+      Conditions fn(2): CIN = 1 uF listed; not needed for stability, but >= 0.47 uF EFFECTIVE recommended
+      (source R/L ringing). Checked at --vsys-max 4.9 V (SYS <= 4.9 V, gen.py comment). Rated 16 V >= 6 V VIN max.
 Exit code 0 = all PASS, 1 = any FAIL, 2 = missing data. Placeholder runs always print a PLACEHOLDER banner.
 """
 import argparse, csv, glob, math, os, re, sys
@@ -141,11 +147,18 @@ def evaluate(ref, curves, a, spice, synthetic):
     if v > p["rated"]: warn.append("bias exceeds rated %g V" % p["rated"])
     if not hot: warn.append("no temperature columns: applied X5R +/-15 %% bound (%g..%g C)" % (a.t_cold, a.t_hot))
     if ref == "C9":
-        tot_t, tot_w = ctyp + a.c8_eff, cw + a.c8_eff * (1 - p["tol"])
-        used = tot_w; label = "C9 + C8 (assumed %.2f uF eff) on VDD11 @ %.2f V" % (a.c8_eff, v)
+        c8t = a.c8_typ if a.c8_typ is not None else a.c8_eff
+        c8src = "from file" if a.c8_typ is not None else "ASSUMED, curve not fetched"
+        tot_t, tot_w = ctyp + c8t, cw + c8t * (1 - p["tol"])
+        tot_hi = ctyp * (1 + p["tol"]) + c8t * (1 + p["tol"])
+        used = tot_w; label = "C9 + C8 (%.2f uF eff, %s) on VDD11 @ %.2f V" % (c8t, c8src, v)
     else:
         tot_t, tot_w = ctyp, cw; used = cw; label = "C17 on VSYS @ %.2f V (max) / %.2f V (nom)" % (v, a.vsys_nom)
     ok = used >= req
+    if ref == "C9":
+        ok = ok and tot_hi <= a.c9_max
+        print("   pair high bound (+%d %%) %.3f uF vs max %.2f uF; ESR<20 mOhm@3MHz, >=10 V rated: %s" % (p["tol"] * 100, tot_hi, a.c9_max,
+              "pair ESR needs SPICE/ESR data for BOTH caps (FLAGGED, not verified)" if not (spice and a.c8_typ is not None) else "see SPICE line"))
     print("%s %s [%s]: %s" % (ref, p["pn"], "SYNTHETIC PLACEHOLDER" if synthetic else "measured data", label))
     print("   nominal %.2f uF -> typical at bias %.3f uF (%.0f %%); worst (tol %d %%%s) %.3f uF" %
           (p["nom"], ctyp, 100 * ctyp / p["nom"], p["tol"] * 100, "" if hot else ", X5R temp", cw))
@@ -162,13 +175,15 @@ def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--c9"); ap.add_argument("--c17"); ap.add_argument("--placeholder", action="store_true")
     ap.add_argument("--t-hot", type=float, default=60); ap.add_argument("--t-cold", type=float, default=0)
-    ap.add_argument("--vdd11", type=float, default=1.2); ap.add_argument("--vsys-nom", type=float, default=4.2)
+    ap.add_argument("--vdd11", type=float, default=1.1); ap.add_argument("--vsys-nom", type=float, default=4.2)
     ap.add_argument("--vsys-max", type=float, default=4.9)
-    ap.add_argument("--c9-min", type=float, default=2.0); ap.add_argument("--c17-min", type=float, default=1.0)
+    ap.add_argument("--c9-min", type=float, default=3.52); ap.add_argument("--c9-max", type=float, default=5.28)
+    ap.add_argument("--c17-min", type=float, default=0.47); ap.add_argument("--c8")
     ap.add_argument("--c8-eff", type=float, default=1.8); ap.add_argument("--csv-out")
     a = ap.parse_args()
     if a.placeholder:
         print("#" * 70 + "\n# PLACEHOLDER: SYNTHETIC curves, not Samsung data. Not an answer.\n" + "#" * 70)
+    a.c8_typ = None
     res, missing = {}, False
     for ref in PARTS:
         curves = spice = None
@@ -183,6 +198,9 @@ def main():
                     curves, notes = parse_table(f, PARTS[ref]["nom"]); syn = syn or "placeholder" in f.lower(); print("%s: %s %s" % (ref, os.path.relpath(f, ROOT), notes))
             if curves is None:
                 print("%s %s: no DC-bias table in ./inbox%s" % (ref, PARTS[ref]["pn"], " (SPICE file found, one bias point only)" if spice else "")); missing = True; continue
+        if ref == "C9" and a.c8 and not a.placeholder:
+            c8c, _ = parse_table(a.c8, 2.2); h8 = [t for t in c8c if t is not None]
+            a.c8_typ = interp(c8c[max(h8)] if h8 else next(iter(c8c.values())), a.vdd11)
         res[ref] = evaluate(ref, curves, a, spice, syn)
     sys.exit(2 if missing and not res else (0 if res and all(res.values()) and not missing else 1) if res else 2)
 
