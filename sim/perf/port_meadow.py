@@ -58,11 +58,29 @@ CONFIGS = {
     "slim+hiz": ({"hiz_idle": 1, "lim_lookahead": 1, "loud_db": 0, "b_variant": 1}, False),
 }
 IDLE_ST = 3
+SCORING_VERSION = 2   # v1 = +-10/30 ms label tolerance, det_prob>=0.5 only, no splice/in-pass rules; v2 rules documented in docs/sim/perf-port-meadow.md
+TOL_S = 0.050         # v2 false-wake label tolerance (was 10 ms before / 30 ms after)
+EXT_DET = 0.3         # v2: labels with det_prob >= 0.3 also excuse a wake (recall stays on >= 0.5 calls)
+SPLICE_S = 0.020      # v2: wakes within this of the scored-copy edges are loop-splice artefacts
+PASS_GAP = 0.5        # v2: labelled calls closer than this form one active pass
+LOW_DB = 10.0         # v2: a wake whose +-30 ms shows >= this many dB over the clip median in 15-25 or 25-40 kHz stays a false wake (unresolved: insect/low bat)
+LOWBAND = {}          # clip name -> (frame times, max(15-25k, 25-40k) level over clip median, dB)
+EXT = {}              # clip name -> [(start, end)] with det_prob >= EXT_DET
 HOP_S = 0.00064
 REPS = 3
 # pass/fail tolerances vs baseline (absolute): the firmware is deterministic, so these only absorb float/compiler drift
 TOL = {"wake_recall": 0.01, "sound_recall": 0.01, "false_wakes_per_min": 2.0, "false_awake_frac": 0.01,
        "latency_p50_ms": 0.7, "latency_p90_ms": 1.4, "level_p50_dbfs": 0.3, "level_max_dbfs": 0.3, "mean_ma": 0.02}
+
+
+def low_levels(y, fs):
+    f, t, Z = signal.stft(y, fs, nperseg=1024, noverlap=768)
+    P = np.abs(Z) ** 2 + 1e-30
+    lv = []
+    for lo, hi in ((15e3, 25e3), (25e3, 40e3)):
+        b = 10 * np.log10(P[(f >= lo) & (f < hi)].sum(axis=0))
+        lv.append(b - np.median(b))
+    return t, np.maximum(*lv)
 
 
 def load_clips(n):
@@ -73,11 +91,15 @@ def load_clips(n):
     for i in idx:
         d = dirs[i]
         fs, y = wavfile.read(d / "receiver_3.wav")
-        calls = []
+        calls, ext = [], []
         for line in (d / "events_3.csv").read_text().splitlines()[1:]:
             c = line.split(",")
-            if len(c) >= 4 and float(c[1]) >= 0.5:
-                calls.append((float(c[2]), float(c[3])))
+            if len(c) >= 4 and float(c[1]) >= EXT_DET:
+                ext.append((float(c[2]), float(c[3])))
+                if float(c[1]) >= 0.5:
+                    calls.append((float(c[2]), float(c[3])))
+        EXT[d.name] = ext
+        LOWBAND[d.name] = low_levels(y.astype(float) / 32768.0, fs)
         out.append((d.name, y.astype(float) / 32768.0, calls))
     return out
 
@@ -115,7 +137,18 @@ def episode_starts(calls, gap=0.5):
     return [t for i, t in enumerate(s) if i == 0 or t - calls[i - 1][1] >= gap]
 
 
-def score(r, calls, t0):
+def passes(calls, gap=PASS_GAP):
+    """Merge labelled calls into active passes [(start, end)] (gap < `gap` s joins)."""
+    out = []
+    for s_, e_ in sorted(calls):
+        if out and s_ - out[-1][1] < gap:
+            out[-1][1] = max(out[-1][1], e_)
+        else:
+            out.append([s_, e_])
+    return out
+
+
+def score(r, calls, t0, ext=None, low=None):
     n = len(r["mode"])
     t = (np.arange(n) + 1) * HOP_S                      # end of hop h
     a = (r["mode"] & 0xFF) != IDLE_ST
@@ -132,7 +165,29 @@ def score(r, calls, t0):
     wake = [bool(a[iv(s, s + 0.010)].any()) for s, _ in calls]
     sound = [bool(snd[iv(s, s + 0.030)].any()) for s, _ in calls]
     rise = np.nonzero(a[1:] & ~a[:-1])[0] + 1
-    fw_n = sum(not any(s - 0.010 <= tt[i] <= e + 0.030 for s, e in calls) for i in rise)
+    ext = calls if ext is None else ext
+    ps = passes(ext)
+    fw_n, fw_v1, ev = 0, 0, []
+    for i in rise:                                      # v1 rule kept as fw_v1; v2 rules applied in order tol -> splice -> in-pass
+        x = tt[i]
+        if any(s - 0.010 <= x <= e + 0.030 for s, e in calls):
+            continue
+        fw_v1 += 1
+        if low is not None and x >= SPLICE_S and x <= dur - SPLICE_S and low[1][(low[0] >= x - 0.03) & (low[0] <= x + 0.03)].max(initial=-99) >= LOW_DB:
+            why = "kept_lowband"
+            fw_n += 1
+        elif any(s - TOL_S <= x <= e + TOL_S for s, e in calls):
+            why = "tol50ms"
+        elif any(s - TOL_S <= x <= e + TOL_S for s, e in ext):
+            why = "det0.3"
+        elif x < SPLICE_S or x > dur - SPLICE_S:
+            why = "splice"
+        elif any(a0 - TOL_S <= x <= a1 + TOL_S for a0, a1 in ps):
+            why = "in_pass"
+        else:
+            why = "kept"
+            fw_n += 1
+        ev.append((round(float(x), 3), why))
     near = np.zeros(len(tt), bool)
     for s, e in calls:
         near |= iv(s - 0.05, e + 0.05)
@@ -147,7 +202,7 @@ def score(r, calls, t0):
     for s, _ in calls:
         m = pk[iv(s, s + 0.030)]
         lvl.append(20 * np.log10(max(float(m.max()) if len(m) else 0.0, 1e-6)))
-    return dict(dur=dur, calls=len(calls), wake=sum(wake), sound=sum(sound), fw=fw_n, fa_hops=int((a & ~near).sum()), hops=len(a),
+    return dict(dur=dur, calls=len(calls), wake=sum(wake), sound=sum(sound), fw=fw_n, fw_v1=fw_v1, fw_ev=ev, fa_hops=int((a & ~near).sum()), hops=len(a),
                 awake_hops=int(a.sum()), awake_sq_hops=int((a & sqf).sum()), sq_hops=int(sqf.sum()), rms_awake=float(rms[a].sum()), lat=lat, lvl=lvl)
 
 
@@ -171,16 +226,20 @@ def current(awake_frac, sq_frac_all, rms_counts, hiz, slim=False):
 def evaluate(n_clips):
     real, quiet = scenes(n_clips)
     out, ref_rms = {}, None
+    fwe = {c: [] for c in CONFIGS}
     for cfg, (knobs, loud) in CONFIGS.items():
-        t_ = dict(dur=0, calls=0, wake=0, sound=0, fw=0, fa_hops=0, hops=0, awake_hops=0, awake_sq_hops=0, sq_hops=0, rms_awake=0.0, lat=[], lvl=[])
-        for _, words, calls, t0 in real:
-            s = score(run_cfg(knobs, loud, words), calls, t0)
+        t_ = dict(dur=0, calls=0, wake=0, sound=0, fw=0, fw_v1=0, fw_ev=[], fa_hops=0, hops=0, awake_hops=0, awake_sq_hops=0, sq_hops=0, rms_awake=0.0, lat=[], lvl=[])
+        for nm, words, calls, t0 in real:
+            s = score(run_cfg(knobs, loud, words), calls, t0, EXT.get(nm), LOWBAND.get(nm))
             for k in t_:
                 t_[k] = t_[k] + s[k]
+            fwe[cfg] += [[nm, t, w] for t, w in s["fw_ev"]]
         q_fw, q_dur, q_aw, q_h = 0, 0.0, 0, 0
-        for _, words, _, t0 in quiet:
+        qs = {}
+        for nm, words, _, t0 in quiet:
             s = score(run_cfg(knobs, loud, words), [], t0)
             q_fw += s["fw"]; q_dur += s["dur"]; q_aw += s["awake_hops"]; q_h += s["hops"]
+            qs[nm] = round(s["fw"] / s["dur"] * 60, 2)
         L, V = np.array(t_["lat"] or [np.nan]), np.array(t_["lvl"])
         rms_mean = t_["rms_awake"] / max(t_["awake_hops"], 1)
         if cfg == "today":
@@ -188,7 +247,9 @@ def evaluate(n_clips):
         af = t_["awake_hops"] / t_["hops"]
         out[cfg] = {
             "wake_recall": round(t_["wake"] / t_["calls"], 4), "sound_recall": round(t_["sound"] / t_["calls"], 4),
-            "false_wakes_per_min": round(t_["fw"] / t_["dur"] * 60, 2), "false_awake_frac": round(t_["fa_hops"] / t_["hops"], 4),
+            "false_wakes_per_min": round(t_["fw"] / t_["dur"] * 60, 2),
+            "false_wakes_per_min_v1": round(t_["fw_v1"] / t_["dur"] * 60, 2),
+            "silence_false_wakes_per_min": qs["silence"], "house_walk_false_wakes_per_min": qs["house_walk"], "false_awake_frac": round(t_["fa_hops"] / t_["hops"], 4),
             "quiet_false_wakes_per_min": round(q_fw / q_dur * 60, 2), "quiet_awake_frac": round(q_aw / q_h, 4),
             "latency_p50_ms": round(float(np.nanmedian(L)), 2), "latency_p90_ms": round(float(np.nanpercentile(L, 90)), 2),
             "level_p50_dbfs": round(float(np.median(V)), 2), "level_max_dbfs": round(float(V.max()), 2),
@@ -196,7 +257,7 @@ def evaluate(n_clips):
     for cfg, o in out.items():
         o["mean_ma"] = round(current(o["awake_frac"], o.pop("_sqa"), o.pop("_rms"), "hiz" in cfg, cfg.startswith("slim")), 4)
     n_calls = t_["calls"]
-    return {"clips": len(real), "calls": n_calls, "audio_s": round(t_["dur"], 1), "configs": out}
+    return {"clips": len(real), "calls": n_calls, "audio_s": round(t_["dur"], 1), "configs": out, "scoring_version": SCORING_VERSION, "fw_events": fwe}
 
 
 def compare(new, base):
