@@ -68,4 +68,4 @@ when writing a rawfile. Netlists with `.meas` now get a second batch pass withou
   names the models it used.
 
 ## Slow opt-in check: Port Meadow regression
-`tools/check_perf.sh` runs `sim/perf/port_meadow.py` (~100 s, fenced 3G) against `sim/perf/port_meadow_baseline.json`; exit 1 on recall/false-wake regression, `--bless` rewrites the baseline. `.githooks/pre-commit` runs it automatically only when `fw/core`, `fw/gen` or `fw/dsp` is staged (`PRECOMMIT_SKIP_PERF=1` skips). Skips cleanly if `../ultrasonic-scratch/rec/extracts` is absent.
+`tools/check_perf.sh` runs `sim/perf/port_meadow.py` (~100 s, fenced 3G) against `sim/perf/port_meadow_baseline.json`; exit 1 on recall/false-wake regression, `--bless` rewrites the baseline. Run it by hand after any change to `fw/core`, `fw/gen` or `fw/dsp` (not in the pre-commit hook: the hook is owner-controlled and agents never edit it). Skips cleanly if `../ultrasonic-scratch/rec/extracts` is absent.

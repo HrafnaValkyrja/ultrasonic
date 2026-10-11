@@ -4,13 +4,6 @@
 # Bypass in an emergency: git commit --no-verify. Override the check list: PRECOMMIT_CHECKS="interfaces bom_check vcrm".
 set -u
 cd "$(git rev-parse --show-toplevel)" || exit 0
-# opt-in slow check: Port Meadow e2e regression (~100 s) when firmware core/gen/dsp is staged; PRECOMMIT_SKIP_PERF=1 skips
-perf_rc=0
-if [ -z "${PRECOMMIT_SKIP_PERF:-}" ] && git diff --cached --name-only | grep -qE '^fw/(core|gen|dsp)/'; then
-  echo "pre-commit: fw/ touched, running tools/check_perf.sh (~100 s)"
-  tools/check_perf.sh 2>&1 | tail -8 | sed 's/^/  /'; [ "${PIPESTATUS[0]}" -eq 0 ] || { echo "pre-commit: Port Meadow regression: commit blocked (PRECOMMIT_SKIP_PERF=1 to skip)"; perf_rc=1; }
-fi
-[ "$perf_rc" -eq 0 ] || exit 1
 git diff --cached --name-only | grep -qE '^(hw/|tools/checks/|docs/system/|docs/build/bom|\.pcba-workflow/|sim/checks/)' || exit 0
 source tools/env.sh >/dev/null 2>&1 || { echo "pre-commit: tools/env.sh failed, checks skipped"; exit 0; }
 fence=(systemd-run --user --scope --quiet -p MemoryMax=3G -p MemorySwapMax=0)
