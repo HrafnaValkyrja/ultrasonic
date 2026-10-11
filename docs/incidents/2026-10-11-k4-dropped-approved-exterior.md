@@ -43,3 +43,9 @@ prevention:
 Counts (exterior/look rulings): dropped 3 (O17, O29, v0.14 Night City/fin/trace), partly 3 (O11, O8, black colour), yes elsewhere.
 
 Not audited line-by-line: decisions-log.yaml (only one hit on audit grep) and the spec §12 A-Z task list; DIRECTION.md has no earlier ultrasonic look rulings beyond line 148.
+
+## Addendum (lead, 2026-10-11): decisions-log.yaml check
+- decisions-log.yaml line 32 / spec O34(a) (2026-10-08): she tapped **"K4 look on glasses: Approve"** in review packet 3. No K4 file imports the Spine/trace code (see root cause above), so that render most likely showed a plain K4 shell. Not verified: the packet artifact's image has not been re-checked.
+- If so, the packet asked her to approve a look that had already lost her approved exterior, and it never said so. Her approval covered K4's proportions (O34 b: taller 15.25 mm, 3.8 mm shorter), not dropping the Spine.
+- Prevention addition: any look/approval packet must list which approved exterior rulings (O11, O17, O29, Night City) are shown, and flag any that are missing.
+- Mask colour (decisions-log line 14: Black or Purple at order time) still stands; no K4 conflict.
