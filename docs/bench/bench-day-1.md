@@ -38,3 +38,7 @@ A (about 15 min) first, then the prints in C5 while epoxy cures, then B, then C1
 - B3 I-021 impedance sweep: `bench/rig/imp_sweep.py --load light --rs 10` (f0, Q; wiring in its docstring). Synthetic self-check recovers f0 within 3 %, Q within about 30 % (sweep noise); trust f0 drift more than absolute Q.
 - B4 I-022 force sweep: `bench/rig/force_sweep.py` (prompts per force step, gain vs 0 N).
 - I-028 2.5 vs 4 kHz A/B: `bench/rig/ab_2k5_4k.py --trials 20` (matched RMS, randomised, logged).
+
+## Shokz salvage test (separate, whenever the headset is ready)
+
+Tragus listening protocol, translated-call playlist and teardown sheet: [shokz/protocol.md](shokz/protocol.md), [shokz/teardown-sheet.md](shokz/teardown-sheet.md), WAVs in `shokz/playlist/` (rebuild: `shokz/make_playlist.py`). Qualitative only.
