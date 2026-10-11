@@ -66,7 +66,7 @@ free_NC: {2: PC13 (keep static, ES §2.2.1), 5: PH0, 6: PH1, 13: PA3 (ADC1_IN8; 
 ### Modes (D12 L218)
 | Mode | Clock / range / regulator | Mic | Bridge | MCU draw | src |
 |---|---|---|---|---|---|
-| Full / Transient-only, alg. B | P80, Range 2, SMPS 3 MHz | on | on | 2.3 / 2.7 / 3.2 mA + periph 0.6-0.8 | `sim/checks/power.py` L27-28 |
+| Full / Transient-only, alg. B | P112 (default knob clock_plan=4, ECR-0027; P80 legacy/legal = 0), Range 1, SMPS 3 MHz | on | on | 2.3 / 2.7 / 3.2 mA + periph 0.6-0.8 | `sim/checks/power.py` L27-28 |
 | same, alg. A | P48 (MSIS direct), Range 3 | on | on | ~1.3-1.8 mA | A3 §5 |
 | Idle listening (C9) | two plans (issue 4) | on | stopped | 0.5-1.0 mA (16 MHz run) or ~0.1 mA (Stop 2 + LPDMA) `[Low]` | power.py L39; A3 §1.3 |
 | Off | Stop 2 on SMPS (asynchronous) | unpowered | stopped | 3.90 / 4.25 (RTC on LSE) / 8.55 µA | DS Table 58 p.183 |

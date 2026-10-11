@@ -15,7 +15,7 @@ void test_app_loop(void)
     /* UCPD dead-battery release comes before any PWM configuration (ECR-0013, FWSIM-R41 rule) */
     int32_t i_ucpd = fake_log_find(FAKE_FN_hal_power_ucpd_dbdis, 0u), i_pwm = fake_log_find(FAKE_FN_hal_pwm_config, 0u);
     TF_CHECK(i_ucpd >= 0 && i_pwm > i_ucpd);
-    TF_CHECK_EQ(fake_pwm()->arr, 200);
+    TF_CHECK_EQ(fake_pwm()->arr, 280);   /* ECR-0027: default clock_plan P112, ARR = 112.012 MHz / 400 kHz */
     TF_CHECK_EQ(fake_pwm()->rcr, 1);
     TF_CHECK(fake_pwm()->dtg_rise >= 1u);
     int32_t hop[128] = {0};
@@ -30,8 +30,8 @@ void test_app_loop(void)
     size_t n;
     const uint16_t *c = fake_pwm_last(&n);
     TF_CHECK_EQ(n, 128);
-    TF_CHECK_EQ(c[0], 100);
-    TF_CHECK_EQ(c[127], 100);
+    TF_CHECK_EQ(c[0], 140);
+    TF_CHECK_EQ(c[127], 140);
     TF_CHECK_EQ(fake_calls(FAKE_FN_hal_adf_hop_release), 3);
     TF_CHECK(fake_wdt_kicks() >= 1u);
     /* VBUS edge -> event; power-on hold releases with injected time */

@@ -252,3 +252,6 @@ board: "34 x 13, parts on both faces; U3 (19.5, 3.0) B, U4 (24.2, 7.4) B, wire p
 rail_copper: "+3V0 as 0.1 mm tracks: U4.1 -> Q1.4 202.5 mΩ (~65 mV at 0.32 A), LF-2 (sim/noise smoke on sha e159bccb, 2026-10-02)"
 body: "cell under foam strips that overlapped it by 0.1 mm (shell_r1)"
 ```
+
+## ECR-0027 (2026-10-11): firmware default clock P112
+Firmware knob `clock_plan` default P80 -> P112 (variant B design clock; matches the MCU row of the current model, unchanged). Dense Port Meadow scene, shipping config A: mean 10.9119 mA (was 10.8151, +0.10 from finer CCR resolution), 10.13 h usable (130 mAh x 0.85; was 10.22). Loud-always-on stress: loud12 7.45 h, loud12+shape 5.56 h. src: sim/perf/port_meadow_baseline.json.

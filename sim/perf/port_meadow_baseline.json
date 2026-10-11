@@ -15,7 +15,7 @@
    "level_p50_dbfs": -34.22,
    "level_max_dbfs": -12.0,
    "awake_frac": 0.8148,
-   "mean_ma": 10.6346
+   "mean_ma": 10.6718
   },
   "A": {
    "wake_recall": 0.8538,
@@ -26,10 +26,10 @@
    "quiet_awake_frac": 0.0734,
    "latency_p50_ms": 90.06,
    "latency_p90_ms": 641.98,
-   "level_p50_dbfs": -34.24,
-   "level_max_dbfs": -3.36,
+   "level_p50_dbfs": -34.23,
+   "level_max_dbfs": -3.03,
    "awake_frac": 0.8148,
-   "mean_ma": 10.8151
+   "mean_ma": 10.9119
   },
   "A+loud4": {
    "wake_recall": 0.8538,
@@ -41,9 +41,9 @@
    "latency_p50_ms": 90.42,
    "latency_p90_ms": 640.88,
    "level_p50_dbfs": -30.23,
-   "level_max_dbfs": -2.98,
+   "level_max_dbfs": -2.59,
    "awake_frac": 0.8148,
-   "mean_ma": 11.4808
+   "mean_ma": 11.8191
   },
   "A+loud12": {
    "wake_recall": 0.8538,
@@ -54,10 +54,10 @@
    "quiet_awake_frac": 0.0734,
    "latency_p50_ms": 90.42,
    "latency_p90_ms": 640.88,
-   "level_p50_dbfs": -22.25,
-   "level_max_dbfs": -2.98,
+   "level_p50_dbfs": -22.22,
+   "level_max_dbfs": -2.59,
    "awake_frac": 0.8148,
-   "mean_ma": 13.6846
+   "mean_ma": 14.8254
   },
   "A+loud12+shape": {
    "wake_recall": 0.8538,
@@ -69,9 +69,9 @@
    "latency_p50_ms": 90.42,
    "latency_p90_ms": 640.88,
    "level_p50_dbfs": -14.3,
-   "level_max_dbfs": -2.98,
+   "level_max_dbfs": -2.59,
    "awake_frac": 0.8148,
-   "mean_ma": 17.3611
+   "mean_ma": 19.8605
   },
   "hiz_idle": {
    "wake_recall": 0.8538,
@@ -85,7 +85,7 @@
    "level_p50_dbfs": -34.22,
    "level_max_dbfs": -12.0,
    "awake_frac": 0.8148,
-   "mean_ma": 10.5492
+   "mean_ma": 10.5864
   }
  },
  "tolerances_abs": {
@@ -99,6 +99,5 @@
   "level_max_dbfs": 0.3,
   "mean_ma": 0.02
  },
- "runtime_s": 77.2,
- "_note": "Re-baselined 2026-10-08 after owner ruling D17 = A + L (fw default lim_lookahead 1, loud_db 12, loud OFF at boot): configs now pin lim_lookahead/loud_db explicitly; uniform +0.051 mA on every config vs the previous baseline is pre-existing drift (not from the D17 defaults), accepted."
+ "runtime_s": 112.2
 }

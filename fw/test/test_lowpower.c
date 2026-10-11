@@ -147,7 +147,7 @@ void test_volume_ticks(void)
             }
         }
         for (size_t j = 0; j < n; j++)
-            ccr_dev = fmax(ccr_dev, fabs(2.0 * ccr[j] / 200.0 - 1.0));
+            ccr_dev = fmax(ccr_dev, fabs(2.0 * ccr[j] / (double)st.arr - 1.0));
     }
     TF_CHECK_EQ(bursts, want);
     TF_CHECK(pk > 0.025f && pk < 0.04f);                          /* -30 dBFS = 0.0316 */

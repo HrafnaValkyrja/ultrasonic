@@ -12,6 +12,7 @@ static void init_with_khz(fw_state_t *st, int32_t khz)
 {
     fw_knobs_t k;
     fw_knobs_defaults(&k);
+    k.clock_plan = 0; /* these tests pin P80 arithmetic (ARR 200 at 200 kHz); ECR-0027 made P112 the default */
     TF_CHECK_EQ(fw_knob_set(&k, FW_KNOB_pwm_khz, khz), FW_KNOB_OK);
     fw_init(st, &k, 1000u);
 }

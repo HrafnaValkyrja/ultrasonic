@@ -273,7 +273,7 @@ void test_cdc_paths_clamp(void)
     size_t n;
     const uint16_t *c = fake_pwm_last(&n);
     for (size_t i = 0; i < n; i++)
-        worst = fmax(worst, fabs(2.0 * c[i] / 200.0 - 1.0));
+        worst = fmax(worst, fabs(2.0 * c[i] / (double)app.st.arr - 1.0));
     TF_CHECK(worst > 0.1 && worst <= ceil);
     uint8_t raw[5] = {0xA5u, 0x03u, 2u, 0xFFu, 0x7Fu};               /* full-scale bring-up drive */
     (void)fw_cdc_rx(&app.st, raw, sizeof raw, &rep, 1u);
@@ -281,7 +281,7 @@ void test_cdc_paths_clamp(void)
     app_run(&app, 4u);
     c = fake_pwm_last(&n);
     for (size_t i = 0; i < n; i++)
-        TF_CHECK(fabs(2.0 * c[i] / 200.0 - 1.0) <= amp_max + 1e-9);
+        TF_CHECK(fabs(2.0 * c[i] / (double)app.st.arr - 1.0) <= amp_max + 1e-9);
     TF_CHECK(app.st.clamp_hits > 0u);
 #endif
     /* fuzz: random frames in any state (both variants) */

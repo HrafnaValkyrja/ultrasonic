@@ -148,7 +148,7 @@ def score(r, calls, t0):
 
 
 BRIDGE_A_PER_UNIT = 0.327   # A per unit duty fraction (3.0 V into 8 ohm + FETs + 0.1 ohm; d17-cost.md, audibility-requirement.md l.7)
-CCR_HALF = 128.0            # counts per unit duty (today: 32 counts = peak 0.251); L filtering ignored, as in d17-cost.md
+CCR_HALF = 140.0            # counts per unit duty = ARR/2 at the default plan P112 (ARR 280; ECR-0027). Was 128 (pre-ECR-0027 P80 ARR 200 gave 100: overstated drive by 1.28x)
 BRIDGE_IDLE_MA = 0.45       # bridge keeps switching 50 % while squelched (D-hiz-idle.md s1); SPICE ripple, hiz_idle removes it
 
 

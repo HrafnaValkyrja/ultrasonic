@@ -696,3 +696,8 @@
 - 2026-10-08 22:53 checkout SPEC by claude-worker: clear stale after D17 spec edit
 - 2026-10-08 22:53 checkin SPEC by claude-worker
 - 2026-10-08 22:53 review SPEC by claude-worker: D17 = A+L ruling already in spec §D17 (71e376f); reviewed against sub-output/loudness docs
+- 2026-10-11 07:19 ECR-0027 raised by claude: clock_plan default P80 -> P112 for variant B
+- 2026-10-11 07:19 checkout SUB-PROCESSING by claude: ECR-0027 clock_plan default P112
+- 2026-10-11 07:19 checkout SUB-POWER by claude: ECR-0027 clock_plan default P112
+- 2026-10-11 07:19 checkin SUB-PROCESSING by claude
+- 2026-10-11 07:19 checkin SUB-POWER by claude

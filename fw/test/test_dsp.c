@@ -11,6 +11,7 @@ static void init_k(fw_state_t *st, int32_t algo, int32_t bvar, int32_t khz, int3
 {
     fw_knobs_t k;
     fw_knobs_defaults(&k);
+    k.clock_plan = 0; /* P80 arithmetic pinned (ARR 200); ECR-0027 default is P112 */
     TF_CHECK_EQ(fw_knob_set(&k, FW_KNOB_algo, algo), FW_KNOB_OK);
     TF_CHECK_EQ(fw_knob_set(&k, FW_KNOB_b_variant, bvar), FW_KNOB_OK);
     TF_CHECK_EQ(fw_knob_set(&k, FW_KNOB_pwm_khz, khz), FW_KNOB_OK);
