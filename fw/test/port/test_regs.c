@@ -88,6 +88,17 @@ int main(int argc, char **argv)
     CHECK(rf_find(T(TIM_CCER), m) > (int32_t)m);
     CHECK(((reg_read(GA + GPIO_MODER) >> 16) & 3u) == 3u && ((reg_read(GA + GPIO_MODER) >> 14) & 3u) == 3u);
     CHECK(((reg_read(GA + GPIO_MODER) >> 20) & 3u) == 3u && ((reg_read(GB + GPIO_MODER) >> 30) & 3u) == 3u);
+    /* hiz_idle re-enable (alt-hiz-idle.md 3c): start after stop must put all four bridge pins back on the TIM1 AF, AFR before MODER */
+    {
+        m = rf_nlog();
+        CHECK(hal_pwm_start() == HAL_OK);
+        CHECK((reg_read(GA + GPIO_AFRH) & 0xFu) == 1u && ((reg_read(GA + GPIO_AFRH) >> 8) & 0xFu) == 1u);   /* PA8, PA10 AF1 TIM1 */
+        CHECK(((reg_read(GA + GPIO_MODER) >> 16) & 3u) == 2u && ((reg_read(GA + GPIO_MODER) >> 14) & 3u) == 2u);
+        CHECK(((reg_read(GA + GPIO_MODER) >> 20) & 3u) == 2u && ((reg_read(GB + GPIO_MODER) >> 30) & 3u) == 2u);
+        CHECK(rf_find(T(TIM_BDTR), m) > rf_find(GA + GPIO_MODER, m));   /* pins muxed before MOE */
+        hal_pwm_stop();
+        CHECK(((reg_read(GA + GPIO_MODER) >> 16) & 3u) == 3u);
+    }
 
     /* ---- I2C2 (charger, 100 kHz from HSI16): clock + pins + timing, write and read transactions, NACK, timeout */
     rf_reset();

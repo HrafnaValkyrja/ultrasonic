@@ -89,6 +89,11 @@ hal_status_t hal_pwm_start(void)
         return HAL_EINVAL;
     if (REG_R(T(TIM_SR)) & (1u << 7))
         return HAL_BUSY;                                         /* break latched (BIF): MOE would be refused */
+    /* restore the TIM1 AF on the four bridge pins: hal_pwm_stop leaves them analog (hiz_idle, I-027). RM0456 Rev 7 sec. GPIO: AFR before
+     * MODER (hal_gpio_mode does this); with MOE = 0 and OSSI = 1 the pins are driven to the idle level (low) as soon as they are AF, so no glitch */
+    if (hal_gpio_mode(BOARD_PIN_GA_P, HAL_GPIO_AF) != HAL_OK || hal_gpio_mode(BOARD_PIN_GA_N, HAL_GPIO_AF) != HAL_OK ||
+        hal_gpio_mode(BOARD_PIN_GB_P, HAL_GPIO_AF) != HAL_OK || hal_gpio_mode(BOARD_PIN_GB_N, HAL_GPIO_AF) != HAL_OK)
+        return HAL_EINVAL;
     REG_W(T(TIM_CCR1), pwm_arr / 2u);                            /* centre (zero differential) preloaded on both legs */
     REG_W(T(TIM_CCR3), pwm_arr / 2u);
     REG_W(T(TIM_EGR), 1u);                                       /* UG: load ARR/CCR preloads */
