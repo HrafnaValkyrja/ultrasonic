@@ -7,8 +7,8 @@
 # Coverage: the knobs_required ids of docs/sim/firmware-emulation.yaml that the foundation needs; the rest are added with their
 # feature (FWSIM-R6 status lists them). Adding, removing or retyping a knob bumps `version` (stored records then load as defaults + event).
 schema: 1
-version: 5
-updated: 2026-10-08   # v5: alert tone + look-ahead limiter (loudness proof); v4: idle detector, ticks, LED; v3: ui/fsm/charger/break knobs, ts_hot_code fixed to 45 C; v2: DSP knobs (b_variant, transient_only, volume_cdb, noise_margin_cdb, a_lo_hz, limiter_release_ms); squelch_hold_ms default 20
+version: 6
+updated: 2026-10-11   # v6: thermal fold-back knobs (off); v5: alert tone + look-ahead limiter (loudness proof); v4: idle detector, ticks, LED; v3: ui/fsm/charger/break knobs, ts_hot_code fixed to 45 C; v2: DSP knobs (b_variant, transient_only, volume_cdb, noise_margin_cdb, a_lo_hz, limiter_release_ms); squelch_hold_ms default 20
 assumed: "assumed (no source yet; FWSIM knobs_required lists the id only)"
 
 hard_clamps:
@@ -98,6 +98,9 @@ knobs:
   - {id: loud_db, def: 12, min: 0, max: 12, unit: dB, src: "D17 loud mode (issue #2, rec A+X+L): pre-limiter drive gain applied while the user toggle is on; 0 = feature OFF (no toggle, bit-identical to legacy). Toggle = HOLD2 in gesture option A, TRIPLE press in option B (the 2 s hold already means Off there); option C has none (HOLD2 = Off, short = immediate toggle). Armed triple delays B's double by one extra double_window_ms only while loud_db > 0. Output still bounded by the limiter and the FWSIM-R64 clamp. Default 12 (owner ruled D17 = A + L, 2026-10-08): the toggle is live; loud mode itself is OFF at boot"}
   - {id: loud_shape, def: 0, min: 0, max: 1, unit: bool, src: "I-034 (docs/brainstorm/D-r6-crest.md, 2026-10-08): 1 = tanh soft flat-top ahead of the look-ahead limiter, only while loud mode is on (S = ceiling x loud gain; +2.2 dB per call median at k=2.5, x1.74 mean current, offline model). 0 = bit-identical. Default 0 (owner decides with D17)"}
   - {id: loud_shape_k, def: 25, min: 5, max: 120, unit: x0.1, src: "I-034: flat-top drive k in tenths (25 = tanh k 2.5; table of 65 points, linear interpolation); only read when loud_shape = 1"}
+  - {id: thermal_fb, def: 0, min: 0, max: 1, unit: bool, src: "docs/sim/alt-thermal-loud.md (2026-10-11): 1 = thermal fold-back, loud gain ramps to 0 dB as the leaky mean of the clipped drive exceeds thermal_thr_pm (duty-integral proxy for exciter mA / shell heat); 0 = bit-identical. Default 0 (prototype, owner decides)"}
+  - {id: thermal_tau_s, def: 120, min: 10, max: 600, unit: s, src: "assumed shell/board thermal time constant, same order as the 21 min charge peak in docs/proof/thermal/README.md (ASSUMED, no Zth published); only read when thermal_fb = 1"}
+  - {id: thermal_thr_pm, def: 70, min: 10, max: 300, unit: permille, src: "mean clipped drive / ceiling at which fold-back starts; 70 permille ~ 14.5 mA mean exciter (dense programme, d17-cost.md) at the 208 mA clamp; gain reaches 0 dB at 2x this"}
   - {id: alert_hz, def: 2500, min: 500, max: 4000, unit: Hz, src: "loudness.md fix 1a: sensation level peaks at 2-3 kHz (Surendran 2023 front-of-tragus threshold min 29.5 dB at 2.5 kHz); legacy 1000 Hz"}
   - {id: alert_cdb, def: 0, min: -4000, max: 0, unit: cdBFS, src: "alert tone peak before the limiter (0 = full scale; the limiter/clamp sets the real ceiling)"}
   - {id: alert_ms, def: 300, min: 50, max: 2000, unit: ms, src: "alert length including the 10 ms raised-cosine ramps (assumed)"}

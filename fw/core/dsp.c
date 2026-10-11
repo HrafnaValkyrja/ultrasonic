@@ -165,6 +165,10 @@ void fw_dsp_init(fw_dsp_t *d, const fw_knobs_t *k, uint32_t arr, uint32_t reps)
         d->lim_c = amp > 0.01f ? amp : 0.01f;   /* per-carrier: true peak + excursion stays under the clamp */
         fw_lahead_init(&d->la, d->lim_c, (uint32_t)k->lim_knee_pct, d->lim_rel);
     }
+    d->th_on = (k->thermal_fb && k->loud_db) ? 1u : 0u;
+    d->th_s = 0.0f;
+    d->th_a = 8.0f / (FS_OUT_HZ * (float)k->thermal_tau_s);
+    d->th_thr = (float)k->thermal_thr_pm * 1e-3f;
     d->shape_s = d->lim_c * d->loud_lin;                 /* flat-top full scale = ceiling x loud gain */
     d->shape_inv_s = 1.0f / d->shape_s;
     d->lim_g = 1.0f;
@@ -603,8 +607,14 @@ NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8_in[8], uint32_t force_squelc
     const float *y8 = y8_in;
     float yd[8];
     if (d->loud_on) {                     /* D17 loud mode: drive gain ahead of the limiter; limiter + R64 clamp still bound the output */
+        float gl = d->loud_lin;
+        if (d->th_on) {                   /* thermal fold-back: ramp loud gain to 1 as the duty integral goes thr -> 2 thr */
+            float f = 2.0f - d->th_s / d->th_thr;
+            f = f < 0.0f ? 0.0f : (f > 1.0f ? 1.0f : f);
+            gl = 1.0f + (gl - 1.0f) * f;
+        }
         for (uint32_t i = 0; i < 8u; i++)
-            yd[i] = y8_in[i] * d->loud_lin;
+            yd[i] = y8_in[i] * gl;
         if (d->shape_on) {                /* I-034 flat-top: odd tanh curve via table, |x| >= S -> S; the limiter after it keeps the bound */
             for (uint32_t i = 0; i < 8u; i++) {
                 float u = fabsf(yd[i]) * d->shape_inv_s * 64.0f;
@@ -622,6 +632,14 @@ NOINL size_t fw_dsp_out(fw_dsp_t *d, const float y8_in[8], uint32_t force_squelc
         }
         y8_in = yd;
         y8 = yd;
+    }
+    if (d->th_on) {                       /* duty integral: mean |drive| clipped at the ceiling, per hop, one-pole tau thermal_tau_s */
+        float m = 0.0f;
+        for (uint32_t i = 0; i < 8u; i++) {
+            float a = fabsf(y8_in[i]);
+            m += a > d->lim_c ? d->lim_c : a;
+        }
+        d->th_s += d->th_a * (m * (0.125f / d->lim_c) - d->th_s);
     }
     if (d->la_on) {
         fw_lahead_hop(&d->la, y8_in, yl);

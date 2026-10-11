@@ -476,3 +476,46 @@ void test_loud_shape(void)
     }
     (void)rm1;
 }
+
+/* ---- thermal fold-back (docs/sim/alt-thermal-loud.md): default off = bit-identical; on = loud gain ramps down under sustained drive ---- */
+static float therm_run(int fb, uint32_t hops, float *early_o, float *late_o)
+{
+    fw_knobs_t k;
+    fw_knobs_defaults(&k);
+    fw_knob_set(&k, FW_KNOB_loud_db, 12);
+    fw_knob_set(&k, FW_KNOB_thermal_fb, fb);
+    fw_knob_set(&k, FW_KNOB_thermal_tau_s, 10);
+    fw_dsp_t d;
+    fw_dsp_init(&d, &k, 200u, 1u);
+    fw_dsp_set_loud(&d, 1u);
+    fw_ccr_bounds_t b = fw_ccr_bounds(200u, fw_out_amp_max_ppm(&k));
+    uint16_t ccr[FW_CCR_MAX_PER_HOP];
+    fw_out_info_t oi;
+    double e = 0, l = 0, sum = 0;
+    for (uint32_t h = 0; h < hops; h++) {
+        float y[8];
+        for (int i = 0; i < 8; i++) y[i] = 0.1f * sinf(0.7f * (float)(h * 8u + (uint32_t)i));
+        size_t n = fw_dsp_out(&d, y, 0u, &b, ccr, &oi);
+        double a = 0;
+        for (size_t j = 0; j < n; j++) a += fabs(2.0 * ccr[j] / 200.0 - 1.0);
+        a /= (double)n;
+        sum += a;
+        if (h >= 2000u && h < 4000u) e += a;
+        if (h >= hops - 2000u) l += a;
+    }
+    *early_o = (float)(e / 2000.0); *late_o = (float)(l / 2000.0);
+    return (float)(sum / hops);
+}
+
+void test_thermal_fold(void)
+{
+    fw_knobs_t k;
+    fw_knobs_defaults(&k);
+    TF_CHECK_EQ(k.thermal_fb, 0);                                    /* default OFF */
+    float e0, l0, e1, l1;
+    therm_run(0, 60000u, &e0, &l0);
+    therm_run(1, 60000u, &e1, &l1);
+    TF_CHECK(fabsf(l0 - e0) < 0.01f * e0);                           /* off: steady */
+    TF_CHECK(fabsf(e1 - e0) < 0.15f * e0);                           /* on: first seconds unchanged (tau 10 s = 15600 hops) */
+    TF_CHECK(l1 < 0.6f * l0);                                        /* on: sustained drive folded back after ~4 tau */
+}

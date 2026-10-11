@@ -57,6 +57,7 @@ typedef struct {
     uint32_t dither, sq_quiet;
     float loud_lin; uint32_t loud_on;             /* knob loud_db: pre-limiter drive gain, applied only while loud_on (user toggle) */
     uint32_t shape_on; float shape_s, shape_inv_s, shape_lut[65];   /* knob loud_shape: tanh flat-top ahead of the limiter (loud mode only) */
+    uint32_t th_on; float th_s, th_a, th_thr;     /* knob thermal_fb: leaky mean of clipped drive, fold-back above th_thr */
     uint32_t la_on;                               /* knob lim_lookahead: look-ahead soft-knee limiter ahead of the interpolator */
     fw_lahead_t la;
 } fw_dsp_t;
